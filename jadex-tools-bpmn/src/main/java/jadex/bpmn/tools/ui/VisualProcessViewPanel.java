@@ -7,6 +7,7 @@ import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.ZoomSlider;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MBpmnModel;
@@ -36,9 +37,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -49,7 +48,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+
+import com.mxgraph.model.mxICell;
+import com.mxgraph.swing.handler.mxConnectionHandler;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 /**
  * 
@@ -107,7 +114,10 @@ public class VisualProcessViewPanel extends JPanel
 			
 			String filename = access.getModel().getFilename();
 			BpmnStylesheetSelections sheet = new BpmnStylesheetSelections();
-			BpmnGraph graph = new BpmnGraph(modelcontainer, sheet);
+			final BpmnGraph graph = new BpmnGraph(modelcontainer, sheet);
+			graph.setCellsMovable(false);
+			graph.setCellsResizable(false);
+			graph.setCellsLocked(true);
 			BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph)
 			{
 				public VActivity createActivity() 
@@ -188,7 +198,14 @@ public class VisualProcessViewPanel extends JPanel
 			modelcontainer.setBpmnModel(mmodel);
 			modelcontainer.setGraph(graph);
 			modelcontainer.setFile(new File(filename));
-			BpmnGraphComponent bpmncomp = new BpmnGraphComponent(graph);
+			BpmnGraphComponent bpmncomp = new BpmnGraphComponent(graph)
+			{
+				// Do not allow connection drawing
+				protected mxConnectionHandler createConnectionHandler()
+				{
+					return null;
+				}
+			};
 			JPanel bpmnpan = new JPanel(new BorderLayout());
 			bpmnpan.add(bpmncomp, BorderLayout.CENTER);
 			
@@ -206,7 +223,31 @@ public class VisualProcessViewPanel extends JPanel
 			graph.getView().setScale(GuiConstants.DEFAULT_ZOOM);
 			
 			bpmncomp.init(modelcontainer);
-//			modelcontainer.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
+			modelcontainer.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, new mxIEventListener()
+			{
+				public void invoke(Object sender, mxEventObject evt)
+				{
+					VElement elem = (VElement)modelcontainer.getGraph().getSelectionCell();
+					if(elem!=null)
+					{
+						String id = elem.getBpmnElement().getId();
+						boolean set = false;
+						for(int row=0; row<threads.getModel().getRowCount() && !set; row++)
+						{
+							ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
+							if(pti.getActId().equals(id))
+							{
+								threads.setRowSelectionInterval(row, row);
+								set = true;
+							}
+						}
+						if(!set)
+						{
+							threads.clearSelection();
+						}
+					}
+				}
+			});
 			modelcontainer.getGraphComponent().refresh();
 			
 			TableSorter sorter = new TableSorter(ptmodel);
@@ -218,7 +259,56 @@ public class VisualProcessViewPanel extends JPanel
 			threads.setTableHeader(header);
 			threads.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			sorter.setTableHeader(header);
-			threads.getColumnModel().setColumnMargin(10);
+//			threads.getColumnModel().setColumnMargin(10);
+		    threads.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		    {
+		        public void valueChanged(ListSelectionEvent e)
+		        {
+		        	int vrow = threads.getSelectedRow();
+		        	if(vrow!=-1)
+		        	{
+		        		int row = threads.convertRowIndexToModel(vrow);
+		        		ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
+		        		mxICell cell = (mxICell)graph.getModel().getRoot();
+		        		VElement elem = getVElement(cell, pti.getActId());
+		        		if(elem!=null)
+		        		{
+		        			graph.setEventsEnabled(false);
+		        			graph.setSelectionCell(elem);
+		        			graph.setEventsEnabled(true);
+		        		}
+		        	}
+		        }
+		        
+		        /**
+		         *  Find the velement of the graph that fits to the bpmn id.
+		         *  @param cell The start cell.
+		         *  @param actid The activity id.
+		         *  @return The element.
+		         */
+		        protected VElement getVElement(mxICell cell, String actid)
+		        {
+		        	VElement ret = null;
+		        	if(cell instanceof VElement)
+	        		{
+	        			VElement ve = (VElement)cell;
+	        			if(ve.getBpmnElement()!=null && ve.getBpmnElement().getId().equals(actid))
+	        			{
+	        				ret = ve;
+	        			}
+	        		}
+		        	
+		        	if(ret==null)
+		        	{
+		        		for(int i=0; i<cell.getChildCount() && ret==null; i++)
+		        		{
+		        			ret = getVElement(cell.getChildAt(i), actid);
+		        		}
+		        	}
+		        	
+		        	return ret;
+		        }
+		    });
 	
 			sorter = new TableSorter(hmodel);
 			this.history = new JTable(sorter);
@@ -228,7 +318,7 @@ public class VisualProcessViewPanel extends JPanel
 			history.setTableHeader(header);
 			history.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			sorter.setTableHeader(header);
-			history.getColumnModel().setColumnMargin(10);
+//			history.getColumnModel().setColumnMargin(10);
 			
 			final JCheckBox hon = new JCheckBox("Store History");
 			hon.setSelected(true);
@@ -325,7 +415,7 @@ public class VisualProcessViewPanel extends JPanel
 			buts.add(hon);
 			buts.add(clear);
 			historyp.add(buts, BorderLayout.SOUTH);
-	
+
 			JSplitPanel tmp2 = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 			tmp2.add(bpmnpan);
 			tmp2.add(procp);
@@ -363,6 +453,14 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected void	updateViews()
 	{
+		ProcessThreadInfo sel = null;
+		int vrow = threads.getSelectedRow();
+		if(vrow!=-1)
+		{
+			int row = threads.convertRowIndexToModel(vrow);
+			sel = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
+		}
+		
 		ptmodel.fireTableDataChanged();
 		hmodel.fireTableDataChanged();
 //		if(ptmodel.getRowCount()>0)
@@ -372,14 +470,29 @@ public class VisualProcessViewPanel extends JPanel
 		threads.repaint();
 		history.repaint();
 		
+		if(sel!=null)
+		{
+			for(int row=0; row<threads.getModel().getRowCount(); row++)
+			{
+				ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
+				if(sel.equals(pti))
+				{
+					threads.setRowSelectionInterval(row, row);
+					break;
+				}
+			}
+		}
+		
 		if(bpp!=null)
 		{
-			List	sel_bps	= new ArrayList();
-			for(Iterator it=threadinfos.iterator(); it.hasNext(); )
+			List<String> sel_bps = new ArrayList<String>();
+			for(Iterator<ProcessThreadInfo> it=threadinfos.iterator(); it.hasNext(); )
 			{
-				ProcessThreadInfo	info	= (ProcessThreadInfo)it.next();
+				ProcessThreadInfo info = it.next();
 				if(info.getActivity()!=null)
+				{
 					sel_bps.add(info.getActivity());
+				}
 			}
 			bpp.setSelectedBreakpoints((String[])sel_bps.toArray(new String[sel_bps.size()]));
 		}
