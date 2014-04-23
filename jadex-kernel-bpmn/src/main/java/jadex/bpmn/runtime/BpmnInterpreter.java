@@ -666,34 +666,40 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
         
         // Search and add trigger activity for event processes (that have trigger event in a subprocess)
         List<MActivity> startacts = new ArrayList<MActivity>();
+        boolean found = false;
         if(getConfiguration()!=null)
         {
         	List<MNamedIdElement> elems = bpmnmodel.getStartElements(getConfiguration());
-        	for(MNamedIdElement elem: elems)
+        	if(elems!=null && !elems.isEmpty())
         	{
-        		if(elem instanceof MActivity)
-        		{
-        			startacts.add((MActivity)elem);
-        		}
-        		else if(elem instanceof MPool)
-        		{
-        			startacts.addAll(bpmnmodel.getStartActivities(elem.getName(), null));
-        		}
-        		else if(elem instanceof MLane)
-        		{
-        			MLane lane = (MLane)elem;
-        			
-        			MIdElement tmp = lane;
-        			for(; tmp!=null && !(tmp instanceof MPool); tmp = bpmnmodel.getParent(tmp))
-        			{
-        			}
-        			String poolname = tmp==null? null: ((MPool)tmp).getName();
-        			
-          			startacts.addAll(bpmnmodel.getStartActivities(poolname, elem.getName()));
-        		}
+        		found = true;
+        		for(MNamedIdElement elem: elems)
+	        	{
+	        		if(elem instanceof MActivity)
+	        		{
+	        			startacts.add((MActivity)elem);
+	        		}
+	        		else if(elem instanceof MPool)
+	        		{
+	        			startacts.addAll(bpmnmodel.getStartActivities(elem.getName(), null));
+	        		}
+	        		else if(elem instanceof MLane)
+	        		{
+	        			MLane lane = (MLane)elem;
+	        			
+	        			MIdElement tmp = lane;
+	        			for(; tmp!=null && !(tmp instanceof MPool); tmp = bpmnmodel.getParent(tmp))
+	        			{
+	        			}
+	        			String poolname = tmp==null? null: ((MPool)tmp).getName();
+	        			
+	          			startacts.addAll(bpmnmodel.getStartActivities(poolname, elem.getName()));
+	        		}
+	        	}
         	}
         }
-        else
+        
+        if(!found)
         {
         	startacts = bpmnmodel.getStartActivities();
         }

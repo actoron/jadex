@@ -911,6 +911,9 @@ public class ModelContainer implements IModelContainer
 	 */
 	public void generateClassLoader()
 	{
+		if(settings==null)
+			return;
+		
 		ClassLoader parent = settings.getLibraryClassLoader();
 		if(parent == null)
 		{
