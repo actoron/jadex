@@ -22,14 +22,14 @@
 				<exclude>*:*-management</exclude>
 				<!-- Exclude maven dependency manager. -->
 				<exclude>*:*-maven</exclude>
+				<!-- Exclude servlet filter -->
+				<exclude>*:*-servletfilter-*</exclude>
 				<!-- Exclude JMonkey support from normal dist to save space. -->
 				<exclude>*:*-jmonkey</exclude>
 				<!-- Exclude launch.jar to avoid optional dependencies being copied to lib. launch.jar is copied manually later. -->
 				<exclude>*:*-launch</exclude>
 				<!-- Don't place .war files in distro. Can be downloaded separately -->
 				<exclude>*:*-web</exclude>
-				<!-- Exclude all jadex pro modules -->
-				<exclude>*:*-pro</exclude>
 				<!-- Exclude all maven distribution modules -->
 				<exclude>*:*-distribution-*</exclude>
 				<!-- Exclude all webservice modules -->

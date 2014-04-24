@@ -2396,7 +2396,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	
 	protected class ConfigComboBox extends JPanel
 	{
-		protected JComboBox<String> combobox;
+		protected JComboBox combobox;
 		
 		public ConfigComboBox(ConfigurationModel model, final AbstractTableModel tmodel)
 		{
@@ -2404,7 +2404,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			JLabel label = new JLabel("Configuration");
 			GridBagConstraints gc = new GridBagConstraints();
 			add(label, gc);
-			combobox = new JComboBox<String>(model);
+			combobox = new JComboBox(model);
 			combobox.setMinimumSize(new Dimension(200, (int) combobox.getMinimumSize().getHeight()));
 			gc = new GridBagConstraints();
 			gc.gridx = 1;

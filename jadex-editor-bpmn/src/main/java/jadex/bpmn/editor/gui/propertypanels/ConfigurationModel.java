@@ -10,7 +10,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-public class ConfigurationModel implements ComboBoxModel<String>
+public class ConfigurationModel implements ComboBoxModel
 {
 	/** Listeners. */
 	protected List<ListDataListener> listeners;

@@ -48,7 +48,7 @@ public class SettingsPanel extends JPanel
 	protected List<File> libentries;
 	
 	/** Look and feel box. */
-	protected JComboBox<String> lookandfeelbox;
+	protected JComboBox lookandfeelbox;
 	
 	/** Smooth zoom box. */
 	protected JCheckBox szbox;
@@ -350,7 +350,7 @@ public class SettingsPanel extends JPanel
 		g.fill = GridBagConstraints.VERTICAL;
 		cppanel.add(new JPanel(), g);
 		
-		lookandfeelbox = new JComboBox<String>(BpmnEditor.LOOK_AND_FEELS.keySet().toArray(new String[0]));
+		lookandfeelbox = new JComboBox(BpmnEditor.LOOK_AND_FEELS.keySet().toArray(new String[0]));
 		lookandfeelbox.setEditable(false);
 		lookandfeelbox.setSelectedItem(settings.getLfName());
 		lookandfeelbox.addActionListener(changeaction);

@@ -21,7 +21,9 @@
 				<exclude>*:*-management</exclude>
 				<!-- Exclude maven dependency manager. -->
 				<exclude>*:*-maven</exclude>
-			    <!-- Exclude JMonkey support from normal dist to save space. -->
+				<!-- Exclude servlet filter -->
+				<exclude>*:*-servletfilter-*</exclude>
+				<!-- Exclude JMonkey support from normal dist to save space. -->
 				<exclude>*:*-jmonkey</exclude>
 				<!-- Exclude distribution pro module -->
 				<exclude>*:*-distribution-pro</exclude>
