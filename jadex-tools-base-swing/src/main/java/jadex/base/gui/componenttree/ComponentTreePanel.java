@@ -377,9 +377,9 @@ public class ComponentTreePanel extends JSplitPane
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 
 						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
-						cms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+						cms.stepComponent(cid, null).addResultListener(new SwingDefaultResultListener<Void>(ComponentTreePanel.this)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(Void result)
 							{
 								// Required for remote nodes.
 								sel.refresh(false);

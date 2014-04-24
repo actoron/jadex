@@ -436,6 +436,15 @@ public class MicroAgentViewPanel extends JPanel
 	//-------- methods --------
 	
 	/**
+	 *  Get the step info. Help to decide which component step to perform next.
+	 *  @return Step info for debugging.
+	 */
+	public String getStepInfo()
+	{
+		return null;
+	}
+	
+	/**
 	 *  Dispose the panel and remove any listeners.
 	 */
 	public void	dispose()

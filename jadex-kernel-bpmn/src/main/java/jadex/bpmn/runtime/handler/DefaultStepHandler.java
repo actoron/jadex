@@ -123,7 +123,7 @@ public class DefaultStepHandler implements IStepHandler
 //							}
 							
 							// Java-style "first matching handler" behavior
-							if (handler.getClazz() == null || SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()), ex.getClass()))
+							if(handler.getClazz() == null || SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()), ex.getClass()))
 							{
 								next = handler;
 								break;
@@ -233,10 +233,18 @@ public class DefaultStepHandler implements IStepHandler
 		if(next instanceof MSequenceEdge)
 		{
 			thread.setLastEdge((MSequenceEdge)next);
+			if(thread.getActivity()!=null && instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			{
+				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+			}
 		}
 		else if(next instanceof MActivity)
 		{
 			thread.setActivity((MActivity)next);
+			if(thread.getActivity()!=null && instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			{
+				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+			}
 		}
 		else if(next==null)
 		{

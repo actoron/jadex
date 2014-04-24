@@ -1280,7 +1280,7 @@ public class ProcessThread	implements ITaskContext
 		{
 			for(Iterator<ProcessThread> it=getSubthreads().iterator(); ret==null && it.hasNext(); )
 			{
-				ProcessThread thread = (ProcessThread)it.next();
+				ProcessThread thread = it.next();
 				
 				if(thread.getSubthreads()!=null)
 				{
@@ -1289,6 +1289,33 @@ public class ProcessThread	implements ITaskContext
 				else if(!thread.isWaiting() && thread.belongsTo(pool, lane))
 				{
 					ret	= thread;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get a thread per id.
+	 *  @param id The thread id.
+	 *  @return The process thread.
+	 */
+	protected ProcessThread getThread(String id)
+	{
+		ProcessThread ret = null;
+		if(getId().equals(id))
+		{
+			ret = this;
+		}
+		else if(getSubthreads()!=null)
+		{
+			for(Iterator<ProcessThread> it=getSubthreads().iterator(); ret==null && it.hasNext(); )
+			{
+				ProcessThread thread = it.next();
+				ret = thread.getThread(id);
+				if(ret!=null)
+				{
+					break;
 				}
 			}
 		}

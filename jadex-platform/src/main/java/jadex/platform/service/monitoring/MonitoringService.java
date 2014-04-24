@@ -70,7 +70,7 @@ public class MonitoringService implements IMonitoringService
 //				boolean trgjadex = tn.indexOf("jadex.bridge")!=-1;
 				
 //				boolean ret =  sn==null || tn.indexOf("jadex.bridge")!=-1;
-//					(tn.indexOf("DecoupledComponentManagementService")==-1
+//					(tn.indexOf("ComponentManagementService")==-1
 //					&& tn.indexOf("LibraryService")==-1
 //					&& tn.indexOf("MonitoringService")==-1);
 				return true;

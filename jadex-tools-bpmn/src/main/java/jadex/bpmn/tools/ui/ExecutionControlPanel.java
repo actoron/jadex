@@ -23,9 +23,6 @@ import javax.swing.SwingUtilities;
  */
 public class ExecutionControlPanel extends JPanel
 {
-	//-------- attributes --------
-	
-
 	//-------- constructors --------
 	
 	/**

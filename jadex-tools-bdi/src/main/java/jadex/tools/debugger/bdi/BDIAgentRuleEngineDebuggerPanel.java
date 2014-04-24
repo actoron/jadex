@@ -105,6 +105,15 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 	{
 		return "Show the rule engine.";
 	}
+	
+	/**
+	 *  Get the step info. Help to decide which component step to perform next.
+	 *  @return Step info for debugging.
+	 */
+	public String getStepInfo()
+	{
+		return null;
+	}
 
 	/**
 	 *  Dispose the component.

@@ -18,14 +18,14 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
-import jadex.platform.service.cms.DecoupledComponentManagementService;
+import jadex.platform.service.cms.ComponentManagementService;
 import jadex.platform.service.cms.StandaloneComponentAdapter;
 
 /**
  *  CMS with additional persistence functionality.
  */
 @Service
-public class PersistenceComponentManagementService	extends DecoupledComponentManagementService
+public class PersistenceComponentManagementService	extends ComponentManagementService
 {
 	/**
 	 *  Static method for reflective creation to allow platform start without add-on.

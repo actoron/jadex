@@ -46,6 +46,9 @@ public class EdgeDragContextMenu extends JPopupMenu
 	{
 		super("Create Target");
 		
+		if(modelcontainer.getSettings()==null)
+			return;
+		
 		if (defaultitems == null)
 		{
 			ImageProvider imgprov = modelcontainer.getSettings().getImageProvider();

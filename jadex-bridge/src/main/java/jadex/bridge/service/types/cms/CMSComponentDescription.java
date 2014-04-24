@@ -31,7 +31,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	protected IResourceIdentifier rid;
 	
 	/** Attribute for children. */
-	protected Set children;
+	protected Set<IComponentIdentifier> children;
 
 	/** Attribute for slot ownership. */
 	protected String ownership;
@@ -71,6 +71,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	
 	/** The cause. */
 	protected Cause cause;
+	
+	/** The step info for debugging. To determine the next step. */
+	protected String stepinfo;
 	
 	//-------- constructors --------
 
@@ -459,7 +462,23 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		this.synchronous = synchronous;
 	}
 
-	
+	/**
+	 *  Get the stepinfo.
+	 *  @return The stepinfo.
+	 */
+	public String getStepInfo()
+	{
+		return stepinfo;
+	}
+
+	/**
+	 *  Set the stepinfo.
+	 *  @param stepinfo The stepinfo to set.
+	 */
+	public void setStepInfo(String stepinfo)
+	{
+		this.stepinfo = stepinfo;
+	}
 
 	/**
 	 *  Test if this description equals another description.

@@ -51,6 +51,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -182,13 +183,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	
 	/** The micro agent model. */
 	protected MBpmnModel bpmnmodel;
-	
-	// todo: allow multiple pools/lanes?
-	/** The configuration. */
-//	protected String pool;
-	
-	/** The configuration. */
-//	protected String lane;
 	
 	/** The activity handlers. */
 	protected Map<String, IActivityHandler> activityhandlers;
@@ -791,7 +785,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             	&& !MBpmnModel.EVENT_START_TIMER.equals(mact.getActivityType()))
             {
                 ProcessThread thread = new ProcessThread(""+idcnt++, mact, getTopLevelThread(), BpmnInterpreter.this);
-//                context.addThread(thread);
                 getTopLevelThread().addThread(thread);
             }
         } 
@@ -1005,17 +998,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		return bpmnmodel;//(MBpmnModel)context.getModelElement();
 	}
 	
-//	/**
-//	 *  Get the thread context.
-//	 *  @return The thread context.
-//	 */
-//	public ThreadContext getThreadContext()
-//	{
-//		return context;
-//	}
-	
 	/**
-	 * 
+	 *  Get the top level thread (is not executed and just acts as top level thread container).
 	 */
 	public ProcessThread getTopLevelThread()
 	{
@@ -1057,8 +1041,31 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		if(!isReady(pool, lane))
 			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
 		
-		ProcessThread thread = topthread.getExecutableThread(pool, lane);
-//		ProcessThread	thread	= context.getExecutableThread(pool, lane);
+		ProcessThread thread = null;
+		String stepinfo = null;
+		if(getComponentDescription().getState().equals(IComponentDescription.STATE_SUSPENDED))
+		{
+			CMSComponentDescription desc = (CMSComponentDescription)getComponentDescription();
+			stepinfo = desc.getStepInfo();
+			if(stepinfo!=null)
+			{
+				desc.setStepInfo(null);
+			}
+		}
+		
+		if(stepinfo!=null)
+		{
+			thread = topthread.getThread(stepinfo);
+			if(thread.isWaiting())
+			{
+				thread = null;
+			}
+		}
+		
+		if(thread==null)
+		{
+			thread = topthread.getExecutableThread(pool, lane);
+		}
 		
 		// Thread may be null when external entry has not changed waiting state of any active plan. 
 		if(thread!=null)
