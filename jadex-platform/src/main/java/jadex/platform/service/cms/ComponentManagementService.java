@@ -625,32 +625,8 @@ public class ComponentManagementService implements IComponentManagementService
 																			// Removed in resumeComponent()
 				//																initinfos.remove(cid);
 																			
-																			CMSComponentDescription padesc	= (CMSComponentDescription)pad.getDescription();
-//																			InitInfo painfo = getParentInfo(cinfo);
-//																			if(painfo!=null && painfo.getDescription()!=null)
-//																			{
-//																				padesc = (CMSComponentDescription)painfo.getDescription();
-//																			}
-//																			else
-//																			{
-//																				padesc = (CMSComponentDescription)getDescription(getParentIdentifier(cinfo));
-//																			}
-																			padesc.addChild(cid);
-																			
-																			Boolean dae = ad.getDaemon();
-					//														if(padesc.isAutoShutdown() && !ad.isDaemon())
-					//														if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
-																			// cannot check parent shutdown state because could be still uninited
-																			if(dae==null || !dae.booleanValue())
-																			{
-																				Integer	childcount	= (Integer)childcounts.get(padesc.getName());
-																				int cc = childcount!=null ? childcount.intValue()+1 : 1;
-																				childcounts.put(padesc.getName(), Integer.valueOf(cc));
-					//															System.out.println("childcount+:"+padesc.getName()+" "+cc);
-																			}
-																			
 																			// Register component at parent.
-																			getComponentInstance(pad).componentCreated(ad, lmodel)
+																			addSubcomponent(pad, ad, lmodel)
 																				.addResultListener(createResultListener(new IResultListener<Void>()
 																			{
 																				public void resultAvailable(Void result)
@@ -1684,6 +1660,30 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		return ret;
 //		listener.resultAvailable(this, ad);
+	}
+	
+	/**
+	 *  Add a new component to its parent.
+	 */
+	protected IFuture<Void>	addSubcomponent(IComponentAdapter pad, IComponentDescription ad, IModelInfo lmodel)
+	{
+		CMSComponentDescription padesc	= (CMSComponentDescription)pad.getDescription();
+		padesc.addChild(ad.getName());
+		
+		Boolean dae = ad.getDaemon();
+
+//		if(padesc.isAutoShutdown() && !ad.isDaemon())
+//		if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+		// cannot check parent shutdown state because could be still uninited
+		if(dae==null || !dae.booleanValue())
+		{
+			Integer	childcount	= (Integer)childcounts.get(padesc.getName());
+			int cc = childcount!=null ? childcount.intValue()+1 : 1;
+			childcounts.put(padesc.getName(), Integer.valueOf(cc));
+		}
+		
+		// Register component at parent.
+		return getComponentInstance(pad).componentCreated(ad, lmodel);
 	}
 	
 	/**

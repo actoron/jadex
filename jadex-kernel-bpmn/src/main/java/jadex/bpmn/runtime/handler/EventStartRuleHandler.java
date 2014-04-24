@@ -26,7 +26,7 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 	{
 		// Top level event -> just move forward to next activity.
 		// Or start event of event subprocess -> just move forward.
-		if(thread.getParent()==null
+		if(thread.getParent().getParent()==null	// check that parent thread is the top thread.
 			|| (thread.getParent().getModelElement() instanceof MSubProcess
 			&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getParent().getModelElement()).getSubprocessType())))
 //			|| (thread.getThreadContext().getModelElement() instanceof MSubProcess

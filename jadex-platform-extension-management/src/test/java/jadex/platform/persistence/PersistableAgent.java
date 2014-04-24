@@ -1,5 +1,7 @@
 package jadex.platform.persistence;
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -11,8 +13,14 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
+/**
+ *  Micro agent that tries to persist itself.
+ */
 @Agent
+@Results(@Result(name="testresults", clazz=Testcase.class))
 public class PersistableAgent
 {
 	@Agent
@@ -44,11 +52,14 @@ public class PersistableAgent
 					public void resultAvailable(IPersistInfo result)
 					{
 						System.out.println("Worked");
+						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", true, null)}));
+						ret.setResult(null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
+						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", exception)}));
+						ret.setResult(null);
 					}
 				});
 			}

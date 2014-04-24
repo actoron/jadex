@@ -11,6 +11,9 @@ import java.util.Map;
  */
 public class ThreadInfo
 {
+	/** Id of the thread. */
+	protected String id;
+	
 	/** Id of the next activity. */
 	protected String activityid;
 	
@@ -30,7 +33,7 @@ public class ThreadInfo
 	protected boolean canceled;
 	
 	/** The id counter for sub processes. */
-//	protected int idcnt;
+	protected int idcnt;
 	
 	/** The split infos. */
 	protected Map<String, SplitInfo> splitinfos;
@@ -51,14 +54,33 @@ public class ThreadInfo
 	 */
 	public ThreadInfo(ProcessThread thread)
 	{
+		id	= thread.getId();
 		activityid = thread.getActivity()!=null ? thread.getActivity().getId() : null;
 		edgeid = thread.getLastEdge()!=null ? thread.getLastEdge().getId() : null;
 		data = thread.getData();
 		dataedges = thread.getDataEdges();
 		exception = thread.getException();
 		canceled = thread.isCanceled();
-//		idcnt = thread.idcnt;
+		idcnt = thread.idcnt;
 		splitinfos = thread.splitinfos;
+	}
+
+	/**
+	 *  Gets the id.
+	 *  @return The id.
+	 */
+	public String getId()
+	{
+		return id;
+	}
+
+	/**
+	 *  Sets the id.
+	 *  @param id The id to set.
+	 */
+	public void setId(String id)
+	{
+		this.id = id;
 	}
 
 	/**
