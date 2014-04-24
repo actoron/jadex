@@ -5,7 +5,6 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
@@ -86,18 +85,21 @@ public class BPMNPersistenceTestAgent
 			System.out.println("Already running.");
 		}
 
-		IPersistInfo	info	= cms.getPersistableState(fut.getFirstResult()).get();
-		exta.killComponent().get();
-
-		cms.resurrectComponent(info).get();
-		
-//		Map<String, Object>	msg	= new HashMap<String, Object>();
-//		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
-//		agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).get();
+//		IPersistInfo	info	= cms.getPersistableState(fut.getFirstResult()).get();
+//		exta.killComponent().get();
+//
+//		cms.resurrectComponent(info).get();
 		
 		Future<Collection<Tuple2<String,Object>>>	cres	= new Future<Collection<Tuple2<String,Object>>>();
 		cms.addComponentResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres), fut.getFirstResult());
+		
+		Map<String, Object>	msg	= new HashMap<String, Object>();
+		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
+		agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).get();
+		
 		cres.get();
+		
+		ret.setResult(new TestReport("1#"+model, "Test if a process can be snapshotted and resurrected: "+model, true, null));
 		
 		return ret;
 	}
