@@ -3827,6 +3827,7 @@ public class SUtil
 		return ret;
 	}
 	
+	
 	/**
 	 *  Write a string to a file.
 	 *  @param val The string to write.
@@ -3834,10 +3835,27 @@ public class SUtil
 	 */
 	public static void writeFile(String val, String filename)
 	{
+		writeFile(val, filename, null);
+	}
+	
+	/**
+	 *  Write a string to a file.
+	 *  @param val The string to write.
+	 *  @param filename The file name.
+	 */
+	public static void writeFile(String val, String filename, String charset)
+	{
 		PrintWriter out = null;
 		try
 		{
-			out = new PrintWriter(filename);
+			if(charset!=null)
+			{
+				out = new PrintWriter(filename, charset);
+			}
+			else
+			{
+				out = new PrintWriter(filename);
+			}
 			out.print(val);
 		}
 		catch(Exception e)
@@ -4012,4 +4030,42 @@ public class SUtil
 		return ret;
 	}
 	
+	/**
+	 *  Remove BOM from UTF text.
+	 *  @param text The text.
+	 *  @return The corrected string.
+	 */
+	public static String removeBOM(String text)
+	{
+		try
+		{
+			String ret = text;
+//			byte[] bytes = text.getBytes("ISO-8859-1");
+			byte[] bytes = text.getBytes("UTF-8");
+			if(isUTF8(bytes)) 
+			{
+				 byte[] barray = new byte[bytes.length - 3];
+			     System.arraycopy(bytes, 3, barray, 0, barray.length);
+//			     ret = new String(barray, "ISO-8859-1");
+			     ret = new String(barray, "UTF-8");
+			}
+			return ret;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Test if starts with UTF-8 BOM.
+	 *  @param bytes The text.
+	 *  @return Bytes without BOM.
+	 */
+	public static boolean isUTF8(byte[] bytes) 
+	{
+		return (bytes[0] & 0xFF) == 0xEF && 
+			(bytes[1] & 0xFF) == 0xBB && 
+			(bytes[2] & 0xFF) == 0xBF;
+    }
 }

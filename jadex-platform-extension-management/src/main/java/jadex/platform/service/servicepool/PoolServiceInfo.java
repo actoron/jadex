@@ -31,6 +31,14 @@ public class PoolServiceInfo
 	/**
 	 *  Create a new PoolServiceInfo.
 	 */
+	public PoolServiceInfo()
+	{
+		// bean constructor
+	}
+	
+	/**
+	 *  Create a new PoolServiceInfo.
+	 */
 	public PoolServiceInfo(String workermodel, Class<?> servicetype)
 	{
 		this(workermodel, servicetype, null, null);
