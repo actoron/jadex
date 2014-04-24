@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -430,6 +431,10 @@ public class SReflect
 			{
 				ret	= "n/a";
 			}
+		}
+		else if(t instanceof GenericArrayType)
+		{
+			ret	= SReflect.getGenericClassName(((GenericArrayType)t).getGenericComponentType(), null) + "[]";
 		}
 		else if(t instanceof WildcardType)
 		{

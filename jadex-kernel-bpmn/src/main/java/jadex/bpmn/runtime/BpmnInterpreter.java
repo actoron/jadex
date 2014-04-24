@@ -309,38 +309,61 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		else
 		{
 			// Taken from construct, hack!!!
+			this.bpmnmodel = model;
 			this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 			this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 			this.messages = new ArrayList<Object>();
 			this.streams = new ArrayList<IConnection>();
 
 			BpmnPersistInfo	bpi	= (BpmnPersistInfo)persistinfo;
-			ThreadInfo	ti	= bpi.getTopLevelThread();
-			MActivity	act	= ti.getActivityid()!=null ? bpmnmodel.getAllActivities().get(ti.getActivityid()) : null;
-			MSequenceEdge	edge	= ti.getEdgeid()!=null ? bpmnmodel.getAllSequenceEdges().get(ti.getEdgeid()) : null;
+			this.topthread	= unpersistThread(bpi.getTopLevelThread(), null);
 			
-			this.topthread	= new ProcessThread(ti.getId(), act, null, this);
-			topthread.setLastEdge(edge);
-			topthread.setException(ti.getException());
-			topthread.splitinfos	= ti.getSplitinfos();
-			
-			if(ti.getData()!=null)
-			{
-				for(Map.Entry<String, Object> entry: ti.getData().entrySet())
-				{
-					topthread.setParameterValue(entry.getKey(), entry.getValue());
-				}	
-			}
-			if(ti.getDataedges()!=null)
-			{
-				for(Map.Entry<String, Object> entry: ti.getDataedges().entrySet())
-				{
-					topthread.setDataEdgeValue(entry.getKey(), entry.getValue());
-				}
-			}
-			
+	        started = true;
+
 			inited.setResult(null);
 		}
+	}
+
+	/**
+	 *  Unpersist a thread.
+	 */
+	protected ProcessThread	unpersistThread(ThreadInfo ti, ProcessThread parent)
+	{
+		ProcessThread	thread;
+		MActivity	act	= ti.getActivityid()!=null ? bpmnmodel.getAllActivities().get(ti.getActivityid()) : null;
+		MSequenceEdge	edge	= ti.getEdgeid()!=null ? bpmnmodel.getAllSequenceEdges().get(ti.getEdgeid()) : null;
+		
+		thread	= new ProcessThread(ti.getId(), act, parent, this);
+		thread.setLastEdge(edge);
+		thread.setException(ti.getException());
+		thread.splitinfos	= ti.getSplitinfos();
+		thread.idcnt	= ti.getIdcnt();
+		
+		if(ti.getData()!=null)
+		{
+			for(Map.Entry<String, Object> entry: ti.getData().entrySet())
+			{
+				thread.setParameterValue(entry.getKey(), entry.getValue());
+			}	
+		}
+		
+		if(ti.getDataedges()!=null)
+		{
+			for(Map.Entry<String, Object> entry: ti.getDataedges().entrySet())
+			{
+				thread.setDataEdgeValue(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		if(ti.getSubthreads()!=null)
+		{
+			for(ThreadInfo sti: ti.getSubthreads())
+			{
+				thread.addThread(unpersistThread(sti, thread));
+			}
+		}
+		
+		return thread;
 	}
 	
 	/**

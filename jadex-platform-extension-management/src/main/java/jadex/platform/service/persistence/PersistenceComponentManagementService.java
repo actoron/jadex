@@ -19,6 +19,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
 import jadex.platform.service.cms.ComponentManagementService;
+import jadex.platform.service.cms.IntermediateResultListener;
 import jadex.platform.service.cms.StandaloneComponentAdapter;
 
 /**
@@ -92,11 +93,23 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 						{
 							public void customResultAvailable(final IModelInfo model)
 							{
+								
+								IntermediateResultListener	reslis;
+								if(resultlisteners.containsKey(pi.getComponentDescription().getName()))
+								{
+									reslis	= resultlisteners.get(pi.getComponentDescription().getName());
+								}
+								else
+								{
+									reslis	= new IntermediateResultListener(null);	
+									resultlisteners.put(pi.getComponentDescription().getName(), reslis);
+								}
+
 								// Todo: allow adapting component identifier (e.g. to changed platform suffix).
 								Future<Void>	init	= new Future<Void>();
 								final IFuture<Tuple2<IComponentInstance, IComponentAdapter>>	tupfut	=
 									factory.createComponentInstance(pi.getComponentDescription(), getComponentAdapterFactory(), model, 
-									null, null, parent, null, copy, realtime, persist, pi, null, init);
+									null, null, parent, null, copy, realtime, persist, pi, reslis, init);
 								
 								init.addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
 								{
@@ -120,6 +133,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 													{
 														public void customResultAvailable(Void result)
 														{
+															notifyListenersAdded(pi.getComponentDescription().getName(), pi.getComponentDescription());
 															done(tup);
 														}
 													});
@@ -128,9 +142,8 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 											
 											public void done(Tuple2<IComponentInstance, IComponentAdapter> tup)
 											{
-												
 												adapters.put(pi.getComponentDescription().getName(), tup.getSecondEntity());
-												tup.getSecondEntity().wakeup();
+												getComponentAdapterFactory().initialWakeup(tup.getSecondEntity());
 												
 												ret.setResult(null);
 											}

@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.persist;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.SplitInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +64,15 @@ public class ThreadInfo
 		canceled = thread.isCanceled();
 		idcnt = thread.idcnt;
 		splitinfos = thread.splitinfos;
+		
+		if(thread.getSubthreads()!=null)
+		{
+			this.subthreadinfos	= new ArrayList<ThreadInfo>();
+			for(ProcessThread pt: thread.getSubthreads())
+			{
+				subthreadinfos.add(new ThreadInfo(pt));
+			}
+		}
 	}
 
 	/**
@@ -156,6 +166,24 @@ public class ThreadInfo
 	}
 
 	/**
+	 *  Gets the subthreads.
+	 *  @return The subthreads.
+	 */
+	public List<ThreadInfo> getSubthreads()
+	{
+		return subthreadinfos;
+	}
+
+	/**
+	 *  Sets the subthreads.
+	 *  @param subthreads The subthreads to set.
+	 */
+	public void setSubthreads(List<ThreadInfo> subthreads)
+	{
+		this.subthreadinfos = subthreads;
+	}
+
+	/**
 	 *  Gets the exception.
 	 *  @return The exception.
 	 */
@@ -191,23 +219,23 @@ public class ThreadInfo
 		this.canceled = canceled;
 	}
 
-//	/**
-//	 *  Gets the idcnt.
-//	 *  @return The idcnt.
-//	 */
-//	public int getIdcnt()
-//	{
-//		return idcnt;
-//	}
-//
-//	/**
-//	 *  Sets the idcnt.
-//	 *  @param idcnt The idcnt to set.
-//	 */
-//	public void setIdcnt(int idcnt)
-//	{
-//		this.idcnt = idcnt;
-//	}
+	/**
+	 *  Gets the idcnt.
+	 *  @return The idcnt.
+	 */
+	public int getIdcnt()
+	{
+		return idcnt;
+	}
+
+	/**
+	 *  Sets the idcnt.
+	 *  @param idcnt The idcnt to set.
+	 */
+	public void setIdcnt(int idcnt)
+	{
+		this.idcnt = idcnt;
+	}
 
 	/**
 	 *  Gets the splitinfos.
