@@ -41,6 +41,8 @@
 		<module>jadex-parent</module>
 		<module>jadex-commons</module>
 		<module>jadex-bridge</module>
+		<module>jadex-rules-eca</module>
+		<module>jadex-xml</module>
 		<module>jadex-javaparser</module>
 		<module>jadex-model-bpmn</module>
 		<module>jadex-editor-bpmn</module>
