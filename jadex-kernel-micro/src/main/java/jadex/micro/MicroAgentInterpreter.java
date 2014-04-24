@@ -159,6 +159,14 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Create the agent.
 	 */
+	protected MicroAgent createAgent(Class<?> microclass, MicroModel model) throws Exception
+	{
+		return createAgent(microclass, model, null);
+	}
+	
+	/**
+	 *  Create the agent.
+	 */
 	protected MicroAgent createAgent(Class<?> microclass, MicroModel model, IPersistInfo pinfo) throws Exception
 	{
 		MicroAgent ret = null;
@@ -205,9 +213,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			}
 		}
 		
-		if (pinfo != null)
-		{
-		}
+//		if (pinfo != null)
+//		{
+//		}
 		
 		return ret;
 	}
