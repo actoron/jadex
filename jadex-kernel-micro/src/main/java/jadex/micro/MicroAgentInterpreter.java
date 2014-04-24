@@ -115,7 +115,14 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		try
 		{
 			this.classloader = model.getClassloader();
-			this.microagent = createAgent(microclass, model, persistinfo);
+			if (persistinfo != null)
+			{
+				this.microagent = createAgent(microclass, model, persistinfo);
+			}
+			else
+			{
+				this.microagent = createAgent(microclass, model);
+			}
 
 			this.container = createMyServiceContainer(args);
 					
