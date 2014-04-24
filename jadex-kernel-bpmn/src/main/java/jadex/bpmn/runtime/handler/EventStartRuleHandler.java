@@ -29,8 +29,6 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 		if(thread.getParent().getParent()==null	// check that parent thread is the top thread.
 			|| (thread.getParent().getModelElement() instanceof MSubProcess
 			&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getParent().getModelElement()).getSubprocessType())))
-//			|| (thread.getThreadContext().getModelElement() instanceof MSubProcess
-//			&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getThreadContext().getModelElement()).getSubprocessType())))
 		{
 			doExecute(activity, instance, thread);
 			instance.step(activity, instance, thread, null);

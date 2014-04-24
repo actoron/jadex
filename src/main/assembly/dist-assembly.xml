@@ -134,6 +134,14 @@
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
+			<source>docs/bpmn_editor.bat</source>
+			<outputDirectory>jadex-${version}/</outputDirectory>
+		</file>
+		<file>
+			<source>docs/bpmn_editor.sh</source>
+			<outputDirectory>jadex-${version}/</outputDirectory>
+		</file>
+		<file>
 			<source>docs/howtostart.txt</source>
 			<outputDirectory>/</outputDirectory>
 		</file><!-- 
