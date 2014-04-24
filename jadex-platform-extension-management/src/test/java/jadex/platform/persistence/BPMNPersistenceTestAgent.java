@@ -91,9 +91,9 @@ public class BPMNPersistenceTestAgent
 
 		cms.resurrectComponent(info).get();
 		
-		Map<String, Object>	msg	= new HashMap<String, Object>();
-		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
-		agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).get();
+//		Map<String, Object>	msg	= new HashMap<String, Object>();
+//		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
+//		agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).get();
 		
 		Future<Collection<Tuple2<String,Object>>>	cres	= new Future<Collection<Tuple2<String,Object>>>();
 		cms.addComponentResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres), fut.getFirstResult());

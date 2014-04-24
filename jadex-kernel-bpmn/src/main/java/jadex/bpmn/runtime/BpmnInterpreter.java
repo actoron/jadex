@@ -29,6 +29,7 @@ import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.persist.BpmnPersistInfo;
+import jadex.bpmn.runtime.persist.ThreadInfo;
 import jadex.bpmn.runtime.task.ExecuteStepTask;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.ClassInfo;
@@ -262,51 +263,90 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, inited);
 		this.inited = inited;
-		construct(model, activityhandlers, stephandlers);
 		
-		scheduleStep(new IComponentStep<Void>()
+		if(persistinfo==null)
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				// Initialize context variables.
-				init(getModel(), getConfiguration(), arguments)
-					.addResultListener(createResultListener(new DelegationResultListener<Void>(inited)
-				{
-					public void customResultAvailable(Void result)
-					{
-						// Notify cms that init is finished.
-						initContextVariables();
-
-						inited.setResult(null);
-					}
-				}));
-				return IFuture.DONE;
-			}
-		}).addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result){}
+			construct(model, activityhandlers, stephandlers);
 			
-			public void exceptionOccurred(Exception exception)
+			scheduleStep(new IComponentStep<Void>()
 			{
-				if(inited.isDone())
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					// Exception after init finished!?
-					exception.printStackTrace();
-				}
-				else
-				{
-					inited.setException(exception);
-					if(exception instanceof RuntimeException)
+					// Initialize context variables.
+					init(getModel(), getConfiguration(), arguments)
+						.addResultListener(createResultListener(new DelegationResultListener<Void>(inited)
 					{
-						throw (RuntimeException)exception;
+						public void customResultAvailable(Void result)
+						{
+							// Notify cms that init is finished.
+							initContextVariables();
+	
+							inited.setResult(null);
+						}
+					}));
+					return IFuture.DONE;
+				}
+			}).addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result){}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					if(inited.isDone())
+					{
+						// Exception after init finished!?
+						exception.printStackTrace();
 					}
 					else
 					{
-						throw new RuntimeException(exception);
+						inited.setException(exception);
+						if(exception instanceof RuntimeException)
+						{
+							throw (RuntimeException)exception;
+						}
+						else
+						{
+							throw new RuntimeException(exception);
+						}
 					}
 				}
+			});
+		}
+		else
+		{
+			// Taken from construct, hack!!!
+			this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
+			this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
+			this.messages = new ArrayList<Object>();
+			this.streams = new ArrayList<IConnection>();
+
+			BpmnPersistInfo	bpi	= (BpmnPersistInfo)persistinfo;
+			ThreadInfo	ti	= bpi.getTopLevelThread();
+			MActivity	act	= ti.getActivityid()!=null ? bpmnmodel.getAllActivities().get(ti.getActivityid()) : null;
+			MSequenceEdge	edge	= ti.getEdgeid()!=null ? bpmnmodel.getAllSequenceEdges().get(ti.getEdgeid()) : null;
+			
+			this.topthread	= new ProcessThread(ti.getId(), act, null, this);
+			topthread.setLastEdge(edge);
+			topthread.setException(ti.getException());
+			topthread.splitinfos	= ti.getSplitinfos();
+			
+			if(ti.getData()!=null)
+			{
+				for(Map.Entry<String, Object> entry: ti.getData().entrySet())
+				{
+					topthread.setParameterValue(entry.getKey(), entry.getValue());
+				}	
 			}
-		});
+			if(ti.getDataedges()!=null)
+			{
+				for(Map.Entry<String, Object> entry: ti.getDataedges().entrySet())
+				{
+					topthread.setDataEdgeValue(entry.getKey(), entry.getValue());
+				}
+			}
+			
+			inited.setResult(null);
+		}
 	}
 	
 	/**
