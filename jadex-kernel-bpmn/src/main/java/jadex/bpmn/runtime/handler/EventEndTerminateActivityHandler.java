@@ -15,7 +15,7 @@ public class EventEndTerminateActivityHandler extends DefaultActivityHandler
 	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		// Top level event -> kill the component.
-		if(thread.getParent()==null)
+		if(thread.getParent().getParent()==null)	// Check that parent thread is top thread.
 		{
 			instance.killComponent();
 		}
