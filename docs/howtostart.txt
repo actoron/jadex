@@ -26,5 +26,11 @@ with the following option:
 For Windows, you can also use the jadex_no_awareness.bat file.
 For Linux, you can also use the jadex_no_awareness.sh file.
 
+
+The BPMN editor for graphical modeling of BPMN workflows can be started using the provided scripts:
+bpmn_editor.bat
+bpmn_editor.sh
+
+
 Further information (user guides, tutorials) is available at:
 http://www.activecomponents.org

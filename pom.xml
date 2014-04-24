@@ -85,6 +85,8 @@
 		<module>jadex-platform-extension-relay</module>
 		<module>jadex-platform-relay-web</module>
 		
+		<module>jadex-editor-bpmn</module>
+				
 		<module>jadex-distribution-minimal</module>
 		<module>jadex-distribution-standard</module>
 	</modules>

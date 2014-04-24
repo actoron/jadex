@@ -123,6 +123,14 @@
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
 		<file>
+			<source>docs/editor_bpmn.bat</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/editor_bpmn.sh</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
 			<source>docs/howtostart.txt</source>
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
