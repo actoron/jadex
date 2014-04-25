@@ -4,6 +4,7 @@ import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.contextmenus.EventContextMenu;
 import jadex.bpmn.editor.gui.contextmenus.GatewayContextMenu;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
@@ -184,6 +185,15 @@ public class MouseController extends MouseAdapter
 					int x = e.getX() - modelcontainer.getGraphComponent().getHorizontalScrollBar().getModel().getValue();
 					int y = e.getY() - modelcontainer.getGraphComponent().getVerticalScrollBar().getModel().getValue();
 					gcm.show(modelcontainer.getGraphComponent(), x, y);
+				}
+				else if (activity.getMActivity().getActivityType().startsWith("Event") &&
+						 (activity.getMActivity().getIncomingMessagingEdges() == null || activity.getMActivity().getIncomingMessagingEdges().size() == 0) &&
+						 (activity.getMActivity().getOutgoingMessagingEdges() == null || activity.getMActivity().getOutgoingMessagingEdges().size() == 0))
+				{
+					EventContextMenu ecm = new EventContextMenu(activity, modelcontainer);
+					int x = e.getX() - modelcontainer.getGraphComponent().getHorizontalScrollBar().getModel().getValue();
+					int y = e.getY() - modelcontainer.getGraphComponent().getVerticalScrollBar().getModel().getValue();
+					ecm.show(modelcontainer.getGraphComponent(), x, y);
 				}
 			}
 		}

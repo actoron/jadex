@@ -4,7 +4,6 @@ import jadex.bpmn.editor.gui.stylesheets.EventShape;
 import jadex.bpmn.editor.gui.stylesheets.GatewayShape;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
-import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 
@@ -97,8 +96,10 @@ public class ImageProvider
 	/** The image symbol inset factor. */
 	protected static final double IMAGE_SYMBOL_INSET_FACTOR = 0.15;
 	
-	/** The shadow size. */
-	protected static final int SHADOW_SIZE = ACTIVATION_SHIFT >>> 1;
+	protected static final double SHADOW_SCALE = 0.875;
+	
+//	/** The shadow size. */
+//	protected static final int SHADOW_SIZE = ACTIVATION_SHIFT >>> 1;
 	
 	/** The frame thickness. */
 	protected static final int FRAME_THICKNESS = BUTTON_SIZE / 12;
@@ -153,20 +154,35 @@ public class ImageProvider
 	
 	static
 	{
-		double bs2 = BUTTON_SIZE * 0.5;
+//		double bs2 = BUTTON_SIZE * 0.5;
+//		GeneralPath gp = new GeneralPath();
+//		gp.moveTo(0, bs2);
+//		gp.lineTo(bs2, BUTTON_SIZE);
+//		gp.lineTo(BUTTON_SIZE, bs2);
+//		gp.lineTo(bs2, 0);
+//		gp.closePath();
+//		SHAPE_RHOMBUS = gp;
+//		
+//		SHAPE_ROUNDED_RECTANGLE = new RoundRectangle2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE, BASE_ICON_SIZE >>> 1, BASE_ICON_SIZE >>> 1);
+//		
+//		SHAPE_ELLIPSE = new Ellipse2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE);
+//		
+//		SHAPE_RECTANGLE = new Rectangle2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE);
+		
+		double bs2 = 0.5;
 		GeneralPath gp = new GeneralPath();
 		gp.moveTo(0, bs2);
-		gp.lineTo(bs2, BUTTON_SIZE);
-		gp.lineTo(BUTTON_SIZE, bs2);
+		gp.lineTo(bs2, 1);
+		gp.lineTo(1, bs2);
 		gp.lineTo(bs2, 0);
 		gp.closePath();
 		SHAPE_RHOMBUS = gp;
 		
-		SHAPE_ROUNDED_RECTANGLE = new RoundRectangle2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE, BASE_ICON_SIZE >>> 1, BASE_ICON_SIZE >>> 1);
+		SHAPE_ROUNDED_RECTANGLE = new RoundRectangle2D.Double(0.0, 0.0, 1, 1, 0.5, 0.5);
 		
-		SHAPE_ELLIPSE = new Ellipse2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE);
+		SHAPE_ELLIPSE = new Ellipse2D.Double(0.0, 0.0, 1, 1);
 		
-		SHAPE_RECTANGLE = new Rectangle2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE);
+		SHAPE_RECTANGLE = new Rectangle2D.Double(0.0, 0.0, 1, 1);
 	}
 	
 	/** The singleton instance */
@@ -256,7 +272,8 @@ public class ImageProvider
 			g.drawImage(symimg, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
 			g.dispose();
 			
-			Image frame = generateGenericFrame(frametype, SHAPE_RECTANGLE, new Dimension(iconsize, iconsize));
+//			Image frame = generateGenericFrame(frametype, SHAPE_RECTANGLE, new Dimension(iconsize, iconsize));
+			Image frame = generateGenericFrame(frametype, SHAPE_RECTANGLE, new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE));
 			
 			offimage = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			g = ((BufferedImage) offimage).createGraphics();
@@ -391,10 +408,10 @@ public class ImageProvider
 		Image shadow = null;
 		if (!shift)
 		{
-			shadow = generateGenericShadow(baseshape, new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE));
+			shadow = generateGenericShadow(baseshape, size);// new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE));
 		}
 		
-		return compositeImageIcon(new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE), new Dimension(iconsize, iconsize), symimg, bgshape, frame, glass, shadow, bgcolor, high);
+		return compositeImageIcon(new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE), new Dimension(iconsize, iconsize), symimg, bgshape, frame, glass, shadow, bgcolor, high, false);
 	}
 	
 	/**
@@ -418,7 +435,7 @@ public class ImageProvider
 		Image glass = generateGenericGlass(baseshape, basesize);
 		Image bgshape = generateGenericBackground(baseshape, basesize);
 		
-		return compositeImageIcon(basesize, size, symimg, bgshape, frame, glass, null, bgcolor, true);
+		return compositeImageIcon(basesize, size, symimg, bgshape, frame, glass, null, bgcolor, true, true);
 	}
 	
 	/**
@@ -427,6 +444,7 @@ public class ImageProvider
 	 *	@param filepath Path to the file.
 	 * 	@throws IOException Exception on IO errors.
 	 */
+	@SuppressWarnings("unchecked")
 	public void loadCache(String filepath) throws IOException
 	{
 		File file = new File(filepath);
@@ -494,7 +512,7 @@ public class ImageProvider
 	 *  @param high Highlight the icon if true.
 	 *  @return The image icon.
 	 */
-	private ImageIcon compositeImageIcon(Dimension basesize, Dimension iconsize, Image symbol, Image bgshape, Image frame, Image glass, Image shadow, Color bgcolor, boolean high)
+	private ImageIcon compositeImageIcon(Dimension basesize, Dimension iconsize, Image symbol, Image bgshape, Image frame, Image glass, Image shadow, Color bgcolor, boolean high, boolean flat)
 	{
 		BufferedImage ret = null;
 		BufferedImage tmpimg = new BufferedImage(basesize.width, basesize.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
@@ -510,14 +528,22 @@ public class ImageProvider
 		
 		int x = 0;
 		int y = 0;
-		if (shadow == null)
+		if (!flat)
 		{
-			x = ACTIVATION_SHIFT;
-			y = ACTIVATION_SHIFT;
-		}
-		else
-		{
-			g.drawImage(shadow, x, y, shadow.getWidth(null), shadow.getHeight(null), null);
+			if (shadow == null)
+			{
+				x = ACTIVATION_SHIFT;
+				y = ACTIVATION_SHIFT;
+			}
+			else
+			{
+	//			g.drawImage(shadow, x, y, shadow.getWidth(null), shadow.getHeight(null), null);
+				int sw = shadow.getWidth(null);
+				int sh = shadow.getHeight(null);
+				int sx = (int) Math.round((basesize.width - sw) * 0.5);
+				int sy = (int) Math.round((basesize.height - sh) * 0.5);
+				g.drawImage(shadow, sx, sy, sw, sh, null);
+			}
 		}
 		
 		g.drawImage(bgshape, x, y, bgshape.getWidth(null), bgshape.getHeight(null), null);
@@ -529,6 +555,7 @@ public class ImageProvider
 		
 		if (basesize.width != iconsize.width || basesize.height != iconsize.height)
 		{
+			
 			full = full.getScaledInstance(iconsize.width, iconsize.height, Image.SCALE_AREA_AVERAGING);
 			ret = new BufferedImage(iconsize.width, iconsize.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			g = ret.createGraphics();
@@ -554,10 +581,14 @@ public class ImageProvider
 		BufferedImage ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 		Graphics2D g = ((BufferedImage) ret).createGraphics();
 		
+		AffineTransform at = new AffineTransform();
+		at.scale(size.getWidth(), size.getHeight());
+		Shape shape = at.createTransformedShape(baseshape);
+		
 		g.setColor(Color.WHITE);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		g.fill(baseshape);
+		g.fill(shape);
 		g.dispose();
 		
 		return ret;
@@ -573,14 +604,21 @@ public class ImageProvider
 	 */
 	private Image generateGenericFrame(int frametype, Shape baseshape, Dimension size)
 	{
-		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple3<String, Integer, Shape>("frame", frametype, baseshape));
+		AffineTransform at = new AffineTransform();
+		at.scale(size.getWidth(), size.getHeight());
+		Shape shape = at.createTransformedShape(baseshape);
+		
+//		double thicknessscale = size.getWidth() / BASE_ICON_SIZE;
+//		thicknessscale = Math.min(thicknessscale, size.getHeight() / BASE_ICON_SIZE);
+		
+		BufferedImage ret = (BufferedImage) imagecache.get(new Object[] { "frame", frametype, shape, size });
 		
 		if (ret == null)
 		{
 			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			
-			Area framearea = new Area(baseshape);
+			Area framearea = new Area(shape);
 			
 			if (THICK_FRAME_TYPE == frametype)
 			{
@@ -588,7 +626,7 @@ public class ImageProvider
 				double sf = (double) (Math.max(size.width, size.height) - (FRAME_THICKNESS << 1)) / Math.max(size.width, size.height);
 				st.translate(FRAME_THICKNESS, FRAME_THICKNESS);
 				st.scale(sf, sf);
-				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
+				framearea.subtract(new Area(st.createTransformedShape(shape)));
 			}
 			else if (THIN_FRAME_TYPE == frametype)
 			{
@@ -597,7 +635,7 @@ public class ImageProvider
 				double sf = (double) (Math.max(size.width, size.height) - (fs * 2.0)) / Math.max(size.width, size.height);
 				st.translate(fs, fs);
 				st.scale(sf, sf);
-				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
+				framearea.subtract(new Area(st.createTransformedShape(shape)));
 			}
 			else if (DOUBLE_FRAME_TYPE == frametype)
 			{
@@ -606,19 +644,19 @@ public class ImageProvider
 				double sf = (double) (Math.max(size.width, size.height) - (fs * 2.0)) / Math.max(size.width, size.height);
 				st.translate(fs, fs);
 				st.scale(sf, sf);
-				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
+				framearea.subtract(new Area(st.createTransformedShape(shape)));
 				
 				st = new AffineTransform();
 				sf = (double) (Math.max(size.width, size.height) - (fs * 6.0)) / Math.max(size.width, size.height);
 				st.translate(fs * 3.0, fs * 3.0);
 				st.scale(sf, sf);
-				framearea.add(new Area(st.createTransformedShape(baseshape)));
+				framearea.add(new Area(st.createTransformedShape(shape)));
 				
 				st = new AffineTransform();
 				sf = (double) (Math.max(size.width, size.height) - (fs * 8.0)) / Math.max(size.width, size.height);
 				st.translate(fs * 4.0, fs * 4.0);
 				st.scale(sf, sf);
-				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
+				framearea.subtract(new Area(st.createTransformedShape(shape)));
 			}
 			
 			if (EMPTY_FRAME_TYPE != frametype)
@@ -630,7 +668,7 @@ public class ImageProvider
 				g.dispose();
 			}
 			
-			imagecache.put(new Tuple3<String, Integer, Shape>("frame", frametype, baseshape), ret);
+			imagecache.put(new Object[] { "frame", frametype, shape, size }, ret);
 		}
 		
 		return ret;
@@ -644,7 +682,11 @@ public class ImageProvider
 	 */
 	private Image generateGenericShadow(Shape baseshape, Dimension size)
 	{
-		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple2<String, Shape>("shadow", baseshape));
+		AffineTransform at = new AffineTransform();
+		at.scale(size.getWidth(), size.getHeight());
+		Shape shape = at.createTransformedShape(baseshape);
+		
+		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple3<String, Shape, Dimension>("shadow", shape, size));
 		if (ret == null)
 		{
 			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
@@ -653,13 +695,14 @@ public class ImageProvider
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			
-			AffineTransform st = new AffineTransform();
-			st.translate(SHADOW_SIZE, SHADOW_SIZE);
+//			AffineTransform st = new AffineTransform();
+//			st.translate(SHADOW_SIZE, SHADOW_SIZE);
 			
-			g.fill(st.createTransformedShape(baseshape));
+//			g.fill(st.createTransformedShape(shape));
+			g.fill(shape);
 			g.dispose();
 			
-			imagecache.put(new Tuple2<String, Shape>("shadow", baseshape), ret);
+			imagecache.put(new Tuple3<String, Shape, Dimension>("shadow", shape, size), ret);
 		}
 		
 		ret = blur(ret);
@@ -675,13 +718,17 @@ public class ImageProvider
 	 */
 	private Image generateGenericGlass(Shape baseshape, Dimension size)
 	{
-		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple2<String, Shape>("glass", baseshape));
+		AffineTransform at = new AffineTransform();
+		at.scale(size.getWidth(), size.getHeight());
+		Shape shape = at.createTransformedShape(baseshape);
+		
+		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple3<String, Shape, Dimension>("glass", shape, size));
 		
 		if (ret == null)
 		{
 			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
-			Shape glassarea = new Area(baseshape);
+			Shape glassarea = new Area(shape);
 			((Area) glassarea).subtract(new Area(new Rectangle2D.Double(0.0, size.height * 0.5, size.width, size.height * 0.5)));
 			
 			AffineTransform st = new AffineTransform();
@@ -699,7 +746,7 @@ public class ImageProvider
 			
 			ret = blur(ret);
 			
-			imagecache.put(new Tuple2<String, Shape>("glass", baseshape), ret);
+			imagecache.put(new Tuple3<String, Shape, Dimension>("glass", shape, size), ret);
 		}
 		
 		return ret;
