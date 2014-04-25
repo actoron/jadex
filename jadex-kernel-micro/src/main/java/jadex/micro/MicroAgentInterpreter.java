@@ -50,6 +50,7 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.DefaultPersistInfo;
 import jadex.kernelbase.ExternalAccess;
 import jadex.micro.annotation.AgentService;
 
@@ -108,7 +109,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		final IPersistInfo persistinfo,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener);
 		
 		this.micromodel = model;
 		
@@ -1736,17 +1737,13 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 	
 	/**
-     *  Get the state of the interpreter.
-     *  @return The state of the interpreter.
-     */
-    public IFuture<IPersistInfo> getPersistableState()
-    {
-        final Future<IPersistInfo> ret = new Future<IPersistInfo>();
-
-        ret.setResult(new MicroAgentPersistInfo(this));
-
-        return ret;
-    }
+	 *  Create a persistable state holder to be filled asynchronously.
+	 *  @return The persistable state holder.
+	 */
+	public DefaultPersistInfo	createPersistInfo()
+	{
+		return new MicroAgentPersistInfo(this);
+	}
 
 	/**
 	 *  Info struct for steps.

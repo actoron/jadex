@@ -80,6 +80,7 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.DefaultPersistInfo;
 import jadex.kernelbase.InterpreterFetcher;
 
 import java.lang.reflect.Array;
@@ -223,7 +224,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container)
 	{
-		super(null, model.getModelInfo(), config, null, parent, null, true, true, false, null, null, new Future<Void>());
+		super(null, model.getModelInfo(), config, null, parent, null, true, true, false, null, null);
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? new BpmnInstanceFetcher(this, fetcher) :null;
 		this.adapter = adapter;
@@ -255,7 +256,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		IPersistInfo persistinfo,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener);
 		this.inited = inited;
 		
 		if(persistinfo==null)
@@ -1798,13 +1799,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	}
 
 	/**
-	 *  Get the state of the interpreter.
-	 *  @return The state of the interpreter.
+	 *  Create a persistable state holder to be filled asynchronously.
+	 *  @return The persistable state holder.
 	 */
-	public IFuture<IPersistInfo> getPersistableState()
+	public DefaultPersistInfo	createPersistInfo()
 	{
-		final Future<IPersistInfo> ret = new Future<IPersistInfo>();
-		ret.setResult(new BpmnPersistInfo(this));
-		return ret;
+		return new BpmnPersistInfo(this);
 	}
 }

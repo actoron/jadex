@@ -1,6 +1,7 @@
 package jadex.kernelbase;
 
 import jadex.bridge.modelinfo.IPersistInfo;
+import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
  *  state information.
  *
  */
-public abstract class AbstractPersistInfo implements IPersistInfo
+public class DefaultPersistInfo	implements IPersistInfo
 {
 	//-------- attributes --------
 	
@@ -32,20 +33,23 @@ public abstract class AbstractPersistInfo implements IPersistInfo
 	
 	/** The properties. */
 	protected Map<String, Object> properties;
+
+	/**	The service container. */
+	protected ServiceContainerPersistInfo	servicecontainer;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Empty constructor for bean compatibility.
 	 */
-	public AbstractPersistInfo()
+	public DefaultPersistInfo()
 	{
 	}
 	
 	/**
 	 *  Creates the state info object.
 	 */
-	public AbstractPersistInfo(AbstractInterpreter interpreter)
+	public DefaultPersistInfo(StatelessAbstractInterpreter interpreter)
 	{
 		modelfilename	= interpreter.getModel().getFilename();
 		desc = interpreter.getComponentDescription();
@@ -175,5 +179,23 @@ public abstract class AbstractPersistInfo implements IPersistInfo
 	public void setProperties(Map<String, Object> properties)
 	{
 		this.properties = properties;
+	}
+
+	/**
+	 *  Get service state.
+	 *  @return The service container info.
+	 */
+	public ServiceContainerPersistInfo getServiceContainer()
+	{
+		return servicecontainer;
+	}
+	
+	/**
+	 *  Set service state.
+	 *  @param container	The service container info.
+	 */
+	public void	setServiceContainer(ServiceContainerPersistInfo container)
+	{
+		this.servicecontainer	= container;
 	}
 }

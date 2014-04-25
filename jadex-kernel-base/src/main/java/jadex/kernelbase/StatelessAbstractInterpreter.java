@@ -36,6 +36,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInfo;
@@ -2329,12 +2330,34 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	public abstract ServiceGetter<IMonitoringService> getMonitoringServiceGetter();
 	
 	/**
+	 *  Create a persistable state holder to be filled asynchronously.
+	 *  Override for specific implementations.
+	 *  @return The persistable state holder.
+	 */
+	public DefaultPersistInfo	createPersistInfo()
+	{
+		return new DefaultPersistInfo(this);
+	}
+	
+	/**
      *  Get the state of the interpreter.
+     *  Override for asynchronous kernel-specific stuff.
      *  @return The state of the interpreter.
      */
     public IFuture<IPersistInfo> getPersistableState()
     {
-    	return new Future<IPersistInfo>(new UnsupportedOperationException("Persistence not supported for this component type."));
+    	final Future<IPersistInfo>	ret	= new Future<IPersistInfo>();
+    	final DefaultPersistInfo	api	= createPersistInfo();
+    	getServiceContainer().getPersistInfo()
+    		.addResultListener(new ExceptionDelegationResultListener<ServiceContainerPersistInfo, IPersistInfo>(ret)
+		{
+    		public void customResultAvailable(ServiceContainerPersistInfo container)
+    		{
+    	    	api.setServiceContainer(container);
+    			ret.setResult(api);
+    		}
+		});
+    	return ret;
     }
 		
 //	/**
