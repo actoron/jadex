@@ -155,7 +155,7 @@ public class VisualProcessViewPanel extends JPanel
 					boolean r = false;
 					for(ProcessThreadInfo pti: ptmodel.getThreadInfos())
 					{
-						if(pti.getActId().equals(myid))
+						if(myid.equals(pti.getActId()))
 						{
 							if(pti.isWaiting())
 							{
@@ -483,10 +483,7 @@ public class VisualProcessViewPanel extends JPanel
 						else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_MODIFICATION))
 						{
 //							System.out.println("changed thread: "+pti);
-							ptmodel.removeValue(pti);
-							ptmodel.addValue(pti);
-//							threadinfos.remove(pti);
-//							threadinfos.add(pti);
+							ptmodel.updateValue(pti);
 						}
 					}
 					else if(event.getType().endsWith(BpmnInterpreter.TYPE_ACTIVITY))
@@ -653,15 +650,49 @@ public class VisualProcessViewPanel extends JPanel
 		
 		public void addValue(ProcessThreadInfo pti)
 		{
-			threadinfos.add(pti);
-			fireTableRowsInserted(threadinfos.size()-1, threadinfos.size()-1);
+			int idx = threadinfos.indexOf(pti);
+			if(idx!=-1)
+			{
+				threadinfos.set(idx, pti);
+				fireTableRowsUpdated(idx, idx);
+			}
+			else
+			{
+				threadinfos.add(pti);
+				fireTableRowsInserted(threadinfos.size()-1, threadinfos.size()-1);
+			}
+			
 		}
 		
 		public void removeValue(ProcessThreadInfo pti)
 		{
 			int idx = threadinfos.indexOf(pti);
-			threadinfos.remove(idx);
-			fireTableRowsInserted(idx, idx);
+			if(idx!=-1)
+			{
+//				System.out.println("Removed: "+pti);
+				threadinfos.remove(idx);
+				fireTableRowsDeleted(idx, idx);
+			}
+//			else
+//			{
+//				System.out.println("Cannot remove: "+pti);
+//			}
+		}
+		
+		public void updateValue(ProcessThreadInfo pti)
+		{
+			int idx = threadinfos.indexOf(pti);
+			if(idx!=-1)
+			{
+//				System.out.println("Updated: "+pti);
+				threadinfos.remove(idx);
+				threadinfos.add(idx, pti);
+				fireTableRowsUpdated(idx, idx);
+			}
+//			else
+//			{
+//				System.out.println("Cannot update: "+pti);
+//			}
 		}
 		
 		public Object getValueAt(int row, int column)

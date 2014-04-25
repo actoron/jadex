@@ -2,8 +2,8 @@ package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.editor.gui.EdgeDragContextMenu;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.contextmenus.EdgeDragContextMenu;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VEdge;

@@ -136,7 +136,7 @@ public class MSequenceEdge extends MEdge
 	 */
 	public IParsedExpression getParsedCondition()
 	{
-		return condition != null? (IParsedExpression) condition.getParsed() : null;
+		return condition != null? (IParsedExpression)condition.getParsed() : null;
 	}
 	
 	/**

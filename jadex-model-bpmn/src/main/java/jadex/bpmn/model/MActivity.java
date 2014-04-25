@@ -97,7 +97,7 @@ public class MActivity extends MAssociationTarget
 	protected ClassInfo clazz;
 	
 	/** Non-functional hard constraints for service searches. */
-	protected List<MHardConstraint> searchconstraints;
+//	protected List<MHardConstraint> searchconstraints;
 	
 	//-------- methods --------
 	
@@ -567,13 +567,13 @@ public class MActivity extends MAssociationTarget
 	 *  Get the parameters.
 	 *  @return The parameters.
 	 */
-	public IndexMap<String, MParameter>	getAllParameters(Map<String, Object> params, IModelInfo model, ClassLoader cl)
+	public IndexMap<String, MParameter>	getAllParameters(Map<String, Object> params, String[] imports, ClassLoader cl)
 	{
 		IndexMap<String, MParameter> ret = new IndexMap<String, MParameter>(parameters);
 		
 		if(clazz!=null)
 		{
-			Class<?> task = clazz.getType(cl, model.getAllImports());
+			Class<?> task = clazz.getType(cl, imports);
 			try
 			{
 				Method m = task.getMethod("getExtraParameters", new Class[]{Map.class});
@@ -823,25 +823,25 @@ public class MActivity extends MAssociationTarget
 		this.properties = properties;
 	}
 	
-	/**
-	 *  Gets the search constraints.
-	 *
-	 *  @return The search constraints.
-	 */
-	public List<MHardConstraint> getSearchConstraints()
-	{
-		return searchconstraints;
-	}
-
-	/**
-	 *  Sets the search constraints.
-	 *
-	 *  @param searchconstraints The search constraints to set.
-	 */
-	public void setSearchConstraints(List<MHardConstraint> searchconstraints)
-	{
-		this.searchconstraints = searchconstraints;
-	}
+//	/**
+//	 *  Gets the search constraints.
+//	 *
+//	 *  @return The search constraints.
+//	 */
+//	public List<MHardConstraint> getSearchConstraints()
+//	{
+//		return searchconstraints;
+//	}
+//
+//	/**
+//	 *  Sets the search constraints.
+//	 *
+//	 *  @param searchconstraints The search constraints to set.
+//	 */
+//	public void setSearchConstraints(List<MHardConstraint> searchconstraints)
+//	{
+//		this.searchconstraints = searchconstraints;
+//	}
 
 	/**
 	 *  Test if a property exists.

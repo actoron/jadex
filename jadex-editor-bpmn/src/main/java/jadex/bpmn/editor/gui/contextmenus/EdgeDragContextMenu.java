@@ -1,5 +1,8 @@
-package jadex.bpmn.editor.gui;
+package jadex.bpmn.editor.gui.contextmenus;
 
+import jadex.bpmn.editor.gui.BpmnToolbar;
+import jadex.bpmn.editor.gui.ImageProvider;
+import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.BpmnToolbar.IconGenerationTask;
 import jadex.bpmn.editor.gui.controllers.SCreationController;
 import jadex.bpmn.editor.model.visual.VActivity;
@@ -27,8 +30,24 @@ import com.mxgraph.model.mxICell;
 
 public class EdgeDragContextMenu extends JPopupMenu
 {
+	/** 
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	/**
+	 *  Default creation items in the main part of the menu.
+	 */
 	protected Tuple3<String, String, Icon>[] defaultitems;
+	
+	/**
+	 *  Intermediate events in sub-menu.
+	 */
 	protected Tuple3<String, String, Icon>[] intermediateeventitems;
+	
+	/**
+	 *  End events in sub-menu.
+	 */
 	protected Tuple3<String, String, Icon>[] endeventitems;
 	
 	/** Source cell */
@@ -42,6 +61,7 @@ public class EdgeDragContextMenu extends JPopupMenu
 	 * 
 	 * @param src The source cell
 	 */
+	@SuppressWarnings("unchecked")
 	public EdgeDragContextMenu(final ModelContainer modelcontainer, Object src, final Point loc, final ActionListener actionlistener)
 	{
 		super("Create Target");
@@ -110,6 +130,11 @@ public class EdgeDragContextMenu extends JPopupMenu
 		
 		Action action = new AbstractAction()
 		{
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				String mode = ((JMenuItem) e.getSource()).getName();
