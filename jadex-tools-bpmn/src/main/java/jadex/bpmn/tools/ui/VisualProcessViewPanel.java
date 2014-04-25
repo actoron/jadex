@@ -16,17 +16,24 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
 import jadex.commons.future.FutureTerminatedException;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
+import jadex.tools.debugger.DebuggerMainPanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -398,15 +405,13 @@ public class VisualProcessViewPanel extends JPanel
 								threads.getSelectionModel().addListSelectionListener(sellistener);
 							}
 						}
+						
+						// Step when double click
+						if(e.getClickCount()==2)
+						{
+							doStep();
+						}
 					}
-				}
-			});
-			
-			modelcontainer.getGraphComponent().addMouseListener(new MouseAdapter()
-			{
-				public void mouseClicked(MouseEvent e)
-				{
-					
 				}
 			});
 			
@@ -608,6 +613,9 @@ public class VisualProcessViewPanel extends JPanel
 			bpp.setSelectedBreakpoints((String[])sel_bps.toArray(new String[sel_bps.size()]));
 		}
 		
+		modelcontainer.getGraph().getView().invalidate();
+		modelcontainer.getGraph().getView().clear(modelcontainer.getGraph().getModel().getRoot(), true, true);
+		modelcontainer.getGraph().getView().validate();
 		modelcontainer.getGraphComponent().refresh();
 	}
 	
@@ -841,6 +849,33 @@ public class VisualProcessViewPanel extends JPanel
     	}
     	return ret;
     }
+	
+	/**
+	 *  Perform a step.
+	 */
+	protected void doStep()
+	{
+		SServiceProvider.getServiceUpwards(access.getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(this)
+		{
+			public void customResultAvailable(final IComponentManagementService cms)
+			{
+				IFuture<Void> ret = cms.stepComponent(access.getComponentIdentifier(), getStepInfo());
+				ret.addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						updateViews();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				});
+			}
+		});
+	}
 }
 
 
