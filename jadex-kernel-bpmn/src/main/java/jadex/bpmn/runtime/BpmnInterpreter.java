@@ -240,7 +240,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		List<MActivity> startevents = model.getStartActivities(null, null);
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
-			ProcessThread	thread	= new ProcessThread(""+idcnt++, startevents.get(i), topthread, BpmnInterpreter.this);
+			ProcessThread	thread	= new ProcessThread(startevents.get(i), topthread, BpmnInterpreter.this);
 			topthread.addThread(thread);
 		}
 	}	
@@ -403,7 +403,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 		
-		this.topthread = new ProcessThread(""+idcnt++, null, null, this);
+		this.topthread = new ProcessThread(null, null, this);
 		this.messages = new ArrayList<Object>();
 		this.streams = new ArrayList<IConnection>();
 		
@@ -483,10 +483,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 											public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 											{
 												BpmnInterpreter ip = (BpmnInterpreter)ia;
-												ProcessThread thread = new ProcessThread(""+ip.idcnt++, fevtsubentry.getFirstEntity(), 
+												ProcessThread thread = new ProcessThread(fevtsubentry.getFirstEntity(), 
 													ip.getTopLevelThread(), ip);
 												ip.getTopLevelThread().addThread(thread);
-												ProcessThread subthread = new ProcessThread(""+ip.idcnt++, fevtsubentry.getSecondEntity(), thread, ip);
+												ProcessThread subthread = new ProcessThread(fevtsubentry.getSecondEntity(), thread, ip);
 												thread.addThread(subthread);
 												subthread.setParameterValue("$event", event);
 												return IFuture.DONE;
@@ -789,15 +789,15 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             {
             	if(triggersubproc != null)
             	{
-            		ProcessThread thread = new ProcessThread(""+idcnt++, triggersubproc, getTopLevelThread(), this);
+            		ProcessThread thread = new ProcessThread(triggersubproc, getTopLevelThread(), this);
             		getTopLevelThread().addThread(thread);
-					ProcessThread subthread = new ProcessThread(""+idcnt++, triggeractivity, thread, this);
+					ProcessThread subthread = new ProcessThread(triggeractivity, thread, this);
 					thread.addThread(subthread);
 					subthread.setParameterValue("$event", trigger.getThirdEntity());
             	}
             	else
             	{
-                    ProcessThread    thread    = new ProcessThread(""+idcnt++, mact, getTopLevelThread(), BpmnInterpreter.this);
+                    ProcessThread    thread    = new ProcessThread(mact, getTopLevelThread(), BpmnInterpreter.this);
                     thread.setParameterValue("$event", trigger.getThirdEntity());
                     getTopLevelThread().addThread(thread);
             	}
@@ -808,7 +808,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             	&& !MBpmnModel.EVENT_START_SIGNAL.equals(mact.getActivityType())
             	&& !MBpmnModel.EVENT_START_TIMER.equals(mact.getActivityType()))
             {
-                ProcessThread thread = new ProcessThread(""+idcnt++, mact, getTopLevelThread(), BpmnInterpreter.this);
+                ProcessThread thread = new ProcessThread(mact, getTopLevelThread(), BpmnInterpreter.this);
                 getTopLevelThread().addThread(thread);
             }
         } 
@@ -1546,7 +1546,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //					MPool pl = pool!=null? bpmnmodel.getPool(pool): (MPool)bpmnmodel.getPools().get(0);
 					MPool pl = (MPool)bpmnmodel.getPools().get(0);
 					act.setPool(pl);
-					ProcessThread thread = new ProcessThread(""+idcnt++, act, topthread, BpmnInterpreter.this);
+					ProcessThread thread = new ProcessThread(act, topthread, BpmnInterpreter.this);
 					thread.setLastEdge(edge);
 					thread.setParameterValue("step", new Object[]{step, ret});
 					topthread.addExternalThread(thread);

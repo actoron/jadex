@@ -54,7 +54,7 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		
 		MActivity	act	= (MActivity)events.get(method);
 //		ThreadContext	tc	= instance.getThreadContext();
-		ProcessThread	thread	= new ProcessThread(""+instance.idcnt++, act, instance.getTopLevelThread(), instance);
+		ProcessThread	thread	= new ProcessThread(act, instance.getTopLevelThread(), instance);
 		instance.getTopLevelThread().addThread(thread);
 //		tc.addThread(thread);
 
