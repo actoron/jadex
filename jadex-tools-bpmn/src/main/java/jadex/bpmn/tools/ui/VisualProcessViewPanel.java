@@ -16,6 +16,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -33,6 +34,7 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
+import jadex.tools.debugger.BreakpointPanel;
 import jadex.tools.debugger.DebuggerMainPanel;
 
 import java.awt.BorderLayout;
@@ -46,6 +48,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -404,12 +407,18 @@ public class VisualProcessViewPanel extends JPanel
 								threads.clearSelection();
 								threads.getSelectionModel().addListSelectionListener(sellistener);
 							}
-						}
-						
-						// Step when double click
-						if(e.getClickCount()==2)
-						{
-							doStep();
+							
+							// Step when double click on thread
+							if(sels.size()>0 && e.getClickCount()==2 && getStepInfo()!=null)
+							{
+								doStep();
+							}
+							
+							// Double click on element toggles breakpoint
+							if(sels.size()==0)
+							{
+								
+							}
 						}
 					}
 				}
@@ -876,6 +885,41 @@ public class VisualProcessViewPanel extends JPanel
 			}
 		});
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public void addBreakPoint(String id)
+//	{
+//		final List	bps	= new ArrayList(Arrays.asList(access.getComponentIdentifier()));
+//		if(but.isSelected())
+//		{
+//			bps.add(breakpoints.get(sorter.modelIndex(rowIndex)));
+//		}
+//		else
+//		{
+//			bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
+//		}
+//		
+//		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(VisualProcessViewPanel.this)
+//		{
+//			public void customResultAvailable(IComponentManagementService cms)
+//			{
+//				cms.setComponentBreakpoints(access.getComponentIdentifier(), (String[])bps.toArray(new String[bps.size()]))
+//				.addResultListener(new IResultListener<Void>()
+//				{
+//					public void resultAvailable(Void result)
+//					{
+//					}
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						exception.printStackTrace();
+//					}
+//				});
+//			}
+//		});
+//	}
 }
 
 
