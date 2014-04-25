@@ -69,6 +69,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		
+		<!-- Remove this stuff, don't know how :-( -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-rules-eca</artifactId>

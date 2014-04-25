@@ -17,21 +17,19 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-commons</artifactId>
-<!-- 			<version>${project.version}</version> -->
 			<version>${project.version}</version>
 		</dependency>
-		
+	
+		<!-- todo: remove, big problem IModelInfo -->  	
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-bridge</artifactId>
-<!-- 			<version>${project.version}</version> -->
 			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>
-<!-- 			<version>${project.version}</version> -->
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

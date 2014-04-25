@@ -1,7 +1,5 @@
 package jadex.bpmn.model;
 
-import jadex.bridge.nonfunctional.hardconstraints.MHardConstraint;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +38,8 @@ public class MSubProcess extends MActivity
 	/** The subprocess type (e.g. looping). */
 	protected String subprocesstype;
 	
-	/** Non-functional hard constraints valid during the subprocess */
-	protected List<MHardConstraint> hardconstraints;
+//	/** Non-functional hard constraints valid during the subprocess */
+//	protected List<MHardConstraint> hardconstraints;
 	
 	//-------- methods --------
 	
@@ -107,43 +105,43 @@ public class MSubProcess extends MActivity
 			activities.remove(vertex);
 	}
 	
-	/**
-	 *  Add a non-functional hard constraint.
-	 *  @param hardconstraint The constraint.
-	 */ 
-	public void addHardConstraint(MHardConstraint hardconstraint)
-	{
-		if(hardconstraints==null)
-			hardconstraints = new ArrayList<MHardConstraint>();
-		
-		if(hardconstraints.contains(hardconstraint))
-		{
-			Thread.dumpStack();
-			System.out.println("Duplicate Item:" +hardconstraint);
-		}
-		
-		hardconstraints.add(hardconstraint);
-	}
-	
-	/**
-	 *  Remove a non-functional hard constraint.
-	 *  @param hardconstraint The constraint.
-	 */ 
-	public void removeHardConstraint(MHardConstraint hardconstraint)
-	{
-		if(hardconstraints!=null)
-			hardconstraints.remove(hardconstraint);
-	}
-	
-	/**
-	 *  Returns the hard constraints.
-	 *  
-	 *  @return The hard constraints.
-	 */
-	public List<MHardConstraint> getHardConstraints()
-	{
-		return hardconstraints;
-	}
+//	/**
+//	 *  Add a non-functional hard constraint.
+//	 *  @param hardconstraint The constraint.
+//	 */ 
+//	public void addHardConstraint(MHardConstraint hardconstraint)
+//	{
+//		if(hardconstraints==null)
+//			hardconstraints = new ArrayList<MHardConstraint>();
+//		
+//		if(hardconstraints.contains(hardconstraint))
+//		{
+//			Thread.dumpStack();
+//			System.out.println("Duplicate Item:" +hardconstraint);
+//		}
+//		
+//		hardconstraints.add(hardconstraint);
+//	}
+//	
+//	/**
+//	 *  Remove a non-functional hard constraint.
+//	 *  @param hardconstraint The constraint.
+//	 */ 
+//	public void removeHardConstraint(MHardConstraint hardconstraint)
+//	{
+//		if(hardconstraints!=null)
+//			hardconstraints.remove(hardconstraint);
+//	}
+//	
+//	/**
+//	 *  Returns the hard constraints.
+//	 *  
+//	 *  @return The hard constraints.
+//	 */
+//	public List<MHardConstraint> getHardConstraints()
+//	{
+//		return hardconstraints;
+//	}
 	
 	/**
 	 *  Get an activity per id.

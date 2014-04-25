@@ -6,6 +6,9 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ */
 public class MContextVariable extends Argument
 {
 	/** Initial values for configurations */

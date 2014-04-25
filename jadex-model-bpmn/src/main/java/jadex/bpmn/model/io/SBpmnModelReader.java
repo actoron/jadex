@@ -467,7 +467,7 @@ public class SBpmnModelReader
 			String dur = (String) buffer.remove("duration");
 			if (dur != null)
 			{
-				UnparsedExpression exp = parseExp(new UnparsedExpression("duration", "java.lang.Number", dur, null),model.getModelInfo().getAllImports(), cl);
+				UnparsedExpression exp = parseExp(new UnparsedExpression("duration", "java.lang.Number", dur, null), model.getModelInfo().getAllImports(), cl);
 				MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
 				evt.addProperty(mprop);
 			}

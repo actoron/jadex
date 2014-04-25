@@ -1,7 +1,6 @@
 package jadex.bpmn.model.task;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
 
 /**
  *  The task context contains the data available to
