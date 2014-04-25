@@ -68,6 +68,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.kernelbase.DefaultPersistInfo;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;

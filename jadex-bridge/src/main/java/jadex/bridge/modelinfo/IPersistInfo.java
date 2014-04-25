@@ -3,8 +3,8 @@ package jadex.bridge.modelinfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 
 /**
- *  Interface for a persistable component state.
- *
+ *  Interface for a persistable component state
+ *  to be used from the outside (e.g. persistence service).
  */
 public interface IPersistInfo
 {

@@ -1,8 +1,8 @@
 package jadex.micro;
 
-import jadex.kernelbase.AbstractPersistInfo;
+import jadex.kernelbase.DefaultPersistInfo;
 
-public class MicroAgentPersistInfo extends AbstractPersistInfo
+public class MicroAgentPersistInfo extends DefaultPersistInfo
 {
 	/** The agent object implemented by the user. */
 	protected Object useragentobject;

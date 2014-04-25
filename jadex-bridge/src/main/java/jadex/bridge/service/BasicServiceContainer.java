@@ -14,7 +14,6 @@ import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.commons.IRemoteFilter;
-import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -539,6 +538,24 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			ret.setResult(null);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get the current state for snapshot or persistence.
+	 */
+	public IFuture<ServiceContainerPersistInfo>	getPersistInfo()
+	{
+		return new Future<ServiceContainerPersistInfo>(new ServiceContainerPersistInfo(this));
+	}
+	
+	/**
+	 *  Restore a container from a persited state,
+	 */
+	public IFuture<Void>	restore(ServiceContainerPersistInfo info)
+	{
+		// Todo...
+		this.started	= true;
+		return IFuture.DONE;
 	}
 	
 	/**

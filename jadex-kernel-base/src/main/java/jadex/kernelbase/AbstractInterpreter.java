@@ -22,7 +22,6 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
-import jadex.commons.future.Future;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
@@ -114,8 +113,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 * Create a new context.
 	 */
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, final IComponentAdapterFactory factory, final IExternalAccess parent,
-		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist, IPersistInfo persistinfo, IIntermediateResultListener<Tuple2<String, Object>> resultlistener,
-		final Future<Void> inited)
+		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist, IPersistInfo persistinfo, IIntermediateResultListener<Tuple2<String, Object>> resultlistener)
 	{
 		this.config = config != null ? config : model.getConfigurationNames().length > 0 ? model.getConfigurationNames()[0] : null;
 		this.model = model;
@@ -139,6 +137,11 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			cmssub.addResultListener(resultlistener);
 			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String, Object>>>();
 			resultsubscriptions.add(cmssub);
+		}
+		
+		if(persistinfo!=null)
+		{
+			getServiceContainer().restore(((DefaultPersistInfo)persistinfo).getServiceContainer());
 		}
 	}
 

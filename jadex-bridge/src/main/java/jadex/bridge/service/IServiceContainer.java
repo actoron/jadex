@@ -7,7 +7,6 @@ import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.IRemoteFilter;
-import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -42,6 +41,16 @@ public interface IServiceContainer extends IServiceProvider
 	 */
 	// todo: remove, only call from platform
 	public IFuture<Void> shutdown();
+	
+	/**
+	 *  Get the current state for snapshot or persistence.
+	 */
+	public IFuture<ServiceContainerPersistInfo>	getPersistInfo();
+	
+	/**
+	 *  Restore a container from a persited state,
+	 */
+	public IFuture<Void>	restore(ServiceContainerPersistInfo info);
 	
 	/**
 	 *  Add a service to the container.

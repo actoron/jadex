@@ -11,6 +11,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.IResultSelector;
@@ -19,6 +20,7 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -71,6 +73,23 @@ public class ServiceContainerProxy implements IServiceContainer
 	{
 		throw new UnsupportedOperationException();
 	}
+	
+	/**
+	 *  Get the current state for snapshot or persistence.
+	 */
+	public IFuture<ServiceContainerPersistInfo>	getPersistInfo()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Restore a container from a persited state,
+	 */
+	public IFuture<Void>	restore(ServiceContainerPersistInfo info)
+	{
+		throw new UnsupportedOperationException();
+	}
+
 	
 	/**
 	 *  Add a service to the container.

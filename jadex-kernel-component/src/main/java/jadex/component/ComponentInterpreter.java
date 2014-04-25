@@ -21,6 +21,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.DefaultPersistInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited,
 		ClassLoader classloader)
 	{
-		super(desc, model, config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, inited);
+		super(desc, model, config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener);
 		this.steps = new ArrayList();
 		this.classloader = classloader;
 	
@@ -359,5 +360,4 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	public void	afterBlock()
 	{
 	}
-
 }

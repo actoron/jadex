@@ -1,13 +1,13 @@
 package jadex.bpmn.runtime.persist;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.kernelbase.AbstractPersistInfo;
+import jadex.kernelbase.DefaultPersistInfo;
 
 /**
  *  Class containing persistence information about
  *  a Bpmn process instance.
  */
-public class BpmnPersistInfo extends AbstractPersistInfo
+public class BpmnPersistInfo extends DefaultPersistInfo
 {
 	//-------- attribute --------
 	

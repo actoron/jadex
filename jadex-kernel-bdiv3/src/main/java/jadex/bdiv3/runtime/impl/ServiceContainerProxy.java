@@ -10,6 +10,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.IResultSelector;
@@ -68,6 +69,22 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	// todo: remove, only call from platform
 	public IFuture shutdown()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get the current state for snapshot or persistence.
+	 */
+	public IFuture<ServiceContainerPersistInfo>	getPersistInfo()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Restore a container from a persited state,
+	 */
+	public IFuture<Void>	restore(ServiceContainerPersistInfo info)
 	{
 		throw new UnsupportedOperationException();
 	}
