@@ -131,7 +131,7 @@ public class DebuggerMainPanel extends JSplitPane
 								}
 								
 								// Sub panels of right panel.
-								SComponentFactory.getProperty(DebuggerMainPanel.this.jcc.getPlatformAccess(), DebuggerMainPanel.this.desc.getType(), KEY_DEBUGGER_PANELS)
+								SComponentFactory.getProperty(exta, DebuggerMainPanel.this.desc.getType(), KEY_DEBUGGER_PANELS)
 									.addResultListener(new SwingDefaultResultListener<Object>(DebuggerMainPanel.this)
 								{
 									public void customResultAvailable(Object result)
