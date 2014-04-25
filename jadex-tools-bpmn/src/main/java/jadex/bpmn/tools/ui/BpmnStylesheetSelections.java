@@ -24,6 +24,20 @@ public class BpmnStylesheetSelections extends BpmnStylesheetColorGradient
 	 */
 	public BpmnStylesheetSelections()
 	{
+		Map<String, Object> style = new HashMap<String, Object>();
+		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
+		style.put(mxConstants.STYLE_FILLCOLOR, "#0000FF");
+		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
+		style.put(mxConstants.STYLE_FONTSIZE, 16);
+		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
+		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
+		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
+		style.put(mxConstants.STYLE_SHADOW, Boolean.FALSE);
+//		style.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
+		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+		putCellStyle(BreakpointMarker.class.getSimpleName(), style);
+		
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK);
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS);
 		addWaitingEntry(VExternalSubProcess.class.getSimpleName());

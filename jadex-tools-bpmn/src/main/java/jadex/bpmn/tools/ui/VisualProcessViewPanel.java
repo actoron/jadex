@@ -1,5 +1,6 @@
 package jadex.bpmn.tools.ui;
 
+import jadex.base.gui.CMSUpdateHandler;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.GuiConstants;
@@ -21,6 +22,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -41,6 +43,7 @@ import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.tools.debugger.BreakpointPanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -56,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.BorderFactory;
@@ -67,10 +71,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
+import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.handler.mxConnectionHandler;
 
@@ -110,7 +116,7 @@ public class VisualProcessViewPanel extends JPanel
 	/**
 	 *  Create an agenda panel.
 	 */
-	public VisualProcessViewPanel(final IExternalAccess access, IBreakpointPanel bpp) 
+	public VisualProcessViewPanel(final IExternalAccess access, IBreakpointPanel bpp, CMSUpdateHandler cmshandler) 
 	{
 		try
 		{
@@ -538,6 +544,74 @@ public class VisualProcessViewPanel extends JPanel
 					}
 				}
 			});
+			
+			cmshandler.addCMSListener(access.getComponentIdentifier(), new ICMSComponentListener()
+			{
+				public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
+				{
+					return IFuture.DONE;
+				}
+				
+				public IFuture<Void> componentChanged(IComponentDescription desc)
+				{
+					final String[] bps = desc.getBreakpoints();
+					if(bps!=null && bps.length>0)
+					{
+						getActiveBreakpoints().addResultListener(new IResultListener<List<String>>()
+						{
+							public void resultAvailable(List<String> abps)
+							{
+								mxICell cell = (mxICell)graph.getModel().getRoot();
+								for(String bp: bps)
+								{
+									if(abps.contains(bp))
+									{
+										VElement ve = getVElement(cell, bp);
+										if(ve!=null)
+										{
+											BreakpointMarker pbm = new BreakpointMarker(graph);
+											mxGeometry geo = new mxGeometry(0, 0, 20, 20);
+//											geo.setRelative(true);
+											pbm.setGeometry(geo);
+											ve.insert(pbm);
+											graph.refreshCellView(ve);
+											graph.refreshCellView(pbm);
+											System.out.println("added: "+pbm);
+										}
+									}
+									else
+									{
+										VElement ve = getVElement(cell, bp);
+										if(ve!=null)
+										{
+											for(int i=0; i<ve.getChildCount(); i++)
+											{
+												mxICell cc = ve.getChildAt(i);
+												if(cc instanceof BreakpointMarker)
+												{
+													graph.removeCells(new Object[]{cc});
+													break;
+												}
+											}
+										}
+									}
+								}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								exception.printStackTrace();
+							}
+						});
+					}
+					return IFuture.DONE;
+				}
+				
+				public IFuture<Void> componentAdded(IComponentDescription desc)
+				{
+					return IFuture.DONE;
+				}
+			});
 		}
 		catch(Exception e)
 		{
@@ -605,7 +679,8 @@ public class VisualProcessViewPanel extends JPanel
 		modelcontainer.getGraph().getView().invalidate();
 		modelcontainer.getGraph().getView().clear(modelcontainer.getGraph().getModel().getRoot(), true, true);
 		modelcontainer.getGraph().getView().validate();
-		modelcontainer.getGraphComponent().refresh();
+		modelcontainer.getGraph().refresh();
+//		modelcontainer.getGraphComponent().refresh();
 	}
 	
 	//-------- helper classes --------
@@ -934,6 +1009,35 @@ public class VisualProcessViewPanel extends JPanel
 				
 		return ret;
 	}
+	
+	 /**
+     *  Find the velement of the graph that fits to the bpmn id.
+     *  @param cell The start cell.
+     *  @param brpid The activity id.
+     *  @return The element.
+     */
+    protected VElement getVElement(mxICell cell, String brpid)
+    {
+    	VElement ret = null;
+    	if(cell instanceof VElement)
+		{
+			VElement ve = (VElement)cell;
+			if(ve.getBpmnElement() instanceof MActivity && ((MActivity)ve.getBpmnElement()).getBreakpointId().equals(brpid))
+			{
+				ret = ve;
+			}
+		}
+    	
+    	if(ret==null)
+    	{
+    		for(int i=0; i<cell.getChildCount() && ret==null; i++)
+    		{
+    			ret = getVElement(cell.getChildAt(i), brpid);
+    		}
+    	}
+    	
+    	return ret;
+    }
 }
 
 
