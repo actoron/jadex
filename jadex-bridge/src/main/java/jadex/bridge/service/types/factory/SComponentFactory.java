@@ -339,13 +339,13 @@ public class SComponentFactory
 	{
 		final Future<Object> ret = new Future<Object>();
 		
-		exta.scheduleStep(new IComponentStep<Object>()
+		exta.scheduleImmediate(new IComponentStep<Object>()
 		{
 			@Classname("getProperty")
 			public IFuture<Object> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class)
+				SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)

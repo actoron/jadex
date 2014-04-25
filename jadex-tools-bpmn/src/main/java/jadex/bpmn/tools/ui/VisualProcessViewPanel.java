@@ -15,15 +15,16 @@ import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.BulkMonitoringEvent;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
+import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -34,8 +35,7 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
-import jadex.tools.debugger.BreakpointPanel;
-import jadex.tools.debugger.DebuggerMainPanel;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -44,13 +44,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -67,9 +67,6 @@ import javax.swing.table.AbstractTableModel;
 
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.handler.mxConnectionHandler;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 /**
  * 
@@ -118,13 +115,12 @@ public class VisualProcessViewPanel extends JPanel
 			this.hmodel	= new HistoryModel();
 			this.modelcontainer = new ModelContainer(null);
 			
-			String filename = access.getModel().getFilename();
 			BpmnStylesheetSelections sheet = new BpmnStylesheetSelections();
 			final BpmnGraph graph = new BpmnGraph(modelcontainer, sheet);
 			graph.setCellsMovable(false);
 			graph.setCellsResizable(false);
 			graph.setCellsLocked(true);
-			BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph)
+			final BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph)
 			{
 				public VActivity createActivity() 
 				{
@@ -190,17 +186,55 @@ public class VisualProcessViewPanel extends JPanel
 					return ret;
 				}
 			};
-			graph.deactivate();
-			graph.setEventsEnabled(false);
-			graph.getModel().beginUpdate();
-			// todo: test jar and use inputstream from classloader
-			MBpmnModel mmodel = SBpmnModelReader.readModel(new FileInputStream(filename), filename, vreader);
-			graph.getModel().endUpdate();
-			graph.setEventsEnabled(true);
-			graph.activate();
-			modelcontainer.setBpmnModel(mmodel);
+
 			modelcontainer.setGraph(graph);
-			modelcontainer.setFile(new File(filename));
+
+			
+			// Asynchronously load the visual model (maybe from remote).
+			access.scheduleImmediate(new IComponentStep<String>()
+			{
+				@Classname("loadModel")
+				public IFuture<String> execute(IInternalAccess ia)
+				{
+					Future<String>	ret	= new Future<String>();
+					try
+					{
+						File f	= new File(ia.getModel().getFilename());
+						String	content	= new Scanner(f, "UTF-8").useDelimiter("\\Z").next();
+						ret.setResult(content);
+					}
+					catch(FileNotFoundException fnfe)
+					{
+						ret.setException(fnfe);
+					}
+					return ret;
+				}
+			})
+				.addResultListener(new SwingDefaultResultListener<String>(this)
+			{
+				public void customResultAvailable(String content)
+				{
+					try
+					{
+						graph.deactivate();
+						graph.setEventsEnabled(false);
+						graph.getModel().beginUpdate();
+						MBpmnModel mmodel = SBpmnModelReader.readModel(new ByteArrayInputStream(content.getBytes("UTF-8")), access.getModel().getFilename(), vreader);
+						graph.getModel().endUpdate();
+						graph.setEventsEnabled(true);
+						graph.activate();
+						modelcontainer.setBpmnModel(mmodel);
+//						modelcontainer.setFile(new File(filename));	// file not available locally?
+						
+						updateViews();
+					}
+					catch(Exception e)
+					{
+						customExceptionOccurred(e);
+					}
+				}
+			});
+			
 			BpmnGraphComponent bpmncomp = new BpmnGraphComponent(graph)
 			{
 				// Do not allow connection drawing
@@ -455,6 +489,7 @@ public class VisualProcessViewPanel extends JPanel
 			
 			sub = access.subscribeToEvents(new IFilter<IMonitoringEvent>()
 			{
+				@Classname("eventfilter")
 				public boolean filter(IMonitoringEvent ev)
 				{
 					return true;	

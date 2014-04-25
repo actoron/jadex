@@ -210,7 +210,10 @@ public class SRemoteGui
 	//										System.out.println("Removing listener: "+id);
 											try
 											{
-												cms.removeComponentListener(null, new RemoteCMSListener(cid, id, cms, null));
+												if(cms!=null)
+												{
+													cms.removeComponentListener(null, new RemoteCMSListener(cid, id, cms, null));
+												}
 											}
 											catch(RuntimeException e)
 											{

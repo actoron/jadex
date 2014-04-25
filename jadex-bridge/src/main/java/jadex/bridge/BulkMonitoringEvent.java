@@ -4,6 +4,7 @@ import java.util.Map;
 
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.transformation.annotations.Exclude;
 
 /**
  * 
@@ -78,6 +79,7 @@ public class BulkMonitoringEvent implements IMonitoringEvent
 	 *  Get the cause.
 	 *  @return The cause.
 	 */
+	@Exclude
 	public Cause getCause()
 	{
 		throw new UnsupportedOperationException();
@@ -87,6 +89,7 @@ public class BulkMonitoringEvent implements IMonitoringEvent
 	 *  Set the cause.
 	 *  @param cause The cause to set.
 	 */
+	@Exclude
 	public void setCause(Cause cause)
 	{
 		throw new UnsupportedOperationException();
