@@ -220,7 +220,8 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		{
 			names.add(((MActivity)it.next()).getBreakpointId());
 		}
-		addProperty("debugger.breakpoints", names);
+		modelinfo.setBreakpoints((String[])names.toArray(new String[names.size()]));
+//		addProperty("debugger.breakpoints", names);
 		
 //		modelinfo.setConfigurationNames(getConfigurations());
 		

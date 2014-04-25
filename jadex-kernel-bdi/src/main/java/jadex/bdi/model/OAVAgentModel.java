@@ -90,8 +90,9 @@ public class OAVAgentModel	extends OAVCapabilityModel
 		List names = new ArrayList();
 		for(Iterator it=matcherfunc.getRulebase().getRules().iterator(); it.hasNext(); )
 			names.add(((IRule)it.next()).getName());
-		modelinfo.addProperty("debugger.breakpoints", names);
-//		
+//		modelinfo.addProperty("debugger.breakpoints", names);
+		modelinfo.setBreakpoints((String[])names.toArray(new String[names.size()]));
+		
 ////		// Exclude IExternalAccess 
 ////		// Exclude all IBDIExternalAccess methods! :-( they work on flyweights
 ////		// Exclude many IEACapability methods
