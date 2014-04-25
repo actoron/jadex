@@ -4,6 +4,7 @@ import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.contextmenus.GatewayContextMenu;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VEdge;
@@ -167,6 +168,23 @@ public class MouseController extends MouseAdapter
 			if (cell instanceof VEdge)
 			{
 				SCreationController.deleteControlPoint((VEdge) cell, mxp, modelcontainer);
+			}
+		}
+		else if (MouseEvent.BUTTON3 == e.getButton() &&
+				 modelcontainer.getGraph().getSelectionCount() == 1 &&
+				 modelcontainer.getGraph().getSelectionCell() instanceof VActivity &&
+				 modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY()) == modelcontainer.getGraph().getSelectionCell())
+		{
+			VActivity activity = (VActivity) modelcontainer.getGraph().getSelectionCell();
+			if (activity.getMActivity().getActivityType() != null)
+			{
+				if (activity.getMActivity().getActivityType().startsWith("Gateway"))
+				{
+					GatewayContextMenu gcm = new GatewayContextMenu(activity, modelcontainer);
+					int x = e.getX() - modelcontainer.getGraphComponent().getHorizontalScrollBar().getModel().getValue();
+					int y = e.getY() - modelcontainer.getGraphComponent().getVerticalScrollBar().getModel().getValue();
+					gcm.show(modelcontainer.getGraphComponent(), x, y);
+				}
 			}
 		}
 //		else if (MouseEvent.BUTTON3 == e.getButton() &&
