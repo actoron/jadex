@@ -124,7 +124,7 @@ public class ProcessThread	implements ITaskContext
 	protected boolean canceled;
 	
 	/** The id counter for sub processes. */
-	public int	idcnt;
+	public int idcnt;
 	
 	/** The split infos. */
 	public Map<String, SplitInfo> splitinfos;
@@ -135,9 +135,18 @@ public class ProcessThread	implements ITaskContext
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
+	public ProcessThread(MActivity activity, ProcessThread parent, BpmnInterpreter instance)
+	{
+		this(null, activity, parent, instance);
+	}
+	
+	/**
+	 *  Create a new process instance.
+	 *  @param activity	The current activity.
+	 */
 	public ProcessThread(String id, MActivity activity, ProcessThread parent, BpmnInterpreter instance)
 	{
-		this.id	= id;
+		this.id	= parent!=null? parent.getNextChildId(): null;
 		this.activity	= activity;
 		this.parent = parent;
 		this.instance = instance;
@@ -341,7 +350,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public ProcessThread createCopy()
 	{
-		ProcessThread	ret	= new ProcessThread(id+"."+idcnt++, activity, parent, instance);
+		ProcessThread	ret	= new ProcessThread(activity, parent, instance);
 		ret.edge	= edge;
 		ret.data	= data!=null? new HashMap<String, Object>(data): null;
 		ret.dataedges	= dataedges!=null? new HashMap<String, Object>(dataedges): null;
@@ -1303,7 +1312,7 @@ public class ProcessThread	implements ITaskContext
 	protected ProcessThread getThread(String id)
 	{
 		ProcessThread ret = null;
-		if(getId().equals(id))
+		if(SUtil.equals(getId(), id))
 		{
 			ret = this;
 		}
@@ -1320,6 +1329,14 @@ public class ProcessThread	implements ITaskContext
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get a cnt for subprocesses.
+	 */
+	protected String getNextChildId()
+	{
+		return getId()!=null? getId()+":"+idcnt++: ""+idcnt++;
 	}
 	
 	/**

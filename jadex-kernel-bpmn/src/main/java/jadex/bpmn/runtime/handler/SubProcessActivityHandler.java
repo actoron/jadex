@@ -74,15 +74,12 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				}
 				else
 				{
-//					ThreadContext subcontext = new ThreadContext(proc, thread);
-//					thread.getThreadContext().addSubcontext(subcontext);
-//					thread.setSubcontext(subcontext);
 					while(it.hasNext())
 					{
 						Object	value	= it.next();
 						for(int i=0; i<start.size(); i++)
 						{
-							ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), thread, instance);
+							ProcessThread subthread = new ProcessThread((MActivity)start.get(i), thread, instance);
 							subthread.setParameterValue("item", value);	// Hack!!! parameter not declared?
 							thread.addThread(subthread);
 //							ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
@@ -136,7 +133,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //				thread.setSubcontext(subcontext);
 				for(int i=0; i<start.size(); i++)
 				{
-					ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), thread, instance);
+					ProcessThread subthread = new ProcessThread((MActivity)start.get(i), thread, instance);
 					thread.addThread(subthread);
 //					subcontext.addThread(subthread);
 //					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
