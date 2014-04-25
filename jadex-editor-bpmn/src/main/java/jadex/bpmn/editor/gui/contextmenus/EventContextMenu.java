@@ -2,14 +2,15 @@ package jadex.bpmn.editor.gui.contextmenus;
 
 import jadex.bpmn.editor.gui.BpmnToolbar;
 import jadex.bpmn.editor.gui.BpmnToolbar.IconGenerationTask;
-import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
 import jadex.commons.Tuple3;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,60 +119,94 @@ public class EventContextMenu extends JPopupMenu
 			}
 		};
 		
-		JMenu submenu = null;
+		List<Container> submenus = new ArrayList<Container>();
+		Container menu = null;
 		if (startlist != null)
 		{
-			submenu = new JMenu("Start Events");
+			if (event.getMActivity().getActivityType() != null && event.getMActivity().getActivityType().startsWith("EventStart"))
+			{
+				menu = this;
+			}
+			else
+			{
+				menu = new JMenu("Start Events");
+				submenus.add(menu);
+			}
 			for (Tuple3<String, String, Icon> item : startlist)
 			{
 				JMenuItem mitem = new JMenuItem(action);
 				mitem.setText(item.getSecondEntity());
 				mitem.setIcon(item.getThirdEntity());
 				mitem.setName(item.getFirstEntity());
-				submenu.add(mitem);
+				menu.add(mitem);
 			}
-			add(submenu);
 		}
 		
 		if (interlist != null)
 		{
-			submenu = new JMenu("Intermediate Events");
+			if (event.getMActivity().getActivityType() != null && event.getMActivity().getActivityType().startsWith("EventIntermediate"))
+			{
+				menu = this;
+			}
+			else
+			{
+				menu = new JMenu("Intermediate Events");
+				submenus.add(menu);
+			}
 			for (Tuple3<String, String, Icon> item : interlist)
 			{
 				JMenuItem mitem = new JMenuItem(action);
 				mitem.setText(item.getSecondEntity());
 				mitem.setIcon(item.getThirdEntity());
 				mitem.setName(item.getFirstEntity());
-				submenu.add(mitem);
+				menu.add(mitem);
 			}
-			add(submenu);
 		}
 		
 		if (handlerlist != null)
 		{
-			submenu = new JMenu("Boundary Events");
+			if (event.getMActivity().isEventHandler())
+			{
+				menu = this;
+			}
+			else
+			{
+				menu = new JMenu("Boundary Events");
+				submenus.add(menu);
+			}
 			for (Tuple3<String, String, Icon> item : handlerlist)
 			{
 				JMenuItem mitem = new JMenuItem(action);
 				mitem.setText(item.getSecondEntity());
 				mitem.setIcon(item.getThirdEntity());
 				mitem.setName(item.getFirstEntity());
-				submenu.add(mitem);
+				menu.add(mitem);
 			}
-			add(submenu);
 		}
 		
 		if (endlist != null)
 		{
-			submenu = new JMenu("End Events");
+			if (event.getMActivity().getActivityType() != null && event.getMActivity().getActivityType().startsWith("EventEnd"))
+			{
+				menu = this;
+			}
+			else
+			{
+				menu = new JMenu("End Events");
+				submenus.add(menu);
+			}
 			for (Tuple3<String, String, Icon> item : endlist)
 			{
 				JMenuItem mitem = new JMenuItem(action);
 				mitem.setText(item.getSecondEntity());
 				mitem.setIcon(item.getThirdEntity());
 				mitem.setName(item.getFirstEntity());
-				submenu.add(mitem);
+				menu.add(mitem);
 			}
+		}
+		
+		for (Container submenu : submenus)
+		{
 			add(submenu);
 		}
 	}

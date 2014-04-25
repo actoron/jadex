@@ -195,52 +195,6 @@ public class VisualProcessViewPanel extends JPanel
 
 			modelcontainer.setGraph(graph);
 
-			
-			// Asynchronously load the visual model (maybe from remote).
-			access.scheduleImmediate(new IComponentStep<String>()
-			{
-				@Classname("loadModel")
-				public IFuture<String> execute(IInternalAccess ia)
-				{
-					Future<String>	ret	= new Future<String>();
-					try
-					{
-						File f	= new File(ia.getModel().getFilename());
-						String	content	= new Scanner(f, "UTF-8").useDelimiter("\\Z").next();
-						ret.setResult(content);
-					}
-					catch(FileNotFoundException fnfe)
-					{
-						ret.setException(fnfe);
-					}
-					return ret;
-				}
-			})
-				.addResultListener(new SwingDefaultResultListener<String>(this)
-			{
-				public void customResultAvailable(String content)
-				{
-					try
-					{
-						graph.deactivate();
-						graph.setEventsEnabled(false);
-						graph.getModel().beginUpdate();
-						MBpmnModel mmodel = SBpmnModelReader.readModel(new ByteArrayInputStream(content.getBytes("UTF-8")), access.getModel().getFilename(), vreader);
-						graph.getModel().endUpdate();
-						graph.setEventsEnabled(true);
-						graph.activate();
-						modelcontainer.setBpmnModel(mmodel);
-//						modelcontainer.setFile(new File(filename));	// file not available locally?
-						
-						updateViews();
-					}
-					catch(Exception e)
-					{
-						customExceptionOccurred(e);
-					}
-				}
-			});
-			
 			BpmnGraphComponent bpmncomp = new BpmnGraphComponent(graph)
 			{
 				// Do not allow connection drawing
@@ -539,6 +493,51 @@ public class VisualProcessViewPanel extends JPanel
 			
 			setLayout(new BorderLayout());
 			add(tmp2, BorderLayout.CENTER);
+			
+			// Asynchronously load the visual model (maybe from remote).
+			access.scheduleImmediate(new IComponentStep<String>()
+			{
+				@Classname("loadModel")
+				public IFuture<String> execute(IInternalAccess ia)
+				{
+					Future<String>	ret	= new Future<String>();
+					try
+					{
+						File f	= new File(ia.getModel().getFilename());
+						String	content	= new Scanner(f, "UTF-8").useDelimiter("\\Z").next();
+						ret.setResult(content);
+					}
+					catch(FileNotFoundException fnfe)
+					{
+						ret.setException(fnfe);
+					}
+					return ret;
+				}
+			})
+				.addResultListener(new SwingDefaultResultListener<String>(this)
+			{
+				public void customResultAvailable(String content)
+				{
+					try
+					{
+						graph.deactivate();
+						graph.setEventsEnabled(false);
+						graph.getModel().beginUpdate();
+						MBpmnModel mmodel = SBpmnModelReader.readModel(new ByteArrayInputStream(content.getBytes("UTF-8")), access.getModel().getFilename(), vreader);
+						graph.getModel().endUpdate();
+						graph.setEventsEnabled(true);
+						graph.activate();
+						modelcontainer.setBpmnModel(mmodel);
+//						modelcontainer.setFile(new File(filename));	// file not available locally?
+						
+						updateViews();
+					}
+					catch(Exception e)
+					{
+						customExceptionOccurred(e);
+					}
+				}
+			});
 		}
 		catch(Exception e)
 		{
