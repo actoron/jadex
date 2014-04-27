@@ -29,6 +29,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -520,7 +521,7 @@ public class VisualProcessViewPanel extends JPanel
 					return ret;
 				}
 			})
-				.addResultListener(new SwingDefaultResultListener<String>(this)
+			.addResultListener(new SwingDefaultResultListener<String>(this)
 			{
 				public void customResultAvailable(String content)
 				{
@@ -552,14 +553,15 @@ public class VisualProcessViewPanel extends JPanel
 					return IFuture.DONE;
 				}
 				
-				public IFuture<Void> componentChanged(IComponentDescription desc)
+				public IFuture<Void> componentChanged(final IComponentDescription desc)
 				{
-					final String[] bps = desc.getBreakpoints();
-					if(bps!=null && bps.length>0)
+					final String[] bps = access.getModel().getBreakpoints();
+					final List<String> abps = SUtil.arrayToList(desc.getBreakpoints());
+					SwingUtilities.invokeLater(new Runnable()
 					{
-						getActiveBreakpoints().addResultListener(new IResultListener<List<String>>()
+						public void run()
 						{
-							public void resultAvailable(List<String> abps)
+							if(bps!=null && bps.length>0)
 							{
 								mxICell cell = (mxICell)graph.getModel().getRoot();
 								for(String bp: bps)
@@ -569,14 +571,29 @@ public class VisualProcessViewPanel extends JPanel
 										VElement ve = getVElement(cell, bp);
 										if(ve!=null)
 										{
-											BreakpointMarker pbm = new BreakpointMarker(graph);
-											mxGeometry geo = new mxGeometry(0, 0, 20, 20);
-//											geo.setRelative(true);
-											pbm.setGeometry(geo);
-											ve.insert(pbm);
-											graph.refreshCellView(ve);
-											graph.refreshCellView(pbm);
-											System.out.println("added: "+pbm);
+											BreakpointMarker pbm = getBreakpointMarker(ve);
+											if(pbm==null)
+											{
+												pbm = new BreakpointMarker(graph);
+												mxGeometry pgeo = ve.getGeometry();
+												double ow = pgeo.getWidth();
+												double oh = pgeo.getHeight();
+												double w = pgeo.getWidth()/10;
+												double h = pgeo.getHeight()/10;
+												double s = Math.max(10, Math.min(w, h));
+												mxGeometry geo = new mxGeometry(ow-s-10, oh-s-10, s, s);
+	//											geo.setRelative(true);
+												pbm.setGeometry(geo);
+	//											ve.insert(pbm);
+												graph.addCell(pbm, ve);
+	//											graph.refreshCellView(ve);
+	//											graph.refreshCellView(pbm);
+												System.out.println("added: "+pbm+" "+ve.getBpmnElement());
+											}
+										}
+										else
+										{
+											System.out.println("no velem found for: "+bp);
 										}
 									}
 									else
@@ -590,20 +607,21 @@ public class VisualProcessViewPanel extends JPanel
 												if(cc instanceof BreakpointMarker)
 												{
 													graph.removeCells(new Object[]{cc});
+													System.out.println("removed: "+cc+" "+ve.getBpmnElement());
 													break;
 												}
 											}
 										}
+										else
+										{
+											System.out.println("no velem found for: "+bp);
+										}
 									}
 								}
 							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								exception.printStackTrace();
-							}
-						});
-					}
+						}
+					});
+					
 					return IFuture.DONE;
 				}
 				
@@ -681,6 +699,24 @@ public class VisualProcessViewPanel extends JPanel
 		modelcontainer.getGraph().getView().validate();
 		modelcontainer.getGraph().refresh();
 //		modelcontainer.getGraphComponent().refresh();
+	}
+	
+	/**
+	 * 
+	 */
+	protected BreakpointMarker getBreakpointMarker(VElement ve)
+	{
+		BreakpointMarker ret = null;
+		for(int i=0; i<ve.getChildCount(); i++)
+		{
+			mxICell cc = ve.getChildAt(i);
+			if(cc instanceof BreakpointMarker)
+			{
+				ret = (BreakpointMarker)cc;
+				break;
+			}
+		}
+		return ret;
 	}
 	
 	//-------- helper classes --------
@@ -1035,7 +1071,7 @@ public class VisualProcessViewPanel extends JPanel
     			ret = getVElement(cell.getChildAt(i), brpid);
     		}
     	}
-    	
+    	   	
     	return ret;
     }
 }
