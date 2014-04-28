@@ -25,8 +25,11 @@ public class BpmnStylesheetSelections extends BpmnStylesheetColorGradient
 	public BpmnStylesheetSelections()
 	{
 		Map<String, Object> style = new HashMap<String, Object>();
-		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
-		style.put(mxConstants.STYLE_FILLCOLOR, "#0000FF");
+//		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
+		style.put(mxConstants.STYLE_SHAPE, BreakpointMarker.class.getSimpleName());
+		style.put(mxConstants.STYLE_FILLCOLOR, "#FF0000");
+		style.put(mxConstants.STYLE_GRADIENTCOLOR, "#ffffff");
+		style.put(mxConstants.STYLE_GRADIENT_DIRECTION, "northwest");
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
 		style.put(mxConstants.STYLE_FONTSIZE, 16);
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");

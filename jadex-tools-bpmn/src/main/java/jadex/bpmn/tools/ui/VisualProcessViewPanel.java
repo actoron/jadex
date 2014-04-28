@@ -44,15 +44,18 @@ import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.tools.debugger.BreakpointPanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -77,9 +80,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
+import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
+import com.mxgraph.shape.mxBasicShape;
 import com.mxgraph.swing.handler.mxConnectionHandler;
+import com.mxgraph.view.mxCellState;
 
 /**
  * 
@@ -578,9 +584,9 @@ public class VisualProcessViewPanel extends JPanel
 												mxGeometry pgeo = ve.getGeometry();
 												double ow = pgeo.getWidth();
 												double oh = pgeo.getHeight();
-												double w = pgeo.getWidth()/10;
-												double h = pgeo.getHeight()/10;
-												double s = Math.max(10, Math.min(w, h));
+												double w = pgeo.getWidth()/8;
+												double h = pgeo.getHeight()/8;
+												double s = Math.max(14, Math.min(w, h));
 												mxGeometry geo = new mxGeometry(ow-s-10, oh-s-10, s, s);
 	//											geo.setRelative(true);
 												pbm.setGeometry(geo);
@@ -588,13 +594,13 @@ public class VisualProcessViewPanel extends JPanel
 												graph.addCell(pbm, ve);
 	//											graph.refreshCellView(ve);
 	//											graph.refreshCellView(pbm);
-												System.out.println("added: "+pbm+" "+ve.getBpmnElement());
+//												System.out.println("added: "+pbm+" "+ve.getBpmnElement());
 											}
 										}
-										else
-										{
-											System.out.println("no velem found for: "+bp);
-										}
+//										else
+//										{
+//											System.out.println("no velem found for: "+bp);
+//										}
 									}
 									else
 									{
@@ -607,15 +613,15 @@ public class VisualProcessViewPanel extends JPanel
 												if(cc instanceof BreakpointMarker)
 												{
 													graph.removeCells(new Object[]{cc});
-													System.out.println("removed: "+cc+" "+ve.getBpmnElement());
+//													System.out.println("removed: "+cc+" "+ve.getBpmnElement());
 													break;
 												}
 											}
 										}
-										else
-										{
-											System.out.println("no velem found for: "+bp);
-										}
+//										else
+//										{
+//											System.out.println("no velem found for: "+bp);
+//										}
 									}
 								}
 							}
@@ -992,7 +998,7 @@ public class VisualProcessViewPanel extends JPanel
 			{
 				public void customResultAvailable(final List<String> abps)
 				{
-					System.out.println("active breakpoints: "+abps);
+//					System.out.println("active breakpoints: "+abps);
 					
 					if(abps.contains(bp))
 					{
@@ -1074,6 +1080,64 @@ public class VisualProcessViewPanel extends JPanel
     	   	
     	return ret;
     }
+    
+//    /**
+//     * 
+//     */
+//    public static void main(String[] args)
+//	{
+//    	Canvas c = new Canvas()
+//    	{
+//    		public void paint(Graphics g)
+//    		{
+//    			Rectangle rect = new Rectangle(100,100,100,100);
+//    			int x = rect.x;
+//    			int y = rect.y;
+//    			int w = rect.width;
+//    			int h = rect.height;
+//    			g.fill(getOctagonShape(x, y, w, h));
+//    		}
+//    	};
+//		
+//    	JFrame f = new JFrame();
+//    	f.add(c, BorderLayout.CENTER);
+//    	f.pack();
+//    	f.setVisible(true);
+//	}
+
+	static
+	{
+		mxGraphics2DCanvas.putShape(BreakpointMarker.class.getSimpleName(), new mxBasicShape()
+		{
+			public Shape createShape(mxGraphics2DCanvas canvas, mxCellState state)
+			{
+				Rectangle temp = state.getRectangle();
+				int x = temp.x;
+				int y = temp.y;
+				int w = temp.width;
+				int h = temp.height;
+				double mw = Math.min(w, h);
+
+				double l = mw/(GuiConstants.SINE_45*2+1);
+				double a = GuiConstants.SINE_45*l;
+				
+				GeneralPath bar = new GeneralPath();
+				bar.moveTo(x+a, y);
+				bar.lineTo(x+a+l, y);
+				bar.lineTo(x+a+a+l, y+a);
+				bar.lineTo(x+a+a+l, y+a+l);
+				bar.lineTo(x+a+l, y+a+a+l);
+				bar.lineTo(x+a, y+a+a+l);
+				bar.lineTo(x+0, y+a+l);
+				bar.lineTo(x+0, y+a);
+				bar.lineTo(x+a, y);
+				bar.closePath();
+				Area ret = new Area(bar);
+				
+				return ret;
+			}
+		});
+	}
 }
 
 
