@@ -231,4 +231,10 @@ public interface IModelInfo
 	 *    The concrete object type depends on the type of the extension (e.g. EnvSupport vs. AGR).
 	 */
 	public Object[] getExtensionTypes();
+	
+	/**
+	 *  Get the possible breakpoint places in that model.
+	 *  @return The breakpoints.
+	 */
+	public String[] getBreakpoints();
 }

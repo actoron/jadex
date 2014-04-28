@@ -82,6 +82,9 @@ public class ModelInfo extends Startable implements IModelInfo
 	
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
+	
+	/** The breakpoints. */
+	protected String[] breakpoints;
 		
 	//-------- constructors --------
 	
@@ -877,6 +880,24 @@ public class ModelInfo extends Startable implements IModelInfo
 		this.extensions = SUtil.arrayToList(extensions);
 	}
 	
+	/**
+	 *  Get the possible breakpoint places in that model.
+	 *  @return The breakpoints.
+	 */
+	public String[] getBreakpoints()
+	{
+		return breakpoints;
+	}
+	
+	/**
+	 *  Set the breakpoints.
+	 *  @param breakpoints The breakpoints to set.
+	 */
+	public void setBreakpoints(String[] breakpoints)
+	{
+		this.breakpoints = breakpoints;
+	}
+
 	/**
 	 *  Add a extension type.
 	 *  @param extension The extension type.

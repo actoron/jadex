@@ -1,8 +1,10 @@
 package jadex.tools.debugger;
 
+import jadex.base.gui.CMSUpdateHandler;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ChangeEvent;
@@ -20,8 +22,8 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JCheckBox;
@@ -30,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
@@ -56,7 +59,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	//-------- attributes --------
 	
 	/** The breakpoints. */
-	protected List	breakpoints;
+	protected List<String>	breakpoints;
 	
 	/** The component description. */
 	protected IComponentDescription	description;
@@ -75,11 +78,37 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	/**
 	 *  Create a new rulebase panel.
 	 */
-	public BreakpointPanel(Collection breakpoints, final IComponentDescription description, IExternalAccess access)
+	public BreakpointPanel(String[] breakpointsa, final IComponentDescription description, IExternalAccess access, CMSUpdateHandler cmshandler)
 	{
-		this.breakpoints = new ArrayList(breakpoints);
+		this.breakpoints = SUtil.arrayToList(breakpointsa);
 		this.description	= description;
 		this.access = access;
+	
+		cmshandler.addCMSListener(access.getComponentIdentifier(), new ICMSComponentListener()
+		{
+			public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
+			{
+				return IFuture.DONE;
+			}
+			
+			public IFuture<Void> componentChanged(IComponentDescription desc)
+			{
+				BreakpointPanel.this.description = desc;
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						((AbstractTableModel)list.getModel()).fireTableDataChanged();
+					}
+				});
+				return IFuture.DONE;
+			}
+			
+			public IFuture<Void> componentAdded(IComponentDescription desc)
+			{
+				return IFuture.DONE;
+			}
+		});
 		
 		TableModel lm = new AbstractTableModel()
 		{
@@ -112,7 +141,6 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 		setLayout(new BorderLayout());
 		JScrollPane sp = new JScrollPane(list);
 		add(sp, BorderLayout.CENTER);
-//				this.setBorder(BorderFactory.createTitledBorder("Rulebase"));
 
 		// Hack!!! Set header preferred size and afterwards set title text to "" (bug in JDK1.5).
 		list.getTableHeader().setPreferredSize(list.getTableHeader().getPreferredSize());
@@ -161,16 +189,6 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 		
 	}
 	
-	/**
-	 *  Called when the component state changes.
-	 */
-	public IFuture componentChanged(IComponentDescription desc)
-	{
-		BreakpointPanel.this.description	= desc;
-		// Todo: update gui?
-		return IFuture.DONE;
-	}
-
 	/**
 	 *  Get the currently selected breakpoints.
 	 */

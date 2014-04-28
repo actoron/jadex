@@ -46,7 +46,7 @@ public class BpmnDebuggerPanel implements IDebuggerPanel
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
 //		this.processpanel = new ProcessViewPanel(access, bpp);
-		this.processpanel = new VisualProcessViewPanel(access, bpp);
+		this.processpanel = new VisualProcessViewPanel(access, bpp, jcc.getCMSHandler());
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package jadex.bpmn.tools.ui;
 
+import jadex.base.gui.CMSUpdateHandler;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.GuiConstants;
@@ -10,6 +11,7 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VSubProcess;
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bpmn.runtime.BpmnInterpreter;
@@ -18,12 +20,18 @@ import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.ICMSComponentListener;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
@@ -36,6 +44,7 @@ import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.tools.debugger.BreakpointPanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -48,8 +57,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.BorderFactory;
@@ -61,10 +72,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
+import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.handler.mxConnectionHandler;
 
@@ -104,7 +117,7 @@ public class VisualProcessViewPanel extends JPanel
 	/**
 	 *  Create an agenda panel.
 	 */
-	public VisualProcessViewPanel(final IExternalAccess access, IBreakpointPanel bpp) 
+	public VisualProcessViewPanel(final IExternalAccess access, IBreakpointPanel bpp, CMSUpdateHandler cmshandler) 
 	{
 		try
 		{
@@ -270,65 +283,6 @@ public class VisualProcessViewPanel extends JPanel
 //			{
 //				public void invoke(Object sender, mxEventObject evt)
 //				{
-////					System.out.println("rec: "+evt);
-//					
-//					VElement elem = (VElement)modelcontainer.getGraph().getSelectionCell();
-//					if(elem!=null)
-//					{
-//						String id = elem.getBpmnElement().getId();
-//						boolean set = false;
-//						List<Integer> sels = new ArrayList<Integer>();
-//						for(int row=0; row<threads.getModel().getRowCount() && !set; row++)
-//						{
-//							ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
-//							if(pti.getActId().equals(id))
-//							{
-//								sels.add(Integer.valueOf(row));
-//							}
-//						}
-//						
-//						if(sels.size()==1)
-//						{
-//							int sel = sels.get(0).intValue();
-//							System.out.println("sel0: "+sel);
-//							threads.getSelectionModel().removeListSelectionListener(sellistener);
-//							threads.setRowSelectionInterval(sel, sel);
-//							threads.getSelectionModel().addListSelectionListener(sellistener);
-//						}
-//						else if(sels.size()>1)
-//						{
-//							int sel = -1;
-//							int curs = getSelectedThredRow();
-//							for(int i=0; i<sels.size() && sel==-1; i++)
-//							{
-//								int nexts = sels.get(i).intValue();
-//								if(nexts==curs || curs==-1)
-//								{
-//									if(i+1<sels.size())
-//									{
-//										sel = sels.get(i+1);
-//									}
-//									else
-//									{
-//										sel = sels.get(i-1);
-//									}
-//								}
-//							}
-//							threads.getSelectionModel().removeListSelectionListener(sellistener);
-//							threads.setRowSelectionInterval(sel, sel);
-//							threads.getSelectionModel().addListSelectionListener(sellistener);
-//						}
-//						else
-//						{
-//							threads.getSelectionModel().removeListSelectionListener(sellistener);
-//							threads.clearSelection();
-//							threads.getSelectionModel().addListSelectionListener(sellistener);
-//						}
-//					}
-//					
-////					graph.setEventsEnabled(false);
-////					modelcontainer.getGraph().removeSelectionCell(elem);
-////					graph.setEventsEnabled(true);
 //				}
 //			});
 			
@@ -343,7 +297,6 @@ public class VisualProcessViewPanel extends JPanel
 						VElement elem = (VElement)cell;
 //						System.out.println("Cell: "+ve.getBpmnElement()); 
 						
-//						VElement elem = (VElement)modelcontainer.getGraph().getSelectionCell();
 						if(elem!=null)
 						{
 							String id = elem.getBpmnElement().getId();
@@ -369,7 +322,7 @@ public class VisualProcessViewPanel extends JPanel
 							else if(sels.size()>1)
 							{
 								int sel = -1;
-								int curs = getSelectedThredRow();
+								int curs = getSelectedThreadRow();
 								for(int i=0; i<sels.size() && sel==-1; i++)
 								{
 									int nexts = sels.get(i).intValue();
@@ -403,9 +356,9 @@ public class VisualProcessViewPanel extends JPanel
 							}
 							
 							// Double click on element toggles breakpoint
-							if(sels.size()==0)
+							if(sels.size()==0 && e.getClickCount()==2 && elem.getBpmnElement() instanceof MActivity)
 							{
-								
+								toggleBreakPoint(((MActivity)elem.getBpmnElement()).getBreakpointId());
 							}
 						}
 					}
@@ -568,7 +521,7 @@ public class VisualProcessViewPanel extends JPanel
 					return ret;
 				}
 			})
-				.addResultListener(new SwingDefaultResultListener<String>(this)
+			.addResultListener(new SwingDefaultResultListener<String>(this)
 			{
 				public void customResultAvailable(String content)
 				{
@@ -590,6 +543,91 @@ public class VisualProcessViewPanel extends JPanel
 					{
 						customExceptionOccurred(e);
 					}
+				}
+			});
+			
+			cmshandler.addCMSListener(access.getComponentIdentifier(), new ICMSComponentListener()
+			{
+				public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
+				{
+					return IFuture.DONE;
+				}
+				
+				public IFuture<Void> componentChanged(final IComponentDescription desc)
+				{
+					final String[] bps = access.getModel().getBreakpoints();
+					final List<String> abps = SUtil.arrayToList(desc.getBreakpoints());
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							if(bps!=null && bps.length>0)
+							{
+								mxICell cell = (mxICell)graph.getModel().getRoot();
+								for(String bp: bps)
+								{
+									if(abps.contains(bp))
+									{
+										VElement ve = getVElement(cell, bp);
+										if(ve!=null)
+										{
+											BreakpointMarker pbm = getBreakpointMarker(ve);
+											if(pbm==null)
+											{
+												pbm = new BreakpointMarker(graph);
+												mxGeometry pgeo = ve.getGeometry();
+												double ow = pgeo.getWidth();
+												double oh = pgeo.getHeight();
+												double w = pgeo.getWidth()/10;
+												double h = pgeo.getHeight()/10;
+												double s = Math.max(10, Math.min(w, h));
+												mxGeometry geo = new mxGeometry(ow-s-10, oh-s-10, s, s);
+	//											geo.setRelative(true);
+												pbm.setGeometry(geo);
+	//											ve.insert(pbm);
+												graph.addCell(pbm, ve);
+	//											graph.refreshCellView(ve);
+	//											graph.refreshCellView(pbm);
+												System.out.println("added: "+pbm+" "+ve.getBpmnElement());
+											}
+										}
+										else
+										{
+											System.out.println("no velem found for: "+bp);
+										}
+									}
+									else
+									{
+										VElement ve = getVElement(cell, bp);
+										if(ve!=null)
+										{
+											for(int i=0; i<ve.getChildCount(); i++)
+											{
+												mxICell cc = ve.getChildAt(i);
+												if(cc instanceof BreakpointMarker)
+												{
+													graph.removeCells(new Object[]{cc});
+													System.out.println("removed: "+cc+" "+ve.getBpmnElement());
+													break;
+												}
+											}
+										}
+										else
+										{
+											System.out.println("no velem found for: "+bp);
+										}
+									}
+								}
+							}
+						}
+					});
+					
+					return IFuture.DONE;
+				}
+				
+				public IFuture<Void> componentAdded(IComponentDescription desc)
+				{
+					return IFuture.DONE;
 				}
 			});
 		}
@@ -659,7 +697,26 @@ public class VisualProcessViewPanel extends JPanel
 		modelcontainer.getGraph().getView().invalidate();
 		modelcontainer.getGraph().getView().clear(modelcontainer.getGraph().getModel().getRoot(), true, true);
 		modelcontainer.getGraph().getView().validate();
-		modelcontainer.getGraphComponent().refresh();
+		modelcontainer.getGraph().refresh();
+//		modelcontainer.getGraphComponent().refresh();
+	}
+	
+	/**
+	 * 
+	 */
+	protected BreakpointMarker getBreakpointMarker(VElement ve)
+	{
+		BreakpointMarker ret = null;
+		for(int i=0; i<ve.getChildCount(); i++)
+		{
+			mxICell cc = ve.getChildAt(i);
+			if(cc instanceof BreakpointMarker)
+			{
+				ret = (BreakpointMarker)cc;
+				break;
+			}
+		}
+		return ret;
 	}
 	
 	//-------- helper classes --------
@@ -870,7 +927,7 @@ public class VisualProcessViewPanel extends JPanel
 	public String getStepInfo()
 	{
 		String ret = null;
-		int row = getSelectedThredRow();
+		int row = getSelectedThreadRow();
 		if(row!=-1)
 		{
 			ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
@@ -882,7 +939,7 @@ public class VisualProcessViewPanel extends JPanel
 	/**
 	 * 
 	 */
-	protected int getSelectedThredRow()
+	protected int getSelectedThreadRow()
 	{
 		int ret = -1;
 		int vrow = threads.getSelectedRow();
@@ -920,40 +977,103 @@ public class VisualProcessViewPanel extends JPanel
 		});
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	public void addBreakPoint(String id)
-//	{
-//		final List	bps	= new ArrayList(Arrays.asList(access.getComponentIdentifier()));
-//		if(but.isSelected())
-//		{
-//			bps.add(breakpoints.get(sorter.modelIndex(rowIndex)));
-//		}
-//		else
-//		{
-//			bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
-//		}
-//		
-//		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(VisualProcessViewPanel.this)
-//		{
-//			public void customResultAvailable(IComponentManagementService cms)
-//			{
-//				cms.setComponentBreakpoints(access.getComponentIdentifier(), (String[])bps.toArray(new String[bps.size()]))
-//				.addResultListener(new IResultListener<Void>()
-//				{
-//					public void resultAvailable(Void result)
-//					{
-//					}
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						exception.printStackTrace();
-//					}
-//				});
-//			}
-//		});
-//	}
+	/**
+	 * 
+	 */
+	public IFuture<Void> toggleBreakPoint(final String bp)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		List<String> bps = Arrays.asList(access.getModel().getBreakpoints());
+		
+		if(bps.contains(bp))
+		{
+			getActiveBreakpoints().addResultListener(new ExceptionDelegationResultListener<List<String>, Void>(ret)
+			{
+				public void customResultAvailable(final List<String> abps)
+				{
+					System.out.println("active breakpoints: "+abps);
+					
+					if(abps.contains(bp))
+					{
+						abps.remove(bp);
+					}
+					else
+					{
+						abps.add(bp);
+					}
+					
+					SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+					{
+						public void customResultAvailable(final IComponentManagementService cms)
+						{
+							cms.setComponentBreakpoints(access.getComponentIdentifier(), (String[])abps.toArray(new String[abps.size()]))
+								.addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					});
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<List<String>> getActiveBreakpoints()
+	{
+		final Future<List<String>> ret = new Future<List<String>>();
+		
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, List<String>>(ret)
+		{
+			public void customResultAvailable(final IComponentManagementService cms)
+			{
+				cms.getComponentDescription(access.getComponentIdentifier())
+					.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, List<String>>(ret)
+				{
+					public void customResultAvailable(IComponentDescription desc) 
+					{
+						List<String> bps = new ArrayList<String>(Arrays.asList(desc.getBreakpoints()));
+						ret.setResult(bps);
+					}
+				});
+			}
+		});
+				
+		return ret;
+	}
+	
+	 /**
+     *  Find the velement of the graph that fits to the bpmn id.
+     *  @param cell The start cell.
+     *  @param brpid The activity id.
+     *  @return The element.
+     */
+    protected VElement getVElement(mxICell cell, String brpid)
+    {
+    	VElement ret = null;
+    	if(cell instanceof VElement)
+		{
+			VElement ve = (VElement)cell;
+			if(ve.getBpmnElement() instanceof MActivity && ((MActivity)ve.getBpmnElement()).getBreakpointId().equals(brpid))
+			{
+				ret = ve;
+			}
+		}
+    	
+    	if(ret==null)
+    	{
+    		for(int i=0; i<cell.getChildCount() && ret==null; i++)
+    		{
+    			ret = getVElement(cell.getChildAt(i), brpid);
+    		}
+    	}
+    	   	
+    	return ret;
+    }
 }
 
 

@@ -810,9 +810,10 @@ public class MicroClassReader
 		List bps = (List)toset.get("breakpoints");
 		if(bps!=null)
 		{
-			if(props==null)
-				props = new HashMap();
-			props.put("debugger.breakpoints", bps);
+//			if(props==null)
+//				props = new HashMap();
+//			props.put("debugger.breakpoints", bps);
+			modelinfo.setBreakpoints((String[])bps.toArray(new String[bps.size()]));
 		}
 		if(props!=null)
 			modelinfo.setProperties(props);
