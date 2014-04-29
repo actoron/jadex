@@ -3,6 +3,7 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MNamedIdElement;
@@ -425,6 +426,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		
 		final Future<Void> ret = new Future<Void>();
 		IFuture<Void> fut = super.init(model, config, arguments);
+		
 		fut.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)

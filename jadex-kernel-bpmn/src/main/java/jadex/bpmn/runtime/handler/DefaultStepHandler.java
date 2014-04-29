@@ -142,6 +142,7 @@ public class DefaultStepHandler implements IStepHandler
 						{
 							activity = (MActivity)context.getModelElement();
 							remove	= context;
+							context.updateParametersAfterStep(activity, instance);
 							context	= context.getParent();
 							
 							// Cancel subprocess handlers.

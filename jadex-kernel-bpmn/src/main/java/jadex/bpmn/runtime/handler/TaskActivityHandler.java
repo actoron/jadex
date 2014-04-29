@@ -33,7 +33,8 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				Object tmp = taskimpl.newInstance();
 				if(!(tmp instanceof ITask))
 				{
-					tmp = new PojoTaskWrapper(tmp);
+					tmp = new PojoTaskWrapper(tmp, instance.getInternalAccess(), thread, activity.getComponentInjections(instance.getClassLoader()),
+						activity.getArgumentInjections(instance.getClassLoader()), activity.getResultInjections(instance.getClassLoader()));
 				}
 				ITask task = (ITask)tmp;
 				thread.setTask(task);

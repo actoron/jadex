@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>TestResultProcess</jadex:modelname>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="Ltt61VhcXVyLBn6+">
+    <semantic:task name="Print" id="4NxRKrh7OVs77yiW">
+      <semantic:incoming>eX3Wof4HcOplirtP</semantic:incoming>
+      <semantic:outgoing>NUrviLVWusS7QFMw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.pojobpmn.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String"/>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Print" id="QwtSRJBlXg/IKIxH">
+      <semantic:incoming>96TV2lu8IawbDeDA</semantic:incoming>
+      <semantic:outgoing>l1e6AuSvYusJgWQS</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.pojobpmn.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String"/>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Print" id="g9y2ZjQKaop5iPHG">
+      <semantic:incoming>omxnXLFw2yiwbDVs</semantic:incoming>
+      <semantic:outgoing>YSw3kV+cfjRPOFyS</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.pojobpmn.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String"/>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Produce\nResult" id="ah3ETuuGcjh/plBX">
+      <semantic:incoming>8XkxTSRbAP+/LbzN</semantic:incoming>
+      <semantic:outgoing>QwsDpTPxwrhDVOaH</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.pojobpmn.MultiResultsTask</jadex:class>
+        <jadex:parameter direction="out" name="result1" type="java.lang.String"/>
+        <jadex:parameter direction="out" name="result2" type="java.lang.String"/>
+        <jadex:parameter direction="out" name="result3" type="java.lang.String"/>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:parallelGateway id="V78RchioS46mLQWQ">
+      <semantic:incoming>QwsDpTPxwrhDVOaH</semantic:incoming>
+      <semantic:outgoing>eX3Wof4HcOplirtP</semantic:outgoing>
+      <semantic:outgoing>96TV2lu8IawbDeDA</semantic:outgoing>
+      <semantic:outgoing>omxnXLFw2yiwbDVs</semantic:outgoing>
+    </semantic:parallelGateway>
+    <semantic:startEvent id="XQOvad1bpuSa5MBR">
+      <semantic:outgoing>8XkxTSRbAP+/LbzN</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:endEvent id="cwc3Ygn4BNr2URhm">
+      <semantic:incoming>3m/YflUKxqmEvHDi</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:parallelGateway id="mAk/DucoJ/QMd9AU">
+      <semantic:incoming>NUrviLVWusS7QFMw</semantic:incoming>
+      <semantic:incoming>l1e6AuSvYusJgWQS</semantic:incoming>
+      <semantic:incoming>YSw3kV+cfjRPOFyS</semantic:incoming>
+      <semantic:outgoing>3m/YflUKxqmEvHDi</semantic:outgoing>
+    </semantic:parallelGateway>
+    <semantic:sequenceFlow sourceRef="4NxRKrh7OVs77yiW" targetRef="mAk/DucoJ/QMd9AU" id="NUrviLVWusS7QFMw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="QwtSRJBlXg/IKIxH" targetRef="mAk/DucoJ/QMd9AU" id="l1e6AuSvYusJgWQS">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="g9y2ZjQKaop5iPHG" targetRef="mAk/DucoJ/QMd9AU" id="YSw3kV+cfjRPOFyS">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="ah3ETuuGcjh/plBX" targetRef="V78RchioS46mLQWQ" id="QwsDpTPxwrhDVOaH">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="V78RchioS46mLQWQ" targetRef="4NxRKrh7OVs77yiW" id="eX3Wof4HcOplirtP">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="V78RchioS46mLQWQ" targetRef="QwtSRJBlXg/IKIxH" id="96TV2lu8IawbDeDA">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="V78RchioS46mLQWQ" targetRef="g9y2ZjQKaop5iPHG" id="omxnXLFw2yiwbDVs">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="XQOvad1bpuSa5MBR" targetRef="ah3ETuuGcjh/plBX" id="8XkxTSRbAP+/LbzN">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="mAk/DucoJ/QMd9AU" targetRef="cwc3Ygn4BNr2URhm" id="3m/YflUKxqmEvHDi">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+      <jadex:dataFlow id="fZQtUY72jdo2DhHH" sourceRef="ah3ETuuGcjh/plBX" sourceParam="result1" targetRef="4NxRKrh7OVs77yiW" targetParam="text"/>
+      <jadex:dataFlow id="E1CTihyD05BKkGKf" sourceRef="ah3ETuuGcjh/plBX" sourceParam="result2" targetRef="QwtSRJBlXg/IKIxH" targetParam="text"/>
+      <jadex:dataFlow id="0RFST//a//v0YL57" sourceRef="ah3ETuuGcjh/plBX" sourceParam="result3" targetRef="g9y2ZjQKaop5iPHG" targetParam="text"/>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="Ltt61VhcXVyLBn6+">
+        <dc:Bounds height="600.0" width="3000.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="4NxRKrh7OVs77yiW">
+        <dc:Bounds height="100.0" width="160.0" x="530.0" y="40.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="QwtSRJBlXg/IKIxH">
+        <dc:Bounds height="100.0" width="160.0" x="530.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="g9y2ZjQKaop5iPHG">
+        <dc:Bounds height="100.0" width="160.0" x="530.0" y="280.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ah3ETuuGcjh/plBX">
+        <dc:Bounds height="100.0" width="160.0" x="150.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="V78RchioS46mLQWQ">
+        <dc:Bounds height="60.0" width="60.0" x="390.0" y="180.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="XQOvad1bpuSa5MBR">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="190.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cwc3Ygn4BNr2URhm">
+        <dc:Bounds height="40.0" width="40.0" x="900.0" y="190.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mAk/DucoJ/QMd9AU">
+        <dc:Bounds height="60.0" width="60.0" x="780.0" y="180.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="8XkxTSRbAP+/LbzN">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="NUrviLVWusS7QFMw">
+      </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="fZQtUY72jdo2DhHH">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="E1CTihyD05BKkGKf">
+      </di:Edge>
+      <bpmndi:BPMNEdge bpmnElement="QwsDpTPxwrhDVOaH">
+      </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="0RFST//a//v0YL57">
+      </di:Edge>
+      <bpmndi:BPMNEdge bpmnElement="l1e6AuSvYusJgWQS">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="YSw3kV+cfjRPOFyS">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="eX3Wof4HcOplirtP">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="96TV2lu8IawbDeDA">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="omxnXLFw2yiwbDVs">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="3m/YflUKxqmEvHDi">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+
