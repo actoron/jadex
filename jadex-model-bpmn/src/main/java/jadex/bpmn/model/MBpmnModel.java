@@ -172,10 +172,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	protected Map<MIdElement, MIdElement> parents;
 
 	/** The association sources. */
-	protected Map associationsources;
+	protected Map<String, MIdElement> associationsources;
 	
 	/** The association targets. */
-	protected Map associationtargets;
+	protected Map<String, MIdElement> associationtargets;
 	
 	/** The messaging edges. */
 	protected Map<String, MMessagingEdge> allmessagingedges;
@@ -219,10 +219,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/**
 	 *  Init the model info.
 	 */
-	public void initModelInfo()
+	public void initModelInfo(ClassLoader cl)
 	{
-		List names = new ArrayList();
-		for(Iterator it=getAllActivities().values().iterator(); it.hasNext(); )
+		List<String> names = new ArrayList<String>();
+		for(Iterator<MActivity> it=getAllActivities().values().iterator(); it.hasNext(); )
 		{
 			names.add(((MActivity)it.next()).getBreakpointId());
 		}
@@ -249,29 +249,29 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		modelinfo.setStartable(true);
 	}
 	
-	/**
-	 *  Add method info.
-	 */
-	public static void addMethodInfos(Map props, String type, String[] names)
-	{
-		Object ex = props.get(type);
-		if(ex!=null)
-		{
-			List newex = new ArrayList();
-			for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
-			{
-				newex.add(it.next());
-			}
-			for(int i=0; i<names.length; i++)
-			{
-				newex.add(names[i]);
-			}
-		}
-		else
-		{
-			props.put(type, names);
-		}
-	}
+//	/**
+//	 *  Add method info.
+//	 */
+//	public static void addMethodInfos(Map props, String type, String[] names)
+//	{
+//		Object ex = props.get(type);
+//		if(ex!=null)
+//		{
+//			List newex = new ArrayList();
+//			for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
+//			{
+//				newex.add(it.next());
+//			}
+//			for(int i=0; i<names.length; i++)
+//			{
+//				newex.add(names[i]);
+//			}
+//		}
+//		else
+//		{
+//			props.put(type, names);
+//		}
+//	}
 	
 	/**
 	 *  Get the pools.
@@ -289,7 +289,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	public void addPool(MPool pool)
 	{
 		if(pools==null)
-			pools = new ArrayList();
+			pools = new ArrayList<MPool>();
 		pools.add(pool);
 	}
 	
@@ -579,39 +579,39 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get all association targets.
 	 *  @return A map of association targets (association id -> target).
 	 */
-	public Map getAllAssociationTargets()
+	public Map<String, MIdElement> getAllAssociationTargets()
 	{
 		if(this.associationtargets==null)
 		{
-			this.associationtargets = new HashMap();
+			this.associationtargets = new HashMap<String, MIdElement>();
 			
 			// Add pools
-			List pools = getPools();
+			List<MPool> pools = getPools();
 			if(pools!=null)
 			{
 				for(int i=0; i<pools.size(); i++)
 				{
-					MPool pool = (MPool)pools.get(i);
+					MPool pool = pools.get(i);
 					addAssociations(pool.getAssociationsDescription(), pool, associationtargets);
 					
 					// Add lanes
-					List lanes = pool.getLanes();
+					List<MLane> lanes = pool.getLanes();
 					if(lanes!=null)
 					{
 						for(int j=0; j<lanes.size(); j++)
 						{
-							MLane lane = (MLane)lanes.get(j);
+							MLane lane = lanes.get(j);
 							addAssociations(lane.getAssociationsDescription(), lane, associationtargets);
 						}
 					}
 					
 					// Add activities
-					List acts = pool.getActivities();
+					List<MActivity> acts = pool.getActivities();
 					if(acts!=null)
 					{
 						for(int j=0; j<acts.size(); j++)
 						{
-							MActivity act = (MActivity)acts.get(j);
+							MActivity act = acts.get(j);
 							addActivityTargets(act);
 						}
 					}
@@ -619,10 +619,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 			}
 			
 			// Add edges
-			Map edges = getAllSequenceEdges();
-			for(Iterator it=edges.values().iterator(); it.hasNext(); )
+			Map<String, MSequenceEdge> edges = getAllSequenceEdges();
+			for(Iterator<MSequenceEdge> it=edges.values().iterator(); it.hasNext(); )
 			{
-				MSequenceEdge edge = (MSequenceEdge)it.next();
+				MSequenceEdge edge = it.next();
 				addAssociations(edge.getAssociationsDescription(), edge, associationtargets);
 			}
 		}
@@ -638,7 +638,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		addAssociations(act.getAssociationsDescription(), act, associationtargets);
 		if(act instanceof MSubProcess)
 		{
-			List acts = ((MSubProcess)act).getActivities();
+			List<MActivity> acts = ((MSubProcess)act).getActivities();
 			if(acts!=null)
 			{
 				for(int i=0; i<acts.size(); i++)
@@ -655,7 +655,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  @param target The target.
 	 *  @param targets The targets result map.
 	 */
-	protected boolean addAssociations(String assosdesc, MIdElement target,  Map targets)
+	protected boolean addAssociations(String assosdesc, MIdElement target,  Map<String, MIdElement> targets)
 	{
 		boolean ret = false;
 		
@@ -677,24 +677,24 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get all association sources.
 	 *  @return The map of association sources (association id -> source).
 	 */
-	public Map getAllAssociationSources()
+	public Map<String, MIdElement> getAllAssociationSources()
 	{
 		if(this.associationsources==null)
 		{
-			this.associationsources = new HashMap();
+			this.associationsources = new HashMap<String, MIdElement>();
 		
 			addArtifacts(getArtifacts(), associationsources);
 		
-			List pools = getPools();
+			List<MPool> pools = getPools();
 			if(pools!=null)
 			{
 				for(int i=0; i<pools.size(); i++)
 				{
-					MPool pool = (MPool)pools.get(i);
+					MPool pool = pools.get(i);
 					addArtifacts(pool.getArtifacts(), associationsources);
 					
 					// Search subprocesses
-					List acts = pool.getActivities();
+					List<MActivity> acts = pool.getActivities();
 					if(acts!=null)
 					{
 						for(int j=0; j<acts.size(); j++)
@@ -717,12 +717,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  @param subproc The sub process.
 	 *  @param sources The sources result map.
 	 */
-	protected void addSubProcesses(MSubProcess subproc, Map sources)
+	protected void addSubProcesses(MSubProcess subproc, Map<String, MIdElement> sources)
 	{
-		List artifacts = subproc.getArtifacts();
+		List<MArtifact> artifacts = subproc.getArtifacts();
 		addArtifacts(artifacts, sources);
 		
-		List acts = subproc.getActivities();
+		List<MActivity> acts = subproc.getActivities();
 		if(acts!=null)
 		{
 			for(int j=0; j<acts.size(); j++)
@@ -819,7 +819,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  @param artifacts The list of artifacts.
 	 *  @param sources The sources result map (association id -> art).
 	 */
-	protected MArtifact addArtifacts(List artifacts, Map sources)
+	protected MArtifact addArtifacts(List<MArtifact> artifacts, Map<String, MIdElement> sources)
 	{
 		MArtifact ret = null;
 		
@@ -827,8 +827,8 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		{
 			for(int i=0; i<artifacts.size() && ret==null; i++)
 			{
-				MArtifact art = (MArtifact)artifacts.get(i);
-				List assos = art.getAssociations();
+				MArtifact art = artifacts.get(i);
+				List<MAssociation> assos = art.getAssociations();
 				if(assos!=null)
 				{
 					for(int j=0; j<assos.size(); j++)
