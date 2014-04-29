@@ -144,6 +144,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/** The messages. */
 	protected List<MMessagingEdge> messages;
+	
+	/** The outgoing data edges for arguments. */
+	protected List<MDataEdge> outdataedges;
+	
+	/** The incoming data edges for results. */
+	protected List<MDataEdge> indataedges;
 			
 	//-------- init structures --------
 	
@@ -728,6 +734,84 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Add an outgoing edge.
+	 *  @param edge The edge.
+	 */
+	public void addOutgoingDataEdge(MDataEdge edge)
+	{
+		if(outdataedges==null)
+			outdataedges = new ArrayList<MDataEdge>();
+		outdataedges.add(edge);
+	}
+	
+	/**
+	 *  Remove an outgoing edge.
+	 *  @param edge The edge.
+	 */
+	public void removeOutgoingDataEdge(MDataEdge edge)
+	{
+		if(outdataedges!=null)
+			outdataedges.remove(edge);
+	}
+	
+	/**
+	 *  Add an incoming edge.
+	 *  @param edge The edge.
+	 */
+	public void addIncomingDataEdge(MDataEdge edge)
+	{
+		if(indataedges==null)
+			indataedges = new ArrayList<MDataEdge>();
+		indataedges.add(edge);
+	}
+	
+	/**
+	 *  Remove an outgoing edge.
+	 *  @param edge The edge.
+	 */
+	public void removeIncomingDataEdge(MDataEdge edge)
+	{
+		if(indataedges!=null)
+			indataedges.remove(edge);
+	}
+	
+	/**
+	 *  Get the incoming data edges.
+	 *  @return the incoming data edges.
+	 */
+	public List<MDataEdge> getIncomingDataEdges()
+	{
+		return indataedges;
+	}
+	
+	/**
+	 *  Set the incoming data edges.
+	 *  @param indataedges The incoming data edges.
+	 */
+	public void setIncomingDataEdges(List<MDataEdge> indataedges)
+	{
+		this.indataedges = indataedges;
+	}
+	
+	/**
+	 *  Get the outgoing data edges.
+	 *  @return the outgoing data edges.
+	 */
+	public List<MDataEdge> getOutgoingDataEdges()
+	{
+		return outdataedges;
+	}
+	
+	/**
+	 *  Set the outgoing data edges.
+	 *  @param outdataedges The outgoing data edges.
+	 */
+	public void setOutgoingDataEdges(List<MDataEdge> outdataedges)
+	{
+		this.outdataedges = outdataedges;
 	}
 	
 	/**
