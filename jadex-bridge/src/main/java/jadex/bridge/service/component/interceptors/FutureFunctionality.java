@@ -1892,8 +1892,8 @@ class DelegatingFuture extends Future<Object>
 	 */
 	public void	setResult(final Object result)
 	{
-	   	if(result!=null && result.getClass().getName().indexOf("Log")!=-1)
-    		System.out.println("ggg");
+//	   	if(result!=null && result.getClass().getName().indexOf("Log")!=-1)
+//    		System.out.println("ggg");
 
 		try
 		{

@@ -113,7 +113,7 @@ public interface IComponentDescription
 	 *  When a master component is killed the parent component will be killed two.
 	 *  @return True, if master component.
 	 */
-	public Boolean getMaster();
+	public boolean isMaster();
 
 	/**
 	 *  Is the component a daemon.
@@ -121,36 +121,35 @@ public interface IComponentDescription
 	 *  the platform will also be shutdowned.
 	 *  @return True, if daemon component.
 	 */
-	public Boolean getDaemon();
+	public boolean isDaemon();
 	
 	/**
 	 *  Get the auto shutdown flag.
 	 *  @return	The flag.
 	 */
-	public Boolean getAutoShutdown();
+	public boolean isAutoShutdown();
 
+	/**
+	 *  Get the synchronous flag.
+	 *  @return	The synchronous flag.
+	 */
+	public boolean isSynchronous();
+	
+	/**
+	 *  Get the persistable flag.
+	 *  @return	The persistable flag.
+	 */
+	public boolean isPersistable();
+	
 	/**
 	 *  Get the monitoring flag.
 	 *  @return	The monitoring flag.
 	 */
 	public PublishEventLevel getMonitoring();
 	
-//	/**
-//	 *  Get the monitoring flag.
-//	 *  @return	The monitoring flag.
-//	 */
-//	public Boolean getMonitoringLevel();
-	
-	/**
-	 *  Get the synchronous flag.
-	 *  @return	The synchronous flag.
-	 */
-	public Boolean getSynchronous();
-	
 	/**
 	 *  Get the local type name of a component (defined in the parent).
 	 *  @return The local type.
 	 */
 	public String getLocalType();
-	
 }

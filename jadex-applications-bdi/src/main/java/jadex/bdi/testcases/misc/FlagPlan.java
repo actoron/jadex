@@ -43,7 +43,7 @@ public class FlagPlan extends Plan
 		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
 		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
 		
-		if(desc.getMaster()!=null && desc.getMaster().booleanValue())
+		if(desc.isMaster())
 		{
 			tr.setSucceeded(true);
 		}
@@ -59,7 +59,7 @@ public class FlagPlan extends Plan
 		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
 		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
 		
-		if(desc.getDaemon()!=null && desc.getDaemon().booleanValue())
+		if(desc.isDaemon())
 		{
 			tr.setSucceeded(true);
 		}
@@ -75,7 +75,7 @@ public class FlagPlan extends Plan
 		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
 		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
 		
-		if(desc.getAutoShutdown()!=null && desc.getAutoShutdown().booleanValue())
+		if(desc.isAutoShutdown())
 		{
 			tr.setSucceeded(true);
 		}
@@ -105,7 +105,7 @@ public class FlagPlan extends Plan
 		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
 		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
 		
-		if(desc.getMaster()!=null && desc.getMaster().booleanValue())
+		if(desc.isMaster())
 		{
 			tr.setSucceeded(true);
 		}
@@ -120,7 +120,7 @@ public class FlagPlan extends Plan
 		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
 		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
 		
-		if(desc.getDaemon()!=null && desc.getDaemon().booleanValue())
+		if(desc.isDaemon())
 		{
 			tr.setSucceeded(true);
 		}
@@ -135,7 +135,7 @@ public class FlagPlan extends Plan
 		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
 		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
 		
-		if(desc.getAutoShutdown()!=null && desc.getAutoShutdown().booleanValue())
+		if(desc.isAutoShutdown())
 		{
 			tr.setSucceeded(true);
 		}
