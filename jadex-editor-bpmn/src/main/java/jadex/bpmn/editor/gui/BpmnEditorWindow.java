@@ -483,7 +483,7 @@ public class BpmnEditorWindow extends JFrame
 	 */
 	public void initializeNewModel(ModelContainer modelcontainer)
 	{
-		modelcontainer.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
+//		modelcontainer.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
 		modelcontainer.getGraphComponent().refresh();
 		modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
 		new DeletionController(modelcontainer);
