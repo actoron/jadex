@@ -44,8 +44,10 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -67,6 +69,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
+
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 /**
  *  BPMN process property panel.
@@ -142,10 +148,43 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	/** Properties Index list. */
 	protected List<String> propertynames;
 	
+	/** Start elements graph selection listener */
+	protected mxIEventListener graphselectionlistener;
+	
+	/** Start elements list selection listener */
+	protected ListSelectionListener listselectionlistener;
+	
 	public BpmnPropertyPanel(ModelContainer container)
 	{
 		super(null, container);
 		this.modelcontainer = container;
+		graphselectionlistener = new mxIEventListener()
+		{
+			public void invoke(Object sender, mxEventObject evt)
+			{
+				Object[] cells = modelcontainer.getGraph().getSelectionCells();
+				Set<String> selectedids = new HashSet<String>();
+				for (int i = 0; i < cells.length; ++i)
+				{
+					if (cells[i] instanceof VElement)
+					{
+						selectedids.add(((VElement) cells[i]).getBpmnElement().getId());
+					}
+				}
+				
+				startelementstable.getSelectionModel().removeListSelectionListener(listselectionlistener);
+				startelementstable.getSelectionModel().clearSelection();
+				for (int i = 0; i < startelementstable.getRowCount(); ++i)
+				{
+					if (selectedids.contains(startelementstable.getValueAt(i, 1)))
+					{
+						startelementstable.getSelectionModel().addSelectionInterval(i, i);
+					}
+				}
+				startelementstable.getSelectionModel().addListSelectionListener(listselectionlistener);
+			}
+		};
+		
 		this.propertynames = new ArrayList<String>();
 		setLayout(new BorderLayout());
 		JTabbedPane tabpane = new JTabbedPane();
@@ -334,6 +373,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				if (startelementsindex == tabpane.getSelectedIndex())
 				{
 					modelcontainer.setEditMode(ModelContainer.EDIT_MODE_STEALTH_SELECTION);
+					modelcontainer.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, graphselectionlistener);
 					wasstealth = true;
 				}
 				else
@@ -342,6 +382,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					{
 						wasstealth = false;
 						modelcontainer.getGraph().clearSelection();
+						modelcontainer.getGraph().getSelectionModel().removeListener(graphselectionlistener);
 						modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
 					}
 				}
@@ -551,6 +592,24 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		startelementstable = new JTable(samodel);
 		JScrollPane tablescrollpane = new JScrollPane(startelementstable);
 		tablepanel.add(tablescrollpane, gc);
+		
+		listselectionlistener = new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				int[] rows = startelementstable.getSelectedRows();
+				VElement[] elements = new VElement[rows.length];
+				for (int i = 0; i < rows.length; ++i)
+				{
+					elements[i] = modelcontainer.getGraph().getVisualElementById((String) startelementstable.getValueAt(rows[i], 1));
+				}
+				
+				modelcontainer.getGraph().getSelectionModel().removeListener(graphselectionlistener);
+				modelcontainer.getGraph().setSelectionCells(elements);
+				modelcontainer.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, graphselectionlistener);
+			}
+		};
+		startelementstable.getSelectionModel().addListSelectionListener(listselectionlistener);
 		
 		Action addaction = new AbstractAction("Add Start Activities")
 		{
@@ -1271,6 +1330,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	public void terminate()
 	{
 		terminateEditing();
+		modelcontainer.getGraph().getSelectionModel().removeListener(graphselectionlistener);
 	}
 	
 	/**

@@ -9,6 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>StartElements</jadex:modelname>
+    <jadex:package>jadex.bpmn.testcases</jadex:package>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
     <jadex:results>
       <jadex:result name="result" type=""/>
