@@ -1,11 +1,8 @@
 package jadex.bpmn.testcases.pojobpmn;
 
 import jadex.bpmn.model.task.annotation.Task;
-import jadex.bpmn.model.task.annotation.TaskArgument;
 import jadex.bpmn.model.task.annotation.TaskBody;
-import jadex.bpmn.model.task.annotation.TaskComponent;
 import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bridge.IInternalAccess;
 
 /**
  *  Print out some text stored in variable text.
@@ -15,13 +12,13 @@ import jadex.bridge.IInternalAccess;
 	description="The text parameter should contain the text to be printed."))
 public class PrintTask
 {
-	/** Injected argument. */
-	@TaskArgument
-	protected String text;
-	
-	/** The component. */
-	@TaskComponent
-	protected IInternalAccess ia;
+//	/** Injected argument. */
+//	@TaskArgument
+//	protected String text;
+//	
+//	/** The component. */
+//	@TaskComponent
+//	protected IInternalAccess ia;
 
 	
 	/**
@@ -31,7 +28,8 @@ public class PrintTask
 //	public void execute(ITaskContext context, @ParameterInfo("text") String text)
 	public void execute(String text)
 	{
-		System.out.println(text+" "+this.text+" "+ia);
+//		System.out.println(text+" "+this.text+" "+ia);
+		System.out.println(text);
 	}
 	
 }
