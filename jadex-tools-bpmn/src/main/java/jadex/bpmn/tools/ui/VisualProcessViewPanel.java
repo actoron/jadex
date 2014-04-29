@@ -41,6 +41,7 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
 import jadex.commons.transformation.annotations.Classname;
@@ -580,14 +581,29 @@ public class VisualProcessViewPanel extends JPanel
 											BreakpointMarker pbm = getBreakpointMarker(ve);
 											if(pbm==null)
 											{
-												pbm = new BreakpointMarker(graph);
 												mxGeometry pgeo = ve.getGeometry();
 												double ow = pgeo.getWidth();
 												double oh = pgeo.getHeight();
-												double w = pgeo.getWidth()/8;
-												double h = pgeo.getHeight()/8;
+												double w = ow/8;
+												double h = oh/8;
+
+												double shift = 10;
+												if(ve.getBpmnElement() instanceof MActivity)
+												{
+													MActivity mact = (MActivity)ve.getBpmnElement();
+													if(mact.isEvent())
+													{
+														shift = 0;
+													}
+													else if(mact.isGateway())
+													{
+														shift = 0;
+													}
+												}
+												
+												pbm = new BreakpointMarker(graph);
 												double s = Math.max(14, Math.min(w, h));
-												mxGeometry geo = new mxGeometry(ow-s-10, oh-s-10, s, s);
+												mxGeometry geo = new mxGeometry(ow-s-shift, oh-s-shift, s, s);
 	//											geo.setRelative(true);
 												pbm.setGeometry(geo);
 	//											ve.insert(pbm);
@@ -661,6 +677,8 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected void	updateViews()
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 //		ProcessThreadInfo sel = null;
 //		int row = getSelectedThredRow();
 //		if(row!=-1)
@@ -712,6 +730,8 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected BreakpointMarker getBreakpointMarker(VElement ve)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		BreakpointMarker ret = null;
 		for(int i=0; i<ve.getChildCount(); i++)
 		{
@@ -739,31 +759,43 @@ public class VisualProcessViewPanel extends JPanel
 		
 		public ProcessThreadModel()
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			this.threadinfos	= new ArrayList<ProcessThreadInfo>();
 		}
 		
 		public String getColumnName(int column)
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			return colnames[column];
 		}
 
 		public int getColumnCount()
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			return colnames.length;
 		}
 		
 		public int getRowCount()
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			return threadinfos.size();
 		}
 		
 		public List<ProcessThreadInfo> getThreadInfos()
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			return threadinfos;
 		}
 		
 		public void addValue(ProcessThreadInfo pti)
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			int idx = threadinfos.indexOf(pti);
 			if(idx!=-1)
 			{
@@ -780,6 +812,8 @@ public class VisualProcessViewPanel extends JPanel
 		
 		public void removeValue(ProcessThreadInfo pti)
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			int idx = threadinfos.indexOf(pti);
 			if(idx!=-1)
 			{
@@ -795,6 +829,8 @@ public class VisualProcessViewPanel extends JPanel
 		
 		public void updateValue(ProcessThreadInfo pti)
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			int idx = threadinfos.indexOf(pti);
 			if(idx!=-1)
 			{
@@ -811,6 +847,8 @@ public class VisualProcessViewPanel extends JPanel
 		
 		public Object getValueAt(int row, int column)
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			Object ret = null;
 			ProcessThreadInfo info = (ProcessThreadInfo)threadinfos.toArray()[row];
 			
@@ -871,21 +909,29 @@ public class VisualProcessViewPanel extends JPanel
 		
 		public String getColumnName(int column)
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			return colnames[column];
 		}
 
 		public int getColumnCount()
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			return colnames.length;
 		}
 		
 		public int getRowCount()
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			return historyinfos.size();
 		}
 		
 		public Object getValueAt(int row, int column)
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			Object ret = null;
 			ProcessThreadInfo	info	= (ProcessThreadInfo)historyinfos.get(row);
 			if(column==0)
@@ -914,12 +960,16 @@ public class VisualProcessViewPanel extends JPanel
 		
 		public void addValue(int idx, ProcessThreadInfo pti)
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			historyinfos.add(idx, pti);
 			fireTableRowsInserted(idx, idx);
 		}
 		
 		public void clear()
 		{
+			assert SwingUtilities.isEventDispatchThread();
+
 			int size = historyinfos.size();
 			historyinfos.clear();
 			fireTableRowsDeleted(0, size-1);
@@ -967,7 +1017,7 @@ public class VisualProcessViewPanel extends JPanel
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				IFuture<Void> ret = cms.stepComponent(access.getComponentIdentifier(), getStepInfo());
-				ret.addResultListener(new IResultListener<Void>()
+				ret.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -978,7 +1028,7 @@ public class VisualProcessViewPanel extends JPanel
 					{
 						exception.printStackTrace();
 					}
-				});
+				}));
 			}
 		});
 	}

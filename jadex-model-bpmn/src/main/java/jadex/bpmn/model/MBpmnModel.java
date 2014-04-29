@@ -1616,4 +1616,5 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		
 		return ret;
 	}
+	
 }
