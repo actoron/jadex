@@ -9,7 +9,6 @@ import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BiHashMap;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -145,11 +144,11 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** The messages. */
 	protected List<MMessagingEdge> messages;
 	
-	/** The outgoing data edges for arguments. */
-	protected List<MDataEdge> outdataedges;
+	/** The outgoing data edges for results. */
+	protected List<MDataEdge> resultdataedges;
 	
-	/** The incoming data edges for results. */
-	protected List<MDataEdge> indataedges;
+	/** The incoming data edges for arguments. */
+	protected List<MDataEdge> argdataedges;
 			
 	//-------- init structures --------
 	
@@ -740,78 +739,78 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Add an outgoing edge.
 	 *  @param edge The edge.
 	 */
-	public void addOutgoingDataEdge(MDataEdge edge)
+	public void addResultDataEdge(MDataEdge edge)
 	{
-		if(outdataedges==null)
-			outdataedges = new ArrayList<MDataEdge>();
-		outdataedges.add(edge);
+		if(resultdataedges==null)
+			resultdataedges = new ArrayList<MDataEdge>();
+		resultdataedges.add(edge);
 	}
 	
 	/**
 	 *  Remove an outgoing edge.
 	 *  @param edge The edge.
 	 */
-	public void removeOutgoingDataEdge(MDataEdge edge)
+	public void removeResultDataEdge(MDataEdge edge)
 	{
-		if(outdataedges!=null)
-			outdataedges.remove(edge);
+		if(resultdataedges!=null)
+			resultdataedges.remove(edge);
 	}
 	
 	/**
 	 *  Add an incoming edge.
 	 *  @param edge The edge.
 	 */
-	public void addIncomingDataEdge(MDataEdge edge)
+	public void addArgumentDataEdge(MDataEdge edge)
 	{
-		if(indataedges==null)
-			indataedges = new ArrayList<MDataEdge>();
-		indataedges.add(edge);
+		if(argdataedges==null)
+			argdataedges = new ArrayList<MDataEdge>();
+		argdataedges.add(edge);
 	}
 	
 	/**
 	 *  Remove an outgoing edge.
 	 *  @param edge The edge.
 	 */
-	public void removeIncomingDataEdge(MDataEdge edge)
+	public void removeArgumentDataEdge(MDataEdge edge)
 	{
-		if(indataedges!=null)
-			indataedges.remove(edge);
+		if(argdataedges!=null)
+			argdataedges.remove(edge);
 	}
 	
 	/**
 	 *  Get the incoming data edges.
 	 *  @return the incoming data edges.
 	 */
-	public List<MDataEdge> getIncomingDataEdges()
+	public List<MDataEdge> getArgumentDataEdges()
 	{
-		return indataedges;
+		return argdataedges;
 	}
 	
 	/**
 	 *  Set the incoming data edges.
 	 *  @param indataedges The incoming data edges.
 	 */
-	public void setIncomingDataEdges(List<MDataEdge> indataedges)
+	public void setArgumentDataEdges(List<MDataEdge> indataedges)
 	{
-		this.indataedges = indataedges;
+		this.argdataedges = indataedges;
 	}
 	
 	/**
 	 *  Get the outgoing data edges.
 	 *  @return the outgoing data edges.
 	 */
-	public List<MDataEdge> getOutgoingDataEdges()
+	public List<MDataEdge> getResultDataEdges()
 	{
-		return outdataedges;
+		return resultdataedges;
 	}
 	
 	/**
 	 *  Set the outgoing data edges.
 	 *  @param outdataedges The outgoing data edges.
 	 */
-	public void setOutgoingDataEdges(List<MDataEdge> outdataedges)
+	public void setResultDataEdges(List<MDataEdge> outdataedges)
 	{
-		this.outdataedges = outdataedges;
+		this.resultdataedges = outdataedges;
 	}
 	
 	/**
