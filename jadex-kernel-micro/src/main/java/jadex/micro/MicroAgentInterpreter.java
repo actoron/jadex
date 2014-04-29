@@ -657,7 +657,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 										exceptionOccurred(e);
 									}
 								}
-								else if(Boolean.TRUE.equals(getComponentDescription().getSynchronous()))
+								else if(getComponentDescription().isSynchronous())
 								{
 									exta.scheduleStep(new IComponentStep<Void>()
 									{

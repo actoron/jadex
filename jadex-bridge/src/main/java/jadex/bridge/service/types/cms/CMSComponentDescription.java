@@ -43,19 +43,22 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	protected String[] breakpoints;
 	
 	/** The master flag. */
-	protected Boolean master;
+	protected boolean master;
 	
 	/** The daemon flag. */
-	protected Boolean daemon;
+	protected boolean daemon;
 	
 	/** The auto shutdown flag. */
-	protected Boolean autoshutdown;
+	protected boolean autoshutdown;
 
+	/** The synchronous flag. */
+	protected boolean synchronous;
+	
+	/** The persistable flag. */
+	protected boolean persistable;
+	
 	/** The monitoring flag. */
 	protected PublishEventLevel monitoring;
-	
-	/** The synchronous flag. */
-	protected Boolean synchronous;
 	
 	/** The model name. */
 	protected String modelname;
@@ -86,10 +89,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	}
 
 	/**
-	 *  Create a new CESComponentDescription.
+	 *  Create a new CMSComponentDescription.
 	 */
-	public CMSComponentDescription(IComponentIdentifier cid, String type, Boolean master, 
-		Boolean daemon, Boolean autoshutdown, PublishEventLevel monitoring, Boolean synchronous, String modelname, String localtype, IResourceIdentifier rid,
+	public CMSComponentDescription(IComponentIdentifier cid, String type, boolean master, 
+		boolean daemon, boolean autoshutdown, PublishEventLevel monitoring, boolean synchronous, String modelname, String localtype, IResourceIdentifier rid,
 		long creationtime, IComponentIdentifier creator, Cause cause)
 	{
 //		if(cid.getName().indexOf("Dyn")!=-1)
@@ -286,7 +289,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Get the master.
 	 *  @return the master.
 	 */
-	public Boolean getMaster()
+	public boolean isMaster()
 	{
 		return master;
 	}
@@ -295,7 +298,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the master.
 	 *  @param master The master to set.
 	 */
-	public void setMaster(Boolean master)
+	public void setMaster(boolean master)
 	{
 		this.master = master;
 	}
@@ -304,7 +307,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Get the daemon.
 	 *  @return the daemon.
 	 */
-	public Boolean getDaemon()
+	public boolean isDaemon()
 	{
 		return daemon;
 	}
@@ -313,7 +316,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the daemon.
 	 *  @param daemon The daemon to set.
 	 */
-	public void setDaemon(Boolean daemon)
+	public void setDaemon(boolean daemon)
 	{
 		this.daemon = daemon;
 	}
@@ -322,7 +325,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Get the autoshutdown.
 	 *  @return the autoshutdown.
 	 */
-	public Boolean getAutoShutdown()
+	public boolean isAutoShutdown()
 	{
 		return autoshutdown;
 	}
@@ -331,7 +334,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the autoshutdown.
 	 *  @param autoshutdown The autoshutdown to set.
 	 */
-	public void setAutoShutdown(Boolean autoshutdown)
+	public void setAutoShutdown(boolean autoshutdown)
 	{
 		this.autoshutdown = autoshutdown;
 	}
@@ -427,6 +430,42 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	}
 
 	/**
+	 *  Get the synchronous flag.
+	 *  @return	The synchronous flag.
+	 */
+	public boolean isSynchronous()
+	{
+		return synchronous;
+	}
+	
+	/**
+	 *  Set the synchronous flag.
+	 *  @param synchronous	The synchronous flag.
+	 */
+	public void	setSynchronous(boolean synchronous)
+	{
+		this.synchronous = synchronous;
+	}
+	
+	/**
+	 *  Get the persistable flag.
+	 *  @return	The persistable flag.
+	 */
+	public boolean isPersistable()
+	{
+		return persistable;
+	}
+
+	/**
+	 *  Set the persistable flag.
+	 *  @param persistable	The persistable flag.
+	 */
+	public void	isPersistable(boolean persistable)
+	{
+		this.persistable	= persistable;
+	}
+
+	/**
 	 *  Get the monitoring.
 	 *  @return The monitoring.
 	 */
@@ -444,24 +483,6 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		this.monitoring = monitoring;
 	}
 	
-	/**
-	 *  Get the synchronous flag.
-	 *  @return	The synchronous flag.
-	 */
-	public Boolean getSynchronous()
-	{
-		return synchronous;
-	}
-	
-	/**
-	 *  Set the synchronous flag.
-	 *  @param synchronous	The synchronous flag.
-	 */
-	public void	setSynchronous(Boolean synchronous)
-	{
-		this.synchronous = synchronous;
-	}
-
 	/**
 	 *  Get the stepinfo.
 	 *  @return The stepinfo.

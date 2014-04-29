@@ -41,6 +41,8 @@ public class ComponentProperties	extends	PropertiesPanel
 		createCheckBox("Master");
 		createCheckBox("Daemon");
 		createCheckBox("Auto shutdown");
+		createCheckBox("Synchronous");
+		createCheckBox("Persistable");
 	}
 	
 	//-------- methods --------
@@ -61,9 +63,11 @@ public class ComponentProperties	extends	PropertiesPanel
 		getTextField("Resource Identifier").setText(gid==null? "n/a": gid);
 		getTextField("(global / local)").setText(lid==null? "n/a": lid.toString());
 //		getTextField("Processing state").setText(desc.getProcessingState());
-		getCheckBox("Master").setSelected(desc.getMaster()==null? false: desc.getMaster().booleanValue());
-		getCheckBox("Daemon").setSelected(desc.getDaemon()==null? false: desc.getDaemon().booleanValue());
-		getCheckBox("Auto shutdown").setSelected(desc.getAutoShutdown()==null? false: desc.getAutoShutdown().booleanValue());
+		getCheckBox("Master").setSelected(desc.isMaster());
+		getCheckBox("Daemon").setSelected(desc.isDaemon());
+		getCheckBox("Auto shutdown").setSelected(desc.isAutoShutdown());
+		getCheckBox("Synchronous").setSelected(desc.isSynchronous());
+		getCheckBox("Persistable").setSelected(desc.isPersistable());
 		
 		JTable	list	= (JTable)getComponent("Addresses");
 		String[]	addresses	= desc.getName().getAddresses();
