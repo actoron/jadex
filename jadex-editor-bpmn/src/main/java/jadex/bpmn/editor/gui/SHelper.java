@@ -267,7 +267,6 @@ public class SHelper
 					vclones.put(genelem.getId(), genelem);
 					
 					List<MIdElement> subelements = new ArrayList<MIdElement>(msp.getActivities());
-					subelements.addAll(msp.getActivities());
 					subelements.addAll(msp.getEdges());
 					List<VElement> elements = generateVisualClones(graph, idmap, oldvmap, subelements, vclones);
 					for (VElement element : elements)
@@ -292,9 +291,15 @@ public class SHelper
 				{
 					String oldid = idmap.rget(mclone.getId());
 					VElement oldelem = oldvmap.get(oldid);
+					
+					if (((VActivity) oldelem).getInternalParameters() != null && ((VActivity) oldelem).getInternalParameters().size() > 0)
+					{
+						((VActivity) genelem).setInternalParameters(((VActivity) oldelem).getInternalParameters());
+					}
+					
 					genelem.setCollapsed(oldelem.isCollapsed());
 					mxGeometry oldgeo = oldelem.getGeometry();
-					mxGeometry newgeo = new mxGeometry(oldgeo.getX(), oldgeo.getY(), oldgeo.getWidth(), oldgeo.getHeight());
+					mxGeometry newgeo = new mxGeometry(oldgeo.getX() + 10, oldgeo.getY() + 10, oldgeo.getWidth(), oldgeo.getHeight());
 					mxRectangle ab = oldgeo.getAlternateBounds() != null? new mxRectangle(oldgeo.getAlternateBounds()) : null;
 					newgeo.setAlternateBounds(ab);
 					genelem.setGeometry(newgeo);

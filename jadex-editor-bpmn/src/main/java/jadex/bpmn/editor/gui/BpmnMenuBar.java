@@ -197,6 +197,9 @@ public class BpmnMenuBar extends JMenuBar
 				copycells = SHelper.copy(graph, mc.getBpmnModel(), cells);
 			}
 		});
+		copyitem.setAccelerator(KeyStroke.getKeyStroke(
+								java.awt.event.KeyEvent.VK_C, 
+								java.awt.Event.CTRL_MASK));
 		editmenu.add(copyitem);
 		
 		JMenuItem pasteitem = new JMenuItem(new AbstractAction("Paste")
@@ -215,6 +218,9 @@ public class BpmnMenuBar extends JMenuBar
 //				editorwindow.getSelectedModelContainer().getGraph().addCells(copycells);
 			}
 		});
+		pasteitem.setAccelerator(KeyStroke.getKeyStroke(
+								 java.awt.event.KeyEvent.VK_V, 
+								 java.awt.Event.CTRL_MASK));
 		editmenu.add(pasteitem);
 		
 		JMenu viewmenu = new JMenu("View");
