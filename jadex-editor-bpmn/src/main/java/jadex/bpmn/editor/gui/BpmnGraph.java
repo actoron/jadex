@@ -15,6 +15,7 @@ import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.commons.collection.LRU;
 
 import javax.swing.SwingUtilities;
 
@@ -36,12 +37,16 @@ public class BpmnGraph extends mxGraph
 	/** The layout manager. */
 	protected BpmnLayoutManager layoutmanager;
 	
+	/** Element ID cache. */
+	protected LRU<String, VElement> elementidcache;
+	
 	/**
 	 *  Creates the graph.
 	 */
 	public BpmnGraph(ModelContainer container, mxStylesheet sheet)
 	{
 		this.modelcontainer = container;
+		this.elementidcache = new LRU<String, VElement>(30);
 		setAllowDanglingEdges(false);
 		setAllowLoops(true);
 		setVertexLabelsMovable(false);
@@ -267,6 +272,25 @@ public class BpmnGraph extends mxGraph
 			});
 		}
 	}
+	
+	/**
+	 *  Gets a visual element by BPMN id.
+	 *  
+	 *  @param id The ID.
+	 *  @return The element, null if not found.
+	 */
+	public VElement getVisualElementById(String id)
+	{
+		VElement ret = elementidcache.get(id);
+		
+		if (ret == null)
+		{
+			ret = findElementById((mxICell) getModel().getRoot(), id);
+			elementidcache.put(id, ret);
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Refreshes the view for a cell.
@@ -326,6 +350,23 @@ public class BpmnGraph extends mxGraph
 		}
 		
 		return error;
+	}
+	
+	protected VElement findElementById(mxICell startelement, String id)
+	{
+		if (startelement instanceof VElement &&
+			id.equals(((VElement) startelement).getBpmnElement().getId()))
+		{
+			return (VElement) startelement;
+		}
+		
+		VElement ret = null;
+		for (int i = 0; i < startelement.getChildCount() && ret == null; ++i)
+		{
+			ret = findElementById(startelement.getChildAt(i), id);
+		}
+		
+		return ret;
 	}
 	
 	/**
