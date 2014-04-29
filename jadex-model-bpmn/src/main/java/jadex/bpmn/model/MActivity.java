@@ -1003,4 +1003,22 @@ public class MActivity extends MAssociationTarget
 		this.clazz = clazz;
 	}
 	
+	/**
+	 *  Test if activity is event.
+	 *  @return True, if is event.
+	 */
+	public boolean isEvent()
+	{
+		return getActivityType().startsWith("Event");
+	}
+	
+	/**
+	 *  Test if activity is gateway.
+	 *  @return True, if is gateway.
+	 */
+	public boolean isGateway()
+	{
+		return getActivityType().startsWith("Gateway");
+	}
+	
 }
