@@ -242,7 +242,7 @@ public class VisualProcessViewPanel extends JPanel
 		        		int row = threads.convertRowIndexToModel(vrow);
 		        		ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
 		        		mxICell cell = (mxICell)graph.getModel().getRoot();
-		        		VElement elem = getVElement(cell, pti.getActId());
+		        		VElement elem = graph.getVisualElementById(cell, pti.getActId());
 		        		if(elem!=null)
 		        		{
 		        			graph.setEventsEnabled(false);
@@ -250,35 +250,6 @@ public class VisualProcessViewPanel extends JPanel
 		        			graph.setEventsEnabled(true);
 		        		}
 		        	}
-		        }
-		        
-		        /**
-		         *  Find the velement of the graph that fits to the bpmn id.
-		         *  @param cell The start cell.
-		         *  @param actid The activity id.
-		         *  @return The element.
-		         */
-		        protected VElement getVElement(mxICell cell, String actid)
-		        {
-		        	VElement ret = null;
-		        	if(cell instanceof VElement)
-	        		{
-	        			VElement ve = (VElement)cell;
-	        			if(ve.getBpmnElement()!=null && ve.getBpmnElement().getId().equals(actid))
-	        			{
-	        				ret = ve;
-	        			}
-	        		}
-		        	
-		        	if(ret==null)
-		        	{
-		        		for(int i=0; i<cell.getChildCount() && ret==null; i++)
-		        		{
-		        			ret = getVElement(cell.getChildAt(i), actid);
-		        		}
-		        	}
-		        	
-		        	return ret;
 		        }
 		    };
 			

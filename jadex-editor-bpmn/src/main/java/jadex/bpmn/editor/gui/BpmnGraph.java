@@ -281,11 +281,22 @@ public class BpmnGraph extends mxGraph
 	 */
 	public VElement getVisualElementById(String id)
 	{
+		return getVisualElementById((mxICell) getModel().getRoot(), id);
+	}
+	
+	/**
+	 *  Gets a visual element by BPMN id.
+	 *  
+	 *  @param id The ID.
+	 *  @return The element, null if not found.
+	 */
+	public VElement getVisualElementById(mxICell startelement, String id)
+	{
 		VElement ret = elementidcache.get(id);
 		
 		if (ret == null)
 		{
-			ret = findElementById((mxICell) getModel().getRoot(), id);
+			ret = findElementById(startelement, id);
 			elementidcache.put(id, ret);
 		}
 		
