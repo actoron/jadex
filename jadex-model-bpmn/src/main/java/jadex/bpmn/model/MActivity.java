@@ -1,9 +1,13 @@
 package jadex.bpmn.model;
 
+import jadex.bpmn.model.task.annotation.TaskArgument;
 import jadex.bpmn.model.task.annotation.TaskBody;
+import jadex.bpmn.model.task.annotation.TaskComponent;
+import jadex.bpmn.model.task.annotation.TaskResult;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -12,10 +16,12 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,6 +114,19 @@ public class MActivity extends MAssociationTarget
 
 	/** The body method cached for speed. */
 	protected volatile MethodInfo cancelmethod;
+	
+	/** The component injection targets. */
+	protected volatile List<FieldInfo> componentinjections;
+
+//	/** The parent injection targets. */
+//	protected volatile List<FieldInfo> parentinjections;
+
+	/** The argument injection targets. */
+	protected volatile Map<String, List<FieldInfo>> argumentinjections;
+
+	/** The result injection targets. */
+	protected volatile Map<String, FieldInfo> resultinjections;
+
 	
 	//-------- methods --------
 	
@@ -1086,6 +1105,101 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Get and save the body method info.
+	 */
+	public List<FieldInfo> getComponentInjections(ClassLoader cl)
+	{
+		if(clazz!=null)
+		{
+			if(componentinjections==null)
+			{
+				synchronized(this)
+				{
+					if(componentinjections==null)
+					{
+						Class<?> body = clazz.getType(cl);
+						componentinjections = getFields(body, TaskComponent.class);
+					}
+				}
+			}
+		}
+		
+		return componentinjections;
+	}
+	
+	/**
+	 *  Get and save the body method info.
+	 */
+	public Map<String, List<FieldInfo>> getArgumentInjections(ClassLoader cl)
+	{
+		if(clazz!=null)
+		{
+			if(argumentinjections==null)
+			{
+				synchronized(this)
+				{
+					if(argumentinjections==null)
+					{
+						argumentinjections = new LinkedHashMap<String, List<FieldInfo>>();
+								
+						Class<?> body = clazz.getType(cl);
+						List<FieldInfo> fis = getFields(body, TaskArgument.class);
+						
+						for(FieldInfo fi: fis)
+						{
+							Field f = fi.getField(cl);
+							TaskArgument arg = f.getAnnotation(TaskArgument.class);
+							String name = arg.value().length()>0? arg.value(): f.getName();
+							List<FieldInfo> ais = argumentinjections.get(name);
+							if(ais==null)
+							{
+								ais = new ArrayList<FieldInfo>();
+								argumentinjections.put(name, ais);
+							}
+							ais.add(fi);
+						}
+					}
+				}
+			}
+		}
+		
+		return argumentinjections;
+	}
+	
+	/**
+	 *  Get and save the body method info.
+	 */
+	public Map<String, FieldInfo> getResultInjections(ClassLoader cl)
+	{
+		if(clazz!=null)
+		{
+			if(resultinjections==null)
+			{
+				synchronized(this)
+				{
+					if(resultinjections==null)
+					{
+						resultinjections = new LinkedHashMap<String, FieldInfo>();
+								
+						Class<?> body = clazz.getType(cl);
+						List<FieldInfo> fis = getFields(body, TaskResult.class);
+						
+						for(FieldInfo fi: fis)
+						{
+							Field f = fi.getField(cl);
+							TaskResult res = f.getAnnotation(TaskResult.class);
+							String name = res.value().length()>0? res.value(): f.getName();
+							resultinjections.put(name, fi);
+						}
+					}
+				}
+			}
+		}
+		
+		return resultinjections;
+	}
+	
+	/**
 	 *  Get method with an annotation.
 	 */
 	public static MethodInfo getMethod(Class<?> body, Class<? extends Annotation> type)
@@ -1103,6 +1217,31 @@ public class MActivity extends MAssociationTarget
 				{
 					ret = new MethodInfo(m);
 					break;
+				}
+			}
+			
+			bcl = bcl.getSuperclass();
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get method with an annotation.
+	 */
+	public static List<FieldInfo> getFields(Class<?> body, Class<? extends Annotation> type)
+	{
+		List<FieldInfo> ret = new ArrayList<FieldInfo>();
+		
+		Class<?> bcl = body;
+		
+		while(!Object.class.equals(bcl))
+		{
+			Field[] fs = bcl.getDeclaredFields();
+			for(Field f: fs)
+			{
+				if(f.isAnnotationPresent(type))
+				{
+					ret.add(new FieldInfo(f));
 				}
 			}
 			

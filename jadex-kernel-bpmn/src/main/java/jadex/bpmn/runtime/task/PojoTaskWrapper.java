@@ -3,18 +3,25 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -29,12 +36,74 @@ public class PojoTaskWrapper implements ITask
 	/** The cancel method. */
 	protected Method cancelmethod;
 	
+	/** The resinjections. */
+	protected Map<String, FieldInfo> resinjections;
+	
 	/**
 	 *  Create a new wrapper task.
 	 */
-	public PojoTaskWrapper(Object pojotask)
+	public PojoTaskWrapper(Object pojotask, IInternalAccess ia, ProcessThread thread, List<FieldInfo> cominjections, Map<String, 
+		List<FieldInfo>> arginjections, Map<String, FieldInfo> resinjections)
 	{
 		this.pojotask = pojotask;
+		this.resinjections = resinjections;
+		
+		for(FieldInfo fi: cominjections)
+		{
+			try
+			{
+				Field f = fi.getField(ia.getClassLoader());
+				if(SReflect.isSupertype(f.getType(), IInternalAccess.class))
+				{
+					f.setAccessible(true);
+					f.set(pojotask, ia);						
+				}
+				else if(SReflect.isSupertype(f.getType(), IExternalAccess.class))
+				{
+					f.setAccessible(true);
+					f.set(pojotask, ia.getExternalAccess());
+				}
+			}
+			catch(Exception e)
+			{
+				System.out.println("Component injection failed: "+e);
+			}
+		}
+		
+		for(String name: arginjections.keySet())
+		{
+			List<FieldInfo> infos = arginjections.get(name);
+			
+			for(FieldInfo fi: infos)
+			{
+				try
+				{
+					Field f = fi.getField(ia.getClassLoader());
+					f.setAccessible(true);
+					f.set(pojotask, thread.getParameterValue(name));
+				}
+				catch(Exception e)
+				{
+					System.out.println("Argument injection failed: "+e);
+				}
+			}
+		}
+		
+		for(String name: resinjections.keySet())
+		{
+			FieldInfo fi = resinjections.get(name);
+			
+			try
+			{
+				Field f = fi.getField(ia.getClassLoader());
+				f.setAccessible(true);
+				f.set(pojotask, thread.getParameterValue(name));
+			}
+			catch(Exception e)
+			{
+				System.out.println("Result injection failed: "+e);
+			}
+		}
 	}
 	
 	/**
@@ -80,18 +149,14 @@ public class PojoTaskWrapper implements ITask
 				{
 					public void customResultAvailable(Object result)
 					{
-						List<MParameter> outs = context.getActivity().getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
-						if(outs!=null && outs.size()==1)
-						{
-							MParameter mparam = outs.get(0);
-							context.setParameterValue(mparam.getName(), result);
-						}
+						setResults(result, context, process);
 						ret.setResult(null);
 					}
 				});
 			}
 			else
 			{
+				setResults(re, context, process);
 				ret.setResult(null);
 			}
 		}
@@ -210,4 +275,37 @@ public class PojoTaskWrapper implements ITask
 		return ret;
 	}
 
+	/**
+	 *  Set the results.
+	 */
+	protected void setResults(Object result, ITaskContext context, IInternalAccess process)
+	{
+		List<MParameter> outs = context.getActivity().getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
+		if(outs!=null && outs.size()==1)
+		{
+			MParameter mparam = outs.get(0);
+			context.setParameterValue(mparam.getName(), result);
+		}
+		else if(outs.size()>0)
+		{
+			if(resinjections!=null)
+			{
+				for(String name: resinjections.keySet())
+				{
+					try
+					{
+						FieldInfo fi = resinjections.get(name);
+						Field f = fi.getField(process.getClassLoader());
+						f.setAccessible(true);
+						Object val = f.get(pojotask);
+						context.setParameterValue(name, val);
+					}
+					catch(Exception e)
+					{
+						System.out.println("Could not set result: "+e);
+					}
+				}
+			}
+		}
+	}
 }
