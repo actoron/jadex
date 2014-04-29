@@ -94,7 +94,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	{
 //		System.out.println("dowakeup: "+getComponentIdentifier());
 		
-		if(desc.getSynchronous()!=null && desc.getSynchronous().booleanValue())
+		if(desc.isSynchronous())
 		{
 			// Add to parent and wake up parent.
 			if(parenta==null)

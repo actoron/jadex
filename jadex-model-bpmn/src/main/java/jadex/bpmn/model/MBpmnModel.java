@@ -10,7 +10,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.FieldInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.BiHashMap;
@@ -146,6 +145,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/** The messages. */
 	protected List<MMessagingEdge> messages;
+	
+	/** The outgoing data edges for results. */
+	protected List<MDataEdge> resultdataedges;
+	
+	/** The incoming data edges for arguments. */
+	protected List<MDataEdge> argdataedges;
 			
 	//-------- init structures --------
 	
@@ -730,6 +735,84 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Add an outgoing edge.
+	 *  @param edge The edge.
+	 */
+	public void addResultDataEdge(MDataEdge edge)
+	{
+		if(resultdataedges==null)
+			resultdataedges = new ArrayList<MDataEdge>();
+		resultdataedges.add(edge);
+	}
+	
+	/**
+	 *  Remove an outgoing edge.
+	 *  @param edge The edge.
+	 */
+	public void removeResultDataEdge(MDataEdge edge)
+	{
+		if(resultdataedges!=null)
+			resultdataedges.remove(edge);
+	}
+	
+	/**
+	 *  Add an incoming edge.
+	 *  @param edge The edge.
+	 */
+	public void addArgumentDataEdge(MDataEdge edge)
+	{
+		if(argdataedges==null)
+			argdataedges = new ArrayList<MDataEdge>();
+		argdataedges.add(edge);
+	}
+	
+	/**
+	 *  Remove an outgoing edge.
+	 *  @param edge The edge.
+	 */
+	public void removeArgumentDataEdge(MDataEdge edge)
+	{
+		if(argdataedges!=null)
+			argdataedges.remove(edge);
+	}
+	
+	/**
+	 *  Get the incoming data edges.
+	 *  @return the incoming data edges.
+	 */
+	public List<MDataEdge> getArgumentDataEdges()
+	{
+		return argdataedges;
+	}
+	
+	/**
+	 *  Set the incoming data edges.
+	 *  @param indataedges The incoming data edges.
+	 */
+	public void setArgumentDataEdges(List<MDataEdge> indataedges)
+	{
+		this.argdataedges = indataedges;
+	}
+	
+	/**
+	 *  Get the outgoing data edges.
+	 *  @return the outgoing data edges.
+	 */
+	public List<MDataEdge> getResultDataEdges()
+	{
+		return resultdataedges;
+	}
+	
+	/**
+	 *  Set the outgoing data edges.
+	 *  @param outdataedges The outgoing data edges.
+	 */
+	public void setResultDataEdges(List<MDataEdge> outdataedges)
+	{
+		this.resultdataedges = outdataedges;
 	}
 	
 	/**

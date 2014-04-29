@@ -2347,16 +2347,23 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
     public IFuture<IPersistInfo> getPersistableState()
     {
     	final Future<IPersistInfo>	ret	= new Future<IPersistInfo>();
-    	final DefaultPersistInfo	api	= createPersistInfo();
-    	getServiceContainer().getPersistInfo()
-    		.addResultListener(new ExceptionDelegationResultListener<ServiceContainerPersistInfo, IPersistInfo>(ret)
-		{
-    		public void customResultAvailable(ServiceContainerPersistInfo container)
-    		{
-    	    	api.setServiceContainer(container);
-    			ret.setResult(api);
-    		}
-		});
+    	try
+    	{
+	    	final DefaultPersistInfo	api	= createPersistInfo();
+	    	getServiceContainer().getPersistInfo()
+	    		.addResultListener(new ExceptionDelegationResultListener<ServiceContainerPersistInfo, IPersistInfo>(ret)
+			{
+	    		public void customResultAvailable(ServiceContainerPersistInfo container)
+	    		{
+	    	    	api.setServiceContainer(container);
+	    			ret.setResult(api);
+	    		}
+			});
+    	}
+    	catch(Exception e)
+    	{
+    		ret.setException(e);
+    	}
     	return ret;
     }
 		

@@ -1,26 +1,39 @@
 package jadex.platform.service.persistence;
 
-import java.util.Arrays;
-
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.kernelbase.IBootstrapFactory;
+import jadex.platform.service.cms.ComponentAdapterFactory;
 import jadex.platform.service.cms.ComponentManagementService;
 import jadex.platform.service.cms.IntermediateResultListener;
 import jadex.platform.service.cms.StandaloneComponentAdapter;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  *  CMS with additional persistence functionality.
@@ -28,6 +41,31 @@ import jadex.platform.service.cms.StandaloneComponentAdapter;
 @Service
 public class PersistenceComponentManagementService	extends ComponentManagementService
 {
+	//-------- constants --------
+	
+	/** The default minimum time span of inactivity after which a component is persisted. */
+	public static final long DEFAULT_PERSIST_DELAY	= BasicService.getScaledLocalDefaultTimeout(1);
+	
+	/** The offset between minimum and maximum persist delay (e.g. delay=30 offset=0.5 -> maximum=30+30*0.5=45). */
+	public static final double DEFAULT_PERSIST_OFFSET	= 0.5;
+	
+	//-------- attributes --------
+	
+	/** The inactive components sorted by last activity (most recent is last). */
+	protected Set<IComponentIdentifier>	lrucomponents;
+	
+	/** The time span of inactivity after which a component is persisted. */
+	protected long	persistdelay;
+	
+	/** The offset between minimum and maximum persist delay. */
+	protected double persistoffset;
+	
+	/** The external access of the cms component. */
+	@ServiceComponent
+	protected IExternalAccess	access;
+	
+	//-------- constructors --------
+	
 	/**
 	 *  Static method for reflective creation to allow platform start without add-on.
 	 */
@@ -44,6 +82,132 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
 		super(root, componentfactory, copy, realtime, persist, uniqueids);
+		this.lrucomponents	= new LinkedHashSet<IComponentIdentifier>();
+		this.persistdelay	= DEFAULT_PERSIST_DELAY;
+		this.persistoffset	= DEFAULT_PERSIST_OFFSET;
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Create the adapter factory.
+	 */
+	protected IComponentAdapterFactory createAdapterFactory()
+	{
+		return new ComponentAdapterFactory()
+		{
+			public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model,
+				IComponentInstance instance, IExternalAccess parent)
+			{
+				return new PersistentComponentAdapter(desc, model, instance, parent,
+					PersistenceComponentManagementService.this, clockservice);
+			}
+		};
+	}
+	
+	/**
+	 *  Add a component to the LRU table.
+	 */
+	public void addLRUComponent(IComponentIdentifier cid)
+	{
+		boolean	starttimer;
+		synchronized(lrucomponents)
+		{
+			starttimer	= lrucomponents.isEmpty();
+			lrucomponents.add(cid);
+		}
+		
+		if(starttimer)
+		{
+			access.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(final IInternalAccess ia)
+				{
+					ia.waitForDelay(persistdelay)
+						.addResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void result)
+							{
+								long	current	= clockservice.getTime();
+								List<IComponentIdentifier>	persistables	= null;
+								long	nexttime	= -1;
+								synchronized(lrucomponents)
+								{
+									for(IComponentIdentifier cid: lrucomponents)
+									{
+										PersistentComponentAdapter	pca	= (PersistentComponentAdapter)internalGetComponentAdapter(cid);
+										if(pca!=null)
+										{
+											long	last	= pca.getLastStepTime();
+											if(last+persistdelay>=current)
+											{
+												if(persistables==null)
+												{
+													persistables	= new ArrayList<IComponentIdentifier>();
+												}
+												persistables.add(cid);
+											}
+											else
+											{
+												nexttime	= last - current + persistdelay + (long)(persistdelay*persistoffset);
+												break;
+											}
+										}
+									}
+								}
+								
+								if(persistables!=null)
+								{
+									for(final IComponentIdentifier cid: persistables)
+									{
+										getComponentInstance(internalGetComponentAdapter(cid)).getPersistableState()
+											.addResultListener(new IResultListener<IPersistInfo>()
+										{
+											public void resultAvailable(IPersistInfo pi)
+											{
+												System.out.println("Got persist info for "+cid+": "+pi);
+											}
+
+											public void exceptionOccurred(Exception exception)
+											{
+												if(!(exception instanceof ComponentTerminatedException))
+												{
+													ia.getLogger().severe("Exception when persisting component "+cid+": "+exception);
+												}
+											}
+										});
+									}
+								}
+								
+								if(nexttime!=-1)
+								{
+									ia.waitForDelay(nexttime).addResultListener(this);
+								}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(!(exception instanceof ComponentTerminatedException))
+								{
+									ia.getLogger().severe("Exception in persistence timer: "+exception);
+								}
+							}
+						});
+					return IFuture.DONE;
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Remove a component from the LRU table.
+	 */
+	public void removeLRUComponent(IComponentIdentifier cid)
+	{
+		synchronized(lrucomponents)
+		{
+			lrucomponents.remove(cid);
+		}
 	}
 	
 	/**

@@ -276,7 +276,7 @@ public class VisualProcessViewPanel extends JPanel
 						VElement elem = (VElement)cell;
 //						System.out.println("Cell: "+ve.getBpmnElement()); 
 						
-						if(elem!=null)
+						if(elem!=null && elem.getBpmnElement()!=null)
 						{
 							String id = elem.getBpmnElement().getId();
 							boolean set = false;

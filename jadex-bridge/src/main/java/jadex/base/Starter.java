@@ -478,8 +478,8 @@ public class Starter
 									moni = (PublishEventLevel)tmpmoni;
 								}
 
-								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, 
-									autosd, moni, null, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
+								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
+									autosd!=null ? autosd.booleanValue() : false, moni, false, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
 								
 								Object	af = getArgumentValue(ADAPTER_FACTORY, model, cmdargs, compargs);
 								if(af==null)

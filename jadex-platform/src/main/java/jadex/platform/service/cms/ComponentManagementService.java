@@ -85,7 +85,7 @@ public class ComponentManagementService implements IComponentManagementService
 	//-------- attributes --------
 	
 	/** The adapter factory. */
-	protected ComponentAdapterFactory adapterfactory = new ComponentAdapterFactory();
+	protected IComponentAdapterFactory adapterfactory;
 	
 	/** The agent. */
 	@ServiceComponent
@@ -190,7 +190,17 @@ public class ComponentManagementService implements IComponentManagementService
 		this.localtypes	= new LRU<Tuple, String>(100);
 		this.lockentries = SCollection.createHashMap();
 		this.cidcounts = new HashMap<String, Integer>();
-   }
+		
+		this.adapterfactory	= createAdapterFactory();
+	}
+    
+    /**
+     *  Create the adapter factory.
+     */
+    protected IComponentAdapterFactory	createAdapterFactory()
+    {
+    	return new ComponentAdapterFactory();
+    }
     
 	/**
 	 *  Get the component instance from an adapter.
@@ -594,7 +604,8 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 //																	Cause cause = new Cause(curcause, cid.getName());
 																	Cause cause = curcause;
-																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master, daemon, autosd, moni, sync,
+																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
+																		daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, moni, sync!=null ? sync.booleanValue() : false,
 																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause);
 																	
 																	logger.info("Starting component: "+cid.getName());
@@ -1670,12 +1681,10 @@ public class ComponentManagementService implements IComponentManagementService
 		CMSComponentDescription padesc	= (CMSComponentDescription)pad.getDescription();
 		padesc.addChild(ad.getName());
 		
-		Boolean dae = ad.getDaemon();
-
 //		if(padesc.isAutoShutdown() && !ad.isDaemon())
 //		if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
 		// cannot check parent shutdown state because could be still uninited
-		if(dae==null || !dae.booleanValue())
+		if(!ad.isDaemon())
 		{
 			Integer	childcount	= (Integer)childcounts.get(padesc.getName());
 			int cc = childcount!=null ? childcount.intValue()+1 : 1;
@@ -1894,15 +1903,13 @@ public class ComponentManagementService implements IComponentManagementService
 				cancel(adapter);
 //				exeservice.cancel(adapter);
 				
-				killparent = desc.getMaster()!=null && desc.getMaster().booleanValue();
+				killparent = desc.isMaster();
 				CMSComponentDescription padesc = (CMSComponentDescription)getDescription(desc.getName().getParent());
 				if(padesc!=null)
 				{
 					padesc.removeChild(desc.getName());
-					Boolean pas = padesc.getAutoShutdown();
-					Boolean dae = desc.getDaemon();
 //							if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
-					if(dae==null || !dae.booleanValue())
+					if(!desc.isDaemon())
 //							if(padesc.isAutoShutdown() && !desc.isDaemon())
 					{
 						Integer	childcount	= (Integer)childcounts.get(padesc.getName());
@@ -1918,7 +1925,7 @@ public class ComponentManagementService implements IComponentManagementService
 						}
 						// todo: could fail when parent is still in init phase. 
 						// Should test for init phase and remember that it has to be killed.
-						killparent = killparent || (pas!=null && pas.booleanValue() 
+						killparent = killparent || (padesc.isAutoShutdown() 
 							&& (childcount==null || childcount.intValue()<=1));
 					}
 				}

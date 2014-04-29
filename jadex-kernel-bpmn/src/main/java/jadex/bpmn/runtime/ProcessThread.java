@@ -797,6 +797,11 @@ public class ProcessThread	implements ITaskContext
 								
 									passedparams.put(pname, val);
 								}
+								else if (de.getSource() == null)
+								{
+									// Argument data edge
+									passedparams.put(de.getTargetParameter(), instance.getArguments().get(de.getSourceParameter()));
+								}
 								else
 								{
 									String pname = de.getTargetParameter();
@@ -955,13 +960,21 @@ public class ProcessThread	implements ITaskContext
 							}
 						}
 					}
-					if(dataedges==null)
-						dataedges = new HashMap<String, Object>();
-					dataedges.put(de.getId(), value);	
+					if (de.getTarget() == null)
+					{
+						// Result data edge
+						instance.setResultValue(de.getTargetParameter(), value);
+					}
+					else
+					{
+						if(dataedges==null)
+							dataedges = new HashMap<String, Object>();
+						dataedges.put(de.getId(), value);
+					}
 				}
 			}
 			
-			// Remove all in paramters
+			// Remove all in parameters
 			List<MParameter> params = activity.getParameters(new String[]{MParameter.DIRECTION_IN});
 			for(int i=0; i<params.size(); i++)
 			{
