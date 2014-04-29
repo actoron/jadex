@@ -60,6 +60,9 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	/** The offset between minimum and maximum persist delay. */
 	protected double persistoffset;
 	
+	/** The flag when the timer is active. */
+	protected boolean	timerrunning;
+	
 	/** The external access of the cms component. */
 	@ServiceComponent
 	protected IExternalAccess	access;
@@ -120,7 +123,11 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 		boolean	starttimer;
 		synchronized(lrucomponents)
 		{
-			starttimer	= lrucomponents.isEmpty();
+			starttimer	= !timerrunning && lrucomponents.isEmpty();
+			if(starttimer)
+			{
+				timerrunning	= true;
+			}
 			lrucomponents.add(cid);
 		}
 		
@@ -160,6 +167,11 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 												break;
 											}
 										}
+									}
+									
+									if(nexttime==-1)
+									{
+										timerrunning	= false;
 									}
 								}
 								
