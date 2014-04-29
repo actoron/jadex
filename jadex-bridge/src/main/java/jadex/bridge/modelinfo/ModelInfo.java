@@ -768,6 +768,39 @@ public class ModelInfo extends Startable implements IModelInfo
 		
 //		return autoshutdown==null? null: (Boolean)autoshutdown.getValue(configname);
 	}
+	
+	/**
+	 *  Get the synchronous flag.
+	 *  @param synchronous The synchronous.
+	 *  @return The synchronous flag value.
+	 */
+	public Boolean getSynchronous(String configname)
+	{
+		Boolean ret = null;
+		ConfigurationInfo config = getConfiguration(configname);
+		if(config!=null)
+			ret = config.getSynchronous();
+		if(ret==null)
+			ret = super.getSynchronous();
+		return ret;
+		
+	}
+	
+	/**
+	 *  Get the persistable flag.
+	 *  @param persistable The persistable.
+	 *  @return The persistable flag value.
+	 */
+	public Boolean getPersistable(String configname)
+	{
+		Boolean ret = null;
+		ConfigurationInfo config = getConfiguration(configname);
+		if(config!=null)
+			ret = config.getPersistable();
+		if(ret==null)
+			ret = super.getPersistable();
+		return ret;		
+	}
 
 	/**
 	 *  Get the suspend flag.
@@ -819,23 +852,6 @@ public class ModelInfo extends Startable implements IModelInfo
 		return ret;
 	}
 	
-	/**
-	 *  Get the synchronous flag.
-	 *  @param synchronous The synchronous.
-	 *  @return The synchronous flag value.
-	 */
-	public Boolean getSynchronous(String configname)
-	{
-		Boolean ret = null;
-		ConfigurationInfo config = getConfiguration(configname);
-		if(config!=null)
-			ret = config.getSynchronous();
-		if(ret==null)
-			ret = super.getSynchronous();
-		return ret;
-		
-	}
-
 	/**
 	 *  Get the subcomponent names. 
 	 */

@@ -37,7 +37,8 @@
 	for(int i=0; !hasflags && i<confs.length; i++)
 	{
 		hasflags	= confs[i].getAutoShutdown()!=null || confs[i].getDaemon()!=null
-			|| confs[i].getMaster()!=null || confs[i].getSuspend()!=null;		
+			|| confs[i].getMaster()!=null || confs[i].getSuspend()!=null
+			 || confs[i].getSynchronous()!=null || confs[i].getPersistable()!=null;		
 	}
 	if(hasflags) {
 %>
@@ -55,6 +56,14 @@
 	<td class="name">Master</td>
 	<td class="value"><div id="master"><%= model.getMaster(null)!=null && model.getMaster(null).booleanValue() ? "true" : "false" %></div></td>
 	<td class="desc">Destroy the parent component, when this component is destroyed.
+	</tr><tr class="odd">			
+	<td class="name">Synchronous</td>
+	<td class="value"><div id="synchronous"><%= model.getSynchronous(null)!=null && model.getSynchronous(null).booleanValue() ? "true" : "false" %></div></td>
+	<td class="desc">Execute the component synchronous to its parent.</td>
+	</tr><tr class="even">			
+	<td class="name">Persistable</td>
+	<td class="value"><div id="persistable"><%= model.getPersistable(null)!=null && model.getPersistable(null).booleanValue() ? "true" : "false" %></div></td>
+	<td class="desc">Is the component persistable?</td>
 	</tr><tr class="odd">			
 	<td class="name">Suspend</td>
 	<td class="value"><div id="suspend"><%= model.getSuspend(null)!=null && model.getSuspend(null).booleanValue() ? "true" : "false" %></div></td>

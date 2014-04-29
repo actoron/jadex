@@ -39,15 +39,20 @@ public @interface CreationInfo
 	public Boolean3 autoshutdown() default Boolean3.NULL;
 
 	/**
-	 *  The monitoring flag.
-	 */
-	public PublishEventLevel monitoring() default PublishEventLevel.OFF;
-
-	/**
 	 *  The synchronous flag.
 	 */
 	public Boolean3 synchronous() default Boolean3.NULL;
 
+	/**
+	 *  The persistable flag.
+	 */
+	public Boolean3 persistable() default Boolean3.NULL;
+
+	/**
+	 *  The monitoring flag.
+	 */
+	public PublishEventLevel monitoring() default PublishEventLevel.OFF;
+	
 	/**
 	 *  The component name.
 	 */

@@ -30,6 +30,9 @@ public class Startable
 	/** The synchronous flag. */
 	private Boolean synchronous;
 	
+	/** The persistable flag. */
+	private Boolean persistable;
+	
 	//-------- methods --------
 	
 	/**
@@ -121,25 +124,7 @@ public class Startable
 	{
 		this.suspend = suspend;
 	}
-
-	/**
-	 *  Get the monitoring.
-	 *  @return The monitoring.
-	 */
-	public PublishEventLevel getMonitoring()
-	{
-		return monitoring==null? PublishEventLevel.OFF: monitoring;
-	}
-
-	/**
-	 *  Set the monitoring.
-	 *  @param monitoring The monitoring to set.
-	 */
-	public void setMonitoring(PublishEventLevel monitoring)
-	{
-		this.monitoring = monitoring;
-	}
-
+	
 	/**
 	 *  Get the synchronous.
 	 *  @return The synchronous.
@@ -156,5 +141,41 @@ public class Startable
 	public void setSynchronous(Boolean synchronous)
 	{
 		this.synchronous = synchronous;
+	}
+	
+	/**
+	 *  Get the persistable.
+	 *  @return The persistable.
+	 */
+	public Boolean getPersistable()
+	{
+		return persistable;
+	}
+
+	/**
+	 *  Set the persistable flag.
+	 *  @param persistable The persistable flag to set.
+	 */
+	public void setPersistable(Boolean persistable)
+	{
+		this.persistable = persistable;
+	}
+	
+	/**
+	 *  Get the monitoring.
+	 *  @return The monitoring.
+	 */
+	public PublishEventLevel getMonitoring()
+	{
+		return monitoring==null? PublishEventLevel.OFF: monitoring;
+	}
+
+	/**
+	 *  Set the monitoring.
+	 *  @param monitoring The monitoring to set.
+	 */
+	public void setMonitoring(PublishEventLevel monitoring)
+	{
+		this.monitoring = monitoring;
 	}
 }

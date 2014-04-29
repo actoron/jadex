@@ -61,6 +61,8 @@ parameters={
 	description="Flag indicating if monitoring should be enabled for the new component (default=false)."),
 	@TaskParameter(name="synchronous", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
 	description="Flag indicating if the new component instance is started in synchronous mode (default=false)."),
+	@TaskParameter(name="persistable", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
+	description="Flag indicating if the new component instance is persistable (default=false)."),
 	@TaskParameter(name="killlistener", clazz=IResultListener.class, direction=TaskParameter.DIRECTION_IN,
 	description="An optional kill listener."),
 	@TaskParameter(name="value", clazz=Object.class, direction=TaskParameter.DIRECTION_IN,
@@ -112,8 +114,9 @@ public class CreateComponentTask implements ITask
 				Boolean master = context.getParameterValue("master")!=null? (Boolean)context.getParameterValue("master"): null;
 				Boolean daemon = context.getParameterValue("daemon")!=null? (Boolean)context.getParameterValue("daemon"): null;
 				Boolean autoshutdown = context.getParameterValue("autoshutdown")!=null? (Boolean)context.getParameterValue("autoshutdown"): null;
-				Boolean monitoring = context.getParameterValue("monitoring")!=null? (Boolean)context.getParameterValue("monitoring"): null;
 				Boolean synchronous = context.getParameterValue("synchronous")!=null? (Boolean)context.getParameterValue("synchronous"): null;
+				Boolean persistable = context.getParameterValue("persistable")!=null? (Boolean)context.getParameterValue("persistable"): null;
+				Boolean monitoring = context.getParameterValue("monitoring")!=null? (Boolean)context.getParameterValue("monitoring"): null;
 				RequiredServiceBinding[] bindings = context.getParameterValue("bindings")!=null? (RequiredServiceBinding[])context.getParameterValue("bindings"): null;
 				
 				Map<String, Object> args = (Map<String, Object>)context.getParameterValue("arguments");
@@ -231,7 +234,7 @@ public class CreateComponentTask implements ITask
 				PublishEventLevel elm = monitoring!=null && monitoring.booleanValue() ? PublishEventLevel.COARSE: PublishEventLevel.OFF;
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub? instance.getComponentIdentifier() : null, 
-						suspend, master, daemon, autoshutdown, elm, synchronous, 
+						suspend, master, daemon, autoshutdown, synchronous, persistable, elm ,
 						((BpmnInterpreter) instance).getModelElement().getModelInfo().getAllImports(), bindings,
 						instance.getModel().getResourceIdentifier()), lis)
 					.addResultListener(instance.createResultListener(new DelegationResultListener(creationfuture)));

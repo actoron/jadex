@@ -835,6 +835,18 @@ public class SBpmnModelReader
 				{
 					((ModelInfo) model.getModelInfo()).setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
 				}
+				if (attrs.containsKey("synchronous"))
+				{
+					((ModelInfo) model.getModelInfo()).setSynchronous(Boolean.parseBoolean(attrs.get("synchronous")));
+				}
+				if (attrs.containsKey("persistable"))
+				{
+					((ModelInfo) model.getModelInfo()).setPersistable(Boolean.parseBoolean(attrs.get("persistable")));
+				}
+				if (attrs.containsKey("keepalive"))
+				{
+					model.setKeepAlive(Boolean.parseBoolean(attrs.get("keepalive")));
+				}
 				if (attrs.containsKey("monitoring"))
 				{
 //					((ModelInfo) model.getModelInfo()).setMonitoring(Boolean.parseBoolean(attrs.get("monitoring")));
@@ -851,14 +863,6 @@ public class SBpmnModelReader
 					{
 						((ModelInfo) model.getModelInfo()).setMonitoring(PublishEventLevel.valueOf(attrs.get("monitoring")));
 					}
-				}
-				if (attrs.containsKey("synchronous"))
-				{
-					((ModelInfo) model.getModelInfo()).setSynchronous(Boolean.parseBoolean(attrs.get("synchronous")));
-				}
-				if (attrs.containsKey("keepalive"))
-				{
-					model.setKeepAlive(Boolean.parseBoolean(attrs.get("keepalive")));
 				}
 			}
 			else if ("import".equals(tag.getLocalPart()))

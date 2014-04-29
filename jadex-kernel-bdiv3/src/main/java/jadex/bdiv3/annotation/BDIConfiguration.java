@@ -70,6 +70,16 @@ public @interface BDIConfiguration
 	public boolean autoshutdown() default false;
 	
 	/**
+	 *  The synchronous flag.
+	 */
+	public boolean synchronous() default false;
+	
+	/**
+	 *  The persistable flag.
+	 */
+	public boolean persistable() default false;
+	
+	/**
 	 *  The suspend flag.
 	 */
 	public boolean suspend() default false;

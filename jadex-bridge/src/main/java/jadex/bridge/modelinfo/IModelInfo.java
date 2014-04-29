@@ -207,18 +207,25 @@ public interface IModelInfo
 	public Boolean getAutoShutdown(String configname);
 
 	/**
-	 *  Get the monitoring flag.
-	 *  @param monitoring The monitoring.
-	 *  @return The monitoring flag value.
-	 */
-	public PublishEventLevel getMonitoring(String configname);
-	
-	/**
 	 *  Get the synchronous flag.
 	 *  @param synchronous The synchronous.
 	 *  @return The synchronous flag value.
 	 */
 	public Boolean getSynchronous(String configname);
+	
+	/**
+	 *  Get the persistable flag.
+	 *  @param persistable The persistable.
+	 *  @return The persistable flag value.
+	 */
+	public Boolean getPersistable(String configname);
+	
+	/**
+	 *  Get the monitoring flag.
+	 *  @param monitoring The monitoring.
+	 *  @return The monitoring flag value.
+	 */
+	public PublishEventLevel getMonitoring(String configname);
 	
 	/**
 	 *  Get the subcomponent names. 

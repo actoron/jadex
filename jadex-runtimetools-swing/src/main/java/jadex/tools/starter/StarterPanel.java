@@ -138,8 +138,9 @@ public class StarterPanel extends JLayeredPane
 	protected JCheckBox mastercb;
 	protected JCheckBox daemoncb;
 	protected JCheckBox autosdcb;
-	protected JComboBox monicb;
 	protected JCheckBox synccb;
+	protected JCheckBox perscb;
+	protected JComboBox monicb;
 
 //	/** The application name. */
 //	protected JComboBox appname;
@@ -341,8 +342,9 @@ public class StarterPanel extends JLayeredPane
 										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-										(PublishEventLevel)monicb.getSelectedItem(),
 										synccb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+										perscb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+										(PublishEventLevel)monicb.getSelectedItem(),
 										killlistener, StarterPanel.this.parent, StarterPanel.this)
 									.addResultListener(new DelegationResultListener(fut));
 								}
@@ -356,8 +358,9 @@ public class StarterPanel extends JLayeredPane
 									mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-									(PublishEventLevel)monicb.getSelectedItem(),
 									synccb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+									perscb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+									(PublishEventLevel)monicb.getSelectedItem(),
 									killlistener, StarterPanel.this.parent, StarterPanel.this)
 								.addResultListener(new DelegationResultListener(fut));
 							}
@@ -455,6 +458,8 @@ public class StarterPanel extends JLayeredPane
 		monicb.setToolTipText("Monitor the component. If turned on it will push events to the IMonitoringService of the platform.");
 		synccb = new JCheckBox("Synchronous");
 		synccb.setToolTipText("Run the component synchronously on the thread of its parent.");
+		perscb = new JCheckBox("Persistable");
+		perscb.setToolTipText("Persistable components are subject to auto persistence to free memory.");
 		
 		flags.add(suspend);
 		flags.add(mastercb);
@@ -750,8 +755,9 @@ public class StarterPanel extends JLayeredPane
 			daemoncb.setSelected(false);
 			mastercb.setSelected(false);
 			autosdcb.setSelected(false);
-			monicb.setSelectedItem(PublishEventLevel.OFF);
 			synccb.setSelected(false);
+			perscb.setSelected(false);
+			monicb.setSelectedItem(PublishEventLevel.OFF);
 			genname.setSelected(false);
 			numcomponents.setValue(Integer.valueOf(1));
 			
@@ -972,8 +978,9 @@ public class StarterPanel extends JLayeredPane
 			boolean m = model.getMaster(c)==null? mastercb.isSelected(): model.getMaster(c).booleanValue();
 			boolean d = model.getDaemon(c)==null? daemoncb.isSelected(): model.getDaemon(c).booleanValue();
 			boolean a = model.getAutoShutdown(c)==null? autosdcb.isSelected(): model.getAutoShutdown(c).booleanValue();
-			PublishEventLevel mo = model.getMonitoring(c)==null? (PublishEventLevel)monicb.getSelectedItem(): model.getMonitoring(c);
 			boolean sy = model.getSynchronous(c)==null? synccb.isSelected(): model.getSynchronous(c).booleanValue();
+			boolean pe = model.getPersistable(c)==null? perscb.isSelected(): model.getPersistable(c).booleanValue();
+			PublishEventLevel mo = model.getMonitoring(c)==null? (PublishEventLevel)monicb.getSelectedItem(): model.getMonitoring(c);
 			suspend.setSelected(s);
 			mastercb.setSelected(m);
 			daemoncb.setSelected(d);
@@ -1643,8 +1650,8 @@ public class StarterPanel extends JLayeredPane
 	 */
 	public static IFuture createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
 		final String configname, final Map arguments, final Boolean suspend, 
-		final Boolean master, final Boolean daemon, final Boolean autosd, final PublishEventLevel moni, final Boolean sync,
-		final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
+		final Boolean master, final Boolean daemon, final Boolean autosd, final Boolean sync, final Boolean pers,
+		final PublishEventLevel moni, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future ret = new Future(); 
 		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -1652,7 +1659,7 @@ public class StarterPanel extends JLayeredPane
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, moni, sync, null, null, rid), killlistener)
+				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, sync, pers, moni, null, null, rid), killlistener)
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)

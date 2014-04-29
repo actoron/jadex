@@ -266,6 +266,7 @@ public class MicroClassReader
 				Boolean	auto	= val.autoshutdown().toBoolean();
 				PublishEventLevel moni = val.monitoring();
 				Boolean	sync	= val.synchronous().toBoolean();
+				Boolean	persist	= val.persistable().toBoolean();
 				if(susp!=null)
 				{
 					modelinfo.setSuspend(susp);
@@ -282,13 +283,17 @@ public class MicroClassReader
 				{
 					modelinfo.setAutoShutdown(auto);
 				}
-				if(!PublishEventLevel.NULL.equals(moni))
-				{
-					modelinfo.setMonitoring(moni);
-				}
 				if(sync!=null)
 				{
 					modelinfo.setSynchronous(sync);
+				}
+				if(persist!=null)
+				{
+					modelinfo.setPersistable(persist);
+				}
+				if(!PublishEventLevel.NULL.equals(moni))
+				{
+					modelinfo.setMonitoring(moni);
 				}
 				
 				// check interfaces and add those which have service annotation to provided service interfaces
@@ -641,13 +646,17 @@ public class MicroClassReader
 						}
 						
 						if(configinfo.getMaster()==null)
-							configinfo.setMaster(config.master());
+							configinfo.setMaster(config.master().toBoolean());
 						if(configinfo.getDaemon()==null)
-							configinfo.setDaemon(config.daemon());
+							configinfo.setDaemon(config.daemon().toBoolean());
 						if(configinfo.getAutoShutdown()==null)
-							configinfo.setAutoShutdown(config.autoshutdown());
+							configinfo.setAutoShutdown(config.autoshutdown().toBoolean());
+						if(configinfo.getSynchronous()==null)
+							configinfo.setSynchronous(config.synchronous().toBoolean());
+						if(configinfo.getPersistable()==null)
+							configinfo.setPersistable(config.persistable().toBoolean());
 						if(configinfo.getSuspend()==null)
-							configinfo.setSuspend(config.suspend());
+							configinfo.setSuspend(config.suspend().toBoolean());
 							
 						NameValue[] argvals = config.arguments();
 						for(int j=0; j<argvals.length; j++)
@@ -1399,10 +1408,12 @@ public class MicroClassReader
 	{
 		ComponentInstanceInfo ret = new ComponentInstanceInfo();
 		
-		ret.setSuspend(comp.suspend());
-		ret.setMaster(comp.master());
-		ret.setDaemon(comp.daemon());
-		ret.setAutoShutdown(comp.autoshutdown());
+		ret.setSuspend(comp.suspend().toBoolean());
+		ret.setMaster(comp.master().toBoolean());
+		ret.setDaemon(comp.daemon().toBoolean());
+		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
+		ret.setSynchronous(comp.synchronous().toBoolean());
+		ret.setPersistable(comp.persistable().toBoolean());
 		
 		if(comp.name().length()>0)
 			ret.setName(comp.name());
@@ -1445,8 +1456,9 @@ public class MicroClassReader
 		ret.setMaster(comp.master().toBoolean());
 		ret.setDaemon(comp.daemon().toBoolean());
 		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
-		ret.setMonitoring(comp.monitoring());
 		ret.setSynchronous(comp.synchronous().toBoolean());
+		ret.setPersistable(comp.persistable().toBoolean());
+		ret.setMonitoring(comp.monitoring());
 		
 		if(comp.name().length()>0)
 			ret.setName(comp.name());

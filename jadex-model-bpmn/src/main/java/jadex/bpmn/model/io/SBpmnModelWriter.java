@@ -211,8 +211,9 @@ public class SBpmnModelWriter
 		boolean master = Boolean.TRUE.equals(mmodel.getModelInfo().getMaster(null));
 		boolean daemon = Boolean.TRUE.equals(mmodel.getModelInfo().getDaemon(null));
 		boolean autoshutdown = Boolean.TRUE.equals(mmodel.getModelInfo().getAutoShutdown(null));
-		String monitoring = mmodel.getModelInfo().getMonitoring(null)!=null ? mmodel.getModelInfo().getMonitoring(null).toString() : null;
 		boolean synchronous = Boolean.TRUE.equals(mmodel.getModelInfo().getSynchronous(null));
+		boolean persistable = Boolean.TRUE.equals(mmodel.getModelInfo().getPersistable(null));
+		String monitoring = mmodel.getModelInfo().getMonitoring(null)!=null ? mmodel.getModelInfo().getMonitoring(null).toString() : null;
 		boolean keepalive = Boolean.TRUE.equals(mmodel.isKeepAlive());
 		
 		if (suspend || master || daemon || autoshutdown || monitoring!=null || synchronous || keepalive)
@@ -226,13 +227,15 @@ public class SBpmnModelWriter
 			out.print(escapeString(String.valueOf(daemon)));
 			out.print("\" autoshutdown=\"");
 			out.print(escapeString(String.valueOf(autoshutdown)));
+			out.print("\" synchronous=\"");
+			out.print(escapeString(String.valueOf(synchronous)));
+			out.print("\" persistable=\"");
+			out.print(escapeString(String.valueOf(persistable)));
 			if(monitoring!=null)
 			{
 				out.print("\" monitoring=\"");
 				out.print(escapeString(String.valueOf(monitoring)));
 			}
-			out.print("\" synchronous=\"");
-			out.print(escapeString(String.valueOf(synchronous)));
 			out.print("\" keepalive=\"");
 			out.print(escapeString(String.valueOf(keepalive)));
 			out.println("\"/>");
@@ -611,6 +614,21 @@ public class SBpmnModelWriter
 					out.print(conf.getAutoShutdown().booleanValue());
 					out.print("\"");
 				}
+
+				if (conf.getSynchronous() != null)
+				{
+					out.print(" synchronous=\"");
+					out.print(conf.getSynchronous().booleanValue());
+					out.print("\"");
+				}
+
+				if (conf.getPersistable() != null)
+				{
+					out.print(" persistable=\"");
+					out.print(conf.getPersistable().booleanValue());
+					out.print("\"");
+				}
+
 				out.println(">");
 				++ind;
 				

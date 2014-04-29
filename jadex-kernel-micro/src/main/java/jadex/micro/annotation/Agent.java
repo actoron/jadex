@@ -44,14 +44,19 @@ public @interface Agent
 	public Boolean3 autoshutdown() default Boolean3.NULL;
 	
 	/**
-	 *  Specify if monitoring should be enabled on the component.
-	 */
-	public PublishEventLevel monitoring() default PublishEventLevel.NULL;
-	
-	/**
 	 *  Specify if the subcomponent should run synchronously on its parent's thread.
 	 */
 	public Boolean3 synchronous() default Boolean3.NULL;
+	
+	/**
+	 *  Specify if the component is persistable.
+	 */
+	public Boolean3 persistable() default Boolean3.NULL;
+	
+	/**
+	 *  Specify if monitoring should be enabled on the component.
+	 */
+	public PublishEventLevel monitoring() default PublishEventLevel.NULL;
 	
 	/**
 	 *  Auto-provide provided services that are directly implemented by the agent.

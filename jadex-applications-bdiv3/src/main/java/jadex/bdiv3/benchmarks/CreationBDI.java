@@ -154,7 +154,7 @@ public class CreationBDI
 				public void resultAvailable(IComponentManagementService result)
 				{
 					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getComponentIdentifier()), CreationBDI.class.getName().replaceAll("\\.", "/")+".class",
-						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, agent.getComponentDescription().getResourceIdentifier()), null);
+						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getComponentDescription().getResourceIdentifier()), null);
 				}
 			});
 		}

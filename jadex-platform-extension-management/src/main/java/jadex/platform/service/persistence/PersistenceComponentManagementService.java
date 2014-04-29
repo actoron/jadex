@@ -94,15 +94,22 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	 */
 	protected IComponentAdapterFactory createAdapterFactory()
 	{
-		return new ComponentAdapterFactory()
+		if(persist)
 		{
-			public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model,
-				IComponentInstance instance, IExternalAccess parent)
+			return new ComponentAdapterFactory()
 			{
-				return new PersistentComponentAdapter(desc, model, instance, parent,
-					PersistenceComponentManagementService.this, clockservice);
-			}
-		};
+				public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model,
+					IComponentInstance instance, IExternalAccess parent)
+				{
+					return new PersistentComponentAdapter(desc, model, instance, parent,
+						PersistenceComponentManagementService.this, clockservice);
+				}
+			};
+		}
+		else
+		{
+			return super.createAdapterFactory();
+		}
 	}
 	
 	/**

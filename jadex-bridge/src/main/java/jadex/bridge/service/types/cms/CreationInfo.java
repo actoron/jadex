@@ -48,6 +48,9 @@ public class CreationInfo
 	/** The synchronous flag (default: false). */
 	protected Boolean synchronous;
 	
+	/** The persistable flag (default: false). */
+	protected Boolean persistable;
+	
 //	/** The platform classloader flag (default: false). */
 //	protected Boolean platformloader;
 	
@@ -117,7 +120,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(IResourceIdentifier rid)
 	{
-		this(null, null, null, null, null, null, null, null, null, null, null, rid);
+		this(null, null, null, null, null, null, null, null, null, null, null, null, rid);
 	}
 	
 	/**
@@ -126,7 +129,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(IComponentIdentifier parent, IResourceIdentifier rid)
 	{
-		this(null, null, parent, null, null, null, null, null, null, null, null, rid);
+		this(null, null, parent, null, null, null, null, null, null, null, null, null, rid);
 	}
 	
 	/**
@@ -145,7 +148,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IResourceIdentifier rid)
 	{
-		this(config, args, null, null, null, null, null, null, null, null, null, rid);
+		this(config, args, null, null, null, null, null, null, null, null, null, null, rid);
 	}
 	
 
@@ -195,7 +198,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, String[] imports)
 	{
-		this(config, args, parent, suspend, null, null, null, null, null, imports, null, null);
+		this(config, args, parent, suspend, null, null, null, null, null, null, imports, null, null);
 	}
 	
 	/**
@@ -221,7 +224,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, Boolean master, Boolean daemon)
 	{
-		this(config, args, parent, suspend, master, daemon, null, null, null);
+		this(config, args, parent, suspend, master, daemon, null, null, null, null);
 	}
 	
 	/**
@@ -233,9 +236,9 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, 
-		Boolean master, Boolean daemon, Boolean autoshutdown, PublishEventLevel monitoring, Boolean synchronous)
+		Boolean master, Boolean daemon, Boolean autoshutdown, Boolean synchronous, Boolean persistable, PublishEventLevel monitoring)
 	{
-		this(config, args, parent, suspend, master, daemon, autoshutdown, monitoring, synchronous, null, null, null);
+		this(config, args, parent, suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, null, null, null);
 	}
 	
 	/**
@@ -248,7 +251,8 @@ public class CreationInfo
 	 *  @param imports	The imports.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, 
-		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, PublishEventLevel monitoring, Boolean synchronous,
+		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, 
+		Boolean synchronous, Boolean persistable, PublishEventLevel monitoring,
 		String[] imports, RequiredServiceBinding[] bindings, IResourceIdentifier rid)
 	{
 		this.config	= config;
@@ -527,4 +531,23 @@ public class CreationInfo
 	{
 		this.synchronous = synchronous;
 	}
+	
+	/**
+	 *  Get the persistable.
+	 *  @return The persistable.
+	 */
+	public Boolean getPersistable()
+	{
+		return persistable;
+	}
+
+	/**
+	 *  Set the persistable.
+	 *  @param persistable The persistable to set.
+	 */
+	public void setPersistable(Boolean persistable)
+	{
+		this.persistable = persistable;
+	}
+
 }

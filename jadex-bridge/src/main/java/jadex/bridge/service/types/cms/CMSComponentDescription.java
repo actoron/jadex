@@ -92,7 +92,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Create a new CMSComponentDescription.
 	 */
 	public CMSComponentDescription(IComponentIdentifier cid, String type, boolean master, 
-		boolean daemon, boolean autoshutdown, PublishEventLevel monitoring, boolean synchronous, String modelname, String localtype, IResourceIdentifier rid,
+		boolean daemon, boolean autoshutdown, boolean synchronous, boolean persistable,
+		PublishEventLevel monitoring, String modelname, String localtype, IResourceIdentifier rid,
 		long creationtime, IComponentIdentifier creator, Cause cause)
 	{
 //		if(cid.getName().indexOf("Dyn")!=-1)
@@ -105,8 +106,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setMaster(master);
 		setDaemon(daemon);
 		setAutoShutdown(autoshutdown);
-		setMonitoring(monitoring!=null? monitoring: PublishEventLevel.OFF);
 		setSynchronous(synchronous);
+		setPersistable(persistable);
+		setMonitoring(monitoring!=null? monitoring: PublishEventLevel.OFF);
 		setModelName(modelname);
 		setLocalType(localtype);
 		setResourceIdentifier(rid);
@@ -460,7 +462,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the persistable flag.
 	 *  @param persistable	The persistable flag.
 	 */
-	public void	isPersistable(boolean persistable)
+	public void	setPersistable(boolean persistable)
 	{
 		this.persistable	= persistable;
 	}
