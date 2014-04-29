@@ -1,16 +1,17 @@
 package jadex.bpmn.model;
 
+import jadex.bpmn.model.task.annotation.TaskBody;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.nonfunctional.hardconstraints.MHardConstraint;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,6 +25,8 @@ import java.util.Set;
  */
 public class MActivity extends MAssociationTarget
 {
+	protected static final MethodInfo MI_NOTFOUND = new MethodInfo();
+
 	//-------- attributes --------
 	
 	/** The lane description. */
@@ -36,10 +39,10 @@ public class MActivity extends MAssociationTarget
 	protected String incomingsequenceedgesdescription;
 	
 	/** The incoming messages description. */
-	protected List incomingmessagesdescriptions;
+	protected List<Object> incomingmessagesdescriptions;
 	
 	/** The outgoing messages description. */
-	protected List outgoingmessagesdescriptions;
+	protected List<Object> outgoingmessagesdescriptions;
 
 	
 	/** The outgoing sequence edges. */
@@ -98,6 +101,13 @@ public class MActivity extends MAssociationTarget
 	
 	/** Non-functional hard constraints for service searches. */
 //	protected List<MHardConstraint> searchconstraints;
+	
+	
+	/** The body method cached for speed. */
+	protected volatile MethodInfo bodymethod;
+
+	/** The body method cached for speed. */
+	protected volatile MethodInfo cancelmethod;
 	
 	//-------- methods --------
 	
@@ -159,7 +169,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get the xml outgoing messages descriptions.
 	 *  @return The outgoing messages descriptions. 
 	 */
-	public List getOutgoingMessagesDescriptions()
+	public List<Object> getOutgoingMessagesDescriptions()
 	{
 		return outgoingmessagesdescriptions;
 	}
@@ -171,7 +181,7 @@ public class MActivity extends MAssociationTarget
 	public void addOutgoingMessageDescription(Object desc)
 	{
 		if(outgoingmessagesdescriptions==null)
-			outgoingmessagesdescriptions = new ArrayList();
+			outgoingmessagesdescriptions = new ArrayList<Object>();
 		outgoingmessagesdescriptions.add(desc);
 	}
 	
@@ -189,7 +199,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get the incoming messages description.
 	 *  @return The incoming messages descriptions.
 	 */
-	public List getIncomingMessagesDescriptions()
+	public List<Object> getIncomingMessagesDescriptions()
 	{
 		return incomingmessagesdescriptions;
 	}
@@ -201,7 +211,7 @@ public class MActivity extends MAssociationTarget
 	public void addIncomingMessageDescription(Object desc)
 	{
 		if(incomingmessagesdescriptions==null)
-			incomingmessagesdescriptions = new ArrayList();
+			incomingmessagesdescriptions = new ArrayList<Object>();
 		incomingmessagesdescriptions.add(desc);
 	}
 	
@@ -1019,6 +1029,87 @@ public class MActivity extends MAssociationTarget
 	public boolean isGateway()
 	{
 		return getActivityType().startsWith("Gateway");
+	}
+	
+	/**
+	 *  Get and save the body method info.
+	 */
+	public MethodInfo getBodyMethod(ClassLoader cl)
+	{
+		if(clazz!=null)
+		{
+			if(bodymethod==null)
+			{
+				synchronized(this)
+				{
+					if(bodymethod==null)
+					{
+						Class<?> body = clazz.getType(cl);
+						bodymethod = getMethod(body, TaskBody.class);
+						if(bodymethod==null)
+						{
+							throw  new RuntimeException("Task has no body method: "+body);
+						}
+					}
+				}
+			}
+		}
+		
+		return bodymethod;
+	}
+	
+	/**
+	 *  Get and save the cancel method info.
+	 */
+	public MethodInfo getCancelMethod(ClassLoader cl)
+	{
+		if(clazz!=null)
+		{
+			if(cancelmethod==null)
+			{
+				synchronized(this)
+				{
+					if(cancelmethod==null)
+					{
+						Class<?> body = clazz.getType(cl);
+						cancelmethod = getMethod(body, TaskBody.class);
+						if(cancelmethod==null)
+						{
+							cancelmethod = MI_NOTFOUND;
+						}
+					}
+				}
+			}
+		}
+		
+		return bodymethod;
+	}
+	
+	/**
+	 *  Get method with an annotation.
+	 */
+	public static MethodInfo getMethod(Class<?> body, Class<? extends Annotation> type)
+	{
+		MethodInfo ret = null;
+		
+		Class<?> bcl = body;
+		
+		while(!Object.class.equals(bcl) && ret==null)
+		{
+			Method[] ms = bcl.getDeclaredMethods();
+			for(Method m: ms)
+			{
+				if(m.isAnnotationPresent(type))
+				{
+					ret = new MethodInfo(m);
+					break;
+				}
+			}
+			
+			bcl = bcl.getSuperclass();
+		}
+		
+		return ret;
 	}
 	
 }

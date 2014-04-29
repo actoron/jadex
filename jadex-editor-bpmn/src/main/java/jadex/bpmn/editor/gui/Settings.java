@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.annotation.Task;
 import jadex.bridge.ClassInfo;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
@@ -34,6 +35,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarEntry;
 
+import org.kohsuke.asm4.AnnotationVisitor;
 import org.kohsuke.asm4.ClassReader;
 import org.kohsuke.asm4.ClassVisitor;
 import org.kohsuke.asm4.Opcodes;
@@ -1025,7 +1027,7 @@ public class Settings
 				{
 					settings.getProgressBar().start("Scanning classes...", filenames.length);
 					int count = 0;
-					for (String filename : filenames)
+					for(String filename : filenames)
 					{
 						filename = filename.replace("/", ".");
 						final String cname = filename.substring(0, filename.length() - 6);
@@ -1050,10 +1052,10 @@ public class Settings
 							ClassVisitor cv = new ClassVisitor(Opcodes.ASM4)
 							{
 								public void visit(int version, int access, String name,
-										String signature, String superName,
-										String[] interfaces)
+									String signature, String superName,
+									String[] interfaces)
 								{
-									if ((access & Opcodes.ACC_ABSTRACT) == 0 &&
+									if((access & Opcodes.ACC_ABSTRACT) == 0 &&
 										(access & Opcodes.ACC_PUBLIC) > 0 &&
 										ifaces.contains("jadex/bpmn/model/task/ITask"))
 									{
@@ -1064,6 +1066,15 @@ public class Settings
 									{
 										cf.iface.add(new ClassInfo(cname));
 									}
+								}
+								
+								public AnnotationVisitor visitAnnotation(String desc, boolean visible)
+								{
+									if("Ljadex/bpmn/model/task/annotation/Task;".equals(desc))
+									{
+										cf.task.add(new ClassInfo(cname));
+									}
+									return super.visitAnnotation(desc, visible);
 								}
 							};
 							
@@ -1076,8 +1087,6 @@ public class Settings
 					}
 					settings.getProgressBar().finish();
 					ret.setResult(null);
-					
-					//****
 					
 //					ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, includeboot);
 //					fut.addResultListener(new IIntermediateResultListener<Class<?>>()
@@ -1216,10 +1225,17 @@ public class Settings
 						if(!task.contains(ci))
 						{
 							ClassLoader cl = obj.getClassLoader();
-							Class<?> taskcl = Class.forName(ITask.class.getName(), false, cl);
-							if(SReflect.isSupertype(taskcl, obj))
+							Class<?> tcl = Class.forName(ITask.class.getName(), false, cl);
+							if(SReflect.isSupertype(tcl, obj))
 							{
 								task.add(ci);
+							}
+							else
+							{
+								if(obj.getAnnotation(Task.class)!=null)
+								{
+									task.add(ci);
+								}
 							}
 						}
 					}

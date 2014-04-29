@@ -77,7 +77,7 @@ public class BpmnModelLoader extends AbstractModelLoader
 				rid = new ResourceIdentifier(new LocalResourceIdentifier((IComponentIdentifier)((Object[])context)[1], url), null);
 			}
 			model.setResourceIdentifier(rid);
-			model.initModelInfo();
+			model.initModelInfo(classloader);
 			return model;
 		}
 		return (ICacheableModel)BpmnXMLReader.read(info, classloader, (IResourceIdentifier)((Object[])context)[0],

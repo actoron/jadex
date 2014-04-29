@@ -16,11 +16,11 @@ public class MPool extends MAssociationTarget
 	/** The sequence edges. */
 	//protected List sequenceedges;
 	
-	/** The pools. */
-	protected List lanes;
+	/** The lanes. */
+	protected List<MLane> lanes;
 	
 	/** The artifacs. */
-	protected List artifacts;
+	protected List<MArtifact> artifacts;
 	
 	/** The type. */
 	protected String type;
@@ -128,7 +128,7 @@ public class MPool extends MAssociationTarget
 	public void addLane(MLane lane)
 	{
 		if(lanes==null)
-			lanes = new ArrayList();
+			lanes = new ArrayList<MLane>();
 		lanes.add(lane);
 	}
 	
@@ -146,7 +146,7 @@ public class MPool extends MAssociationTarget
 	 *  Get the artifacts.
 	 *  @return The artifacts.
 	 */
-	public List getArtifacts()
+	public List<MArtifact> getArtifacts()
 	{
 		return artifacts;
 	}
@@ -158,7 +158,7 @@ public class MPool extends MAssociationTarget
 	public void addArtifact(MArtifact artifact)
 	{
 		if(artifacts==null)
-			artifacts = new ArrayList();
+			artifacts = new ArrayList<MArtifact>();
 		artifacts.add(artifact);
 	}
 	

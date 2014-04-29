@@ -4,6 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.task.PojoTaskWrapper;
 import jadex.commons.future.IResultListener;
 
 /**
@@ -22,14 +23,19 @@ public class TaskActivityHandler extends DefaultActivityHandler
 		if(thread.isCanceled())
 			return;
 		
-		Class<?> taskimpl = activity.getClazz() != null? activity.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()) : null;
+		Class<?> taskimpl = activity.getClazz()!=null? activity.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()) : null;
 		if(taskimpl!=null)
 		{
 //			thread.setWaitingState(ProcessThread.WAITING_FOR_TASK);
 			thread.setWaiting(true);
 			try
 			{
-				ITask task = (ITask)taskimpl.newInstance();
+				Object tmp = taskimpl.newInstance();
+				if(!(tmp instanceof ITask))
+				{
+					tmp = new PojoTaskWrapper(tmp);
+				}
+				ITask task = (ITask)tmp;
 				thread.setTask(task);
 				thread.setCanceled(false);
 				// FIXME: Really bad! Some task use un-generified futures to return values in the callback
@@ -77,7 +83,9 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	{
 		thread.setCanceled(true);
 		ITask task = thread.getTask();
-		if (task != null)
+		if(task != null)
+		{
 			task.cancel(instance);
+		}
 	}
 }

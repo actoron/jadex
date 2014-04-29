@@ -31,7 +31,7 @@ public class MSubProcess extends MActivity
 //	protected List sequenceedges;
 	
 	/** The artifacts. */
-	protected List artifacts;
+	protected List<MArtifact> artifacts;
 	
 	//-------- added --------
 	
@@ -206,7 +206,7 @@ public class MSubProcess extends MActivity
 	 *  Get the artifacts.
 	 *  @return The artifacts.
 	 */
-	public List getArtifacts()
+	public List<MArtifact> getArtifacts()
 	{
 		return artifacts;
 	}
@@ -218,7 +218,7 @@ public class MSubProcess extends MActivity
 	public void addArtifact(MArtifact artifact)
 	{
 		if(artifacts==null)
-			artifacts = new ArrayList();
+			artifacts = new ArrayList<MArtifact>();
 		artifacts.add(artifact);
 	}
 	
