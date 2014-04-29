@@ -17,6 +17,7 @@ import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.BulkMonitoringEvent;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -243,7 +244,7 @@ public class VisualProcessViewPanel extends JPanel
 		        		int row = threads.convertRowIndexToModel(vrow);
 		        		ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
 		        		mxICell cell = (mxICell)graph.getModel().getRoot();
-		        		VElement elem = getVElement(cell, pti.getActId());
+		        		VElement elem = graph.getVisualElementById(cell, pti.getActId());
 		        		if(elem!=null)
 		        		{
 		        			graph.setEventsEnabled(false);
@@ -251,35 +252,6 @@ public class VisualProcessViewPanel extends JPanel
 		        			graph.setEventsEnabled(true);
 		        		}
 		        	}
-		        }
-		        
-		        /**
-		         *  Find the velement of the graph that fits to the bpmn id.
-		         *  @param cell The start cell.
-		         *  @param actid The activity id.
-		         *  @return The element.
-		         */
-		        protected VElement getVElement(mxICell cell, String actid)
-		        {
-		        	VElement ret = null;
-		        	if(cell instanceof VElement)
-	        		{
-	        			VElement ve = (VElement)cell;
-	        			if(ve.getBpmnElement()!=null && ve.getBpmnElement().getId().equals(actid))
-	        			{
-	        				ret = ve;
-	        			}
-	        		}
-		        	
-		        	if(ret==null)
-		        	{
-		        		for(int i=0; i<cell.getChildCount() && ret==null; i++)
-		        		{
-		        			ret = getVElement(cell.getChildAt(i), actid);
-		        		}
-		        	}
-		        	
-		        	return ret;
 		        }
 		    };
 			
@@ -562,88 +534,94 @@ public class VisualProcessViewPanel extends JPanel
 				
 				public IFuture<Void> componentChanged(final IComponentDescription desc)
 				{
-					final String[] bps = access.getModel().getBreakpoints();
-					final List<String> abps = SUtil.arrayToList(desc.getBreakpoints());
-					SwingUtilities.invokeLater(new Runnable()
+					try
 					{
-						public void run()
+						final String[] bps = access.getModel().getBreakpoints();
+						final List<String> abps = SUtil.arrayToList(desc.getBreakpoints());
+						SwingUtilities.invokeLater(new Runnable()
 						{
-							if(bps!=null && bps.length>0)
+							public void run()
 							{
-								mxICell cell = (mxICell)graph.getModel().getRoot();
-								for(String bp: bps)
+								if(bps!=null && bps.length>0)
 								{
-									if(abps.contains(bp))
+									mxICell cell = (mxICell)graph.getModel().getRoot();
+									for(String bp: bps)
 									{
-										VElement ve = getVElement(cell, bp);
-										if(ve!=null)
+										if(abps.contains(bp))
 										{
-											BreakpointMarker pbm = getBreakpointMarker(ve);
-											if(pbm==null)
+											VElement ve = getVElement(cell, bp);
+											if(ve!=null)
 											{
-												mxGeometry pgeo = ve.getGeometry();
-												double ow = pgeo.getWidth();
-												double oh = pgeo.getHeight();
-												double w = ow/8;
-												double h = oh/8;
-
-												double shift = 10;
-												if(ve.getBpmnElement() instanceof MActivity)
+												BreakpointMarker pbm = getBreakpointMarker(ve);
+												if(pbm==null)
 												{
-													MActivity mact = (MActivity)ve.getBpmnElement();
-													if(mact.isEvent())
+													mxGeometry pgeo = ve.getGeometry();
+													double ow = pgeo.getWidth();
+													double oh = pgeo.getHeight();
+													double w = ow/8;
+													double h = oh/8;
+	
+													double shift = 10;
+													if(ve.getBpmnElement() instanceof MActivity)
 													{
-														shift = 0;
+														MActivity mact = (MActivity)ve.getBpmnElement();
+														if(mact.isEvent())
+														{
+															shift = 0;
+														}
+														else if(mact.isGateway())
+														{
+															shift = 0;
+														}
 													}
-													else if(mact.isGateway())
-													{
-														shift = 0;
-													}
-												}
-												
-												pbm = new BreakpointMarker(graph);
-												double s = Math.max(14, Math.min(w, h));
-												mxGeometry geo = new mxGeometry(ow-s-shift, oh-s-shift, s, s);
-	//											geo.setRelative(true);
-												pbm.setGeometry(geo);
-	//											ve.insert(pbm);
-												graph.addCell(pbm, ve);
-	//											graph.refreshCellView(ve);
-	//											graph.refreshCellView(pbm);
-//												System.out.println("added: "+pbm+" "+ve.getBpmnElement());
-											}
-										}
-//										else
-//										{
-//											System.out.println("no velem found for: "+bp);
-//										}
-									}
-									else
-									{
-										VElement ve = getVElement(cell, bp);
-										if(ve!=null)
-										{
-											for(int i=0; i<ve.getChildCount(); i++)
-											{
-												mxICell cc = ve.getChildAt(i);
-												if(cc instanceof BreakpointMarker)
-												{
-													graph.removeCells(new Object[]{cc});
-//													System.out.println("removed: "+cc+" "+ve.getBpmnElement());
-													break;
+													
+													pbm = new BreakpointMarker(graph);
+													double s = Math.max(14, Math.min(w, h));
+													mxGeometry geo = new mxGeometry(ow-s-shift, oh-s-shift, s, s);
+		//											geo.setRelative(true);
+													pbm.setGeometry(geo);
+		//											ve.insert(pbm);
+													graph.addCell(pbm, ve);
+		//											graph.refreshCellView(ve);
+		//											graph.refreshCellView(pbm);
+	//												System.out.println("added: "+pbm+" "+ve.getBpmnElement());
 												}
 											}
+	//										else
+	//										{
+	//											System.out.println("no velem found for: "+bp);
+	//										}
 										}
-//										else
-//										{
-//											System.out.println("no velem found for: "+bp);
-//										}
+										else
+										{
+											VElement ve = getVElement(cell, bp);
+											if(ve!=null)
+											{
+												for(int i=0; i<ve.getChildCount(); i++)
+												{
+													mxICell cc = ve.getChildAt(i);
+													if(cc instanceof BreakpointMarker)
+													{
+														graph.removeCells(new Object[]{cc});
+	//													System.out.println("removed: "+cc+" "+ve.getBpmnElement());
+														break;
+													}
+												}
+											}
+	//										else
+	//										{
+	//											System.out.println("no velem found for: "+bp);
+	//										}
+										}
 									}
 								}
 							}
-						}
-					});
-					
+						});
+					}
+					catch(ComponentTerminatedException e)
+					{
+						// nop, component can be terminated
+					}
 					return IFuture.DONE;
 				}
 				

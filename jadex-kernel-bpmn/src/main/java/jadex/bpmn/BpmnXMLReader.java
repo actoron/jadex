@@ -225,7 +225,7 @@ public class BpmnXMLReader
 		}
 		ret.setResourceIdentifier(rid);
 		
-		ret.initModelInfo();
+		ret.initModelInfo(classloader);
 		rinfo.getInputStream().close();
 		
 		if(!((ModelInfo)ret.getModelInfo()).checkName())

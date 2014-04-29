@@ -12,7 +12,7 @@ public class MArtifact extends MNamedIdElement
 	//-------- attributes --------
 	
 	/** The associations. */
-	protected List associations;
+	protected List<MAssociation> associations;
 	
 	/** The type. */
 	protected String type;
@@ -23,7 +23,7 @@ public class MArtifact extends MNamedIdElement
 	 *  Get the associations.
 	 *  return The associations.
 	 */
-	public List getAssociations()
+	public List<MAssociation> getAssociations()
 	{
 		return associations;
 	}
@@ -35,7 +35,7 @@ public class MArtifact extends MNamedIdElement
 	public void addAssociation(MAssociation association)
 	{
 		if(associations==null)
-			associations = new ArrayList();
+			associations = new ArrayList<MAssociation>();
 		associations.add(association);
 	}
 	
