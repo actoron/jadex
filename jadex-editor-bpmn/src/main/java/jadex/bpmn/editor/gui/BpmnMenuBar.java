@@ -41,6 +41,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
@@ -54,6 +55,7 @@ import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 import org.w3c.dom.Document;
 
 import com.mxgraph.model.mxICell;
+import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxStylesheet;
 
@@ -208,12 +210,26 @@ public class BpmnMenuBar extends JMenuBar
 			{
 				if (copycells != null)
 				{
+					BpmnGraph graph = editorwindow.getSelectedModelContainer().getGraph();
+					graph.getModel().beginUpdate();
 					for (Object obj : copycells)
 					{
 						mxICell cell = (mxICell) obj;
-						editorwindow.getSelectedModelContainer().getGraph().addCell(cell, cell.getParent());
+						graph.addCell(cell, cell.getParent());
 //						editorwindow.getSelectedModelContainer().getGraph().addCell(cell);
 					}
+					final Object[] ccells = copycells.toArray();
+					graph.cellsOrdered(ccells, false);
+					graph.getModel().endUpdate();
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						
+						public void run()
+						{
+							copycells = SHelper.copy(editorwindow.getSelectedModelContainer().getGraph(), editorwindow.getSelectedModelContainer().getBpmnModel(), ccells);
+						}
+					});
+					
 				}
 //				editorwindow.getSelectedModelContainer().getGraph().addCells(copycells);
 			}

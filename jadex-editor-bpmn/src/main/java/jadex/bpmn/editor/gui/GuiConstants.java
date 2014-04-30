@@ -61,4 +61,7 @@ public class GuiConstants
 	
 	/** Minimum Edge Distance */
 	public static final double MIN_EDGE_DIST = 18.0;
+	
+	/** Shift for newly pasted elements */
+	public static final int PASTE_SHIFT = 10;
 }

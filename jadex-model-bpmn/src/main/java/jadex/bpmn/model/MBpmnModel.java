@@ -7,11 +7,9 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.FieldInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.collection.BiHashMap;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -23,6 +21,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 
@@ -1602,7 +1601,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 * 	@param originals The original elements.
 	 * 	@return Mapping of original IDs to cloned IDs, cloned elements.
 	 */
-	public Tuple2<BiHashMap<String,String>, List<MIdElement>> cloneElements(final Map<String, MIdElement> originals)
+	public Tuple2<BiHashMap<String,String>, List<MIdElement>> cloneElements(final Set<MIdElement> originals)
 	{
 		final BiHashMap<String, String> idmap = new BiHashMap<String, String>();
 		final IdGenerator idgen = new IdGenerator();
@@ -1659,9 +1658,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		});
 		procs.addAll(Traverser.getDefaultProcessors());
 		
-		List<MIdElement> mclone = new ArrayList<MIdElement>(originals.values());
+		List<MIdElement> mclone = new ArrayList<MIdElement>(originals);
 		mclone = (List<MIdElement>) trav.traverse(mclone, null, new IdentityHashMap<Object, Object>(), procs, true, null, null);
 		
+		clearCaches();
 		return new Tuple2<BiHashMap<String,String>, List<MIdElement>>(idmap, mclone);
 	}
 	
@@ -1672,11 +1672,11 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *	@param idelem The element
 	 * 	@return True, if contained.
 	 */
-	public boolean isContainedInParentSet(Map<String, MIdElement> mmap, MIdElement idelem)
+	public boolean isContainedInParentSet(Set<MIdElement> mmap, MIdElement idelem)
 	{
 		boolean ret = false;
 		
-		ret = mmap.containsKey(idelem.getId());
+		ret = mmap.contains(idelem);
 		boolean running = true;
 		while (!ret && running)
 		{
@@ -1688,7 +1688,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 			}
 			else
 			{
-				if (mmap.containsKey(parent))
+				if (mmap.contains(parent))
 				{
 					ret = true;
 				}
@@ -1700,6 +1700,18 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Clears the model caches if stale.
+	 */
+	protected void clearCaches()
+	{
+		allactivities = null;
+		eventsubprocessstartevents = null;
+		waitingevents = null;
+		typematchedstartevents = null;
+		parents = null;
 	}
 	
 }

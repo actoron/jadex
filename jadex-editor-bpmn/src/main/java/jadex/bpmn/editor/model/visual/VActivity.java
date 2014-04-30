@@ -141,7 +141,7 @@ public class VActivity extends VNamedNode
 					mactivity.setPool(null);
 				}
 			}
-			if (parent != null)
+			if (parent != null && (!(parent instanceof VElement) || ((VElement) parent).getBpmnElement() != null))
 			{
 				if (mactivity.isEventHandler())
 				{

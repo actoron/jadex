@@ -53,6 +53,15 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
+	 *  Set the activities.
+	 *  @param activities The activities.
+	 */
+	public void setActivities(List<MActivity> activities)
+	{
+		this.activities = activities;
+	}
+	
+	/**
 	 *  Get the edges.
 	 *  @return The edges.
 	 */

@@ -23,8 +23,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.kohsuke.asm4.ClassReader;
 import org.kohsuke.asm4.Type;
@@ -183,11 +185,15 @@ public class SHelper
 	}
 	
 	/**
-	 * FIXME: Finish!
+	 *  Copies a set of selected elements.
+	 *  
+	 *  @param graph The graph.
+	 *  @param model The BPMN model.
+	 *  @param incells The cells to be copied.
 	 */
 	public static final List<VElement> copy(BpmnGraph graph, final MBpmnModel model, Object[] incells)
 	{
-		Map<String, MIdElement> tmpmmap = new HashMap<String, MIdElement>();
+		Set<MIdElement> tmpmelems = new HashSet<MIdElement>();
 		for (Object cell : incells)
 		{
 			if (cell instanceof VElement &&
@@ -196,12 +202,12 @@ public class SHelper
 			{
 				VElement velem = (VElement) cell;
 				MIdElement melem = velem.getBpmnElement();
-				tmpmmap.put(melem.getId(), melem);
+				tmpmelems.add(melem);
 			}
 		}
 		
 		Map<String, VElement> vmap = new HashMap<String, VElement>();
-		final Map<String, MIdElement> mmap = new HashMap<String, MIdElement>();
+		final Set<MIdElement> melems = new HashSet<MIdElement>();
 		for (Object cell : incells)
 		{
 			if (cell instanceof VElement &&
@@ -211,17 +217,17 @@ public class SHelper
 				VElement velem = (VElement) cell;
 				MIdElement melem = velem.getBpmnElement();
 				MIdElement parent = model.getParent(melem);
-				if (parent == null || !model.isContainedInParentSet(tmpmmap, parent))
+				if (parent == null || !model.isContainedInParentSet(tmpmelems, parent))
 				{
-					mmap.put(melem.getId(), melem);
+					melems.add(melem);
 					vmap.put(melem.getId(), velem);
 				}
 			}
 		}
-		tmpmmap = null;
+		tmpmelems = null;
 		
-		Tuple2<BiHashMap<String, String>, List<MIdElement>> cloned = model.cloneElements(mmap);
-		List<VElement> clonedvisuals = generateVisualClones(graph, cloned.getFirstEntity(), vmap, cloned.getSecondEntity(), null);
+		Tuple2<BiHashMap<String, String>, List<MIdElement>> cloned = model.cloneElements(melems);
+		List<VElement> clonedvisuals = generateVisualClones(graph, cloned.getFirstEntity(), vmap, cloned.getSecondEntity(), null, true);
 		
 		for (VElement clonedvisual : clonedvisuals)
 		{
@@ -240,7 +246,7 @@ public class SHelper
 	 * @param vclones
 	 * @return
 	 */
-	protected static final List<VElement> generateVisualClones(BpmnGraph graph, BiHashMap<String, String> idmap, Map<String, VElement> oldvmap, List<MIdElement> mclones, Map<String, VElement> vclones)
+	protected static final List<VElement> generateVisualClones(BpmnGraph graph, BiHashMap<String, String> idmap, Map<String, VElement> oldvmap, List<MIdElement> mclones, Map<String, VElement> vclones, boolean istoplevelelement)
 	{
 		List<VElement> ret = new ArrayList<VElement>();
 		if (vclones == null)
@@ -268,10 +274,10 @@ public class SHelper
 					
 					List<MIdElement> subelements = new ArrayList<MIdElement>(msp.getActivities());
 					subelements.addAll(msp.getEdges());
-					List<VElement> elements = generateVisualClones(graph, idmap, oldvmap, subelements, vclones);
+					List<VElement> elements = generateVisualClones(graph, idmap, oldvmap, subelements, vclones, false);
 					for (VElement element : elements)
 					{
-						element.setVisualParent(genelem);
+						genelem.insert(element);
 					}
 				}
 			}
@@ -290,7 +296,7 @@ public class SHelper
 				if (genelem instanceof VActivity)
 				{
 					String oldid = idmap.rget(mclone.getId());
-					VElement oldelem = oldvmap.get(oldid);
+					VElement oldelem = graph.getVisualElementById(oldid);
 					
 					if (((VActivity) oldelem).getInternalParameters() != null && ((VActivity) oldelem).getInternalParameters().size() > 0)
 					{
@@ -299,7 +305,8 @@ public class SHelper
 					
 					genelem.setCollapsed(oldelem.isCollapsed());
 					mxGeometry oldgeo = oldelem.getGeometry();
-					mxGeometry newgeo = new mxGeometry(oldgeo.getX() + 10, oldgeo.getY() + 10, oldgeo.getWidth(), oldgeo.getHeight());
+					int shift = istoplevelelement? GuiConstants.PASTE_SHIFT : 0;
+					mxGeometry newgeo = new mxGeometry(oldgeo.getX() + shift, oldgeo.getY() + shift, oldgeo.getWidth(), oldgeo.getHeight());
 					mxRectangle ab = oldgeo.getAlternateBounds() != null? new mxRectangle(oldgeo.getAlternateBounds()) : null;
 					newgeo.setAlternateBounds(ab);
 					genelem.setGeometry(newgeo);
