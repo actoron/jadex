@@ -272,8 +272,16 @@ public class SHelper
 					genelem = new VSubProcess(graph);
 					vclones.put(genelem.getId(), genelem);
 					
-					List<MIdElement> subelements = new ArrayList<MIdElement>(msp.getActivities());
-					subelements.addAll(msp.getEdges());
+					List<MIdElement> subelements = new ArrayList<MIdElement>();
+					if (msp.getActivities() != null)
+					{
+						subelements.addAll(msp.getActivities());
+						if (msp.getEdges() != null)
+						{
+							subelements.addAll(msp.getEdges());
+						}
+					}
+					
 					List<VElement> elements = generateVisualClones(graph, idmap, oldvmap, subelements, vclones, false);
 					for (VElement element : elements)
 					{
