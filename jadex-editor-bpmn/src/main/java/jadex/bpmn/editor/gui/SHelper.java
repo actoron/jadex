@@ -18,6 +18,7 @@ import jadex.bridge.service.annotation.ParameterInfo;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BiHashMap;
 
+import java.awt.geom.Point2D;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -35,6 +36,7 @@ import org.kohsuke.asm4.tree.LocalVariableNode;
 import org.kohsuke.asm4.tree.MethodNode;
 
 import com.mxgraph.model.mxGeometry;
+import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 
 
@@ -270,7 +272,6 @@ public class SHelper
 				else
 				{
 					genelem = new VSubProcess(graph);
-					vclones.put(genelem.getId(), genelem);
 					
 					List<MIdElement> subelements = new ArrayList<MIdElement>();
 					if (msp.getActivities() != null)
@@ -332,8 +333,8 @@ public class SHelper
 				}
 				
 				ret.add(genelem);
-				vclones.put(genelem.getId(), genelem);
 				genelem.setBpmnElement(mclone);
+				vclones.put(genelem.getBpmnElement().getId(), genelem);
 			}
 		}
 		
@@ -346,6 +347,8 @@ public class SHelper
 				vedge.setSource(vclones.get(medge.getSource().getId()));
 				vedge.setTarget(vclones.get(medge.getTarget().getId()));
 				vedge.setBpmnElement(medge);
+				
+				ret.add(vedge);
 			}
 		}
 		

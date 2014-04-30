@@ -1609,8 +1609,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		{
 			public Object doTraverse(Object object, Class<?> clazz, Map<Object, Object> traversed, List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
 			{
+				boolean istraversed = traversed.containsKey(object);
 				Object ret = super.doTraverse(object, clazz, traversed, processors, clone, targetcl, context);
-				if (object != ret && ret instanceof MIdElement)
+				if (!istraversed && object != ret && ret instanceof MIdElement)
 				{
 					String oldid = ((MIdElement) ret).getId();
 					((MIdElement) ret).setId(idgen.generateId());

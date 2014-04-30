@@ -1,18 +1,25 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.controllers.SCreationController;
 import jadex.bpmn.editor.gui.propertypanels.BasePropertyPanel;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
+import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.editor.model.visual.VMessagingEdge;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.io.SBpmnModelWriter;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -41,7 +48,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
@@ -55,7 +61,6 @@ import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 import org.w3c.dom.Document;
 
 import com.mxgraph.model.mxICell;
-import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxStylesheet;
 
@@ -63,7 +68,7 @@ public class BpmnMenuBar extends JMenuBar
 {
 	/** The editor window. */
 	protected BpmnEditorWindow editorwindow;
-	protected List<VElement> copycells;
+	protected Tuple2<BpmnGraph, List<VElement>> copycells;
 	/**
 	 *  Creates the menu bar.
 	 *  
@@ -196,7 +201,7 @@ public class BpmnMenuBar extends JMenuBar
 				ModelContainer mc = editorwindow.getSelectedModelContainer();
 				BpmnGraph graph = mc.getGraph();
 				Object[] cells = graph.getSelectionCells();
-				copycells = SHelper.copy(graph, mc.getBpmnModel(), cells);
+				copycells = new Tuple2<BpmnGraph, List<VElement>>(graph, SHelper.copy(graph, mc.getBpmnModel(), cells));
 			}
 		});
 		copyitem.setAccelerator(KeyStroke.getKeyStroke(
@@ -210,19 +215,69 @@ public class BpmnMenuBar extends JMenuBar
 			{
 				if (copycells != null)
 				{
-					BpmnGraph graph = editorwindow.getSelectedModelContainer().getGraph();
+					ModelContainer mc = editorwindow.getSelectedModelContainer();
+					BpmnGraph graph = mc.getGraph();
+					mxICell newparent = null;
+					if (graph != copycells.getFirstEntity())
+					{
+						if (mc.getBpmnModel().getPools() == null || mc.getBpmnModel().getPools().size() == 0)
+						{
+							newparent = SCreationController.createPool(mc, new Point(50, 50));
+						}
+						else
+						{
+							MPool pool = mc.getBpmnModel().getPools().get(0);
+							if (pool.getLanes() == null || pool.getLanes().size() == 0)
+							{
+								newparent = graph.getVisualElementById(pool.getId());
+								
+							}
+							else
+							{
+								newparent = graph.getVisualElementById(pool.getLanes().get(0).getId());
+							}
+						}
+					}
 					graph.getModel().beginUpdate();
-					for (Object obj : copycells)
+					List<VEdge> edges = new ArrayList<VEdge>();
+					for (Object obj : copycells.getSecondEntity())
 					{
 						mxICell cell = (mxICell) obj;
-						graph.addCell(cell, cell.getParent());
+						if (cell instanceof VEdge)
+						{
+							edges.add((VEdge) cell);
+						}
+						else
+						{
+							if (newparent != null)
+							{
+								cell.setParent(newparent);
+								graph.addCell(cell, newparent);
+							}
+							else
+							{
+								graph.addCell(cell, cell.getParent());
+							}
+						}
 //						editorwindow.getSelectedModelContainer().getGraph().addCell(cell);
 					}
-					final Object[] ccells = copycells.toArray();
-					graph.cellsOrdered(ccells, false);
 					graph.getModel().endUpdate();
+					for (VEdge edge : edges)
+					{
+						if (edge instanceof VMessagingEdge)
+						{
+							graph.addCell(edge, graph.getCurrentRoot());
+						}
+						else
+						{
+							graph.addCell(edge, edge.getEdgeParent());
+						}
+						graph.refreshCellView(edge);
+					}
+					final Object[] ccells = copycells.getSecondEntity().toArray();
+					graph.cellsOrdered(ccells, false);
 					graph.setSelectionCells(ccells);
-					copycells = SHelper.copy(editorwindow.getSelectedModelContainer().getGraph(), editorwindow.getSelectedModelContainer().getBpmnModel(), ccells);
+					copycells = new Tuple2<BpmnGraph, List<VElement>>(graph, SHelper.copy(editorwindow.getSelectedModelContainer().getGraph(), editorwindow.getSelectedModelContainer().getBpmnModel(), ccells));
 					
 				}
 //				editorwindow.getSelectedModelContainer().getGraph().addCells(copycells);
