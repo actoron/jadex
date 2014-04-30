@@ -4,6 +4,7 @@ import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 
@@ -34,7 +35,7 @@ public class ServiceContainerNode	extends AbstractSwingTreeNode
 	//-------- attributes --------
 	
 	/** The service container. */
-	protected IServiceContainer container;
+	protected IServiceProvider container;
 	
 	/** Flag to indicate a broken service container (i.e. remote lookup failed due to class not found). */
 	protected boolean	broken;
@@ -44,7 +45,7 @@ public class ServiceContainerNode	extends AbstractSwingTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ServiceContainerNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IServiceContainer container)
+	public ServiceContainerNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IServiceProvider container)
 	{
 		super(parent, model, tree);
 		this.container = container;
@@ -97,7 +98,7 @@ public class ServiceContainerNode	extends AbstractSwingTreeNode
 	 *  Get the container.
 	 *  @return The container.
 	 */
-	public IServiceContainer getContainer()
+	public IServiceProvider getContainer()
 	{
 		return container;
 	}

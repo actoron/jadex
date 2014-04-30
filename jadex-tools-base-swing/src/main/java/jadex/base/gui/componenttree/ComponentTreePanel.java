@@ -1,5 +1,6 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.SRemoteGui;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ObjectInspectorPanel;
 import jadex.base.gui.PropertyUpdateHandler;
@@ -439,9 +440,10 @@ public class ComponentTreePanel extends JSplitPane
 				{
 					final ServiceContainerNode scn = (ServiceContainerNode)path.getPathComponent(path.getPathCount()-2);
 					final ProvidedServiceInfoNode sn = (ProvidedServiceInfoNode)path.getLastPathComponent();
-					scn.getContainer().removeService(sn.getServiceIdentifier()).addResultListener(new SwingDefaultResultListener(proppanel)
+					SRemoteGui.removeService(cms, scn.getContainer(), sn.getServiceIdentifier())
+						.addResultListener(new SwingDefaultResultListener<Void>(proppanel)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Void result)
 						{
 							scn.removeChild(sn);
 						}

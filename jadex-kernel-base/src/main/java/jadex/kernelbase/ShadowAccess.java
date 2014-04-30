@@ -8,11 +8,20 @@ import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.sensor.service.IMethodInvocationListener;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceContainerPersistInfo;
+import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
@@ -21,11 +30,14 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
+import jadex.commons.MethodInfo;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -33,6 +45,7 @@ import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -693,11 +706,11 @@ public class ShadowAccess implements IExternalAccess
 	/**
 	 *  Shadow access to service provider.
 	 */
-	public class ShadowServiceProvider implements IServiceProvider
+	public class ShadowServiceProvider implements IServiceProvider, IServiceContainer // Todo: remove service container. only included for backwards compatibility with old JCC (ComponentTreeNode.java:447)
 	{
 		//-------- attributes --------
 		
-		protected String type	= getServiceProvider().getType();
+		protected String type	= access.getServiceProvider().getType();
 		
 		//-------- IServiceProvider interface --------
 		
@@ -711,7 +724,7 @@ public class ShadowAccess implements IExternalAccess
 			final TerminableIntermediateDelegationFuture<IService>	ret	= new TerminableIntermediateDelegationFuture<IService>();
 			try
 			{
-				ITerminableIntermediateFuture<IService>	fut	= getServiceProvider().getServices(manager, decider, selector);
+				ITerminableIntermediateFuture<IService>	fut	= access.getServiceProvider().getServices(manager, decider, selector);
 				fut.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(ret, fut));
 			}
 			catch(ComponentPersistedException e)
@@ -722,7 +735,7 @@ public class ShadowAccess implements IExternalAccess
 					{
 						try
 						{
-							ITerminableIntermediateFuture<IService>	fut	= getServiceProvider().getServices(manager, decider, selector);
+							ITerminableIntermediateFuture<IService>	fut	= access.getServiceProvider().getServices(manager, decider, selector);
 							fut.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(ret, fut));
 						}
 						catch(Exception e)
@@ -744,7 +757,7 @@ public class ShadowAccess implements IExternalAccess
 			final Future<IServiceProvider>	ret	= new Future<IServiceProvider>();
 			try
 			{
-				getServiceProvider().getParent().addResultListener(new DelegationResultListener<IServiceProvider>(ret));
+				access.getServiceProvider().getParent().addResultListener(new DelegationResultListener<IServiceProvider>(ret));
 			}
 			catch(ComponentPersistedException e)
 			{
@@ -754,7 +767,7 @@ public class ShadowAccess implements IExternalAccess
 					{
 						try
 						{
-							getServiceProvider().getParent().addResultListener(new DelegationResultListener<IServiceProvider>(ret));
+							access.getServiceProvider().getParent().addResultListener(new DelegationResultListener<IServiceProvider>(ret));
 						}
 						catch(Exception e)
 						{
@@ -780,7 +793,7 @@ public class ShadowAccess implements IExternalAccess
 			final Future<Collection<IServiceProvider>>	ret	= new Future<Collection<IServiceProvider>>();
 			try
 			{
-				getServiceProvider().getChildren().addResultListener(new DelegationResultListener<Collection<IServiceProvider>>(ret));
+				access.getServiceProvider().getChildren().addResultListener(new DelegationResultListener<Collection<IServiceProvider>>(ret));
 			}
 			catch(ComponentPersistedException e)
 			{
@@ -790,7 +803,7 @@ public class ShadowAccess implements IExternalAccess
 					{
 						try
 						{
-							getServiceProvider().getChildren().addResultListener(new DelegationResultListener<Collection<IServiceProvider>>(ret));
+							access.getServiceProvider().getChildren().addResultListener(new DelegationResultListener<Collection<IServiceProvider>>(ret));
 						}
 						catch(Exception e)
 						{
@@ -804,6 +817,193 @@ public class ShadowAccess implements IExternalAccess
 				ret.setException(e);
 			}
 			return ret;
+		}
+
+		//-------- IServiceContainer methods (todo: remove) --------
+		
+		public IFuture<Void> start()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public IFuture<Void> shutdown()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public IFuture<ServiceContainerPersistInfo>	getPersistInfo()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public IFuture<Void>	restore(ServiceContainerPersistInfo info)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public IFuture<Void>	addService(IInternalService service, ProvidedServiceInfo info)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		public IFuture<Void>	removeService(IServiceIdentifier sid)
+		{
+			throw new UnsupportedOperationException();
+		}
+			
+		public IService getProvidedService(String name)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public IService getProvidedService(Class<?> clazz)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		public IService[] getProvidedServices(Class<?> clazz)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public Object getProvidedServiceRawImpl(Class<?> clazz)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public RequiredServiceInfo[] getRequiredServiceInfos()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public RequiredServiceInfo getRequiredServiceInfo(String name)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> IFuture<T> getRequiredService(String name)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> IFuture<T> getRequiredService(String name, boolean rebind)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> IFuture<T> getRequiredService(String name, boolean rebind, IRemoteFilter<T> filter)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IRemoteFilter<T> filter)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> T getLastRequiredService(String name)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> Collection<T> getLastRequiredServices(String name)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		public void removeInterceptor(IServiceInvocationInterceptor interceptor, Object service)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public IServiceInvocationInterceptor[] getInterceptors(Object service)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public void addMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public void removeMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public void notifyMethodListeners(IServiceIdentifier sid, boolean start, Object proxy, final Method method, final Object[] args, Object callid, ServiceInvocationContext context)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public boolean hasMethodListeners(IServiceIdentifier sid, MethodInfo mi)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> IFuture<T> searchService(Class<T> type)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> IFuture<T> searchService(Class<T> type, String scope)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		public <T> IFuture<T> searchServiceUpwards(Class<T> type)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		public <T> IIntermediateFuture<T> searchServices(Class<T> type)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
+		{
+			throw new UnsupportedOperationException();
 		}
 	}
 }

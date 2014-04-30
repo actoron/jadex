@@ -14,6 +14,7 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -119,6 +120,37 @@ public class SRemoteGui
 				return ret;
 			}
 		});		
+	}
+	
+	/**
+	 *  Remove a service.
+	 *  @param cms	The cms
+	 *  @param container	The service provider.
+	 *  @param sid	The service to remove.
+	 */
+	public static IFuture<Void> removeService(IComponentManagementService cms,
+			IServiceProvider container, final IServiceIdentifier sid)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		cms.getExternalAccess(sid.getProviderId())
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+		{
+			public void customResultAvailable(IExternalAccess exta)
+			{
+				exta.scheduleStep(new IComponentStep<Void>()
+				{
+					@Classname("removeService")
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ia.getServiceContainer().removeService(sid);
+						return IFuture.DONE;
+					}
+				})
+					.addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -1314,5 +1346,4 @@ public class SRemoteGui
 			SUtil.removeSystemErrListener(this);
 		}
 	}
-	
 }

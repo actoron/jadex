@@ -541,4 +541,12 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	{
 		return 31 + getServiceIdentifier().hashCode();
 	}
+	
+	/**
+	 *  Get a string representation.
+	 */
+	public String	toString()
+	{
+		return SReflect.getUnqualifiedClassName(getClass())+"("+sid+")";
+	}
 }

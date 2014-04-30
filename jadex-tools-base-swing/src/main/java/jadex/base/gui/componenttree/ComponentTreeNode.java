@@ -444,7 +444,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 										{
 											ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
 											if(scn==null)
-												scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), (IServiceContainer)ea.getServiceProvider());
+												scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), ea.getServiceProvider());
 	//										System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 											children.add(0, scn);
 											

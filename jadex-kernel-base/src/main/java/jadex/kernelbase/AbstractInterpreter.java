@@ -45,40 +45,40 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	// -------- attributes --------
 
 	/** The application type. */
-	protected IModelInfo																									model;
+	protected IModelInfo	model;
 
 	/** The application configuration. */
-	protected String																										config;
+	protected String	config;
 
 	/** The arguments. */
-	private Map<String, Object>																								arguments;
+	private Map<String, Object>	arguments;
 
 	/** The results. */
-	protected Map<String, Object>																							results;
+	protected Map<String, Object>	results;
 
 	/** The properties. */
-	protected Map<String, Object>																							properties;
+	protected Map<String, Object>	properties;
 
 	/** The parent component. */
-	protected IExternalAccess																								parent;
+	protected IExternalAccess	parent;
 
 	/** The component adapter. */
-	protected IComponentAdapter																								adapter;
+	protected IComponentAdapter	adapter;
 
 	/** The value fetcher. */
-	protected IValueFetcher																									fetcher;
+	protected IValueFetcher	fetcher;
 
 	/** The service container. */
-	protected IServiceContainer																								container;
+	protected IServiceContainer	container;
 
 	/** The external access (cached). */
-	protected volatile IExternalAccess																						access;
+	protected volatile IExternalAccess	access;
 
 	/** The required service binding information. */
-	protected RequiredServiceBinding[]																						bindings;
+	protected RequiredServiceBinding[]	bindings;
 
 	/** The extension instances. */
-	protected Map<String, IExtensionInstance>																				extensions;
+	protected Map<String, IExtensionInstance>	extensions;
 
 
 	/** The subscriptions (subscription future -> subscription info). */
@@ -87,25 +87,25 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The result listener. */
 	// protected IIntermediateResultListener<Tuple2<String, Object>>
 	// resultlistener;
-	protected SubscriptionIntermediateFuture<Tuple2<String, Object>>														cmssub;
+	protected SubscriptionIntermediateFuture<Tuple2<String, Object>>	cmssub;
 
-	protected List<SubscriptionIntermediateFuture<Tuple2<String, Object>>>													resultsubscriptions;
+	protected List<SubscriptionIntermediateFuture<Tuple2<String, Object>>>	resultsubscriptions;
 
 	/** The monitoring service getter. */
-	protected ServiceGetter<IMonitoringService>																				getter;
+	protected ServiceGetter<IMonitoringService>	getter;
 
 	/** The event emit level for subscriptions. */
-	protected PublishEventLevel																								emitlevelsub;
+	protected PublishEventLevel	emitlevelsub;
 
 
 	/** The parameter copy allowed flag. */
-	protected boolean																										copy;
+	protected boolean	copy;
 
 	/** The flag if local timeouts should be realtime. */
-	protected boolean																										realtime;
+	protected boolean	realtime;
 
 	/** The flag if persistence is enabled. */
-	protected boolean																										persist;
+	protected boolean	persist;
 
 	// -------- constructors --------
 
@@ -164,7 +164,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			}
 		}
 
-		return persist ? new ShadowAccess(access) : access;
+		// No shadow access for platform to avoid bootstrapping problems.
+		return persist && !(getComponentIdentifier().getParent()==null) ? new ShadowAccess(access) : access;
 	}
 
 	/**
@@ -786,15 +787,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public void invalidateAccess(boolean terminate)
 	{
-		if(access instanceof ExternalAccess && getComponentIdentifier().getParent() != null) // Do
-																								// not
-																								// invalidate
-																								// platform
-																								// access,
-																								// otherwise
-																								// shutdown
-																								// doesn't
-																								// work.
+		// Do not invalidate platform access, otherwise shutdown doesn't work.
+		if(access instanceof ExternalAccess && getComponentIdentifier().getParent() != null)
 		{
 			((ExternalAccess)access).invalidate(terminate);
 		}
