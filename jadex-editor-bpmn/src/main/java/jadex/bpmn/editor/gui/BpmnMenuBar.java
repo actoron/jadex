@@ -252,6 +252,7 @@ public class BpmnMenuBar extends JMenuBar
 							if (newparent != null)
 							{
 								cell.setParent(newparent);
+								newparent.insert(cell);
 								graph.addCell(cell, newparent);
 							}
 							else
@@ -277,7 +278,7 @@ public class BpmnMenuBar extends JMenuBar
 					final Object[] ccells = copycells.getSecondEntity().toArray();
 					graph.cellsOrdered(ccells, false);
 					graph.setSelectionCells(ccells);
-					copycells = new Tuple2<BpmnGraph, List<VElement>>(graph, SHelper.copy(editorwindow.getSelectedModelContainer().getGraph(), editorwindow.getSelectedModelContainer().getBpmnModel(), ccells));
+//					copycells = new Tuple2<BpmnGraph, List<VElement>>(graph, SHelper.copy(editorwindow.getSelectedModelContainer().getGraph(), editorwindow.getSelectedModelContainer().getBpmnModel(), ccells));
 					
 				}
 //				editorwindow.getSelectedModelContainer().getGraph().addCells(copycells);
