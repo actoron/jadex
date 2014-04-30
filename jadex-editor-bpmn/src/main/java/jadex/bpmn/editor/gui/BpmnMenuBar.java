@@ -221,14 +221,8 @@ public class BpmnMenuBar extends JMenuBar
 					final Object[] ccells = copycells.toArray();
 					graph.cellsOrdered(ccells, false);
 					graph.getModel().endUpdate();
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						
-						public void run()
-						{
-							copycells = SHelper.copy(editorwindow.getSelectedModelContainer().getGraph(), editorwindow.getSelectedModelContainer().getBpmnModel(), ccells);
-						}
-					});
+					graph.setSelectionCells(ccells);
+					copycells = SHelper.copy(editorwindow.getSelectedModelContainer().getGraph(), editorwindow.getSelectedModelContainer().getBpmnModel(), ccells);
 					
 				}
 //				editorwindow.getSelectedModelContainer().getGraph().addCells(copycells);
