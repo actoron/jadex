@@ -94,10 +94,12 @@
       <semantic:incoming>3m/YflUKxqmEvHDi</semantic:incoming>
       <semantic:outgoing>kLSNDeN5WoHevzba</semantic:outgoing>
       <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="a" type=""/>
         <jadex:parameter direction="in" name="b" type=""/>
         <jadex:parameter direction="in" name="c" type=""/>
         <jadex:parameter direction="out" name="result" type="java.lang.Boolean">a!=null &amp;&amp; b!=null &amp;&amp; c!=null &amp;&amp; !a.equals(b) &amp;&amp; !a.equals(c) &amp;&amp; !b.equals(c)</jadex:parameter>
+        <jadex:parameter direction="inout" name="text" type="java.lang.String">&quot;&quot;+a+&quot; &quot;+b+&quot; &quot;+c</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:endEvent id="cwc3Ygn4BNr2URhm">
@@ -134,9 +136,9 @@
     <semantic:sequenceFlow sourceRef="xEsVgTYe8Ppvp91u" targetRef="NFBcR80UvdR7UNEm" id="kLSNDeN5WoHevzba">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
-      <jadex:dataFlow id="6qvgNuEF/tKg42AK" sourceRef="4NxRKrh7OVs77yiW" sourceParam="text" targetRef="xEsVgTYe8Ppvp91u" targetParam="name"/>
-      <jadex:dataFlow id="ZtiE9CpTHy6BRnkE" sourceRef="QwtSRJBlXg/IKIxH" sourceParam="text" targetRef="xEsVgTYe8Ppvp91u" targetParam="name1"/>
-      <jadex:dataFlow id="9lxSKEbTcuksGK5x" sourceRef="g9y2ZjQKaop5iPHG" sourceParam="text" targetRef="xEsVgTYe8Ppvp91u" targetParam="name2"/>
+      <jadex:dataFlow id="zdy41B4NLwt9ecMe" sourceRef="4NxRKrh7OVs77yiW" sourceParam="text" targetRef="xEsVgTYe8Ppvp91u" targetParam="a"/>
+      <jadex:dataFlow id="9weaOJr3zjlvJu1u" sourceRef="QwtSRJBlXg/IKIxH" sourceParam="text" targetRef="xEsVgTYe8Ppvp91u" targetParam="b"/>
+      <jadex:dataFlow id="aEKyYcHXhFrgu0Tg" sourceRef="g9y2ZjQKaop5iPHG" sourceParam="text" targetRef="xEsVgTYe8Ppvp91u" targetParam="c"/>
       <jadex:dataFlow id="fZQtUY72jdo2DhHH" sourceRef="ah3ETuuGcjh/plBX" sourceParam="result1" targetRef="4NxRKrh7OVs77yiW" targetParam="text"/>
       <jadex:dataFlow id="E1CTihyD05BKkGKf" sourceRef="ah3ETuuGcjh/plBX" sourceParam="result2" targetRef="QwtSRJBlXg/IKIxH" targetParam="text"/>
       <jadex:dataFlow id="0RFST//a//v0YL57" sourceRef="ah3ETuuGcjh/plBX" sourceParam="result3" targetRef="g9y2ZjQKaop5iPHG" targetParam="text"/>
@@ -215,14 +217,14 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="p/pNlq8OcrZAPHXK">
       </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="6qvgNuEF/tKg42AK">
-      </di:Edge>
-      <di:Edge type="data" jadexElement="ZtiE9CpTHy6BRnkE">
-      </di:Edge>
-      <di:Edge type="data" jadexElement="9lxSKEbTcuksGK5x">
-      </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="kLSNDeN5WoHevzba">
       </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="zdy41B4NLwt9ecMe">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="9weaOJr3zjlvJu1u">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="aEKyYcHXhFrgu0Tg">
+      </di:Edge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </semantic:definitions>

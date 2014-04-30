@@ -730,7 +730,7 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected class ProcessThreadModel extends AbstractTableModel
 	{
-		protected String[] colnames = new String[]{"Process-Id", "Parent-Id", "Activity", "Pool", "Lane", "Exception", "Data", "Status"};
+		protected String[] colnames = new String[]{"Process-Id", "Parent-Id", "Activity", "Pool", "Lane", "Exception", "Data", "Edge Data", "Status"};
 		
 		/** The displayed process threads. */
 		protected List<ProcessThreadInfo> threadinfos;
@@ -859,6 +859,10 @@ public class VisualProcessViewPanel extends JPanel
 				ret = info.getData();
 			}
 			else if(column==7)
+			{
+				ret = info.getEdges();
+			}
+			else if(column==8)
 			{
 				ret = info.isWaiting() ? "waiting" : "ready";
 			}
@@ -1109,30 +1113,6 @@ public class VisualProcessViewPanel extends JPanel
     	return ret;
     }
     
-//    /**
-//     * 
-//     */
-//    public static void main(String[] args)
-//	{
-//    	Canvas c = new Canvas()
-//    	{
-//    		public void paint(Graphics g)
-//    		{
-//    			Rectangle rect = new Rectangle(100,100,100,100);
-//    			int x = rect.x;
-//    			int y = rect.y;
-//    			int w = rect.width;
-//    			int h = rect.height;
-//    			g.fill(getOctagonShape(x, y, w, h));
-//    		}
-//    	};
-//		
-//    	JFrame f = new JFrame();
-//    	f.add(c, BorderLayout.CENTER);
-//    	f.pack();
-//    	f.setVisible(true);
-//	}
-
 	static
 	{
 		mxGraphics2DCanvas.putShape(BreakpointMarker.class.getSimpleName(), new mxBasicShape()

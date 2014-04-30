@@ -253,9 +253,9 @@ public abstract class AbstractGatewayActivityHandler
 							{
 								Object value = dataedges.get(key);
 								
-								if(thread.hasParameterValue(key))
+								if(thread.getDataEdges().get(key)!=null)
 								{
-									Object origval =thread.getParameterValue(key);
+									Object origval = thread.getDataEdges().get(key);
 									if(!SUtil.equals(origval, value))
 									{
 //										System.out.println("origact: "+thread.getModelElement());
@@ -266,6 +266,8 @@ public abstract class AbstractGatewayActivityHandler
 								else
 								{
 									thread.setDataEdgeValue(key, value);
+									
+									System.out.println("set data edge: "+key+" "+value);
 								}
 							}
 						}

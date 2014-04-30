@@ -1602,8 +1602,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		String lanename =  thread.getActivity()!=null && thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null;
 		String ex = thread.getException()!=null ? thread.getException().toString() : "";
 		String data = thread.getData()!=null ? thread.getData().toString() : "";
+		String edges = thread.getDataEdges()!=null ? thread.getDataEdges().toString() : "";
 		ProcessThreadInfo info = new ProcessThreadInfo(thread.getId(), parentid, actname,
-			actid, poolname, lanename, ex, thread.isWaiting(), data);
+			actid, poolname, lanename, ex, thread.isWaiting(), data, edges);
 		return info;
 	}
 

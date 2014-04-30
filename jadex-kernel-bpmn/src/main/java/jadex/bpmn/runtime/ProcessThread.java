@@ -48,29 +48,6 @@ import java.util.StringTokenizer;
  */
 public class ProcessThread	implements ITaskContext
 {
-	//-------- constants --------
-	
-//	/** Waiting constant for time. */
-//	public static String WAITING_FOR_TIME = "waiting_for_time";
-//	
-//	/** Waiting constant for message. */
-//	public static String WAITING_FOR_MESSAGE = "waiting_for_message";
-//	
-//	/** Waiting constant for condition. */
-//	public static String WAITING_FOR_CONDITION = "waiting_for_condition";
-//	
-//	/** Waiting constant for join. */
-//	public static String WAITING_FOR_JOIN = "waiting_for_join";
-//
-//	/** Waiting constant for task. */
-//	public static String WAITING_FOR_TASK = "waiting_for_task";
-//
-//	/** Waiting constant for subprocess. */
-//	public static String WAITING_FOR_SUBPROCESS = "waiting_for_subprocess";
-//	
-//	/** Waiting constant for multi. */
-//	public static String WAITING_FOR_MULTI = "waiting_for_multi";
-	
 	//-------- attributes --------
 	
 	/** The thread id. */
@@ -88,12 +65,6 @@ public class ProcessThread	implements ITaskContext
 	/** The data of the current data edges. */
 	protected Map<String, Object> dataedges;
 	
-//	/** The thread context. */
-//	protected ThreadContext context;
-//	
-//	/** The thread subcontext (if any). */
-//	protected ThreadContext subcontext;
-	
 	/** The parent process thread. */
 	protected ProcessThread parent;
 	
@@ -107,11 +78,9 @@ public class ProcessThread	implements ITaskContext
 	protected Exception	exception;
 	
 	/** Is the process in a waiting state. */
-//	protected String	waiting;
 	protected boolean waiting;
 	
 	/** The wait info. */
-//	protected Object waitinfo;
 	protected ICancelable cancelinfo;
 	
 	/** The wait filter. */
@@ -789,6 +758,7 @@ public class ProcessThread	implements ITaskContext
 								if(dataedges.containsKey(de.getId()))
 								{
 									String pname = de.getTargetParameter();
+									// Value is consumed -> remove?!
 									Object val = dataedges.remove(de.getId());
 								
 									// if already contains value must be identical
@@ -960,7 +930,7 @@ public class ProcessThread	implements ITaskContext
 							}
 						}
 					}
-					if (de.getTarget() == null)
+					if(de.getTarget() == null)
 					{
 						// Result data edge
 						instance.setResultValue(de.getTargetParameter(), value);

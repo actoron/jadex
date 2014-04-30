@@ -36,6 +36,9 @@ public class ProcessThreadInfo
 	
 	/** The data of the process. */
 	protected String data;
+	
+	/** The data edges of the process. */
+	protected String edges;
 
 	//-------- constructors --------
 	
@@ -64,7 +67,7 @@ public class ProcessThreadInfo
 	 *  Create a new process info.
 	 */
 	public ProcessThreadInfo(String id, String parentid, String activity, String actid, String pool, String lane, 
-		String exception, boolean waiting, String data)
+		String exception, boolean waiting, String data, String edges)
 	{
 		this.id = id;
 		this.parentid = parentid;
@@ -75,6 +78,7 @@ public class ProcessThreadInfo
 		this.exception = exception;
 		this.waiting = waiting;
 		this.data = data;
+		this.edges = edges;
 	}
 	
 	//-------- methods --------
@@ -239,6 +243,24 @@ public class ProcessThreadInfo
 	public void getData(String data)
 	{
 		this.data = data;
+	}
+	
+	/**
+	 *  Get the edges.
+	 *  @return The edges.
+	 */
+	public String getEdges()
+	{
+		return edges;
+	}
+
+	/**
+	 *  Set the edges.
+	 *  @param edges The edges to set.
+	 */
+	public void setEdges(String edges)
+	{
+		this.edges = edges;
 	}
 
 	/**
