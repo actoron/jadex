@@ -180,7 +180,24 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				Class<?> cl = ci.getType(modelcontainer.getProjectClassLoader());
 				String txt = null;
 				if(cl!=null)
+				{
 					txt = SReflect.getInnerClassName(cl)+" - "+cl.getPackage().getName();
+				}
+				else
+				{
+					String fn = ci.getTypeName();
+					int idx = fn.lastIndexOf(".");
+					if(idx!=-1)
+					{
+						String cn = fn.substring(idx+1);
+						String pck = fn.substring(0, idx);
+						txt = cn+" - "+pck;
+					}
+					else
+					{
+						txt = fn;
+					}
+				}
 				return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
 			}
 		});
