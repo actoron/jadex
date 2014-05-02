@@ -40,7 +40,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 34;
+	public static final int BUILD = 35;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";

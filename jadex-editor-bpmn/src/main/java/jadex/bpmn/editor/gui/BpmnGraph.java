@@ -46,7 +46,7 @@ public class BpmnGraph extends mxGraph
 	public BpmnGraph(ModelContainer container, mxStylesheet sheet)
 	{
 		this.modelcontainer = container;
-		this.elementidcache = new LRU<String, VElement>(30);
+		this.elementidcache = new LRU<String, VElement>(100);
 		setAllowDanglingEdges(false);
 		setAllowLoops(true);
 		setVertexLabelsMovable(false);
@@ -366,7 +366,8 @@ public class BpmnGraph extends mxGraph
 	protected VElement findElementById(mxICell startelement, String id)
 	{
 		if(startelement instanceof VElement &&
-			id.equals(((VElement)startelement).getBpmnElement().getId()))
+		   !(startelement instanceof VInParameter || startelement instanceof VOutParameter) &&
+		   id.equals(((VElement)startelement).getBpmnElement().getId()))
 		{
 			return (VElement) startelement;
 		}
