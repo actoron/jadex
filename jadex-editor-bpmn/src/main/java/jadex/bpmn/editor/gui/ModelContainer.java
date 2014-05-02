@@ -850,6 +850,7 @@ public class ModelContainer implements IModelContainer
 		String pkg = model.getModelInfo().getPackage();
 		if (pkg == null || pkg.length() == 0)
 		{
+			generateClassLoader();
 			return;
 		}
 		String filepath = file.getAbsolutePath();
@@ -876,6 +877,7 @@ public class ModelContainer implements IModelContainer
 					if (!pathfrag.equals(pkgfrag))
 					{
 						// Package/Directory mismatch
+						generateClassLoader();
 						return;
 					}
 					
@@ -883,6 +885,7 @@ public class ModelContainer implements IModelContainer
 				}
 				else
 				{
+					generateClassLoader();
 					return;
 				}
 			}
