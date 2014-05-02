@@ -9,7 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>TestProcess</jadex:modelname>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="aY8/KB0nu5ATYv63">
     <semantic:startEvent id="MFx4RjvG+XOotjrq">
@@ -17,18 +17,27 @@
     </semantic:startEvent>
     <semantic:task name="Print" id="5Ma1mHR+dKrkOUQs">
       <semantic:incoming>tQFo20vOtuMWdy3y</semantic:incoming>
-      <semantic:outgoing>YtTf++V0Jj2j8tpi</semantic:outgoing>
+      <semantic:outgoing>Ni4xcZbeXoW81y/J</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.testcases.pojobpmn.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Hello pojo process&quot;</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:endEvent id="lSUjbg10MLioCdmq">
-      <semantic:incoming>YtTf++V0Jj2j8tpi</semantic:incoming>
+      <semantic:incoming>HlmfQL1VcxMuYPzK</semantic:incoming>
     </semantic:endEvent>
+    <semantic:task name="Success" id="F5lLw1dmg2nmuaUt">
+      <semantic:incoming>Ni4xcZbeXoW81y/J</semantic:incoming>
+      <semantic:outgoing>HlmfQL1VcxMuYPzK</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+      </semantic:extensionElements>
+    </semantic:task>
     <semantic:sequenceFlow sourceRef="MFx4RjvG+XOotjrq" targetRef="5Ma1mHR+dKrkOUQs" id="tQFo20vOtuMWdy3y">
     </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="5Ma1mHR+dKrkOUQs" targetRef="lSUjbg10MLioCdmq" id="YtTf++V0Jj2j8tpi">
+    <semantic:sequenceFlow sourceRef="5Ma1mHR+dKrkOUQs" targetRef="F5lLw1dmg2nmuaUt" id="Ni4xcZbeXoW81y/J">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="F5lLw1dmg2nmuaUt" targetRef="lSUjbg10MLioCdmq" id="HlmfQL1VcxMuYPzK">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
     </semantic:extensionElements>
@@ -45,11 +54,16 @@
         <dc:Bounds height="100.0" width="160.0" x="230.0" y="120.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="lSUjbg10MLioCdmq">
-        <dc:Bounds height="40.0" width="40.0" x="460.0" y="150.0"/>
+        <dc:Bounds height="40.0" width="40.0" x="740.0" y="150.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="F5lLw1dmg2nmuaUt">
+        <dc:Bounds height="100.0" width="160.0" x="470.0" y="120.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="tQFo20vOtuMWdy3y">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="YtTf++V0Jj2j8tpi">
+      <bpmndi:BPMNEdge bpmnElement="Ni4xcZbeXoW81y/J">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="HlmfQL1VcxMuYPzK">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -1005,7 +1005,7 @@ public class ModelContainer implements IModelContainer
 		{
 			//final ClassLoader cl = model.getClassLoader();
 			
-			Set<ClassInfo>[] infos = new Set[] { new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>() };
+			Set<ClassInfo>[] infos = new Set[]{new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>() };
 			URL[] urls = ((URLClassLoader)model.getClassLoader()).getURLs();
 //			for (URL url : urls)
 //			{

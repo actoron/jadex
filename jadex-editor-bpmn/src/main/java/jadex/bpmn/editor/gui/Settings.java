@@ -37,6 +37,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.jar.JarEntry;
 
+import javax.swing.SwingUtilities;
+
 import org.kohsuke.asm4.AnnotationVisitor;
 import org.kohsuke.asm4.ClassReader;
 import org.kohsuke.asm4.ClassVisitor;
@@ -450,10 +452,10 @@ public class Settings
 	public IFuture<Void> scanForClasses()
 	{
 //		Set<ClassInfo>[] tmp = Settings.scanForClasses(this, getLibraryClassLoader(), true);
-		final List<ClassInfo>[] stmp = new List[4];
+		final Set<ClassInfo>[] stmp = new Set[4];
 		for (int i = 0; i < 4; ++i)
 		{
-			stmp[i] = new ArrayList<ClassInfo>();
+			stmp[i] = new HashSet<ClassInfo>();
 		}
 		IFuture<Void> ret = Settings.scanForClasses(this, getLibraryClassLoader(), new FileFilter("$", false), new BpmnClassFilter(stmp, true), true);
 		
@@ -470,14 +472,17 @@ public class Settings
 						return str1.compareTo(str2);
 					}
 				};
-				for (int i = 0; i < 4; ++i)
+				final List<ClassInfo>[] ltmp = new List[4];
+				for(int i = 0; i < 4; ++i)
 				{
-					Collections.sort(stmp[i], comp);
+					ltmp[i] = new ArrayList<ClassInfo>(stmp[i]);
+					Collections.sort(ltmp[i], comp);
 				}
-				setGlobalTaskClasses(stmp[0]);
-				setGlobalInterfaces(stmp[1]);
-				setGlobalExceptions(stmp[2]);
-				setGlobalAllClasses(stmp[3]);
+//				System.out.println("found2: "+stmp[0]+" "+stmp[0].getClass());
+				setGlobalTaskClasses(ltmp[0]);
+				setGlobalInterfaces(ltmp[1]);
+				setGlobalExceptions(ltmp[2]);
+				setGlobalAllClasses(ltmp[3]);
 				
 				try
 				{
@@ -541,6 +546,7 @@ public class Settings
 	 */
 	public void setGlobalTaskClasses(List<ClassInfo> globaltaskclasses)
 	{
+//		System.out.println("task cls: "+globaltaskclasses);
 		this.globaltaskclasses = globaltaskclasses;
 	}
 
@@ -1025,7 +1031,7 @@ public class Settings
 		{
 			public void run()
 			{
-				final BpmnClassFilter cf = ((BpmnClassFilter) classfilter);
+				final BpmnClassFilter cf = ((BpmnClassFilter)classfilter);
 				
 				URLClassLoader rcl = new URLClassLoader(urls, null);
 				
@@ -1096,7 +1102,15 @@ public class Settings
 						settings.getProgressBar().update(++count);
 					}
 					settings.getProgressBar().finish();
-					ret.setResult(null);
+//					System.out.println("found1: "+cf.task+" "+cf.task.getClass());
+					
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							ret.setResult(null);
+						}
+					});
 					
 //					ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, includeboot);
 //					fut.addResultListener(new IIntermediateResultListener<Class<?>>()
@@ -1192,13 +1206,13 @@ public class Settings
 	 */
 	public static class BpmnClassFilter implements IFilter<Class<?>>
 	{
-		protected Collection<ClassInfo> task;
-		protected Collection<ClassInfo> iface;
-		protected Collection<ClassInfo> exception;
-		protected Collection<ClassInfo> all;
+		protected Set<ClassInfo> task;
+		protected Set<ClassInfo> iface;
+		protected Set<ClassInfo> exception;
+		protected Set<ClassInfo> all;
 		protected boolean includeboot;
 		
-		public BpmnClassFilter(Collection<ClassInfo> task, Collection<ClassInfo> iface, Collection<ClassInfo> exception, Collection<ClassInfo> all, boolean includeboot)
+		public BpmnClassFilter(Set<ClassInfo> task, Set<ClassInfo> iface, Set<ClassInfo> exception, Set<ClassInfo> all, boolean includeboot)
 		{
 			this.task = task;
 			this.iface = iface;
@@ -1207,7 +1221,7 @@ public class Settings
 			this.includeboot = includeboot;
 		}
 		
-		public BpmnClassFilter(Collection<ClassInfo>[] classes, boolean includeboot)
+		public BpmnClassFilter(Set<ClassInfo>[] classes, boolean includeboot)
 		{
 			this.task = classes[0];
 			this.iface = classes[1];

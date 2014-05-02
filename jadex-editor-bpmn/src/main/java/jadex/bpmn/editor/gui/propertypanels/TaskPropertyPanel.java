@@ -128,6 +128,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		final AutoCompleteCombo cbox = new AutoCompleteCombo(null, cl);
 		final FixedClassInfoComboModel model = new FixedClassInfoComboModel(cbox, -1, new ArrayList<ClassInfo>(modelcontainer.getTaskClasses()));
+//		System.out.println("cls: "+modelcontainer.getTaskClasses());
 //		final ClassComboModel model = new ClassComboModel(cbox, 20, false, false, true, true, null,// null);
 //			new IFilter<Class<?>>()
 //		{
