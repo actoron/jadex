@@ -6,7 +6,7 @@ import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.model.task.annotation.TaskResult;
 
 /**
- * 
+ *
  */
 @Task(description="Test if result works as return value of execute.",	
 	parameters={@TaskParameter(name="text", clazz=String.class, direction=TaskParameter.DIRECTION_IN),
