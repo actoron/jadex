@@ -51,11 +51,35 @@ public class SPropertyPanelFactory
 			{
 				ret = new ErrorEventPropertyPanel(container, (VActivity) velement);
 			}
+//			else if ((velement instanceof VActivity && MBpmnModel.TASK.equals(((MActivity) velement.getBpmnElement()).getActivityType())) ||
+//					  (velement instanceof VSubProcess) ||
+//					  (velement instanceof VExternalSubProcess) ||
+//					  (velement instanceof VInParameter) ||
+//					  (velement instanceof VOutParameter))
+//			{
+//				VActivity act = null;
+//				MParameter selectedparameter = null;
+//				if (velement instanceof VInParameter)
+//				{
+//					act = (VActivity) ((VInParameter) velement).getParent();
+//					selectedparameter = ((VInParameter) velement).getParameter();
+//				}
+//				else if (velement instanceof VOutParameter)
+//				{
+//					act = (VActivity) ((VOutParameter) velement).getParent();
+//					selectedparameter = ((VOutParameter) velement).getParameter();
+//				}
+//				else
+//				{
+//					act = (VActivity) velement;
+//				}
+//				ret = new TaskPropertyPanel(container, act, selectedparameter);
+//			}
 			else if ((velement instanceof VActivity && MBpmnModel.TASK.equals(((MActivity) velement.getBpmnElement()).getActivityType())) ||
-					  (velement instanceof VSubProcess) ||
-					  (velement instanceof VExternalSubProcess) ||
-					  (velement instanceof VInParameter) ||
-					  (velement instanceof VOutParameter))
+				  (velement instanceof VSubProcess) ||
+				  (velement instanceof VExternalSubProcess) ||
+				  (velement instanceof VInParameter) ||
+				  (velement instanceof VOutParameter))
 			{
 				VActivity act = null;
 				MParameter selectedparameter = null;
@@ -73,7 +97,18 @@ public class SPropertyPanelFactory
 				{
 					act = (VActivity) velement;
 				}
-				ret = new TaskPropertyPanel(container, act, selectedparameter);
+				if(velement instanceof VExternalSubProcess)
+				{
+					ret = new ExternalSubprocessPropertyPanel(container, act, selectedparameter);
+				}
+				else if(velement instanceof VSubProcess)
+				{
+					ret = new InternalSubprocessPropertyPanel(container, act, selectedparameter);
+				}
+				else
+				{
+					ret = new TaskPropertyPanel2(container, act, selectedparameter);
+				}
 			}
 			else if (velement instanceof VActivity && ((MActivity) velement.getBpmnElement()).getActivityType().contains("Timer"))
 			{

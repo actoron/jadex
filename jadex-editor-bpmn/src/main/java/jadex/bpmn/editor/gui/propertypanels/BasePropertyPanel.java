@@ -70,6 +70,15 @@ public class BasePropertyPanel extends JPanel
 		return modelcontainer.getBpmnModel();
 	}
 	
+	/**
+	 *  Get the modelcontainer.
+	 *  @return The modelcontainer.
+	 */
+	public ModelContainer getModelContainer()
+	{
+		return modelcontainer;
+	}
+
 	/** Default text field border used for text areas. */
 	protected static final Border DEFAULT_TEXT_BORDER = new JTextField().getBorder();
 	
