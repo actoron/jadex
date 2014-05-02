@@ -8,7 +8,6 @@ import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VMessagingEdge;
-import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.io.SBpmnModelWriter;
 import jadex.commons.SUtil;

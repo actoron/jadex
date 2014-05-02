@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -156,6 +158,37 @@ public class BpmnEditorWindow extends JFrame
 		statusbar.setLayout(new BoxLayout(statusbar, BoxLayout.LINE_AXIS));
 		statusbar.setFloatable(false);
 		add(statusbar, BorderLayout.PAGE_END);
+		
+		JButton refreshbutton = new JButton(new AbstractAction()
+		{
+			
+			public void actionPerformed(ActionEvent e)
+			{
+				getSettings().scanForClasses().addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						for (ModelContainer container : getModelContainers())
+						{
+							container.generateClassLoader();
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				}));
+			}
+		});
+		Icon[] icons = settings.getImageProvider().generateGenericFlatImageIconSet(16, ImageProvider.EMPTY_FRAME_TYPE, "refresh", Color.BLACK);
+		refreshbutton.setIcon(icons[0]);
+		refreshbutton.setPressedIcon(icons[1]);
+		refreshbutton.setRolloverIcon(icons[2]);
+		refreshbutton.setContentAreaFilled(false);
+		refreshbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
+		refreshbutton.setMargin(new Insets(0, 0, 0, 0));
+		statusbar.add(refreshbutton);
+		
 		statusbar.add(bgprogressbar);
 //		statusbar.add(Box.createHorizontalGlue());
 		ZoomSlider zs = new ZoomSlider(this);

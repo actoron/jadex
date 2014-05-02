@@ -1,8 +1,6 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -71,7 +69,7 @@ public class SettingsPanel extends JPanel
 	/** The settings */
 	protected Settings settings;
 	
-	protected boolean dorefresh;
+//	protected boolean dorefresh;
 	
 	public SettingsPanel(final Settings settings)
 	{
@@ -282,21 +280,21 @@ public class SettingsPanel extends JPanel
 		clearbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		clearbutton.setMargin(new Insets(0, 0, 0, 0));
 		
-		JButton refreshbutton = new JButton(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				dorefresh = true;
-			}
-		});
-		icons = settings.getImageProvider().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "user-trash", Color.BLACK);
-		refreshbutton.setToolTipText("Refresh");
-		refreshbutton.setIcon(icons[0]);
-		refreshbutton.setPressedIcon(icons[1]);
-		refreshbutton.setRolloverIcon(icons[2]);
-		refreshbutton.setContentAreaFilled(false);
-		refreshbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
-		refreshbutton.setMargin(new Insets(0, 0, 0, 0));
+//		JButton refreshbutton = new JButton(new AbstractAction()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				dorefresh = true;
+//			}
+//		});
+//		icons = settings.getImageProvider().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "user-trash", Color.BLACK);
+//		refreshbutton.setToolTipText("Refresh");
+//		refreshbutton.setIcon(icons[0]);
+//		refreshbutton.setPressedIcon(icons[1]);
+//		refreshbutton.setRolloverIcon(icons[2]);
+//		refreshbutton.setContentAreaFilled(false);
+//		refreshbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
+//		refreshbutton.setMargin(new Insets(0, 0, 0, 0));
 		
 		JPanel cppanel = new JPanel(new GridBagLayout());
 		cppanel.setBorder(new TitledBorder("Class Path Settings"));
@@ -336,16 +334,17 @@ public class SettingsPanel extends JPanel
 		g.insets = GuiConstants.DEFAULT_BUTTON_INSETS;
 		cppanel.add(clearbutton, g);
 		
-		g = new GridBagConstraints();
-		g.gridx = 1;
-		g.gridy = 4;
-		g.fill = GridBagConstraints.HORIZONTAL;
-		g.insets = GuiConstants.DEFAULT_BUTTON_INSETS;
-		cppanel.add(refreshbutton, g);
+//		g = new GridBagConstraints();
+//		g.gridx = 1;
+//		g.gridy = 4;
+//		g.fill = GridBagConstraints.HORIZONTAL;
+//		g.insets = GuiConstants.DEFAULT_BUTTON_INSETS;
+//		cppanel.add(refreshbutton, g);
 		
 		g = new GridBagConstraints();
 		g.gridx = 1;
-		g.gridy = 5;
+//		g.gridy = 5;
+		g.gridy = 4;
 		g.weighty = 1.0;
 		g.fill = GridBagConstraints.VERTICAL;
 		cppanel.add(new JPanel(), g);
@@ -451,8 +450,9 @@ public class SettingsPanel extends JPanel
 	public boolean[] applySettings()
 	{
 		boolean[] ret = new boolean[2];
-		ret[0] = dorefresh;
-		dorefresh = false;
+//		ret[0] = dorefresh;
+//		dorefresh = false;
+		ret[0] = false;
 		ret[1] = false;
 //		String pf = libpathfield.getText();
 //		pf = pf != null && pf.length() == 0 ? null : pf;

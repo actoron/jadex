@@ -29,6 +29,7 @@ public class BackgroundProgressBar extends JPanel
 	public BackgroundProgressBar()
 	{
 		super(new GridLayout(1, 2));
+		setBorder(new EmptyBorder(0, 5, 0, 0));
 		monitor = new Object();
 		progressbar = new JProgressBar();
 		progressbar.setVisible(false);

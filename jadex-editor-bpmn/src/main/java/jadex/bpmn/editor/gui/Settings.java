@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -120,6 +119,9 @@ public class Settings
 	
 	/** Global allclasses */
 	protected List<ClassInfo> globalallclasses = new ArrayList<ClassInfo>();
+	
+	/** Flag if a scan is in progress */
+	protected boolean scanning;
 	
 	/**
 	 *  Gets the progress bar.
@@ -452,6 +454,14 @@ public class Settings
 	public IFuture<Void> scanForClasses()
 	{
 //		Set<ClassInfo>[] tmp = Settings.scanForClasses(this, getLibraryClassLoader(), true);
+		
+		if (scanning)
+		{
+			return IFuture.DONE;
+		}
+		
+		scanning = true;
+		
 		final Set<ClassInfo>[] stmp = new Set[4];
 		for (int i = 0; i < 4; ++i)
 		{
@@ -491,10 +501,12 @@ public class Settings
 				catch (IOException e)
 				{
 				}
+				scanning = false;
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				scanning = false;
 			}
 		});
 		
@@ -1023,6 +1035,17 @@ public class Settings
 	
 	/**
 	 *  Scan for task classes.
+	 *  
+	 *  Note: This uses ASM for inspecting classes for the following reason:
+	 *  Generally, if a class is loaded through a classloader and the classloader is
+	 *  garbage-collected at a later point, the class will be unloaded as well. However,
+	 *  some Java base classes are loaded through some sort of implicit classloader, even
+	 *  if the parent of the classloader is null. Since that classloader cannot be
+	 *  unloaded, the classes are permanently stored in memory once loaded. Since we potentially
+	 *  scan all classes here, even Java system classes, this results in a huge baggage in memory
+	 *  after scanning which cannot be unloaded. Therefore we have to use an arms-length
+	 *  approach for touching classes, i.e. inspect them without loading them, which
+	 *  is what ASM provides here.
 	 */
 	protected static final IFuture<Void> scanForClasses(final Settings settings, final URL[] urls, final IFilter<Object> filefilter, final IFilter<Class<?>> classfilter, boolean includeboot)
 	{
