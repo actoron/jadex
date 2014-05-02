@@ -178,7 +178,7 @@ public class BpmnEditor
 			}
 		}
 		
-		synchronized (BpmnEditor.class)
+		synchronized(BpmnEditor.class)
 		{
 			if (TASK_INFOS == null)
 			{

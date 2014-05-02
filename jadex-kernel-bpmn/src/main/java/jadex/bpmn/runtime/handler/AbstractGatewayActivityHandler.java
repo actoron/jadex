@@ -267,7 +267,7 @@ public abstract class AbstractGatewayActivityHandler
 								{
 									thread.setDataEdgeValue(key, value);
 									
-									System.out.println("set data edge: "+key+" "+value);
+//									System.out.println("set data edge: "+key+" "+value);
 								}
 							}
 						}

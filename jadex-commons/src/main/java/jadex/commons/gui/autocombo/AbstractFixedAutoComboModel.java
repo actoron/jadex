@@ -25,6 +25,8 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 		super(combo, max);
 		this.allentries = allentries;
 		copyEntries();
+		
+//		System.out.println("all: "+allentries);
 	}
 	
 	/**
@@ -79,7 +81,10 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 			}
 			int size2 = entries.size();
 			
+//			System.out.println("entries: "+entries);
+			
 //			fireChangeEvents(size1, size2);
+//			fireContentsChanged(this, 0, size2);
 			
 //			getCombo().setSelectedItem(pattern);
 			getCombo().updatePopup();

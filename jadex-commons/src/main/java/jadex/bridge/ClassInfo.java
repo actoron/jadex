@@ -4,7 +4,6 @@ import jadex.commons.SReflect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Map;
 
 
 /**
@@ -174,8 +173,8 @@ public class ClassInfo
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((getGenericTypeName() == null) ? 0 : getGenericTypeName().hashCode());
+//		result = prime * result + ((getGenericTypeName() == null)? 0 : getGenericTypeName().hashCode());
+		result = prime * result + ((getTypeName() == null)? 0 : getTypeName().hashCode());
 		return result;
 	}
 
@@ -189,7 +188,22 @@ public class ClassInfo
 		if(obj instanceof ClassInfo)
 		{
 			ClassInfo ci = (ClassInfo)obj;
+//			ret = getTypeName().equals(ci.getTypeName());
+//			if(ret)
+//			{
+//				String gtn1 = getGenericTypeName();
+//				String gtn2 = ci.getGenericTypeName();
+//				if(gtn1!=null && gtn2!=null)
+//				{
+//					ret = gtn1.equals(gtn2);
+//				}
+//			}
+//			if(getTypeName().indexOf("WriteContext")!=-1)
+//			{
+//				System.out.println(getGenericTypeName()+" - "+ci.getGenericTypeName()+" "+getGenericTypeName().equals(ci.getGenericTypeName()));
+//			}
 			ret = getGenericTypeName().equals(ci.getGenericTypeName());
+//			ret = getTypeName().equals(ci.getTypeName());
 		}
 		
 		return ret;
@@ -201,11 +215,6 @@ public class ClassInfo
 	public String toString()
 	{
 		return getGenericTypeName()!=null? getGenericTypeName(): "n/a";
-	}
-	
-	public static Map<Map<String, Long>, Integer> getVals()
-	{
-		return null;
 	}
 	
 //	/**
