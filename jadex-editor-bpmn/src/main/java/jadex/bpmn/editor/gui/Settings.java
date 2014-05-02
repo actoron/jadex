@@ -29,10 +29,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.jar.JarEntry;
 
 import org.kohsuke.asm4.AnnotationVisitor;
@@ -898,7 +900,7 @@ public class Settings
 				}
 			}
 			
-			List<File> openfiles = new ArrayList<File>();
+			Map<Integer, File> openfiles = new TreeMap<Integer, File>();
 			for(Object okey: props.keySet())
 			{
 				if(okey instanceof String)
@@ -906,11 +908,19 @@ public class Settings
 					String key = (String) okey;
 					if (key.startsWith("openfile"))
 					{
-						openfiles.add(new File(props.getProperty(key)));
+						int index = 0;
+						try
+						{
+							index = Integer.parseInt(key.substring(8));
+						}
+						catch (Exception e)
+						{
+						}
+						openfiles.put(index, new File(props.getProperty(key)));
 					}
 				}
 			}
-			ret.setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
+			ret.setOpenedFiles(openfiles.values().toArray(new File[openfiles.size()]));
 			
 			List<File> lentries = new ArrayList<File>();
 			for(Object okey: props.keySet())
