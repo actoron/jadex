@@ -142,21 +142,23 @@ public class PojoTaskWrapper implements ITask
 				}
 			}
 
-			Object re = bodymethod.invoke(pojotask, guessParameters(bodymethod.getParameterTypes(), vals));
+			Class<?> rettype = bodymethod.getReturnType();
+			final boolean noret = Void.class.equals(rettype) || void.class.equals(rettype);
+ 			Object re = bodymethod.invoke(pojotask, guessParameters(bodymethod.getParameterTypes(), vals));
 			if(re instanceof Future)
 			{
 				((Future<Object>)re).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						setResults(result, context, process);
+						setResults(noret, result, context, process);
 						ret.setResult(null);
 					}
 				});
 			}
 			else
 			{
-				setResults(re, context, process);
+				setResults(noret, re, context, process);
 				ret.setResult(null);
 			}
 		}
@@ -278,10 +280,10 @@ public class PojoTaskWrapper implements ITask
 	/**
 	 *  Set the results.
 	 */
-	protected void setResults(Object result, ITaskContext context, IInternalAccess process)
+	protected void setResults(boolean noret, Object result, ITaskContext context, IInternalAccess process)
 	{
 		List<MParameter> outs = context.getActivity().getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
-		if(outs!=null && outs.size()==1)
+		if(!noret && outs!=null && outs.size()==1)
 		{
 			MParameter mparam = outs.get(0);
 			context.setParameterValue(mparam.getName(), result);

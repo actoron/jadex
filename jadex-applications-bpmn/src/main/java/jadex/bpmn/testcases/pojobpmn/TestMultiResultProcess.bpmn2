@@ -99,7 +99,7 @@
         <jadex:parameter direction="in" name="b" type=""/>
         <jadex:parameter direction="in" name="c" type=""/>
         <jadex:parameter direction="out" name="result" type="java.lang.Boolean">a!=null &amp;&amp; b!=null &amp;&amp; c!=null &amp;&amp; !a.equals(b) &amp;&amp; !a.equals(c) &amp;&amp; !b.equals(c)</jadex:parameter>
-        <jadex:parameter direction="inout" name="text" type="java.lang.String">&quot;&quot;+a+&quot; &quot;+b+&quot; &quot;+c</jadex:parameter>
+        <jadex:parameter direction="inout" name="text" type="java.lang.String">&quot;a=&quot;+a+&quot;  b=&quot;+b+&quot; c= &quot;+c</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:endEvent id="cwc3Ygn4BNr2URhm">

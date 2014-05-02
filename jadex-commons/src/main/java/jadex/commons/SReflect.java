@@ -504,7 +504,7 @@ public class SReflect
 	public static String makeNiceArrayNotation(String name)
 	{
 		int found = 0;
-		for(int i=0; name.charAt(i)=='['; i++)
+		for(int i=0; i<name.length() && name.charAt(i)=='['; i++)
 			found++;
 		
 		if(found>0)

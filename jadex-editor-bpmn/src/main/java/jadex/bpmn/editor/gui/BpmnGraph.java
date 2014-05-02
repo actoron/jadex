@@ -365,8 +365,8 @@ public class BpmnGraph extends mxGraph
 	
 	protected VElement findElementById(mxICell startelement, String id)
 	{
-		if (startelement instanceof VElement &&
-			id.equals(((VElement) startelement).getBpmnElement().getId()))
+		if(startelement instanceof VElement &&
+			id.equals(((VElement)startelement).getBpmnElement().getId()))
 		{
 			return (VElement) startelement;
 		}
