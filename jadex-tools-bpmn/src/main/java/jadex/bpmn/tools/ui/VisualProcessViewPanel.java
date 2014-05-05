@@ -284,7 +284,7 @@ public class VisualProcessViewPanel extends JPanel
 							for(int row=0; row<threads.getModel().getRowCount() && !set; row++)
 							{
 								ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
-								if(pti.getActId().equals(id))
+								if(pti.getActId()!=null && pti.getActId().equals(id))
 								{
 									sels.add(Integer.valueOf(row));
 								}

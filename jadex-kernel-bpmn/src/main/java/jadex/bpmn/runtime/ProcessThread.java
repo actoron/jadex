@@ -13,11 +13,11 @@ import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -97,6 +97,9 @@ public class ProcessThread	implements ITaskContext
 	
 	/** The split infos. */
 	public Map<String, SplitInfo> splitinfos;
+	
+	/** The loop command. */
+	protected IResultCommand<Boolean, Void> loopcmd;
 	
 	//-------- constructors --------
 
@@ -223,6 +226,10 @@ public class ProcessThread	implements ITaskContext
 	{
 //		System.out.println("Set waiting thread: "+getId()+" "+waiting);
 		this.waiting = waiting;
+		if(getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		{	
+			instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
+		}
 	}
 	
 	/**
@@ -234,6 +241,10 @@ public class ProcessThread	implements ITaskContext
 //		this.waitinfo = null;
 		this.cancelinfo = null;
 		this.waitfilter = null;
+		if(getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		{	
+			instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
+		}
 //		System.out.println("Thread: "+ComponentIdentifier.LOCAL.get()+", "+getId()+" "+waiting);
 	}
 	
@@ -861,7 +872,7 @@ public class ProcessThread	implements ITaskContext
 //		System.out.println("after: "+activity.getId());
 		
 //		System.out.println("after: "+act);
-		if(MBpmnModel.TASK.equals(activity.getActivityType()) || activity instanceof MSubProcess)
+		if(activity!=null && (MBpmnModel.TASK.equals(activity.getActivityType()) || activity instanceof MSubProcess))
 		{
 			// Add parameter value for each out edge using the edge id
 			List<MDataEdge> des = activity.getOutgoingDataEdges();
@@ -1322,6 +1333,24 @@ public class ProcessThread	implements ITaskContext
 		return getId()!=null? getId()+":"+idcnt++: ""+idcnt++;
 	}
 	
+	/**
+	 *  Get the loopcmd.
+	 *  @return The loopcmd.
+	 */
+	public IResultCommand<Boolean, Void> getLoopCommand()
+	{
+		return loopcmd;
+	}
+
+	/**
+	 *  Set the loopcmd.
+	 *  @param loopcmd The loopcmd to set.
+	 */
+	public void setLoopCommand(IResultCommand<Boolean, Void> loopcmd)
+	{
+		this.loopcmd = loopcmd;
+	}
+
 	/**
 	 *  Create a string representation of this process thread.
 	 *  @return A string representation of this process thread.

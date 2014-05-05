@@ -17,6 +17,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -48,7 +49,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //		System.out.println(instance.getComponentIdentifier().getLocalName()+": sub "+activity);
 
 		MSubProcess	proc	= (MSubProcess)activity;
-		List<MActivity> start = proc.getStartActivities();
+		final List<MActivity> start = proc.getStartActivities();
 		String tmpfile = (String)thread.getPropertyValue("file");
 		if(tmpfile == null)
 		{
@@ -92,39 +93,69 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			else if(MSubProcess.SUBPROCESSTYPE_LOOPING.equals(proc.getSubprocessType()) || thread.hasPropertyValue("items"))
 			{
 //				throw new UnsupportedOperationException("Looping subprocess not yet supported: "+activity+", "+instance);
-				Iterator<Object> it = SReflect.getIterator(thread.getPropertyValue("items"));
+				final Iterator<Object> it = SReflect.getIterator(thread.getPropertyValue("items"));
 				// If empty looping activity (i.e. no items at all) continue process.
+				
+				IResultCommand<Boolean, Void> cmd = new IResultCommand<Boolean, Void>()
+				{
+					public Boolean execute(Void args)
+					{
+						Boolean ret = it.hasNext()? Boolean.TRUE: Boolean.FALSE;
+						if(it.hasNext())
+						{
+							Object elem = it.next();
+							for(MActivity st: start)
+							{
+								ProcessThread subthread = new ProcessThread(st, thread, instance);
+								thread.addThread(subthread);
+								subthread.setParameterValue("item", elem);	// Hack!!! parameter not declared?
+							}
+						}
+						return ret;
+					}
+				};
+				
+				if(!cmd.execute(null).booleanValue())
+				{
+					wait = false;
+				}
+				else
+				{
+					thread.setLoopCommand(cmd);
+				}
 				
 //				List<Object> elems = new LinkedList<Object>();
 //				while(it.hasNext())
 //				{
 //					elems.add(0, it.next());
 //				}
+//				
 //				ProcessThread tmp = thread;
-
-				if(!it.hasNext())
 //				if(elems.isEmpty())
-				{
-					wait = false;
-				}
-				else
-				{
-					boolean	first = true;
-					for(Object elem=it.next(); it.hasNext();)
-					{
-						for(MActivity st: start)
-						{
-							ProcessThread subthread = new ProcessThread(st, thread, instance);
-							thread.addThread(subthread);
-							subthread.setParameterValue("item", elem);	// Hack!!! parameter not declared?
-							if(!first)
-							{
-								subthread.setWaiting(true);
-							}
-						}
-						first = false;
-					}
-				}
+//				{
+//					wait = false;
+//				}
+//				else
+//				{
+//					for(Object elem: elems)
+//					{
+//						ProcessThread cothread = new ProcessThread(null, tmp, instance);
+//						cothread.setWaiting(true);
+//						tmp.addThread(cothread);
+//						tmp = cothread;
+//						for(MActivity st: start)
+//						{
+//							ProcessThread subthread = new ProcessThread(st, cothread, instance);
+//							subthread.setWaiting(true);
+//							cothread.addThread(subthread);
+//							subthread.setParameterValue("item", elem);	// Hack!!! parameter not declared?
+//						}
+//					}
+//					for(ProcessThread t: tmp.getSubthreads())
+//					{
+//						t.setWaiting(false);
+//					}
+//				}
 				
 //				if(!it.hasNext())
 //				{
@@ -135,19 +166,16 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //					boolean	first = true;
 //					while(it.hasNext())
 //					{
-//						Object	value	= it.next();
-//						for(int i=0; i<start.size(); i++)
+//						Object elem = it.next();
+//						for(MActivity st: start)
 //						{
-//							ProcessThread subthread = new ProcessThread((MActivity)start.get(i), thread, instance);
+//							ProcessThread subthread = new ProcessThread(st, thread, instance);
 //							thread.addThread(subthread);
-//							subthread.setParameterValue("item", value);	// Hack!!! parameter not declared?
+//							subthread.setParameterValue("item", elem);	// Hack!!! parameter not declared?
 //							if(!first)
 //							{
 //								subthread.setWaiting(true);
 //							}
-////							ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
-////								subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
-////							instance.notifyListeners(cce);
 //						}
 //						first = false;
 //					}

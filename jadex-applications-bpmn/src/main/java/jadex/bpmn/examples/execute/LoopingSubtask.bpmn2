@@ -15,6 +15,8 @@
   </semantic:extension>
   <semantic:process name="Pool" id="_7GnScUdBEeG8rbYlagcQXQ">
     <semantic:subProcess name="Loop" id="_BaPMoUdCEeG8rbYlagcQXQ">
+      <semantic:multiInstanceLoopCharacteristics isSequential="true">
+      </semantic:multiInstanceLoopCharacteristics> 
       <semantic:incoming>_Bar4kUdCEeG8rbYlagcQXQ</semantic:incoming>
       <semantic:outgoing>_1irTWEdCEeG8rbYlagcQXQ</semantic:outgoing>
       <semantic:task name="Print" id="_Jexq0UdCEeG8rbYlagcQXQ">

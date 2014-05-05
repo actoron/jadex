@@ -303,6 +303,12 @@ public class SBpmnModelReader
 													  String content,
 													  Map<String, Object> buffer)
 	{
+		if("multiInstanceLoopCharacteristics".equals(tag.getLocalPart()))
+		{
+			Boolean seq = attrs.containsKey("isSequential");
+			buffer.put("multiInstance", seq!=null? seq: Boolean.FALSE);
+		}
+		
 		/*if ("process".equals(tag.getLocalPart()))
 		{
 			MPool currentpool = new MPool();
@@ -361,7 +367,7 @@ public class SBpmnModelReader
 			{
 				act = new MActivity();
 			}
-			
+				
 			if (attrs.containsKey("name"))
 			{
 				act.setName(attrs.get("name"));
@@ -401,6 +407,19 @@ public class SBpmnModelReader
 				for(MProperty prop : props)
 				{
 					act.addProperty(prop);
+				}
+			}
+			
+			if(act instanceof MSubProcess && buffer.containsKey("multiInstance"))
+			{
+				Boolean seq = (Boolean)buffer.remove("multiInstance");
+				if(seq.booleanValue())
+				{
+					((MSubProcess)act).setSubprocessType(MSubProcess.SUBPROCESSTYPE_LOOPING);
+				}
+				else
+				{
+					((MSubProcess)act).setSubprocessType(MSubProcess.SUBPROCESSTYPE_PARALLEL);
 				}
 			}
 			

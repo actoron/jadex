@@ -12,6 +12,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 
 import java.util.Iterator;
@@ -38,8 +39,7 @@ public class DefaultStepHandler implements IStepHandler
 		thread.updateParametersAfterStep(activity, instance);
 		
 		MNamedIdElement	next	= null;
-//		ThreadContext	remove	= null;	// Context that needs to be removed (if any).
-		ProcessThread remove = null;
+		ProcessThread remove = null; // Thread that needs to be removed (if any).
 		Exception ex = thread.getException();
 		
 		// Store event (if any).
@@ -68,7 +68,7 @@ public class DefaultStepHandler implements IStepHandler
 		}
 		
 		// Find next element and context(s) to be removed.
-		else
+		else 
 		{
 			boolean	outside	= false;
 			ProcessThread parent = thread.getParent();
@@ -134,13 +134,28 @@ public class DefaultStepHandler implements IStepHandler
 					outside	= parent.getParent()==null;
 					if(next==null && !outside)
 					{
+						// Create new subthreads if it is a looping subprocess
+						if(parent.getActivity() instanceof MSubProcess)
+						{
+							MSubProcess subp = (MSubProcess)parent.getActivity();
+							if(MSubProcess.SUBPROCESSTYPE_LOOPING.equals(subp.getSubprocessType())
+								&& thread.getParent().getLoopCommand()!=null)
+							{
+								IResultCommand<Boolean, Void> cmd = thread.getParent().getLoopCommand();
+								if(!cmd.execute(null))
+								{
+									parent.setLoopCommand(null);
+								}
+							}
+						}
+						
 						// When last thread or exception, mark current context for removal.
 						if(parent.getSubthreads().size()==1 || ex!=null)
 						{
 							activity = (MActivity)parent.getModelElement();
-							remove	= parent;
+							remove = parent;
 							parent.updateParametersAfterStep(activity, instance);
-							parent	= parent.getParent();
+							parent = parent.getParent();
 							
 							// Cancel subprocess handlers.
 							if(activity instanceof MSubProcess)
@@ -175,21 +190,20 @@ public class DefaultStepHandler implements IStepHandler
 		// Remove inner context(s), if any.
 		if(remove!=null)
 		{
-			thread	= remove;
+			thread = remove;
 			thread.setNonWaiting();
 			if(ex!=null)
 				thread.setException(ex);
 			// Todo: Callbacks for aborted threads (to abort external activities)
-//			thread.getThreadContext().removeSubcontext(remove);
 			thread.removeSubcontext();
 			
-			for(Iterator<ProcessThread> it=remove.getAllThreads().iterator(); it.hasNext(); )
-			{
-				if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-				{
-					instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
-				}
-			}
+//			for(Iterator<ProcessThread> it=remove.getAllThreads().iterator(); it.hasNext(); )
+//			{
+//				if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//				{
+//					instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
+//				}
+//			}
 			if(thread.getActivity()!=null && instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
@@ -236,11 +250,11 @@ public class DefaultStepHandler implements IStepHandler
 		else if(next==null)
 		{
 			thread.setActivity(null);
-//			thread.getThreadContext().removeThread(thread);
 			if(thread.getParent()!=null)
 			{
 				thread.getParent().removeThread(thread);
 			}
+			
 		} 
 		else
 		{
