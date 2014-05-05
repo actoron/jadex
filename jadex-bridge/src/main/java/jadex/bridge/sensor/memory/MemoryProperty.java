@@ -16,6 +16,6 @@ public abstract class MemoryProperty extends NFRootProperty<Long, MemoryUnit>
 	public MemoryProperty(String name, final IInternalAccess comp, long updaterate)
 	{
 		super(comp, new NFPropertyMetaInfo(name, long.class, MemoryUnit.class, 
-			updaterate>0? true: false, updaterate, false, Target.Root));
+			updaterate>0? true: false, updaterate, true, Target.Root));
 	}
 }

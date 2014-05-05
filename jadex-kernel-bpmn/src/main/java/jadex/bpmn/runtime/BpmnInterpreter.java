@@ -1007,24 +1007,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		Set<String>	bps	= new HashSet<String>(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
 		for(Iterator<ProcessThread> it=getTopLevelThread().getAllThreads().iterator(); !isatbreakpoint && it.hasNext(); )
 		{
-			if(it==null)
-			{
-				System.out.println("it null");
-			}
-			
 			ProcessThread	pt	= it.next();
-			
-			if(bps==null)
-			{
-				System.out.println("bps null");
-			}
-			if(pt==null)
-			{
-				System.out.println("pt null");
-			}
+
 			if(pt.getActivity()==null)
 			{
 				System.out.println("pt.getActivity() null");
+				System.out.println("Threads: "+getTopLevelThread().getAllThreads());
 			}
 			
 			isatbreakpoint	= bps.contains(pt.getActivity().getBreakpointId());

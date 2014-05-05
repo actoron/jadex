@@ -35,7 +35,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	 */
 	public WaitqueueProperty(IInternalAccess comp, IService service, MethodInfo method)
 	{
-		super(comp, new NFPropertyMetaInfo(NAME, int.class, Void.class, true, -1, false, null));
+		super(comp, new NFPropertyMetaInfo(NAME, int.class, Void.class, true, -1, true, null));
 		this.method = method;
 		this.sid = service.getServiceIdentifier();
 		

@@ -66,6 +66,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 		this.dynamic = dynamic;
 		this.updaterate = updaterate;
 		this.target = target;
+		this.realtime	= realtime;
 	}
 	
 	/**
