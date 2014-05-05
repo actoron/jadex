@@ -368,8 +368,7 @@ public class BpmnEditorWindow extends JFrame
 		
 		int index = tabpane.getTabCount();
 		final BpmnEditorPanel panel = new BpmnEditorPanel(modelcontainer);
-		
-		tabpane.addTab(tabname, panel);
+		tabpane.addTab(tabname, null, panel, modelcontainer.getFile() != null? modelcontainer.getFile().getAbsolutePath() : "");
 		final JPanel tabtitlecomponent = new JPanel()
 		{
 			/** The title label. */
@@ -628,5 +627,15 @@ public class BpmnEditorWindow extends JFrame
 			dispose();
 			System.exit(0);
 		}
+	}
+	
+	/** 
+	 *  Get the tab pane.
+	 *  
+	 *  @return The tab pane
+	 */
+	public JTabbedPane getTabPane()
+	{
+		return tabpane;
 	}
 }
