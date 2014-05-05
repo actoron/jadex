@@ -53,9 +53,7 @@ public class DefaultStepHandler implements IStepHandler
 		if(AbstractEventIntermediateTimerActivityHandler.TIMER_EVENT.equals(event))
 		{
 			// Cancel subflows.
-//			remove = thread.getSubcontext();
 			remove = thread;
-//			remove = thread.getThreadContext().getSubcontext(thread);
 			
 			// Continue with timer edge.
 			List<MSequenceEdge> outedges = activity.getOutgoingSequenceEdges();
@@ -73,8 +71,7 @@ public class DefaultStepHandler implements IStepHandler
 		else
 		{
 			boolean	outside	= false;
-//			ThreadContext	context	= thread.getThreadContext();
-			ProcessThread context = thread.getParent();
+			ProcessThread parent = thread.getParent();
 			
 			while(next==null && !outside)
 			{
@@ -132,18 +129,18 @@ public class DefaultStepHandler implements IStepHandler
 					}
 				}
 				
-				if(context!=null)
+				if(parent!=null)
 				{
-					outside	= context.getParent()==null;
+					outside	= parent.getParent()==null;
 					if(next==null && !outside)
 					{
 						// When last thread or exception, mark current context for removal.
-						if(context.getSubthreads().size()==1 || ex!=null)
+						if(parent.getSubthreads().size()==1 || ex!=null)
 						{
-							activity = (MActivity)context.getModelElement();
-							remove	= context;
-							context.updateParametersAfterStep(activity, instance);
-							context	= context.getParent();
+							activity = (MActivity)parent.getModelElement();
+							remove	= parent;
+							parent.updateParametersAfterStep(activity, instance);
+							parent	= parent.getParent();
 							
 							// Cancel subprocess handlers.
 							if(activity instanceof MSubProcess)
@@ -158,7 +155,7 @@ public class DefaultStepHandler implements IStepHandler
 						}
 						
 						// If more threads are available in current context just exit loop.
-						else if(context.getSubthreads().size()>1)
+						else if(parent.getSubthreads().size()>1)
 						{
 							outside	= true;
 						}
@@ -188,22 +185,11 @@ public class DefaultStepHandler implements IStepHandler
 			
 			for(Iterator<ProcessThread> it=remove.getAllThreads().iterator(); it.hasNext(); )
 			{
-//				ProcessThread	pt	= it.next();
-//				ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, pt.getClass().getName(), 
-//					pt.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(pt));
-//				instance.notifyListeners(cce);
-//				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, (ProcessThread)it.next());
-				
 				if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{
 					instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
 				}
-
 			}
-//			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-//				thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(thread));
-//			instance.notifyListeners(cce);
-//			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_CHANGED, thread);
 			if(thread.getActivity()!=null && instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
