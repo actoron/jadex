@@ -1,5 +1,6 @@
 package jadex.micro.testcases.semiautomatic.monitoring;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -81,21 +82,28 @@ public class TesterAgent implements ITestService
 			{
 				public void run()
 				{
-					ThreadSuspendable sus = new ThreadSuspendable();
+					try
+					{
+						ThreadSuspendable sus = new ThreadSuspendable();
+						
+						CreationInfo ci = new CreationInfo("created", null);
+						ci.setParent(agent.getComponentIdentifier());
+						ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
+						final String name =  TesterAgent.class.getName()+".class";
+						
+						IComponentIdentifier ida = cms.createComponent(name, ci).getFirstResult(sus);
+						IComponentIdentifier idb = cms.createComponent(name, ci).getFirstResult(sus);
 					
-					CreationInfo ci = new CreationInfo("created", null);
-					ci.setParent(agent.getComponentIdentifier());
-					ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
-					final String name =  TesterAgent.class.getName()+".class";
+						IComponentDescription desca = cms.getComponentDescription(ida).get(sus);
+						IComponentDescription descb = cms.getComponentDescription(ida).get(sus);
 					
-					IComponentIdentifier ida = cms.createComponent(name, ci).getFirstResult(sus);
-					IComponentIdentifier idb = cms.createComponent(name, ci).getFirstResult(sus);
-				
-					IComponentDescription desca = cms.getComponentDescription(ida).get(sus);
-					IComponentDescription descb = cms.getComponentDescription(ida).get(sus);
-				
-					System.out.println("chain a: "+ida+" "+desca.getCause().getOrigin());
-					System.out.println("chain b: "+idb+" "+descb.getCause().getOrigin());
+						System.out.println("chain a: "+ida+" "+desca.getCause().getOrigin());
+						System.out.println("chain b: "+idb+" "+descb.getCause().getOrigin());
+					}
+					catch(ComponentTerminatedException e)
+					{
+						// avoid exception being printed during start test.
+					}
 				}
 			});
 		}
