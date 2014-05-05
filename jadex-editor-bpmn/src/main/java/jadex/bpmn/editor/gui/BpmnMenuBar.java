@@ -737,6 +737,15 @@ public class BpmnMenuBar extends JMenuBar
 					modelcontainer.setDirty(false);
 					modelcontainer.setFile(file);
 					editorwindow.getSettings().setLastFile(file);
+					for (int i = 0; i < editorwindow.getTabPane().getTabCount(); ++i)
+					{
+						BpmnEditorPanel panel = (BpmnEditorPanel) editorwindow.getTabPane().getComponentAt(i);
+						if (panel.getModelContainer() == modelcontainer)
+						{
+							editorwindow.getTabPane().setToolTipTextAt(i, file.getAbsolutePath());
+							break;
+						}
+					}
 				}
 				catch (IOException e1)
 				{
