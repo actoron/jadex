@@ -15,7 +15,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,6 +92,24 @@ public class BpmnEditor
 	/** Task informations. */
 	public static Map<String, TaskMetaInfo> TASK_INFOS;
 	
+	public static Map<String, String> STRINGS;
+	static
+	{
+		try
+		{
+			String res = BpmnEditor.class.getPackage().getName().replaceAll("\\.", "/") + "/strings_USA_eng.properties";
+			InputStream sis = BpmnEditor.class.getClassLoader().getResourceAsStream(res);
+			Properties strings = new Properties();
+			strings.load(sis);
+			sis.close();
+			STRINGS = propertiesToMap(strings);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 *  Starts the BPMN editor.
 	 *  
@@ -104,6 +124,21 @@ public class BpmnEditor
 		if (osname != null && osname.toLowerCase().contains("win"))
 		{
 			HOME_DIR = WINDOWS_HOME_DIR;
+		}
+		
+		try
+		{
+			String country = Locale.getDefault().getISO3Country();
+			String lang = Locale.getDefault().getISO3Language();
+			InputStream sis = BpmnEditor.class.getClassLoader().getResourceAsStream(BpmnEditor.class.getPackage().getName().replaceAll("\\.", "/") + "/strings_" + country + "_" + lang + ".properties");
+			Properties strings = new Properties();
+			strings.load(sis);
+			sis.close();
+			STRINGS = propertiesToMap(strings);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
 		}
 
 		try
@@ -192,5 +227,46 @@ public class BpmnEditor
 		}
 		
 		TASK_INFOS.put("", null);
+	}
+	
+	/**
+	 *  Gets a localized string.
+	 * 
+	 *  @param key String key.
+	 *  @return The string.
+	 */
+	public static String getString(String key)
+	{
+		String ret = key;
+		if (STRINGS != null)
+		{
+			String rkey = key.replaceAll("_", "__");
+			rkey = rkey.replaceAll(" ", "_");
+//			System.out.println("RKEY " + rkey);
+			if (STRINGS.containsKey(rkey))
+			{
+				ret = STRINGS.get(rkey);
+			}
+			else
+			{
+				System.out.println("Key not found: " + key);
+			}
+		}
+		else
+		{
+			System.out.println("STRINGS null.");
+		}
+		return ret;
+	}
+	
+	protected static Map<String, String> propertiesToMap(Properties props)
+	{
+		Map<String, String> ret = new HashMap<String, String>();
+		for (Object okey : props.keySet())
+		{
+			String key = (String) okey;
+			ret.put(key, props.getProperty(key));
+		}
+		return ret;
 	}
 }

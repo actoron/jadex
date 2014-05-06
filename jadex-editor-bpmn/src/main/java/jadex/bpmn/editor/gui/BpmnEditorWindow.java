@@ -187,6 +187,7 @@ public class BpmnEditorWindow extends JFrame
 		refreshbutton.setContentAreaFilled(false);
 		refreshbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		refreshbutton.setMargin(new Insets(0, 0, 0, 0));
+		refreshbutton.setToolTipText(BpmnEditor.getString("Refresh Classes"));
 		statusbar.add(refreshbutton);
 		
 		statusbar.add(bgprogressbar);
