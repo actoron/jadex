@@ -78,7 +78,7 @@ public class BpmnMenuBar extends JMenuBar
 		
 		this.editorwindow = editwindow;
 		
-		JMenu filemenu = new JMenu("File");
+		JMenu filemenu = new JMenu(BpmnEditor.getString("File"));
 		
 		filemenu.add(createNewMenuItem());
 		filemenu.add(createOpenMenuItem());
@@ -88,12 +88,12 @@ public class BpmnMenuBar extends JMenuBar
 		filemenu.add(createExportMenuItem());
 		filemenu.addSeparator();
 		
-		JMenuItem optionsitem = new JMenuItem(new AbstractAction("Settings...")
+		JMenuItem optionsitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Settings..."))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				final SettingsPanel spanel = new SettingsPanel(editorwindow.getSettings());
-				OptionDialog od = new OptionDialog(editorwindow, "Settings", true, spanel, new AbstractAction()
+				OptionDialog od = new OptionDialog(editorwindow, BpmnEditor.getString("Settings"), true, spanel, new AbstractAction()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
@@ -149,7 +149,7 @@ public class BpmnMenuBar extends JMenuBar
 		});
 		filemenu.add(optionsitem);
 		
-		JMenuItem item = new JMenuItem(new AbstractAction("Save Settings")
+		JMenuItem item = new JMenuItem(new AbstractAction(BpmnEditor.getString("Save Settings"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -175,7 +175,7 @@ public class BpmnMenuBar extends JMenuBar
 		});
 		filemenu.add(item);
 		
-		JCheckBoxMenuItem saveonexititem = new JCheckBoxMenuItem(new AbstractAction("Save Settings on Exit")
+		JCheckBoxMenuItem saveonexititem = new JCheckBoxMenuItem(new AbstractAction(BpmnEditor.getString("Save Settings on Exit"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -190,10 +190,10 @@ public class BpmnMenuBar extends JMenuBar
 		filemenu.add(createExitMenuItem());
 		add(filemenu);
 		
-		JMenu editmenu = new JMenu("Edit");
+		JMenu editmenu = new JMenu(BpmnEditor.getString("Edit"));
 		add(editmenu);
 		
-		JMenuItem copyitem = new JMenuItem(new AbstractAction("Copy")
+		JMenuItem copyitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Copy"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -208,7 +208,7 @@ public class BpmnMenuBar extends JMenuBar
 								java.awt.Event.CTRL_MASK));
 		editmenu.add(copyitem);
 		
-		JMenuItem pasteitem = new JMenuItem(new AbstractAction("Paste")
+		JMenuItem pasteitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Paste"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -288,11 +288,11 @@ public class BpmnMenuBar extends JMenuBar
 								 java.awt.Event.CTRL_MASK));
 		editmenu.add(pasteitem);
 		
-		JMenu viewmenu = new JMenu("View");
+		JMenu viewmenu = new JMenu(BpmnEditor.getString("View"));
 		add(viewmenu);
 		
 		/* Styles */
-		JMenu stylemenu = new JMenu("Styles");
+		JMenu stylemenu = new JMenu(BpmnEditor.getString("Styles"));
 		final ButtonGroup stylegroup = new ButtonGroup();
 		Action styleaction = new AbstractAction()
 		{
@@ -355,7 +355,7 @@ public class BpmnMenuBar extends JMenuBar
 		});
 		
 		/** Icon sizes */
-		JMenu iconmenu = new JMenu("Icon Size");
+		JMenu iconmenu = new JMenu(BpmnEditor.getString("Icon Size"));
 		ButtonGroup icongroup = new ButtonGroup();
 		Action iconaction = new AbstractAction()
 		{
@@ -386,10 +386,10 @@ public class BpmnMenuBar extends JMenuBar
 		}
 		viewmenu.add(iconmenu);
 		
-		JMenu helpmenu = new JMenu("Help");
+		JMenu helpmenu = new JMenu(BpmnEditor.getString("Help"));
 		add(helpmenu);
 		
-		JMenuItem aboutitem = new JMenuItem(new AbstractAction("About " + BpmnEditor.APP_NAME)
+		JMenuItem aboutitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("About") + " " + BpmnEditor.APP_NAME)
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -401,7 +401,7 @@ public class BpmnMenuBar extends JMenuBar
 		});
 		helpmenu.add(aboutitem);
 		
-		JMenuItem errorlogitem = new JMenuItem(new AbstractAction("Debug Log")
+		JMenuItem errorlogitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Debug Log"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -420,7 +420,7 @@ public class BpmnMenuBar extends JMenuBar
 	 */
 	protected JMenuItem createNewMenuItem()
 	{
-		JMenuItem newitem = new JMenuItem(new AbstractAction("New")
+		JMenuItem newitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("New"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -440,7 +440,7 @@ public class BpmnMenuBar extends JMenuBar
 	 */
 	protected JMenuItem createOpenMenuItem()
 	{
-		JMenuItem openitem = new JMenuItem(new AbstractAction("Open...")
+		JMenuItem openitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Open..."))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -456,10 +456,10 @@ public class BpmnMenuBar extends JMenuBar
 				}
 				
 				BetterFileChooser fc = new BetterFileChooser(curfile);
-				FileFilter filter = new FileNameExtensionFilter("BPMN model file", "bpmn2");
+				FileFilter filter = new FileNameExtensionFilter(BpmnEditor.getString("BPMN model file"), "bpmn2");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
-				filter = new FileNameExtensionFilter("Legacy BPMN model file", "bpmn");
+				filter = new FileNameExtensionFilter(BpmnEditor.getString("Legacy BPMN model file"), "bpmn");
 				fc.addChoosableFileFilter(filter);
 				int result = fc.showOpenDialog(getParent());
 				if (JFileChooser.APPROVE_OPTION == result)
@@ -489,7 +489,7 @@ public class BpmnMenuBar extends JMenuBar
 	 */
 	protected JMenuItem createSaveMenuItem()
 	{
-		JMenuItem saveitem = new JMenuItem(new AbstractAction("Save")
+		JMenuItem saveitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Save"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -530,7 +530,7 @@ public class BpmnMenuBar extends JMenuBar
 	 */
 	protected JMenuItem createSaveAsMenuItem()
 	{
-		JMenuItem saveasitem = new JMenuItem(new AbstractAction("Save As...")
+		JMenuItem saveasitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Save As..."))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -548,7 +548,7 @@ public class BpmnMenuBar extends JMenuBar
 	 */
 	protected JMenuItem createExportMenuItem()
 	{
-		JMenuItem exportitem = new JMenuItem(new AbstractAction("Export...")
+		JMenuItem exportitem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Export..."))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -687,7 +687,7 @@ public class BpmnMenuBar extends JMenuBar
 	 */
 	protected JMenuItem createExitMenuItem()
 	{
-		JMenuItem exititem = new JMenuItem(new AbstractAction("Exit")
+		JMenuItem exititem = new JMenuItem(new AbstractAction(BpmnEditor.getString("Exit"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
