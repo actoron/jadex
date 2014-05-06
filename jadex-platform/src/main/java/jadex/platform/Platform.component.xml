@@ -265,7 +265,7 @@
 				)
 			</implementation>
 		</providedservice>
-		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService">
+		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService" name="cms">
 			<implementation>
 				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService",
 					jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
@@ -294,6 +294,14 @@
 				Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null
 			</implementation>
 		</providedservice> -->
+		<providedservice class="jadex.bridge.service.types.persistence.IPersistenceService">
+			<implementation>
+				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService",
+					jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
+				? $component.getRawService("cms")
+			    : null
+			</implementation>
+		</providedservice>
 		<requiredservice name="factoryservices" class="jadex.bridge.service.types.factory.IComponentFactory" multiple="true">
 			<binding scope="platform"/>
 		</requiredservice>

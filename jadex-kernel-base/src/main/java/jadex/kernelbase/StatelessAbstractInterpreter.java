@@ -2331,41 +2331,12 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	public abstract ServiceGetter<IMonitoringService> getMonitoringServiceGetter();
 	
 	/**
-	 *  Create a persistable state holder to be filled asynchronously.
-	 *  Override for specific implementations.
-	 *  @return The persistable state holder.
-	 */
-	public DefaultPersistInfo	createPersistInfo()
-	{
-		return new DefaultPersistInfo(this);
-	}
-	
-	/**
      *  Get the state of the interpreter.
-     *  Override for asynchronous kernel-specific stuff.
      *  @return The state of the interpreter.
      */
-    public IFuture<IPersistInfo> getPersistableState()
+    public IPersistInfo getPersistableState()
     {
-    	final Future<IPersistInfo>	ret	= new Future<IPersistInfo>();
-    	try
-    	{
-	    	final DefaultPersistInfo	api	= createPersistInfo();
-	    	getServiceContainer().getPersistInfo()
-	    		.addResultListener(new ExceptionDelegationResultListener<ServiceContainerPersistInfo, IPersistInfo>(ret)
-			{
-	    		public void customResultAvailable(ServiceContainerPersistInfo container)
-	    		{
-	    	    	api.setServiceContainer(container);
-	    			ret.setResult(api);
-	    		}
-			});
-    	}
-    	catch(Exception e)
-    	{
-    		ret.setException(e);
-    	}
-    	return ret;
+		return new DefaultPersistInfo(this);
     }
 		
 //	/**

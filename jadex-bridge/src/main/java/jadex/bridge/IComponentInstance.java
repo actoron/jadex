@@ -155,6 +155,10 @@ public interface IComponentInstance
 	 */
 	public void	afterBlock();
 	
-	public IFuture<IPersistInfo> getPersistableState();
+	/**
+	 *  Get the persistable state.
+	 *  Needs to be called on component thread.
+	 */
+	public IPersistInfo getPersistableState();
 
 }

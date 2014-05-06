@@ -3,7 +3,6 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
-import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MNamedIdElement;
@@ -1809,10 +1808,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	}
 
 	/**
-	 *  Create a persistable state holder to be filled asynchronously.
-	 *  @return The persistable state holder.
+	 *  Get the persistable state.
+	 *  @return The persistable state.
 	 */
-	public DefaultPersistInfo	createPersistInfo()
+	public DefaultPersistInfo	getPersistableState()
 	{
 		return new BpmnPersistInfo(this);
 	}

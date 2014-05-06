@@ -57,6 +57,8 @@ public class DefaultPersistInfo	implements IPersistInfo
 		arguments = interpreter.getArguments();
 		results = interpreter.getResults();
 		properties = interpreter.getProperties();
+		servicecontainer	= interpreter.getServiceContainer().getPersistInfo();
+
 	}
 	
 	//-------- methods --------

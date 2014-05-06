@@ -8,6 +8,7 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -72,6 +73,7 @@ public class BPMNPersistenceTestAgent
 		Future<TestReport> ret = new Future<TestReport>();
 		
 		IComponentManagementService	cms	= agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IPersistenceService	ps	= agent.getServiceContainer().searchService(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 		IExternalAccess	exta	= cms.getExternalAccess(fut.getFirstResult()).get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
@@ -86,10 +88,10 @@ public class BPMNPersistenceTestAgent
 			System.out.println("Already running.");
 		}
 
-		IPersistInfo	info	= cms.getPersistableState(fut.getFirstResult()).get();
+		IPersistInfo	info	= ps.getPersistableState(fut.getFirstResult()).get();
 		exta.killComponent().get();
 
-		cms.resurrectComponent(info).get();
+		ps.resurrectComponent(info).get();
 		
 		Future<Collection<Tuple2<String,Object>>>	cres	= new Future<Collection<Tuple2<String,Object>>>();
 		cms.addComponentResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres), fut.getFirstResult()).get();
