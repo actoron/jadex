@@ -216,6 +216,7 @@ public class SUtil
 
 		htmlwraps.put("\u00E7", "&ccedil;");
 		htmlwraps.put("\u00C7", "&Ccedil;");
+		htmlwraps.put("+", "%2b");
 
 		String	tmp = "";
 		Iterator<String> it = htmlwraps.keySet().iterator();
