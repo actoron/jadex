@@ -2225,6 +2225,12 @@ public class SUtil
 	 * e) { System.out.println(e); } }
 	 */
 	
+	public static void main(String[] args)
+	{
+		String res = SUtil.makeConform("uniique-dialogservice.de/ues4/rc?f=https://plus.google.com/+targobank?koop_id=mar_vermoegen18");
+		System.out.println(res);
+	}
+	
 	/**
 	 *  Convert bytes to a short.
 	 */
@@ -3959,26 +3965,26 @@ public class SUtil
 		Enumeration<String> getDexEntries(File dexFile) throws IOException;
 	}
 	
-	/**
-	 * Main method for testing.
-	 */
-	public static void main(String[] args)
-	{
-//		List<URL> urls = getClasspathURLs(null);
-		Properties props = System.getProperties();
-		for(Object key: props.keySet())
-		{
-			System.out.println(key+" "+props.get(key));
-		}
-		
-//		System.out.println(log2(8));
-//		System.out.println(log2(800000000000L));
-		
-		
-//		System.out.println("Here: " + createUniqueId("test", 3));
-//		System.out.println(htmlwraps);
-//		testIntByteConversion();
-	}
+//	/**
+//	 * Main method for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+////		List<URL> urls = getClasspathURLs(null);
+//		Properties props = System.getProperties();
+//		for(Object key: props.keySet())
+//		{
+//			System.out.println(key+" "+props.get(key));
+//		}
+//		
+////		System.out.println(log2(8));
+////		System.out.println(log2(800000000000L));
+//		
+//		
+////		System.out.println("Here: " + createUniqueId("test", 3));
+////		System.out.println(htmlwraps);
+////		testIntByteConversion();
+//	}
 
 	/**
 	 *  Load a binary file as base 64 string, e.g. for embedded html images.

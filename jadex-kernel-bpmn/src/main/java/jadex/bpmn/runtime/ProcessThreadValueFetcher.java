@@ -71,22 +71,23 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 		boolean	found	= false;
 		Object	value	= null;
 		
+		// we do not need a loop here as hasParameterValue() is build recursively
 		// Check for parameter value.
-		for(ProcessThread t=thread; t!=null && !found; t=t.getParent() )
-		{
-			if(t.hasParameterValue(name))
+//		for(ProcessThread t=thread; t!=null && !found; t=t.getParent() )
+//		{
+			if(thread.hasParameterValue(name))
 			{
-				value	= t.getParameterValue(name);
+				value	= thread.getParameterValue(name);
 				found	= true;
 			}
 			// todo: remove this sucking stuff below
 			String paramname = name.startsWith("$")? name.substring(1) : name;
-			if(t.hasParameterValue(paramname))
+			if(thread.hasParameterValue(paramname))
 			{
-				value	= t.getParameterValue(paramname);
+				value	= thread.getParameterValue(paramname);
 				found	= true;
 			}
-		}
+//		}
 				
 		if(!found)
 		{

@@ -21,12 +21,14 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -164,8 +166,38 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			}
 		}
 
+		IExternalAccess	ret	= access;
+		
 		// No shadow access for platform to avoid bootstrapping problems.
-		return persist && !(getComponentIdentifier().getParent()==null) ? new ShadowAccess(access) : access;
+		if(persist && !(getComponentIdentifier().getParent()==null))
+		{
+			try
+			{
+				Class<IExternalAccess>	clazz	= (Class<IExternalAccess>)SReflect.classForName0("jadex.platform.service.persistence.ShadowAccess", getClassLoader());
+				ret	= clazz.getConstructor(IExternalAccess.class).newInstance(access);
+			}
+			catch(Throwable t)
+			{
+				if(t instanceof InvocationTargetException)
+				{
+					t	= ((InvocationTargetException)t).getTargetException();
+				}
+				
+				if(t instanceof RuntimeException)
+				{
+					throw (RuntimeException)t;
+				}
+				else if(t instanceof Error)
+				{
+					throw (Error)t;
+				}
+				else
+				{
+					throw new RuntimeException(t);
+				}
+			}
+		}
+		return ret;
 	}
 
 	/**

@@ -1161,16 +1161,24 @@ public class SBpmnModelWriter
 			boolean issubproc = MBpmnModel.SUBPROCESS.equals(activity.getActivityType());
 			String procref = null;
 			boolean isprocrefexp = false;
-			if (issubproc)
+			if(issubproc)
 			{
-				MSubProcess subproc = (MSubProcess) activity;
-				if (subproc.hasPropertyValue("file"))
+				MSubProcess subproc = (MSubProcess)activity;
+				
+				String tp = subproc.getSubprocessType();
+				if(MSubProcess.SUBPROCESSTYPE_SEQUENTIAL.equals(tp) || MSubProcess.SUBPROCESSTYPE_PARALLEL.equals(tp))
+				{
+					out.print(getIndent(baseind + 1));
+					out.println("<semantic:multiInstanceLoopCharacteristics isSequential=\""+(MSubProcess.SUBPROCESSTYPE_SEQUENTIAL.equals(tp)? "true": "false")+"\" />");
+				}
+				
+				if(subproc.hasPropertyValue("file"))
 				{
 					UnparsedExpression fileexp = (UnparsedExpression)subproc.getPropertyValue("file"); 
 					procref = fileexp.getValue();
 					isprocrefexp = true;
 				}
-				else if (subproc.hasPropertyValue("filename"))
+				else if(subproc.hasPropertyValue("filename"))
 				{
 					procref = subproc.getPropertyValue("filename").getValue();
 					if (procref != null && procref.length() >= 2)

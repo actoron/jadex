@@ -126,20 +126,20 @@ public class BpmnEditor
 			HOME_DIR = WINDOWS_HOME_DIR;
 		}
 		
-		try
-		{
-			String country = Locale.getDefault().getISO3Country();
-			String lang = Locale.getDefault().getISO3Language();
-			InputStream sis = BpmnEditor.class.getClassLoader().getResourceAsStream(BpmnEditor.class.getPackage().getName().replaceAll("\\.", "/") + "/strings_" + country + "_" + lang + ".properties");
-			Properties strings = new Properties();
-			strings.load(sis);
-			sis.close();
-			STRINGS = propertiesToMap(strings);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+//		try
+//		{
+//			String country = Locale.getDefault().getISO3Country();
+//			String lang = Locale.getDefault().getISO3Language();
+//			InputStream sis = BpmnEditor.class.getClassLoader().getResourceAsStream(BpmnEditor.class.getPackage().getName().replaceAll("\\.", "/") + "/strings_" + country + "_" + lang + ".properties");
+//			Properties strings = new Properties();
+//			strings.load(sis);
+//			sis.close();
+//			STRINGS = propertiesToMap(strings);
+//		}
+//		catch (Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 
 		try
 		{
@@ -259,6 +259,12 @@ public class BpmnEditor
 		return ret;
 	}
 	
+	/**
+	 *  Converts properties to a map.
+	 * 
+	 *  @param props Properties.
+	 *  @return The map.
+	 */
 	protected static Map<String, String> propertiesToMap(Properties props)
 	{
 		Map<String, String> ret = new HashMap<String, String>();

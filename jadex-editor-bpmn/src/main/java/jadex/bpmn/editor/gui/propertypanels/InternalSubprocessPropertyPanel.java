@@ -1,39 +1,29 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
 import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.propertypanels.ActivityParameterTable.ParameterTableModel;
 import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VExternalSubProcess;
-import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.model.task.ITaskPropertyGui;
 import jadex.bpmn.task.info.ParameterMetaInfo;
-import jadex.bpmn.task.info.PropertyMetaInfo;
 import jadex.bpmn.task.info.STaskMetaInfoExtractor;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.collection.IndexMap;
 import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.autocombo.AutoCompleteCombo;
-import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
-import jadex.javaparser.SJavaParser;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,25 +34,16 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import javax.swing.plaf.metal.MetalComboBoxEditor;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 /**
  *  Property panel for task activities.
@@ -110,8 +91,8 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 	protected JTabbedPane createTabPanel()
 	{
 		JTabbedPane tabpane = new JTabbedPane();
-//		tabpane.addTab("Properties", proppanel);
 		tabpane.addTab("Parameters", createParameterPanel());
+		tabpane.insertTab("Task Settings", null, createSubprocessTypePanel(), null, 0);
 		return tabpane;
 	}
 	
@@ -148,6 +129,76 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 	/**
 	 * 
 	 */
+	protected JPanel createSubprocessTypePanel()
+	{
+		PropertiesPanel pp = new PropertiesPanel();
+		final JComboBox cb = pp.createComboBox("Multi instance: ", new String[]{MSubProcess.SUBPROCESSTYPE_NONE, MSubProcess.SUBPROCESSTYPE_SEQUENTIAL, MSubProcess.SUBPROCESSTYPE_PARALLEL});
+		cb.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+				String sel = (String)cb.getSelectedItem();
+				MSubProcess subp = (MSubProcess)getBpmnTask();
+				subp.setSubprocessType(sel);
+			}
+		});
+		
+		final ParameterTableModel m = (ParameterTableModel)atable.getModel();
+		String[] vals = new String[m.getRowCount()];
+		for(int i=0; i<m.getRowCount(); i++)
+		{
+			vals[i] = (String)m.getValueAt(i, -1);
+		}
+		final JComboBox pa = pp.createComboBox("Iterator parameter: ", vals);
+		m.addTableModelListener(new TableModelListener()
+		{
+			public void tableChanged(TableModelEvent e)
+			{
+				String[] vals = new String[m.getRowCount()];
+				for(int i=0; i<m.getRowCount(); i++)
+				{
+					vals[i] = (String)m.getValueAt(i, -1);
+				}
+				pa.removeAllItems();
+				for(String v: vals)
+				{
+					pa.addItem(v);
+				}
+			}
+		});
+		pa.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+				String sel = (String)pa.getSelectedItem();
+//				getBpmnTask().setPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR, new UnparsedExpression(null, "\""+sel+"\""));
+				getBpmnTask().setPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR, new UnparsedExpression(null, sel));
+			}
+		});
+		
+		MSubProcess subp = (MSubProcess)getBpmnTask();
+		if(subp.getSubprocessType()!=null)
+		{
+			cb.setSelectedItem(subp.getSubprocessType());
+		}
+		if(subp.getPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR)!=null)
+		{
+			UnparsedExpression uexp = subp.getPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR);
+			if(uexp.getValue()!=null)// && uexp.getValue().length()>2)
+			{
+				String ue = uexp.getValue();
+//				ue.substring(1);
+//				ue = ue.substring(0, ue.length()-1);
+				pa.setSelectedItem(ue);
+			}
+		}
+		
+		return pp;
+	}
+	
+	/**
+	 * 
+	 */
 	protected AddRemoveButtonPanel createButtonPanel()
 	{
 		Action addaction = new AbstractAction("Add Parameter")
@@ -168,181 +219,6 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 		};
 		return new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 	}
-	
-//	/**
-//	 * 
-//	 */
-//	protected JPanel createPropertyPanel(final ModelContainer container)
-//	{
-//		final ClassLoader cl = container.getProjectClassLoader()!=null? 
-//			container.getProjectClassLoader(): TaskPropertyPanel.class.getClassLoader();
-//		
-//		JPanel proppanel = new JPanel(new GridBagLayout());
-//		final JPanel propsp = new JPanel(new BorderLayout());
-//		JButton refresh = new JButton("Refresh");
-//		final ActionListener al = new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-////				System.out.println("pressed");
-//				
-//				propsp.removeAll();
-//				
-//				String taskname = getBpmnTask().getClazz() != null? getBpmnTask().getClazz().getTypeName() : null;
-//				TaskMetaInfo info = getTaskMetaInfo(taskname);
-//				List<PropertyMetaInfo> props = info!=null? info.getPropertyInfos(): null;
-//				
-//				if(props!=null)
-//				{					
-//					ClassInfo cinfo = info.getGuiClassInfo();
-//		
-//					if(cinfo!=null)
-//					{
-//						Class<?> clazz = cinfo.getType(cl);
-//						if(clazz!=null)
-//						{
-//							try
-//							{
-//								ITaskPropertyGui gui = (ITaskPropertyGui)clazz.newInstance();
-//								gui.init(container, getBpmnTask(), cl);
-//								JComponent comp = gui.getComponent();
-//								propsp.add(comp, BorderLayout.CENTER);
-//							}
-//							catch(Exception ex)
-//							{
-//								ex.printStackTrace();
-//							}
-//						}
-//					}
-//					else
-//					{
-//						final PropertiesPanel pp = new PropertiesPanel();
-//						IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
-//						for(final PropertyMetaInfo pmi: props)
-//						{
-//							String lab = pmi.getName();
-//							if(pmi.getClazz()!=null)
-//								lab += " ("+pmi.getClazz().getTypeName()+")";
-//							
-//							String valtxt = "";
-//							if(mprops!=null && mprops.containsKey(pmi.getName()))
-//							{
-//								MProperty mprop = mprops.get(pmi.getName());
-//								if(SJavaParser.evaluateExpression(mprop.getInitialValue().getValue(), null)!=null)
-//									valtxt = mprop.getInitialValue().getValue();
-//							}
-//							
-//							final JTextField tf = pp.createTextField(lab, valtxt, true, 0, pmi.getDescription().length()>0? pmi.getDescription(): null);
-//							tf.addActionListener(new ActionListener()
-//							{
-//								public void actionPerformed(ActionEvent e)
-//								{
-//									String val = tf.getText();
-//									if(val.length()>0)
-//									{
-//										IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
-//										MProperty mprop = mprops.get(pmi.getName());
-//										UnparsedExpression uexp = new UnparsedExpression(null, 
-//											pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), val, null);
-//										mprop.setInitialValue(uexp);
-//									}
-//								}
-//							});
-//						}
-//						propsp.add(pp, BorderLayout.CENTER);
-//					}
-//				}
-//			}
-//		};
-//		refresh.addActionListener(al);
-
-//		ActionListener alcbox = new AbstractAction()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-////				String taskname = (String) ((JComboBox)e.getSource()).getSelectedItem();
-//				ClassInfo taskcl = (ClassInfo)cbox.getSelectedItem();
-//				if(taskcl==null)
-//					return;
-//				
-//				String taskname = taskcl.getTypeName();
-//				
-//				// change task class
-//				getBpmnTask().setClazz(taskcl);
-//
-//				// and renew properties
-////				TaskMetaInfo info = getTaskMetaInfo(taskname);
-////				initTaskProperties(taskcl);
-//				
-//				IndexMap<String, MProperty> props = getBpmnTask().getProperties();
-//				if(props!=null)
-//					props.clear();
-//
-//				TaskMetaInfo info = getTaskMetaInfo(taskname);
-//				if(info!=null)
-//				{
-//					List<PropertyMetaInfo> pmis = info.getPropertyInfos();
-//					if(pmis!=null)
-//					{
-//						for(PropertyMetaInfo pmi: pmis)
-//						{
-//							UnparsedExpression uexp = new UnparsedExpression(null, 
-//								pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), pmi.getInitialValue(), null);
-//							MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
-//							getBpmnTask().addProperty(mprop);
-//						}
-//					}
-//					
-//					processTaskInfos(taskname, descarea);
-//					
-//					defaultParameterButton.setEnabled(getTaskMetaInfo(taskname) != null);
-//				}
-//				
-////						if(info!=null)
-////						{
-////							processTaskInfos(taskname, descarea);
-////							defaultParameterButton.setEnabled(getTaskMetaInfo(taskname) != null);
-////						}
-//				al.actionPerformed(null);
-//			}
-//		};
-//		cbox.addActionListener(alcbox);
-		
-		//addVerticalFiller(column, y);
-		
-//		proppanel.add(propsp, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, 
-//			GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
-//		
-//		return proppanel;
-//	}
-	
-//	/**
-//	 * 
-//	 */
-//	protected void initTaskProperties(ClassInfo taskcl)
-//	{
-//		if(taskcl==null)
-//			return;
-//		IndexMap<String, MProperty> props = getBpmnTask().getProperties();
-//		if(props!=null)
-//			props.clear();
-//
-//		TaskMetaInfo info = getTaskMetaInfo(taskcl.getTypeName());
-//		if(info!=null)
-//		{
-//			List<PropertyMetaInfo> pmis = info.getPropertyInfos();
-//			if(pmis!=null)
-//			{
-//				for(PropertyMetaInfo pmi: pmis)
-//				{
-//					UnparsedExpression uexp = new UnparsedExpression(null, 
-//						pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), pmi.getInitialValue(), null);
-//					MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
-//					getBpmnTask().addProperty(mprop);
-//				}
-//			}
-//		}
-//	}
 	
 	/**
 	 *  Gets the BPMN task.

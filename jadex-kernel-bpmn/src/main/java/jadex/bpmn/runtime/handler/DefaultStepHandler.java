@@ -15,7 +15,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -138,7 +137,7 @@ public class DefaultStepHandler implements IStepHandler
 						if(parent.getActivity() instanceof MSubProcess)
 						{
 							MSubProcess subp = (MSubProcess)parent.getActivity();
-							if(MSubProcess.SUBPROCESSTYPE_LOOPING.equals(subp.getSubprocessType())
+							if(MSubProcess.SUBPROCESSTYPE_SEQUENTIAL.equals(subp.getSubprocessType())
 								&& thread.getParent().getLoopCommand()!=null)
 							{
 								IResultCommand<Boolean, Void> cmd = thread.getParent().getLoopCommand();

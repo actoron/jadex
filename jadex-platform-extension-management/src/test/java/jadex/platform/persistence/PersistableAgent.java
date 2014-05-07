@@ -6,7 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -41,10 +41,10 @@ public class PersistableAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IComponentManagementService> fut = SServiceProvider.getService(agent.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		SServiceProvider.getService(agent.getServiceContainer(), IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IPersistenceService, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService result)
+			public void customResultAvailable(IPersistenceService result)
 			{
 				IFuture<IPersistInfo> fut = result.getPersistableState(agent.getComponentIdentifier());
 				fut.addResultListener(new IResultListener<IPersistInfo>()
