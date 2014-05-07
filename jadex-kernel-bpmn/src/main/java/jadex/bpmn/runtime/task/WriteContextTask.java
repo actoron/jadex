@@ -9,11 +9,15 @@ import jadex.bridge.IInternalAccess;
 /**
  *  Writes values to context variables.
  */
-@Task(description="The write context task can be used to write values to context variables.",
-	parameters={@TaskParameter(name="name", clazz=String.class, direction=TaskParameter.DIRECTION_IN,
-	description="The name of the context variable that is the target of the write operation."),
-	@TaskParameter(name="value", clazz=Object.class, direction=TaskParameter.DIRECTION_IN,
-	description="The value that is written to the context variable.")}
+@Task(description="The write context task can be used to write values to context variables.", parameters=
+	{
+		@TaskParameter(name="name", clazz=String.class, direction=TaskParameter.DIRECTION_IN,
+			description="The name of the context variable that is the target of the write operation."),
+		@TaskParameter(name="value", clazz=Object.class, direction=TaskParameter.DIRECTION_IN,
+			description="The value that is written to the context variable."),
+		@TaskParameter(name="key", clazz=Object.class, direction=TaskParameter.DIRECTION_IN,
+			description="The optional key if should be put in map.")
+	}
 )
 public class WriteContextTask extends AbstractTask
 {

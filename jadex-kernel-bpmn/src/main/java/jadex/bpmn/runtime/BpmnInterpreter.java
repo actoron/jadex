@@ -1444,6 +1444,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			{
 				((Map)coll).put(key, value);
 			}
+			else if(coll instanceof Set)
+			{
+				((Set)coll).add(value);
+			}
+//			System.out.println("coll: "+coll);
 			if(isres)
 			{
 				// Trigger event notification
