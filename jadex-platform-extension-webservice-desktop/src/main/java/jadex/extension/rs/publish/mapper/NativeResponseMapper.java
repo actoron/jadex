@@ -1,9 +1,7 @@
 package jadex.extension.rs.publish.mapper;
 
 import jadex.commons.SUtil;
-import jadex.extension.rs.publish.mapper.IValueMapper;
 
-import java.io.ByteArrayInputStream;
 import java.net.URI;
 
 import javax.ws.rs.core.Response;
