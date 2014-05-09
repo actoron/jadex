@@ -215,8 +215,8 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				MActivity act = ((MActivity) task.getBpmnElement());
-				if (externalcheckbox.isSelected())
+				MActivity act = ((MActivity)task.getBpmnElement());
+				if(externalcheckbox.isSelected())
 				{
 					UnparsedExpression exp = new UnparsedExpression("external", "java.lang.Boolean", "true", null);
 					act.setPropertyValue("external", exp);
@@ -228,10 +228,14 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 				
 			}
 		});
+		MActivity act = ((MActivity)task.getBpmnElement());
+		String ext = act.getPropertyValueString("external");
+		externalcheckbox.setSelected(ext!=null? Boolean.parseBoolean(ext): false);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.fill = GridBagConstraints.NONE;
 		cboxpanel.add(externalcheckbox);
+		
 		
 		configureAndAddInputLine(column, label, cboxpanel, y++, SUtil.createHashMap(new String[]{"second_fill"}, new Object[]{GridBagConstraints.HORIZONTAL}));
 		
