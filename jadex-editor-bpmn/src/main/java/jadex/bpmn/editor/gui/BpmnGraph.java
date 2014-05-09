@@ -6,6 +6,7 @@ import jadex.bpmn.editor.gui.layouts.LaneLayout;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VMessagingEdge;
@@ -238,7 +239,8 @@ public class BpmnGraph extends mxGraph
 		}
 		else if (cell instanceof VActivity &&
 				 ((VActivity) cell).getBpmnElement() != null &&
-				 MBpmnModel.TASK.equals(((MActivity) ((VActivity) cell).getBpmnElement()).getActivityType()))
+				 (cell instanceof VExternalSubProcess ||
+				 MBpmnModel.TASK.equals(((MActivity) ((VActivity) cell).getBpmnElement()).getActivityType())))
 		{
 			/* Tasks are never drop targets, even if they contain children, they will be all event handlers. */
 			ret = false;
