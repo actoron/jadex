@@ -161,7 +161,7 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 			
 			if(getBpmnTask().getProperties()==null || getBpmnTask().getProperties().size()==0)
 			{
-				TaskMetaInfo info = getTaskMetaInfo(getBpmnTask().getName());
+				TaskMetaInfo info = getTaskMetaInfo(getBpmnTask().getClazz().getTypeName());
 				if(info!=null)
 				{
 					List<PropertyMetaInfo> pmis = info.getPropertyInfos();

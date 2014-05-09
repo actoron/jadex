@@ -76,7 +76,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	/**
 	 *  Get the current state for snapshot or persistence.
 	 */
-	public IFuture<ServiceContainerPersistInfo>	getPersistInfo()
+	public ServiceContainerPersistInfo	getPersistInfo()
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -84,7 +84,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	/**
 	 *  Restore a container from a persited state,
 	 */
-	public IFuture<Void>	restore(ServiceContainerPersistInfo info)
+	public void	restore(ServiceContainerPersistInfo info)
 	{
 		throw new UnsupportedOperationException();
 	}

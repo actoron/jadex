@@ -1,4 +1,4 @@
-package jadex.kernelbase;
+package jadex.platform.service.persistence;
 
 import jadex.bridge.ComponentPersistedException;
 import jadex.bridge.IComponentIdentifier;
@@ -26,9 +26,9 @@ import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.MethodInfo;
@@ -66,7 +66,7 @@ public class ShadowAccess implements IExternalAccess
 	protected IServiceProvider	provider;
 	
 	/** The cms. */
-	protected IComponentManagementService	cms;
+	protected IPersistenceService	cms;
 	
 	//-------- constructors --------
 	
@@ -78,10 +78,10 @@ public class ShadowAccess implements IExternalAccess
 		this.access	= access;
 		this.provider	= new ShadowServiceProvider();
 		
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener<IComponentManagementService>()
+		SServiceProvider.getService(access.getServiceProvider(), IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<IPersistenceService>()
 		{
-			public void resultAvailable(IComponentManagementService cms)
+			public void resultAvailable(IPersistenceService cms)
 			{
 				ShadowAccess.this.cms	= cms;
 			}
@@ -831,12 +831,12 @@ public class ShadowAccess implements IExternalAccess
 			throw new UnsupportedOperationException();
 		}
 		
-		public IFuture<ServiceContainerPersistInfo>	getPersistInfo()
+		public ServiceContainerPersistInfo	getPersistInfo()
 		{
 			throw new UnsupportedOperationException();
 		}
 		
-		public IFuture<Void>	restore(ServiceContainerPersistInfo info)
+		public void	restore(ServiceContainerPersistInfo info)
 		{
 			throw new UnsupportedOperationException();
 		}

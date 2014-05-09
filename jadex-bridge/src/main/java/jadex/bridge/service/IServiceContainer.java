@@ -45,12 +45,12 @@ public interface IServiceContainer extends IServiceProvider
 	/**
 	 *  Get the current state for snapshot or persistence.
 	 */
-	public IFuture<ServiceContainerPersistInfo>	getPersistInfo();
+	public ServiceContainerPersistInfo	getPersistInfo();
 	
 	/**
 	 *  Restore a container from a persited state,
 	 */
-	public IFuture<Void>	restore(ServiceContainerPersistInfo info);
+	public void	restore(ServiceContainerPersistInfo info);
 	
 	/**
 	 *  Add a service to the container.

@@ -84,6 +84,9 @@ public class ComponentManagementService implements IComponentManagementService
 {
 	//-------- attributes --------
 	
+	/** Flag to avoid double initialization. */
+	protected boolean	running;
+	
 	/** The adapter factory. */
 	protected IComponentAdapterFactory adapterfactory;
 	
@@ -2540,25 +2543,6 @@ public class ComponentManagementService implements IComponentManagementService
 	}
 	
 	/**
-	 *  Gets the component state.
-	 *  
-	 *  @param cid The component.
-	 *  @return The component state.
-	 */
-	public IFuture<IPersistInfo> getPersistableState(IComponentIdentifier cid)
-	{
-		return new Future<IPersistInfo>(new UnsupportedOperationException("Jadex platform management extension addon required for enabling component persistence."));
-	}
-	
-	/**
-	 *  Resurrect a persisted component.
-	 */
-	public IFuture<Void>	resurrectComponent(IPersistInfo pi)
-	{
-		return new Future<Void>(new UnsupportedOperationException("Jadex platform management extension addon required for enabling component persistence."));
-	}
-
-	/**
 	 *  Get the component identifiers.
 	 *  @return The component identifiers.
 	 *  
@@ -2792,72 +2776,82 @@ public class ComponentManagementService implements IComponentManagementService
 	public IFuture<Void> startService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		
-		logger = agent.getLogger();
-		componentfactory.startService(agent, sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
+
+		if(!running)
 		{
-			public void customResultAvailable(Void result)
+			// Avoid double initialization from persistence service.
+			running	= true;
+		
+			logger = agent.getLogger();
+			componentfactory.startService(agent, sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				SServiceProvider.getService(agent.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
+				public void customResultAvailable(Void result)
 				{
-					public void customResultAvailable(IExecutionService result)
+					SServiceProvider.getService(agent.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
 					{
-						exeservice	= result;
-						
-//						SServiceProvider.getService(agent.getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
-//						{
-//							public void customResultAvailable(IMarshalService result)
-//							{
-//								marshalservice	= result;
-						
-								SServiceProvider.getService(agent.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(createResultListener(new IResultListener<IMessageService>()
-								{
-									public void resultAvailable(IMessageService result)
+						public void customResultAvailable(IExecutionService result)
+						{
+							exeservice	= result;
+							
+	//						SServiceProvider.getService(agent.getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+	//							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
+	//						{
+	//							public void customResultAvailable(IMarshalService result)
+	//							{
+	//								marshalservice	= result;
+							
+									SServiceProvider.getService(agent.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										.addResultListener(createResultListener(new IResultListener<IMessageService>()
 									{
-										msgservice	= result;
-										cont();
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										cont();
-									}
-									
-									protected void cont()
-									{
-										SServiceProvider.getService(agent.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-											.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+										public void resultAvailable(IMessageService result)
 										{
-											public void customResultAvailable(IClockService result)
-											{
-												clockservice	= result;
+											msgservice	= result;
+											cont();
+										}
 										
-												// add root adapter and register root component
-												if(root!=null)
+										public void exceptionOccurred(Exception exception)
+										{
+											cont();
+										}
+										
+										protected void cont()
+										{
+											SServiceProvider.getService(agent.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+											{
+												public void customResultAvailable(IClockService result)
 												{
-													getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+													clockservice	= result;
+											
+													// add root adapter and register root component
+													if(root!=null)
 													{
-														public void customResultAvailable(String[] addresses)
+														getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
 														{
-															((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(addresses);
-															adapters.put(root.getComponentIdentifier(), root);
-															ret.setResult(null);
-														}
-													}));
+															public void customResultAvailable(String[] addresses)
+															{
+																((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(addresses);
+																adapters.put(root.getComponentIdentifier(), root);
+																ret.setResult(null);
+															}
+														}));
+													}
 												}
-											}
-										});	
-									}
-								}));
-//							}
-//						}));
-					}
-				}));
-			}
-		});
+											});	
+										}
+									}));
+	//							}
+	//						}));
+						}
+					}));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}

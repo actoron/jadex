@@ -68,7 +68,10 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			
 			if(MSubProcess.SUBPROCESSTYPE_PARALLEL.equals(proc.getSubprocessType()))
 			{
-				Iterator<Object>	it	= SReflect.getIterator(thread.getPropertyValue("items"));
+				final String itername = proc.getPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR).getValue();
+				Object val = thread.getParameterValue(itername);
+				final Iterator<Object> it = SReflect.getIterator(val);
+				
 				// If empty parallel activity (i.e. no items at all) continue process.
 				if(!it.hasNext())
 				{
@@ -82,18 +85,21 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						for(int i=0; i<start.size(); i++)
 						{
 							ProcessThread subthread = new ProcessThread((MActivity)start.get(i), thread, instance);
-							subthread.setParameterValue("item", value);	// Hack!!! parameter not declared?
+							subthread.setParameterValue(itername, value);	// Hack!!! parameter not declared?
 							thread.addThread(subthread);
+//							System.out.println("val in t: "+subthread+" "+itername+"="+value);
 						}
 					}
 				}
 			}
 			
 			// Todo: support LOOPING in editor.
-			else if(MSubProcess.SUBPROCESSTYPE_LOOPING.equals(proc.getSubprocessType()) || thread.hasPropertyValue("items"))
+			else if(MSubProcess.SUBPROCESSTYPE_SEQUENTIAL.equals(proc.getSubprocessType()))// || thread.hasPropertyValue("items"))
 			{
 //				throw new UnsupportedOperationException("Looping subprocess not yet supported: "+activity+", "+instance);
-				final Iterator<Object> it = SReflect.getIterator(thread.getPropertyValue("items"));
+				final String itername = proc.getPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR).getValue();
+				Object val = thread.getParameterValue(itername);
+				final Iterator<Object> it = SReflect.getIterator(val);
 				// If empty looping activity (i.e. no items at all) continue process.
 				
 				IResultCommand<Boolean, Void> cmd = new IResultCommand<Boolean, Void>()
@@ -108,7 +114,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							{
 								ProcessThread subthread = new ProcessThread(st, thread, instance);
 								thread.addThread(subthread);
-								subthread.setParameterValue("item", elem);	// Hack!!! parameter not declared?
+								subthread.setParameterValue(itername, elem);	// Hack!!! parameter not declared?
 							}
 						}
 						return ret;

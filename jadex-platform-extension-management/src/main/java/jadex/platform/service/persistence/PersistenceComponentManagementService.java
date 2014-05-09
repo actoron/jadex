@@ -17,6 +17,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -27,7 +28,6 @@ import jadex.kernelbase.IBootstrapFactory;
 import jadex.platform.service.cms.ComponentAdapterFactory;
 import jadex.platform.service.cms.ComponentManagementService;
 import jadex.platform.service.cms.IntermediateResultListener;
-import jadex.platform.service.cms.StandaloneComponentAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +39,7 @@ import java.util.Set;
  *  CMS with additional persistence functionality.
  */
 @Service
-public class PersistenceComponentManagementService	extends ComponentManagementService
+public class PersistenceComponentManagementService	extends ComponentManagementService	implements IPersistenceService
 {
 	//-------- constants --------
 	
@@ -179,7 +179,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 								{
 									for(final IComponentIdentifier cid: persistables)
 									{
-										getComponentInstance(internalGetComponentAdapter(cid)).getPersistableState()
+										getPersistableState(cid)
 											.addResultListener(new IResultListener<IPersistInfo>()
 										{
 											public void resultAvailable(IPersistInfo pi)
@@ -235,17 +235,26 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	 *  @param cid The component.
 	 *  @return The component state.
 	 */
-	public IFuture<IPersistInfo> getPersistableState(IComponentIdentifier cid)
+	public IFuture<IPersistInfo> getPersistableState(final IComponentIdentifier cid)
 	{
 		final Future<IPersistInfo> ret = new Future<IPersistInfo>();
 		
-		final IComponentAdapter adapter = adapters.get(cid);
-		adapter.invokeLater(new Runnable()
+		getExternalAccess(cid)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IPersistInfo>(ret)
 		{
-			public void run()
+			public void customResultAvailable(IExternalAccess exta)
 			{
-				final IComponentInstance instance = ((StandaloneComponentAdapter)adapter).getComponentInstance();
-				instance.getPersistableState().addResultListener(new DelegationResultListener<IPersistInfo>(ret));
+				final IComponentInstance	instance	= getComponentInstance(internalGetComponentAdapter(cid));
+				
+				// Fetch persistable state on component thread.
+				exta.scheduleImmediate(new IComponentStep<IPersistInfo>()
+				{
+					public IFuture<IPersistInfo> execute(IInternalAccess ia)
+					{
+						return new Future<IPersistInfo>(instance.getPersistableState());
+					}
+				})
+					.addResultListener(new DelegationResultListener<IPersistInfo>(ret));
 			}
 		});
 		

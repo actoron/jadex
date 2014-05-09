@@ -17,10 +17,13 @@ public class MSubProcess extends MActivity
 	public static final String	SUBPROCESSTYPE_PARALLEL	= "parallel";
 	
 	/** The looping subprocess type. */
-	public static final String	SUBPROCESSTYPE_LOOPING	= "looping";
+	public static final String	SUBPROCESSTYPE_SEQUENTIAL = "sequential";
 	
 	/** The event subprocess type. */
 	public static final String	SUBPROCESSTYPE_EVENT	= "event";
+	
+	/** The name of the parameter identifying the multi instance iterator. */
+	public static final String	MULTIINSTANCE_ITERATOR = "iterator";
 	
 	//-------- attributes --------
 	
@@ -256,7 +259,7 @@ public class MSubProcess extends MActivity
 	{
 		assert SUBPROCESSTYPE_NONE.equals(subprocesstype)
 			|| SUBPROCESSTYPE_PARALLEL.equals(subprocesstype)
-			|| SUBPROCESSTYPE_LOOPING.equals(subprocesstype)
+			|| SUBPROCESSTYPE_SEQUENTIAL.equals(subprocesstype)
 			|| SUBPROCESSTYPE_EVENT.equals(subprocesstype) : subprocesstype+", "+this;
 
 		this.subprocesstype	= subprocesstype;

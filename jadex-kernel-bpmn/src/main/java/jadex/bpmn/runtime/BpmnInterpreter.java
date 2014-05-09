@@ -3,7 +3,6 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
-import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MNamedIdElement;
@@ -1007,24 +1006,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		Set<String>	bps	= new HashSet<String>(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
 		for(Iterator<ProcessThread> it=getTopLevelThread().getAllThreads().iterator(); !isatbreakpoint && it.hasNext(); )
 		{
-			if(it==null)
-			{
-				System.out.println("it null");
-			}
-			
 			ProcessThread	pt	= it.next();
-			
-			if(bps==null)
-			{
-				System.out.println("bps null");
-			}
-			if(pt==null)
-			{
-				System.out.println("pt null");
-			}
+
 			if(pt.getActivity()==null)
 			{
 				System.out.println("pt.getActivity() null");
+				System.out.println("Threads: "+getTopLevelThread().getAllThreads());
 			}
 			
 			isatbreakpoint	= bps.contains(pt.getActivity().getBreakpointId());
@@ -1457,6 +1444,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			{
 				((Map)coll).put(key, value);
 			}
+			else if(coll instanceof Set)
+			{
+				((Set)coll).add(value);
+			}
+//			System.out.println("coll: "+coll);
 			if(isres)
 			{
 				// Trigger event notification
@@ -1821,10 +1813,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	}
 
 	/**
-	 *  Create a persistable state holder to be filled asynchronously.
-	 *  @return The persistable state holder.
+	 *  Get the persistable state.
+	 *  @return The persistable state.
 	 */
-	public DefaultPersistInfo	createPersistInfo()
+	public DefaultPersistInfo	getPersistableState()
 	{
 		return new BpmnPersistInfo(this);
 	}

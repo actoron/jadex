@@ -543,19 +543,18 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 *  Get the current state for snapshot or persistence.
 	 */
-	public IFuture<ServiceContainerPersistInfo>	getPersistInfo()
+	public ServiceContainerPersistInfo	getPersistInfo()
 	{
-		return new Future<ServiceContainerPersistInfo>(new ServiceContainerPersistInfo(this));
+		return new ServiceContainerPersistInfo(this);
 	}
 	
 	/**
 	 *  Restore a container from a persited state,
 	 */
-	public IFuture<Void>	restore(ServiceContainerPersistInfo info)
+	public void	restore(ServiceContainerPersistInfo info)
 	{
 		// Todo...
 		this.started	= true;
-		return IFuture.DONE;
 	}
 	
 	/**

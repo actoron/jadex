@@ -1737,10 +1737,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 	
 	/**
-	 *  Create a persistable state holder to be filled asynchronously.
-	 *  @return The persistable state holder.
+	 *  Get the persistable state.
+	 *  @return The persistable state.
 	 */
-	public DefaultPersistInfo	createPersistInfo()
+	public DefaultPersistInfo	getPersistableState()
 	{
 		return new MicroAgentPersistInfo(this);
 	}
