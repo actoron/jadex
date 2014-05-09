@@ -5,6 +5,7 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -17,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Wrapper for executing a task on a worker agent.
+ *  Workers have to implement ITaskExecutionService.
  */
 public class ExternalTaskWrapper implements ITask
 {	
@@ -42,12 +44,14 @@ public class ExternalTaskWrapper implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(process.getServiceContainer(), ITaskExecutionService.class)
+		// todo: scope
+		SServiceProvider.getService(process.getServiceContainer(), ITaskExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ITaskExecutionService, Void>(ret)
 		{
 			public void customResultAvailable(ITaskExecutionService tes)
 			{
-				tes.execute(task, context).addResultListener(new DelegationResultListener<Void>(ret));
+				// todo: results
+				tes.execute(task, new ExternalTaskContext((ProcessThread)context)).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		
@@ -66,23 +70,25 @@ public class ExternalTaskWrapper implements ITask
 	}
 	
 	/**
-	 * 
+	 *  Transferrable context.
 	 */
 	public static class ExternalTaskContext implements ITaskContext
 	{
+		/** The parameter values flattened. */
 		protected Map<String, Object> params;
 		
+		/** The acticity. */
 		protected MActivity mactivity;
 		
 		/**
-		 * 
+		 *  Create a new context.
 		 */
 		public ExternalTaskContext()
 		{
 		}
 		
 		/**
-		 * 
+		 *  Create a new context.
 		 */
 		public ExternalTaskContext(ProcessThread thread)
 		{
@@ -94,31 +100,60 @@ public class ExternalTaskWrapper implements ITask
 			}
 		}
 		
+		/**
+		 *  Get the activity.
+		 *  @return The activity.
+		 */
 		public MActivity getActivity()
 		{
 			return mactivity;
 		}
 		
+		/**
+		 *  Get the modelelement.
+		 *  @return The modelelement.
+		 */
 		public MActivity getModelElement()
 		{
 			return mactivity;
 		}
 		
+		/**
+		 *  Get a parameter value.
+		 *  @param name The name.
+		 *  @return The object.
+		 */
 		public Object getParameterValue(String name)
 		{
 			return params.get(name);
 		}
 		
+		/**
+		 *  Get a property value.
+		 *  @param name The name.
+		 *  @return The object.
+		 */
 		public Object getPropertyValue(String name)
 		{
 			throw new UnsupportedOperationException();
 		}
 		
+		/**
+		 *  Test if context has a parameter.
+		 *  @param name The name.
+		 *  @return True, if has parameter.
+		 */
 		public boolean hasParameterValue(String name)
 		{
 			return params.containsKey(name);
 		}
 		
+		/**
+		 *  Set a parameter value.
+		 *  @param name The name.
+		 *  @param key The key.
+		 *  @param value The value.
+		 */
 		public void setParameterValue(String name, Object key, Object value)
 		{
 			if(params==null)
@@ -155,9 +190,41 @@ public class ExternalTaskWrapper implements ITask
 			}
 		}
 		
+		/**
+		 *  Set a parameter value.
+		 *  @param name The name.
+		 *  @param value The value.
+		 */
 		public void setParameterValue(String name, Object value)
 		{
 			params.put(name, value);
+		}
+
+		/**
+		 *  Get the params.
+		 *  @return The params.
+		 */
+		public Map<String, Object> getParameters()
+		{
+			return params;
+		}
+
+		/**
+		 *  Set the params.
+		 *  @param params The params to set.
+		 */
+		public void setParameters(Map<String, Object> params)
+		{
+			this.params = params;
+		}
+
+		/**
+		 *  Set the mactivity.
+		 *  @param mactivity The mactivity to set.
+		 */
+		public void setActivity(MActivity mactivity)
+		{
+			this.mactivity = mactivity;
 		}
 	}
 	

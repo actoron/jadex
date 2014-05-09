@@ -40,6 +40,13 @@ public class PojoTaskWrapper implements ITask
 	protected Map<String, FieldInfo> resinjections;
 	
 	/**
+	 *  Bean constructor.
+	 */
+	public PojoTaskWrapper()
+	{
+	}
+	
+	/**
 	 *  Create a new wrapper task.
 	 */
 	public PojoTaskWrapper(Object pojotask, IInternalAccess ia, ProcessThread thread, List<FieldInfo> cominjections, Map<String, 
@@ -310,4 +317,59 @@ public class PojoTaskWrapper implements ITask
 			}
 		}
 	}
+
+	/**
+	 *  Get the pojotask.
+	 *  @return The pojotask.
+	 */
+	public Object getPojoTask()
+	{
+		return pojotask;
+	}
+
+	/**
+	 *  Set the pojotask.
+	 *  @param pojotask The pojotask to set.
+	 */
+	public void setPojoTask(Object pojotask)
+	{
+		this.pojotask = pojotask;
+	}
+
+	/**
+	 *  Get the cancelmethod.
+	 *  @return The cancelmethod.
+	 */
+	public Method getCancelMethod()
+	{
+		return cancelmethod;
+	}
+
+	/**
+	 *  Set the cancelmethod.
+	 *  @param cancelmethod The cancelmethod to set.
+	 */
+	public void setCancelMethod(Method cancelmethod)
+	{
+		this.cancelmethod = cancelmethod;
+	}
+
+	/**
+	 *  Get the resinjections.
+	 *  @return The resinjections.
+	 */
+	public Map<String, FieldInfo> getResultInjections()
+	{
+		return resinjections;
+	}
+
+	/**
+	 *  Set the resinjections.
+	 *  @param resinjections The resinjections to set.
+	 */
+	public void setResultInjections(Map<String, FieldInfo> resinjections)
+	{
+		this.resinjections = resinjections;
+	}
+	
 }
