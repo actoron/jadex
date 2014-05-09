@@ -490,6 +490,26 @@ public class ProcessThread	implements ITaskContext
 	}
 	
 	/**
+	 *  Get the name of all parameters.
+	 *  @return The parameter names.
+	 */
+	public Set<String> getAllParameterNames()
+	{
+		Set<String> ret = new HashSet<String>();
+		ProcessThread pt = this;
+		while(pt!=null)
+		{
+			String[] names = getParameterNames();
+			for(String name: names)
+			{
+				ret.add(name);
+			}
+			pt = pt.getParent();
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get the value of a property.
 	 *  @param name	The property name. 
 	 *  @return	The property value. 

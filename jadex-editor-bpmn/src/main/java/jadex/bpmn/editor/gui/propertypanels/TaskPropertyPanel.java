@@ -208,7 +208,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			
 			if(getBpmnTask().getProperties()==null || getBpmnTask().getProperties().size()==0)
 			{
-				TaskMetaInfo info = getTaskMetaInfo(getBpmnTask().getName());
+				TaskMetaInfo info = getTaskMetaInfo(getBpmnTask().getClazz().getTypeName());
 				if(info!=null)
 				{
 					List<PropertyMetaInfo> pmis = info.getPropertyInfos();

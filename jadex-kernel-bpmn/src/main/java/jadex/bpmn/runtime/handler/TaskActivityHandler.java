@@ -4,6 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.exttask.ExternalTaskWrapper;
 import jadex.bpmn.runtime.task.PojoTaskWrapper;
 import jadex.commons.future.IResultListener;
 
@@ -37,8 +38,16 @@ public class TaskActivityHandler extends DefaultActivityHandler
 						activity.getArgumentInjections(instance.getClassLoader()), activity.getResultInjections(instance.getClassLoader()));
 				}
 				ITask task = (ITask)tmp;
+				
+				String ext = activity.getPropertyValueString("external");
+				if(ext!=null && Boolean.parseBoolean(ext))
+				{
+					task = new ExternalTaskWrapper(task);
+				}
+				
 				thread.setTask(task);
 				thread.setCanceled(false);
+				
 				// FIXME: Really bad! Some task use un-generified futures to return values in the callback
 				//		  despite Void-definition in interface.
 				task.execute(thread, instance).addResultListener(new IResultListener()
