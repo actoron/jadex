@@ -85,7 +85,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						for(int i=0; i<start.size(); i++)
 						{
 							ProcessThread subthread = new ProcessThread((MActivity)start.get(i), thread, instance);
-							subthread.setParameterValue(itername, value);	// Hack!!! parameter not declared?
+							subthread.setOrCreateParameterValue(itername, value);	// Hack!!! parameter not declared?
 							thread.addThread(subthread);
 //							System.out.println("val in t: "+subthread+" "+itername+"="+value);
 						}
@@ -114,7 +114,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							{
 								ProcessThread subthread = new ProcessThread(st, thread, instance);
 								thread.addThread(subthread);
-								subthread.setParameterValue(itername, elem);	// Hack!!! parameter not declared?
+								subthread.setOrCreateParameterValue(itername, elem); // Hack!!! parameter not declared?
 							}
 						}
 						return ret;
