@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>EvaluateProposalsRandom</jadex:modelname>
+    <jadex:description>&lt;h1&gt;Standard Proposal Evaluation Process&lt;/h1&gt; This process randomly selects some of the available proposals.</jadex:description>
+    <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:imports>
+      <jadex:import>java.util.Collection</jadex:import>
+    </jadex:imports>
+    <jadex:arguments>
+      <jadex:argument name="proposals" type="Collection">
+        <jadex:description>The proposals to be evaluated.</jadex:description>
+      </jadex:argument>
+    </jadex:arguments>
+    <jadex:results>
+      <jadex:result name="proposals" type="Collection">
+        <jadex:description>The proposals to be evaluated.</jadex:description>
+      </jadex:result>
+    </jadex:results>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_-CVGAVmxEd-CVtZr0hfiVg">
+    <semantic:subProcess name="For all Proposals" id="_WIdYgVmyEd-CVtZr0hfiVg">
+      <semantic:multiInstanceLoopCharacteristics isSequential="false" />
+      <semantic:task id="_WIdYg1myEd-CVtZr0hfiVg">
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.InvokeMethodTask</jadex:class>
+          <jadex:parameter direction="in" name="object" type="java.lang.Object">proposals</jadex:parameter>
+          <jadex:parameter direction="in" name="methodname" type="java.lang.String">&quot;setEvaluation&quot;</jadex:parameter>
+          <jadex:parameter direction="in" name="param" type="java.lang.Object">Math.random()&lt;0.5 ? Boolean.TRUE : Boolean.FALSE</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:extensionElements>
+        <jadex:parameter direction="inout" name="proposals" type="java.util.Collection">proposals</jadex:parameter>
+        <jadex:property name="items">proposals</jadex:property>
+        <jadex:property name="iterator">proposals</jadex:property>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_-CVGAVmxEd-CVtZr0hfiVg">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_WIdYgVmyEd-CVtZr0hfiVg" isExpanded="true">
+        <dc:Bounds height="200.0" width="480.0" x="450.0" y="280.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_WIdYg1myEd-CVtZr0hfiVg">
+        <dc:Bounds height="100.0" width="160.0" x="110.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

@@ -14,7 +14,7 @@
 	name="ContractNet" package="jadex.bpmn.examples.contractnet" autoshutdown="true">
 	
 	<componenttypes>
-		<componenttype name="CNPProtocol" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn"/>
+		<componenttype name="CNPProtocol" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn2"/>
 	</componenttypes>
 	
 	<configurations>
@@ -22,27 +22,27 @@
 			<components>
 				<component name="Participant_1"	type="CNPProtocol" configuration="Participant">
 					<arguments>
-						<argument name="mpp">"MakeProposalRandom.bpmn"</argument>
-						<argument name="erp">"ExecuteRequestRandom.bpmn"</argument>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
 					</arguments>
 				</component>
 				<component name="Participant_2"	type="CNPProtocol" configuration="Participant">
 					<arguments>
-						<argument name="mpp">"MakeProposalRandom.bpmn"</argument>
-						<argument name="erp">"ExecuteRequestRandom.bpmn"</argument>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
 					</arguments>
 				</component>
 				<component name="Participant_3"	type="CNPProtocol" configuration="Participant">
 					<arguments>
-						<argument name="mpp">"MakeProposalRandom.bpmn"</argument>
-						<argument name="erp">"ExecuteRequestRandom.bpmn"</argument>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
 					</arguments>
 				</component>
 				<component name="Initiator" type="CNPProtocol" configuration="Initiator">
 					<arguments>
 						<argument name="participants">new String[]{"Participant_1", "Participant_2", "Participant_3"}</argument>
 						<argument name="cfp">"Hello?"</argument>
-						<argument name="epp">"EvaluateProposalsRandom.bpmn"</argument>
+						<argument name="epp">"EvaluateProposalsRandom.bpmn2"</argument>
 					</arguments>
 				</component>
 			</components>
