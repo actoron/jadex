@@ -34,7 +34,6 @@ import jadex.commons.future.ISuspendable;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,7 +51,7 @@ import java.util.logging.SimpleFormatter;
 /**
  *  Base component adapter with reusable functionality for all platforms.
  */
-public abstract class AbstractComponentAdapter implements IComponentAdapter, IExecutable, Serializable
+public abstract class AbstractComponentAdapter implements IComponentAdapter, IExecutable
 {
 	//-------- attributes --------
 
@@ -588,14 +587,16 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
-//		if(getComponentIdentifier().toString().startsWith("Initiator"))
+		boolean	ret;
+		
+//		if(getComponentIdentifier().toString().startsWith("ExternalTask"))
 //		{
-//			System.out.println("Enter: "+getComponentIdentifier()+", "+System.currentTimeMillis());
+//			System.out.println("Enter: "+getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread().hashCode());
 //		}
 		
 		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(this));
 		
-		synchronized(this)
+//		synchronized(this)
 		{
 			if(executing)
 			{
@@ -614,11 +615,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		// component itself is currently running. I.e. it cannot be ensured easily
 		// that an execution task is enqueued and the component has terminated
 		// meanwhile.
-		boolean	ret;
 		if(!IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
 			if(exception!=null)
+			{
+				this.executing	= false;
 				return false;	// Component already failed: tell executor not to call again. (can happen during failed init)
+			}
 	
 			// Remember execution thread.
 			this.componentthread	= Thread.currentThread();
@@ -789,7 +792,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		executing	= false;
 		ISuspendable.SUSPENDABLE.set(null);
 
-//		if(getComponentIdentifier().toString().indexOf("GarbageCollector")!=-1)
+//		if(getComponentIdentifier().toString().indexOf("ExternalTask")!=-1)
 ////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
 //		{
 //			System.out.println("Leave: "+getComponentIdentifier()+", "+System.currentTimeMillis());
@@ -989,6 +992,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	protected void fatalError(final Exception e)
 	{
+//		if(getComponentIdentifier().toString().indexOf("ExternalTask")!=-1)
+//		{
+//			System.out.println("fatal error: "+getComponentIdentifier()+", "+System.currentTimeMillis());
+//		}
 //		e.printStackTrace();
 		getLogger().info("fatal error: "+getComponentIdentifier()+e.getMessage());
 		if(getComponentIdentifier().getParent()==null)
