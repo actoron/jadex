@@ -40,7 +40,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 35;
+	public static final int BUILD = 37;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -1378,6 +1378,8 @@ public class SBpmnModelWriter
 				out.print("\" ");
 			}
 			out.print("sourceRef=\"");
+			if (edge.getSource() == null)
+				System.out.println("IDD: " + edge.getId());
 			out.print(escapeString(edge.getSource().getId()));
 			out.print("\" targetRef=\"");
 			out.print(escapeString(edge.getTarget().getId()));

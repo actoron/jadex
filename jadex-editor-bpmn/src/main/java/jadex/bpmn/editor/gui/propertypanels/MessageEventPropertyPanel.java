@@ -355,6 +355,11 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 			return parametercache.size();
 		}
 		
+		public boolean isCellEditable(int rowIndex, int columnIndex)
+		{
+			return true;
+		}
+		
 		/**
 		 * 
 		 */

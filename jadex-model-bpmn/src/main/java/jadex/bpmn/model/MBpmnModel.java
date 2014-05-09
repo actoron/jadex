@@ -180,6 +180,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** The messaging edges. */
 	protected Map<String, MMessagingEdge> allmessagingedges;
 	
+	/** The data edges. */
+	protected Map<String, MDataEdge> alldataedges;
+	
 	//-------- added structures --------
 
 	/** The context variables (name -> [class, initexpression]). */
@@ -382,6 +385,58 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	//-------- helper init methods --------
 	
 	/**
+	 *  Get all edges.
+	 *  @return The edges (id -> edge).
+	 */
+	public Map<String, MEdge> getAllEdges()
+	{
+		Map<String, MEdge> edges = new HashMap<String, MEdge>();
+		Map<String, MSequenceEdge> seqedges = getAllSequenceEdges();
+		if (seqedges != null)
+			edges.putAll(seqedges);
+		Map<String, MMessagingEdge> mesedges = getAllMessagingEdges();
+		if (mesedges != null)
+			edges.putAll(mesedges);
+		Map<String, MDataEdge> datedges = getAllDataEdges();
+		if (datedges != null)
+			edges.putAll(datedges);
+		return edges;
+	}
+	
+	/**
+	 *  Get all data edges.
+	 *  @return The data edges (id -> edge).
+	 */
+	public Map<String, MDataEdge> getAllDataEdges()
+	{
+		if(this.alldataedges==null)
+		{
+			Map<String, MActivity> acts = getAllActivities();
+			for (MActivity act : acts.values())
+			{
+				List<MDataEdge> inde = act.getIncomingDataEdges();
+				List<MDataEdge> outde = act.getOutgoingDataEdges();
+				if (inde != null)
+				{
+					for (MDataEdge de : inde)
+					{
+						alldataedges.put(de.getId(), de);
+					}
+				}
+				if (outde != null)
+				{
+					for (MDataEdge de : outde)
+					{
+						alldataedges.put(de.getId(), de);
+					}
+				}
+			}
+		}
+		
+		return alldataedges;
+	}
+	
+	/**
 	 *  Get all message edges.
 	 *  @return The message edges (id -> edge).
 	 */
@@ -543,6 +598,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	protected void getAllEdges(MActivity act, Map<String, MSequenceEdge> edges)
 	{
 //		addEdges(sub.getSequenceEdges(), edges);
+		addEdges(act.getIncomingSequenceEdges(), edges);
 		addEdges(act.getOutgoingSequenceEdges(), edges);
 		
 		if(act instanceof MSubProcess)
@@ -1706,13 +1762,16 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/**
 	 *  Clears the model caches if stale.
 	 */
-	protected void clearCaches()
+	public void clearCaches()
 	{
 		allactivities = null;
 		eventsubprocessstartevents = null;
 		waitingevents = null;
 		typematchedstartevents = null;
 		parents = null;
+		alledges = null;
+		allmessagingedges = null;
+		alldataedges = null;
 	}
 	
 }

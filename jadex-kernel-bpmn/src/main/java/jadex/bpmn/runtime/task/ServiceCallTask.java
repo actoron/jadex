@@ -453,12 +453,13 @@ public class ServiceCallTask implements ITask
 //	}
 	
 	/**
-	 *  Compensate in case the task is canceled.
+	 *  Cancel the task.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
 	public IFuture<Void> cancel(IInternalAccess instance)
 	{
-		// Todo: how to compensate service call!?
+		// Todo: how to interrupt service call!?
+		// should call terminate if service call is terminable
 		return IFuture.DONE;
 	}
 	

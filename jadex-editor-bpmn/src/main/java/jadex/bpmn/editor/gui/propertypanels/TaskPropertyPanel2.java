@@ -1,8 +1,10 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.task.ITaskPropertyGui;
@@ -20,6 +22,7 @@ import jadex.javaparser.SJavaParser;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -33,6 +36,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -63,7 +67,7 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public TaskPropertyPanel2(final ModelContainer container, VActivity task, MParameter selectedparameter)
+	public TaskPropertyPanel2(final ModelContainer container, final VActivity task, MParameter selectedparameter)
 	{
 		super(container, task, selectedparameter);
 		
@@ -161,7 +165,7 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 			
 			if(getBpmnTask().getProperties()==null || getBpmnTask().getProperties().size()==0)
 			{
-				TaskMetaInfo info = getTaskMetaInfo(getBpmnTask().getName());
+				TaskMetaInfo info = getTaskMetaInfo(getBpmnTask().getClazz().getTypeName());
 				if(info!=null)
 				{
 					List<PropertyMetaInfo> pmis = info.getPropertyInfos();
@@ -200,13 +204,46 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 //		column.add(sel, new GridBagConstraints(2, y++, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 //			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
 		
-		configureAndAddInputLine(column, label, cbox, y++, SUtil.createHashMap(new String[]{"second_fill"}, new Object[]{GridBagConstraints.HORIZONTAL}));
+		JPanel cboxpanel = new JPanel(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.weightx = 1;
+		gc.fill = GridBagConstraints.HORIZONTAL;
+		cboxpanel.add(cbox, gc);
+		
+		final JCheckBox externalcheckbox = new JCheckBox();
+		externalcheckbox.setAction(new AbstractAction(BpmnEditor.getString("External"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				MActivity act = ((MActivity)task.getBpmnElement());
+				if(externalcheckbox.isSelected())
+				{
+					UnparsedExpression exp = new UnparsedExpression("external", "java.lang.Boolean", "true", null);
+					act.setPropertyValue("external", exp);
+				}
+				else
+				{
+					act.removeProperty("external");
+				}
+				
+			}
+		});
+		MActivity act = ((MActivity)task.getBpmnElement());
+		String ext = act.getPropertyValueString("external");
+		externalcheckbox.setSelected(ext!=null? Boolean.parseBoolean(ext): false);
+		gc = new GridBagConstraints();
+		gc.gridx = 1;
+		gc.fill = GridBagConstraints.NONE;
+		cboxpanel.add(externalcheckbox);
+		
+		
+		configureAndAddInputLine(column, label, cboxpanel, y++, SUtil.createHashMap(new String[]{"second_fill"}, new Object[]{GridBagConstraints.HORIZONTAL}));
 		
 		// Hack, side effect
 		descarea = new JEditorPane("text/html", "");
 		final JScrollPane descpane = new JScrollPane(descarea);
 		
-		GridBagConstraints gc = new GridBagConstraints();
+		gc = new GridBagConstraints();
 		gc.gridx = 0;
 		gc.gridy = y;
 		gc.gridwidth = 2;

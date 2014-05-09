@@ -432,7 +432,25 @@ public class ProcessThread	implements ITaskContext
 				pt.setParameterValue(name, key, value);
 			}
 		}
-			
+		else
+		{
+			setOrCreateParameterValue(name, key, value);
+		}
+	}
+
+	/**
+	 *  Set or create a parameter value directly in this thread.
+	 */
+	public void setOrCreateParameterValue(String name, Object value)
+	{
+		setOrCreateParameterValue(name, null, value);
+	}
+	
+	/**
+	 *  Set or create a parameter value directly in this thread.
+	 */
+	public void setOrCreateParameterValue(String name, Object key, Object value)
+	{
 		if(data==null)
 			data = new HashMap<String, Object>();
 		
@@ -460,13 +478,17 @@ public class ProcessThread	implements ITaskContext
 			{
 				((Map)coll).put(key, value);
 			}
+			else if(coll instanceof Set)
+			{
+				((Set)coll).add(value);
+			}
 //			else
 //			{
 //				throw new RuntimeException("Unsupported collection type: "+coll);
 //			}
 		}
 	}
-
+	
 	/**
 	 *  Remove the value of a parameter.
 	 *  @param name	The parameter name. 
@@ -487,6 +509,26 @@ public class ProcessThread	implements ITaskContext
 	public String[] getParameterNames()
 	{
 		return data!=null? (String[])data.keySet().toArray(new String[data.size()]): SUtil.EMPTY_STRING_ARRAY;
+	}
+	
+	/**
+	 *  Get the name of all parameters.
+	 *  @return The parameter names.
+	 */
+	public Set<String> getAllParameterNames()
+	{
+		Set<String> ret = new HashSet<String>();
+		ProcessThread pt = this;
+		while(pt!=null)
+		{
+			String[] names = getParameterNames();
+			for(String name: names)
+			{
+				ret.add(name);
+			}
+			pt = pt.getParent();
+		}
+		return ret;
 	}
 	
 	/**

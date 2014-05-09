@@ -8,6 +8,8 @@ import jadex.bpmn.model.MAssociation;
 import jadex.bpmn.model.MAssociationTarget;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
+import jadex.bpmn.model.MDataEdge;
+import jadex.bpmn.model.MEdge;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MNamedIdElement;
@@ -312,7 +314,7 @@ public class BpmnXMLReader
     protected static void cleanupModel(MBpmnModel model)
     {
     	// Clean model from duplicate activities
-		Map acts = model.getAllActivities();
+		Map<String, MActivity> acts = model.getAllActivities();
 		if(acts!=null)
 		{
 			for(MActivity act: (Collection<MActivity>)acts.values())
@@ -364,6 +366,47 @@ public class BpmnXMLReader
 				}
 			}
 		}
+		
+		Map<String, MEdge> edges = model.getAllEdges();
+		for (Map.Entry<String, MEdge> entry : edges.entrySet())
+		{
+			if (entry.getValue().getSource() == null ||
+				entry.getValue().getTarget() == null ||
+				entry.getValue().getId() == null)
+			{
+				if (entry.getValue() instanceof MSequenceEdge)
+				{
+					if (entry.getValue().getSource() != null)
+						entry.getValue().getSource().removeOutgoingSequenceEdge((MSequenceEdge) entry.getValue());
+					if (entry.getValue().getTarget() != null)
+						entry.getValue().getTarget().removeIncomingSequenceEdge((MSequenceEdge) entry.getValue());
+				}
+				else if (entry.getValue() instanceof MMessagingEdge)
+				{
+					if (entry.getValue().getSource() != null)
+						entry.getValue().getSource().removeOutgoingMessagingEdge((MMessagingEdge) entry.getValue());
+					
+					if (entry.getValue().getTarget() != null)
+						entry.getValue().getTarget().removeIncomingMessagingEdge((MMessagingEdge) entry.getValue());
+					
+					// Deep scan for really messed-up models.
+					if (acts != null)
+					{
+						for (Map.Entry<String, MActivity> aentry : acts.entrySet())
+						{
+							aentry.getValue().removeIncomingMessagingEdge((MMessagingEdge) entry.getValue());
+							aentry.getValue().removeOutgoingMessagingEdge((MMessagingEdge) entry.getValue());;
+						}
+					}
+//					
+					model.removeMessagingEdge((MMessagingEdge) entry.getValue());
+				}
+				System.out.println("Removing stray edge with ID " + String.valueOf(entry.getValue().getId()) +
+						   		   ", source: " + String.valueOf(entry.getValue().getSource()) +
+						   		   ", target: " + String.valueOf(entry.getValue().getTarget()));
+			}
+		}
+		model.clearCaches();
     }
     
 	/**

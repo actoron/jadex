@@ -506,6 +506,8 @@ public class BpmnEditorWindow extends JFrame
 			SCreationController.createPool(modelcontainer, new Point(50, 50));
 		}
 		
+		modelcontainer.generateClassLoader();
+		
 		return modelcontainer;
 	}
 	
