@@ -140,6 +140,7 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 				String sel = (String)cb.getSelectedItem();
 				MSubProcess subp = (MSubProcess)getBpmnTask();
 				subp.setSubprocessType(sel);
+				getModelContainer().setDirty(true);
 			}
 		});
 		
@@ -180,6 +181,7 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 //					getBpmnTask().setPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR, new UnparsedExpression(null, "\""+sel+"\""));
 					getBpmnTask().setPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR, new UnparsedExpression(null, sel));
 				}
+				getModelContainer().setDirty(true);
 			}
 		});
 		
@@ -187,6 +189,7 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 		if(subp.getSubprocessType()!=null)
 		{
 			cb.setSelectedItem(subp.getSubprocessType());
+			getModelContainer().setDirty(true);
 		}
 		if(subp.getPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR)!=null)
 		{
@@ -197,6 +200,7 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 //				ue.substring(1);
 //				ue = ue.substring(0, ue.length()-1);
 				pa.setSelectedItem(ue);
+				getModelContainer().setDirty(true);
 			}
 		}
 		
