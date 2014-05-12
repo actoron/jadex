@@ -854,7 +854,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		if(info==null)
 		{
 			Future<T> ret = new Future<T>();
-			ret.setException(new ServiceNotFoundException(name));
+			ret.setException(new ServiceNotFoundException(name+" in: "+id));
 			return ret;
 		}
 		else

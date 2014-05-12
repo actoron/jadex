@@ -144,20 +144,20 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 		});
 		
 		final ParameterTableModel m = (ParameterTableModel)atable.getModel();
-		String[] vals = new String[m.getRowCount()];
+		String[] vals = new String[m.getRowCount()+1];
 		for(int i=0; i<m.getRowCount(); i++)
 		{
-			vals[i] = (String)m.getValueAt(i, -1);
+			vals[i+1] = (String)m.getValueAt(i, -1);
 		}
 		final JComboBox pa = pp.createComboBox("Iterator parameter: ", vals);
 		m.addTableModelListener(new TableModelListener()
 		{
 			public void tableChanged(TableModelEvent e)
 			{
-				String[] vals = new String[m.getRowCount()];
+				String[] vals = new String[m.getRowCount()+1];
 				for(int i=0; i<m.getRowCount(); i++)
 				{
-					vals[i] = (String)m.getValueAt(i, -1);
+					vals[i+1] = (String)m.getValueAt(i, -1);
 				}
 				pa.removeAllItems();
 				for(String v: vals)
@@ -171,8 +171,15 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 			public void itemStateChanged(ItemEvent e)
 			{
 				String sel = (String)pa.getSelectedItem();
-//				getBpmnTask().setPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR, new UnparsedExpression(null, "\""+sel+"\""));
-				getBpmnTask().setPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR, new UnparsedExpression(null, sel));
+				if(sel==null)
+				{
+					getBpmnTask().removeProperty(MSubProcess.MULTIINSTANCE_ITERATOR);
+				}
+				else
+				{
+//					getBpmnTask().setPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR, new UnparsedExpression(null, "\""+sel+"\""));
+					getBpmnTask().setPropertyValue(MSubProcess.MULTIINSTANCE_ITERATOR, new UnparsedExpression(null, sel));
+				}
 			}
 		});
 		
