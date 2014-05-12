@@ -53,7 +53,7 @@ public class ParameterElementFilter implements IFilter, Serializable
 	{
 		if(values.containsKey(name))
 		{
-			values.remove(name, value);
+			values.removeObject(name, value);
 		}
 	}
 

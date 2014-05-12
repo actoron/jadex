@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /**
  *  Result listener that delegates calls to a future.
  */
-public abstract class ExceptionDelegationResultListener<E, T> implements IResultListener<E>, IFutureCommandListener
+public abstract class ExceptionDelegationResultListener<E, T> implements IResultListener<E>, IFutureCommandListener, IUndoneResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -27,6 +27,16 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	public ExceptionDelegationResultListener(Future<T> future)
 	{
 		this.future = future;
+//		this.ex	= new DebugException();
+	}
+	
+	/**
+	 *  Create a new listener.
+	 */
+	public ExceptionDelegationResultListener(Future<T> future, boolean undone)
+	{
+		this.future = future;
+		this.undone	= undone;
 //		this.ex	= new DebugException();
 	}
 	
@@ -82,9 +92,6 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	 * @param result The result.
 	 */
 	public abstract void customResultAvailable(E result);
-//	{
-//		future.setResult(result);
-//	}
 
 	/**
 	 *  Called when an exception occurred.
@@ -93,7 +100,14 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	public void exceptionOccurred(Exception exception)
 	{
 //		System.err.println("Problem: "+exception);
-		future.setException(exception);
+		if(undone)
+		{
+			future.setExceptionIfUndone(exception);
+		}
+		else
+		{
+			future.setException(exception);
+		}
 	}
 	
 	/**

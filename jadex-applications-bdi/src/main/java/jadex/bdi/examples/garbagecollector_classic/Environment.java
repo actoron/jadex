@@ -170,7 +170,7 @@ public class Environment
 			assert newpos.getY()>=0 && newpos.getY()<size;
 	
 			wo = getWorldObject(name);
-			pos_objects.remove(wo.getPosition(), wo);
+			pos_objects.removeObject(wo.getPosition(), wo);
 			getWorldObject(name).setPosition(newpos);
 			pos_objects.put(wo.getPosition(), wo);
 		}
@@ -240,7 +240,7 @@ public class Environment
 				//System.out.println("pickup: "+wo);
 				wo.setProperty(GARBAGE, garb);
 				name_objects.remove(garb.getName());
-				pos_objects.remove(pos, garb);
+				pos_objects.removeObject(pos, garb);
 				ret = true;
 				pcs.firePropertyChange("worldObjects", garb, null);
 			}

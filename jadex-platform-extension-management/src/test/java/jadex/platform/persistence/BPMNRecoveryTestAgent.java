@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  Agent that tests the rule and timer monitoring of events in bpmn processes.
+ *  Agent that tests snapshot and restore of a simple BPMN processes.
  */
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class BPMNPersistenceTestAgent
+public class BPMNRecoveryTestAgent
 {
 	/** The agent. */
 	@Agent
@@ -88,10 +88,10 @@ public class BPMNPersistenceTestAgent
 			System.out.println("Already running.");
 		}
 
-		IPersistInfo	info	= ps.getPersistableState(fut.getFirstResult()).get();
+		IPersistInfo	info	= ps.snapshot(fut.getFirstResult()).get();
 		exta.killComponent().get();
 
-		ps.resurrectComponent(info).get();
+		ps.restore(info).get();
 		
 		Future<Collection<Tuple2<String,Object>>>	cres	= new Future<Collection<Tuple2<String,Object>>>();
 		cms.addComponentResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres), fut.getFirstResult()).get();

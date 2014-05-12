@@ -232,7 +232,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 									{
 										for(Iterator it = affectedkernels.iterator(); it.hasNext(); )
 										{
-											kernellocationcache.remove(keys[i], it.next());
+											kernellocationcache.removeObject(keys[i], it.next());
 										}
 									}
 								}
@@ -864,7 +864,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					kernellocationcache.remove(kernelsext, kernelmodel);
+					kernellocationcache.removeObject(kernelsext, kernelmodel);
 					findKernelInCache(model, imports, rid, isrecur)
 						.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 				}

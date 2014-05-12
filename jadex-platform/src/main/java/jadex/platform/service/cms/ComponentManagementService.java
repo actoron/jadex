@@ -1802,7 +1802,7 @@ public class ComponentManagementService implements IComponentManagementService
      */
     public IFuture<Void> removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
     {
-		listeners.remove(comp, listener);
+		listeners.removeObject(comp, listener);
 		return IFuture.DONE;
     }
     
@@ -2303,12 +2303,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			if(cid.getParent()==null)
 //				System.out.println("getChildren: "+cid);
 			
-			IComponentIdentifier[] tmp;
-			CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
-//			System.out.println("desc: "+desc.getName()+" "+desc.hashCode());
-			tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
-			IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
-//			System.out.println(getServiceIdentifier()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
+			IComponentIdentifier[] tmp = internalGetChildren(cid);
 			ret.setResult(tmp);
 			
 			// Nice style to check for valid?
@@ -2330,6 +2325,20 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Get the children of a component.
+	 */
+	protected IComponentIdentifier[] internalGetChildren(final IComponentIdentifier cid)
+	{
+		IComponentIdentifier[] tmp;
+		CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+//			System.out.println("desc: "+desc.getName()+" "+desc.hashCode());
+		tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+			IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+//			System.out.println(getServiceIdentifier()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
+		return tmp;
 	}
 	
 //	/**

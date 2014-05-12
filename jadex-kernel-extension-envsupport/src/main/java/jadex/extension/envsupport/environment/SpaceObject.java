@@ -304,7 +304,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 		{
 			if(tasklisteners!=null)
 			{
-				tasklisteners.remove(taskid, listener);
+				tasklisteners.removeObject(taskid, listener);
 				
 				if(tasklisteners.isEmpty())
 					tasklisteners	= null;

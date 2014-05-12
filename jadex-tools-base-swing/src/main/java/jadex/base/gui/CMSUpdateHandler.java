@@ -193,7 +193,7 @@ public class CMSUpdateHandler
 					assert SwingUtilities.isEventDispatchThread();
 //					System.out.println("remove: "+cid+", "+listener+", "+this);
 					if(listeners!=null)
-						listeners.remove(cid, listener);
+						listeners.removeObject(cid, listener);
 					
 					if(futures!=null)	// Todo: why can be null?
 					{
@@ -233,7 +233,7 @@ public class CMSUpdateHandler
 		else if(listeners!=null)
 		{
 //			System.out.println("remove: "+cid+", "+listener+", "+this);
-			listeners.remove(cid, listener);
+			listeners.removeObject(cid, listener);
 			if(!listeners.containsKey(cid))
 			{
 				Future<Void>	fut	= new Future<Void>();
