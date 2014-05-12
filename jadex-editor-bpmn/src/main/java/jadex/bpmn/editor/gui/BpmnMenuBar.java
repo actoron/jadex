@@ -457,11 +457,11 @@ public class BpmnMenuBar extends JMenuBar
 				}
 				
 				BetterFileChooser fc = new BetterFileChooser(curfile);
-				FileFilter filter = new FileNameExtensionFilter(BpmnEditor.getString("BPMN model file"), "bpmn2");
+				FileFilter filter2 = new FileNameExtensionFilter(BpmnEditor.getString("BPMN model file"), "bpmn2");
+				fc.addChoosableFileFilter(filter2);
+				FileFilter filter = new FileNameExtensionFilter(BpmnEditor.getString("Legacy BPMN model file"), "bpmn");
 				fc.addChoosableFileFilter(filter);
-				fc.setFileFilter(filter);
-				filter = new FileNameExtensionFilter(BpmnEditor.getString("Legacy BPMN model file"), "bpmn");
-				fc.addChoosableFileFilter(filter);
+				fc.setFileFilter(filter2);
 				int result = fc.showOpenDialog(getParent());
 				if (JFileChooser.APPROVE_OPTION == result)
 				{
