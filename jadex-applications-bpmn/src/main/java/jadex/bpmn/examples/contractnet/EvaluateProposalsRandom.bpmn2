@@ -28,8 +28,9 @@
   </semantic:extension>
   <semantic:process name="Pool" id="_-CVGAVmxEd-CVtZr0hfiVg">
     <semantic:subProcess name="For all Proposals" id="_WIdYgVmyEd-CVtZr0hfiVg">
+      <semantic:outgoing>XaJUbFCCziArV4kG</semantic:outgoing>
       <semantic:multiInstanceLoopCharacteristics isSequential="false" />
-      <semantic:task id="_WIdYg1myEd-CVtZr0hfiVg">
+      <semantic:task name="Evaluate" id="_WIdYg1myEd-CVtZr0hfiVg">
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.InvokeMethodTask</jadex:class>
           <jadex:parameter direction="in" name="object" type="java.lang.Object">proposals</jadex:parameter>
@@ -43,21 +44,39 @@
         <jadex:property name="iterator">proposals</jadex:property>
       </semantic:extensionElements>
     </semantic:subProcess>
+    <semantic:task name="Set Result" id="f9JD/2hR8NiVkfcG">
+      <semantic:incoming>XaJUbFCCziArV4kG</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="java.lang.String">&quot;proposals&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="java.lang.Object"/>
+        <jadex:parameter direction="in" name="key" type="java.lang.Object"/>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:sequenceFlow sourceRef="_WIdYgVmyEd-CVtZr0hfiVg" targetRef="f9JD/2hR8NiVkfcG" id="XaJUbFCCziArV4kG">
+    </semantic:sequenceFlow>
     <semantic:extensionElements>
+      <jadex:dataFlow id="lnBroX1cs6Yubo+J" sourceRef="_WIdYgVmyEd-CVtZr0hfiVg" sourceParam="proposals" targetRef="f9JD/2hR8NiVkfcG" targetParam="value"/>
     </semantic:extensionElements>
   </semantic:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_-CVGAVmxEd-CVtZr0hfiVg">
-        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+        <dc:Bounds height="290.0" width="900.0" x="0.0" y="0.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_WIdYgVmyEd-CVtZr0hfiVg" isExpanded="true">
-        <dc:Bounds height="200.0" width="480.0" x="450.0" y="280.0"/>
-        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
+        <dc:Bounds height="200.0" width="480.0" x="80.0" y="50.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_WIdYg1myEd-CVtZr0hfiVg">
         <dc:Bounds height="100.0" width="160.0" x="110.0" y="50.0"/>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="f9JD/2hR8NiVkfcG">
+        <dc:Bounds height="100.0" width="160.0" x="650.0" y="100.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="XaJUbFCCziArV4kG">
+      </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="lnBroX1cs6Yubo+J">
+      </di:Edge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </semantic:definitions>

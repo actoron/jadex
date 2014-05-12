@@ -279,13 +279,15 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					{
 						public void intermediateResultAvailable(Tuple2<String, Object> result)
 						{
-							Map<String, Object> res = (Map<String, Object>)thread.getParameterValue("$results");
-							if(res==null)
-							{
-								res = new HashMap<String, Object>();
-								thread.setParameterValue("$results", res);
-							}
-							res.put(result.getFirstEntity(), result.getSecondEntity());
+							thread.setParameterValue(result.getFirstEntity(), result.getSecondEntity());
+							
+//							Map<String, Object> res = (Map<String, Object>)thread.getParameterValue("$results");
+//							if(res==null)
+//							{
+//								res = new HashMap<String, Object>();
+//								thread.setParameterValue("$results", res);
+//							}
+//							res.put(result.getFirstEntity(), result.getSecondEntity());
 //							System.out.println("inter: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
 							
 							List<MActivity> handlers = activity.getEventHandlers();
