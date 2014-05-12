@@ -204,7 +204,7 @@ public class Grid3D extends Space3D
 				if(objectsygridpos.containsKey(oldpos))
 				{
 //					System.out.println("remove: "+oldpos+" "+obj);
-					objectsygridpos.remove(oldpos, obj);
+					objectsygridpos.removeObject(oldpos, obj);
 				}
 			}
 			
@@ -253,7 +253,7 @@ public class Grid3D extends Space3D
 				if(pos!=null)
 				{
 					IVector3 fieldpos = new Vector3Int(pos.getXAsInteger(), pos.getYAsInteger(), pos.getZAsInteger());
-					objectsygridpos.remove(fieldpos, spaceobjects.get(id));
+					objectsygridpos.removeObject(fieldpos, spaceobjects.get(id));
 				}
 				super.destroySpaceObject(id);
 			}

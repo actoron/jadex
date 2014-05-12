@@ -147,10 +147,10 @@ public class TwoWayMultiCollection	extends MultiCollection
 	 *  Remove a special object from the 
 	 *  collection of a defined key.
 	 */
-	public void	remove(Object key, Object value)
+	public void	removeObject(Object key, Object value)
 	{
 		reverse._remove(value, key);
-		super.remove(key, value);
+		super.removeObject(key, value);
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class TwoWayMultiCollection	extends MultiCollection
 	 */
 	protected void _remove(Object key, Object value)
 	{
-		super.remove(key, value);
+		super.removeObject(key, value);
 	}
 }
 

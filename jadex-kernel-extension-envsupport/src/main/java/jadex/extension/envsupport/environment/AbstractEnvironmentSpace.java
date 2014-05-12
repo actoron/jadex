@@ -1996,7 +1996,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
-			this.avatarmappings.remove(mapping.getComponentType(), mapping);			
+			this.avatarmappings.removeObject(mapping.getComponentType(), mapping);			
 		}
 	}
 	
@@ -2443,7 +2443,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				Object[] tmp = (Object[])procs.get(i);
 				if(proc.equals(tmp[1]))
 				{
-					perceptprocessors.remove(componenttype, tmp);
+					perceptprocessors.removeObject(componenttype, tmp);
 					break;
 				}
 			}

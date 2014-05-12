@@ -219,7 +219,7 @@ public class Grid2D extends Space2D
 				if(objectsygridpos.containsKey(oldpos))
 				{
 	//				System.out.println("remove: "+oldpos+" "+obj);
-					objectsygridpos.remove(oldpos, obj);
+					objectsygridpos.removeObject(oldpos, obj);
 				}
 			}
 			
@@ -269,7 +269,7 @@ public class Grid2D extends Space2D
 				if(pos!=null)
 				{
 					IVector2 fieldpos = new Vector2Int(pos.getXAsInteger(), pos.getYAsInteger());
-					objectsygridpos.remove(fieldpos, spaceobjects.get(id));
+					objectsygridpos.removeObject(fieldpos, spaceobjects.get(id));
 				}
 				super.destroySpaceObject(id);
 				ret = true;
@@ -297,7 +297,7 @@ public class Grid2D extends Space2D
 				if(pos!=null)
 				{
 					IVector2 fieldpos = new Vector2Int(pos.getXAsInteger(), pos.getYAsInteger());
-					objectsygridpos.remove(fieldpos, spaceobjects.get(id));
+					objectsygridpos.removeObject(fieldpos, spaceobjects.get(id));
 				}
 				super.destroySpaceObject(id);
 			}

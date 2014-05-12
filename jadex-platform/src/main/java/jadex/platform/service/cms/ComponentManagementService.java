@@ -1802,7 +1802,7 @@ public class ComponentManagementService implements IComponentManagementService
      */
     public IFuture<Void> removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
     {
-		listeners.remove(comp, listener);
+		listeners.removeObject(comp, listener);
 		return IFuture.DONE;
     }
     

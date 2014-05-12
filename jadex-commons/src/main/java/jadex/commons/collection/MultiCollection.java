@@ -451,7 +451,7 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 *  Remove a special object from the 
 	 *  collection of a defined key.
 	 */
-	public void	remove(Object key, Object value)
+	public void	removeObject(Object key, Object value)
 	{
 		Collection coll	= (Collection)map.get(key);
 //		if(coll==null)

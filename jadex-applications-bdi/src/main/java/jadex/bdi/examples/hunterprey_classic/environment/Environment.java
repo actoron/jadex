@@ -364,7 +364,7 @@ public class Environment implements IEnvironment
 	 */
 	public boolean removeFood(Food nfood)
 	{
-		this.world.remove(nfood.getLocation(), nfood);
+		this.world.removeObject(nfood.getLocation(), nfood);
 		return this.food.remove(nfood);
 	}
 
@@ -384,7 +384,7 @@ public class Environment implements IEnvironment
 	 */
 	public boolean removeObstacle(Obstacle obstacle)
 	{
-		this.world.remove(obstacle.getLocation(), obstacle);
+		this.world.removeObject(obstacle.getLocation(), obstacle);
 		return this.obstacles.remove(obstacle);
 	}
 
@@ -444,7 +444,7 @@ public class Environment implements IEnvironment
 		}
 		this.pcs.firePropertyChange("taskSize", tasks, tasklist.size());
 		if(this.world.containsKey(creature.getLocation()))
-			this.world.remove(creature.getLocation(), creature);
+			this.world.removeObject(creature.getLocation(), creature);
 		return this.creatures.remove(creature)!=null;
 	}
 
@@ -575,7 +575,7 @@ public class Environment implements IEnvironment
 			// Move creature.
 			try
 			{
-				world.remove(me.getLocation(), me);
+				world.removeObject(me.getLocation(), me);
 				me.setLocation(newloc);
 				world.put(me.getLocation(), me);
 			}
