@@ -3,7 +3,6 @@ package jadex.platform.service.persistence;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.platform.service.cms.StandaloneComponentAdapter;
 
@@ -15,16 +14,11 @@ public class PersistentComponentAdapter extends StandaloneComponentAdapter
 {
 	//-------- attributes --------
 	
-	/** The cms. */
-	protected PersistenceComponentManagementService	cms;
+	/** The persistence service. */
+	protected PersistenceComponentManagementService	ps;
 	
-	/** The clock service. */
-	protected IClockService	clockservice;
-	
-	/** The time of the completion of the last step. */
-	protected long	laststep;
-	
-	/** Flag if the component is persistable. */
+	/** The active flag to avoid too many active/idle calls. */
+	protected boolean active;
 	
 	//-------- constructors --------
 	
@@ -32,11 +26,10 @@ public class PersistentComponentAdapter extends StandaloneComponentAdapter
 	 *  Create a component adapter.
 	 */
 	public PersistentComponentAdapter(IComponentDescription desc, IModelInfo model,
-		IComponentInstance component, IExternalAccess parent, PersistenceComponentManagementService cms, IClockService clockservice)
+		IComponentInstance component, IExternalAccess parent, PersistenceComponentManagementService ps)
 	{
 		super(desc, model, component, parent);
-		this.cms	= cms;
-		this.clockservice	= clockservice;
+		this.ps	= ps;
 	}
 	
 	//-------- methods --------
@@ -46,18 +39,17 @@ public class PersistentComponentAdapter extends StandaloneComponentAdapter
 	 */
 	public boolean execute()
 	{
-		cms.removeLRUComponent(getComponentIdentifier());
+		if(!active)
+		{
+			active	= true;
+			ps.componentActive(getComponentIdentifier());
+		}
 		boolean ret	= super.execute();
-		this.laststep	= clockservice.getTime();
-		cms.addLRUComponent(getComponentIdentifier());
+		if(!ret)
+		{
+			active	= false;
+			ps.componentIdle(getComponentIdentifier());
+		}
 		return ret;
-	}
-	
-	/**
-	 *  Get the time of the last step.
-	 */
-	public long	getLastStepTime()
-	{
-		return laststep;
 	}
 }

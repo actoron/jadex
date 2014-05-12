@@ -7,7 +7,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
@@ -28,7 +27,7 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.persistence.IPersistenceService;
+import jadex.bridge.service.types.persistence.ISwapService;
 import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.MethodInfo;
@@ -65,8 +64,8 @@ public class ShadowAccess implements IExternalAccess
 	/** The shadow service provider. */
 	protected IServiceProvider	provider;
 	
-	/** The cms. */
-	protected IPersistenceService	cms;
+	/** The swap service. */
+	protected ISwapService	swapservice;
 	
 	//-------- constructors --------
 	
@@ -78,18 +77,18 @@ public class ShadowAccess implements IExternalAccess
 		this.access	= access;
 		this.provider	= new ShadowServiceProvider();
 		
-		SServiceProvider.getService(access.getServiceProvider(), IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener<IPersistenceService>()
+		SServiceProvider.getService(access.getServiceProvider(), ISwapService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<ISwapService>()
 		{
-			public void resultAvailable(IPersistenceService cms)
+			public void resultAvailable(ISwapService swapservice)
 			{
-				ShadowAccess.this.cms	= cms;
+				ShadowAccess.this.swapservice	= swapservice;
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				Logger.getLogger(ShadowAccess.this.access.getComponentIdentifier().getName())
-					.severe("No CMS for "+ShadowAccess.this.access.getComponentIdentifier()+"!? "+exception);
+					.severe("No swap service for "+ShadowAccess.this.access.getComponentIdentifier()+"!? "+exception);
 			}
 		});
 	}
@@ -102,9 +101,7 @@ public class ShadowAccess implements IExternalAccess
 	 */
 	protected IFuture<Void>	resurrect()
 	{
-		// Todo: get persist info.
-		IPersistInfo	pi	= null;
-		return cms.resurrectComponent(pi);
+		return swapservice.swapFromStorage(getComponentIdentifier());
 	}
 	
 	//-------- IExternalAccess interface --------

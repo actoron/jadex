@@ -33,6 +33,16 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 	//-------- constructors --------
 	
 	/**
+	 *  Create a new collection listener that stops on failures.
+	 *  @param num The expected number of results.
+	 *  @param delegate	The delegate result listener.
+	 */
+	public CollectionResultListener(int num, IResultListener<Collection<E>> delegate)
+	{
+		this(num, false, delegate);
+	}
+	
+	/**
 	 *  Create a new collection listener.
 	 *  @param num The expected number of results.
 	 *  @param ignorefailures When set to true failures will be 
@@ -44,7 +54,7 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 		this.num = num;
 		this.ignorefailures	= ignorefailures;
 		this.delegate	= delegate;
-		this.results	= new ArrayList();
+		this.results	= new ArrayList<E>();
 //		System.out.println("CollectionResultListener: "+this+", "+num);
 		
 		if(num==0)

@@ -4,7 +4,6 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -13,9 +12,7 @@ import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFuture;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +22,7 @@ import java.util.Set;
  *  able to execute Jadex components without any 3rd party
  *  execution platform.
  */
-public class StandaloneComponentAdapter	extends AbstractComponentAdapter	implements IComponentAdapter, IExecutable, Serializable
+public class StandaloneComponentAdapter	extends AbstractComponentAdapter	implements IComponentAdapter, IExecutable
 {
 	//-------- attributes --------
 	
