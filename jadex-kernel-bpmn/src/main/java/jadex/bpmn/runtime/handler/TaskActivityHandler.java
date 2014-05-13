@@ -71,8 +71,18 @@ public class TaskActivityHandler extends DefaultActivityHandler
 			}
 			catch(Exception e)
 			{
-				thread.setException(e);
-				instance.notify(activity, thread, null);
+				if(thread.getException()==null)
+				{
+					thread.setException(e);
+					instance.notify(activity, thread, null);
+				}
+				else
+				{
+					// Hack!!! Rethrow exception when task.execute() is synchronous
+					// and instance.notify() throws exception due to no suitable exception  handlers in BPMN.
+					throw thread.getException() instanceof RuntimeException
+						? (RuntimeException)thread.getException() : new RuntimeException(thread.getException());
+				}
 			}
 		}
 		else

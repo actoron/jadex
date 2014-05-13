@@ -88,6 +88,7 @@
           <jadex:class>jadex.bpmn.runtime.task.InvokeMethodTask</jadex:class>
           <jadex:parameter direction="in" name="object" type="java.lang.Object">proposals</jadex:parameter>
           <jadex:parameter direction="in" name="methodname" type="java.lang.String">&quot;add&quot;</jadex:parameter>
+          <jadex:parameter direction="in" name="param" type="java.lang.Object">new ParticipantProposal($event.getValue(&quot;sender&quot;), $event.getValue(&quot;content&quot;))</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
       <semantic:intermediateCatchEvent id="_NmBZcVapEd-1RJ7RXx1qjA">
@@ -150,7 +151,7 @@
           <jadex:property name="protocol">&quot;fipa-contract-net&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:intermediateThrowEvent>
-      <semantic:exclusiveGateway id="_q-MCwVaoEd-1RJ7RXx1qjA" default="_sCuo-laoEd-1RJ7RXx1qjA">
+      <semantic:exclusiveGateway name="accept?" id="_q-MCwVaoEd-1RJ7RXx1qjA" default="_sCuo-laoEd-1RJ7RXx1qjA">
         <semantic:incoming>_q-MCylaoEd-1RJ7RXx1qjA</semantic:incoming>
         <semantic:outgoing>_sCuo-laoEd-1RJ7RXx1qjA</semantic:outgoing>
         <semantic:outgoing>_ulJiYVaoEd-1RJ7RXx1qjA</semantic:outgoing>
@@ -178,6 +179,7 @@
       <semantic:extensionElements>
         <jadex:parameter direction="inout" name="proposals" type="Set">proposals</jadex:parameter>
         <jadex:parameter direction="inout" name="accepted" type="Set">new LinkedHashSet()</jadex:parameter>
+        <jadex:property name="iterator">proposals</jadex:property>
       </semantic:extensionElements>
     </semantic:subProcess>
     <semantic:subProcess name="Evaluate Proposals" id="_LSKZ0VmxEd-CVtZr0hfiVg">
@@ -222,6 +224,7 @@
       </semantic:intermediateCatchEvent>
       <semantic:extensionElements>
         <jadex:parameter direction="inout" name="accepted" type="Set">accepted</jadex:parameter>
+        <jadex:property name="iterator">accepted</jadex:property>
       </semantic:extensionElements>
     </semantic:subProcess>
     <semantic:boundaryEvent id="_AhyfYVavEd-1RJ7RXx1qjA" attachedToRef="_pv3uIVarEd-1RJ7RXx1qjA">
@@ -268,7 +271,7 @@
     <semantic:sequenceFlow sourceRef="_q-MCwVaoEd-1RJ7RXx1qjA" targetRef="_sCuo8VaoEd-1RJ7RXx1qjA" id="_sCuo-laoEd-1RJ7RXx1qjA">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_q-MCwVaoEd-1RJ7RXx1qjA" targetRef="_uk_xYVaoEd-1RJ7RXx1qjA" id="_ulJiYVaoEd-1RJ7RXx1qjA">
-      <semantic:conditionExpression>item.getEvaluation()!=null &amp;&amp; ((Boolean)item.getEvaluation()).booleanValue()</semantic:conditionExpression>
+      <semantic:conditionExpression>proposals.getEvaluation()!=null &amp;&amp; ((Boolean)proposals.getEvaluation()).booleanValue()</semantic:conditionExpression>
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_LSKZ0VmxEd-CVtZr0hfiVg" targetRef="_oPQXUVaoEd-1RJ7RXx1qjA" id="_3S3gcVaoEd-1RJ7RXx1qjA">
     </semantic:sequenceFlow>
@@ -283,6 +286,7 @@
     <semantic:sequenceFlow sourceRef="_AhyfYVavEd-1RJ7RXx1qjA" targetRef="_mSCYgVavEd-1RJ7RXx1qjA" id="_mSCYilavEd-1RJ7RXx1qjA">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
+      <jadex:dataFlow id="0WzC5fzPbyvOGKls" sourceRef="_oPQXUVaoEd-1RJ7RXx1qjA" sourceParam="proposals" targetRef="_pv3uIVarEd-1RJ7RXx1qjA" targetParam="accepted"/>
     </semantic:extensionElements>
   </semantic:process>
   <semantic:process name="Participant" id="_mTY88VT6Ed-32983CGnnJA">
@@ -634,6 +638,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_3S3gcVaoEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="0WzC5fzPbyvOGKls">
+      </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="_3XYM-lT7Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_3XYM-lT7Ed-32983CGnnJA">
