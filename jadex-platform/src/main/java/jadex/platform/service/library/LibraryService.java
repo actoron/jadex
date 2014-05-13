@@ -194,7 +194,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<IResourceIdentifier> addResourceIdentifier(final IResourceIdentifier parid,
 		final IResourceIdentifier orid, final boolean workspace)
 	{
-		System.out.println("adding: "+orid+" on: "+parid);
+//		System.out.println("adding: "+orid+" on: "+parid);
 
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 
