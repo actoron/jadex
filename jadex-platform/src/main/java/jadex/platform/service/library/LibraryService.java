@@ -194,7 +194,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<IResourceIdentifier> addResourceIdentifier(final IResourceIdentifier parid,
 		final IResourceIdentifier orid, final boolean workspace)
 	{
-//		System.out.println("adding: "+orid+" on: "+parid);
+		System.out.println("adding: "+orid+" on: "+parid);
 
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 
@@ -663,6 +663,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		if(isLocal(rid) && getInternalNonManagedURLs().contains(SUtil.toURI0(rid.getLocalIdentifier().getUrl())))
 		{
 			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
+			notifyAdditionListeners(support, rid);
 		}
 		else if(clfuts.containsKey(rid))
 		{
@@ -910,6 +911,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		for(int i=0; i<lis.length; i++)
 		{
 			final ILibraryServiceListener liscopy = lis[i];
+//			System.out.println("added: "+parid+" "+rid);
 			lis[i].resourceIdentifierAdded(parid, rid, rem).addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
@@ -1307,7 +1309,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<Properties> getProperties()
 	{
-		Properties props	= new Properties();
+		Properties props = new Properties();
 		
 		for(Tuple2<IResourceIdentifier, IResourceIdentifier> link: addedlinks)
 		{

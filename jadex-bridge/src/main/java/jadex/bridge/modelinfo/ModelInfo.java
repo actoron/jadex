@@ -622,6 +622,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void setResourceIdentifier(IResourceIdentifier rid)
 	{
+//		System.out.println("rid: "+rid+" "+getName());
 		this.rid = rid;
 	}
 
