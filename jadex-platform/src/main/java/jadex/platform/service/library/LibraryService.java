@@ -194,11 +194,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<IResourceIdentifier> addResourceIdentifier(final IResourceIdentifier parid,
 		final IResourceIdentifier orid, final boolean workspace)
 	{
-		System.out.println("adding: "+orid+" on: "+parid);
+//		System.out.println("adding: "+orid+" on: "+parid);
 
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 
-		if(parid!=null && !rootloader.getAllResourceIdentifiers().contains(parid))
+//		if(parid!=null && !rootloader.getAllResourceIdentifiers().contains(parid))
+		if(parid!=null && !internalgetAllResourceIdentifiers().contains(parid))
 		{
 			ret.setException(new RuntimeException("Parent rid unknown: "+parid));
 		}
@@ -277,7 +278,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 //		System.out.println("remove "+rid);
 		final Future<Void> ret = new Future<Void>();
 		
-		if(parid!=null && !rootloader.getAllResourceIdentifiers().contains(parid))
+//		if(parid!=null && !rootloader.getAllResourceIdentifiers().contains(parid))
+		if(parid!=null && !internalgetAllResourceIdentifiers().contains(parid))
 		{
 			ret.setException(new RuntimeException("Parent rid unknown: "+parid));
 		}
@@ -307,60 +309,116 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<List<IResourceIdentifier>> getAllResourceIdentifiers()
 	{
-		return new Future<List<IResourceIdentifier>>(new ArrayList<IResourceIdentifier>(rootloader.getAllResourceIdentifiers()));
+		return new Future<List<IResourceIdentifier>>(new ArrayList<IResourceIdentifier>(internalgetAllResourceIdentifiers()));
+//		return new Future<List<IResourceIdentifier>>(new ArrayList<IResourceIdentifier>(rootloader.getAllResourceIdentifiers()));
 	}
+	
+	// This implementation is incorrect as not for all added rids classloaders are created (if already managed by base loader)
+//	/**
+//	 *  Get the rids.
+//	 */
+//	public IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> getResourceIdentifiers()
+//	{
+//		if(rids==null)
+//		{
+//			Map<IResourceIdentifier, List<IResourceIdentifier>> deps = new HashMap<IResourceIdentifier, List<IResourceIdentifier>>();
+//			
+//			List<IResourceIdentifier> todo = new ArrayList<IResourceIdentifier>();
+////			todo.add(rootloader.getResourceIdentifier());
+//			todo.add(null);
+//			
+//			while(!todo.isEmpty())
+//			{
+//				IResourceIdentifier clrid = todo.remove(0);
+//				if(SYSTEMCPRID.equals(clrid))
+//				{
+//					List<IResourceIdentifier> mydeps = new ArrayList<IResourceIdentifier>();
+//					Set<URI> nonmans = getInternalNonManagedURLs();
+//					for(URI uri: nonmans)
+//					{
+//						URL url = SUtil.toURL0(uri);
+//						if(url!=null)
+//							mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null));
+//					}
+//					deps.put(clrid, mydeps);
+//				}
+//				else
+//				{
+//					DelegationURLClassLoader cl = clrid==null? rootloader: classloaders.get(clrid);
+//					List<IResourceIdentifier> mydeps = cl.getDelegateResourceIdentifiers();
+//					deps.put(clrid, mydeps);
+//					if(clrid==null)
+//					{
+//						mydeps.add(SYSTEMCPRID);
+//					}
+//					for(IResourceIdentifier rid: mydeps)
+//					{
+//						if(!deps.containsKey(rid))
+//						{
+//							todo.add(rid);
+//						}
+//					}
+//				}
+//			}
+//			
+//			rids = new Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>(rootloader.getResourceIdentifier(), deps);
+//		}
+//		
+//		return new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(rids);
+//	}
 	
 	/**
 	 *  Get the rids.
 	 */
 	public IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> getResourceIdentifiers()
 	{
+		return new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(internalGetResourceIdentifiers());
+	}
+	
+	/**
+	 * 
+	 */
+	public Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> internalGetResourceIdentifiers()
+	{
 		if(rids==null)
 		{
 			Map<IResourceIdentifier, List<IResourceIdentifier>> deps = new HashMap<IResourceIdentifier, List<IResourceIdentifier>>();
+
+			// rootloader rid
+			List<IResourceIdentifier> mydeps = rootloader.getDelegateResourceIdentifiers();
+			deps.put(null, mydeps);
+			mydeps.add(SYSTEMCPRID);
 			
-			List<IResourceIdentifier> todo = new ArrayList<IResourceIdentifier>();
-//			todo.add(rootloader.getResourceIdentifier());
-			todo.add(null);
-			
-			while(!todo.isEmpty())
+			// baseloader rid
+			mydeps = new ArrayList<IResourceIdentifier>();
+			Set<URI> nonmans = getInternalNonManagedURLs();
+			for(URI uri: nonmans)
 			{
-				IResourceIdentifier clrid = todo.remove(0);
-				if(SYSTEMCPRID.equals(clrid))
+				URL url = SUtil.toURL0(uri);
+				if(url!=null)
+					mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null));
+			}
+			deps.put(SYSTEMCPRID, mydeps);
+			
+			// other rids
+			for(Tuple2<IResourceIdentifier, IResourceIdentifier> link: addedlinks)
+			{
+				mydeps = deps.get(link.getFirstEntity());
+				if(mydeps==null)
 				{
-					List<IResourceIdentifier> mydeps = new ArrayList<IResourceIdentifier>();
-					Set<URI> nonmans = getInternalNonManagedURLs();
-					for(URI uri: nonmans)
-					{
-						URL url = SUtil.toURL0(uri);
-						if(url!=null)
-							mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null));
-					}
-					deps.put(clrid, mydeps);
+					mydeps = new ArrayList<IResourceIdentifier>();
+					deps.put(link.getFirstEntity(), mydeps);
 				}
-				else
+				if(!mydeps.contains(link.getSecondEntity()))
 				{
-					DelegationURLClassLoader cl = clrid==null? rootloader: classloaders.get(clrid);
-					List<IResourceIdentifier> mydeps = cl.getDelegateResourceIdentifiers();
-					deps.put(clrid, mydeps);
-					if(clrid==null)
-					{
-						mydeps.add(SYSTEMCPRID);
-					}
-					for(IResourceIdentifier rid: mydeps)
-					{
-						if(!deps.containsKey(rid))
-						{
-							todo.add(rid);
-						}
-					}
+					mydeps.add(link.getSecondEntity());
 				}
 			}
 			
 			rids = new Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>(rootloader.getResourceIdentifier(), deps);
 		}
 		
-		return new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(rids);
+		return rids;
 	}
 	
 	/**
@@ -1282,7 +1340,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 			else
 			{
-				if(a==null || rootloader.getAllResourceIdentifiers().contains(a))
+//				if(a==null || rootloader.getAllResourceIdentifiers().contains(a))
+				if(a==null || internalgetAllResourceIdentifiers().contains(a))
 				{
 					todo.add(new Tuple2<IResourceIdentifier, IResourceIdentifier>(a, b));
 				}
@@ -1408,6 +1467,23 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Get all managed resource identifiers inlcuding all subdependencies.
+	 *  @return The resource identifiers.
+	 */
+	public Set<IResourceIdentifier> internalgetAllResourceIdentifiers()
+	{
+		Set<IResourceIdentifier> ret = new HashSet<IResourceIdentifier>();
+		Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> all = internalGetResourceIdentifiers();
+		for(Map.Entry<IResourceIdentifier, List<IResourceIdentifier>> entry: all.getSecondEntity().entrySet())
+		{
+			ret.add(entry.getKey());
+			ret.addAll(entry.getValue());
+		}
+		ret.remove(null);
 		return ret;
 	}
 }
