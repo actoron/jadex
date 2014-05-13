@@ -194,7 +194,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<IResourceIdentifier> addResourceIdentifier(final IResourceIdentifier parid,
 		final IResourceIdentifier orid, final boolean workspace)
 	{
-//		System.out.println("adding: "+orid+" on: "+parid);
+		System.out.println("adding: "+orid+" on: "+parid);
 
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 
@@ -827,6 +827,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		classloaders.put(rid, cl);
 		// Add also local rid to ensure that classloader will be found for these searches as well
 		if(rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
+//		if(rid.getGlobalIdentifier()==null && rid.getLocalIdentifier()!=null)
 		{
 			IResourceIdentifier localrid = ResourceIdentifier.getLocalResourceIdentifier(rid);
 			if(localrid!=null)
@@ -908,8 +909,14 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			throw new IllegalArgumentException("Rid must not null.");
 				
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
+		// special case that parid is local and already handled by baseloader
+		if(pacl==null && isLocal(parid) && getInternalNonManagedURLs().contains(SUtil.toURI0(parid.getLocalIdentifier().getUrl())))
+		{
+			pacl = rootloader;
+		}
 		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
 		pacl.addDelegateClassLoader(cl);
+		
 		if(cl.addParentClassLoader(pacl))
 		{
 			rids = null;
@@ -937,6 +944,11 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			throw new IllegalArgumentException("Rid must not null.");
 
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
+		// special case that parid is local and already handled by baseloader
+		if(pacl==null && isLocal(parid) && getInternalNonManagedURLs().contains(SUtil.toURI0(parid.getLocalIdentifier().getUrl())))
+		{
+			pacl = rootloader;
+		}
 		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
 		pacl.removeDelegateClassLoader(cl);
 		if(cl.removeParentClassLoader(pacl))

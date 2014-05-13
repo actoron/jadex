@@ -119,7 +119,9 @@ public class ResourceIdentifier implements IResourceIdentifier
 	public static IResourceIdentifier getLocalResourceIdentifier(IResourceIdentifier rid)
 	{
 		IResourceIdentifier ret = null;
+		// why check that global is not null???
 		if(rid!=null && rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
+//		if(rid!=null && rid.getLocalIdentifier()!=null)
 		{
 			ret = new ResourceIdentifier(rid.getLocalIdentifier(), null);
 		}
