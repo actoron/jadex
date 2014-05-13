@@ -29,6 +29,8 @@ import jadex.commons.collection.IndexMap;
 import jadex.commons.gui.autocombo.AutoComboTableCellEditor;
 import jadex.commons.gui.autocombo.AutoComboTableCellRenderer;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.ClassInfoComboBoxRenderer;
+import jadex.commons.gui.autocombo.ComboBoxEditor;
 import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
 import java.awt.BorderLayout;
@@ -707,6 +709,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
 		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getAllClasses());
 		acc.setModel(accm);
+		acc.setEditor(new ComboBoxEditor(accm));
+		acc.setRenderer(new ClassInfoComboBoxRenderer());
 		TableColumn col = paramtable.getColumnModel().getColumn(4);
 		col.setCellEditor(new AutoComboTableCellEditor(acc));
 		col.setCellRenderer(new AutoComboTableCellRenderer(acc));
@@ -854,6 +858,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
 		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getAllClasses());
 		acc.setModel(accm);
+		acc.setEditor(new ComboBoxEditor(accm));
+		acc.setRenderer(new ClassInfoComboBoxRenderer());
 		TableColumn col = proptable.getColumnModel().getColumn(1);
 		col.setCellEditor(new AutoComboTableCellEditor(acc));
 		col.setCellRenderer(new AutoComboTableCellRenderer(acc));
@@ -950,6 +956,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
 		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getInterfaces());
 		acc.setModel(accm);
+		acc.setEditor(new ComboBoxEditor(accm));
+		acc.setRenderer(new ClassInfoComboBoxRenderer());
 		TableColumn col = pstable.getColumnModel().getColumn(1);
 		col.setCellEditor(new AutoComboTableCellEditor(acc));
 		col.setCellRenderer(new AutoComboTableCellRenderer(acc));
@@ -957,6 +965,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		final AutoCompleteCombo acc2 = new AutoCompleteCombo(null, null);
 		final FixedClassInfoComboModel accm2 = new FixedClassInfoComboModel(acc2, 20, modelcontainer.getAllClasses());
 		acc2.setModel(accm2);
+		acc2.setEditor(new ComboBoxEditor(accm2));
+		acc2.setRenderer(new ClassInfoComboBoxRenderer());
 		TableColumn col2 = pstable.getColumnModel().getColumn(3);
 		col2.setCellEditor(new AutoComboTableCellEditor(acc2));
 		col2.setCellRenderer(new AutoComboTableCellRenderer(acc2));
@@ -1086,6 +1096,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
 		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getInterfaces());
 		acc.setModel(accm);
+		acc.setEditor(new ComboBoxEditor(accm));
+		acc.setRenderer(new ClassInfoComboBoxRenderer());
 		TableColumn col = rstable.getColumnModel().getColumn(1);
 		col.setCellEditor(new AutoComboTableCellEditor(acc));
 		col.setCellRenderer(new AutoComboTableCellRenderer(acc));

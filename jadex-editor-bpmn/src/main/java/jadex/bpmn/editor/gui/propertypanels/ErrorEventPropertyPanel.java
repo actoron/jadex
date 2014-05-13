@@ -9,6 +9,8 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.ClassInfoComboBoxRenderer;
+import jadex.commons.gui.autocombo.ComboBoxEditor;
 import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
 import java.awt.GridBagConstraints;
@@ -87,6 +89,8 @@ public class ErrorEventPropertyPanel extends BasePropertyPanel
 			final FixedClassInfoComboModel model = new FixedClassInfoComboModel(cbox, -1, new ArrayList<ClassInfo>(modelcontainer.getExceptions()));
 			cbox.setModel(model);
 			configureAndAddInputLine(column, label, cbox, y++, SUtil.createHashMap(new String[] { "second_fill" }, new Object[] { GridBagConstraints.HORIZONTAL } ));
+			cbox.setEditor(new ComboBoxEditor(model));
+			cbox.setRenderer(new ClassInfoComboBoxRenderer());
 			
 			if(getMEvent().getClazz() != null)
 			{

@@ -3,6 +3,8 @@ package jadex.commons.gui.autocombo;
 import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -15,7 +17,22 @@ public class FixedClassInfoComboModel extends AbstractFixedAutoComboModel<ClassI
 	 */
 	public FixedClassInfoComboModel(AutoCompleteCombo combo, int max, List<ClassInfo> allentries)
 	{
-		super(combo, max, allentries);
+		super(combo, max, sort(allentries)); 
+	}
+	
+	/**
+	 * 
+	 */
+	public static List<ClassInfo> sort(List<ClassInfo> entries)
+	{
+		Collections.sort(entries, new Comparator<ClassInfo>()
+		{
+			public int compare(ClassInfo c1, ClassInfo c2)
+			{
+				return c1.getPrefixNotation().compareTo(c2.getPrefixNotation());
+			}
+		});
+		return entries;
 	}
 	
 	/**

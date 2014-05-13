@@ -94,8 +94,7 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 		{				
 			entries.clear();
 
-			ret = performSearch(pattern, inter, absclasses, 
-				classes, inclasses, max);
+			ret = performSearch(pattern, inter, absclasses, classes, inclasses, max);
 			final ISubscriptionIntermediateFuture<Class<?>> fret = ret;
 			
 			ret.addResultListener(new IIntermediateResultListener<Class<?>>()

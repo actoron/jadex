@@ -9,6 +9,8 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.gui.autocombo.AutoComboTableCellEditor;
 import jadex.commons.gui.autocombo.AutoComboTableCellRenderer;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.ClassInfoComboBoxRenderer;
+import jadex.commons.gui.autocombo.ComboBoxEditor;
 import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
 import java.util.Arrays;
@@ -55,6 +57,8 @@ public class ActivityParameterTable extends JTable
 		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
 		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getAllClasses());
 		acc.setModel(accm);
+		acc.setEditor(new ComboBoxEditor(accm));
+		acc.setRenderer(new ClassInfoComboBoxRenderer());
 		
 		TableColumn col = getColumnModel().getColumn(2);
 		col.setCellEditor(new AutoComboTableCellEditor(acc));

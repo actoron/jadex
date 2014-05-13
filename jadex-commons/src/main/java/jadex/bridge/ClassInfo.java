@@ -217,6 +217,30 @@ public class ClassInfo
 		return getGenericTypeName()!=null? getGenericTypeName(): "n/a";
 	}
 	
+	/**
+	 *  Get class info in prefix notation, i.e. String - java.lang
+	 */
+	public String getPrefixNotation()
+	{
+		String ret = null;
+		if(getTypeName()!=null)
+		{
+			String fn = getTypeName();
+			int idx = fn.lastIndexOf(".");
+			if(idx!=-1)
+			{
+				String cn = fn.substring(idx+1);
+				String pck = fn.substring(0, idx);
+				ret = cn+" - "+pck;
+			}
+			else
+			{
+				ret = fn;
+			}
+		}
+		return ret;
+	}
+	
 //	/**
 //	 *  Main for testing
 //	 */

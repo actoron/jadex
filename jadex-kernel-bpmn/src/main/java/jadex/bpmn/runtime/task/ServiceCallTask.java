@@ -694,7 +694,7 @@ public class ServiceCallTask implements ITask
 			if(task.getProperties()!=null)
 			{
 				MProperty mprop = task.getProperties().get(PROPERTY_SERVICE);
-				if(mprop.getInitialValue()!=null)
+				if(mprop!=null && mprop.getInitialValue()!=null)
 				{
 					String sername = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
 					cbsername.setSelectedItem(sername);

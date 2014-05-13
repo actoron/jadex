@@ -17,6 +17,8 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.ClassInfoComboBoxRenderer;
+import jadex.commons.gui.autocombo.ComboBoxEditor;
 import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 import jadex.javaparser.SJavaParser;
 
@@ -30,6 +32,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -102,62 +107,64 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 		
 		final ClassLoader cl = getModelContainer().getProjectClassLoader()!=null? getModelContainer().getProjectClassLoader()
 			: TaskPropertyPanel.class.getClassLoader();
-		
+			
 		// Hack, side effect :-(
 		cbox = new AutoCompleteCombo(null, cl);
 		final FixedClassInfoComboModel model = new FixedClassInfoComboModel(cbox, -1, new ArrayList<ClassInfo>(modelcontainer.getTaskClasses()));
 		cbox.setModel(model);
-		cbox.setEditor(new MetalComboBoxEditor()//BasicComboBoxEditor()
-		{
-			Object val;
-			public void setItem(Object obj)
-			{
-				if(obj==null || SUtil.equals(val, obj))
-					return;
-				
-				String text = obj instanceof ClassInfo? model.convertToString((ClassInfo)obj): "";
-			    if(text!=null && !text.equals(editor.getText())) 
-			    {
-			    	val = obj;
-			    	editor.setText(text);
-			    }
-			}
-			
-			public Object getItem()
-			{
-				return val;
-			}
-		});
-		cbox.setRenderer(new BasicComboBoxRenderer()
-		{
-			public Component getListCellRendererComponent(JList list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus)
-			{
-				ClassInfo ci = (ClassInfo)value;
-				Class<?> cl = ci.getType(modelcontainer.getProjectClassLoader());
-				String txt = null;
-				if(cl!=null)
-				{
-					txt = SReflect.getInnerClassName(cl)+" - "+cl.getPackage().getName();
-				}
-				else
-				{
-					String fn = ci.getTypeName();
-					int idx = fn.lastIndexOf(".");
-					if(idx!=-1)
-					{
-						String cn = fn.substring(idx+1);
-						String pck = fn.substring(0, idx);
-						txt = cn+" - "+pck;
-					}
-					else
-					{
-						txt = fn;
-					}
-				}
-				return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
-			}
-		});
+		cbox.setEditor(new ComboBoxEditor(model));
+		cbox.setRenderer(new ClassInfoComboBoxRenderer());
+//		cbox.setEditor(new MetalComboBoxEditor()//BasicComboBoxEditor()
+//		{
+//			Object val;
+//			public void setItem(Object obj)
+//			{
+//				if(obj==null || SUtil.equals(val, obj))
+//					return;
+//				
+//				String text = obj instanceof ClassInfo? model.convertToString((ClassInfo)obj): "";
+//			    if(text!=null && !text.equals(editor.getText())) 
+//			    {
+//			    	val = obj;
+//			    	editor.setText(text);
+//			    }
+//			}
+//			
+//			public Object getItem()
+//			{
+//				return val;
+//			}
+//		});
+//		cbox.setRenderer(new BasicComboBoxRenderer()
+//		{
+//			public Component getListCellRendererComponent(JList list, Object value,
+//				int index, boolean isSelected, boolean cellHasFocus)
+//			{
+//				ClassInfo ci = (ClassInfo)value;
+//				Class<?> cl = ci.getType(modelcontainer.getProjectClassLoader());
+//				String txt = null;
+//				if(cl!=null)
+//				{
+//					txt = SReflect.getInnerClassName(cl)+" - "+cl.getPackage().getName();
+//				}
+//				else
+//				{
+//					String fn = ci.getTypeName();
+//					int idx = fn.lastIndexOf(".");
+//					if(idx!=-1)
+//					{
+//						String cn = fn.substring(idx+1);
+//						String pck = fn.substring(0, idx);
+//						txt = cn+" - "+pck;
+//					}
+//					else
+//					{
+//						txt = fn;
+//					}
+//				}
+//				return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
+//			}
+//		});
 		
 		if(getBpmnTask().getClazz()!=null)
 		{
