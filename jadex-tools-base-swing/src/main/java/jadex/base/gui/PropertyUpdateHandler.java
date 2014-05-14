@@ -113,7 +113,8 @@ public class PropertyUpdateHandler
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+				// can happen when monitoring service is not available
+//				exception.printStackTrace();
 			}
 		});
 	}
@@ -187,6 +188,7 @@ public class PropertyUpdateHandler
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
-		subscription.terminate();
+		if(subscription!=null)
+			subscription.terminate();
 	}
 }
