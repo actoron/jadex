@@ -1402,7 +1402,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			}
 			else
 			{
-				throw new RuntimeException("Undeclared context variable: "+name+", "+this);				
+				throw new RuntimeException("Undeclared context variable: "+name+", "+this);
 			}
 		}
 		
