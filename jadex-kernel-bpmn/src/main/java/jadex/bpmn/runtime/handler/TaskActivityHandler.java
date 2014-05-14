@@ -79,7 +79,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				else
 				{
 					// Hack!!! Rethrow exception when task.execute() is synchronous
-					// and instance.notify() throws exception due to no suitable exception  handlers in BPMN.
+					// and instance.notify() throws exception due to no suitable exception handlers in BPMN.
 					throw thread.getException() instanceof RuntimeException
 						? (RuntimeException)thread.getException() : new RuntimeException(thread.getException());
 				}

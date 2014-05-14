@@ -421,20 +421,34 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setParameterValue(String name, Object key, Object value)
 	{
-		if(getActivity()!=null && !getActivity().hasParameter(name))
+		internalSetParameterValue(name, key, value, this);
+	}
+
+	/**
+	 *  Set the value of a parameter.
+	 *  @param name	The parameter name. 
+	 *  @param value	The parameter value. 
+	 */
+	protected void	internalSetParameterValue(String name, Object key, Object value, ProcessThread start)
+	{
+		if(getActivity()!=null && getActivity().hasParameter(name))
 		{
-//			if(getThreadContext()==null)
-//				System.out.println("sdkljl");
-			
-			ProcessThread pt = getParent();
-			if(pt!=null)
-			{
-				pt.setParameterValue(name, key, value);
-			}
+			// Local parameter
+			setOrCreateParameterValue(name, key, value);
+		}
+		else if(getParent()!=null)
+		{
+			// Try local parameter in parent
+			getParent().internalSetParameterValue(name, key, value, start);
+		}
+		else if(getParent()==null && instance.getModelElement().getContextVariable(name)!=null)
+		{
+			// Global parameter
+			setOrCreateParameterValue(name, key, value);			
 		}
 		else
 		{
-			setOrCreateParameterValue(name, key, value);
+			throw new RuntimeException("No such parameter: "+name+", "+start);
 		}
 	}
 

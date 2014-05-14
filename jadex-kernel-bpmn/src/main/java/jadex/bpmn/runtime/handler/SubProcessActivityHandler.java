@@ -14,14 +14,14 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
@@ -29,7 +29,6 @@ import jadex.javaparser.IParsedExpression;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -274,56 +273,62 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 //					System.out.println("parent is: "+parent.getAddresses());	
 
-					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file, info, 
-						instance.createResultListener(new IIntermediateResultListener<Tuple2<String, Object>>()
+					cms.createComponent(info, null, file)
+						.addResultListener(instance.createResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 					{
-						public void intermediateResultAvailable(Tuple2<String, Object> result)
+						public void intermediateResultAvailable(CMSStatusEvent cse)
 						{
-							thread.setParameterValue(result.getFirstEntity(), result.getSecondEntity());
-							
-//							Map<String, Object> res = (Map<String, Object>)thread.getParameterValue("$results");
-//							if(res==null)
-//							{
-//								res = new HashMap<String, Object>();
-//								thread.setParameterValue("$results", res);
-//							}
-//							res.put(result.getFirstEntity(), result.getSecondEntity());
-//							System.out.println("inter: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
-							
-							List<MActivity> handlers = activity.getEventHandlers();
-							if(handlers!=null)
+							if(cse instanceof CMSIntermediateResultEvent)
 							{
-								for(int i=0; i<handlers.size(); i++)
+								String	param	= ((CMSIntermediateResultEvent)cse).getName();
+								Object	value	= ((CMSIntermediateResultEvent)cse).getValue();
+								
+								// Only set result value in thread when out parameter exists.
+								if(activity.getParameters().get(param)!=null)
 								{
-									MActivity act = handlers.get(i);
-									String trig = null;
-									if (act.hasProperty(MBpmnModel.SIGNAL_EVENT_TRIGGER))
+									String	dir	= activity.getParameters().get(param).getDirection();
+									if(MParameter.DIRECTION_INOUT.equals(dir) || MParameter.DIRECTION_OUT.equals(dir))
 									{
-										trig = (String) thread.getPropertyValue(MBpmnModel.SIGNAL_EVENT_TRIGGER, act);
-									}
-									if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL) &&
-									   (trig == null || result.getFirstEntity().equals(trig)))
-									{
-										ProcessThread newthread	= thread.createCopy();
-										updateParameters(newthread);
-										// todo: allow this, does not work because handler is used for waiting for service calls!
-//										newthread.setActivity(act);
-										newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
-										thread.getParent().addThread(newthread);
-										
-//										ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-//											thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
-//										instance.notifyListeners(cce);
-										
-										if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+										thread.setParameterValue(param, value);
+
+										// Todo: event handlers should also react to internal subprocesses???
+										List<MActivity> handlers = activity.getEventHandlers();
+										if(handlers!=null)
 										{
-											instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
-										}
+											for(int i=0; i<handlers.size(); i++)
+											{
+												MActivity act = handlers.get(i);
+												String trig = null;
+												if (act.hasProperty(MBpmnModel.SIGNAL_EVENT_TRIGGER))
+												{
+													trig = (String) thread.getPropertyValue(MBpmnModel.SIGNAL_EVENT_TRIGGER, act);
+												}
+												if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL) &&
+												   (trig == null || param.equals(trig)))
+												{
+													ProcessThread newthread	= thread.createCopy();
+													updateParameters(newthread);
+													// todo: allow this, does not work because handler is used for waiting for service calls!
+//													newthread.setActivity(act);
+													newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
+													thread.getParent().addThread(newthread);
+													
+//													ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
+//														thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
+//													instance.notifyListeners(cce);
+													
+													if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+													{
+														instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+													}
+												}
+											}
+										}									
 									}
-								}
+								}								
 							}
 						}
-
+						
 						public void finished()
 						{
 //							System.out.println("end0: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
@@ -333,26 +338,13 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							instance.step(activity, instance, thread, null);
 						}
 						
-						public void resultAvailable(final Collection<Tuple2<String, Object>> results)
+						public void resultAvailable(Collection<CMSStatusEvent> cses)
 						{
-							// Store results in out parameters.
-							Map<String, Object> res = new HashMap<String, Object>();
-							if(results!=null)
+							for(CMSStatusEvent cse: cses)
 							{
-								for(Iterator<Tuple2<String, Object>> it=results.iterator(); it.hasNext(); )
-								{
-									Tuple2<String, Object> tup = it.next();
-									res.put(tup.getFirstEntity(), tup.getSecondEntity());
-								}
+								intermediateResultAvailable(cse);
 							}
-							thread.setParameterValue("$results", res);	// Hack???
-							
-//							System.out.println("end1: "+instance.getComponentIdentifier()+" "+file+" "+res);
-							
-							updateParameters(thread);
-							
-							thread.setNonWaiting();
-							instance.step(activity, instance, thread, null);
+							finished();
 						}
 						
 						public void exceptionOccurred(final Exception exception)
@@ -362,7 +354,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								|| !instance.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 							{
 //								System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
-								exception.printStackTrace();
+//								exception.printStackTrace();
 								thread.setNonWaiting();
 								thread.setException(exception);
 								instance.step(activity, instance, thread, null);
@@ -371,8 +363,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 						protected void updateParameters(ProcessThread thread)
 						{
-							Map<String, Object> res = (Map<String, Object>)thread.getParameterValue("$results");
-							
 							List<MParameter>	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
 							if(params!=null && !params.isEmpty())
 							{
@@ -394,10 +384,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 											throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
 										}
 									}
-									else if(res!=null && res.containsKey(param.getName()))
-									{
-										thread.setParameterValue(param.getName(), res.get(param.getName()));
-									}
 								}
 								
 								if(activity.getOutgoingDataEdges() != null)	
@@ -415,31 +401,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							return "lis: "+instance.getComponentIdentifier()+" "+file;
 						}
 					}));
-					
-					IResultListener<IComponentIdentifier> lis = new IResultListener<IComponentIdentifier>()
-					{
-						public void resultAvailable(IComponentIdentifier result)
-						{
-							// todo: save component id
-//							System.out.println("created: "+result);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// Hack!!! Ignore exception, when component already terminated.
-							if(!(exception instanceof ComponentTerminatedException)
-								|| !instance.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
-							{
-								//							System.out.println("exception: "+exception);
-								exception.printStackTrace();
-								thread.setNonWaiting();
-								thread.setException(exception);
-								instance.step(activity, instance, thread, null);
-							}
-						}
-					};
-					
-					ret.addResultListener(lis);
 				}
 				
 				public void exceptionOccurred(Exception exception)

@@ -10,9 +10,11 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TupleResult;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -291,7 +293,7 @@ public class IntermediateTestAgent
 	 */
 	protected IFuture<TestReport> testIntermediateBpmn(String model, String eventtype, TestReport tr)
 	{
-		System.out.println("testIntermediateBpmn: "+model);
+//		System.out.println("testIntermediateBpmn: "+model);
 		
 		Future<TestReport> ret = new Future<TestReport>();
 		
@@ -302,6 +304,19 @@ public class IntermediateTestAgent
 		
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 		fut.getFirstResult();
+		
+//		// For debugging to receive error messages, when thread hangs before fut.get().
+//		fut.addResultListener(new IResultListener<Collection<TupleResult>>()
+//		{
+//			public void resultAvailable(Collection<TupleResult> result)
+//			{
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				exception.printStackTrace();
+//			}
+//		});
 
 		agent.waitForDelay(500).get();
 		
@@ -336,7 +351,7 @@ public class IntermediateTestAgent
 	 */
 	protected IFuture<TestReport> testWrongEventValueIntermediateBpmn(String model, String eventtype, TestReport tr)
 	{
-		System.out.println("testWrongEventValueIntermediateBpmn: "+model);
+//		System.out.println("testWrongEventValueIntermediateBpmn: "+model);
 
 		Future<TestReport> ret = new Future<TestReport>();
 		
@@ -381,7 +396,7 @@ public class IntermediateTestAgent
 	 */
 	protected IFuture<TestReport> testWrongEventPropertyIntermediateBpmn(String model, String eventtype, TestReport tr)
 	{
-		System.out.println("testWrongEventPropertyIntermediateBpmn: "+model);
+//		System.out.println("testWrongEventPropertyIntermediateBpmn: "+model);
 		
 		Future<TestReport> ret = new Future<TestReport>();
 		
@@ -427,7 +442,7 @@ public class IntermediateTestAgent
 	 */
 	protected IFuture<TestReport> testNoEventIntermediateBpmn(String model, TestReport tr)
 	{
-		System.out.println("testNoEventIntermediateBpmn: "+model);
+//		System.out.println("testNoEventIntermediateBpmn: "+model);
 
 		Future<TestReport> ret = new Future<TestReport>();
 		

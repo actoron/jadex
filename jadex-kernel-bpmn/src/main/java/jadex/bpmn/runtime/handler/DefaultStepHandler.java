@@ -44,7 +44,7 @@ public class DefaultStepHandler implements IStepHandler
 		// Store event (if any).
 		if(event!=null)
 		{
-			thread.setParameterValue("$event", event);
+			thread.setOrCreateParameterValue("$event", event);
 //			System.out.println("Event: "+activity+" "+thread+" "+event);
 		}
 		

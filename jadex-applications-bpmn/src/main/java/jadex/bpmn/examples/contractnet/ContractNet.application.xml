@@ -18,7 +18,7 @@
 	</componenttypes>
 	
 	<configurations>
-		<configuration name="One Initiator and Three Participants">
+		<configuration name="One Initiator and Five Participants">
 			<components>
 				<component name="Participant_1"	type="CNPProtocol" configuration="Participant">
 					<arguments>
@@ -38,9 +38,21 @@
 						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
 					</arguments>
 				</component>
-				<component name="Initiator" type="CNPProtocol" configuration="Initiator">
+				<component name="Participant_4"	type="CNPProtocol" configuration="Participant">
 					<arguments>
-						<argument name="participants">new String[]{"Participant_1", "Participant_2", "Participant_3"}</argument>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+				<component name="Participant_5"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+								<component name="Initiator" type="CNPProtocol" configuration="Initiator">
+					<arguments>
+						<argument name="participants">new String[]{"Participant_1", "Participant_2", "Participant_3", "Participant_4", "Participant_5"}</argument>
 						<argument name="cfp">"Hello?"</argument>
 						<argument name="epp">"EvaluateProposalsRandom.bpmn2"</argument>
 					</arguments>

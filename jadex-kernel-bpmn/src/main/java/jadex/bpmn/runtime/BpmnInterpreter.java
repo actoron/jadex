@@ -230,9 +230,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		this.adapter = adapter;
 		this.container = container;
 		
-		topthread.setParameterValue("$cms", cms);
-		topthread.setParameterValue("$clock", cs);
-		topthread.setParameterValue("$msgservice", ms);
+		topthread.setOrCreateParameterValue("$cms", cms);
+		topthread.setOrCreateParameterValue("$clock", cs);
+		topthread.setOrCreateParameterValue("$msgservice", ms);
 		
 		initContextVariables();
 		
@@ -489,7 +489,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 												ip.getTopLevelThread().addThread(thread);
 												ProcessThread subthread = new ProcessThread(fevtsubentry.getSecondEntity(), thread, ip);
 												thread.addThread(subthread);
-												subthread.setParameterValue("$event", event);
+												subthread.setOrCreateParameterValue("$event", event);
 												return IFuture.DONE;
 											}
 										});
@@ -794,12 +794,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             		getTopLevelThread().addThread(thread);
 					ProcessThread subthread = new ProcessThread(triggeractivity, thread, this);
 					thread.addThread(subthread);
-					subthread.setParameterValue("$event", trigger.getThirdEntity());
+					subthread.setOrCreateParameterValue("$event", trigger.getThirdEntity());
             	}
             	else
             	{
                     ProcessThread    thread    = new ProcessThread(mact, getTopLevelThread(), BpmnInterpreter.this);
-                    thread.setParameterValue("$event", trigger.getThirdEntity());
+                    thread.setOrCreateParameterValue("$event", trigger.getThirdEntity());
                     getTopLevelThread().addThread(thread);
             	}
             }
@@ -906,6 +906,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 						IFilter<Object> filter = pt.getWaitFilter();
 						if(filter!=null && filter.filter(message))
 						{
+//							System.out.println("Dispatched to thread: "+System.identityHashCode(message)+", "+pt);
 							BpmnInterpreter.this.notify(pt.getActivity(), pt, message);
 //							((DefaultActivityHandler)getActivityHandler(pt.getActivity())).notify(pt.getActivity(), BpmnInterpreter.this, pt, message);
 							processed = true;
@@ -1067,6 +1068,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public void executeStep(String pool, String lane)
 	{
+		assert !getComponentAdapter().isExternalThread();
+		
 		if(isFinished(pool, lane))
 			throw new UnsupportedOperationException("Cannot execute a finished process: "+this);
 		
@@ -1140,10 +1143,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					IFilter<Object> filter = thread.getWaitFilter();
 					if(filter!=null && filter.filter(message))
 					{
-						notify(thread.getActivity(), thread, message);
 						processed = true;
 						messages.remove(i);
-//						System.out.println("Dispatched from waitqueue: "+messages.size()+" "+message);
+//						System.out.println("Dispatched from waitqueue: "+messages.size()+" "+System.identityHashCode(message)+", "+message);
+						notify(thread.getActivity(), thread, message);
 					}
 				}
 			}
@@ -1156,9 +1159,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					IFilter<Object> filter = thread.getWaitFilter();
 					if(filter!=null && filter.filter(stream))
 					{
-						notify(thread.getActivity(), thread, stream);
 						processed = true;
 						streams.remove(i);
+						notify(thread.getActivity(), thread, stream);
 //						System.out.println("Dispatched from stream: "+messages.size()+" "+message);
 					}
 				}

@@ -248,6 +248,12 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 							ret	= false;
 						}
 					}
+					
+//					if(ret)
+//					{
+//						System.out.println("Message matched: "+thread+", "+obj);
+//					}
+					
 					return ret;
 				}
 			};

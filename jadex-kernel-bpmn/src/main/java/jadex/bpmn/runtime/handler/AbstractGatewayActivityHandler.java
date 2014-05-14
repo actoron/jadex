@@ -237,7 +237,7 @@ public abstract class AbstractGatewayActivityHandler
 								}
 								else
 								{
-									thread.setParameterValue(key, value);
+									thread.setOrCreateParameterValue(key, value);
 								}
 							}
 						}

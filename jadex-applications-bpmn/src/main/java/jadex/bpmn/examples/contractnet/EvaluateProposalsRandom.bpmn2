@@ -39,6 +39,7 @@
         </semantic:extensionElements>
       </semantic:task>
       <semantic:extensionElements>
+        <jadex:class>jadex.bdibpmn.examples.puzzle.ChooseMoveTask</jadex:class>
         <jadex:parameter direction="inout" name="proposals" type="java.util.Collection">proposals</jadex:parameter>
         <jadex:property name="items">proposals</jadex:property>
         <jadex:property name="iterator">proposals</jadex:property>
@@ -62,21 +63,23 @@
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="_-CVGAVmxEd-CVtZr0hfiVg">
-        <dc:Bounds height="290.0" width="900.0" x="0.0" y="0.0"/>
+        <dc:Bounds height="290.0" width="1170.0" x="0.0" y="0.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_WIdYgVmyEd-CVtZr0hfiVg" isExpanded="true">
-        <dc:Bounds height="200.0" width="480.0" x="80.0" y="50.0"/>
+        <dc:Bounds height="200.0" width="480.0" x="400.0" y="40.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_WIdYg1myEd-CVtZr0hfiVg">
         <dc:Bounds height="100.0" width="160.0" x="110.0" y="50.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="f9JD/2hR8NiVkfcG">
-        <dc:Bounds height="100.0" width="160.0" x="650.0" y="100.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="970.0" y="90.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="XaJUbFCCziArV4kG">
       </bpmndi:BPMNEdge>
       <di:Edge type="data" jadexElement="lnBroX1cs6Yubo+J">
       </di:Edge>
+      <bpmndi:BPMNEdge bpmnElement="dGGR/rkTeqLml2U4">
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </semantic:definitions>

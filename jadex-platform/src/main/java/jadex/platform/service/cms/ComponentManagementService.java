@@ -478,7 +478,9 @@ public class ComponentManagementService implements IComponentManagementService
 					{
 						kt.removeLocker(lockkey);
 						if(kt.getLockerCount()==0)
+						{
 							lockentries.remove(cinfo.getParent());
+						}
 					}
 				}
 				public void exceptionOccurred(Exception exception)
@@ -488,7 +490,9 @@ public class ComponentManagementService implements IComponentManagementService
 					{
 						kt.removeLocker(lockkey);
 						if(kt.getLockerCount()==0)
+						{
 							lockentries.remove(cinfo.getParent());
+						}
 					}
 				}
 			}));
@@ -621,8 +625,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		public void resultAvailable(Void result)
 																		{
 																			logger.info("Started component: "+cid.getName());
-							//												System.err.println("Post-Init: "+cid);
-							
+																			
 																			// Create the component instance.
 																			final IComponentAdapter adapter;
 																			
@@ -720,9 +723,19 @@ public class ComponentManagementService implements IComponentManagementService
 																				
 																				public void exceptionOccurred(Exception exception)
 																				{
-																					// Todo: use some logger for user error?
-																					if(!(exception instanceof ComponentTerminatedException))
+																					// Exception in parent during startup of subcomponent
+																					// --> complete init, so parent can terminate.
+																					if(exception instanceof ComponentTerminatedException)
+																					{
+																						notifyListenersAdded(cid, ad);
+																						resultlisteners.put(cid, reslis);
+																						inited.setResult(cid);
+																					}
+																					else
+																					{
+																						// Todo: use some logger for user error?
 																						exception.printStackTrace();
+																					}																					
 																				}
 																			}));								
 																		}
@@ -1214,7 +1227,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid));
 //			Thread.currentThread().dumpStack();
 		
-		// If destroyComponent has not called before
+		// If destroyComponent has not been called before
 		if(!contains)
 		{
 			cfs.put(cid, tmp);

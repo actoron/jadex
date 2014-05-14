@@ -36,7 +36,6 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInfo;
@@ -371,17 +370,16 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public IFuture<Void>	componentCreated(final IComponentDescription desc, final IModelInfo model)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
 //		// cannot use scheduleStep as it is not available in init phase of component.
 ////		return scheduleStep(new IComponentStep()
 		
 		// Must throw component events here for extensions
 		
-		getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
+		return getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				Future<Void>	ret	= new Future<Void>();
 //				System.out.println("created: "+desc.getName());
 //				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), 
 //					desc.getName().getName(), getComponentIdentifier(), desc.getCreationTime(), desc);
@@ -398,11 +396,9 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 				{
 					ret.setResult(null);
 				}
-				return IFuture.DONE;
+				return ret;
 			}
 		});
-		
-		return ret;
 	}
 	
 	/**
