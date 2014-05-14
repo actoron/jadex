@@ -209,11 +209,14 @@ import java.util.logging.Level;
 			arguments={@NameValue(name="console", value="$args.cliconsole")})
 	}),
 	@Configuration(name="fixed", arguments={
-		@NameValue(name="tcpport", value="0"),
-		@NameValue(name="ssltcpport", value="0"),
-		@NameValue(name="niotcpport", value="0"),
-		@NameValue(name="platformname", value="null")
+		//@NameValue(name="tcpport", value="0"),
+		//@NameValue(name="ssltcpport", value="0"),
+		//@NameValue(name="niotcpport", value="0"),
+		//@NameValue(name="platformname", value="null"),
+		//@NameValue(name="kernels", value="\"component,micro,application,bdi,bdiv3,bpmn,gpmn\"")
 	}, components={
+		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
+		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="extensions", type="extensions", daemon=Boolean3.TRUE, number="$args.extensions!=null ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
