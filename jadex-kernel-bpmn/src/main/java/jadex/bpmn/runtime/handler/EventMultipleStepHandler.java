@@ -1,13 +1,13 @@
 package jadex.bpmn.runtime.handler;
 
-import java.util.List;
-
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.commons.IFilter;
+
+import java.util.List;
 
 /**
  *  Step handler that can be used for event-multiple elements.

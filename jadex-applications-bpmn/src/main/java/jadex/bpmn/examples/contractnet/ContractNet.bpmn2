@@ -126,11 +126,11 @@
         <jadex:property name="duration">timeout</jadex:property>
       </semantic:extensionElements>
     </semantic:boundaryEvent>
-    <semantic:exclusiveGateway id="_vpa4QVanEd-1RJ7RXx1qjA" default="_xfIcsVanEd-1RJ7RXx1qjA">
+    <semantic:exclusiveGateway id="_vpa4QVanEd-1RJ7RXx1qjA" default="eaMqI01HizBqx2PI">
       <semantic:incoming>_8af54VauEd-1RJ7RXx1qjA</semantic:incoming>
       <semantic:incoming>_9R7RIVauEd-1RJ7RXx1qjA</semantic:incoming>
-      <semantic:outgoing>_xfIcsVanEd-1RJ7RXx1qjA</semantic:outgoing>
       <semantic:outgoing>_ncPh0VavEd-1RJ7RXx1qjA</semantic:outgoing>
+      <semantic:outgoing>eaMqI01HizBqx2PI</semantic:outgoing>
     </semantic:exclusiveGateway>
     <semantic:subProcess name="For all Proposals" id="_oPQXUVaoEd-1RJ7RXx1qjA">
       <semantic:incoming>_3S3gcVaoEd-1RJ7RXx1qjA</semantic:incoming>
@@ -151,7 +151,7 @@
           <jadex:property name="protocol">&quot;fipa-contract-net&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:intermediateThrowEvent>
-      <semantic:exclusiveGateway name="accept?" id="_q-MCwVaoEd-1RJ7RXx1qjA" default="_sCuo-laoEd-1RJ7RXx1qjA">
+      <semantic:exclusiveGateway id="_q-MCwVaoEd-1RJ7RXx1qjA" default="_sCuo-laoEd-1RJ7RXx1qjA">
         <semantic:incoming>_q-MCylaoEd-1RJ7RXx1qjA</semantic:incoming>
         <semantic:outgoing>_sCuo-laoEd-1RJ7RXx1qjA</semantic:outgoing>
         <semantic:outgoing>_ulJiYVaoEd-1RJ7RXx1qjA</semantic:outgoing>
@@ -183,7 +183,7 @@
       </semantic:extensionElements>
     </semantic:subProcess>
     <semantic:subProcess name="Evaluate Proposals" id="_LSKZ0VmxEd-CVtZr0hfiVg">
-      <semantic:incoming>_xfIcsVanEd-1RJ7RXx1qjA</semantic:incoming>
+      <semantic:incoming>eaMqI01HizBqx2PI</semantic:incoming>
       <semantic:outgoing>_3S3gcVaoEd-1RJ7RXx1qjA</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:parameter direction="inout" name="proposals" type="Collection">proposals</jadex:parameter>
@@ -257,10 +257,10 @@
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_z3NDIVauEd-1RJ7RXx1qjA" targetRef="_vpa4QVanEd-1RJ7RXx1qjA" id="_8af54VauEd-1RJ7RXx1qjA">
     </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_vpa4QVanEd-1RJ7RXx1qjA" targetRef="_LSKZ0VmxEd-CVtZr0hfiVg" id="_xfIcsVanEd-1RJ7RXx1qjA">
-    </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_vpa4QVanEd-1RJ7RXx1qjA" targetRef="_mSCYgVavEd-1RJ7RXx1qjA" id="_ncPh0VavEd-1RJ7RXx1qjA">
       <semantic:conditionExpression>proposals.isEmpty()</semantic:conditionExpression>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_vpa4QVanEd-1RJ7RXx1qjA" targetRef="_LSKZ0VmxEd-CVtZr0hfiVg" id="eaMqI01HizBqx2PI">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_oPQXUVaoEd-1RJ7RXx1qjA" targetRef="_pv3uIVarEd-1RJ7RXx1qjA" id="_yBSKsVarEd-1RJ7RXx1qjA">
     </semantic:sequenceFlow>
@@ -590,8 +590,6 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_8af54VauEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_8af54VauEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_q-MCylaoEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_sCuo-laoEd-1RJ7RXx1qjA">
@@ -608,55 +606,29 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_mSCYilavEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_mSCYilavEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_y8pRoVapEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_y8pRoVapEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_xfIcsVanEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_ncPh0VavEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_xfIcsVanEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_ncPh0VavEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_yBSKsVarEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_yBSKsVarEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_9R7RIVauEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_9R7RIVauEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_pKWpcVavEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_pKWpcVavEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_3S3gcVaoEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_3S3gcVaoEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
       <di:Edge type="data" jadexElement="0WzC5fzPbyvOGKls">
       </di:Edge>
-      <bpmndi:BPMNEdge bpmnElement="_3XYM-lT7Ed-32983CGnnJA">
+      <bpmndi:BPMNEdge bpmnElement="eaMqI01HizBqx2PI">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_3XYM-lT7Ed-32983CGnnJA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_3piJalT6Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_3piJalT6Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_7gJOmVT6Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_-n97KFT6Ed-32983CGnnJA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_7gJOmVT6Ed-32983CGnnJA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_-n97KFT6Ed-32983CGnnJA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_i2I9ilT7Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_i2I9ilT7Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
@@ -666,45 +638,21 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_uUFpkVaSEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_qYG8OlaSEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_t40p4VaSEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_uUFpkVaSEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_ts_LQVT7Ed-32983CGnnJA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_ts_LQVT7Ed-32983CGnnJA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_rc4w4VT7Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_rc4w4VT7Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_1XO6KlT7Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_1XO6KlT7Ed-32983CGnnJA">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_GCv1OlT8Ed-32983CGnnJA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_GCv1OlT8Ed-32983CGnnJA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_HOvuQVT8Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_HOvuQVT8Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_eYyVYVaQEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_eYyVYVaQEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_sgKN0VaSEd-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_sgKN0VaSEd-1RJ7RXx1qjA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_wU91Cla6Ed-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_wU91Cla6Ed-1RJ7RXx1qjA">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_5-1z6lT6Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_5-1z6lT6Ed-32983CGnnJA">
       </bpmndi:BPMNEdge>

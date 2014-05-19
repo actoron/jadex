@@ -13,6 +13,9 @@
     <jadex:imports>
       <jadex:import>jadex.base.test.*</jadex:import>
     </jadex:imports>
+    <jadex:results>
+      <jadex:result name="testresults" type="jadex.base.test.Testcase"/>
+    </jadex:results>
   </semantic:extension>
   <semantic:process name="Pool" id="aY8/KB0nu5ATYv63">
     <semantic:startEvent id="MFx4RjvG+XOotjrq">

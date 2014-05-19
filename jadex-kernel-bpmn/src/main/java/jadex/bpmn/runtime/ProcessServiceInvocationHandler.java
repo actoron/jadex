@@ -61,9 +61,9 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		String[] params	= act.getPropertyNames();
 		for(int i=0; i<params.length; i++)
 		{
-			thread.setParameterValue(params[i], args[i]);
+			thread.setOrCreateParameterValue(params[i], args[i]);
 		}
-		thread.setParameterValue(THREAD_PARAMETER_SERVICE_RESULT, ret);
+		thread.setOrCreateParameterValue(THREAD_PARAMETER_SERVICE_RESULT, ret);
 		
 		instance.step(act, instance, thread, null);
 		

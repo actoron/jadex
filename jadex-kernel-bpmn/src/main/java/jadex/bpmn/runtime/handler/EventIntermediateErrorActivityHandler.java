@@ -22,7 +22,7 @@ public class EventIntermediateErrorActivityHandler extends DefaultActivityHandle
 		// Do catch exception when the activity is an event handler.
 		if(activity.isEventHandler() || !activity.isThrowing())
 		{
-			thread.setParameterValue("$exception", thread.getException());
+			thread.setOrCreateParameterValue("$exception", thread.getException());
 			thread.setException(null);
 			super.doExecute(activity, instance, thread);
 		}

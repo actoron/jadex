@@ -150,7 +150,7 @@ public class CreateComponentTask implements ITask
 							{
 								if(resultmapping[i].equals(result.getFirstEntity()))
 								{
-									context.setParameterValue(resultmapping[i+1], result.getSecondEntity());
+									context.setOrCreateParameterValue(resultmapping[i+1], result.getSecondEntity());
 									break;
 								}
 							}
@@ -183,7 +183,7 @@ public class CreateComponentTask implements ITask
 							for(int i=0; i<resultmapping.length/2; i++)
 							{
 								Object value = results.get(resultmapping[i]);
-								context.setParameterValue(resultmapping[i+1], value);
+								context.setOrCreateParameterValue(resultmapping[i+1], value);
 								
 //								System.out.println("Mapped result value: "+value+" "+resultmapping[i]+" "+resultmapping[i+1]);
 							}

@@ -199,6 +199,28 @@ public class ExternalTaskWrapper implements ITask
 		{
 			params.put(name, value);
 		}
+		
+		/**
+		 *  Set or create a parameter value directly in this thread.
+		 *  @param name	The parameter name.
+		 *  @param value The parameter value. 
+		 */
+		public void setOrCreateParameterValue(String name, Object value)
+		{
+			setParameterValue(name, value);
+		}
+		
+		/**
+		 *  Set or create a parameter value directly in this thread.
+		 *  @param name	The parameter name.
+		 *  @param key An optional helper (index, key etc.) 
+		 *  @param value The parameter value. 
+		 */
+		public void setOrCreateParameterValue(String name, Object key, Object value)
+		{
+			setParameterValue(name, key, value);
+		}
+
 
 		/**
 		 *  Get the params.

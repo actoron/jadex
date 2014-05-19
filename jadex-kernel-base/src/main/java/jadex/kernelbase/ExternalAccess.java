@@ -912,7 +912,14 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+						if(!valid)
+						{
+							ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+						}
+						else
+						{
+							interpreter.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+						}
 					}
 				});
 			}

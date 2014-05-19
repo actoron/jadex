@@ -54,7 +54,7 @@ public class InvokeMethodTask extends AbstractTask
 			Object val = method.invoke(object, params.toArray());
 			if(returnname!=null)
 			{
-				context.setParameterValue(returnname, val);
+				context.setOrCreateParameterValue(returnname, val);
 			}
 		}
 		catch(InvocationTargetException e)
