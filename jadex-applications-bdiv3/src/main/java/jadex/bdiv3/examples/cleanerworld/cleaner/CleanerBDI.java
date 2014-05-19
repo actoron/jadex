@@ -173,7 +173,7 @@ public class CleanerBDI
 	 */
 	// currently creates too many goals and abandons them with during adopt with unique
 //	@Goal(unique=true, deliberation=@Deliberation(cardinality=1, inhibits={PerformLookForWaste.class, AchieveCleanup.class}))
-	@Goal(unique=true, deliberation=@Deliberation(inhibits={PerformLookForWaste.class, AchieveCleanup.class}))
+	@Goal(excludemode=ExcludeMode.Never, unique=true, deliberation=@Deliberation(inhibits={PerformLookForWaste.class, AchieveCleanup.class}))
 	public class AchieveCleanup
 	{
 		/** The waste. */
@@ -396,7 +396,7 @@ public class CleanerBDI
 	/**
 	 *  
 	 */
-	@Goal(excludemode=ExcludeMode.Never)
+	@Goal//(excludemode=ExcludeMode.Never)
 	public class AchieveDropWaste
 	{
 		/** The wastebin. */

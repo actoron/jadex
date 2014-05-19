@@ -15,6 +15,7 @@ import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -40,7 +41,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 37;
+	public static final int BUILD = 39;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -243,6 +244,8 @@ public class SBpmnModelWriter
 		
 		writeImports(out, ind, mmodel.getModelInfo().getImports());
 		
+		writeSubcomponents(out, ind, mmodel.getModelInfo().getSubcomponentTypes());
+		
 		writeArguments(out, ind, false, mmodel.getModelInfo().getArguments());
 		
 		writeArguments(out, ind, true, mmodel.getModelInfo().getResults());
@@ -286,6 +289,37 @@ public class SBpmnModelWriter
 			--ind;
 			out.print(getIndent(ind));
 			out.println("</jadex:imports>");
+		}
+	}
+	
+	/**
+	 *  Writes the subcomponents.
+	 *  
+	 *  @param out The output.
+	 *  @param ind The indentation level.
+	 *  @param scti The subcomponent type infos.
+	 */
+	protected static final void writeSubcomponents(PrintStream out, int ind, SubcomponentTypeInfo[] scti)
+	{
+		if (scti.length > 0)
+		{
+			out.print(getIndent(ind));
+			out.println("<jadex:subcomponents>");
+			++ind;
+			
+			for (int i = 0; i < scti.length; ++i)
+			{
+				out.print(getIndent(ind));
+				out.print("<jadex:subcomponent name=\"");
+				out.print(escapeString(scti[i].getName()));
+				out.print("\">");
+				out.print(escapeString(scti[i].getFilename()));
+				out.println("</jadex:subcomponent>");
+			}
+			
+			--ind;
+			out.print(getIndent(ind));
+			out.println("</jadex:subcomponents>");
 		}
 	}
 	
@@ -531,6 +565,10 @@ public class SBpmnModelWriter
 					boolean dyn = rs.getDefaultBinding().isDynamic();
 					out.print("\" dynamic=\"");
 					out.print(dyn);
+					
+					boolean create = rs.getDefaultBinding().isCreate();
+					out.print("\" create=\"");
+					out.print(create);
 				}
 				
 				out.println("\"/>");

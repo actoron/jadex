@@ -104,7 +104,8 @@ public class CleanUpWastePlan
 		{
 			public void customResultAvailable(QueryWastebin qw)
 			{
-//				System.out.println("found wastebin: "+goal.getWaste());
+//				System.out.println("found wastebin: "+qw.getWastebin());
+				
 				IFuture<AchieveDropWaste> fut = rplan.dispatchSubgoal(capa.new AchieveDropWaste(qw.getWastebin()));
 				fut.addResultListener(new IResultListener<CleanerBDI.AchieveDropWaste>()
 				{

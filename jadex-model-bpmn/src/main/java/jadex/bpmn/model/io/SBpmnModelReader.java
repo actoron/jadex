@@ -17,6 +17,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -889,6 +890,11 @@ public class SBpmnModelReader
 			{
 				model.addImport(content);
 			}
+			else if ("subcomponent".equals(tag.getLocalPart()))
+			{
+				SubcomponentTypeInfo scti = new SubcomponentTypeInfo(attrs.get("name"), content);
+				((ModelInfo) model.getModelInfo()).addSubcomponentType(scti);
+			}
 			else if ("argument".equals(tag.getLocalPart()))
 			{
 				Argument arg = new Argument();
@@ -980,6 +986,7 @@ public class SBpmnModelReader
 				Boolean multi = attrs.get("multi") != null? Boolean.parseBoolean(attrs.get("multi")) : null;
 				String scope = attrs.get("scope");
 				String dyn = attrs.get("dynamic");
+				String create = attrs.get("create");
 				
 				RequiredServiceInfo rs = new RequiredServiceInfo();
 				rs.setName(name);
@@ -992,6 +999,8 @@ public class SBpmnModelReader
 				rs.getDefaultBinding().setScope(scope);
 				if(dyn!=null)
 					rs.getDefaultBinding().setDynamic(Boolean.parseBoolean(dyn));
+				if(create!=null)
+					rs.getDefaultBinding().setCreate(Boolean.parseBoolean(create));
 				((ModelInfo)model.getModelInfo()).addRequiredService(rs);
 			}
 			else if ("requiredserviceconfiguration".equals(tag.getLocalPart()))

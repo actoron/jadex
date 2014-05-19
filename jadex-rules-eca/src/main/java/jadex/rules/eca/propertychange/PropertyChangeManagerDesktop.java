@@ -18,6 +18,9 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 	/** The argument types for alternative property change listener adding/removal (cached for speed). */
 	protected static Class<?>[]	JAVABEANS_PCL	= new Class[]{java.beans.PropertyChangeListener.class};
 	
+	/**
+	 *  Create a new listener.
+	 */
 	protected PropertyChangeManagerDesktop()
 	{
 		super();
@@ -41,9 +44,11 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 				boolean javaBeans = false;
 				// Do not use Class.getMethod (slow).
 				Method	meth = SReflect.getMethod(object.getClass(), "addPropertyChangeListener", PCL);
-				if (meth == null) {
+				if(meth == null) 
+				{
 					meth = SReflect.getMethod(object.getClass(), "addPropertyChangeListener", JAVABEANS_PCL);
-					if (meth != null) {
+					if(meth != null) 
+					{
 						javaBeans = true;
 					}
 				}
@@ -51,15 +56,20 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 				if(pcl==null)
 				{
 					PropertyChangeListener jadexPcl = createPCL(eventadder);
-					if (javaBeans) {
+					if(javaBeans) 
+					{
 						pcl = wrapJadexPcl(jadexPcl);
-					} else {
+					} 
+					else 
+					{
 						pcl = jadexPcl;
 					}
 				}
 				
 				if(meth!=null)
+				{
 					meth.invoke(object, new Object[]{pcl});	
+				}
 				pcls.put(object, pcl);
 			}
 			catch(IllegalAccessException e){e.printStackTrace();}
@@ -67,13 +77,15 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 		}
 	}
 	
-
+	/**
+	 * 
+	 * @param pcl
+	 * @return
+	 */
 	private java.beans.PropertyChangeListener wrapJadexPcl(final jadex.commons.beans.PropertyChangeListener pcl)
 	{
 		return new java.beans.PropertyChangeListener()
 		{
-			
-			@Override
 			public void propertyChange(java.beans.PropertyChangeEvent evt)
 			{
 				PropertyChangeEvent jadexPCE = new PropertyChangeEvent(evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
@@ -103,9 +115,12 @@ public class PropertyChangeManagerDesktop extends PropertyChangeManager
 //						System.out.println(getTypeModel().getName()+": Deregister: "+value+", "+type);						
 						// Do not use Class.getMethod (slow).
 						Method	meth = null;
-						if (pcl instanceof jadex.commons.beans.PropertyChangeListener) {
+						if(pcl instanceof jadex.commons.beans.PropertyChangeListener) 
+						{
 							meth = SReflect.getMethod(object.getClass(), "removePropertyChangeListener", PCL);
-						} else {
+						} 
+						else 
+						{
 							meth = SReflect.getMethod(object.getClass(), "removePropertyChangeListener", JAVABEANS_PCL);
 						}
 						
