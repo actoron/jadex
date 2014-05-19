@@ -17,6 +17,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -888,6 +889,11 @@ public class SBpmnModelReader
 			else if ("import".equals(tag.getLocalPart()))
 			{
 				model.addImport(content);
+			}
+			else if ("subcomponent".equals(tag.getLocalPart()))
+			{
+				SubcomponentTypeInfo scti = new SubcomponentTypeInfo(attrs.get("name"), content);
+				((ModelInfo) model.getModelInfo()).addSubcomponentType(scti);
 			}
 			else if ("argument".equals(tag.getLocalPart()))
 			{
