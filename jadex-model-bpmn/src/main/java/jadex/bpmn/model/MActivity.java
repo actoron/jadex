@@ -598,7 +598,7 @@ public class MActivity extends MAssociationTarget
 	 */
 	public IndexMap<String, MParameter>	getAllParameters(Map<String, Object> params, String[] imports, ClassLoader cl)
 	{
-		IndexMap<String, MParameter> ret = new IndexMap<String, MParameter>(parameters);
+		IndexMap<String, MParameter> ret = parameters !=null ? new IndexMap<String, MParameter>(parameters) : new IndexMap<String, MParameter>();
 		
 		if(clazz!=null)
 		{

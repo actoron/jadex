@@ -60,6 +60,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
@@ -366,15 +367,36 @@ public class ComponentManagementService implements IComponentManagementService
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponent(CreationInfo info, String name, String model)
 	{
 		final SubscriptionIntermediateFuture<CMSStatusEvent> ret = (SubscriptionIntermediateFuture)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
-				
+		
 		final IComponentIdentifier[] mycid = new IComponentIdentifier[1];
+		final boolean[] terminate = new boolean[1];
+		ret.setTerminationCommand(new ITerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				if(mycid[0]!=null)
+				{
+					destroyComponent(mycid[0]);
+				}
+				else
+				{
+					terminate[0]	= true;
+				}
+			}
+			
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
+			}
+		});
+
 		createComponent(name, model, info, new IIntermediateResultListener<Tuple2<String, Object>>()
 		{
 			Map<String, Object> results = new HashMap<String, Object>();
 			
 			public void intermediateResultAvailable(Tuple2<String, Object> result)
 			{
-				ret.addIntermediateResult(new CMSIntermediateResultEvent(mycid[0], result.getFirstEntity(), result.getSecondEntity()));
+				ret.addIntermediateResultIfUndone(new CMSIntermediateResultEvent(mycid[0], result.getFirstEntity(), result.getSecondEntity()));
 				results.put(result.getFirstEntity(), result.getSecondEntity());
 			}
 			
@@ -392,25 +414,29 @@ public class ComponentManagementService implements IComponentManagementService
 			
 			public void finished()
 			{
-				ret.addIntermediateResult(new CMSTerminatedEvent(mycid[0], results));
-				ret.setFinished();
+				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(mycid[0], results));
+				ret.setFinishedIfUndone();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 		}).addResultListener(new IResultListener<IComponentIdentifier>()
 		{
 			public void resultAvailable(IComponentIdentifier cid)
 			{
 				mycid[0] = cid;
-				ret.addIntermediateResult(new CMSCreatedEvent(cid));
+				ret.addIntermediateResultIfUndone(new CMSCreatedEvent(cid));
+				if(terminate[0])
+				{
+					destroyComponent(cid);
+				}
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 		});
 		

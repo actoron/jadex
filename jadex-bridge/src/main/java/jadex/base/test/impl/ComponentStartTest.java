@@ -5,12 +5,26 @@ import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Tuple2;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
+
+import java.util.Collection;
+
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
@@ -65,10 +79,13 @@ public class ComponentStartTest extends	TestCase
 		result.startTest(this);
 		
 		// Start the component.
+		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		try
 		{
 //			System.out.println("starting: "+comp.getFilename());
-			IComponentIdentifier	cid	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), null).get(new ThreadSuspendable());
+			Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
+			final IComponentIdentifier	cid	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), 
+				new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
 			try
 			{
 //				if(comp.getFilename().indexOf("Heatbugs")!=-1)
@@ -76,7 +93,36 @@ public class ComponentStartTest extends	TestCase
 //					System.out.println("killing: "+comp.getFilename());
 //					SyncExecutionService.DEBUG	= true;
 //				}
-				cms.destroyComponent(cid).get(new ThreadSuspendable());
+				
+				// Wait some time (simulation and real time) and kill the component afterwards.
+				final IResultListener<Void>	lis	= new CounterResultListener<Void>(2, new DefaultResultListener<Void>()
+				{
+					public synchronized void resultAvailable(Void result)
+					{
+						IComponentManagementService	mycms	= cms;
+						if(mycms!=null)
+						{
+							mycms.destroyComponent(cid);
+						}
+					}
+				});
+				IExternalAccess	ea	= cms.getExternalAccess(cid.getRoot()).get();
+				ea.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						return ia.waitForDelay(500, false);
+					}
+				}).addResultListener(lis);
+				ea.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						return ia.waitForDelay(500, true);
+					}
+				}).addResultListener(lis);
+				
+				finished.get(BasicService.getLocalDefaultTimeout());
 //				System.out.println("killed: "+comp.getFilename());
 			}
 			catch(ComponentTerminatedException cte)
@@ -96,7 +142,8 @@ public class ComponentStartTest extends	TestCase
 		{
 			result.addError(this, e);
 		}
-
+		ISuspendable.SUSPENDABLE.set(null);
+		
 		result.endTest(this);
 
 		// Remove references to Jadex resources to aid GC cleanup.

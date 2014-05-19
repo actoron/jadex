@@ -982,9 +982,16 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			Collection<Object> res = (Collection<Object>)func.setResult(result);
 			DelegatingSubscriptionIntermediateDelegationFuture.super.setResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1000,9 +1007,12 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
 			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.setResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1020,7 +1030,14 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(RuntimeException e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1036,9 +1053,12 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			Object res = func.addIntermediateResultIfUndone(result);
 			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.addIntermediateResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1055,9 +1075,16 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			func.setFinished((Collection<Object>)getIntermediateResults());
 			DelegatingSubscriptionIntermediateDelegationFuture.super.setFinished();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1073,9 +1100,12 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
 			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.setFinishedIfUndone();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1091,9 +1121,16 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			Exception ex = func.setException(exception);
 			DelegatingSubscriptionIntermediateDelegationFuture.super.setException(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1109,9 +1146,12 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			func.setExceptionIfUndone(exception);
 			ret = DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1132,7 +1172,14 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(exception);
+				if(!DelegatingSubscriptionIntermediateDelegationFuture.super.isDone())
+				{
+					DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					throw exception instanceof RuntimeException ? (RuntimeException) exception : new RuntimeException(exception);
+				}
 			}
 		});
     }
@@ -1238,9 +1285,16 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			Collection<Object> res = (Collection<Object>)func.setResult(result);
 			DelegatingTerminableIntermediateDelegationFuture.super.setResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1256,9 +1310,12 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
 			ret = DelegatingTerminableIntermediateDelegationFuture.super.setResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1274,9 +1331,16 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			Object res = func.addIntermediateResult(result);
 			DelegatingTerminableIntermediateDelegationFuture.super.addIntermediateResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1292,9 +1356,12 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			Object res = func.addIntermediateResultIfUndone(result);
 			ret = DelegatingTerminableIntermediateDelegationFuture.super.addIntermediateResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1310,9 +1377,16 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			func.setFinished((Collection<Object>)getIntermediateResults());
 			DelegatingTerminableIntermediateDelegationFuture.super.setFinished();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1328,9 +1402,12 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
 			ret = DelegatingTerminableIntermediateDelegationFuture.super.setFinishedIfUndone();
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1346,9 +1423,16 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			Exception ex = func.setException(exception);
 			DelegatingTerminableIntermediateDelegationFuture.super.setException(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1364,9 +1448,12 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			func.setExceptionIfUndone(exception);
 			ret = DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1387,7 +1474,14 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingTerminableIntermediateDelegationFuture.super.terminate(exception);
+				if(!DelegatingTerminableIntermediateDelegationFuture.super.isDone())
+				{
+					DelegatingTerminableIntermediateDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					throw exception instanceof RuntimeException ? (RuntimeException) exception : new RuntimeException(exception);
+				}
 			}
 		});
     }
@@ -1488,9 +1582,16 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			Object res = func.setResult(result);
 			DelegatingTerminableDelegationFuture.super.setResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1506,9 +1607,12 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			Object res = func.setResultIfUndone(result);
 			ret = DelegatingTerminableDelegationFuture.super.setResultIfUndone(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1524,9 +1628,16 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			Exception ex = func.setException(exception);
 			DelegatingTerminableDelegationFuture.super.setException(ex);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableDelegationFuture.super.terminate(e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
 	}
 	
@@ -1542,9 +1653,12 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			func.setExceptionIfUndone(exception);
 			ret = DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingTerminableDelegationFuture.super.terminate(e);
+			if(!DelegatingTerminableDelegationFuture.super.isDone())
+			{
+				DelegatingTerminableDelegationFuture.super.terminate(e);
+			}
 		}
 		
 		return ret;
@@ -1564,7 +1678,14 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingTerminableDelegationFuture.super.terminate(exception);
+				if(!DelegatingTerminableDelegationFuture.super.isDone())
+				{
+					DelegatingTerminableDelegationFuture.super.terminate(exception);
+				}
+				else
+				{
+					throw exception instanceof RuntimeException ? (RuntimeException) exception : new RuntimeException(exception);
+				}
 			}
 		});
 	}
