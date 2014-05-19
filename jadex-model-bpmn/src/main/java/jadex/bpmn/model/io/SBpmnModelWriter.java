@@ -41,7 +41,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 38;
+	public static final int BUILD = 39;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -565,6 +565,10 @@ public class SBpmnModelWriter
 					boolean dyn = rs.getDefaultBinding().isDynamic();
 					out.print("\" dynamic=\"");
 					out.print(dyn);
+					
+					boolean create = rs.getDefaultBinding().isCreate();
+					out.print("\" create=\"");
+					out.print(create);
 				}
 				
 				out.println("\"/>");

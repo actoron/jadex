@@ -986,6 +986,7 @@ public class SBpmnModelReader
 				Boolean multi = attrs.get("multi") != null? Boolean.parseBoolean(attrs.get("multi")) : null;
 				String scope = attrs.get("scope");
 				String dyn = attrs.get("dynamic");
+				String create = attrs.get("create");
 				
 				RequiredServiceInfo rs = new RequiredServiceInfo();
 				rs.setName(name);
@@ -998,6 +999,8 @@ public class SBpmnModelReader
 				rs.getDefaultBinding().setScope(scope);
 				if(dyn!=null)
 					rs.getDefaultBinding().setDynamic(Boolean.parseBoolean(dyn));
+				if(create!=null)
+					rs.getDefaultBinding().setCreate(Boolean.parseBoolean(create));
 				((ModelInfo)model.getModelInfo()).addRequiredService(rs);
 			}
 			else if ("requiredserviceconfiguration".equals(tag.getLocalPart()))
