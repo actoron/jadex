@@ -55,14 +55,18 @@ public class DropWastePlan
 		
 		final Waste waste = capa.getCarriedWaste();
 //		System.out.println("carriedwaste a ="+waste);
-		if(waste==null)
-			System.out.println("here");
+//		if(waste==null)
+//			System.out.println("here");
 		
 		// Move to a not full waste-bin
 		final Wastebin wastebin = goal.getWastebin();
 		if(wastebin==null)
-			throw new PlanFailureException();
-
+		{
+			ret.setException(new PlanFailureException());
+			return ret;
+//			throw new PlanFailureException();
+		}
+		
 		Location location = wastebin.getLocation();
 		
 		IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(location));

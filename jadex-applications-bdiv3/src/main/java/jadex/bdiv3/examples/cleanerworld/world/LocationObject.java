@@ -146,6 +146,9 @@ public abstract class LocationObject implements Cloneable
 	 */
 	public void addPropertyChangeListener(PropertyChangeListener listener)
 	{
+		if(listener==null)
+			System.out.println("nulllllllllllllll");
+		
 		pcs.addPropertyChangeListener(listener);
 	}
 
