@@ -77,7 +77,7 @@ public class BDIViewerPanel extends JPanel
 	/** The external access to the agent. */
 	protected IExternalAccess access;
 	
-	/** The beliefs of selected capabilities. */
+	/** The beliefs of all beliefs. */
 	protected List<BeliefInfo> allbeliefs;
 	
 	/** The beliefs. */
@@ -139,7 +139,7 @@ public class BDIViewerPanel extends JPanel
 		
 		JPanel	beliefpanel	= new JPanel(new BorderLayout());
 		beliefpanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Beliefs"));
-		final AbstractTableModel	beliefmodel	= new AbstractTableModel()
+		final AbstractTableModel beliefmodel	= new AbstractTableModel()
 		{
 			protected String[]	columnames	= new String[]{"Name", "Type", "Value"};
 			
@@ -156,7 +156,7 @@ public class BDIViewerPanel extends JPanel
 			public Object getValueAt(int row, int col)
 			{
 				Object	ret	= null;
-				BeliefInfo	info	= (BeliefInfo)beliefs.get(row);
+				BeliefInfo info = (BeliefInfo)beliefs.get(row);
 				if(col==0)
 				{
 					ret	= info.getId();//info.getType()+"#"+info.getId();
@@ -379,7 +379,6 @@ public class BDIViewerPanel extends JPanel
 					}
 
 					updateShown(belieftable, factmodel, goaltable, plantable);
-
 				}
 			}
 		});
@@ -387,7 +386,7 @@ public class BDIViewerPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				shown	= capas;
+				shown = capas;
 				updateShown(belieftable, factmodel, goaltable, plantable);
 			}
 		});
@@ -835,9 +834,16 @@ public class BDIViewerPanel extends JPanel
 		return shown.contains(name);
 	}
 
+	/**
+	 * 
+	 * @param belieftable
+	 * @param factmodel
+	 * @param goaltable
+	 * @param plantable
+	 */
 	protected void updateShown(final JTable belieftable,
-			final AbstractTableModel factmodel, final JTable goaltable,
-			final JTable plantable)
+		final AbstractTableModel factmodel, final JTable goaltable,
+		final JTable plantable)
 	{
 		List<BeliefInfo> beliefsel = getTableSelection(belieftable, beliefs);
 		List<GoalInfo> goalsel = getTableSelection(goaltable, goals);

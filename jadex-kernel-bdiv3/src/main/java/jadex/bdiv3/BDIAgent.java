@@ -565,6 +565,8 @@ public class BDIAgent extends MicroAgent
 		
 		final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 		
+		assert ip.isComponentThread();
+
 		// Test if array store is really a belief store instruction by
 		// looking up the current belief value and comparing it with the
 		// array that is written
@@ -651,6 +653,8 @@ public class BDIAgent extends MicroAgent
 	 */
 	public static void observeValue(final RuleSystem rs, final Object val, final BDIAgentInterpreter agent, final EventType etype, final MBelief mbel)
 	{
+		assert agent.isComponentThread();
+
 		if(val!=null)
 		{
 			rs.observeObject(val, true, false, new IResultCommand<IFuture<Void>, PropertyChangeEvent>()
@@ -968,6 +972,8 @@ public class BDIAgent extends MicroAgent
 		
 		final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 		
+		assert ip.isComponentThread();
+
 		// Test if array store is really a belief store instruction by
 		// looking up the current belief value and comparing it with the
 		// array that is written
@@ -1008,7 +1014,6 @@ public class BDIAgent extends MicroAgent
 		
 		if(isparamwrite)
 		{
-			observeValue(rs, val, ip, new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname}), null);
 			
 			if(!SUtil.equals(val, oldval))
 			{

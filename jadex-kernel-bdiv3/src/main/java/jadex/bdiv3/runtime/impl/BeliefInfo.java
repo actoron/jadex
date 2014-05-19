@@ -2,7 +2,6 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.model.MBelief;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -146,6 +145,7 @@ public class BeliefInfo	extends AbstractBDIInfo
 			{
 				vals.add("" + it.next());
 			}
+			value = vals;
 		}
 		else if(value!=null)
 		{
