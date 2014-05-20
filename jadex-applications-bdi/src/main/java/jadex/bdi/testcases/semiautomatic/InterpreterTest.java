@@ -5,7 +5,7 @@ import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
@@ -102,7 +102,7 @@ class ComponentAdapterFactory implements IComponentAdapterFactory
 
 	
 	public IComponentAdapter createComponentAdapter(IComponentDescription desc,
-		IModelInfo model, IComponentInstance instance, IExternalAccess parent)
+		IModelInfo model, IComponentInterpreter instance, IExternalAccess parent)
 	{
 		return new ComponentAdapter(instance);
 	}
@@ -113,7 +113,7 @@ class ComponentAdapter implements IComponentAdapter
 	final Executor exe;
 	final IServiceContainer container;
 	
-	public ComponentAdapter(final IComponentInstance interpreter)
+	public ComponentAdapter(final IComponentInterpreter interpreter)
 	{
 		container = new ComponentServiceContainer(this, "platform", null, false);
 		// Todo: move test to somewhere more useful? (jadex-launch?)

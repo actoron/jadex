@@ -1,7 +1,7 @@
 package jadex.component;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -293,18 +293,18 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
+	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
 		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, 
 		final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
 		final IPersistInfo persistinfo,
 		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
 	{
-		final Future<Tuple2<IComponentInstance, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
 		
 		if(libservice!=null)
 		{
 			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
-				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
+				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInterpreter, IComponentAdapter>>(ret)
 			{
 				public void customResultAvailable(ClassLoader cl)
 				{
@@ -314,7 +314,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 							new Object[]{modelinfo.getResourceIdentifier(), getServiceIdentifier().getProviderId().getRoot()});
 						ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, 
 							arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl);
-						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+						ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
 					catch(Exception e)
 					{
@@ -334,7 +334,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 					new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
 				ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent,
 					arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl);
-				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+				ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}
 			catch(Exception e)
 			{

@@ -1,7 +1,7 @@
 package jadex.platform.service.cms;
 
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -41,7 +41,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance component, IExternalAccess parent)
+	public StandaloneComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInterpreter component, IExternalAccess parent)
 	{
 		super(desc, model, component, parent);
 	}

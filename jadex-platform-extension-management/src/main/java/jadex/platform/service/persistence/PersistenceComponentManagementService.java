@@ -1,7 +1,7 @@
 package jadex.platform.service.persistence;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -81,7 +81,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 			return new ComponentAdapterFactory()
 			{
 				public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model,
-					IComponentInstance instance, IExternalAccess parent)
+					IComponentInterpreter instance, IExternalAccess parent)
 				{
 					return new PersistentComponentAdapter(desc, model, instance, parent, PersistenceComponentManagementService.this);
 				}
@@ -164,7 +164,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 			{
 				public void customResultAvailable(IExternalAccess exta)
 				{
-					final IComponentInstance	instance	= getComponentInstance(internalGetComponentAdapter(cid));
+					final IComponentInterpreter	instance	= getComponentInstance(internalGetComponentAdapter(cid));
 					
 					// Fetch persistable state on component thread.
 					exta.scheduleImmediate(new IComponentStep<IPersistInfo>()
@@ -243,7 +243,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 		
 									// Todo: allow adapting component identifier (e.g. to changed platform suffix).
 									Future<Void>	init	= new Future<Void>();
-									final IFuture<Tuple2<IComponentInstance, IComponentAdapter>>	tupfut	=
+									final IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>>	tupfut	=
 										factory.createComponentInstance(pi.getComponentDescription(), getComponentAdapterFactory(), model, 
 										null, null, parent, null, copy, realtime, persist, pi, reslis, init);
 									
@@ -251,9 +251,9 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 									{
 										public void customResultAvailable(Void result)
 										{
-											tupfut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, Void>(fut)
+											tupfut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>, Void>(fut)
 											{
-												public void customResultAvailable(final Tuple2<IComponentInstance, IComponentAdapter> tup)
+												public void customResultAvailable(final Tuple2<IComponentInterpreter, IComponentAdapter> tup)
 												{
 													IComponentAdapter	pad	= internalGetComponentAdapter(parent.getComponentIdentifier());
 													if(Arrays.asList(((CMSComponentDescription)pad.getDescription()).getChildren()).contains(pi.getComponentDescription().getName()))
@@ -276,7 +276,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 													}
 												}
 												
-												public void done(Tuple2<IComponentInstance, IComponentAdapter> tup)
+												public void done(Tuple2<IComponentInterpreter, IComponentAdapter> tup)
 												{
 													adapters.put(pi.getComponentDescription().getName(), tup.getSecondEntity());
 													getComponentAdapterFactory().initialWakeup(tup.getSecondEntity());

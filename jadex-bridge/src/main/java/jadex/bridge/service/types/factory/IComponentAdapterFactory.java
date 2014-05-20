@@ -1,6 +1,6 @@
 package jadex.bridge.service.types.factory;
 
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -21,7 +21,7 @@ public interface IComponentAdapterFactory
 	 *  @param parent The external access of the component's parent.
 	 *  @return The component adapter.
 	 */
-	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance instance, IExternalAccess parent);
+	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInterpreter instance, IExternalAccess parent);
 	
 	/**
 	 *  Execute a step of the component via triggering the adapter.

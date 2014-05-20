@@ -5,7 +5,7 @@ import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageAdapter;
@@ -59,7 +59,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected IExternalAccess parent;
 
 	/** The component instance. */
-	protected IComponentInstance component;
+	protected IComponentInterpreter component;
 	
 	/** The component model. */
 	protected IModelInfo model;
@@ -128,7 +128,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public AbstractComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance component, IExternalAccess parent)
+	public AbstractComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInterpreter component, IExternalAccess parent)
 	{
 		this.desc = desc;
 		this.model = model;
@@ -1120,7 +1120,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/**
 	 *  Make kernel component available.
 	 */
-	public IComponentInstance	getComponentInstance()
+	public IComponentInterpreter	getComponentInstance()
 	{
 		return component;
 	}

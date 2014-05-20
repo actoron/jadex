@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.IMessageAdapter;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IFilter;
 
@@ -14,7 +15,7 @@ public interface IMessageHandler
 	 *  Get the filter.
 	 *  @return The filter.
 	 */
-	public IFilter getFilter();
+	public IFilter<IMessageAdapter> getFilter();
 	
 	/**
 	 *  Get the timeout.

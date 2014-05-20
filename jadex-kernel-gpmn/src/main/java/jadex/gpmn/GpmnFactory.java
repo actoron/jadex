@@ -5,7 +5,7 @@ import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
 import jadex.bdibpmn.BpmnPlanExecutor;
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -278,11 +278,11 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
+	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
 		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, 
 		final boolean copy, final boolean realtime, final boolean persist, final IPersistInfo persistinfo, final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
-		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>> ret = new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
 
 //		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 //		System.out.println(factory.getClass().toString());
@@ -290,7 +290,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		if(libservice!=null)
 		{
 			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
-				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
+				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInterpreter, IComponentAdapter>>(ret)
 			{
 				public void customResultAvailable(ClassLoader cl)
 				{

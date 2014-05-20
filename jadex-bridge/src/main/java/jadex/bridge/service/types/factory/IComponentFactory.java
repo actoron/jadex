@@ -1,18 +1,12 @@
 package jadex.bridge.service.types.factory;
 
-import jadex.bridge.IComponentInstance;
-import jadex.bridge.IExternalAccess;
+import jadex.bridge.IComponentInterpreter;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.IPersistInfo;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.Tuple2;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 
 import java.util.Map;
 
@@ -85,26 +79,12 @@ public interface IComponentFactory
 	public Map<String, Object>	getProperties(String type);
 	
 	/**
-	 * Create a component instance.
-	 * @param desc	The component description.
-	 * @param factory The component adapter factory.
+	 * Create a component interpreter.
 	 * @param model The component model.
-	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the component as name/value pairs.
-	 * @param parent The parent component (if any).
-	 * @param bindings	Optional bindings to override bindings from model.
-	 * @param copy	Global flag for parameter copying.
-	 * @param realtime	Global flag for real time timeouts.
-	 * @param persist	Global flag for persistence support.
-	 * @param resultlistener	Optional listener to be notified when the component finishes.
-	 * @param init	Future to be notified when init of the component is completed.
-	 * @return An instance of a component and the corresponding adapter.
+	 * @param component The platform component.
+	 * @param persistinfo The previously saved interpreter-specific state (if any).
+	 * @return An interpreter for the component.
 	 */
 	@Excluded
-	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, 
-		IComponentAdapterFactory factory, IModelInfo model, String config, Map<String, Object> arguments, 
-		IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
-		IPersistInfo persistinfo, 
-		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> init);
-
+	public IFuture<IComponentInterpreter> createComponentInterpreter(final IModelInfo model, IInternalAccess component, final Object persistinfo);
 }

@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.IMessageAdapter;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IFilter;
 
@@ -13,7 +14,7 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	//-------- attributes --------
 	
 	/** The filter. */
-	protected IFilter filter;
+	protected IFilter<IMessageAdapter> filter;
 	
 	/** The timeout. */
 	protected long timeout;
@@ -37,7 +38,7 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	/**
 	 *  Create a new message handler.
 	 */
-	public AbstractMessageHandler(IFilter filter, long timeout, boolean remove, boolean realtime)
+	public AbstractMessageHandler(IFilter<IMessageAdapter> filter, long timeout, boolean remove, boolean realtime)
 	{
 		this.filter = filter;
 		this.timeout = timeout;
@@ -51,7 +52,7 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	 *  Get the filter.
 	 *  @return The filter.
 	 */
-	public IFilter getFilter()
+	public IFilter<IMessageAdapter> getFilter()
 	{
 		return filter;
 	}
@@ -60,7 +61,7 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	 *  Set the filter.
 	 *  @param filter The filter to set.
 	 */
-	public void setFilter(IFilter filter)
+	public void setFilter(IFilter<IMessageAdapter> filter)
 	{
 		this.filter = filter;
 	}

@@ -1,6 +1,6 @@
 package jadex.platform.service.cms;
 
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -20,7 +20,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	 *  @param parent The external access of the component's parent.
 	 *  @return The component adapter.
 	 */
-	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance instance, IExternalAccess parent)
+	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInterpreter instance, IExternalAccess parent)
 	{
 		return new StandaloneComponentAdapter(desc, model, instance, parent);
 	}

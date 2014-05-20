@@ -6,7 +6,7 @@ import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -209,7 +209,7 @@ public class ComponentManagementService implements IComponentManagementService
 	/**
 	 *  Get the component instance from an adapter.
 	 */
-	public IComponentInstance getComponentInstance(IComponentAdapter adapter)
+	public IComponentInterpreter getComponentInstance(IComponentAdapter adapter)
 	{
 		return ((StandaloneComponentAdapter)adapter).getComponentInstance();
 	}
@@ -827,9 +827,9 @@ public class ComponentManagementService implements IComponentManagementService
 																	IPersistInfo persistinfo = null;
 																	factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
 																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, persist, persistinfo, reslis, resfut)
-																		.addResultListener(createResultListener(new IResultListener<Tuple2<IComponentInstance, IComponentAdapter>>()
+																		.addResultListener(createResultListener(new IResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>>()
 																	{
-																		public void resultAvailable(Tuple2<IComponentInstance, IComponentAdapter> comp)
+																		public void resultAvailable(Tuple2<IComponentInterpreter, IComponentAdapter> comp)
 																		{
 																			// Store (invalid) desc, adapter and info for children
 																			// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
@@ -1596,7 +1596,7 @@ public class ComponentManagementService implements IComponentManagementService
 							if(initresume)
 							{
 								boolean	wakeup	= false;
-								IComponentInstance instance	= null;
+								IComponentInterpreter instance	= null;
 								Future<Map<String, Object>>	destroy	= null;
 								// Not killed during init.
 								if(!cfs.containsKey(cid))
@@ -1628,7 +1628,7 @@ public class ComponentManagementService implements IComponentManagementService
 								{
 									try
 									{
-										final IComponentInstance	ci	= instance;
+										final IComponentInterpreter	ci	= instance;
 										instance.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
 										{
 											public IFuture<Void> execute(IInternalAccess ia)
@@ -3298,7 +3298,7 @@ public class ComponentManagementService implements IComponentManagementService
 		protected Future<Void> initfuture;
 		
 		/** The component instance. */
-		protected IComponentInstance instance;
+		protected IComponentInterpreter instance;
 
 		//-------- constructors --------
 		
@@ -3307,7 +3307,7 @@ public class ComponentManagementService implements IComponentManagementService
 		 */
 		public InitInfo(IComponentDescription description,
 			IComponentAdapter adapter, CreationInfo info, IModelInfo model,
-			Future<Void> initfuture, IComponentInstance instance)
+			Future<Void> initfuture, IComponentInterpreter instance)
 		{
 			this.description = description;
 			this.adapter = adapter;
@@ -3413,7 +3413,7 @@ public class ComponentManagementService implements IComponentManagementService
 		 *  Get the instance.
 		 *  @return The instance.
 		 */
-		public IComponentInstance getInstance()
+		public IComponentInterpreter getInstance()
 		{
 			return instance;
 		}
@@ -3422,7 +3422,7 @@ public class ComponentManagementService implements IComponentManagementService
 		 *  Set the instance.
 		 *  @param instance The instance to set.
 		 */
-		public void setInstance(IComponentInstance instance)
+		public void setInstance(IComponentInterpreter instance)
 		{
 			this.instance = instance;
 		}

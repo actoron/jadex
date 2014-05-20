@@ -3,7 +3,7 @@ package jadex.bdiv3;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -330,19 +330,19 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, final IModelInfo model, 
+	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, final IModelInfo model, 
 		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] binding, final boolean copy, final boolean realtime, final boolean persist,
 		final IPersistInfo persistinfo,
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
-		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>> res = new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
 		
 		if(libservice!=null)
 		{
 			// todo: is model info ok also in remote case?
 	//		ClassLoader cl = libservice.getClassLoader(model.getResourceIdentifier());
 			libservice.getClassLoader(model.getResourceIdentifier())
-				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(res)
+				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInterpreter, IComponentAdapter>>(res)
 			{
 				public void customResultAvailable(ClassLoader cl)
 				{
@@ -351,7 +351,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 						BDIModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
 						BDIAgentInterpreter mai = new BDIAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST, 
 							null, cl), arguments, config, parent, binding, copy, realtime, persist, persistinfo, listener, inited);
-						res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
+						res.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(mai, mai.getComponentAdapter()));
 					}
 					catch(Exception e)
 					{
@@ -370,7 +370,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 				BDIModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
 				BDIAgentInterpreter mai = new BDIAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST, 
 					null, cl), arguments, config, parent, binding, copy, realtime, persist, persistinfo, listener, inited);
-				res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
+				res.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(mai, mai.getComponentAdapter()));
 			}
 			catch(Exception e)
 			{

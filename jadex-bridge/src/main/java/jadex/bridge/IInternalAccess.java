@@ -131,7 +131,17 @@ public interface IInternalAccess
 //	 */
 //	public IFuture getFileName(String ctype);
 	
-	// todo: generic interface does not match MicroAgent implementation (returns IFuture<TimerWrapper>).
+	/**
+	 *  Execute a component step.
+	 */
+	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step);
+	
+	/**
+	 *  Execute an immediate component step,
+	 *  i.e., the step is executed also when the component is currently suspended.
+	 */
+	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step);
+	
 	/**
 	 *  Wait for some time and execute a component step afterwards.
 	 */

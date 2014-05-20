@@ -255,7 +255,7 @@ public class MicroClassReader
 		
 		Set<Class<?>> serifaces = new HashSet<Class<?>>(); 
 		
-		while(cma!=null && !cma.equals(Object.class) && !cma.equals(getClass(MicroAgent.class, cl)))
+		while(cma!=null && !cma.equals(Object.class))
 		{
 			if(isAnnotationPresent(cma, Agent.class, cl))
 			{
@@ -795,19 +795,6 @@ public class MicroClassReader
 				}
 			}
 
-			if(micromodel.getBreakpointMethod()==null)
-			{
-//				Method[] methods = cma.getDeclaredMethods();
-				for(int i=0; i<methods.length; i++)
-				{
-					final Method method = methods[i];
-					if(isAnnotationPresent(methods[i], AgentBreakpoint.class, cl))
-					{
-						micromodel.setBreakpointMethod(method);
-					}
-				}
-			}
-			
 			cma = cma.getSuperclass();
 		}
 				
@@ -1563,7 +1550,7 @@ public class MicroClassReader
 		{
 			throw new RuntimeException("Micro agent class not found: " + clname);
 		}
-		else if(!MicroAgent.class.isAssignableFrom(ret))
+		else
 		{
 			boolean	found	= false;
 			Class	cma	= ret;

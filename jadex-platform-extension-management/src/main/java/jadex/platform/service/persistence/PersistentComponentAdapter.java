@@ -1,6 +1,6 @@
 package jadex.platform.service.persistence;
 
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -26,7 +26,7 @@ public class PersistentComponentAdapter extends StandaloneComponentAdapter
 	 *  Create a component adapter.
 	 */
 	public PersistentComponentAdapter(IComponentDescription desc, IModelInfo model,
-		IComponentInstance component, IExternalAccess parent, PersistenceComponentManagementService ps)
+		IComponentInterpreter component, IExternalAccess parent, PersistenceComponentManagementService ps)
 	{
 		super(desc, model, component, parent);
 		this.ps	= ps;

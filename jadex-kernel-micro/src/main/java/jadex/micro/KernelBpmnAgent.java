@@ -1,7 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
@@ -27,6 +27,7 @@ import jadex.micro.annotation.ProvidedServices;
 	+		"})"
 	+	")"))
 })
-public class KernelBpmnAgent extends MicroAgent
+@Agent
+public class KernelBpmnAgent
 {
 }

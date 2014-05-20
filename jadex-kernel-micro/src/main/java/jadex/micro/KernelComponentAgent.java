@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.NameValue;
@@ -16,6 +17,7 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.component.ComponentComponentFactory($component.getServiceProvider())"))
 })
-public class KernelComponentAgent extends MicroAgent
+@Agent
+public class KernelComponentAgent
 {
 }

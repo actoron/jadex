@@ -2,6 +2,7 @@ package jadex.micro;
 
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -11,6 +12,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentBreakpoint;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
@@ -24,9 +26,12 @@ import java.util.Map;
 /**
  *  Micro agent class that redirects calls to a pojo agent object.
  */
-public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
+public class PojoMicroAgent	implements IPojoMicroAgent
 {
 	//-------- attributes --------
+	
+	/** The internal access. */
+	protected IInternalAccess component;
 	
 	/** The pojo agent object. */
 	protected Object agent;
@@ -34,12 +39,13 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	//-------- constructors --------
 	
 	/**
-	 *  Init the micro agent with the interpreter.
-	 *  @param interpreter The interpreter.
+	 *  Init the micro agent.
+	 *  @param component The component.
+	 *  @param agent The pojo agent object.
 	 */
-	public void init(MicroAgentInterpreter interpreter, Object agent)
+	public PojoMicroAgent(IInternalAccess component, Object agent)
 	{
-		super.init(interpreter);
+		this.component	= component;
 		this.agent = agent;
 	}
 	
@@ -52,7 +58,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		invokeMethod(AgentCreated.class, null).addResultListener(
-			createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+			component.createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
 		{
 			public void customResultAvailable(Tuple2<Method, Object> result)
 			{
@@ -71,7 +77,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 		final Future<Void> ret = new Future<Void>();
 		
 		invokeMethod(AgentBody.class, null)
-			.addResultListener(interpreter.createResultListener(
+			.addResultListener(component.createResultListener(
 				new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
 		{
 			public void customResultAvailable(Tuple2<Method, Object> res)
@@ -114,10 +120,10 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 *  @param msg The message.
 	 *  @param mt The message type.
 	 */
-	public void messageArrived(Map msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
 		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt}).addResultListener(
-			interpreter.createResultListener(new IResultListener<Tuple2<Method, Object>>()
+			component.createResultListener(new IResultListener<Tuple2<Method, Object>>()
 		{
 			public void resultAvailable(Tuple2<Method, Object> result)
 			{
@@ -144,7 +150,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	public void streamArrived(IConnection con)
 	{
 		invokeMethod(AgentStreamArrived.class, new Object[]{con}).addResultListener(
-			interpreter.createResultListener(new IResultListener<Tuple2<Method, Object>>()
+			component.createResultListener(new IResultListener<Tuple2<Method, Object>>()
 		{
 			public void resultAvailable(Tuple2<Method, Object> result)
 			{
@@ -173,7 +179,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 		final Future<Void> ret = new Future<Void>();
 
 		invokeMethod(AgentKilled.class, null).addResultListener(
-			createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+			component.createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
 		{
 			public void customResultAvailable(Tuple2<Method, Object> result)
 			{
@@ -194,27 +200,13 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 */
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
-		boolean ret = false;
-		
-		MicroModel mm = getInterpreter().getMicroModel();
-		if(mm.getBreakpointMethod()!=null)
+		IFuture<Tuple2<Method, Object>>	fut	= invokeMethod(AgentBreakpoint.class, new Object[]{breakpoints});
+		if(!fut.isDone())
 		{
-			try
-			{
-				Object res = mm.getBreakpointMethod().invoke(agent, new Object[]{breakpoints});
-				ret = ((Boolean)res).booleanValue();
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
+			throw new UnsupportedOperationException("Asynchronous breakpoint method not supported");
 		}
-		
-		return ret;
+		Object	ret	= fut.get(null).getSecondEntity();
+		return ret instanceof Boolean ? ((Boolean)ret).booleanValue() : false;
 	}
 	
 	/**
@@ -261,7 +253,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 						}
 						else if(SReflect.isSupertype(clazz, IExternalAccess.class))
 						{
-							tmp[j]= PojoMicroAgent.this.getExternalAccess();
+							tmp[j]= component.getExternalAccess();
 						}
 					}
 					args	= tmp;
@@ -272,7 +264,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 					Object res = method.invoke(agent, args);
 					if(res instanceof IFuture)
 					{
-						((IFuture)res).addResultListener(createResultListener(
+						((IFuture<Object>)res).addResultListener(component.createResultListener(
 							new ExceptionDelegationResultListener<Object, Tuple2<Method, Object>>(ret)
 						{
 							public void customResultAvailable(Object result)

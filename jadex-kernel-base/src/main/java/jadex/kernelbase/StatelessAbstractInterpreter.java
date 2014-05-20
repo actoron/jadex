@@ -2,7 +2,7 @@ package jadex.kernelbase;
 
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
@@ -91,7 +91,7 @@ import java.util.logging.Logger;
  *  Implements the IComponentInstance interface and is responsible
  *  for realizing the outer structure of active components.
  */
-public abstract class StatelessAbstractInterpreter extends NFPropertyProvider implements IComponentInstance
+public abstract class StatelessAbstractInterpreter extends NFPropertyProvider implements IComponentInterpreter
 {
 	/** Constant for step event. */
 	public static final String TYPE_COMPONENT = "component";

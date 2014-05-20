@@ -1,32 +1,24 @@
 package jadex.micro;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentInstance;
-import jadex.bridge.IExternalAccess;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
-import jadex.kernelbase.IBootstrapFactory;
 import jadex.commons.LazyResource;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.kernelbase.IBootstrapFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -212,53 +204,6 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		return ret;
 	}
 	
-//	/**
-//	 *  Load a  model.
-//	 *  @param model The model (e.g. file name).
-//	 *  @param The imports (if any).
-//	 *  @return The loaded model.
-//	 */
-//	public IModelInfo loadModel(InputStream in, String[] imports, ClassLoader classloader)
-//	{
-//		IModelInfo ret = null;
-//		
-//		ByteClassLoader cl = new ByteClassLoader(classloader);
-//		BufferedInputStream bin = new BufferedInputStream(in);
-//		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//
-//		try
-//		{
-//			int d;
-//			while((d = bin.read())!=-1)
-//				bos.write(d);
-//		
-//			Class cma = cl.loadClass(null, bos.toByteArray(), true);
-//			String model = cma.getName().replace('.', '/');
-//			
-//			ret = loader.read(model, cma, cl);
-//		}
-//		catch(Exception e)
-//		{
-//		}
-//		
-//		try
-//		{
-//			bin.close();
-//		}
-//		catch(IOException e)
-//		{
-//		}
-//		try
-//		{
-//			bos.close();
-//		}
-//		catch(IOException e)
-//		{
-//		}
-//		
-//		return ret;
-//	}
-	
 	/**
 	 *  Test if a model can be loaded by the factory.
 	 *  @param model The model (e.g. file name).
@@ -398,36 +343,28 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	}
 	
 	/**
-	 * Create a component instance.
-	 * @param adapter The component adapter.
+	 * Create a component interpreter.
 	 * @param model The component model.
-	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the agent as name/value pairs.
-	 * @param parent The parent component (if any).
-	 * @return An instance of a component.
+	 * @param component The platform component.
+	 * @param persistinfo The previously saved interpreter-specific state (if any).
+	 * @return An interpreter for the component.
 	 */
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, final IModelInfo model, 
-		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] binding, final boolean copy, final boolean realtime, final boolean persist,
-		final IPersistInfo persistinfo,
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
+	public IFuture<IComponentInterpreter> createComponentInterpreter(final IModelInfo model, IInternalAccess component, final Object persistinfo)
 	{
-		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+		final Future<IComponentInterpreter> res = new Future<IComponentInterpreter>();
 		
 		if(libservice!=null)
 		{
-			// todo: is model info ok also in remote case?
-	//		ClassLoader cl = libservice.getClassLoader(model.getResourceIdentifier());
 			libservice.getClassLoader(model.getResourceIdentifier())
-				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(res)
+				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, IComponentInterpreter>(res)
 			{
 				public void customResultAvailable(ClassLoader cl)
 				{
 					try
 					{
 						MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
-						MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
-							null, cl), arguments, config, parent, binding, copy, realtime, persist, persistinfo, resultlistener, inited);
-						res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
+						MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), null, (MicroAgentPersistInfo)persistinfo);
+						res.setResult(mai);
 					}
 					catch(Exception e)
 					{
@@ -444,9 +381,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			{
 				ClassLoader	cl	= getClass().getClassLoader();
 				MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
-				MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
-					null, cl), arguments, config, parent, binding, copy, realtime, persist, persistinfo, resultlistener, inited);
-				res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
+				MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), null, (MicroAgentPersistInfo)persistinfo);
+				res.setResult(mai);
 			}
 			catch(Exception e)
 			{

@@ -36,9 +36,6 @@ public class MicroModel extends CacheableKernelModel
 	/** The service injection targets. */
 	protected Map<String, Object> serviceinjections;
 	
-	/** The breakpoint method. */
-	protected Method bpmethod;
-	
 	/** The class loader. */
 	protected ClassLoader classloader;
 	
@@ -197,24 +194,6 @@ public class MicroModel extends CacheableKernelModel
 	{
 		return serviceinjections==null? SUtil.EMPTY_STRING_ARRAY: 
 			(String[])serviceinjections.keySet().toArray(new String[serviceinjections.size()]);
-	}
-
-	/**
-	 *  Get the breakpoint method.
-	 *  @return The breakpoint method.
-	 */
-	public Method getBreakpointMethod()
-	{
-		return bpmethod;
-	}
-
-	/**
-	 *  Set the breakpoint method.
-	 *  @param breakpoint method The breakpoint method to set.
-	 */
-	public void setBreakpointMethod(Method breakpointMethod)
-	{
-		this.bpmethod = breakpointMethod;
 	}
 
 	/**

@@ -1,33 +1,30 @@
 package jadex.micro;
 
-import jadex.kernelbase.DefaultPersistInfo;
-
-public class MicroAgentPersistInfo extends DefaultPersistInfo
+/**
+ *  Custom persistent data for micro agents.
+ */
+public class MicroAgentPersistInfo
 {
-	/** The agent object implemented by the user. */
+	//-------- attributes --------
+	
+	/** The pojo agent object provided by the user. */
 	protected Object useragentobject;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Empty constructor for bean compatibility.
 	 */
 	public MicroAgentPersistInfo()
 	{
-		super();
 	}
 	
 	/**
 	 *  Creates the state info object.
 	 */
-	public MicroAgentPersistInfo(MicroAgentInterpreter interpreter)
+	public MicroAgentPersistInfo(PojoMicroAgent agent)
 	{
-		super(interpreter);
-		
-		if (!(interpreter.getAgent() instanceof IPojoMicroAgent))
-		{
-			throw new UnsupportedOperationException("Persisting non-POJO micro agent is currently unsupported: " + interpreter.getName());
-		}
-		
-		useragentobject = ((IPojoMicroAgent) interpreter.getAgent()).getPojoAgent();
+		setUserAgentObject(agent.getPojoAgent());
 	}
 
 	/**
@@ -49,6 +46,4 @@ public class MicroAgentPersistInfo extends DefaultPersistInfo
 	{
 		this.useragentobject = useragentobject;
 	}
-	
-	
 }

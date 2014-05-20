@@ -3,7 +3,7 @@ package jadex.base;
 import jadex.bridge.Cause;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
@@ -492,15 +492,15 @@ public class Starter
 									Class<?> afclass = af instanceof Class ? (Class<?>)af : SReflect.classForName(af.toString(), cl);
 									final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
 									
-									final Future<IComponentInstance>	instancefut	= new Future<IComponentInstance>();
+									final Future<IComponentInterpreter>	instancefut	= new Future<IComponentInterpreter>();
 									Future<Void> future = new Future<Void>();
 									future.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 									{
 										public void customResultAvailable(Void result)
 										{
-											instancefut.addResultListener(new ExceptionDelegationResultListener<IComponentInstance, IExternalAccess>(ret)
+											instancefut.addResultListener(new ExceptionDelegationResultListener<IComponentInterpreter, IExternalAccess>(ret)
 											{
-												public void customResultAvailable(final IComponentInstance instance)
+												public void customResultAvailable(final IComponentInterpreter instance)
 												{
 													startComponents(0, components, instance)
 														.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
@@ -533,9 +533,9 @@ public class Starter
 									boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
 									// what about platform result listener?!
 									cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, realtime, persist, null, null, future)
-										.addResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, IExternalAccess>(ret)
+										.addResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>, IExternalAccess>(ret)
 									{
-										public void customResultAvailable(Tuple2<IComponentInstance, IComponentAdapter> root)
+										public void customResultAvailable(Tuple2<IComponentInterpreter, IComponentAdapter> root)
 										{
 											instancefut.setResult(root.getFirstEntity());
 											IComponentAdapter adapter = root.getSecondEntity();
@@ -695,7 +695,7 @@ public class Starter
 	 *  @param instance The instance.
 	 *  @return True, when done.
 	 */
-	protected static IFuture<Void> startComponents(final int i, final List<String> components, final IComponentInstance instance)
+	protected static IFuture<Void> startComponents(final int i, final List<String> components, final IComponentInterpreter instance)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		

@@ -2,6 +2,7 @@ package jadex.micro;
 
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Component;
@@ -35,6 +36,7 @@ import jadex.micro.annotation.ProvidedServices;
 		@Component(name="kernel_micro", type="KernelMicro")
 	})
 })
-public class KernelMultiAgent extends MicroAgent
+@Agent
+public class KernelMultiAgent
 {
 }

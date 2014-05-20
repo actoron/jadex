@@ -1,6 +1,6 @@
 package jadex.kernelbase;
 
-import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -584,7 +584,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
+	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
 			final IComponentAdapterFactory factory, final IModelInfo model, final String config,
 			final Map<String, Object> arguments, final IExternalAccess parent,
 			final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
@@ -598,7 +598,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		if(fac != null)
 			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, ret);
 		
-		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>> res = new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
 		
 		findKernel(model.getFilename(), null, model.getResourceIdentifier()).addResultListener(ia.createResultListener(new DelegationResultListener(res)
 		{
