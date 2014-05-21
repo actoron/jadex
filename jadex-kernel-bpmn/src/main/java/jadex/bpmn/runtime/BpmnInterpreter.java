@@ -55,7 +55,7 @@ import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -250,7 +250,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 *  @param adapter The adapter.
 	 */
 	// Constructor for self-contained bpmn components
-	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, final Map<String, Object> arguments, 
+	public BpmnInterpreter(IComponentDescription desc, IPlatformComponentFactory factory, MBpmnModel model, final Map<String, Object> arguments, 
 		String config, final IExternalAccess parent, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers, 
 		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		IPersistInfo persistinfo,

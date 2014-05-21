@@ -21,8 +21,8 @@ import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -57,66 +57,66 @@ public class Starter
 {
 	//-------- constants --------
 
-	/** The fallback platform configuration. */
+	/** The default platform configuration. */
 //	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/Platform.component.xml";
 	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/PlatformAgent.class";
 
-	/** The component factory to be used for platform component. */
+	/** The default component factory to be used for platform component. */
 //	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";
 	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.micro.MicroAgentFactory";
 
-	/** The configuration file. */
+	/** The configuration file argument. */
 	public static final String CONFIGURATION_FILE = "conf";
 	
-	/** The configuration name. */
+	/** The configuration name argument. */
 	public static final String CONFIGURATION_NAME = "configname";
 	
-	/** The platform name. */
+	/** The platform name argument. */
 	public static final String PLATFORM_NAME = "platformname";
 
-	/** The component factory classname. */
+	/** The component factory classname argument. */
 	public static final String COMPONENT_FACTORY = "componentfactory";
 	
-	/** The adapter factory classname. */
-	public static final String ADAPTER_FACTORY = "adapterfactory";
+	/** The platform component implementation classname argument. */
+	public static final String PLATFORM_COMPONENT = "platformcomponent";
 	
-	/** The autoshutdown flag. */
+	/** The autoshutdown flag argument. */
 	public static final String AUTOSHUTDOWN = "autoshutdown";
 
-	/** The monitoring flag. */
+	/** The monitoring flag argument. */
 	public static final String MONITORING = "monitoring";
 
-	/** The welcome flag. */
+	/** The welcome flag argument. */
 	public static final String WELCOME = "welcome";
 
-	/** The component flag (for starting an additional component). */
+	/** The component flag argument (for starting an additional component). */
 	public static final String COMPONENT = "component";
 	
-	/** The parameter copy flag. */
+	/** The parameter copy flag argument. */
 	public static final String PARAMETERCOPY = "parametercopy";
 
-	/** The persist flag. */
+	/** The persist flag argument. */
 	public static final String PERSIST = "persist";
 
-	/** The default timeout. */
+	/** The default timeout argument. */
 	public static final String DEFTIMEOUT = "deftimeout";
 	
-	/** The realtime timeout flag. */
+	/** The realtime timeout flag argument. */
 	public static final String REALTIMETIMEOUT = "realtimetimeout";
 	
-	/** The debug futures flag. */
+	/** The debug futures flag argument. */
 	public static final String DEBUGFUTURES = "debugfutures";
 	
-	/** The debug futures services. */
+	/** The debug futures services argument. */
 	public static final String DEBUGSERVICES = "debugservices";
 	
-	/** The stack compaction disable flag. */
+	/** The stack compaction disable flag argument. */
 	public static final String NOSTACKCOMPACTION = "nostackcompaction";
 	
-	/** The opengl disable flag. */
+	/** The opengl disable flag argument. */
 	public static final String OPENGL = "opengl";
 	
-	/** The component factory classname. */
+	/** The argument key, where program arguments are stored for later retrieval. */
 	public static final String PROGRAM_ARGUMENTS = "programarguments";
 
 	
@@ -130,7 +130,7 @@ public class Starter
 		RESERVED.add(CONFIGURATION_NAME);
 		RESERVED.add(PLATFORM_NAME);
 		RESERVED.add(COMPONENT_FACTORY);
-		RESERVED.add(ADAPTER_FACTORY);
+		RESERVED.add(PLATFORM_COMPONENT);
 		RESERVED.add(AUTOSHUTDOWN);
 		RESERVED.add(MONITORING);
 		RESERVED.add(WELCOME);
@@ -288,6 +288,7 @@ public class Starter
 			}
 			
 			CallAccess.setCurrentInvocation(scn);
+			sc	= scn;
 		}
 		
 		try
@@ -375,13 +376,24 @@ public class Starter
 			
 //			System.out.println("Using config file: "+configfile);
 			
-			cfac.loadModel(configfile, null, null)//rid)
-				.addResultListener(new ExceptionDelegationResultListener<IModelInfo, IExternalAccess>(ret)
+			final IModelInfo model	= cfac.loadModel(configfile, null, null).get(null);	// No execution yet, can only work if method is synchronous.
+			
+			if(model.getReport()!=null)
 			{
-				public void customResultAvailable(final IModelInfo model) 
+				ret.setException(new RuntimeException("Error loading model:\n"+model.getReport().getErrorText()));
+			}
+			else
+			{
+				Object	pc = getArgumentValue(PLATFORM_COMPONENT, model, cmdargs, compargs);
+				if(pc==null)
 				{
-					if(model.getReport()!=null)
-						throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
+					ret.setException(new RuntimeException("No platform component class found."));
+				}
+				else
+				{
+					Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
+					final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
+					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null);
 					
 					// Build platform name.
 					Object pfname = getArgumentValue(PLATFORM_NAME, model, cmdargs, compargs);
@@ -437,168 +449,123 @@ public class Starter
 					// Create an instance of the component.
 					final IComponentIdentifier cid = new ComponentIdentifier(platformname);
 					if(IComponentIdentifier.LOCAL.get()==null)
+					{
 						IComponentIdentifier.LOCAL.set(cid);
-					// Hack!!! Autoshutdown!?
-
+					}
+	
 					// Hack: change rid afterwards?!
-//					String src = SUtil.getCodeSource(model.getFilename(), model.getPackage());
-//					URL url = SUtil.toURL(src);
-//					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, url));
-//					URL url = model.getClass().getProtectionDomain().getCodeSource().getLocation();
 					ResourceIdentifier rid = (ResourceIdentifier)model.getResourceIdentifier();
 					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
 					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUrl()));
 					
-					initRescueThread(cid);
-					
-					cfac.getComponentType(configfile, null, model.getResourceIdentifier())
-						.addResultListener(new ExceptionDelegationResultListener<String, IExternalAccess>(ret)
+					String ctype	= cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get(null);
+					IComponentIdentifier caller = sc.getCaller();
+					Cause cause = sc.getCause();
+					Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
+					Object tmpmoni = getArgumentValue(MONITORING, model, cmdargs, compargs);
+					PublishEventLevel moni = PublishEventLevel.OFF;
+					if(tmpmoni instanceof Boolean)
 					{
-						public void customResultAvailable(String ctype) 
+						moni = ((Boolean)tmpmoni).booleanValue()? PublishEventLevel.FINE: PublishEventLevel.OFF;
+					}
+					else if(tmpmoni instanceof String)
+					{
+						moni = PublishEventLevel.valueOf((String)tmpmoni);
+					}
+					else if(tmpmoni instanceof PublishEventLevel)
+					{
+						moni = (PublishEventLevel)tmpmoni;
+					}
+	
+					final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
+						autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(),
+						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
+					
+					boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
+					boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
+					boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
+	
+					component.init(desc, model, interpreter, null).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+					{
+						public void customResultAvailable(Void result)
 						{
-							try
+							startComponents(0, components, interpreter)
+								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 							{
-								ServiceCall sc = CallAccess.getCurrentInvocation();
-								IComponentIdentifier caller = sc==null? null: sc.getCaller();
-								Cause cause = sc==null? null: sc.getCause();
-								
-								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
-								
-								Object tmpmoni = getArgumentValue(MONITORING, model, cmdargs, compargs);
-								PublishEventLevel moni = PublishEventLevel.OFF;
-								if(tmpmoni instanceof Boolean)
+								public void customResultAvailable(Void result)
 								{
-									moni = ((Boolean)tmpmoni).booleanValue()? PublishEventLevel.FINE: PublishEventLevel.OFF;
-								}
-								else if(tmpmoni instanceof String)
-								{
-									moni = PublishEventLevel.valueOf((String)tmpmoni);
-								}
-								else if(tmpmoni instanceof PublishEventLevel)
-								{
-									moni = (PublishEventLevel)tmpmoni;
-								}
-
-								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
-									autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
-								
-								Object	af = getArgumentValue(ADAPTER_FACTORY, model, cmdargs, compargs);
-								if(af==null)
-								{
-									ret.setException(new RuntimeException("No adapterfactory found."));
-								}
-								else
-								{
-									Class<?> afclass = af instanceof Class ? (Class<?>)af : SReflect.classForName(af.toString(), cl);
-									final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
-									
-									final Future<IComponentInterpreter>	instancefut	= new Future<IComponentInterpreter>();
-									Future<Void> future = new Future<Void>();
-									future.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+									if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
 									{
-										public void customResultAvailable(Void result)
-										{
-											instancefut.addResultListener(new ExceptionDelegationResultListener<IComponentInterpreter, IExternalAccess>(ret)
-											{
-												public void customResultAvailable(final IComponentInterpreter instance)
-												{
-													startComponents(0, components, instance)
-														.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
-													{
-														public void customResultAvailable(Void result)
-														{
-															if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
-															{
-																long startup = System.currentTimeMillis() - starttime;
-																// platform.logger.info("Platform startup time: " + startup + " ms.");
-																System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
-															}
-															ret.setResult(instance.getExternalAccess());
-														}
-														
-														public void exceptionOccurred(Exception exception)
-														{
-															// On exception in init: kill platform.
-															instance.getExternalAccess().killComponent();
-															super.exceptionOccurred(exception);
-														}
-													});
-												}
-											});
-										}
-									});
-									
-									boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
-									boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
-									boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
-									// what about platform result listener?!
-									cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, realtime, persist, null, null, future)
-										.addResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>, IExternalAccess>(ret)
-									{
-										public void customResultAvailable(Tuple2<IComponentInterpreter, IComponentAdapter> root)
-										{
-											instancefut.setResult(root.getFirstEntity());
-											IComponentAdapter adapter = root.getSecondEntity();
-											
-											// Execute init steps of root component on main thread (i.e. platform)
-											// until platform is ready to run by itself.
-											boolean again = true;
-											// Remember suspandable as it gets overwritten by adapter.executeStep()
-											ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
-											while(again && !ret.isDone())
-											{
-												again = afac.executeStep(adapter);
-												
-												// When adapter not running, process open future notifications as if on platform thread.
-												if(!again)
-												{
-													IComponentAdapter.LOCAL.set(adapter);
-													IComponentIdentifier.LOCAL.set(cid);
-													again	= FutureHelper.notifyStackedListeners();
-													IComponentIdentifier.LOCAL.set(null);
-													IComponentAdapter.LOCAL.set(null);
-												}
-											}
-											ISuspendable.SUSPENDABLE.set(sus);
-											
-											// Start normal execution of root component (i.e. platform) unless an error occurred during init.
-											boolean	wakeup	= false;
-											try
-											{
-												wakeup	= !ret.isDone() || ret.get(null)!=null;
-											}
-											catch(Exception e)
-											{
-											}
-											
-											if(wakeup)
-											{
-	//											try
-	//											{
-	//												Thread.sleep(300000);
-	//											}
-	//											catch(InterruptedException e)
-	//											{
-	//												// TODO Auto-generated catch block
-	//												e.printStackTrace();
-	//											}
-												afac.initialWakeup(adapter);
-											}
-										}
-									});
+										long startup = System.currentTimeMillis() - starttime;
+										// platform.logger.info("Platform startup time: " + startup + " ms.");
+										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+									}
+									ret.setResult(component.getExternalAccess());
 								}
-							}
-							catch(Exception e)
-							{
-								ret.setException(e);
-							}
-						};
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									// On exception in init: kill platform.
+									component.getExternalAccess().killComponent();
+									super.exceptionOccurred(exception);
+								}
+							});
+						}						
 					});
+					
+					// Execute init steps of root component on main thread (i.e. platform)
+					// until platform is ready to run by itself.
+					boolean again = true;
+					// Remember suspendable as it gets overwritten by adapter.executeStep()
+					ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
+					while(again && !ret.isDone())
+					{
+						again = component.executeStep();
+						
+						// When adapter not running, process open future notifications as if on platform thread.
+						if(!again)
+						{
+							IPlatformComponentAccess.LOCAL.set(component);
+							IComponentIdentifier.LOCAL.set(cid);
+							again	= FutureHelper.notifyStackedListeners();
+							IComponentIdentifier.LOCAL.set(null);
+							IPlatformComponentAccess.LOCAL.set(null);
+						}
+					}
+					ISuspendable.SUSPENDABLE.set(sus);
+					
+					// Start normal execution of root component (i.e. platform) unless an error occurred during init.
+					boolean	wakeup	= false;
+					try
+					{
+						wakeup	= !ret.isDone() || ret.get(null)!=null;
+					}
+					catch(Exception e)
+					{
+					}
+					
+					if(wakeup)
+					{
+//						try
+//						{
+//							Thread.sleep(300000);
+//						}
+//						catch(InterruptedException e)
+//						{
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+						afac.initialWakeup(component);
+					}
 
+//					initRescueThread(cid);
+					
 					if(cid.equals(IComponentIdentifier.LOCAL.get()))
+					{
 						IComponentIdentifier.LOCAL.set(null);
+					}
 				}
-			});
+			}
 	//		System.out.println("Model: "+model);
 		}
 		catch(Exception e)

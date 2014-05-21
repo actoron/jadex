@@ -18,7 +18,7 @@ import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.Boolean3;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -50,7 +50,7 @@ import java.util.logging.Level;
 	@Argument(name="platformname", clazz=String.class, defaultvalue="\"jadex\""),
 	@Argument(name="configname", clazz=String.class, defaultvalue="\"auto\""),
 	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="adapterfactory", clazz=Class.class, defaultvalue="jadex.platform.service.cms.ComponentAdapterFactory.class"),
+	@Argument(name="platformcomponent", clazz=Class.class, defaultvalue="jadex.platform.service.cms.PlatformComponent.class"),
 	@Argument(name="welcome", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="programarguments", clazz=String[].class),
 	
@@ -245,6 +245,7 @@ import java.util.logging.Level;
 			arguments={@NameValue(name="console", value="$args.cliconsole")})
 	})
 })
-public class PlatformAgent extends MicroAgent
+@Agent
+public class PlatformAgent
 {
 }

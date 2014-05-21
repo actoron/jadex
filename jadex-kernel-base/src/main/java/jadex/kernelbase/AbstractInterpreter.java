@@ -13,7 +13,7 @@ import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -114,7 +114,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/**
 	 * Create a new context.
 	 */
-	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, final IComponentAdapterFactory factory, final IExternalAccess parent,
+	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, final IPlatformComponentFactory factory, final IExternalAccess parent,
 		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist, IPersistInfo persistinfo, IIntermediateResultListener<Tuple2<String, Object>> resultlistener)
 	{
 		this.config = config != null ? config : model.getConfigurationNames().length > 0 ? model.getConfigurationNames()[0] : null;

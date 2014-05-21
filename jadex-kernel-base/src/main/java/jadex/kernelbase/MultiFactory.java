@@ -23,7 +23,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -585,7 +585,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	@Excluded
 	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
-			final IComponentAdapterFactory factory, final IModelInfo model, final String config,
+			final IPlatformComponentFactory factory, final IModelInfo model, final String config,
 			final Map<String, Object> arguments, final IExternalAccess parent,
 			final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
 			final IPersistInfo persistinfo,

@@ -12,7 +12,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.ThreadPool;
@@ -87,7 +87,7 @@ public class InterpreterTest
 	}
 }
 
-class ComponentAdapterFactory implements IComponentAdapterFactory
+class ComponentAdapterFactory implements IPlatformComponentFactory
 {
 	public boolean executeStep(IComponentAdapter adapter)
 	{

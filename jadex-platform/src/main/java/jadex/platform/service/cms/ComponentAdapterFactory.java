@@ -5,12 +5,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 
 /**
  *  Standalone version of the adapter factory.
  */
-public class ComponentAdapterFactory implements IComponentAdapterFactory
+public class ComponentAdapterFactory implements IPlatformComponentFactory
 {
 	/**
 	 *  Create a component adapter for a component instance.

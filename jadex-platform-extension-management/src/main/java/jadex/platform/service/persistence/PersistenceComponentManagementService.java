@@ -14,7 +14,7 @@ import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.persistence.IIdleHook;
 import jadex.bridge.service.types.persistence.IPersistenceService;
@@ -74,7 +74,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	/**
 	 *  Create the adapter factory.
 	 */
-	protected IComponentAdapterFactory createAdapterFactory()
+	protected IPlatformComponentFactory createAdapterFactory()
 	{
 		if(persist)
 		{

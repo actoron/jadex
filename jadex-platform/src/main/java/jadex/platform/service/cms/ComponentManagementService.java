@@ -37,7 +37,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -89,7 +89,7 @@ public class ComponentManagementService implements IComponentManagementService
 	protected boolean	running;
 	
 	/** The adapter factory. */
-	protected IComponentAdapterFactory adapterfactory;
+	protected IPlatformComponentFactory adapterfactory;
 	
 	/** The agent. */
 	@ServiceComponent
@@ -201,7 +201,7 @@ public class ComponentManagementService implements IComponentManagementService
     /**
      *  Create the adapter factory.
      */
-    protected IComponentAdapterFactory	createAdapterFactory()
+    protected IPlatformComponentFactory	createAdapterFactory()
     {
     	return new ComponentAdapterFactory();
     }
@@ -217,7 +217,7 @@ public class ComponentManagementService implements IComponentManagementService
 	/**
 	 *  Get the component adapter factory.
 	 */
-	public IComponentAdapterFactory getComponentAdapterFactory()
+	public IPlatformComponentFactory getComponentAdapterFactory()
 	{
 		return adapterfactory;
 	}

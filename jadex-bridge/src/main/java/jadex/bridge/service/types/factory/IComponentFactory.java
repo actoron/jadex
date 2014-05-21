@@ -86,5 +86,6 @@ public interface IComponentFactory
 	 * @return An interpreter for the component.
 	 */
 	@Excluded
-	public IFuture<IComponentInterpreter> createComponentInterpreter(final IModelInfo model, IInternalAccess component, final Object persistinfo);
+	// Synchronous method for speed and cannot be used from remote.
+	public IComponentInterpreter createComponentInterpreter(IModelInfo model, IInternalAccess component, Object persistinfo);
 }

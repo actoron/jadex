@@ -23,7 +23,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
@@ -261,7 +261,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, final IModelInfo modelinfo, 
+	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IPlatformComponentFactory factory, final IModelInfo modelinfo, 
 		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, boolean persist,
 		final IPersistInfo persistinfo,
 		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
@@ -344,7 +344,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Tuple2<IComponentInterpreter, IComponentAdapter> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
+	public Tuple2<IComponentInterpreter, IComponentAdapter> createComponentInstance(IComponentDescription desc, IPlatformComponentFactory factory, OAVAgentModel amodel, 
 		String config, Map<String, Object> arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> ret)
 	{
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).

@@ -44,7 +44,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
@@ -130,7 +130,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 *  Create a new agent.
 	 */
-	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
+	public BDIAgentInterpreter(IComponentDescription desc, IPlatformComponentFactory factory, 
 		final BDIModel model, Class<?> agentclass, final Map<String, Object> args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		IPersistInfo persistinfo,
