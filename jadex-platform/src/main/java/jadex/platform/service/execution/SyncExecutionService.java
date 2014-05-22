@@ -25,8 +25,14 @@ import java.util.Set;
  */
 public class SyncExecutionService extends BasicService implements IExecutionService
 {
-//	public static boolean DEBUG;
-	
+	/**
+	 *  The possible states of the service.
+	 */
+	public enum State
+	{
+		CREATED, INITED, RUNNING, SHUTDOWN
+	}
+		
 	//-------- attributes --------
 	
 	/** The queue of tasks to be executed. */
@@ -38,12 +44,9 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	/** The idle future. */
 	protected Future<Void> idlefuture;
 	
-	/** Flag, indicating if executor is running. */
-	protected boolean running;
+	/** The state of the service. */
+	protected State state;
 
-	/** The shutdown flag. */
-	protected boolean shutdown;
-	
 	/** The current task. */
 	protected IExecutable task;
 	
@@ -74,7 +77,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		super(provider.getId(), IExecutionService.class, properties);
 
 		this.provider = provider;
-		this.running	= false;
+		this.state	= State.CREATED;
 		this.queue	= SCollection.createLinkedHashSet();
 		this.removedfut = new ArrayList<Future<Void>>();
 	}
@@ -88,7 +91,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public void execute(IExecutable task)
 	{
-		if(shutdown)
+		if(state==State.SHUTDOWN)
 			return;
 
 //		if(DEBUG)
@@ -105,7 +108,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		// On change, wake up the main executor for executing tasks
 		if(added)
 		{
-			if(running) 
+			if(state==State.RUNNING) 
 				executor.execute();
 		}
 	}
@@ -159,7 +162,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public boolean customIsValid()
 	{
-		return running && !shutdown;
+		return state==State.INITED || state==State.RUNNING;
 	}
 
 	/**
@@ -170,7 +173,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	{	
 		final  Future<Void> ret = new Future<Void>();
 	
-		if(shutdown)
+		if(state==State.SHUTDOWN)
 		{
 			ret.setResult(null);
 //			ret.setResult(getServiceIdentifier());
@@ -195,7 +198,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 								// assert task==null;
 								synchronized(SyncExecutionService.this)
 								{
-									if(running && !queue.isEmpty())
+									if(state==State.RUNNING && !queue.isEmpty())
 									{
 										// Hack!!! Is there a better way to get first element from queue without creating iterator?
 										Iterator<IExecutable> iterator = queue.iterator();
@@ -226,7 +229,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 								{
 									if(removedtask==null)
 									{
-										if(again && running)
+										if(again && state==State.RUNNING)
 										{
 											queue.add(task);
 										}
@@ -244,7 +247,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 									
 									task = null;
 //									System.out.println("task finished: "+running+", "+queue.isEmpty());
-									if(running && queue.isEmpty())
+									if(state==State.RUNNING && queue.isEmpty())
 									{
 										idf = idlefuture;
 										idlefuture = null;
@@ -252,7 +255,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 									}
 
 									// Perform next task when queue is not empty and service is running.
-									again	= running && !queue.isEmpty();
+									again	= state==State.RUNNING && !queue.isEmpty();
 								}
 
 								
@@ -277,12 +280,8 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 							}
 						});
 						
-						running = true;
-						// Wake up the main executor for executing tasks
-						executor.execute();
-						
+						state	= State.INITED;
 						ret.setResult(null);
-//						ret.setResult(getServiceIdentifier());
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -296,6 +295,14 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		return ret;
 	}
 
+	/**
+	 *  Start the execution.
+	 */
+	public void start()
+	{
+		// Wake up the main executor for executing tasks
+		executor.execute();
+	}
 		
 	/**
 	 *  Shutdown the executor service.
@@ -313,14 +320,12 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 				synchronized(this)
 				{
 					if(!customIsValid())
-		//			if(!running || shutdown)
 					{
 						ret.setException(new RuntimeException("Not running."));
 					}
 					else
 					{
-						running = false;
-						shutdown = true;
+						state	= State.SHUTDOWN;
 						executor.shutdown().addResultListener(new DelegationResultListener<Void>(ret));
 						queue = null;
 						idf = idlefuture;
@@ -335,24 +340,13 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		return ret;
 	}
 	
-//	/**
-//	 *  Test if the executor is currently idle.
-//	 *  @return True, if idle.
-//	 */
-//	public synchronized boolean	isIdle()
-//	{
-//		//System.out.println(running+" "+queue);
-//		//return running && queue.isEmpty();
-//		return queue.isEmpty();
-//	}
-	
 	/**
 	 *  Get the future indicating that executor is idle.
 	 */
 	public synchronized IFuture<Void> getNextIdleFuture()
 	{
 		Future<Void> ret;
-		if(shutdown)
+		if(state==State.SHUTDOWN)
 		{
 			ret = new Future<Void>(new RuntimeException("Shutdown"));
 		}
@@ -364,33 +358,4 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		}
 		return ret;
 	}
-
-//	/**
-//	 *  Add a command to be executed whenever the executor
-//	 *  is idle (i.e. no executables running).
-//	 */
-//	public void addIdleCommand(ICommand command)
-//	{
-//		if(idlecommands==null)
-//		{
-//			synchronized(this)
-//			{
-//				if(idlecommands==null)
-//				{
-//					idlecommands	= SCollection.createLinkedHashSet();
-//				}
-//			}
-//		}
-//		
-//		idlecommands.add(command);
-//	}
-//
-//	/**
-//	 *  Remove a previously added idle command.
-//	 */
-//	public void removeIdleCommand(ICommand command)
-//	{
-//		if(idlecommands!=null)
-//			idlecommands.remove(command);
-//	}
 }

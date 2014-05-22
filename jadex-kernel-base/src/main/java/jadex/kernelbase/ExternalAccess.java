@@ -53,11 +53,8 @@ public class ExternalAccess implements IExternalAccess
 	protected IComponentIdentifier	cid;
 	
 	/** The component. */
-	protected StatelessAbstractInterpreter interpreter;
+	protected IInternalAccess ia;
 
-	/** The component adapter. */
-	protected IComponentAdapter adapter;
-	
 	/** The toString value. */
 	protected String tostring;
 	
@@ -80,13 +77,12 @@ public class ExternalAccess implements IExternalAccess
 	/**
 	 *	Create an external access.
 	 */
-	public ExternalAccess(StatelessAbstractInterpreter interpreter)
+	public ExternalAccess(IInternalAccess ia)
 	{
 		this.valid	= true;
-		this.interpreter = interpreter;
-		this.cid	= interpreter.getComponentIdentifier();
-		this.adapter = interpreter.getComponentAdapter();
-		this.provider = interpreter.getServiceContainer();
+		this.ia = ia;
+		this.cid	= ia.getComponentIdentifier();
+		this.provider = ia.getServiceContainer();
 		this.tostring = cid.getLocalName();
 	}
 
@@ -108,7 +104,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			return interpreter.getModel();
+			return ia.getModel();
 		}
 	}
 	
@@ -210,7 +206,7 @@ public class ExternalAccess implements IExternalAccess
 						}
 						else
 						{
-							interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+							ia.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 						}
 					}
 					
@@ -238,7 +234,7 @@ public class ExternalAccess implements IExternalAccess
 //				System.err.println("platform i: "+cid.getName());
 //				Thread.dumpStack();
 //			}
-			interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+			ia.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		}
 		
 		return ret;
@@ -275,7 +271,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
+						ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
 					}
 				});
 			}
@@ -292,7 +288,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
+			ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
 		}
 		
 		return ret;
@@ -318,7 +314,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+						ia.createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 					}
 				});
 			}
@@ -335,7 +331,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+			ia.createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 		}
 		
 		return ret;
@@ -363,7 +359,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						String fn = interpreter.getComponentFilename(ctype);
+						String fn = ia.getComponentFilename(ctype);
 						if(fn!=null)
 						{
 							ret.setResult(fn);
@@ -388,7 +384,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			String fn = interpreter.getComponentFilename(ctype);
+			String fn = ia.getComponentFilename(ctype);
 			if(fn!=null)
 			{
 				ret.setResult(fn);
@@ -418,7 +414,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			return interpreter.getLocalType();
+			return ia.getLocalType();
 		}
 	}
 	
@@ -457,7 +453,7 @@ public class ExternalAccess implements IExternalAccess
 						}
 						else
 						{
-							IFuture<T>	fut	= interpreter.scheduleStep(step);
+							IFuture<T>	fut	= ia.scheduleStep(step);
 							FutureFunctionality.connectDelegationFuture(ret, fut);
 						}
 							
@@ -473,7 +469,7 @@ public class ExternalAccess implements IExternalAccess
 					{
 						public void run()
 						{
-							IFuture<T>	fut	= step.execute(interpreter.getInternalAccess());
+							IFuture<T>	fut	= step.execute(ia.getInternalAccess());
 							FutureFunctionality.connectDelegationFuture(ret, fut);
 						}
 					});					
@@ -487,7 +483,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			IFuture<T>	fut	= interpreter.scheduleStep(step);
+			IFuture<T>	fut	= ia.scheduleStep(step);
 			FutureFunctionality.connectDelegationFuture(ret, fut);
 		}
 		
@@ -513,7 +509,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					try
 					{
-						IFuture<T>	result	= step.execute(interpreter.getInternalAccess());
+						IFuture<T>	result	= step.execute(ia.getInternalAccess());
 						result.addResultListener(new DelegationResultListener<T>(ret));
 					}
 					catch(Exception e)
@@ -562,8 +558,8 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+			SServiceProvider.getService(ia.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -600,8 +596,8 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+			SServiceProvider.getService(ia.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -641,7 +637,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.getExtension(name));
+						ret.setResult(ia.getExtension(name));
 					}
 				});
 			}
@@ -658,7 +654,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.getExtension(name));
+			ret.setResult(ia.getExtension(name));
 		}
 		
 		return ret;
@@ -685,7 +681,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = interpreter.subscribeToEvents(filter, initial, elm);
+						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.subscribeToEvents(filter, initial, elm);
 						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 						fut.addResultListener(lis);
 					}
@@ -704,7 +700,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = interpreter.subscribeToEvents(filter, initial, elm);
+			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.subscribeToEvents(filter, initial, elm);
 			TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 			fut.addResultListener(lis);
 		}
@@ -732,7 +728,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = interpreter.subscribeToResults(); 
+						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.subscribeToResults(); 
 						TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 						fut.addResultListener(lis);
 					}
@@ -751,7 +747,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = interpreter.subscribeToResults(); 
+			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.subscribeToResults(); 
 			TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 			fut.addResultListener(lis);
 		}
@@ -779,7 +775,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.getArguments());
+						ret.setResult(ia.getArguments());
 					}
 				});
 			}
@@ -796,7 +792,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.getArguments());
+			ret.setResult(ia.getArguments());
 		}
 		
 		return ret;
@@ -822,7 +818,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.getResults());
+						ret.setResult(ia.getResults());
 					}
 				});
 			}
@@ -833,7 +829,7 @@ public class ExternalAccess implements IExternalAccess
 					public void run()
 					{
 						// Should be possible to get the results even if component is already terminated?!
-						ret.setResult(interpreter.getResults());
+						ret.setResult(ia.getResults());
 //						ret.setException(e);
 					}
 				});
@@ -841,7 +837,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.getResults());
+			ret.setResult(ia.getResults());
 		}
 		
 		return ret;
@@ -868,7 +864,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
+						ia.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
 					}
 				});
 			}
@@ -886,7 +882,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
+			ia.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
 		}
 		
 		return ret;
@@ -918,7 +914,7 @@ public class ExternalAccess implements IExternalAccess
 						}
 						else
 						{
-							interpreter.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+							ia.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 						}
 					}
 				});
@@ -937,7 +933,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+			ia.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 		}
 		
 		return ret;
@@ -963,7 +959,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+						ia.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 					}
 				});
 			}
@@ -981,7 +977,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+			ia.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 		}
 		
 		return ret;
@@ -1008,7 +1004,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+						ia.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 					}
 				});
 			}
@@ -1026,7 +1022,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+			ia.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 		}
 		
 		return ret;
@@ -1053,7 +1049,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						IFuture<T> fut = interpreter.getNFPropertyValue(name);
+						IFuture<T> fut = ia.getNFPropertyValue(name);
 						fut.addResultListener(new IResultListener<T>()
 						{
 							public void resultAvailable(T result)
@@ -1093,7 +1089,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			IFuture<T> fut = interpreter.getNFPropertyValue(name);
+			IFuture<T> fut = ia.getNFPropertyValue(name);
 			fut.addResultListener(new IResultListener<T>()
 			{
 				public void resultAvailable(T result)
@@ -1144,7 +1140,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						IFuture<T> fut = interpreter.getNFPropertyValue(name, unit);
+						IFuture<T> fut = ia.getNFPropertyValue(name, unit);
 						fut.addResultListener(new IResultListener<T>()
 						{
 							public void resultAvailable(T result)
@@ -1184,7 +1180,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			IFuture<T> fut = interpreter.getNFPropertyValue(name, unit);
+			IFuture<T> fut = ia.getNFPropertyValue(name, unit);
 			fut.addResultListener(new IResultListener<T>()
 			{
 				public void resultAvailable(T result)
@@ -1231,7 +1227,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.addNFProperty(nfprop);
+						ia.addNFProperty(nfprop);
 						ret.setResult(null);
 					}
 				});
@@ -1251,7 +1247,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.addNFProperty(nfprop);
+			ia.addNFProperty(nfprop);
 			ret.setResult(null);
 		}
 		
@@ -1278,7 +1274,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
+						ia.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}
@@ -1297,7 +1293,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
+			ia.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;
@@ -1322,7 +1318,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
+						ia.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}
@@ -1341,7 +1337,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
+			ia.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;
@@ -1358,7 +1354,7 @@ public class ExternalAccess implements IExternalAccess
 			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
 		}
 
-		return interpreter;
+		return ia;
 	}
 	
 	/**
@@ -1393,7 +1389,7 @@ public class ExternalAccess implements IExternalAccess
 	{
 		this.terminated	= terminated;
 		this.valid	= false;
-		this.results	= interpreter.getResults();
+		this.results	= ia.getResults();
 		
 		if(terminated)
 		{
@@ -1402,11 +1398,11 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			model	= interpreter.getModel();
-			localtype	= interpreter.getLocalType();
+			model	= ia.getModel();
+			localtype	= ia.getLocalType();
 		}
 		
-		this.interpreter	= null;
+		this.ia	= null;
 		this.adapter	= null;
 		this.provider	= null;
 	}

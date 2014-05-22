@@ -25,6 +25,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -675,15 +676,15 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param clazz The class.
 	 *  @return The raw object.
 	 */
-	public Object getProvidedServiceRawImpl(Class<?> clazz)
+	public <T> T getProvidedServiceRawImpl(Class<T> clazz)
 	{
-		Object ret = null;
+		T ret = null;
 		
-		IService service = getProvidedService(clazz);
+		T service = getProvidedService(clazz);
 		if(service!=null)
 		{
 			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
-			ret = handler.getDomainService();
+			ret = (T)handler.getDomainService();
 		}
 		
 		return ret;
@@ -695,13 +696,14 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param clazz The interface.
 	 *  @return The service.
 	 */
-	public IService[] getProvidedServices(Class<?> clazz)
+	public <T> T[] getProvidedServices(Class<T> clazz)
 	{
 		if(shutdowned)
 			throw new ComponentTerminatedException(id);
 		
 		Collection<IInternalService> coll = services!=null? services.get(clazz): null;
-		return coll==null ? new IService[0] : coll.toArray(new IService[coll.size()]);
+		T[] ret	= (T[])Array.newInstance(clazz, coll!=null ? coll.size(): 0);
+		return coll==null ? ret : coll.toArray(ret);
 	}
 	
 	/**
@@ -709,9 +711,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param clazz The interface.
 	 *  @return The service.
 	 */
-	public IService getProvidedService(Class<?> clazz)
+	public <T> T getProvidedService(Class<T> clazz)
 	{
-		IService[] ret = getProvidedServices(clazz);
+		T[] ret = getProvidedServices(clazz);
 		return ret.length>0? ret[0]: null;
 	}
 	

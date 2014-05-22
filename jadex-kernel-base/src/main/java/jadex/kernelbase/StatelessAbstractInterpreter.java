@@ -1914,8 +1914,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		IService[] sers = getServiceContainer().getProvidedServices(type);
-		return convertRawService(sers[0]);
+		IService ser = getServiceContainer().getProvidedService(type);
+		return convertRawService(ser);
 	}
 	
 	/**

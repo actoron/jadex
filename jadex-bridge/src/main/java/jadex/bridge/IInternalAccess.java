@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -17,9 +16,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- *  Common interface for all component types. Is used when
- *  scheduleStep() is called and the executing thread is the
- *  component thread.
+ *  Common interface for all component types.
+ *  Provides the user view of the component, i.e.,
+ *  methods the component can call on itself.
  */
 public interface IInternalAccess
 {
@@ -36,22 +35,16 @@ public interface IInternalAccess
 	public String getConfiguration();
 	
 	/**
-	 *  Get the parent access (if any).
-	 *  @return The parent access.
-	 */
-	public IExternalAccess getParentAccess();
-	
-	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
 	public IComponentIdentifier	getComponentIdentifier();
 	
-	/**
-	 *  Get the component description.
-	 *  @return	The component description.
-	 */
-	public IComponentDescription	getComponentDescription();
+//	/**
+//	 *  Get the component description.
+//	 *  @return	The component description.
+//	 */
+//	public IComponentDescription	getComponentDescription();
 	
 	/**
 	 *  Get the service provider.
@@ -63,12 +56,6 @@ public interface IInternalAccess
 	 *  Kill the component.
 	 */
 	public IFuture<Map<String, Object>> killComponent();
-	
-//	/**
-//	 *  Test if component has been killed.
-//	 *  @return True, if has been killed.
-//	 */
-//	public boolean isKilled();
 	
 	/**
 	 *  Create a result listener that is executed on the

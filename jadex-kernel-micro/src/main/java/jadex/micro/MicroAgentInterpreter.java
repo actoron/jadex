@@ -49,7 +49,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 	//-------- attributes --------
 	
 	/** The interpreter. */
-	protected IInternalAccess	interpreter;
+	protected IInternalAccess	component;
 	
 	/** The micro agent. */
 	protected PojoMicroAgent microagent;
@@ -70,15 +70,15 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public MicroAgentInterpreter(final MicroModel model, Class<?> microclass, IInternalAccess interpreter, MicroAgentPersistInfo persistinfo)
+	public MicroAgentInterpreter(final MicroModel model, Class<?> microclass, IInternalAccess component, MicroAgentPersistInfo persistinfo)
 	{
 		this.micromodel = model;
-		this.interpreter	= interpreter;
+		this.component	= component;
 		
 		this.microagent = createAgent(microclass, model, persistinfo);
-		injectArguments(microagent.getPojoAgent(), model);
 		
 		// Todo:
+//		injectArguments(microagent.getPojoAgent(), model);
 //		injectServices(...); // after components.
 //		injectParent(); // asynchronous
 		
@@ -95,7 +95,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 		{
 			// Todo: reinject values in user agent?
 			Object agent = mapi!=null ? mapi.getUserAgentObject() : microclass.newInstance();
-			ret = new PojoMicroAgent(interpreter, agent);
+			ret = new PojoMicroAgent(component, agent);
 	
 			// Todo: what to inject?
 //			FieldInfo[] fields = model.getAgentInjections();
@@ -158,21 +158,21 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 	 */
 	protected void	injectArguments(final Object agent, final MicroModel model)
 	{
-		if(interpreter.getArguments()!=null)
+		if(component.getArguments()!=null)
 		{
 			String[] names = model.getArgumentInjectionNames();
 			if(names.length>0)
 			{
 				for(int i=0; i<names.length; i++)
 				{
-					Object val = interpreter.getArguments().get(names[i]);
+					Object val = component.getArguments().get(names[i]);
 					
 //					if(val!=null || getModel().getArgument(names[i]).getDefaultValue()!=null)
 					final Tuple2<FieldInfo, String>[] infos = model.getArgumentInjections(names[i]);
 					
 					for(int j=0; j<infos.length; j++)
 					{
-						Field field = infos[j].getFirstEntity().getField(interpreter.getClassLoader());
+						Field field = infos[j].getFirstEntity().getField(component.getClassLoader());
 						String convert = infos[j].getSecondEntity();
 //						System.out.println("seting arg: "+names[i]+" "+val);
 						setFieldValue(val, field, convert);
@@ -182,19 +182,19 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 		}
 		
 		// Inject default result values
-		if(interpreter.getResults()!=null)
+		if(component.getResults()!=null)
 		{
 			String[] names = model.getResultInjectionNames();
 			if(names.length>0)
 			{
 				for(int i=0; i<names.length; i++)
 				{
-					if(interpreter.getResults().containsKey(names[i]))
+					if(component.getResults().containsKey(names[i]))
 					{
-						Object val = interpreter.getResults().get(names[i]);
+						Object val = component.getResults().get(names[i]);
 						final Tuple3<FieldInfo, String, String> info = model.getResultInjection(names[i]);
 						
-						Field field = info.getFirstEntity().getField(interpreter.getClassLoader());
+						Field field = info.getFirstEntity().getField(component.getClassLoader());
 						String convert = info.getSecondEntity();
 //						System.out.println("seting res: "+names[i]+" "+val);
 						setFieldValue(val, field, convert);
@@ -218,7 +218,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 				{
 					SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
 					fetcher.setValue("$value", val);
-					val = SJavaParser.evaluateExpression(convert, interpreter.getModel().getAllImports(), fetcher, interpreter.getClassLoader());
+					val = SJavaParser.evaluateExpression(convert, component.getModel().getAllImports(), fetcher, component.getClassLoader());
 				}
 				field.setAccessible(true);
 				field.set(agent, val);
@@ -253,19 +253,19 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 				final IFuture<Object>	sfut;
 				if(info!=null && info.isMultiple())
 				{
-					IFuture	ifut	= interpreter.getServiceContainer().getRequiredServices(sernames[i]);
+					IFuture	ifut	= component.getServiceContainer().getRequiredServices(sernames[i]);
 					sfut	= ifut;
 				}
 				else
 				{
-					sfut	= interpreter.getServiceContainer().getRequiredService(sernames[i]);					
+					sfut	= component.getServiceContainer().getRequiredService(sernames[i]);					
 				}
 				
 				for(int j=0; j<infos.length; j++)
 				{
 					if(infos[j] instanceof FieldInfo)
 					{
-						final Field	f	= ((FieldInfo)infos[j]).getField(interpreter.getClassLoader());
+						final Field	f	= ((FieldInfo)infos[j]).getField(component.getClassLoader());
 						if(SReflect.isSupertype(IFuture.class, f.getType()))
 						{
 							try
@@ -276,7 +276,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 							}
 							catch(Exception e)
 							{
-								interpreter.getLogger().warning("Field injection failed: "+e);
+								component.getLogger().warning("Field injection failed: "+e);
 								lis2.exceptionOccurred(e);
 							}	
 						}
@@ -294,7 +294,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 									}
 									catch(Exception e)
 									{
-										interpreter.getLogger().warning("Field injection failed: "+e);
+										component.getLogger().warning("Field injection failed: "+e);
 										lis2.exceptionOccurred(e);
 									}	
 								}
@@ -304,7 +304,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 									if(!(e instanceof ServiceNotFoundException)
 										|| f.getAnnotation(AgentService.class).required())
 									{
-										interpreter.getLogger().warning("Field injection failed: "+e);
+										component.getLogger().warning("Field injection failed: "+e);
 										lis2.exceptionOccurred(e);
 									}
 									else
@@ -327,7 +327,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 					else if(infos[j] instanceof MethodInfo)
 					{
 						final Method	m	= SReflect.getMethod(agent.getClass(), ((MethodInfo)infos[j]).getName(),
-							((MethodInfo)infos[j]).getParameterTypes(interpreter.getClassLoader()));
+							((MethodInfo)infos[j]).getParameterTypes(component.getClassLoader()));
 						if(info.isMultiple())
 						{
 							lis2.resultAvailable(null);
@@ -340,7 +340,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 								{
 									if(SReflect.isSupertype(m.getParameterTypes()[0], result.getClass()))
 									{
-										interpreter.scheduleStep(new IComponentStep<Void>()
+										component.scheduleStep(new IComponentStep<Void>()
 										{
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
@@ -369,7 +369,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 								{
 									if(SReflect.isSupertype(m.getParameterTypes()[0], Collection.class))
 									{
-										interpreter.scheduleStep(new IComponentStep<Void>()
+										component.scheduleStep(new IComponentStep<Void>()
 										{
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
@@ -394,7 +394,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 									if(!(e instanceof ServiceNotFoundException)
 										|| m.getAnnotation(AgentService.class).required())
 									{
-										interpreter.getLogger().warning("Method injection failed: "+e);
+										component.getLogger().warning("Method injection failed: "+e);
 									}
 									else
 									{
@@ -412,7 +412,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 							{
 								public void resultAvailable(final Object result)
 								{
-									interpreter.scheduleStep(new IComponentStep<Void>()
+									component.scheduleStep(new IComponentStep<Void>()
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
@@ -437,7 +437,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 									if(!(e instanceof ServiceNotFoundException)
 										|| m.getAnnotation(AgentService.class).required())
 									{
-										interpreter.getLogger().warning("Method service injection failed: "+e);
+										component.getLogger().warning("Method service injection failed: "+e);
 									}
 								}
 							});
@@ -472,13 +472,13 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 				final Future<Void>	fut	= new Future<Void>();
 				fut.addResultListener(lis);
 				
-				final Field	f	= pis[i].getField(interpreter.getClassLoader());
-				interpreter.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				final Field	f	= pis[i].getField(component.getClassLoader());
+				component.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut)
 				{
 					public void customResultAvailable(IComponentManagementService cms)
 					{
-						cms.getExternalAccess(interpreter.getComponentIdentifier().getParent())
+						cms.getExternalAccess(component.getComponentIdentifier().getParent())
 							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(fut)
 						{
 							public void customResultAvailable(IExternalAccess exta)
@@ -496,7 +496,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 										exceptionOccurred(e);
 									}
 								}
-								else if(interpreter.getComponentDescription().isSynchronous())
+								else if(component.getComponentDescription().isSynchronous())
 								{
 									exta.scheduleStep(new IComponentStep<Void>()
 									{
@@ -566,24 +566,24 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 	public void startBehavior()
 	{
 //		System.out.println("started: "+getComponentIdentifier());
-		interpreter.scheduleStep(new IComponentStep<Void>()
+		component.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				System.out.println("body: "+getComponentAdapter().getComponentIdentifier());
-				microagent.executeBody().addResultListener(interpreter.createResultListener(new IResultListener<Void>()
+				microagent.executeBody().addResultListener(component.createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
 						// result?!
 //						System.out.println("Killing (res): "+getComponentIdentifier().getName());
-						interpreter.killComponent();
+						component.killComponent();
 					}
 					public void exceptionOccurred(Exception exception)
 					{
 						// Throw exception to cause fatal error message
 						if(!(exception instanceof ComponentTerminatedException)
-							|| !interpreter.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
+							|| !component.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 						{
 							Throwable	t	= exception instanceof InvocationTargetException
 								? ((InvocationTargetException)exception).getTargetException() : exception;
@@ -633,7 +633,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 	{
 		if(fetcher==null)
 		{
-			SimpleValueFetcher fetcher = new SimpleValueFetcher(interpreter.getFetcher());
+			SimpleValueFetcher fetcher = new SimpleValueFetcher(component.getFetcher());
 			if(microagent instanceof IPojoMicroAgent)
 			{
 				fetcher.setValue("$pojoagent", ((IPojoMicroAgent)microagent).getPojoAgent());
@@ -703,7 +703,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 				collectInjectedResults();
 				StringWriter	sw	= new StringWriter();
 				exception.printStackTrace(new PrintWriter(sw));
-				interpreter.getLogger().severe(interpreter.getComponentIdentifier()+", "+interpreter.getModel().getFullName()+": Exception during cleanup: "+sw);
+				component.getLogger().severe(component.getComponentIdentifier()+", "+component.getModel().getFullName()+": Exception during cleanup: "+sw);
 				ret.setResult(null);
 			}
 		});
@@ -719,7 +719,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 		for(String name: micromodel.getResultInjectionNames())
 		{
 			Tuple3<FieldInfo, String, String> inj = micromodel.getResultInjection(name);
-			Field field = inj.getFirstEntity().getField(interpreter.getClassLoader());
+			Field field = inj.getFirstEntity().getField(component.getClassLoader());
 			String convback = inj.getThirdEntity();
 			
 			try
@@ -732,10 +732,10 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 				{
 					SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
 					fetcher.setValue("$value", val);
-					val = SJavaParser.evaluateExpression(convback, interpreter.getModel().getAllImports(), fetcher, interpreter.getClassLoader());
+					val = SJavaParser.evaluateExpression(convback, component.getModel().getAllImports(), fetcher, component.getClassLoader());
 				}
 				
-				interpreter.setResultValue(name, val);
+				component.setResultValue(name, val);
 			}
 			catch(Exception e)
 			{
@@ -782,7 +782,7 @@ public class MicroAgentInterpreter	implements IComponentInterpreter
 		}
 		if(handler.getTimeout()>0)
 		{
-			interpreter.waitForDelay(handler.getTimeout(), new IComponentStep<Void>()
+			component.waitForDelay(handler.getTimeout(), new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

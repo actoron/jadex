@@ -21,6 +21,14 @@ import java.util.Map;
  */
 public class AsyncExecutionService	extends BasicService implements IExecutionService
 {
+	/**
+	 *  The possible states of the service.
+	 */
+	public enum State
+	{
+		CREATED, INITED, RUNNING, SHUTDOWN
+	}
+	
 	//-------- attributes --------
 	
 	/** The threadpool. */
@@ -33,10 +41,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	protected Future<Void> idlefuture;
 	
 	/** The state. */
-	protected boolean running;
-	
-	/** The shutdown flag. */
-	protected boolean shutdown;
+	protected State state;
 	
 	/** The provider. */
 	protected IServiceProvider provider;
@@ -62,7 +67,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		super(provider.getId(), IExecutionService.class, properties);
 
 		this.provider = provider;
-		this.running	= false;
+		this.state	= State.CREATED;
 		this.executors	= SCollection.createHashMap();
 		this.runningexes = SCollection.createHashMap();
 	}
@@ -77,10 +82,9 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	public synchronized void execute(final IExecutable task)
 	{	
 		if(!customIsValid())
-			throw new RuntimeException("Not running: "+task);
-		
-		if(shutdown)
-			throw new RuntimeException("Shutting down: "+task);
+		{
+			throw new RuntimeException("Not running. Cannot execute: "+task);
+		}
 		
 		Executor exe = executors.get(task);
 
@@ -113,7 +117,12 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 								}
 								runningexes.remove(task);
 								
-								idf	= checkIdleFuture();
+								// When no more executable threads, inform idle commands.				
+								if(state==State.RUNNING && idlefuture!=null && runningexes.isEmpty())
+								{
+									idf = idlefuture;
+									idlefuture = null;
+								}
 							}
 							else if(executors!=null && executors.get(task)!=this && runningexes.get(task)==this)
 							{
@@ -131,7 +140,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 			executors.put(task, exe);
 		}
 	
-		if(running)
+		if(state==State.RUNNING)
 		{
 			boolean	exec = exe.execute();
 			if(exec)
@@ -154,7 +163,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		
 		if(!customIsValid())
 		{
-			ret.setException(new RuntimeException("Shutting down."));
+			throw new RuntimeException("Not running. Cannot cancel: "+task);
 		}
 		else
 		{
@@ -220,9 +229,9 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		{
 			public void customResultAvailable(Void result)
 			{
-				if(shutdown)
+				if(state!=State.CREATED)
 				{
-					ret.setException(new RuntimeException("Cannot start: shutdowning service."));
+					ret.setException(new RuntimeException("Cannot init service in "+state));
 				}
 				else
 				{
@@ -234,28 +243,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							try
 							{
 								threadpool = result;
-								
-								running	= true;
-								
-								if(!executors.isEmpty())
-								{
-									// Resume all suspended tasks.
-									IExecutable[] keys = (IExecutable[])executors.keySet()
-										.toArray(new IExecutable[executors.size()]);
-									for(int i=0; i<keys.length; i++)
-										execute(keys[i]);
-								}
-								else
-								{
-									Future<Void> idf = null;
-									synchronized(AsyncExecutionService.this)
-									{
-										idf = idlefuture;
-										idlefuture = null;
-									}
-									if(idf!=null)
-										idf.setResult(null);
-								}
+								state	= State.INITED;
 								ret.setResult(null);
 							}
 							catch(RuntimeException e)
@@ -275,6 +263,39 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		
 		return ret;
 	}
+
+	/**
+	 * 
+	 */
+	public void start()
+	{
+		if(state!=State.CREATED)
+		{
+			throw new RuntimeException("Cannot start service in "+state);
+		}
+		
+		state	= State.RUNNING;
+		
+		if(!executors.isEmpty())
+		{
+			// Resume all suspended tasks.
+			IExecutable[] keys = (IExecutable[])executors.keySet()
+				.toArray(new IExecutable[executors.size()]);
+			for(int i=0; i<keys.length; i++)
+				execute(keys[i]);
+		}
+		else
+		{
+			Future<Void> idf = null;
+			synchronized(AsyncExecutionService.this)
+			{
+				idf = idlefuture;
+				idlefuture = null;
+			}
+			if(idf!=null)
+				idf.setResult(null);
+		}
+	}
 	
 	/**
 	 *  Shutdown the executor service.
@@ -288,13 +309,13 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		{
 			public void customResultAvailable(Void result)
 			{
-				if(shutdown)
+				if(state==State.SHUTDOWN)
 				{
 					ret.setException((new RuntimeException("Already shutdowned.")));
 				}
 				else
 				{
-					shutdown = true;
+					state = State.SHUTDOWN;
 					
 					IExecutable[] keys = (IExecutable[])executors.keySet()
 						.toArray(new IExecutable[executors.size()]);
@@ -338,7 +359,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public synchronized boolean customIsValid()
 	{
-		return running && !shutdown;
+		return state==State.INITED || state==State.RUNNING;
 	}
 	
 	/**
@@ -347,7 +368,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	public synchronized IFuture<Void> getNextIdleFuture()
 	{
 		Future<Void> ret;
-		if(shutdown)
+		if(state==State.SHUTDOWN)
 		{
 			ret = new Future<Void>(new RuntimeException("Shutdown"));
 		}
@@ -357,27 +378,6 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				idlefuture = new Future<Void>();
 			ret = idlefuture;
 		}
-		return ret;
-	}
-
-	//-------- helper methods --------
-	
-	/**
-	 *  Get the idle future if any and if service is idle.
-	 *  Must be called while holding service lock.
-	 *  @return	An idle future to be notified (if any) after releasing service lock.
-	 */
-	protected Future<Void>	checkIdleFuture()
-	{
-		Future<Void>	ret	= null;
-
-		// When no more executable threads, inform idle commands.				
-		if(AsyncExecutionService.this.running && idlefuture!=null && runningexes.isEmpty())
-		{
-			ret = idlefuture;
-			idlefuture = null;
-		}
-		
 		return ret;
 	}
 }

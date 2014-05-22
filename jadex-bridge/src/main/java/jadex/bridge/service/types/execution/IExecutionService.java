@@ -21,6 +21,14 @@ import jadex.commons.future.IFuture;
 public interface IExecutionService	extends IService
 {
 	/**
+	 *  Manually start the execution service.
+	 *  Before the execution service is started,
+	 *  execution requests are collected, but not executed.
+	 *  Required for platform bootstrapping handshake. 
+	 */
+	public void	start();
+	
+	/**
 	 *  Execute a task. Triggers the task to
 	 *  be executed in future. 
 	 *  @param task The task to execute.

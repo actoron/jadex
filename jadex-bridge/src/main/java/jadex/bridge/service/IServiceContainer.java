@@ -80,19 +80,19 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param clazz The interface.
 	 *  @return The service.
 	 */
-	public IService getProvidedService(Class<?> clazz);
+	public <T> T getProvidedService(Class<T> clazz);
 
 	/**
 	 *  Get provided (declared) service.
 	 *  @param clazz The interface.
 	 *  @return The service.
 	 */
-	public IService[] getProvidedServices(Class<?> clazz);
+	public <T> T[] getProvidedServices(Class<T> clazz);
 	
 	/**
 	 *  Get the provided service
 	 */
-	public Object getProvidedServiceRawImpl(Class<?> clazz);
+	public <T> T getProvidedServiceRawImpl(Class<T> clazz);
 	
 	/**
 	 *  Get the required service infos.

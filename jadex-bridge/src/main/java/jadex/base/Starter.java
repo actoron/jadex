@@ -5,6 +5,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
@@ -20,7 +21,8 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.bridge.service.types.factory.ComponentCreationInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -31,9 +33,7 @@ import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
 
@@ -206,8 +206,7 @@ public class Starter
 //			e.printStackTrace();
 //		}
 		
-		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-		createPlatform(args).get();
+		createPlatform(args).get(new ThreadSuspendable());
 		
 //		IExternalAccess access	= createPlatform(args).get();
 //				Runtime.getRuntime().addShutdownHook(new Thread()
@@ -274,7 +273,8 @@ public class Starter
 
 //		System.out.println("Arguments: "+args.length/2+" "+SUtil.arrayToString(args));
 		
-		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+		Future<IExternalAccess> ret = new Future<IExternalAccess>();
+		final Future<IExternalAccess>	fret	= ret;
 		
 		// Perform manual switch to allow users specify next call properties
 		ServiceCall sc = CallAccess.getCurrentInvocation();
@@ -393,7 +393,7 @@ public class Starter
 				{
 					Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
 					final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
-					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null);
+					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null).get(null); // No execution yet, can only work if method is synchronous.
 					
 					// Build platform name.
 					Object pfname = getArgumentValue(PLATFORM_NAME, model, cmdargs, compargs);
@@ -485,12 +485,14 @@ public class Starter
 					boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
 					boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
 	
-					component.init(desc, model, interpreter, null).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, cid);
+					
+					component.init(cci, interpreter).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
-							startComponents(0, components, interpreter)
-								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+							startComponents(0, components, component.getInternalAccess())
+								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
 							{
 								public void customResultAvailable(Void result)
 								{
@@ -500,13 +502,13 @@ public class Starter
 										// platform.logger.info("Platform startup time: " + startup + " ms.");
 										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
 									}
-									ret.setResult(component.getExternalAccess());
+									fret.setResult(component.getInternalAccess().getExternalAccess());
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
 									// On exception in init: kill platform.
-									component.getExternalAccess().killComponent();
+									component.getInternalAccess().getExternalAccess().killComponent();
 									super.exceptionOccurred(exception);
 								}
 							});
@@ -516,25 +518,22 @@ public class Starter
 					// Execute init steps of root component on main thread (i.e. platform)
 					// until platform is ready to run by itself.
 					boolean again = true;
-					// Remember suspendable as it gets overwritten by adapter.executeStep()
-					ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
 					while(again && !ret.isDone())
 					{
 						again = component.executeStep();
 						
-						// When adapter not running, process open future notifications as if on platform thread.
-						if(!again)
-						{
-							IPlatformComponentAccess.LOCAL.set(component);
-							IComponentIdentifier.LOCAL.set(cid);
-							again	= FutureHelper.notifyStackedListeners();
-							IComponentIdentifier.LOCAL.set(null);
-							IPlatformComponentAccess.LOCAL.set(null);
-						}
+//						// When adapter not running, process open future notifications as if on platform thread.
+//						if(!again)
+//						{
+//							IPlatformComponentAccess.LOCAL.set(component);
+//							IComponentIdentifier.LOCAL.set(cid);
+//							again	= FutureHelper.notifyStackedListeners();
+//							IComponentIdentifier.LOCAL.set(null);
+//							IPlatformComponentAccess.LOCAL.set(null);
+//						}
 					}
-					ISuspendable.SUSPENDABLE.set(sus);
 					
-					// Start normal execution of root component (i.e. platform) unless an error occurred during init.
+					// Start execution of platform unless an error occurred during init.
 					boolean	wakeup	= false;
 					try
 					{
@@ -546,16 +545,8 @@ public class Starter
 					
 					if(wakeup)
 					{
-//						try
-//						{
-//							Thread.sleep(300000);
-//						}
-//						catch(InterruptedException e)
-//						{
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-						afac.initialWakeup(component);
+						IExecutionService	exe	= component.getInternalAccess().getServiceContainer().getProvidedService(IExecutionService.class);
+						exe.start();
 					}
 
 //					initRescueThread(cid);
@@ -571,7 +562,10 @@ public class Starter
 		catch(Exception e)
 		{
 //			e.printStackTrace();
-			ret.setException(e);
+			if(!ret.setExceptionIfUndone(e))
+			{
+				ret	= new Future<IExternalAccess>(e);
+			}
 		}
 		
 		return ret;
@@ -662,7 +656,7 @@ public class Starter
 	 *  @param instance The instance.
 	 *  @return True, when done.
 	 */
-	protected static IFuture<Void> startComponents(final int i, final List<String> components, final IComponentInterpreter instance)
+	protected static IFuture<Void> startComponents(final int i, final List<String> components, final IInternalAccess instance)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		

@@ -349,7 +349,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 * @param persistinfo The previously saved interpreter-specific state (if any).
 	 * @return An interpreter for the component.
 	 */
-	public IFuture<IComponentInterpreter> createComponentInterpreter(final IModelInfo model, IInternalAccess component, final Object persistinfo)
+	public IFuture<IComponentInterpreter> createComponentInterpreter(final IModelInfo model, final IInternalAccess component, final Object persistinfo)
 	{
 		final Future<IComponentInterpreter> res = new Future<IComponentInterpreter>();
 		
@@ -363,7 +363,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 					try
 					{
 						MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
-						MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), null, (MicroAgentPersistInfo)persistinfo);
+						MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), component, (MicroAgentPersistInfo)persistinfo);
 						res.setResult(mai);
 					}
 					catch(Exception e)
@@ -381,7 +381,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			{
 				ClassLoader	cl	= getClass().getClassLoader();
 				MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
-				MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), null, (MicroAgentPersistInfo)persistinfo);
+				MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), component, (MicroAgentPersistInfo)persistinfo);
 				res.setResult(mai);
 			}
 			catch(Exception e)

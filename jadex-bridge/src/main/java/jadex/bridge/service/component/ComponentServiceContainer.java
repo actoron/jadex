@@ -62,9 +62,6 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 {	
 	//-------- attributes --------
 	
-	/** The component adapter. */
-	protected IComponentAdapter adapter;
-	
 	/** The internal access. */
 	protected IInternalAccess instance;
 	
@@ -88,22 +85,21 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
-	public ComponentServiceContainer(IComponentAdapter adapter, String type, IInternalAccess instance, boolean realtime)
+	public ComponentServiceContainer(String type, IInternalAccess instance, boolean realtime)
 	{
-		this(adapter, type, instance, realtime, 50);
+		this(type, instance, realtime, 50);
 	}
 	
 	/**
 	 *  Create a new service container.
 	 */
-	public ComponentServiceContainer(IComponentAdapter adapter, String type, IInternalAccess instance, boolean realtime, int maxreq)
+	public ComponentServiceContainer(String type, IInternalAccess instance, boolean realtime, int maxreq)
 	{
-		super(adapter.getComponentIdentifier());
+		super(instance.getComponentIdentifier());
 		
 		if(instance==null)
 			throw new IllegalArgumentException("Instance must not null.");
 		
-		this.adapter = adapter;
 		this.type	= type;
 		this.instance = instance;
 		this.realtime	= realtime;
