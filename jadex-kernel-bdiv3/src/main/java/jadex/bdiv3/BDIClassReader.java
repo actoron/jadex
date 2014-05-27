@@ -160,6 +160,7 @@ public class BDIClassReader extends MicroClassReader
 //		modelinfo.setStartable(cma.getName().endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
 		modelinfo.setType(BDIAgentFactory.FILETYPE_BDIAGENT);
 		modelinfo.setResourceIdentifier(rid);
+		modelinfo.setClassloader(classloader);
 		ret.setClassloader(classloader); // use parent
 		
 //		System.out.println("filename: "+modelinfo.getFilename());

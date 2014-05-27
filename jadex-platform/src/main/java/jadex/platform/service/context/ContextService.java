@@ -1,5 +1,6 @@
 package jadex.platform.service.context;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
@@ -22,9 +23,9 @@ public class ContextService extends BasicService implements jadex.bridge.service
 	/**
 	 *  Create a new ContextService.
 	 */
-	public ContextService(IServiceProvider provider)
+	public ContextService(IComponentIdentifier provider)
 	{
-		super(provider.getId(), IContextService.class, null);
+		super(provider, IContextService.class, null);
 	}
 
 	// -------- methods ----------

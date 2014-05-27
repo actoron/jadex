@@ -153,6 +153,7 @@ public class MicroClassReader
 			rid = new ResourceIdentifier(new LocalResourceIdentifier(root, url), null);
 		}
 		modelinfo.setResourceIdentifier(rid);
+		modelinfo.setClassloader(classloader);
 		ret.setClassloader(classloader);
 		
 		// not supported any longer

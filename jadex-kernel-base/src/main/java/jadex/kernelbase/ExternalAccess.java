@@ -82,7 +82,7 @@ public class ExternalAccess implements IExternalAccess
 		this.valid	= true;
 		this.ia = ia;
 		this.cid	= ia.getComponentIdentifier();
-		this.provider = ia.getServiceContainer();
+//		this.provider = ia.getServiceContainer();
 		this.tostring = cid.getLocalName();
 	}
 

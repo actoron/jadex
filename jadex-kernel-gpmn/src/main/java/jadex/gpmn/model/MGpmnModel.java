@@ -64,9 +64,6 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 	/** The model info. */
 	protected ModelInfo modelinfo;
 	
-	/** The classloader. */
-	protected ClassLoader classloader;
-	
 	/**
 	 *  Create a new model.
 	 */
@@ -225,7 +222,7 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return classloader;
+		return modelinfo.getClassLoader();
 	}
 
 	/**
@@ -234,7 +231,7 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 	 */
 	public void setClassLoader(ClassLoader classloader)
 	{
-		this.classloader = classloader;
+		modelinfo.setClassloader(classloader);
 	}
 	
 	/**

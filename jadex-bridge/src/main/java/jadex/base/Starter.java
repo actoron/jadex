@@ -15,6 +15,9 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.component.ArgumentsComponentFeature;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.SServiceProvider;
@@ -24,6 +27,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.ComponentCreationInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IComponentFeature;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
@@ -40,6 +44,8 @@ import jadex.javaparser.SJavaParser;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -55,6 +61,19 @@ import java.util.logging.Logger;
  */
 public class Starter
 {
+	//-------- todo: move somewhere else? --------
+	
+	/** The default component features. */
+	public static final Collection<IComponentFeature>	DEFAULT_FEATURES;
+	
+	static
+	{
+		Collection<IComponentFeature>	def_features	= new ArrayList<IComponentFeature>();
+		def_features.add(new ArgumentsComponentFeature());
+		def_features.add(new ProvidedServicesComponentFeature());
+		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
+	}
+	
 	//-------- constants --------
 
 	/** The default platform configuration. */
@@ -481,21 +500,21 @@ public class Starter
 						autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(),
 						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
 					
-					boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
 					boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
+					boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
 					boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
 	
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, cid);
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, cid, realtime, copy);
 					
-					component.init(cci, interpreter).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+					component.init(cci, DEFAULT_FEATURES).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
-							startComponents(0, components, component.getInternalAccess())
-								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
-							{
-								public void customResultAvailable(Void result)
-								{
+//							startComponents(0, components, component.getInternalAccess())
+//								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
+//							{
+//								public void customResultAvailable(Void result)
+//								{
 									if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
 									{
 										long startup = System.currentTimeMillis() - starttime;
@@ -503,15 +522,15 @@ public class Starter
 										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
 									}
 									fret.setResult(component.getInternalAccess().getExternalAccess());
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									// On exception in init: kill platform.
-									component.getInternalAccess().getExternalAccess().killComponent();
-									super.exceptionOccurred(exception);
-								}
-							});
+//								}
+//								
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									// On exception in init: kill platform.
+//									component.getInternalAccess().getExternalAccess().killComponent();
+//									super.exceptionOccurred(exception);
+//								}
+//							});
 						}						
 					});
 					
@@ -545,7 +564,8 @@ public class Starter
 					
 					if(wakeup)
 					{
-						IExecutionService	exe	= component.getInternalAccess().getServiceContainer().getProvidedService(IExecutionService.class);
+						IProvidedServicesFeature	services	= component.getInternalAccess().getComponentFeature(IProvidedServicesFeature.class);
+						IExecutionService	exe	= services.getProvidedService(IExecutionService.class);
 						exe.start();
 					}
 

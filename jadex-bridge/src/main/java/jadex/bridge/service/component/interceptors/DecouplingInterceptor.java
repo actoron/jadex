@@ -13,7 +13,6 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
@@ -81,11 +80,11 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/** The external access. */
 	protected IExternalAccess ea;	
 		
-//	/** The internal access. */
-//	protected IInternalAccess ia;	
+	/** The internal access. */
+	protected IInternalAccess ia;	
 		
-	/** The component adapter. */
-	protected IComponentAdapter adapter;
+//	/** The component adapter. */
+//	protected IComponentAdapter adapter;
 	
 	/** Is the interceptor for a required service proxy? */
 	protected boolean required;
@@ -104,11 +103,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DecouplingInterceptor(IInternalAccess ia, IComponentAdapter adapter, boolean copy, boolean required)
+	public DecouplingInterceptor(IInternalAccess ia, boolean copy, boolean required)
 	{
-//		this.ia = ia;
+		this.ia = ia;
 		this.ea	= ia.getExternalAccess();
-		this.adapter = adapter;
 		this.copy = copy;
 		this.required	= required;
 //		System.out.println("copy: "+copy);
@@ -252,7 +250,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //		if(sic.getMethod().getName().indexOf("getChildren")!=-1)
 //			System.out.println("huhuhu");
 		
-		if(!adapter.isExternalThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
+		if(ia.isComponentThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{
 			// Not possible to use if it complains this way
 			// E.g. you have prov service and need to reschedule on the component then first getProviderId(), getExtAccess(), scheduleStep
@@ -420,7 +418,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					}
 				};
 				
-				FutureFunctionality func = new FutureFunctionality(adapter.getLogger())
+				FutureFunctionality func = new FutureFunctionality(ia.getLogger())
 				{
 					TimeoutException ex = null;
 					
@@ -484,7 +482,11 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					
 					protected void internalNotifyListener(final IResultListener<Void> lis)
 					{
-						if(adapter.isExternalThread())
+						if(ia.isComponentThread())
+						{
+							lis.resultAvailable(null);
+						}
+						else
 						{
 							try
 							{
@@ -501,10 +503,6 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 							{
 								lis.exceptionOccurred(e);
 							}				
-						}
-						else
-						{
-							lis.resultAvailable(null);
 						}	
 					}
 					

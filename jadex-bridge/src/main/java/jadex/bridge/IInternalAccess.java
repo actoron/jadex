@@ -1,7 +1,6 @@
 package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -40,17 +39,24 @@ public interface IInternalAccess
 	 */
 	public IComponentIdentifier	getComponentIdentifier();
 	
+	/**
+	 *  Get a feature of the component.
+	 *  @param feature	The type of the feature.
+	 *  @return The feature instance.
+	 */
+	public <T> T	getComponentFeature(Class<? extends T> type);
+	
 //	/**
 //	 *  Get the component description.
 //	 *  @return	The component description.
 //	 */
 //	public IComponentDescription	getComponentDescription();
 	
-	/**
-	 *  Get the service provider.
-	 *  @return The service provider.
-	 */
-	public IServiceContainer getServiceContainer();
+//	/**
+//	 *  Get the service provider.
+//	 *  @return The service provider.
+//	 */
+//	public IServiceContainer getServiceContainer();
 	
 	/**
 	 *  Kill the component.
@@ -87,24 +93,24 @@ public interface IInternalAccess
 	 */
 	public IValueFetcher getFetcher();
 		
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments.
-	 */
-	public Map<String, Object> getArguments();
+//	/**
+//	 *  Get the arguments.
+//	 *  @return The arguments.
+//	 */
+//	public Map<String, Object> getArguments();
+//	
+//	/**
+//	 *  Get the component results.
+//	 *  @return The results.
+//	 */
+//	public Map<String, Object> getResults();
 	
-	/**
-	 *  Get the component results.
-	 *  @return The results.
-	 */
-	public Map<String, Object> getResults();
-	
-	/**
-	 *  Set a result value.
-	 *  @param name The result name.
-	 *  @param value The result value.
-	 */
-	public void setResultValue(String name, Object value);
+//	/**
+//	 *  Set a result value.
+//	 *  @param name The result name.
+//	 *  @param value The result value.
+//	 */
+//	public void setResultValue(String name, Object value);
 	
 	/**
 	 *  Get the class loader of the component.

@@ -426,9 +426,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
-	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
+	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, Object service, 
 		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, 
-		boolean realtime, IResourceIdentifier rid, boolean monitoring, IResultCommand<Object, Class<?>> componentfetcher)
+		boolean realtime, boolean monitoring)
 	{
 		IInternalService	ret;
 		
@@ -439,7 +439,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(service instanceof IInternalService)
 		{
-			((IInternalService)service).createServiceIdentifier(name, service.getClass(), rid, type);
+			((IInternalService)service).createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type);
 		}
 		
 //		if(type.getName().indexOf("IServiceCallService")!=-1)
@@ -447,9 +447,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
-			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, realtime, componentfetcher);
+			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, realtime);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
-			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, adapter, ia, proxytype, copy, monitoring, ret.getServiceIdentifier());
+			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, copy, monitoring, ret.getServiceIdentifier());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			if(!(service instanceof IService))
@@ -481,14 +481,16 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a basic invocation handler.
 	 */
-	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service,
-		boolean realtime, IResultCommand<Object, Class<?>> componentfetcher)
+	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, boolean realtime)
 	{
 		BasicServiceInvocationHandler handler;
 		if(service instanceof IService)
 		{
 			IService ser = (IService)service;
-			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), realtime, ia.getComponentDescription().getCause(), false);
+			// Todo: cause
+			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), realtime, null, false);
+//			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), realtime, ia.getComponentDescription().getCause(), false);
+			
 //			if(type==null)
 //			{
 //				type = ser.getServiceIdentifier().getServiceType();
@@ -522,7 +524,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			Class<?> serclass = service.getClass();
 
-			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, serclass, null);
+			BasicService mgmntservice = new BasicService(ia.getComponentIdentifier(), type, serclass, null);
 			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type);
 						
 			// Do not try to call isAnnotationPresent for Proxy on Android
@@ -560,7 +562,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 						
 						if(fields[i].isAnnotationPresent(ServiceComponent.class))
 						{
-							Object val = componentfetcher!=null ? componentfetcher.execute(fields[i].getType()) : null;
+							// Todo: component fetcher?
+							Object val = /*componentfetcher!=null ? componentfetcher.execute(fields[i].getType()) :*/ null;
 							if(val==null && SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
 							{
 								val = ia;
@@ -592,7 +595,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			
 			ServiceInfo si = new ServiceInfo(service, mgmntservice);
-			handler = new BasicServiceInvocationHandler(ia, si, ia.getLogger(), realtime, ia.getComponentDescription().getCause());
+			// Todo: cause
+			handler = new BasicServiceInvocationHandler(ia, si, ia.getLogger(), realtime, /*ia.getComponentDescription().getCause()*/null);
+			
+			
 //			addPojoServiceIdentifier(service, mgmntservice.getServiceIdentifier());
 		}
 		
@@ -603,7 +609,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 *  Add the standard and custom interceptors.
 	 */
 	protected static void addProvidedInterceptors(BasicServiceInvocationHandler handler, Object service, 
-		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, boolean copy, 
+		IServiceInvocationInterceptor[] ics, IInternalAccess ia, String proxytype, boolean copy, 
 		boolean monitoring, IServiceIdentifier sid)
 	{
 //		System.out.println("addI:"+service);
@@ -620,11 +626,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			{
 				handler.addFirstServiceInterceptor(new ResolveInterceptor());
 			}
-			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
+			// Todo
+//			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
 			handler.addFirstServiceInterceptor(new ValidationInterceptor(ia));
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 			{
-				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, copy, false));
+				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, copy, false));
 			}
 			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
 		}
@@ -642,7 +649,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 *  Static method for creating a delegation service proxy for 
 	 *  provided service that is not offered by the component itself.
 	 */
-	public static IInternalService createDelegationProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, IServiceIdentifier sid, 
+	public static IInternalService createDelegationProvidedServiceProxy(IInternalAccess ia, IServiceIdentifier sid, 
 		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader, boolean realtime)
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, adapter.getLogger(), realtime, ia.getComponentDescription().getCause(), false);

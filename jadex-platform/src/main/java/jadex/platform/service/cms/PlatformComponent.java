@@ -1,29 +1,36 @@
 package jadex.platform.service.cms;
 
-import java.util.Map;
-import java.util.logging.Logger;
-
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.component.ComponentServiceContainer;
-import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.types.factory.ComponentCreationInfo;
+import jadex.bridge.service.types.factory.IComponentFeature;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.kernelbase.ExternalAccess;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  *  Standalone platform component implementation.
@@ -35,9 +42,14 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/** The creation info. */
 	protected ComponentCreationInfo	info;
 	
-	/** The service container. */
-	protected ComponentServiceContainer	sc;
+	/** The features. */
+	protected Map<Class<?>, IComponentFeature>	features;
 	
+	/** The feature instances as list (for reverse execution, cached for speed). */
+	protected List<IComponentFeature>	lfeatures;
+	
+	/** The logger. */
+	protected Logger	logger;
 	
 	//-------- IPlatformComponentAccess interface --------
 	
@@ -45,14 +57,49 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 *  Perform the initialization of the component.
 	 *  
 	 *  @param info The component creation info.
-	 *  @param interpreter The kernel specific component part.
+	 *  @param templates The component feature templates to be instantiated for this component.
 	 *  @return A future to indicate when the initialization is done.
 	 */
-	public IFuture<Void>	init(ComponentCreationInfo info, IComponentInterpreter interpreter)
+	public IFuture<Void>	init(ComponentCreationInfo info, Collection<IComponentFeature> templates)
 	{
+		Future<Void>	ret	= new Future<Void>();
 		this.info	= info;
-		this.sc	= new ComponentServiceContainer(null, this, false);	// Todo
-		return IFuture.DONE;
+		this.features	= new LinkedHashMap<Class<?>, IComponentFeature>();
+		this.lfeatures	= new ArrayList<IComponentFeature>();
+		for(IComponentFeature feature: templates)
+		{
+			IComponentFeature	instance	= feature.createInstance(getInternalAccess(), info);
+			features.put((Class<?>)feature.getType(), instance);
+			lfeatures.add(instance);
+		}
+		initFeatures(lfeatures.iterator())
+			.addResultListener(new DelegationResultListener<Void>(ret));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Recursively init the features.
+	 */
+	protected IFuture<Void>	initFeatures(final Iterator<IComponentFeature> features)
+	{
+		if(features.hasNext())
+		{
+			final Future<Void>	ret	= new Future<Void>();
+			features.next().init()
+				.addResultListener(new DelegationResultListener<Void>(ret)
+			{
+				public void customResultAvailable(Void result)
+				{
+					initFeatures(features).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+			return ret;
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
 	}
 	
 	/**
@@ -106,13 +153,31 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
-	 *  Get the service provider.
-	 *  @return The service provider.
+	 *  Get a feature of the component.
+	 *  @param feature	The type of the feature.
+	 *  @return The feature instance.
 	 */
-	public IServiceContainer getServiceContainer()
+	public <T> T	getComponentFeature(Class<? extends T> type)
 	{
-		return sc;
+		if(!features.containsKey(type))
+		{
+			throw new RuntimeException("No such feature: "+type);
+		}
+		else
+		{
+			return type.cast(features.get(type));
+		}
 	}
+
+	
+//	/**
+//	 *  Get the service provider.
+//	 *  @return The service provider.
+//	 */
+//	public IServiceContainer getServiceContainer()
+//	{
+//		return sc;
+//	}
 	
 	/**
 	 *  Kill the component.
@@ -151,37 +216,225 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 *  Get the logger.
 	 *  @return The logger.
 	 */
-	public Logger getLogger();
+	public Logger getLogger()
+	{
+		if(logger==null)
+		{
+			// todo: problem: loggers can cause memory leaks
+			// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
+			String name = getLoggerName(getComponentIdentifier());
+			logger = LogManager.getLogManager().getLogger(name);
+			
+			// if logger does not already exist, create it
+			if(logger==null)
+			{
+				// Hack!!! Might throw exception in applet / webstart.
+				try
+				{
+					logger = Logger.getLogger(name);
+					initLogger(logger);
+					logger = new LoggerWrapper(logger, null);	// Todo: clock
+					//System.out.println(logger.getParent().getLevel());
+				}
+				catch(SecurityException e)
+				{
+					// Hack!!! For applets / webstart use anonymous logger.
+					logger = Logger.getAnonymousLogger();
+					initLogger(logger);
+					logger = new LoggerWrapper(logger, null);	// Todo: clock
+				}
+			}
+		}
+		
+		return logger;
+	}
+
+	/**
+	 *  Get the logger name.
+	 *  @param cid The component identifier.
+	 *  @return The name.
+	 */
+	public static String getLoggerName(IComponentIdentifier cid)
+	{
+		// Prepend parent names for nested loggers.
+		String	name	= null;
+		for(; cid!=null; cid=cid.getParent())
+		{
+			name	= name==null ? cid.getLocalName() : cid.getLocalName() + "." +name;
+		}
+		return name;
+	}
+	
+	/**
+	 *  Init the logger with capability settings.
+	 *  @param logger The logger.
+	 */
+	protected void initLogger(Logger logger)
+	{
+		// Todo: properties
+		
+//		// get logging properties (from ADF)
+//		// the level of the logger
+//		// can be Integer or Level
+//		
+//		Object prop = component.getProperty("logging.level");
+//		Level level = prop!=null? (Level)prop : logger.getParent()!=null && logger.getParent().getLevel()!=null ? logger.getParent().getLevel() : Level.SEVERE;
+//		logger.setLevel(level);
+//		
+//		// if logger should use Handlers of parent (global) logger
+//		// the global logger has a ConsoleHandler(Level:INFO) by default
+//		prop = component.getProperty("logging.useParentHandlers");
+//		if(prop!=null)
+//		{
+//			logger.setUseParentHandlers(((Boolean)prop).booleanValue());
+//		}
+//			
+//		// add a ConsoleHandler to the logger to print out
+//        // logs to the console. Set Level to given property value
+//		prop = component.getProperty("logging.addConsoleHandler");
+//		if(prop!=null)
+//		{
+//			Handler console;
+//			/*if[android]
+//			console = new jadex.commons.android.AndroidHandler();
+//			 else[android]*/
+//			console = new ConsoleHandler();
+//			/* end[android]*/
+//			
+//            console.setLevel(Level.parse(prop.toString()));
+//            logger.addHandler(console);
+//        }
+//		
+//		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
+//		// if logger should add a filehandler to capture log data in a file. 
+//		// The user specifies the directory to contain the log file.
+//		// $scope.getAgentName() can be used to have agent-specific log files 
+//		//
+//		// The directory name can use special patterns defined in the
+//		// class, java.util.logging.FileHandler, 
+//		// such as "%h" for the user's home directory.
+//		// 
+//		String logfile =	(String)component.getProperty("logging.file");
+//		if(logfile!=null)
+//		{
+//		    try
+//		    {
+//			    Handler fh	= new FileHandler(logfile);
+//		    	fh.setFormatter(new SimpleFormatter());
+//		    	logger.addHandler(fh);
+//		    }
+//		    catch (IOException e)
+//		    {
+//		    	System.err.println("I/O Error attempting to create logfile: "
+//		    		+ logfile + "\n" + e.getMessage());
+//		    }
+//		}
+//		
+//		// Add further custom log handlers.
+//		prop = component.getProperty("logging.handlers");
+//		if(prop!=null)
+//		{
+//			if(prop instanceof Handler)
+//			{
+//				logger.addHandler((Handler)prop);
+//			}
+//			else if(SReflect.isIterable(prop))
+//			{
+//				for(Iterator<?> it=SReflect.getIterator(prop); it.hasNext(); )
+//				{
+//					Object obj = it.next();
+//					if(obj instanceof Handler)
+//					{
+//						logger.addHandler((Handler)obj);
+//					}
+//					else
+//					{
+//						logger.warning("Property is not a logging handler: "+obj);
+//					}
+//				}
+//			}
+//			else
+//			{
+//				logger.warning("Property 'logging.handlers' must be Handler or list of handlers: "+prop);
+//			}
+//		}
+	}
 	
 	/**
 	 *  Get the fetcher.
 	 *  @return The fetcher.
 	 */
-	public IValueFetcher getFetcher();
+	public IValueFetcher getFetcher()
+	{
+		// Return a fetcher that tries features first.
+		// Todo: better (faster) way than throwing exceptions?
+		return new IValueFetcher()
+		{
+			public Object fetchValue(String name)
+			{
+				Object	ret	= null;
+				boolean	found	= false;
+				
+				for(int i=lfeatures.size()-1; !found && i>=0; i--)
+				{
+					try
+					{
+						ret	= lfeatures.get(i).fetchValue(name);
+						found	= true;
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				
+				if(ret==null && "$component".equals(name))
+				{
+					ret	= getInternalAccess();
+					found	= true;
+				}
+				
+				if(!found)
+				{
+					throw new UnsupportedOperationException();
+				}
+				
+				return ret;
+			}
+			
+			public Object fetchValue(String name, Object object)
+			{
+				Object	ret	= null;
+				boolean	found	= false;
+				
+				for(int i=lfeatures.size()-1; !found && i>=0; i--)
+				{
+					try
+					{
+						ret	= lfeatures.get(i).fetchValue(name, object);
+						found	= true;
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				
+				if(!found)
+				{
+					throw new UnsupportedOperationException();
+				}
+				
+				return ret;
+			}
+		};
+	}
 		
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments.
-	 */
-	public Map<String, Object> getArguments();
-	
-	/**
-	 *  Get the component results.
-	 *  @return The results.
-	 */
-	public Map<String, Object> getResults();
-	
-	/**
-	 *  Set a result value.
-	 *  @param name The result name.
-	 *  @param value The result value.
-	 */
-	public void setResultValue(String name, Object value);
-	
 	/**
 	 *  Get the class loader of the component.
 	 */
-	public ClassLoader	getClassLoader();
+	public ClassLoader	getClassLoader()
+	{
+		return ((ModelInfo)getModel()).getClassLoader();
+	}
 	
 //	/**
 //	 *  Get the model name of a component type.

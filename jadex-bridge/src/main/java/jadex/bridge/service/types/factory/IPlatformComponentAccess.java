@@ -1,8 +1,9 @@
 package jadex.bridge.service.types.factory;
 
-import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
+
+import java.util.Collection;
 
 /**
  *  Interface for operations on the component to be called from the platform.
@@ -21,10 +22,10 @@ public interface IPlatformComponentAccess
 	 *  Perform the initialization of the component.
 	 *  
 	 *  @param info The component creation info.
-	 *  @param interpreter The kernel specific component part.
+	 *  @param templates The component feature templates to be instantiated for this component.
 	 *  @return A future to indicate when the initialization is done.
 	 */
-	public IFuture<Void>	init(ComponentCreationInfo info, IComponentInterpreter interpreter);
+	public IFuture<Void>	init(ComponentCreationInfo info, Collection<IComponentFeature> templates);
 	
 	/**
 	 *  Get the user view of this platform component.

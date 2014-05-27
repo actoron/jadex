@@ -1,7 +1,7 @@
 package jadex.platform.service.threadpool;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.concurrent.IThreadPool;
@@ -22,9 +22,9 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 	/**
 	 *  Create a new threadpool service.
 	 */
-	public ThreadPoolService(IThreadPool threadpool, IServiceProvider provider)
+	public ThreadPoolService(IThreadPool threadpool, IComponentIdentifier provider)
 	{
-		super(provider.getId(), IThreadPoolService.class, null);
+		super(provider, IThreadPoolService.class, null);
 
 		this.threadpool = threadpool;
 	}

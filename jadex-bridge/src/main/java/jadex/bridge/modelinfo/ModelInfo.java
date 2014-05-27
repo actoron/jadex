@@ -6,6 +6,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.annotations.Exclude;
 import jadex.javaparser.SJavaParser;
 
 import java.util.ArrayList;
@@ -66,7 +67,8 @@ public class ModelInfo extends Startable implements IModelInfo
 	protected List<NFPropertyInfo> nfproperties;
 	
 	/** The classloader. */
-//	protected ClassLoader classloader;
+	// only locally available
+	protected ClassLoader classloader;
 	
 	/** The required services. */
 	protected Map<String, RequiredServiceInfo> requiredservices;
@@ -119,7 +121,7 @@ public class ModelInfo extends Startable implements IModelInfo
 		this.startable = startable;
 		this.filename = filename;
 		this.properties = properties!=null? properties: new HashMap<String, Object>();
-//		this.classloader = classloader;
+		this.classloader = classloader;
 		if(providedservices!=null)
 			this.providedservices = SUtil.arrayToList(providedservices);
 		if(configurations!=null)
@@ -382,16 +384,15 @@ public class ModelInfo extends Startable implements IModelInfo
 		return SJavaParser.getProperty(getProperties(), name, getAllImports(), null, cl);
 	}
 
-	
-	
-//	/**
-//	 *  Return the class loader corresponding to the model.
-//	 *  @return The class loader corresponding to the model.
-//	 */
-//	public ClassLoader getClassLoader()
-//	{
-//		return classloader;
-//	}
+	/**
+	 *  Return the class loader corresponding to the model.
+	 *  @return The class loader corresponding to the model.
+	 */
+	@Exclude
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
+	}
 	
 	/**
 	 *  Get the nfproperties.
@@ -594,17 +595,15 @@ public class ModelInfo extends Startable implements IModelInfo
 		properties.put(unexp.getName(), unexp);
 	}
 	
-	// Exclude from transfer?!
-//	/**
-//	 *  Set the classloader.
-//	 *  @param classloader The classloader to set.
-//	 */
-//	public void setClassloader(ClassLoader classloader)
-//	{
-//		this.classloader = classloader;
-//	}
-
-	
+	/**
+	 *  Set the classloader.
+	 *  @param classloader The classloader to set.
+	 */
+	@Exclude
+	public void setClassloader(ClassLoader classloader)
+	{
+		this.classloader = classloader;
+	}
 	
 	/**
 	 *  Get the required services.

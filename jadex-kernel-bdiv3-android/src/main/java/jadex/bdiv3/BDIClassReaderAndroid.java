@@ -64,6 +64,7 @@ public class BDIClassReaderAndroid extends BDIClassReader
 		modelinfo.setStartable(!Modifier.isAbstract(cma.getModifiers()));
 		modelinfo.setType(BDIAgentFactory.FILETYPE_BDIAGENT);
 		modelinfo.setResourceIdentifier(rid);
+		modelinfo.setClassloader(classloader);
 		ret.setClassloader(classloader); // use parent
 		
 //		System.out.println("filename: "+modelinfo.getFilename());
