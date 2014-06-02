@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.TimeoutResultListener;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -250,7 +251,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //		if(sic.getMethod().getName().indexOf("getChildren")!=-1)
 //			System.out.println("huhuhu");
 		
-		if(ia.isComponentThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
+		if(ia.getComponentFeature(IExecutionFeature.class).isComponentThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{
 			// Not possible to use if it complains this way
 			// E.g. you have prov service and need to reschedule on the component then first getProviderId(), getExtAccess(), scheduleStep
@@ -482,7 +483,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					
 					protected void internalNotifyListener(final IResultListener<Void> lis)
 					{
-						if(ia.isComponentThread())
+						if(ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
 						{
 							lis.resultAvailable(null);
 						}

@@ -1,11 +1,9 @@
-package jadex.bridge.service.component;
+package jadex.bridge.component;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.types.factory.ComponentCreationInfo;
-import jadex.bridge.service.types.factory.IComponentFeature;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
@@ -142,5 +140,16 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		}
 		
 		return ret;
+	}
+	
+	//-------- IArgumentsFeature interface --------
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public Map<String, Object> getArguments()
+	{
+		return arguments;
 	}
 }

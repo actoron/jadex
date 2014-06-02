@@ -218,7 +218,7 @@ public class HttpRelayTransport implements ITransport
 	public IFuture<Void> start()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(component.getServiceContainer(), IDaemonThreadPoolService.class, Binding.SCOPE_PLATFORM)
+		SServiceProvider.getService(component.getServiceProvider(), IDaemonThreadPoolService.class, Binding.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Void>(ret)
 		{
 			public void customResultAvailable(IDaemonThreadPoolService tps)
@@ -309,7 +309,7 @@ public class HttpRelayTransport implements ITransport
 			{
 				public IFuture<Void> execute(final IInternalAccess ia)
 				{
-					ia.getServiceContainer().searchService(IMessageService.class, Binding.SCOPE_PLATFORM)
+					SServiceProvider.getService(ia.getServiceProvider(), IMessageService.class, Binding.SCOPE_PLATFORM)
 						.addResultListener(new IResultListener<IMessageService>()
 					{
 						public void resultAvailable(IMessageService ms)
@@ -318,7 +318,7 @@ public class HttpRelayTransport implements ITransport
 							{
 								public void resultAvailable(Void result)
 								{
-									ia.getServiceContainer().searchService(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
+									SServiceProvider.getService(ia.getServiceProvider(), IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
 										.addResultListener(new IResultListener<IRelayAwarenessService>()
 									{
 										public void resultAvailable(IRelayAwarenessService ras)

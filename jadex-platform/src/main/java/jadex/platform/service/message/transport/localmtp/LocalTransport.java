@@ -1,9 +1,6 @@
 package jadex.platform.service.message.transport.localmtp;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
@@ -13,7 +10,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
-import jadex.platform.service.message.transport.MessageEnvelope;
+
+import java.util.Map;
 
 
 /**
@@ -36,19 +34,17 @@ public class LocalTransport implements ITransport
 	protected String[] addresses;
 	
 	/** The platform. */
-	protected IServiceProvider container;
+	protected IInternalAccess component;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Init the transport.
-	 *  @param platform The platform.
-	 *  @param settings The settings.
 	 */
-	public LocalTransport(IServiceProvider container)
+	public LocalTransport(IInternalAccess component)
 	{
-		this.container = container;
-		this.addresses = new String[]{SCHEMAS[0]+container.getId().getPlatformName()};
+		this.component = component;
+		this.addresses = new String[]{SCHEMAS[0]+component.getComponentIdentifier().getPlatformName()};
 	}
 
 	/**
@@ -57,7 +53,7 @@ public class LocalTransport implements ITransport
 	public IFuture<Void> start()
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
 			public void customResultAvailable(IMessageService result)
@@ -90,7 +86,7 @@ public class LocalTransport implements ITransport
 		for(int i=0; !applicable && i<getServiceSchemas().length; i++)
 		{
 			applicable	= address.startsWith(getServiceSchemas()[i])
-				&& address.substring(getServiceSchemas()[i].length()).equals(container.getId().getPlatformName());
+				&& address.substring(getServiceSchemas()[i].length()).equals(component.getComponentIdentifier().getPlatformName());
 		}
 		return applicable;
 	}

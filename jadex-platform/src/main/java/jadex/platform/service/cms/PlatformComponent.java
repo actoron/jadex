@@ -1,22 +1,29 @@
 package jadex.platform.service.cms;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.service.types.factory.ComponentCreationInfo;
-import jadex.bridge.service.types.factory.IComponentFeature;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -24,9 +31,9 @@ import jadex.kernelbase.ExternalAccess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.LogManager;
@@ -169,38 +176,73 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 	}
 
+	/**
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	// Todo: convenience object? -> fix search!?
+	public IServiceContainer getServiceContainer()
+	{
+		// Todo: wrapped services with local interceptor chain
+		return new IServiceContainer()
+		{
+			public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
+			{
+				return SServiceProvider.getServices(getServiceProvider(), type, scope);
+			}
+			
+			public <T> IIntermediateFuture<T> searchServices(Class<T> type)
+			{
+				return SServiceProvider.getServices(getServiceProvider(), type);
+			}
+			
+			public <T> IFuture<T> searchServiceUpwards(Class<T> type)
+			{
+				return SServiceProvider.getServiceUpwards(getServiceProvider(), type);
+			}
+			
+			public <T> IFuture<T> searchService(Class<T> type, String scope)
+			{
+				return SServiceProvider.getService(getServiceProvider(), type, scope);
+			}
+			
+			public <T> IFuture<T> searchService(Class<T> type)
+			{
+				return SServiceProvider.getService(getServiceProvider(), type);
+			}
+			
+			public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
+			{
+				return SServiceProvider.getService(getServiceProvider(), cid, type);
+			}
+		};
+	}
 	
-//	/**
-//	 *  Get the service provider.
-//	 *  @return The service provider.
-//	 */
-//	public IServiceContainer getServiceContainer()
-//	{
-//		return sc;
-//	}
+	/**
+	 *  Get the service provider.
+	 */
+	// Todo: internal object? -> fix search!?
+	public IServiceProvider	getServiceProvider()
+	{
+		// Hack!?
+		return (IServiceProvider)getComponentFeature(IProvidedServicesFeature.class);
+	}
+
 	
 	/**
 	 *  Kill the component.
 	 */
-	public IFuture<Map<String, Object>> killComponent();
+	public IFuture<Map<String, Object>> killComponent()
+	{
+		// Todo:
+		return new Future<Map<String, Object>>();
+	}
 	
 //	/**
 //	 *  Test if component has been killed.
 //	 *  @return True, if has been killed.
 //	 */
 //	public boolean isKilled();
-	
-	/**
-	 *  Create a result listener that is executed on the
-	 *  component thread.
-	 */
-	public <T> IResultListener<T> createResultListener(IResultListener<T> listener);
-	
-	/**
-	 *  Create a result listener that is executed on the
-	 *  component thread.
-	 */
-	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener);
 	
 	/**
 	 *  Get the external access.
@@ -442,49 +484,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //	 *  @return The model name of this component type.
 //	 */
 //	public IFuture getFileName(String ctype);
-	
-	/**
-	 *  Execute a component step.
-	 */
-	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step);
-	
-	/**
-	 *  Execute an immediate component step,
-	 *  i.e., the step is executed also when the component is currently suspended.
-	 */
-	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step);
-	
-	/**
-	 *  Wait for some time and execute a component step afterwards.
-	 */
-	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime);
-
-	/**
-	 *  Wait for some time and execute a component step afterwards.
-	 */
-	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
-
-	/**
-	 *  Wait for some time.
-	 */
-	public IFuture<Void> waitForDelay(long delay, boolean realtime);
-	
-	/**
-	 *  Wait for some time.
-	 */
-	public IFuture<Void> waitForDelay(long delay);
-	
-	// todo:?
-//	/**
-//	 *  Wait for some time and execute a component step afterwards.
-//	 */
-//	public IFuture waitForImmediate(long delay, IComponentStep step);
-
-	/**
-	 *  Test if current thread is the component thread.
-	 *  @return True if the current thread is the component thread.
-	 */
-	public boolean isComponentThread();
 	
 	/**
 	 *  Subscribe to component events.

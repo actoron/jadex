@@ -1,6 +1,5 @@
 package jadex.platform.service.message.transport.niotcpmtp;
 
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -47,9 +46,6 @@ public class SelectorThread implements Runnable
 	/** The logger. */
 	protected Logger	logger;
 	
-	/** The service provider. */
-	protected IServiceProvider	provider;
-	
 	/** The tasks enqueued from external threads. */
 	protected List<Runnable>	tasks;
 
@@ -69,13 +65,12 @@ public class SelectorThread implements Runnable
 	/**
 	 * Create a NIO selector thread.
 	 */
-	public SelectorThread(Selector selector, IMessageService msgsservice, Logger logger, IServiceProvider provider)
+	public SelectorThread(Selector selector, IMessageService msgsservice, Logger logger)
 	{
 		this.running = true;
 		this.selector	= selector;
 		this.msgservice	= msgsservice;
 		this.logger	= logger;
-		this.provider	= provider;
 		this.tasks	= new ArrayList<Runnable>();
 		this.futconnections	= new LinkedHashMap<InetSocketAddress, Future<NIOTCPOutputConnection>>();
 		this.aliveconnections = new LinkedHashMap<InetSocketAddress, Object>();

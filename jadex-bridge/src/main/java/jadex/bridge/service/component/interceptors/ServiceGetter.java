@@ -1,11 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.monitoring.IMonitoringService;
-import jadex.commons.future.CallMultiplexer;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -94,8 +91,8 @@ public class ServiceGetter<T>
 				{
 					lastsearch = System.currentTimeMillis();
 					
-					SServiceProvider.getService(component.getServiceContainer(), type, scope)
-						.addResultListener(component.createResultListener(new IResultListener<T>()
+					SServiceProvider.getService(component.getServiceProvider(), type, scope)
+						.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<T>()
 					{
 						public void resultAvailable(T result)
 						{

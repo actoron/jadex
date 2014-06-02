@@ -1,10 +1,13 @@
 package jadex.platform.service.settings;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
@@ -69,12 +72,12 @@ public class SettingsService implements ISettingsService
 	public IFuture<Void>	startService()
 	{
 		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
-		Object	soe	= access.getArguments().get("saveonexit");
+		Object	soe	= access.getComponentFeature(IArgumentsFeature.class).getArguments().get("saveonexit");
 		this.saveonexit	= soe instanceof Boolean && ((Boolean)soe).booleanValue();
 		this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 		
 		final Future<Void>	ret	= new Future<Void>();
-		access.getServiceContainer().searchService(IContextService.class)
+		SServiceProvider.getService(access.getServiceProvider(), IContextService.class)
 			.addResultListener(new DefaultResultListener<IContextService>()
 		{
 			public void resultAvailable(IContextService result)
@@ -129,7 +132,7 @@ public class SettingsService implements ISettingsService
 			Properties	sub	= props.getSubproperty(id);
 			if(sub!=null)
 			{
-				provider.setProperties(sub).addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+				provider.setProperties(sub).addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 			}
 			else
 			{
@@ -159,7 +162,7 @@ public class SettingsService implements ISettingsService
 			if(saveonexit)
 			{
 //				provider.getProperties().addResultListener(new DelegationResultListener(ret)
-				provider.getProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)
+				provider.getProperties().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -195,7 +198,7 @@ public class SettingsService implements ISettingsService
 		if(providers.containsKey(id))
 		{
 			((IPropertiesProvider)providers.get(id)).setProperties(props)
-				.addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+				.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 		}
 		else
 		{
@@ -231,7 +234,7 @@ public class SettingsService implements ISettingsService
 				props = mprops;
 				
 				final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(providers.size(),
-					access.createResultListener(new DelegationResultListener<Void>(ret)));
+					access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 				
 				for(Iterator<String> it=providers.keySet().iterator(); it.hasNext(); )
 				{
@@ -241,7 +244,7 @@ public class SettingsService implements ISettingsService
 					Properties	sub	= props.getSubproperty(id);
 					if(sub!=null)
 					{
-						provider.setProperties(sub).addResultListener(access.createResultListener(crl));
+						provider.setProperties(sub).addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(crl));
 					}
 					else
 					{
@@ -375,7 +378,7 @@ public class SettingsService implements ISettingsService
 
 			
 		};
-		rl	= shutdown ? rl : access.createResultListener(rl); 
+		rl	= shutdown ? rl : access.getComponentFeature(IExecutionFeature.class).createResultListener(rl); 
 		final CounterResultListener	crl	= new CounterResultListener(providers.size(), rl);
 		
 		for(Iterator it=providers.keySet().iterator(); it.hasNext(); )
@@ -391,7 +394,7 @@ public class SettingsService implements ISettingsService
 					crl.resultAvailable(null);
 				}
 			};
-			rl	= shutdown ? rl : access.createResultListener(rl); 
+			rl	= shutdown ? rl : access.getComponentFeature(IExecutionFeature.class).createResultListener(rl); 
 			provider.getProperties().addResultListener(rl);
 		}
 		

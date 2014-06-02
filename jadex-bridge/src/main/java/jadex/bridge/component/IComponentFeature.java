@@ -1,4 +1,4 @@
-package jadex.bridge.service.types.factory;
+package jadex.bridge.component;
 
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IValueFetcher;

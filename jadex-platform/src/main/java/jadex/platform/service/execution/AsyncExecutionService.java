@@ -1,7 +1,7 @@
 package jadex.platform.service.execution;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -43,8 +43,8 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	/** The state. */
 	protected State state;
 	
-	/** The provider. */
-	protected IServiceProvider provider;
+	/** The component. */
+	protected IInternalAccess component;
 	
 	/** The running (i.e. non-blocked) executors. */
 	protected Map<IExecutable, Executor> runningexes;
@@ -54,22 +54,22 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	/**
 	 *  Create a new asynchronous executor service. 
 	 */
-	public AsyncExecutionService(IServiceProvider provider)//, int max)
+	public AsyncExecutionService(IInternalAccess component)//, int max)
 	{
-		this(provider, null);
+		this(component, null);
 	}
 	
 	/**
 	 *  Create a new asynchronous executor service. 
 	 */
-	public AsyncExecutionService(IServiceProvider provider, Map<String, Object> properties)//, int max)
+	public AsyncExecutionService(IInternalAccess component, Map<String, Object> properties)//, int max)
 	{
-		super(provider.getId(), IExecutionService.class, properties);
+		super(component.getComponentIdentifier(), IExecutionService.class, properties);
 
-		this.provider = provider;
-		this.state	= State.CREATED;
+		this.component = component;
 		this.executors	= SCollection.createHashMap();
 		this.runningexes = SCollection.createHashMap();
+		this.state	= State.CREATED;
 	}
 
 	//-------- methods --------
@@ -235,7 +235,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				}
 				else
 				{
-					SServiceProvider.getServiceUpwards(provider, IThreadPoolService.class)
+					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IThreadPoolService.class)
 						.addResultListener(new IResultListener<IThreadPoolService>()
 					{
 						public void resultAvailable(IThreadPoolService result)
@@ -269,7 +269,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public void start()
 	{
-		if(state!=State.CREATED)
+		if(state!=State.INITED)
 		{
 			throw new RuntimeException("Cannot start service in "+state);
 		}

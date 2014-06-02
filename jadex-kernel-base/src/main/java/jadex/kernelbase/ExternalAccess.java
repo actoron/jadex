@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -82,7 +83,7 @@ public class ExternalAccess implements IExternalAccess
 		this.valid	= true;
 		this.ia = ia;
 		this.cid	= ia.getComponentIdentifier();
-//		this.provider = ia.getServiceContainer();
+		this.provider = ia.getServiceProvider();
 		this.tostring = cid.getLocalName();
 	}
 
@@ -438,52 +439,52 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
 		}
-		else if(adapter.isExternalThread())
+		else if(!ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						// Hack!!! Should not be called after termination.
-						if(!valid)
-						{
-							ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-						}
-						else
-						{
-							IFuture<T>	fut	= ia.scheduleStep(step);
-							FutureFunctionality.connectDelegationFuture(ret, fut);
-						}
-							
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				// Allow executing steps on platform during (and after?) shutdown.
-				if(cid.getParent()==null)
-				{
-					Starter.scheduleRescueStep(cid, new Runnable()
-					{
-						public void run()
-						{
-							IFuture<T>	fut	= step.execute(ia.getInternalAccess());
-							FutureFunctionality.connectDelegationFuture(ret, fut);
-						}
-					});					
-				}
-				
-				else
-				{
-					ret.setException(e);
-				}
-			}
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						// Hack!!! Should not be called after termination.
+//						if(!valid)
+//						{
+//							ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//						}
+//						else
+//						{
+//							IFuture<T>	fut	= ia.scheduleStep(step);
+//							FutureFunctionality.connectDelegationFuture(ret, fut);
+//						}
+//							
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				// Allow executing steps on platform during (and after?) shutdown.
+//				if(cid.getParent()==null)
+//				{
+//					Starter.scheduleRescueStep(cid, new Runnable()
+//					{
+//						public void run()
+//						{
+//							IFuture<T>	fut	= step.execute(ia.getInternalAccess());
+//							FutureFunctionality.connectDelegationFuture(ret, fut);
+//						}
+//					});					
+//				}
+//				
+//				else
+//				{
+//					ret.setException(e);
+//				}
+//			}
 		}
 		else
 		{
-			IFuture<T>	fut	= ia.scheduleStep(step);
+			IFuture<T>	fut	= ia.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 			FutureFunctionality.connectDelegationFuture(ret, fut);
 		}
 		
@@ -499,46 +500,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T>	IFuture<T> scheduleImmediate(final IComponentStep<T> step)
 	{
-		final Future<T> ret = new Future<T>();
-		
-		try
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					try
-					{
-						IFuture<T>	result	= step.execute(ia.getInternalAccess());
-						result.addResultListener(new DelegationResultListener<T>(ret));
-					}
-					catch(Exception e)
-					{
-						if(!ret.isDone())
-						{
-							ret.setException(e);
-						}
-						else
-						{
-							adapter.getLogger().warning("Exception occurred: "+e);
-							e.printStackTrace();
-						}
-					}
-				}
-			});
-		}
-		catch(final Exception e)
-		{
-			Starter.scheduleRescueStep(cid, new Runnable()
-			{
-				public void run()
-				{
-					ret.setException(e);
-				}
-			});
-		}
-		
-		return ret;
+		return ia.getComponentFeature(IExecutionFeature.class).scheduleImmediate(step);
 	}
 	
 	/**

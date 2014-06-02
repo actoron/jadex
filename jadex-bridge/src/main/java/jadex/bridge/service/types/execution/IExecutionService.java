@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.execution;
 
-import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.IFuture;
@@ -18,7 +17,7 @@ import jadex.commons.future.IFuture;
  *  State representation? = all executables and their state?
  *  todo: use callbacks?
  */
-public interface IExecutionService	extends IService
+public interface IExecutionService	//	extends IService
 {
 	/**
 	 *  Manually start the execution service.

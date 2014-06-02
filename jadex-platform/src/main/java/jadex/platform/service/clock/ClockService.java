@@ -1,7 +1,7 @@
 package jadex.platform.service.clock;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClock;
@@ -43,8 +43,8 @@ public class ClockService extends BasicService implements IClockService, IProper
 	/** The clock listeners. */
 	protected List listeners;
 	
-	/** The provider. */
-	protected IServiceProvider provider;
+	/** The component. */
+	protected IInternalAccess component;
 
 	/** The clock type. */
 	protected ClockCreationInfo cinfo;
@@ -60,20 +60,20 @@ public class ClockService extends BasicService implements IClockService, IProper
 	/**
 	 *  Create a new clock service.
 	 */
-	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider, Boolean simulation)
+	public ClockService(ClockCreationInfo cinfo, IInternalAccess component, Boolean simulation)
 	{
-		this(cinfo, provider, null, simulation);
+		this(cinfo, component, null, simulation);
 	}
 	
 	/**
 	 *  Create a new clock service.
 	 */
-	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider, Map properties, Boolean simulation)
+	public ClockService(ClockCreationInfo cinfo, IInternalAccess component, Map properties, Boolean simulation)
 	{
-		super(provider.getId(), IClockService.class, properties);
+		super(component.getComponentIdentifier(), IClockService.class, properties);
 
 		this.cinfo = cinfo;
-		this.provider = provider;
+		this.component = component;
 		this.simulation = simulation;
 		this.listeners = Collections.synchronizedList(new ArrayList());
 	}
@@ -289,7 +289,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getServiceUpwards(provider, IThreadPoolService.class)
+		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IThreadPoolService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -301,7 +301,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 				{
 					public void customResultAvailable(Object result)
 					{
-						SServiceProvider.getService(provider, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService(component.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
@@ -346,7 +346,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 		{
 			public void customResultAvailable(Void result)
 			{
-				SServiceProvider.getService(provider, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(component.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new IResultListener<ISettingsService>()
 				{
 					public void resultAvailable(ISettingsService settings)
@@ -356,7 +356,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 						{
 							public void customResultAvailable(Void result)
 							{
-								ClockService.this.provider	= null;
+								ClockService.this.component	= null;
 								ClockService.this.clock	= null;
 								ret.setResult(null);
 							}
@@ -366,7 +366,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 					public void exceptionOccurred(Exception exception)
 					{
 						// No settings service: ignore.
-						ClockService.this.provider	= null;
+						ClockService.this.component	= null;
 						ClockService.this.clock	= null;
 						ret.setResult(null);
 					}

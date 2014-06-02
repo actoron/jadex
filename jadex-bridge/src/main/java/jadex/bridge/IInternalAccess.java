@@ -1,6 +1,8 @@
 package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -52,28 +54,35 @@ public interface IInternalAccess
 //	 */
 //	public IComponentDescription	getComponentDescription();
 	
-//	/**
-//	 *  Get the service provider.
-//	 *  @return The service provider.
-//	 */
-//	public IServiceContainer getServiceContainer();
+	/**
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	// Todo: convenience object? -> fix search!?
+	public IServiceContainer getServiceContainer();
+	
+	/**
+	 *  Get the service provider.
+	 */
+	// Todo: internal object? -> fix search!?
+	public IServiceProvider	getServiceProvider();
 	
 	/**
 	 *  Kill the component.
 	 */
 	public IFuture<Map<String, Object>> killComponent();
 	
-	/**
-	 *  Create a result listener that is executed on the
-	 *  component thread.
-	 */
-	public <T> IResultListener<T> createResultListener(IResultListener<T> listener);
-	
-	/**
-	 *  Create a result listener that is executed on the
-	 *  component thread.
-	 */
-	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener);
+//	/**
+//	 *  Create a result listener that is executed on the
+//	 *  component thread.
+//	 */
+//	public <T> IResultListener<T> createResultListener(IResultListener<T> listener);
+//	
+//	/**
+//	 *  Create a result listener that is executed on the
+//	 *  component thread.
+//	 */
+//	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener);
 	
 	/**
 	 *  Get the external access.
@@ -124,48 +133,48 @@ public interface IInternalAccess
 //	 */
 //	public IFuture getFileName(String ctype);
 	
-	/**
-	 *  Execute a component step.
-	 */
-	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step);
-	
-	/**
-	 *  Execute an immediate component step,
-	 *  i.e., the step is executed also when the component is currently suspended.
-	 */
-	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step);
-	
-	/**
-	 *  Wait for some time and execute a component step afterwards.
-	 */
-	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime);
-
-	/**
-	 *  Wait for some time and execute a component step afterwards.
-	 */
-	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
-
-	/**
-	 *  Wait for some time.
-	 */
-	public IFuture<Void> waitForDelay(long delay, boolean realtime);
-	
-	/**
-	 *  Wait for some time.
-	 */
-	public IFuture<Void> waitForDelay(long delay);
-	
-	// todo:?
+//	/**
+//	 *  Execute a component step.
+//	 */
+//	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step);
+//	
+//	/**
+//	 *  Execute an immediate component step,
+//	 *  i.e., the step is executed also when the component is currently suspended.
+//	 */
+//	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step);
+//	
 //	/**
 //	 *  Wait for some time and execute a component step afterwards.
 //	 */
-//	public IFuture waitForImmediate(long delay, IComponentStep step);
-
-	/**
-	 *  Test if current thread is the component thread.
-	 *  @return True if the current thread is the component thread.
-	 */
-	public boolean isComponentThread();
+//	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime);
+//
+//	/**
+//	 *  Wait for some time and execute a component step afterwards.
+//	 */
+//	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
+//
+//	/**
+//	 *  Wait for some time.
+//	 */
+//	public IFuture<Void> waitForDelay(long delay, boolean realtime);
+//	
+//	/**
+//	 *  Wait for some time.
+//	 */
+//	public IFuture<Void> waitForDelay(long delay);
+//	
+//	// todo:?
+////	/**
+////	 *  Wait for some time and execute a component step afterwards.
+////	 */
+////	public IFuture waitForImmediate(long delay, IComponentStep step);
+//
+//	/**
+//	 *  Test if current thread is the component thread.
+//	 *  @return True if the current thread is the component thread.
+//	 */
+//	public boolean isComponentThread();
 	
 	/**
 	 *  Subscribe to component events.

@@ -14,6 +14,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
@@ -37,7 +38,6 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -88,9 +88,6 @@ public class ComponentManagementService implements IComponentManagementService
 	/** Flag to avoid double initialization. */
 	protected boolean	running;
 	
-	/** The adapter factory. */
-	protected IPlatformComponentFactory adapterfactory;
-	
 	/** The agent. */
 	@ServiceComponent
 	protected IInternalAccess agent;
@@ -126,7 +123,7 @@ public class ComponentManagementService implements IComponentManagementService
 //	protected IMarshalService	marshalservice;
 	
 	/** The root component. */
-	protected IComponentAdapter root;
+	protected IInternalAccess root;
 	
 	/** The init adapters and descriptions, i.e. adapters and desc of initing components, 
 	 *  are only visible for the component and child components in their init. */
@@ -172,7 +169,7 @@ public class ComponentManagementService implements IComponentManagementService
      *  Create a new component execution service.
      *  @param exta	The service provider.
      */
-    public ComponentManagementService(IComponentAdapter root, 
+    public ComponentManagementService(IInternalAccess root, 
     	IBootstrapFactory componentfactory, boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
 		this.root = root;
@@ -194,17 +191,7 @@ public class ComponentManagementService implements IComponentManagementService
 		this.localtypes	= new LRU<Tuple, String>(100);
 		this.lockentries = SCollection.createHashMap();
 		this.cidcounts = new HashMap<String, Integer>();
-		
-		this.adapterfactory	= createAdapterFactory();
 	}
-    
-    /**
-     *  Create the adapter factory.
-     */
-    protected IPlatformComponentFactory	createAdapterFactory()
-    {
-    	return new ComponentAdapterFactory();
-    }
     
 	/**
 	 *  Get the component instance from an adapter.
@@ -214,14 +201,6 @@ public class ComponentManagementService implements IComponentManagementService
 		return ((StandaloneComponentAdapter)adapter).getComponentInstance();
 	}
 
-	/**
-	 *  Get the component adapter factory.
-	 */
-	public IPlatformComponentFactory getComponentAdapterFactory()
-	{
-		return adapterfactory;
-	}
-	
 	/**
 	 *  Invoke kill on adapter.
 	 */
@@ -275,12 +254,12 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		else
 		{
-			SServiceProvider.getService(agent.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<ILibraryService, IModelInfo>(ret)
 			{
 				public void customResultAvailable(final ILibraryService ls)
 				{
-					IFuture<IComponentFactory> fut = SServiceProvider.getService(agent.getServiceContainer(), new ComponentFactorySelector(filename, null, rid));
+					IFuture<IComponentFactory> fut = SServiceProvider.getService(agent.getServiceProvider(), new ComponentFactorySelector(filename, null, rid));
 					fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 					{
 						public void customResultAvailable(IComponentFactory factory)
@@ -989,7 +968,7 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 //			System.out.println("searching factories");
 			
-			IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(agent.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(agent.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
 			fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
 			{
 				public void customResultAvailable(Collection<IComponentFactory> facts)
@@ -1046,7 +1025,7 @@ public class ComponentManagementService implements IComponentManagementService
 						System.out.println("factory ex: "+exception+", "+agent);
 					}
 					
-					IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(agent.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(agent.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
 					fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
 					{
 						public void customResultAvailable(Collection<IComponentFactory> facts)
@@ -2694,7 +2673,7 @@ public class ComponentManagementService implements IComponentManagementService
 //		open.add(fut);
 		if(remote)
 		{
-			IFuture<Collection<IComponentManagementService>> futi = SServiceProvider.getServices(agent.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+			IFuture<Collection<IComponentManagementService>> futi = SServiceProvider.getServices(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 			futi.addResultListener(createResultListener(new IResultListener<Collection<IComponentManagementService>>()
 			{
 				public void resultAvailable(Collection<IComponentManagementService> result)
@@ -2771,7 +2750,7 @@ public class ComponentManagementService implements IComponentManagementService
 		ComponentIdentifier ret = null;
 
 		if(platformname==null)
-			platformname = ((IComponentIdentifier)agent.getServiceContainer().getId()).getName();
+			platformname = agent.getComponentIdentifier().getName();
 		ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
 		
 		if(uniqueids || adapters.containsKey(ret) || initinfos.containsKey(ret))
@@ -2835,7 +2814,7 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				public void customResultAvailable(Void result)
 				{
-					SServiceProvider.getService(agent.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(agent.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
 					{
 						public void customResultAvailable(IExecutionService result)
@@ -2849,7 +2828,7 @@ public class ComponentManagementService implements IComponentManagementService
 	//							{
 	//								marshalservice	= result;
 							
-									SServiceProvider.getService(agent.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									SServiceProvider.getService(agent.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 										.addResultListener(createResultListener(new IResultListener<IMessageService>()
 									{
 										public void resultAvailable(IMessageService result)
@@ -2865,7 +2844,7 @@ public class ComponentManagementService implements IComponentManagementService
 										
 										protected void cont()
 										{
-											SServiceProvider.getService(agent.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											SServiceProvider.getService(agent.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 											{
 												public void customResultAvailable(IClockService result)
@@ -3147,7 +3126,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
-		return agent==null? listener: agent.createResultListener(listener);
+		return agent==null? listener: agent.getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
 	/**
@@ -3222,7 +3201,7 @@ public class ComponentManagementService implements IComponentManagementService
 	protected IFuture<IComponentManagementService>	getRemoteCMS(final IComponentIdentifier cid)
 	{
 		final Future<IComponentManagementService>	ret	= new Future<IComponentManagementService>();
-		SServiceProvider.getService(agent.getServiceContainer(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(agent.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IComponentManagementService>(ret)
 		{
 			public void customResultAvailable(IRemoteServiceManagementService rms)

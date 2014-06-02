@@ -1,6 +1,6 @@
 package jadex.platform.service.message.transport.niotcpmtp;
 
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
@@ -54,7 +54,7 @@ public class NIOTCPTransport implements ITransport
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IServiceProvider container;
+	protected IInternalAccess component;
 	
 	/** The addresses. */
 	protected String[] addresses;
@@ -81,10 +81,10 @@ public class NIOTCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public NIOTCPTransport(final IServiceProvider container, int port, Logger logger)
+	public NIOTCPTransport(final IInternalAccess component, int port, Logger logger)
 	{
 		this.logger = logger;
-		this.container = container;
+		this.component = component;
 		this.port = port;		
 	}
 	
@@ -129,17 +129,17 @@ public class NIOTCPTransport implements ITransport
 			}
 			
 			// Start receiver thread.
-			SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 			{
 				public void customResultAvailable(final IMessageService ms)
 				{
-					SServiceProvider.getService(container, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(component.getServiceProvider(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Void>(ret)
 					{
 						public void customResultAvailable(IDaemonThreadPoolService tp)
 						{
-							selectorthread	= new SelectorThread(selector, ms, logger, container);
+							selectorthread	= new SelectorThread(selector, ms, logger);
 							tp.execute(selectorthread);
 							ret.setResult(null);
 						}

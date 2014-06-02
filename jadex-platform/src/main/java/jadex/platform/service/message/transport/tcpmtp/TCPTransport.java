@@ -1,6 +1,6 @@
 package jadex.platform.service.message.transport.tcpmtp;
 
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
@@ -71,7 +71,7 @@ public class TCPTransport implements ITransport
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IServiceProvider container;
+	protected IInternalAccess component;
 	
 	/** The addresses. */
 	protected String[] addresses;
@@ -109,9 +109,9 @@ public class TCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public TCPTransport(final IServiceProvider container, int port)
+	public TCPTransport(final IInternalAccess component, int port)
 	{
-		this(container, port, true);
+		this(component, port, true);
 	}
 
 	
@@ -120,11 +120,11 @@ public class TCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public TCPTransport(final IServiceProvider container, int port, final boolean async)
+	public TCPTransport(final IInternalAccess component, int port, final boolean async)
 	{
-		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(container.getId())+".TCPTransport");
+		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(component.getComponentIdentifier())+".TCPTransport");
 		
-		this.container = container;
+		this.component = component;
 		this.async = async;
 		this.port = port;
 		
@@ -168,7 +168,7 @@ public class TCPTransport implements ITransport
 			}
 			
 			// Start the receiver thread.
-			SServiceProvider.getService(container, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(component.getServiceProvider(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Void>(ret)
 			{
 				public void customResultAvailable(final IDaemonThreadPoolService tp)
@@ -702,7 +702,7 @@ public class TCPTransport implements ITransport
 		
 		if(msgservice==null)
 		{
-			SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DelegationResultListener<IMessageService>(ret)
 			{
 				public void customResultAvailable(IMessageService result)

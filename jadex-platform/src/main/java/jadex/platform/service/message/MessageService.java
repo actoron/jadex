@@ -228,7 +228,7 @@ public class MessageService extends BasicService implements IMessageService
 	public MessageService(IExternalAccess component, Logger logger, ITransport[] transports, 
 		MessageType[] messagetypes, IContentCodec[] contentcodecs, String deflanguage, CodecFactory codecfactory, boolean strictcom)
 	{
-		super(component.getServiceProvider().getId(), IMessageService.class, null);
+		super(component.getComponentIdentifier(), IMessageService.class, null);
 		
 		// Register communication classes with aliases
 		STransformation.registerClass(MessageEnvelope.class);
@@ -2684,7 +2684,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					SServiceProvider.getService(ia.getServiceContainer(), IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(ia.getServiceProvider(), IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(ia.createResultListener(new IResultListener<IMessageAwarenessService>()
 					{
 						public void resultAvailable(IMessageAwarenessService result)

@@ -1,4 +1,4 @@
-package jadex.bridge.service.types.factory;
+package jadex.bridge.component;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;

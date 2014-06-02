@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -234,7 +235,7 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	 */
 	public void initNFProperties()
 	{
-		IService ser = internalaccess.getServiceContainer().getProvidedService(type);
+		IService ser = (IService)internalaccess.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
 		
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		Class<?> superclazz = type;

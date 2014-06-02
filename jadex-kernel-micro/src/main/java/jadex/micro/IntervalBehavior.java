@@ -3,6 +3,7 @@ package jadex.micro;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -84,7 +85,7 @@ public class IntervalBehavior<T>
 						}
 						else if(id.equals(getId()) && getDelay()>0)
 						{
-							component.waitForDelay(getDelay(), self, realtime)
+							component.getComponentFeature(IExecutionFeature.class).waitForDelay(getDelay(), self, realtime)
 								.addResultListener(new StepResultListener<Void, Void>(ret)
 							{
 								public void customResultAvailable(Void result) 

@@ -1,6 +1,7 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
 
 /**
@@ -29,7 +30,7 @@ public abstract class ComponentThreadInterceptor extends AbstractApplicableInter
 //			System.out.println("not on comp: "+context.getMethod().toString());
 //			throw new RuntimeException("Must be called on component thread: "+Thread.currentThread());
 
-		return getComponent().isComponentThread();
+		return getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 	}
 	
 	/**

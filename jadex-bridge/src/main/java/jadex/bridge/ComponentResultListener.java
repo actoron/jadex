@@ -1,13 +1,13 @@
 package jadex.bridge;
 
-import java.util.logging.Logger;
-
 import jadex.base.Starter;
-import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
+
+import java.util.logging.Logger;
 
 /**
  *  The result listener for executing listener invocations as a component step.
@@ -19,11 +19,8 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	/** The result listener. */
 	protected IResultListener<E> listener;
 	
-	/** The component adapter. */
-	protected IComponentAdapter adapter;
-	
-	/** The external acess. */
-	protected IExternalAccess access;
+	/** The component. */
+	protected IInternalAccess component;
 	
 	/** The undone flag. */
 	protected boolean undone;
@@ -35,27 +32,14 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	 *  @param listener The listener.
 	 *  @param adapter The adapter.
 	 */
-	public ComponentResultListener(IResultListener<E> listener, IComponentAdapter adapter)
+	public ComponentResultListener(IResultListener<E> listener, IInternalAccess component)
 	{
 		if(listener==null)
 			throw new NullPointerException("Listener must not null.");
 		this.listener = listener;
-		this.adapter = adapter;
+		this.component = component;
 	}
 	
-	/**
-	 *  Create a new component result listener.
-	 *  @param listener The listener.
-	 *  @param adapter The adapter.
-	 */
-	public ComponentResultListener(IResultListener<E> listener, IExternalAccess access)
-	{
-		if(listener==null)
-			throw new NullPointerException("Listener must not null.");
-		this.listener = listener;
-		this.access = access;
-	}
-
 	//-------- methods --------
 	
 	/**
@@ -64,27 +48,19 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	 */
 	public void resultAvailable(final E result)
 	{
-		if(access!=null)
+		if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
-			access.scheduleStep(new IComponentStep<Void>()
+			component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
-				public static final String XML_CLASSNAME = "res";
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					try
+					if(undone && listener instanceof IUndoneResultListener)
 					{
-						if(undone && listener instanceof IUndoneResultListener)
-						{
-							((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
-						}
-						else
-						{
-							listener.resultAvailable(result);
-						}
+						((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
 					}
-					catch(Exception e)
+					else
 					{
-						// always return null to ensure that listener is not invoked twice
+						listener.resultAvailable(result);
 					}
 					return IFuture.DONE;
 				}
@@ -94,81 +70,39 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 				{
 				}
 				
-				public void exceptionOccurred(final Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
-					Starter.scheduleRescueStep(access.getComponentIdentifier(), new Runnable()
+					if(exception instanceof ComponentTerminatedException)
 					{
-						public void run()
+						Starter.scheduleRescueStep(component.getComponentIdentifier(), new Runnable()
 						{
-							if(undone && listener instanceof IUndoneResultListener)
+							public void run()
 							{
-								((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+								if(undone && listener instanceof IUndoneResultListener)
+								{
+									((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+								}
+								else
+								{
+									listener.resultAvailable(result);
+								}
 							}
-							else
-							{
-								listener.exceptionOccurred(exception);
-							}
-						}
-					});
+						});						
+					}
 				}
 			});
 		}
 		else
 		{
-			if(adapter.isExternalThread())
+			if(undone && listener instanceof IUndoneResultListener)
 			{
-				try
-				{
-					adapter.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							if(undone && listener instanceof IUndoneResultListener)
-							{
-								((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
-							}
-							else
-							{
-								listener.resultAvailable(result);
-							}
-						}
-						
-						public String toString()
-						{
-							return "resultAvailable("+result+")_#"+this.hashCode();
-						}
-					});
-				}
-				catch(final Exception e)
-				{
-					Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
-					{
-						public void run()
-						{
-							if(undone && listener instanceof IUndoneResultListener)
-							{
-								((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(e);
-							}
-							else
-							{
-								listener.exceptionOccurred(e);
-							}
-						}
-					});
-				}
+				((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
 			}
 			else
 			{
-				if(undone && listener instanceof IUndoneResultListener)
-				{
-					((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
-				}
-				else
-				{
-					listener.resultAvailable(result);
-				}
-			}	
-		}
+				listener.resultAvailable(result);
+			}
+		}	
 	}
 	
 	/**
@@ -177,36 +111,11 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	 */
 	public void exceptionOccurred(final Exception exception)
 	{
-		if(access!=null)
+		if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
-			access.scheduleStep(new IComponentStep<Void>()
+			component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
-				public static final String XML_CLASSNAME = "ex";
 				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					try
-					{
-						if(undone && listener instanceof IUndoneResultListener)
-						{
-							((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
-						}
-						else
-						{
-							listener.exceptionOccurred(exception);
-						}
-					}
-					catch(Exception e)
-					{
-						// always return null to ensure that listener is not invoked twice
-					}
-					return IFuture.DONE;
-				}
-			}).addResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-				}
-				public void exceptionOccurred(Exception exception)
 				{
 					if(undone && listener instanceof IUndoneResultListener)
 					{
@@ -216,21 +125,22 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					{
 						listener.exceptionOccurred(exception);
 					}
+					return IFuture.DONE;
 				}
-			});
-		}
-		else
-		{
-			if(adapter.isExternalThread() && !Starter.isRescueThread(adapter.getComponentIdentifier()))
+			}).addResultListener(new IResultListener<Void>()
 			{
-				try
+				public void resultAvailable(Void result)
 				{
-					adapter.invokeLater(new Runnable()
+				}
+				
+				public void exceptionOccurred(Exception e)
+				{
+					if(e instanceof ComponentTerminatedException)
 					{
-						public void run()
+						Starter.scheduleRescueStep(component.getComponentIdentifier(), new Runnable()
 						{
-//							try
-//							{
+							public void run()
+							{
 								if(undone && listener instanceof IUndoneResultListener)
 								{
 									((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
@@ -239,44 +149,23 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 								{
 									listener.exceptionOccurred(exception);
 								}
-//							}
-//							catch(Exception e) 
-//							{
-//								exception.printStackTrace();
-//								e.printStackTrace();
-//							}
-						}
-						
-						public String toString()
-						{
-							return "exceptionOccurred("+exception+")_#"+this.hashCode();
-						}
-					});
-				}
-				catch(Exception e)
-				{
-					if(undone && listener instanceof IUndoneResultListener)
-					{
-						((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
-					}
-					else
-					{
-						listener.exceptionOccurred(exception);
+							}
+						});						
 					}
 				}
+			});
+		}
+		else
+		{
+			if(undone && listener instanceof IUndoneResultListener)
+			{
+				((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
 			}
 			else
 			{
-				if(undone && listener instanceof IUndoneResultListener)
-				{
-					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
-				}
-				else
-				{
-					listener.exceptionOccurred(exception);
-				}
+				listener.exceptionOccurred(exception);
 			}
-		}
+		}	
 	}
 	
 	/**
@@ -304,6 +193,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	 */
 	public void commandAvailable(Object command)
 	{
+		// Todo: should be scheduled on component thread?
 		if(listener instanceof IFutureCommandListener)
 		{
 			((IFutureCommandListener)listener).commandAvailable(command);

@@ -133,7 +133,8 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 						Cause cause = sc==null? null: sc.getCause();
 						String info = context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
 	//					info += context.getArguments();
-						MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(),
+						// Todo: creation time.
+						MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
 							info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start, PublishEventLevel.MEDIUM);
 						
 	//					if(context.getMethod().getName().indexOf("method")!=-1)
@@ -215,7 +216,8 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 							long end = System.currentTimeMillis();
 							ServiceCall sc = sic.getServiceCall();
 							Cause cause = sc==null? null: sc.getCause();
-							monser.publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(),
+							// Todo: creation time.
+							monser.publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
 								sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end, PublishEventLevel.MEDIUM));
 						}
 					}

@@ -14,7 +14,6 @@ import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.persistence.IIdleHook;
 import jadex.bridge.service.types.persistence.IPersistenceService;
@@ -26,7 +25,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
-import jadex.platform.service.cms.ComponentAdapterFactory;
 import jadex.platform.service.cms.ComponentManagementService;
 import jadex.platform.service.cms.IntermediateResultListener;
 
@@ -54,7 +52,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	/**
 	 *  Static method for reflective creation to allow platform start without add-on.
 	 */
-	public static PersistenceComponentManagementService	create(IComponentAdapter root, IBootstrapFactory componentfactory,
+	public static PersistenceComponentManagementService	create(IInternalAccess root, IBootstrapFactory componentfactory,
 		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
 		return new PersistenceComponentManagementService(root, componentfactory, copy, realtime, persist, uniqueids);
@@ -63,7 +61,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	/**
 	 *  Create a persistence CMS.
 	 */
-	public PersistenceComponentManagementService(IComponentAdapter root, IBootstrapFactory componentfactory,
+	public PersistenceComponentManagementService(IInternalAccess root, IBootstrapFactory componentfactory,
 		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
 		super(root, componentfactory, copy, realtime, persist, uniqueids);
@@ -71,27 +69,27 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	
 	//-------- methods --------
 	
-	/**
-	 *  Create the adapter factory.
-	 */
-	protected IPlatformComponentFactory createAdapterFactory()
-	{
-		if(persist)
-		{
-			return new ComponentAdapterFactory()
-			{
-				public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model,
-					IComponentInterpreter instance, IExternalAccess parent)
-				{
-					return new PersistentComponentAdapter(desc, model, instance, parent, PersistenceComponentManagementService.this);
-				}
-			};
-		}
-		else
-		{
-			return super.createAdapterFactory();
-		}
-	}	
+//	/**
+//	 *  Create the adapter factory.
+//	 */
+//	protected IPlatformComponentFactory createAdapterFactory()
+//	{
+//		if(persist)
+//		{
+//			return new ComponentAdapterFactory()
+//			{
+//				public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model,
+//					IComponentInterpreter instance, IExternalAccess parent)
+//				{
+//					return new PersistentComponentAdapter(desc, model, instance, parent, PersistenceComponentManagementService.this);
+//				}
+//			};
+//		}
+//		else
+//		{
+//			return super.createAdapterFactory();
+//		}
+//	}	
 	
 	//-------- recovery methods --------
 	

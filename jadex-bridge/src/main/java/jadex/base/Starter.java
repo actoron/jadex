@@ -10,12 +10,15 @@ import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.ArgumentsComponentFeature;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.ExecutionComponentFeature;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.component.ArgumentsComponentFeature;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
@@ -25,9 +28,7 @@ import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
-import jadex.bridge.service.types.factory.ComponentCreationInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.factory.IComponentFeature;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
@@ -69,6 +70,7 @@ public class Starter
 	static
 	{
 		Collection<IComponentFeature>	def_features	= new ArrayList<IComponentFeature>();
+		def_features.add(new ExecutionComponentFeature());
 		def_features.add(new ArgumentsComponentFeature());
 		def_features.add(new ProvidedServicesComponentFeature());
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
@@ -682,7 +684,7 @@ public class Starter
 		
 		if(i<components.size())
 		{
-			SServiceProvider.getServiceUpwards(instance.getServiceContainer(), IComponentManagementService.class)
+			SServiceProvider.getServiceUpwards(instance.getServiceProvider(), IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)

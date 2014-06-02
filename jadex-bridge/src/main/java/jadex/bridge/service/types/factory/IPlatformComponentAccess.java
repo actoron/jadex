@@ -1,6 +1,8 @@
 package jadex.bridge.service.types.factory;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IComponentFeature;
 import jadex.commons.future.IFuture;
 
 import java.util.Collection;
