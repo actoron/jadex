@@ -1,10 +1,16 @@
 package jadex.extension.rs.publish;
 
 import jadex.commons.MethodInfo;
+import jadex.commons.Tuple2;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
@@ -63,6 +69,9 @@ public class RestMethodInfo
 	/** The delegation (prototype) method. */
 	protected String dmname;
 	
+	/** The parameter annotations. */
+	protected List<List<Tuple2<String, Map<String, Object>>>> parameterannos;
+	
 	//-------- constructors --------
 	
 	/**
@@ -89,6 +98,8 @@ public class RestMethodInfo
 		
 		this.dclazz = dclazz;
 		this.dmname = dmname;
+		
+		getAnnotationInfo();
 	}
 	
 	/**
@@ -429,6 +440,52 @@ public class RestMethodInfo
 		return buf.toString();
 	}
 
+	/**
+	 *  Get the annotations of a method as list of list of tuples.
+	 *  A tuple saves the class name and the parameter values as hashmap.
+	 */
+	public List<List<Tuple2<String, Map<String, Object>>>> getAnnotationInfo()
+	{
+		if(method!=null && parameterannos==null)
+		{
+			parameterannos = new ArrayList<List<Tuple2<String,Map<String,Object>>>>();
+
+			Annotation[][] annos = method.getParameterAnnotations();
+			
+			for(Annotation[] ans: annos)
+			{
+				List<Tuple2<String,Map<String,Object>>> list = new ArrayList<Tuple2<String,Map<String,Object>>>();
+
+				for(Annotation an: ans)
+				{
+					Map<String, Object> vals = new HashMap<String, Object>();
+					Class<?> anc = an.annotationType();
+					Method[] ms = anc.getDeclaredMethods();
+//					System.out.println("an: "+an+" "+ms.length);
+					for(Method m: ms)
+					{
+						try
+						{
+							Object val = m.invoke(an, null);
+							vals.put(m.getName(), val);
+						}
+						catch(Exception e)
+						{
+							
+						}
+					}
+					Tuple2<String, Map<String, Object>> tup = new Tuple2<String, Map<String,Object>>(anc.getName(), vals);
+					list.add(tup);
+				}
+				
+				parameterannos.add(list);
+			}
+		}
+		
+		return parameterannos;
+	}
+	
+	
 	/**
 	 *  Get the string representation.
 	 */

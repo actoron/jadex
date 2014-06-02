@@ -2,6 +2,8 @@ package jadex.extension.rs.publish.mapper;
 
 import jadex.commons.SUtil;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 
 import javax.ws.rs.core.Response;
@@ -39,6 +41,10 @@ public class NativeResponseMapper implements IValueMapper
 		else if(o instanceof String)
 		{
 			ret = Response.ok(o).build();
+		}
+		else if(o instanceof Exception)
+		{
+			ret = Response.ok(SUtil.getExceptionStacktrace((Exception)o)).build();
 		}
 		else if(o instanceof URI)
 		{

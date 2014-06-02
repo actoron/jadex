@@ -4075,4 +4075,16 @@ public class SUtil
 			(bytes[1] & 0xFF) == 0xBB && 
 			(bytes[2] & 0xFF) == 0xBF;
     }
+	
+	/**
+	 *  Get the exception stacktrace.
+	 *  @param e The exception.
+	 *  @return The exception stacktrace.
+	 */
+	public static String getExceptionStacktrace(Exception e)
+	{
+		StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		return sw.toString();
+	}
 }

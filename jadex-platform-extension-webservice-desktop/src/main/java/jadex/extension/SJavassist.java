@@ -92,6 +92,38 @@ public class SJavassist
 	}
 	
 	/**
+	 *  Get a ctclass for a Java class from the pool.
+	 *  @param clazz The Java class.
+	 *  @param pool The class pool.
+	 *  @return The ctclass.
+	 */
+	public static CtClass getCtClass(String clname, ClassPool pool)
+	{
+		if(clname==null)
+			throw new IllegalArgumentException("Class must not null.");
+		
+		CtClass ret = null;
+		try
+		{
+			ret = pool.get(clname);
+		}
+		catch(Exception e)
+		{
+			try
+			{
+//				ClassPath cp = new ClassClassPath(clazz);
+//				pool.insertClassPath(cp);
+				ret = pool.get(clname);
+			}
+			catch(Exception e2)
+			{
+				throw new RuntimeException(e2);
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get a ctclass array for a class array.
 	 *  @param classes The classes.
 	 *  @param pool The pool.

@@ -26,7 +26,6 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -59,8 +58,14 @@ import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.AnnotationMemberValue;
 import javassist.bytecode.annotation.ArrayMemberValue;
 import javassist.bytecode.annotation.BooleanMemberValue;
+import javassist.bytecode.annotation.CharMemberValue;
 import javassist.bytecode.annotation.ClassMemberValue;
+import javassist.bytecode.annotation.DoubleMemberValue;
+import javassist.bytecode.annotation.FloatMemberValue;
+import javassist.bytecode.annotation.IntegerMemberValue;
+import javassist.bytecode.annotation.LongMemberValue;
 import javassist.bytecode.annotation.MemberValue;
+import javassist.bytecode.annotation.ShortMemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
 import javax.inject.Singleton;
@@ -632,43 +637,144 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 				m.getMethodInfo().addAttribute(attr);
 				proxyclazz.addMethod(m);
 						
+				int pcnt = rmi.getParameterTypes().length;
+				Annotation[][] annos = new Annotation[pcnt][];
+				
+				List<List<Tuple2<String, Map<String, Object>>>> aninfs = rmi.getAnnotationInfo();
+				if(aninfs!=null && !aninfs.isEmpty())
+				{
+					ConstPool cp = m.getMethodInfo().getConstPool();
+					
+					for(int k=0; k<annos.length; k++)
+					{
+						List<Tuple2<String, Map<String, Object>>> paninfs = aninfs.get(k);
+						Annotation[] ans = new Annotation[paninfs.size()];
+						annos[k] = ans;
+						
+						for(int l=0; l<paninfs.size(); l++)
+						{
+							Tuple2<String, Map<String, Object>> tup = paninfs.get(l);
+							ans[l] = new Annotation(cp, SJavassist.getCtClass(tup.getFirstEntity(), pool));
+							Map<String, Object> vals = tup.getSecondEntity();
+							for(Map.Entry<String, Object> entry: vals.entrySet())
+							{
+								MemberValue mv = null;
+								if(entry.getValue() instanceof String)
+								{
+									mv = new StringMemberValue((String)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Integer)
+								{
+									mv = new IntegerMemberValue((Integer)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Double)
+								{
+									mv = new DoubleMemberValue((Double)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Float)
+								{
+									mv = new FloatMemberValue((Float)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Boolean)
+								{
+									mv = new BooleanMemberValue((Boolean)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Short)
+								{
+									mv = new ShortMemberValue((Short)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Long)
+								{
+									mv = new LongMemberValue((Long)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Character)
+								{
+									mv = new CharMemberValue((Character)entry.getValue(), cp);
+								}
+								
+								// todo: support annotations with arrays and annotation types!?
+								
+								if(mv!=null)
+								{
+									ans[l].addMemberValue(entry.getKey(), mv);
+								}
+								else
+								{
+									System.out.println("Annotation member value currently not supported: "+entry.getValue());
+								}
+							}
+						}
+					}
+				}
+								
 				// add @QueryParam if get
 				// this means that each parameter of the method is automatically
 				// mapped to arg0, arg1 etc of the request
 				if(GET.class.equals(rmi.getRestType()))
 				{
-					int pcnt = rmi.getParameterTypes().length;
 					if(pcnt>0)
 					{
-						Annotation[][] annos = new Annotation[pcnt][];
 						ConstPool cp = m.getMethodInfo().getConstPool();
 						for(int k=0; k<annos.length; k++)
 						{
-							Annotation anno = new Annotation(cp, SJavassist.getCtClass(QueryParam.class, pool));
-							anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
-							annos[k] = new Annotation[]{anno};
+							Annotation[] ans = annos[k];
+							boolean hasq = false;
+							for(Annotation an: ans)
+							{
+								if(an.getTypeName().equals(QueryParam.class.getName()))
+								{
+									hasq = true;
+									break;
+								}
+							}
+							
+							if(!hasq)
+							{
+								Annotation anno = new Annotation(cp, SJavassist.getCtClass(QueryParam.class, pool));
+								anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+								Annotation[] newans = new Annotation[ans.length+1];
+								System.arraycopy(ans, 0, newans, 0, ans.length);
+								newans[newans.length-1] = anno;
+								annos[k] = newans;
+							}
 						}
-						SJavassist.addMethodParameterAnnotation(m, annos, pool);
 					}
 				}
 				// add @FormDataParam if post
 				else if(POST.class.equals(rmi.getRestType()))
 				{
-					int pcnt = rmi.getParameterTypes().length;
 					if(pcnt>0)
 					{
-						Annotation[][] annos = new Annotation[pcnt][];
 						ConstPool cp = m.getMethodInfo().getConstPool();
 						for(int k=0; k<annos.length; k++)
 						{
-							Annotation anno = new Annotation(cp, SJavassist.getCtClass(FormDataParam.class, pool));
-							anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
-							annos[k] = new Annotation[]{anno};
+							Annotation[] ans = annos[k];
+							boolean hasq = false;
+							for(Annotation an: ans)
+							{
+								if(an.getTypeName().equals(FormDataParam.class.getName()))
+								{
+									hasq = true;
+									break;
+								}
+							}
+							
+							if(!hasq)
+							{
+								Annotation anno = new Annotation(cp, SJavassist.getCtClass(FormDataParam.class, pool));
+								anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+								Annotation[] newans = new Annotation[ans.length+1];
+								System.arraycopy(ans, 0, newans, 0, ans.length);
+								newans[newans.length-1] = anno;
+								annos[k] = newans;
+							}
 						}
-						SJavassist.addMethodParameterAnnotation(m, annos, pool);
 					}
 				}
-//						System.out.println("m: "+m.getName()+" "+SUtil.arrayToString(m.getParameterTypes()));
+				
+				SJavassist.addMethodParameterAnnotation(m, annos, pool);
+				
+//				System.out.println("m: "+m.getName()+" "+SUtil.arrayToString(m.getParameterTypes()));
 			}
 			
 			// Add the path annotation 
