@@ -6,7 +6,6 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.interceptors.CallAccess;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -129,8 +128,8 @@ public class ServiceInvocationContext
 	/** The caller component. */
 	protected IComponentIdentifier caller;
 	
-	/** The caller component adapter. */
-	protected IComponentAdapter calleradapter;
+//	/** The caller component adapter. */
+//	protected IComponentAdapter calleradapter;
 	
 	/** The platform identifier. */
 	protected IComponentIdentifier platform;
@@ -169,7 +168,7 @@ public class ServiceInvocationContext
 		this.interceptors = interceptors;
 		
 		this.caller = IComponentIdentifier.LOCAL.get();
-		this.calleradapter	= IComponentAdapter.LOCAL.get();
+//		this.calleradapter	= IComponentAdapter.LOCAL.get();
 		
 		this.lastcall = CallAccess.getCurrentInvocation();
 		
@@ -261,7 +260,7 @@ public class ServiceInvocationContext
 		this.interceptors = context.interceptors;
 		
 		this.caller = context.caller;
-		this.calleradapter = context.calleradapter;
+//		this.calleradapter = context.calleradapter;
 		this.cause = context.cause;
 	}
 	
@@ -590,10 +589,10 @@ public class ServiceInvocationContext
 	/**
 	 *  Get the caller adapter.
 	 */
-	public IComponentAdapter	getCallerAdapter()
-	{
-		return this.calleradapter;
-	}
+//	public IComponentAdapter	getCallerAdapter()
+//	{
+//		return this.calleradapter;
+//	}
 	
 	/**
 	 *  Get the caller.

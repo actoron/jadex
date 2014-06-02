@@ -23,6 +23,7 @@ import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -173,13 +174,12 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						}
 						
 						final Class<?> type = info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
-//						PublishEventLevel elm = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring(): null;
-						// todo: remove this? currently the level cannot be turned on due to missing interceptor
-//						boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
-//						boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
+						PublishEventLevel elm = component.getComponentDescription().getMonitoring()!=null? component.getComponentDescription().getMonitoring(): null;
+//						 todo: remove this? currently the level cannot be turned on due to missing interceptor
+						boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 						final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 							component, ser, info.getName(), type, info.getImplementation().getProxytype(), ics, cinfo.isCopy(), 
-							cinfo.isRealtime(), false);
+							cinfo.isRealtime(), moni);
 						
 						addService(proxy, info);
 					}

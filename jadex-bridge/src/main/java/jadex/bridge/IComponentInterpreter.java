@@ -8,7 +8,7 @@ import jadex.commons.future.IFuture;
  *  To create a kernel component instance use the kernel's component factory
  *  @link{IComponentFactory}. 
  */
-public interface IComponentInterpreter
+public interface _IComponentInterpreter
 {
 	//-------- methods to be called by adapter --------
 

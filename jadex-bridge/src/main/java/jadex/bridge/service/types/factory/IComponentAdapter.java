@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  *  Implementations of this interface should be thread safe.
  */
 @Reference(local=true, remote=false)	// Hack!!! required because of local getComponentAdapter method of CMS.
-public interface IComponentAdapter
+public interface _IComponentAdapter
 {
 	//-------- constants -------- 
 	

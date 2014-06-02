@@ -1,7 +1,7 @@
 package jadex.bridge.component;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
 
 import java.util.Map;
 
@@ -21,8 +21,9 @@ public class ComponentCreationInfo
 	/** The arguments. */
 	protected Map<String, Object> arguments;
 	
-	/** The component identifier. */
-	protected IComponentIdentifier cid;
+	/** The component description. */
+	// Hack???
+	protected IComponentDescription desc;
 	
 	/** The real time flag. */
 	protected boolean	realtime;
@@ -37,16 +38,16 @@ public class ComponentCreationInfo
 	 *  @param model	The model (required).
 	 *  @param config	The configuration name or null for default (if any).
 	 *  @param arguments	The arguments (if any).
-	 *  @param cid	The component identifier (required).
+	 *  @param desc	The component description (required).
 	 *  @param realtime	The real time flag.
 	 *  @param copy	The copy flag.
 	 */
-	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, IComponentIdentifier cid, boolean realtime, boolean copy)
+	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, IComponentDescription desc, boolean realtime, boolean copy)
 	{
 		this.model	= model;
 		this.config = config!=null ? config : model.getConfigurationNames().length>0 ? model.getConfigurationNames()[0] : null;
 		this.arguments	= arguments;
-		this.cid	= cid;
+		this.desc	= desc;
 		this.realtime	= realtime;
 		this.copy	= copy;
 	}
@@ -78,11 +79,11 @@ public class ComponentCreationInfo
 	}
 	
 	/**
-	 *  Get the component identifier.
+	 *  Get the component description.
 	 */
-	public IComponentIdentifier	getComponentIdentifier()
+	public IComponentDescription	getComponentDescription()
 	{
-		return this.cid;
+		return this.desc;
 	}
 	
 	/**

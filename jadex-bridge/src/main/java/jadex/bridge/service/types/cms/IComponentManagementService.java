@@ -5,9 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.ParameterInfo;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
@@ -279,14 +277,14 @@ public interface IComponentManagementService
 //	*/
 //	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
 	
-	/**
-	 *  Get the component adapter for a component identifier.
-	 *  @param aid The component identifier.
-	 *  @param listener The result listener.
-	 */
-    // Todo: Hack!!! remove
-	@Excluded
-	public IFuture<IComponentAdapter> getComponentAdapter(IComponentIdentifier cid);
+//	/**
+//	 *  Get the component adapter for a component identifier.
+//	 *  @param aid The component identifier.
+//	 *  @param listener The result listener.
+//	 */
+//    // Todo: Hack!!! remove
+//	@Excluded
+//	public IFuture<IComponentAdapter> getComponentAdapter(IComponentIdentifier cid);
 	
 	/**
 	 * 

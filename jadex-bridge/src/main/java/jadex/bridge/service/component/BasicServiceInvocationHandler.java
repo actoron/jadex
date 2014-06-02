@@ -3,7 +3,6 @@ package jadex.bridge.service.component;
 import jadex.bridge.Cause;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
@@ -31,8 +30,6 @@ import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
-import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -487,9 +484,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(service instanceof IService)
 		{
 			IService ser = (IService)service;
-			// Todo: cause
-			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), realtime, null, false);
-//			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), realtime, ia.getComponentDescription().getCause(), false);
+			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), realtime, ia.getComponentDescription().getCause(), false);
 			
 //			if(type==null)
 //			{
@@ -595,8 +590,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			
 			ServiceInfo si = new ServiceInfo(service, mgmntservice);
-			// Todo: cause
-			handler = new BasicServiceInvocationHandler(ia, si, ia.getLogger(), realtime, /*ia.getComponentDescription().getCause()*/null);
+			handler = new BasicServiceInvocationHandler(ia, si, ia.getLogger(), realtime, ia.getComponentDescription().getCause());
 			
 			
 //			addPojoServiceIdentifier(service, mgmntservice.getServiceIdentifier());
@@ -652,7 +646,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	public static IInternalService createDelegationProvidedServiceProxy(IInternalAccess ia, IServiceIdentifier sid, 
 		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader, boolean realtime)
 	{
-		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, adapter.getLogger(), realtime, ia.getComponentDescription().getCause(), false);
+		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, ia.getLogger(), realtime, ia.getComponentDescription().getCause(), false);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));
 		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/));
@@ -663,7 +657,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Static method for creating a standard service proxy for a required service.
 	 */
-	public static IService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IService service, 
+	public static IService createRequiredServiceProxy(IInternalAccess ia, IService service, 
 		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, boolean realtime)
 	{
 //		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IServiceCallService")!=-1)
@@ -675,11 +669,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(binding==null || !PROXYTYPE_RAW.equals(binding.getProxytype()))
 		{
 	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
-			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, adapter.getLogger(), realtime, ia.getComponentDescription().getCause(), true);
+			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, ia.getLogger(), realtime, ia.getComponentDescription().getCause(), true);
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, true));
 			if(binding!=null && binding.isRecover())
-				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
+				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ia.getExternalAccess(), info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getServiceIdentifier()));
@@ -691,14 +685,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				{
 					IServiceInvocationInterceptor interceptor = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(
 //						interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), ea.getModel().getClassLoader());
-						interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), ia.getClassLoader());
+						interceptors[i].getValue(), ia.getModel().getAllImports(), ia.getFetcher(), ia.getClassLoader());
 					handler.addServiceInterceptor(interceptor);
 				}
 			}
 			// Decoupling interceptor on required chains ensures that wrong incoming calls e.g. from gui thread
 			// are automatically pushed to the req component thread
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
-				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, false, true));
+				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, false, true));
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 			// service.getServiceIdentifier().getServiceType()
 			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports())}, handler); 

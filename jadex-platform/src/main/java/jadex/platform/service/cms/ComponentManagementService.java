@@ -6,7 +6,6 @@ import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -37,8 +36,8 @@ import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -99,7 +98,7 @@ public class ComponentManagementService implements IComponentManagementService
 	protected Logger logger;
 
 	/** The components (id->component adapter). */
-	protected Map<IComponentIdentifier, IComponentAdapter> adapters;
+	protected Map<IComponentIdentifier, IPlatformComponentAccess> adapters;
 	
 	/** The cleanup commands for the components (component id -> cleanup command). */
 	protected Map<IComponentIdentifier, CleanupCommand> ccs;
@@ -113,17 +112,11 @@ public class ComponentManagementService implements IComponentManagementService
 	/** The result (kill listeners). */
 	protected Map<IComponentIdentifier, IntermediateResultListener> resultlisteners;
 	
-	/** The execution service (cached to avoid using futures). */
-	protected IExecutionService	exeservice;
+//	/** The execution service (cached to avoid using futures). */
+//	protected IExecutionService	exeservice;
 	
 	/** The message service (cached to avoid using futures). */
 	protected IMessageService	msgservice;
-	
-//	/** The marshal service (cached to avoid using futures). */
-//	protected IMarshalService	marshalservice;
-	
-	/** The root component. */
-	protected IInternalAccess root;
 	
 	/** The init adapters and descriptions, i.e. adapters and desc of initing components, 
 	 *  are only visible for the component and child components in their init. */
@@ -169,17 +162,14 @@ public class ComponentManagementService implements IComponentManagementService
      *  Create a new component execution service.
      *  @param exta	The service provider.
      */
-    public ComponentManagementService(IInternalAccess root, 
-    	IBootstrapFactory componentfactory, boolean copy, boolean realtime, boolean persist, boolean uniqueids)
+    public ComponentManagementService(IBootstrapFactory componentfactory, boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
-		this.root = root;
 		this.componentfactory = componentfactory;
 		this.copy = copy;
 		this.realtime = realtime;
 		this.persist	= persist;
 		this.uniqueids = uniqueids;
 		
-		// Todo: why some collections synchronized? single thread access!?
 		this.adapters = SCollection.createHashMap();
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
@@ -193,46 +183,46 @@ public class ComponentManagementService implements IComponentManagementService
 		this.cidcounts = new HashMap<String, Integer>();
 	}
     
-	/**
-	 *  Get the component instance from an adapter.
-	 */
-	public IComponentInterpreter getComponentInstance(IComponentAdapter adapter)
-	{
-		return ((StandaloneComponentAdapter)adapter).getComponentInstance();
-	}
+//	/**
+//	 *  Get the component instance from an adapter.
+//	 */
+//	public IComponentInterpreter getComponentInstance(IComponentAdapter adapter)
+//	{
+//		return ((StandaloneComponentAdapter)adapter).getComponentInstance();
+//	}
 
-	/**
-	 *  Invoke kill on adapter.
-	 */
-	public IFuture<Void> killComponent(IComponentAdapter adapter)
-	{
-		Future<Void> ret = new Future<Void>();
-		((StandaloneComponentAdapter)adapter).killComponent()
-			.addResultListener(new DelegationResultListener<Void>(ret));
-		return ret;
-	}
+//	/**
+//	 *  Invoke kill on adapter.
+//	 */
+//	public IFuture<Void> killComponent(IComponentAdapter adapter)
+//	{
+//		Future<Void> ret = new Future<Void>();
+//		((StandaloneComponentAdapter)adapter).killComponent()
+//			.addResultListener(new DelegationResultListener<Void>(ret));
+//		return ret;
+//	}
 	
-	/**
-	 *  Cancel the execution.
-	 */
-	public IFuture<Void> cancel(IComponentAdapter adapter)
-	{
-		Future<Void> ret = new Future<Void>();
-		getExecutionService().cancel((StandaloneComponentAdapter)adapter)
-			.addResultListener(new DelegationResultListener<Void>(ret));
-		return ret;
-	}
+//	/**
+//	 *  Cancel the execution.
+//	 */
+//	public IFuture<Void> cancel(IComponentAdapter adapter)
+//	{
+//		Future<Void> ret = new Future<Void>();
+//		getExecutionService().cancel((StandaloneComponentAdapter)adapter)
+//			.addResultListener(new DelegationResultListener<Void>(ret));
+//		return ret;
+//	}
 
-	/**
-	 *  Do a step.
-	 */
-	public IFuture<Void> doStep(IComponentAdapter adapter)
-	{
-		Future<Void> ret = new Future<Void>();
-		((StandaloneComponentAdapter)adapter).doStep()
-			.addResultListener(new DelegationResultListener<Void>(ret));
-		return ret;
-	}
+//	/**
+//	 *  Do a step.
+//	 */
+//	public IFuture<Void> doStep(IComponentAdapter adapter)
+//	{
+//		Future<Void> ret = new Future<Void>();
+//		((StandaloneComponentAdapter)adapter).doStep()
+//			.addResultListener(new DelegationResultListener<Void>(ret));
+//		return ret;
+//	}
 	
     //-------- IComponentManagementService interface --------
     

@@ -21,7 +21,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
@@ -877,8 +876,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							{
 //								System.out.println("createProxy 2:"+service);
 								
-								T ret = (T)BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ia.getExternalAccess(), 
-									(IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding, realtime);
+								T ret = (T)BasicServiceInvocationHandler.createRequiredServiceProxy(ia, service, DefaultServiceFetcher.this, info, binding, realtime);
 								
 								IServiceIdentifier sid = service.getServiceIdentifier();
 								

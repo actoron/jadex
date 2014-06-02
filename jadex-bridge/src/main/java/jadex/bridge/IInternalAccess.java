@@ -3,14 +3,13 @@ package jadex.bridge;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 import java.util.Map;
@@ -48,11 +47,12 @@ public interface IInternalAccess
 	 */
 	public <T> T	getComponentFeature(Class<? extends T> type);
 	
-//	/**
-//	 *  Get the component description.
-//	 *  @return	The component description.
-//	 */
-//	public IComponentDescription	getComponentDescription();
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IComponentDescription	getComponentDescription();
 	
 	/**
 	 *  Get the service provider.

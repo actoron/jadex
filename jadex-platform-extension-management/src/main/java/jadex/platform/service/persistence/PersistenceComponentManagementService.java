@@ -52,19 +52,19 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	/**
 	 *  Static method for reflective creation to allow platform start without add-on.
 	 */
-	public static PersistenceComponentManagementService	create(IInternalAccess root, IBootstrapFactory componentfactory,
+	public static PersistenceComponentManagementService	create(IBootstrapFactory componentfactory,
 		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
-		return new PersistenceComponentManagementService(root, componentfactory, copy, realtime, persist, uniqueids);
+		return new PersistenceComponentManagementService(componentfactory, copy, realtime, persist, uniqueids);
 	}
 	
 	/**
 	 *  Create a persistence CMS.
 	 */
-	public PersistenceComponentManagementService(IInternalAccess root, IBootstrapFactory componentfactory,
+	public PersistenceComponentManagementService(IBootstrapFactory componentfactory,
 		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
-		super(root, componentfactory, copy, realtime, persist, uniqueids);
+		super(componentfactory, copy, realtime, persist, uniqueids);
 	}
 	
 	//-------- methods --------

@@ -3,7 +3,6 @@ package jadex.base;
 import jadex.bridge.Cause;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
@@ -414,7 +413,7 @@ public class Starter
 				{
 					Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
 					final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
-					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null).get(null); // No execution yet, can only work if method is synchronous.
+//					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null).get(null); // No execution yet, can only work if method is synchronous.
 					
 					// Build platform name.
 					Object pfname = getArgumentValue(PLATFORM_NAME, model, cmdargs, compargs);
@@ -506,7 +505,7 @@ public class Starter
 					boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
 					boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
 	
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, cid, realtime, copy);
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, realtime, copy);
 					
 					component.init(cci, DEFAULT_FEATURES).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{

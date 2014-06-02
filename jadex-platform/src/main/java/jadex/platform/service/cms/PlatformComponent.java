@@ -13,6 +13,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -156,9 +157,19 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return info.getComponentIdentifier();
+		return info.getComponentDescription().getName();
 	}
 	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IComponentDescription	getComponentDescription()
+	{
+		return info.getComponentDescription();
+	}
+
 	/**
 	 *  Get a feature of the component.
 	 *  @param feature	The type of the feature.

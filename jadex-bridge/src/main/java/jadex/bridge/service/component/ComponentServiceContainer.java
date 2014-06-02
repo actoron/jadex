@@ -22,7 +22,6 @@ import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
@@ -225,8 +224,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 				else
 				{
-					fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-						instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
+					fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
 				}
 			}
 		});
@@ -257,8 +255,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 				else
 				{
-					fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-						instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
+					fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
 				}
 			}
 		});
@@ -289,8 +286,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 				else
 				{
-					fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-						instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
+					fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
 				}
 			}
 		});
@@ -320,8 +316,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 				else
 				{
-					fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-						adapter, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
+					fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
 				}
 			}
 		});
@@ -351,8 +346,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 				else
 				{
-					fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-						adapter, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
+					fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
 				}
 			}
 		});
@@ -396,8 +390,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 									}
 									else
 									{
-										ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-											adapter, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
+										ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
 									}
 								}
 							});
@@ -424,8 +417,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 							}
 							else
 							{
-								ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-									adapter, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
+								ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
 							}
 						}
 					});

@@ -1,7 +1,6 @@
 package jadex.micro;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -342,57 +341,57 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		return new Future<String>(model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null);
 	}
 	
-	/**
-	 * Create a component interpreter.
-	 * @param model The component model.
-	 * @param component The platform component.
-	 * @param persistinfo The previously saved interpreter-specific state (if any).
-	 * @return An interpreter for the component.
-	 */
-	public IFuture<IComponentInterpreter> createComponentInterpreter(final IModelInfo model, final IInternalAccess component, final Object persistinfo)
-	{
-		final Future<IComponentInterpreter> res = new Future<IComponentInterpreter>();
-		
-		if(libservice!=null)
-		{
-			libservice.getClassLoader(model.getResourceIdentifier())
-				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, IComponentInterpreter>(res)
-			{
-				public void customResultAvailable(ClassLoader cl)
-				{
-					try
-					{
-						MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
-						MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), component, (MicroAgentPersistInfo)persistinfo);
-						res.setResult(mai);
-					}
-					catch(Exception e)
-					{
-						res.setException(e);
-					}
-				}
-			});
-		}
-		
-		// For platform bootstrapping
-		else
-		{
-			try
-			{
-				ClassLoader	cl	= getClass().getClassLoader();
-				MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
-				MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), component, (MicroAgentPersistInfo)persistinfo);
-				res.setResult(mai);
-			}
-			catch(Exception e)
-			{
-				res.setException(e);
-			}
-		}
-
-		return res;
-//		return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getAgentAdapter()));
-	}
+//	/**
+//	 * Create a component interpreter.
+//	 * @param model The component model.
+//	 * @param component The platform component.
+//	 * @param persistinfo The previously saved interpreter-specific state (if any).
+//	 * @return An interpreter for the component.
+//	 */
+//	public IFuture<IComponentInterpreter> createComponentInterpreter(final IModelInfo model, final IInternalAccess component, final Object persistinfo)
+//	{
+//		final Future<IComponentInterpreter> res = new Future<IComponentInterpreter>();
+//		
+//		if(libservice!=null)
+//		{
+//			libservice.getClassLoader(model.getResourceIdentifier())
+//				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, IComponentInterpreter>(res)
+//			{
+//				public void customResultAvailable(ClassLoader cl)
+//				{
+//					try
+//					{
+//						MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
+//						MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), component, (MicroAgentPersistInfo)persistinfo);
+//						res.setResult(mai);
+//					}
+//					catch(Exception e)
+//					{
+//						res.setException(e);
+//					}
+//				}
+//			});
+//		}
+//		
+//		// For platform bootstrapping
+//		else
+//		{
+//			try
+//			{
+//				ClassLoader	cl	= getClass().getClassLoader();
+//				MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
+//				MicroAgentInterpreter mai = new MicroAgentInterpreter(mm, getMicroAgentClass(model.getFullName()+"Agent", null, cl), component, (MicroAgentPersistInfo)persistinfo);
+//				res.setResult(mai);
+//			}
+//			catch(Exception e)
+//			{
+//				res.setException(e);
+//			}
+//		}
+//
+//		return res;
+////		return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getAgentAdapter()));
+//	}
 	
 	/**
 	 *  Get the element type.

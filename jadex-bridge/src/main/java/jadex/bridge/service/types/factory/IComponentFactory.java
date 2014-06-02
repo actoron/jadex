@@ -1,7 +1,5 @@
 package jadex.bridge.service.types.factory;
 
-import jadex.bridge.IComponentInterpreter;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Excluded;
@@ -78,13 +76,13 @@ public interface IComponentFactory
 	@Excluded
 	public Map<String, Object>	getProperties(String type);
 	
-	/**
-	 * Create a component interpreter.
-	 * @param model The component model.
-	 * @param component The platform component.
-	 * @param persistinfo The previously saved interpreter-specific state (if any).
-	 * @return An interpreter for the component.
-	 */
-	@Excluded
-	public IFuture<IComponentInterpreter> createComponentInterpreter(IModelInfo model, IInternalAccess component, Object persistinfo);
+//	/**
+//	 * Create a component interpreter.
+//	 * @param model The component model.
+//	 * @param component The platform component.
+//	 * @param persistinfo The previously saved interpreter-specific state (if any).
+//	 * @return An interpreter for the component.
+//	 */
+//	@Excluded
+//	public IFuture<IComponentInterpreter> createComponentInterpreter(IModelInfo model, IInternalAccess component, Object persistinfo);
 }
