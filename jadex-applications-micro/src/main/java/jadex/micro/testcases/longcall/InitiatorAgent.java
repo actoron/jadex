@@ -15,11 +15,12 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.future.IForwardCommandFuture.Type;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -28,8 +29,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -164,7 +163,7 @@ public class InitiatorAgent extends TestAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if a long running call works.");
-				tr.setReason(exception);
+				tr.setFailed(exception);
 				List<TestReport> li = new ArrayList<TestReport>();
 				super.resultAvailable(li);
 			}
@@ -272,41 +271,93 @@ public class InitiatorAgent extends TestAgent
 			ServiceCall.getOrCreateNextInvocation().setTimeout(BasicService.getScaledLocalDefaultTimeout(1.0/15));
 			
 			final long start	= System.currentTimeMillis();
-			((IFuture<Object>)m.invoke(ts, new Object[0])).addResultListener(new IFutureCommandResultListener<Object>()
+			Object	fut	= m.invoke(ts, new Object[0]);
+			
+			if(fut instanceof ISubscriptionIntermediateFuture)
 			{
-				public void resultAvailable(Object result)
+				((ISubscriptionIntermediateFuture<Object>)fut).addResultListener(new IIntermediateFutureCommandResultListener<Object>()
 				{
-//					System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
-					tr.setSucceeded(true);
-					ret.addIntermediateResult(tr);
-					proceed();
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-//					System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
-					tr.setFailed("Exception: "+exception);
-					ret.addIntermediateResult(tr);
-					proceed();
-				}
-				
-				public void commandAvailable(Object command)
-				{
-					// ignore timer updates
-				}
-				
-				public void proceed()
-				{
-					if(cnt<6)
+					public void intermediateResultAvailable(Object result)
 					{
-						callMethod(ts, cnt+1, ret).addResultListener(new DelegationResultListener<Void>(res));
 					}
-					else
+					
+					public void finished()
 					{
-						res.setResult(null);
+//						System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						tr.setSucceeded(true);
+						ret.addIntermediateResult(tr);
+						proceed();
 					}
-				}
-			});
+					
+					public void resultAvailable(Collection<Object> result)
+					{
+						finished();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						tr.setFailed("Exception: "+exception);
+						ret.addIntermediateResult(tr);
+						proceed();
+					}
+					
+					public void commandAvailable(Object command)
+					{
+						// ignore timer updates
+					}
+					
+					public void proceed()
+					{
+						if(cnt<6)
+						{
+							callMethod(ts, cnt+1, ret).addResultListener(new DelegationResultListener<Void>(res));
+						}
+						else
+						{
+							res.setResult(null);
+						}
+					}
+				});				
+			}
+			else
+			{
+				((IFuture<Object>)fut).addResultListener(new IFutureCommandResultListener<Object>()
+				{
+					public void resultAvailable(Object result)
+					{
+	//					System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						tr.setSucceeded(true);
+						ret.addIntermediateResult(tr);
+						proceed();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+	//					System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						tr.setFailed("Exception: "+exception);
+						ret.addIntermediateResult(tr);
+						proceed();
+					}
+					
+					public void commandAvailable(Object command)
+					{
+						// ignore timer updates
+					}
+					
+					public void proceed()
+					{
+						if(cnt<6)
+						{
+							callMethod(ts, cnt+1, ret).addResultListener(new DelegationResultListener<Void>(res));
+						}
+						else
+						{
+							res.setResult(null);
+						}
+					}
+				});
+			}
 		}
 		catch(Exception e)
 		{

@@ -11,12 +11,11 @@ public class ConditionPlan extends Plan
 	{
 		while(true)
 		{
-			System.out.println("waiting...");
-			long start = getClock().getTime();
 			waitForCondition("five_seconds");
-			long end = getClock().getTime();
+			System.out.println("woken up: "+getClock().getTime());
 			
-			System.out.println("woken up: "+(end-start));
+			// Avoid condition being still true.
+			waitFor(1000);
 		} 
 	}
 }

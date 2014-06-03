@@ -84,7 +84,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				
 				final Object	res	= sic.getResult();
 				
-//				if(sic.getMethod().getName().indexOf("subscribeToEvents")!=-1)
+//				if(sic.getMethod().getName().indexOf("test")!=-1)
 //					System.out.println("sjdjfhsdfhj: "+sic.getResult()+" "+sic.getResult().hashCode());
 				
 				if(res instanceof IFuture)

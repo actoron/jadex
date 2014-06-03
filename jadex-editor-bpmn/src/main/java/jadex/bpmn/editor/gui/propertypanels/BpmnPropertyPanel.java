@@ -101,7 +101,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected String[] PROVIDED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Proxytype", "Implementation Class", "Implementation Expression" };
 	
 	/** The column names for the required services table. */
-	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = {"Name", "Interface", "Multiple", "Scope", "Dynamic"};
+	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = {"Name", "Interface", "Multiple", "Scope", "Dynamic", "Create"};
 	
 	/** The proxy types. */
 	protected String[] PROXY_TYPES = { BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,
@@ -2269,7 +2269,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public Class<?> getColumnClass(int columnIndex)
 		{
-			if(columnIndex == 2 || columnIndex==4)
+			if(columnIndex == 2 || columnIndex==4 || columnIndex==5)
 			{
 				return Boolean.class;
 			}
@@ -2351,6 +2351,17 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					if(rs != null && rs.getDefaultBinding() != null && rs.getDefaultBinding().getScope() != null)
 					{
 						ret = rs.getDefaultBinding().isDynamic();
+					}
+					return ret;
+				}
+				case 5:
+				{
+					boolean ret = false;
+					if(cs != null)
+						rs = cs;
+					if(rs != null && rs.getDefaultBinding() != null && rs.getDefaultBinding().getScope() != null)
+					{
+						ret = rs.getDefaultBinding().isCreate();
 					}
 					return ret;
 				}
@@ -2452,6 +2463,31 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					{
 						createBinding(rs);
 						rs.getDefaultBinding().setDynamic((Boolean)value);
+						for(ConfigurationInfo itconf : getModelInfo().getConfigurations())
+						{
+							cs = getReqService(rs.getName(), itconf);
+							if(compareService(rs, cs))
+							{
+								itconf.removeRequiredService(cs);
+							}
+						}
+					}
+				}
+				case 5:
+				{
+					if(cs != null)
+					{
+						createBinding(cs);
+						cs.getDefaultBinding().setDynamic((Boolean)value);
+						if(compareService(rs, cs))
+						{
+							conf.removeRequiredService(cs);
+						}
+					}
+					else
+					{
+						createBinding(rs);
+						rs.getDefaultBinding().setCreate((Boolean)value);
 						for(ConfigurationInfo itconf : getModelInfo().getConfigurations())
 						{
 							cs = getReqService(rs.getName(), itconf);

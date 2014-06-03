@@ -58,7 +58,7 @@ public class TestReport
 		this.name = name;
 		this.description = description;
 		this.succeeded = false;
-		setReason(reason);
+		setFailed(reason);
 	}
 
 	//-------- methods --------
@@ -144,18 +144,18 @@ public class TestReport
 	}
 
 	/**
-	 *  Set the failure reason.
+	 *  Set the report result to failed and set the failure reason.
 	 *  @param reason The failure reason.
 	 */
-	public void setReason(Exception reason)
+	public void setFailed(Exception reason)
 	{
 		StringWriter	sw	= new StringWriter();
 		reason.printStackTrace(new PrintWriter(sw));
-		setReason(sw.toString());
+		setFailed(sw.toString());
 	}
 
 	/**
-	 *  Set the report result to failed and set the failurereason.
+	 *  Set the report result to failed and set the failure reason.
 	 *  @param reason The failure reason.
 	 */
 	public void setFailed(String reason)

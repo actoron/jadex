@@ -404,7 +404,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 			final Object	res	= sic.getResult();
 			
-//			if(sic.getMethod().getName().equals("subscribeToEvents"))
+//			if(sic.getMethod().getName().equals("test"))
 //				System.out.println("heererrere");
 			
 			if(res instanceof IFuture)

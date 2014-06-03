@@ -245,7 +245,7 @@ public class UserAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if rec results work");
-				tr.setReason(exception);
+				tr.setFailed(exception);
 				super.resultAvailable(tr);
 			}
 		});

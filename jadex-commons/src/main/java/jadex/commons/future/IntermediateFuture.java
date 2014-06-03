@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -26,8 +27,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	/** The scheduled notifications. */
 	protected List	scheduled;
 	
-	/** Flag if notifying. */
-    protected boolean notifying;
+//	/** Flag if notifying. */
+//    protected boolean notifying;
     
 	/** The blocked intermediate callers (caller->state). */
 	protected Map<ISuspendable, String> icallers;
@@ -627,7 +628,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	{
     		if(scheduled==null)
     		{
-    			scheduled	= new ArrayList();
+    			scheduled	= new LinkedList();
     		}
     		scheduled.add(intermediate ? new Object[]{listener, result} : listener);
     	}
@@ -639,25 +640,26 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     protected void	startScheduledNotifications()
     {
-    	boolean	notify	= false;
-    	synchronized(this)
-    	{
-    		if(!notifying && scheduled!=null)
-    		{
-    			notifying	= true;
-    			notify	= true;
-    		}
-    	}
+//    	boolean	notify	= false;
+//    	synchronized(this)
+//    	{
+//    		if(!notifying && scheduled!=null)
+//    		{
+//    			notifying	= true;
+//    			notify	= true;
+//    		}
+//    	}
     	
+    	boolean	notify	= true;
     	while(notify)
     	{
     		Object	next	= null;
         	synchronized(this)
         	{
-        		if(scheduled.isEmpty())
+        		if(scheduled==null || scheduled.isEmpty())
         		{
         			notify	= false;
-        			notifying	= false;
+//        			notifying	= false;
         			scheduled	= null;
         		}
         		else

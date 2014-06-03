@@ -223,9 +223,13 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 				
 				String path = "";
 				if(method.isAnnotationPresent(Path.class))
+				{
 					path = ((Path)method.getAnnotation(Path.class)).value();
+				}
 				else
+				{
 					path = mw.getName();
+				}
 				
 				ret.add(new RestMethodInfo(method, mw.getName(), getPathName(path, paths), resttype, consumed, produced, 
 					methodmapper, parametermapper, automapping, resultmapper,

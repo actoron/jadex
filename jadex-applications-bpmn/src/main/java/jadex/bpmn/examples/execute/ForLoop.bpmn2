@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>ForLoop</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
     </jadex:imports>
@@ -21,10 +21,11 @@
       <semantic:incoming>_yMFS8XazEd6l0pFqo-bUbg</semantic:incoming>
       <semantic:outgoing>_OLZJananEd6l0pFqo-bUbg</semantic:outgoing>
       <semantic:extensionElements>
-        <jadex:class>PrintTask</jadex:class>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="inout" name="texts" type="String[]">new String[]{&quot;test1&quot;, &quot;test2&quot;, &quot;test3&quot;}</jadex:parameter>
         <jadex:parameter direction="inout" name="i" type="int">0</jadex:parameter>
         <jadex:parameter direction="in" name="text" type="String">texts[i]</jadex:parameter>
+        <jadex:property name="external" type="boolean">false</jadex:property>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:startEvent id="_x6pksXazEd6l0pFqo-bUbg">
@@ -38,7 +39,7 @@
     <semantic:task name="Finished" id="_XJFdIXanEd6l0pFqo-bUbg">
       <semantic:incoming>_YViCIXanEd6l0pFqo-bUbg</semantic:incoming>
       <semantic:extensionElements>
-        <jadex:class>PrintTask</jadex:class>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
         <jadex:parameter direction="in" name="text" type="String">&quot;Finished&quot;</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
@@ -50,6 +51,9 @@
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_OLZJYXanEd6l0pFqo-bUbg" targetRef="_NQFXsXanEd6l0pFqo-bUbg" id="_Yv5p8XanEd6l0pFqo-bUbg">
       <semantic:conditionExpression>i+1&lt;texts.length</semantic:conditionExpression>
+      <semantic:extensionElements>
+        <jadex:parametermapping name="i">i+1</jadex:parametermapping>
+      </semantic:extensionElements>
     </semantic:sequenceFlow>
     <semantic:extensionElements>
     </semantic:extensionElements>

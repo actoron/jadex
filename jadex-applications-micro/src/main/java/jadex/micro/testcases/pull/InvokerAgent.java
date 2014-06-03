@@ -222,7 +222,7 @@ public class InvokerAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-				tr.setReason(exception);
+				tr.setFailed(exception);
 				super.resultAvailable(tr);
 			}
 		});
@@ -294,7 +294,7 @@ public class InvokerAgent
 											{
 												System.out.println("exceptionOccurred: "+exception);
 												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-												tr.setReason(exception);
+												tr.setFailed(exception);
 												ret.setResult(tr);
 											}
 										}));
@@ -331,7 +331,7 @@ public class InvokerAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-				tr.setReason(exception);
+				tr.setFailed(exception);
 				super.resultAvailable(tr);
 			}
 		});

@@ -76,7 +76,9 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 		if(term && setExceptionIfUndone(reason))
 		{
 			if(terminate!=null)
+			{
 				terminate.terminated(reason);
+			}
 		}
 	}
 	

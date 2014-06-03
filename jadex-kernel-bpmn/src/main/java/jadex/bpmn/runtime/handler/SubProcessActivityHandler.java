@@ -284,7 +284,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								Object	value	= ((CMSIntermediateResultEvent)cse).getValue();
 								
 								// Only set result value in thread when out parameter exists.
-								if(activity.getParameters().get(param)!=null)
+								if(activity.getParameters()!=null && activity.getParameters().get(param)!=null)
 								{
 									String	dir	= activity.getParameters().get(param).getDirection();
 									if(MParameter.DIRECTION_INOUT.equals(dir) || MParameter.DIRECTION_OUT.equals(dir))
