@@ -13,6 +13,7 @@ import jadex.bridge.component.ArgumentsComponentFeature;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.ExecutionComponentFeature;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.SubcomponentsComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -72,6 +73,7 @@ public class Starter
 		def_features.add(new ExecutionComponentFeature());
 		def_features.add(new ArgumentsComponentFeature());
 		def_features.add(new ProvidedServicesComponentFeature());
+		def_features.add(new SubcomponentsComponentFeature());
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
 	
