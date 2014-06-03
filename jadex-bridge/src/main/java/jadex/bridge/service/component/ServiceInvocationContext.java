@@ -3,8 +3,10 @@ package jadex.bridge.service.component;
 import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SUtil;
@@ -196,12 +198,29 @@ public class ServiceInvocationContext
 			{
 				props = new HashMap<String, Object>();
 			}
+//			props.put("method", method.getName());
 			this.call = CallAccess.createServiceCall(caller, props);
 		}
+//		else
+//		{
+//			this.call.setProperty("method", method.getName());
+//		}
 		
+		// If not user supplied a custom timeout value set to what the interface says
 		if(!call.getProperties().containsKey(ServiceCall.TIMEOUT))
 		{
-			call.setProperty(ServiceCall.TIMEOUT, Long.valueOf(BasicServiceContainer.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall())));			
+//			if(method.getName().indexOf("service")!=-1)
+//				System.out.println("ggo");
+			// Only set defined timeouts. Otherwise the default timeout is used
+			long to = BasicServiceContainer.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall());
+			if(Timeout.UNSET!=to)
+			{
+				call.setProperty(ServiceCall.TIMEOUT, Long.valueOf(to));			
+			}
+			else 
+			{
+				call.setProperty(ServiceCall.DEFTIMEOUT, isRemoteCall()? BasicService.getRemoteDefaultTimeout(): BasicService.getLocalDefaultTimeout());
+			}
 		}
 		if(!call.getProperties().containsKey(ServiceCall.REALTIME))
 		{
@@ -209,9 +228,6 @@ public class ServiceInvocationContext
 		}
 		
 		// Init the cause of the next call based on the last one
-//		if(method.getName().indexOf("test")!=-1 && lastcall!=null)
-//			System.out.println("lastcall: "+lastcall.getCause());
-
 		if(this.call.getCause()==null)
 		{
 //			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);

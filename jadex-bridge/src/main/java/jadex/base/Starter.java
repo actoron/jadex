@@ -461,6 +461,7 @@ public class Starter
 								ServiceCall sc = CallAccess.getCurrentInvocation();
 								IComponentIdentifier caller = sc==null? null: sc.getCaller();
 								Cause cause = sc==null? null: sc.getCause();
+								assert cause!=null;
 								
 								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
 								

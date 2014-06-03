@@ -115,6 +115,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public BasicServiceInvocationHandler(IInternalAccess comp, IServiceIdentifier sid, Logger logger, boolean realtime, Cause cause, boolean required)
 	{
+		assert cause!=null;
 		this.comp = comp;
 		this.sid = sid;
 		this.logger	= logger;
@@ -130,6 +131,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public BasicServiceInvocationHandler(IInternalAccess comp, IService service, Logger logger, boolean realtime, Cause cause, boolean required)
 	{
+		assert cause!=null;
 		this.comp = comp;
 		this.service = service;
 //		this.sid = service.getServiceIdentifier();
@@ -146,6 +148,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public BasicServiceInvocationHandler(IInternalAccess comp, ServiceInfo service, Logger logger, boolean realtime, Cause cause)
 	{
+		assert cause!=null;
 		this.comp = comp;
 		this.service = service;
 //		this.sid = service.getManagementService().getServiceIdentifier();

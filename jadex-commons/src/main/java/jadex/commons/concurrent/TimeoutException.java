@@ -7,12 +7,15 @@ package jadex.commons.concurrent;
  */
 public class TimeoutException	extends RuntimeException
 {
+	Exception e = null;
+	
 	/**
 	 *  Create a timeout exception.
 	 */
 	public TimeoutException()
 	{
-//		System.out.println("timeout");
+		e = new RuntimeException();
+		System.out.println("timeout");
 //		Thread.dumpStack();
 	}
 	
@@ -22,15 +25,17 @@ public class TimeoutException	extends RuntimeException
 	public TimeoutException(String message)
 	{
 		super(message);
+		e = new RuntimeException();
 //		Thread.dumpStack();
 	}
 	
 //	/**
 //	 *  Hack for finding print source.
 //	 */
-//	public void printStackTrace()
-//	{
+	public void printStackTrace()
+	{
+		e.printStackTrace();
 //		Thread.dumpStack();
 //		super.printStackTrace();
-//	}
+	}
 }

@@ -542,8 +542,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				// Add timeout handling for local case.
 				if(!((IFuture<?>)res).isDone() && !sic.isRemoteCall())
 				{
-					long	timeout	= sic.getServiceCall().getTimeout();
-					boolean	realtime	= sic.getServiceCall().getRealtime();
+					long timeout = sic.getServiceCall().getTimeout();
+					boolean	realtime = sic.getServiceCall().getRealtime();
 					
 					if(timeout>=0)
 					{
