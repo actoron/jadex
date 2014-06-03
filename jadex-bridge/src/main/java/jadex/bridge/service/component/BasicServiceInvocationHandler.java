@@ -223,7 +223,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				{
 					public void customResultAvailable(Void result)
 					{
-//						if(sic.getMethod().getName().indexOf("addEntry")!=-1)
+//						if(sic.getMethod().getName().indexOf("test")!=-1)
 //							System.out.println("connect: "+sic.getMethod().getName());
 						FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
 					}

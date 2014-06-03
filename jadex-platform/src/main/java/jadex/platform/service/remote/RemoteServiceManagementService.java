@@ -42,6 +42,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
@@ -659,22 +661,52 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							putWaitingCall(callid, future, tt, context);
 							
 							// Remove waiting call when future is done
-							future.addResultListener(ia.createResultListener(new IFutureCommandResultListener<Object>()
+							if(future instanceof ISubscriptionIntermediateFuture)
 							{
-								public void resultAvailable(Object result)
+								// IResultListener not allowed for subscription future.
+								((ISubscriptionIntermediateFuture)future).addResultListener(ia.createResultListener(new IIntermediateFutureCommandResultListener<Object>()
 								{
-									removeWaitingCall(callid);
-								}
-								public void exceptionOccurred(Exception exception)
+									public void intermediateResultAvailable(Object result)
+									{
+									}
+									public void finished()
+									{
+										removeWaitingCall(callid);
+									}
+									public void resultAvailable(Collection<Object> result)
+									{
+										removeWaitingCall(callid);
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										removeWaitingCall(callid);								
+										ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
+									}
+									public void commandAvailable(Object command)
+									{
+										// do nothing here, cannot forward
+									}
+								}));								
+							}
+							else
+							{
+								future.addResultListener(ia.createResultListener(new IFutureCommandResultListener<Object>()
 								{
-									removeWaitingCall(callid);								
-									ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
-								}
-								public void commandAvailable(Object command)
-								{
-									// do nothing here, cannot forward
-								}
-							}));
+									public void resultAvailable(Object result)
+									{
+										removeWaitingCall(callid);
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										removeWaitingCall(callid);								
+										ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
+									}
+									public void commandAvailable(Object command)
+									{
+										// do nothing here, cannot forward
+									}
+								}));
+							}
 							
 	//						System.out.println("Waitingcalls: "+waitingcalls.size());
 							

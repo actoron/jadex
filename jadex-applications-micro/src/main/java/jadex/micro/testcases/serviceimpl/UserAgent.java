@@ -62,7 +62,7 @@ public class UserAgent
 		}
 		catch(Exception e)
 		{
-			tr.setReason(e);
+			tr.setFailed(e);
 		}
 		return tr;
 	}

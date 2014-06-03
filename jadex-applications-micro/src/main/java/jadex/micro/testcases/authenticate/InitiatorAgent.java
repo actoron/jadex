@@ -127,7 +127,7 @@ public class InitiatorAgent extends TestAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if authentication works.");
-				tr.setReason(exception);
+				tr.setFailed(exception);
 				super.resultAvailable(tr);
 			}
 		});
