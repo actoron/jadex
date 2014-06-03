@@ -1,7 +1,5 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.base.Starter;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
@@ -9,6 +7,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
+
+import java.util.logging.Logger;
 
 /**
  *  The decoupling return interceptor ensures that the result
@@ -52,7 +52,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 	{
 		Future<Void> fut	= new Future<Void>();
 		
-		final IComponentAdapter	ada	= /*adapter!=null ? adapter :*/ sic.getCallerAdapter();
+//		final IComponentAdapter	ada	= /*adapter!=null ? adapter :*/ sic.getCallerAdapter();
 		final IComponentIdentifier caller = IComponentIdentifier.LOCAL.get();
 		
 //		// Todo: disallow component methods being called from wrong thread and afterwards remove adapter attribute.
@@ -61,7 +61,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //			System.out.println("sdifzgio sd");
 //		}
 //		assert adapter==null || adapter.equals(sic.getCallerAdapter()): adapter+", "+sic.getCallerAdapter();
-		assert ada==null || caller==null || ada.getComponentIdentifier().equals(caller): ada+", "+caller+" "+sic.getMethod()+" "+sic.getMethod().getDeclaringClass();
+//		assert ada==null || caller==null || ada.getComponentIdentifier().equals(caller): ada+", "+caller+" "+sic.getMethod()+" "+sic.getMethod().getDeclaringClass();
 
 //		if(ada!=null && caller!=null && !caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
 //		{
@@ -88,7 +88,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				
 				if(res instanceof IFuture)
 				{
-					FutureFunctionality func = new FutureFunctionality(ada!=null ? ada.getLogger() : null)
+					FutureFunctionality func = new FutureFunctionality(/*ada!=null ? ada.getLogger() :*/(Logger) null)
 					{
 						public void terminate(Exception reason, IResultListener<Void> terminate)
 						{
@@ -112,7 +112,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //								System.out.println("sjdjfhsdfhj: "+sic.getResult()+" "+sic.getResult().hashCode());
 							
 							// Don't reschedule if already on correct thread or called from remote.
-							if(ada==null || !ada.isExternalThread())
+//							if(ada==null || !ada.isExternalThread())
 //								|| !caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()) )
 							{
 //								if(sic.getMethod().getName().indexOf("test")!=-1)
@@ -128,123 +128,123 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									listener.resultAvailable(null);
 								}
 							}
-							else
-							{
-								try
-								{
-//									if(sic.getMethod().getName().indexOf("method3")!=-1)
-//										System.out.println("setting to d: "+sic.getLastServiceCall()+", "+res);
-//									final Exception ex = new Exception();
-									ada.invokeLater(new Runnable()
-									{
-										public void run()
-										{
-//											if(ada.getComponentIdentifier().getName().indexOf("rms")!=-1)
-////												ada.getDescription().getModelName().indexOf("testcases.threading")!=-1)
-//											{
-//												System.out.println("resched: "+sic.getMethod().getName()+", "+System.currentTimeMillis());
-//											}
-//											if(sic.getMethod().getName().indexOf("method3")!=-1)
-//												System.out.println("setting to d: "+sic.getLastServiceCall());
-											CallAccess.setCurrentInvocation(sic.getLastServiceCall());
-											CallAccess.setLastInvocation(sic.getServiceCall());
-											if(isUndone() && listener instanceof IUndoneResultListener)
-											{
-												((IUndoneResultListener)listener).resultAvailableIfUndone(null);
-											}
-											else
-											{
-//												boolean a = true;
-//												if(!a)
-//													ex.printStackTrace();
-												listener.resultAvailable(null);
-											}
-										}
-									});
-								}
-								catch(ComponentTerminatedException e)
-								{
-									// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
-									if(sic.getMethod().getName().equals("destroyComponent")
-										&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
-									{
-										Runnable run = new Runnable()
-										{
-											public void run() 
-											{
-												if(isUndone() && listener instanceof IUndoneResultListener)
-												{
-													((IUndoneResultListener)listener).resultAvailableIfUndone(null);
-												}
-												else
-												{
-													listener.resultAvailable(null);
-												}
-											}
-										};
-										
-										if(caller.getParent()==null)
-										{
-											// If destroy of platform, run directly as rescue thread already shut down.
-											run.run();
-										}
-										else
-										{
-											Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
-										}
-									}
-									else
-									{
-										// pass exception back to result provider as receiver is already dead.
-										throw e;
-//										listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
-									}
-								}
-//								catch(final Exception e)
+//							else
+//							{
+//								try
 //								{
-//									Runnable run = new Runnable()
+////									if(sic.getMethod().getName().indexOf("method3")!=-1)
+////										System.out.println("setting to d: "+sic.getLastServiceCall()+", "+res);
+////									final Exception ex = new Exception();
+//									ada.invokeLater(new Runnable()
 //									{
-//										public void run() 
+//										public void run()
 //										{
-////											System.out.println("out ex2: "+mycnt);
-//											
-//											// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
-//											if(sic.getMethod().getName().equals("destroyComponent")
-//												&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
+////											if(ada.getComponentIdentifier().getName().indexOf("rms")!=-1)
+//////												ada.getDescription().getModelName().indexOf("testcases.threading")!=-1)
+////											{
+////												System.out.println("resched: "+sic.getMethod().getName()+", "+System.currentTimeMillis());
+////											}
+////											if(sic.getMethod().getName().indexOf("method3")!=-1)
+////												System.out.println("setting to d: "+sic.getLastServiceCall());
+//											CallAccess.setCurrentInvocation(sic.getLastServiceCall());
+//											CallAccess.setLastInvocation(sic.getServiceCall());
+//											if(isUndone() && listener instanceof IUndoneResultListener)
 //											{
-////												System.out.println("Rescheduled to rescue thread1: "+e+", "+sic);
-//												listener.resultAvailable(null);
+//												((IUndoneResultListener)listener).resultAvailableIfUndone(null);
 //											}
 //											else
 //											{
-////												System.out.println("Rescheduled to rescue thread2: "+e+", "+sic+", "+this);
-////												Thread.dumpStack();
-//												listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
+////												boolean a = true;
+////												if(!a)
+////													ex.printStackTrace();
+//												listener.resultAvailable(null);
 //											}
 //										}
-//									};
-//									Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
-////									if(tp!=null)
-////									{
-////										// Hack!!! Thread pool service should be asynchronous.
-////										try
-////										{
-////											tp.execute(run);
-////										}
-////										catch(RuntimeException re)
-////										{
-////											// Happens when thread pool already terminated.
-////											Thread t = new Thread(run);
-////											t.start();																
-////										}
-////									}
-////									else
-////									{
-////										Thread t = new Thread(run);
-////										t.start();
-////									}
+//									});
 //								}
-							}
+//								catch(ComponentTerminatedException e)
+//								{
+//									// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
+//									if(sic.getMethod().getName().equals("destroyComponent")
+//										&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
+//									{
+//										Runnable run = new Runnable()
+//										{
+//											public void run() 
+//											{
+//												if(isUndone() && listener instanceof IUndoneResultListener)
+//												{
+//													((IUndoneResultListener)listener).resultAvailableIfUndone(null);
+//												}
+//												else
+//												{
+//													listener.resultAvailable(null);
+//												}
+//											}
+//										};
+//										
+//										if(caller.getParent()==null)
+//										{
+//											// If destroy of platform, run directly as rescue thread already shut down.
+//											run.run();
+//										}
+//										else
+//										{
+//											Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
+//										}
+//									}
+//									else
+//									{
+//										// pass exception back to result provider as receiver is already dead.
+//										throw e;
+////										listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
+//									}
+//								}
+////								catch(final Exception e)
+////								{
+////									Runnable run = new Runnable()
+////									{
+////										public void run() 
+////										{
+//////											System.out.println("out ex2: "+mycnt);
+////											
+////											// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
+////											if(sic.getMethod().getName().equals("destroyComponent")
+////												&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
+////											{
+//////												System.out.println("Rescheduled to rescue thread1: "+e+", "+sic);
+////												listener.resultAvailable(null);
+////											}
+////											else
+////											{
+//////												System.out.println("Rescheduled to rescue thread2: "+e+", "+sic+", "+this);
+//////												Thread.dumpStack();
+////												listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
+////											}
+////										}
+////									};
+////									Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
+//////									if(tp!=null)
+//////									{
+//////										// Hack!!! Thread pool service should be asynchronous.
+//////										try
+//////										{
+//////											tp.execute(run);
+//////										}
+//////										catch(RuntimeException re)
+//////										{
+//////											// Happens when thread pool already terminated.
+//////											Thread t = new Thread(run);
+//////											t.start();																
+//////										}
+//////									}
+//////									else
+//////									{
+//////										Thread t = new Thread(run);
+//////										t.start();
+//////									}
+////								}
+//							}
 						}
 						
 						/**

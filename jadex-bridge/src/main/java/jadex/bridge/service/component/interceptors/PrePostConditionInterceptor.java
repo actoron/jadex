@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *  Interceptor that checks annotated pre- and postconditions.
@@ -413,7 +414,7 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 			{
 //				final IIntermediateFuture<?> iresfut = res instanceof IIntermediateFuture? (IIntermediateFuture<?>)res: null;
 				
-				FutureFunctionality func = new FutureFunctionality(sic.getCallerAdapter()!=null ? sic.getCallerAdapter().getLogger() : null)
+				FutureFunctionality func = new FutureFunctionality(/*sic.getCallerAdapter()!=null ? sic.getCallerAdapter().getLogger() :*/(Logger) null)
 				{
 					List<Object> ires;
 					

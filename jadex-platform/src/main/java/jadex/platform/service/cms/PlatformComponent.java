@@ -1,8 +1,6 @@
 package jadex.platform.service.cms;
 
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -20,13 +18,10 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.kernelbase.ExternalAccess;
 
@@ -34,9 +29,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -325,6 +320,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	protected void initLogger(Logger logger)
 	{
 		// Todo: properties
+		logger.setLevel(Level.INFO);
 		
 //		// get logging properties (from ADF)
 //		// the level of the logger
@@ -502,16 +498,26 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 *  @param initial True, for receiving the current state.
 	 */
 //	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm);
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
 
 	/**
 	 *  Publish a monitoring event. This event is automatically send
 	 *  to the monitoring service of the platform (if any). 
 	 */
-	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt);
+	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt)
+	{
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 *  Check if event targets exist.
 	 */
-	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi);
+	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi)
+	{
+		throw new UnsupportedOperationException();
+	}
 }

@@ -13,8 +13,9 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.MessageFailureException;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.ServiceTerminatedException;
+import jadex.bridge.component.ICommunicationFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -29,7 +30,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.EncodingContext;
 import jadex.bridge.service.types.message.ICodec;
@@ -2137,8 +2137,6 @@ public class MessageService extends BasicService implements IMessageService
 			IComponentIdentifier sender = (IComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
 			announceComponentIdentifier(sender);
 			
-			final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
-
 			// Content decoding works as follows:
 			// Find correct classloader for each receiver by
 			// a) if message contains rid ask library service for classloader (global rids are resolved with maven, locals possibly with peer to peer jar transfer)
@@ -2167,7 +2165,7 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						public void customResultAvailable(IComponentManagementService cms)
 						{
-							deliverToAllReceivers(receivers, cms, classloader, decoded, msg, logger, messagetype)
+							deliverToAllReceivers(receivers, cms, classloader, msg, logger, messagetype)
 								.addResultListener(new DelegationResultListener<Void>(ret)
 							{
 								public void customResultAvailable(Void result)
@@ -2182,16 +2180,16 @@ public class MessageService extends BasicService implements IMessageService
 									
 									if(lis!=null)
 									{
-										// Hack?! Use message decoded for some component. What if listener has different class loader? 
-										Map	message	= decoded.isEmpty() ? msg : (Map)decoded.get(decoded.keySet().iterator().next());
-										IMessageAdapter msg = new DefaultMessageAdapter(message, messagetype);
+										// Decode message for listener. What if listener has different class loader?
+										decodeMessage(logger, messagetype, msg, classloader);
+										IMessageAdapter message = new DefaultMessageAdapter(msg, messagetype);
 										for(int i=0; i<lis.length; i++)
 										{
 											IMessageListener li = (IMessageListener)lis[i];
 											boolean	match	= false;
 											try
 											{
-												match	= fils[i]==null || fils[i].filter(msg);
+												match	= fils[i]==null || fils[i].filter(message);
 											}
 											catch(Exception e)
 											{
@@ -2201,7 +2199,7 @@ public class MessageService extends BasicService implements IMessageService
 											{
 												try
 												{
-													li.messageReceived(msg);
+													li.messageReceived(message);
 												}
 												catch(Exception e)
 												{
@@ -2223,19 +2221,19 @@ public class MessageService extends BasicService implements IMessageService
 	 * 
 	 */
 	protected IFuture<Void> deliverToAllReceivers(final IComponentIdentifier[] receivers, final IComponentManagementService cms, 
-		final ClassLoader classloader, final Map decoded, final Map msg, final Logger logger, final MessageType messagetype)
+		final ClassLoader classloader, final Map msg, final Logger logger, final MessageType messagetype)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
 		final int[] i = new int[1];
-		deliverToReceiver(receivers, i[0], cms, classloader, decoded, msg, logger, messagetype)
+		deliverToReceiver(receivers, i[0], cms, classloader, msg, logger, messagetype)
 			.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 				if(++i[0]<receivers.length)
 				{
-					deliverToReceiver(receivers, i[0], cms, classloader, decoded, msg, logger, messagetype).addResultListener(this);
+					deliverToReceiver(receivers, i[0], cms, classloader, msg, logger, messagetype).addResultListener(this);
 				}
 				else
 				{
@@ -2256,153 +2254,61 @@ public class MessageService extends BasicService implements IMessageService
 	 * 
 	 */
 	protected IFuture<Void> deliverToReceiver(final IComponentIdentifier[] receivers, final int i, final IComponentManagementService cms, final ClassLoader classloader, 
-		final Map decoded, final Map msg, final Logger logger, final MessageType messagetype)
+		final Map<String, Object> msg, final Logger logger, final MessageType messagetype)
 	{
 //		System.out.println("dtr: "+SUtil.arrayToString(receivers)+" "+i+" "+classloader);
 		
 		final Future<Void> ret = new Future<Void>();
 		
 		final IComponentIdentifier receiver = receivers[i];
-		cms.getComponentAdapter(receiver)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentAdapter, Void>(ret)
+
+		// Copy message for state isolation.
+		final Map<String, Object>	fmessage	= new HashMap<String, Object>(msg);
+		
+		// Perform decoding on component thread (necessary for rms)
+		cms.getExternalAccess(receiver).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentAdapter ca)
+			public void customResultAvailable(IExternalAccess exta)
 			{
-				final AbstractComponentAdapter component = (AbstractComponentAdapter)ca;
-				if(component != null)
+				exta.scheduleStep(new IComponentStep<Void>()
 				{
-					final ClassLoader cl = classloader!=null? classloader: component.getComponentInstance().getClassLoader();
-					Map	message	= (Map)decoded.get(cl);
-					final boolean decode = message==null;
-					if(message==null)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						if(receivers.length>1)
+						ICommunicationFeature	com	= ia.getComponentFeature(ICommunicationFeature.class);
+						
+						if(com!=null)
 						{
-							// Create copy for each receiver
-							message	= new HashMap(msg);
-							decoded.put(cl, message);
+							ClassLoader cl = classloader!=null? classloader: ia.getClassLoader();
+							decodeMessage(logger, messagetype, fmessage, cl);
+							
+							try
+							{
+								com.messageArrived(new DefaultMessageAdapter(fmessage, messagetype));
+								ret.setResult(null);
+							}
+							catch(Exception e)
+							{
+								logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ fmessage.get(messagetype.getIdIdentifier())+", "+e);
+								
+								ret.setResult(null);
+								// todo: notify sender that message could not be delivered!
+								// Problem: there is no connection back to the sender, so that
+								// the only chance is sending a separate failure message.
+							}
 						}
 						else
 						{
-							// Skip creation of copy when only one receiver.
-							message	= msg;
-							
+							logger.warning("Message could not be delivered to local receiver (no communication feature): " + receiver + ", "+ fmessage.get(messagetype.getIdIdentifier()));							
 						}
+						
+						return IFuture.DONE;
 					}
-					final Map fmessage = message;
-					
-					// Perform decoding on component thread (necessary for rms)
-					cms.getExternalAccess(receiver).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-					{
-						public void customResultAvailable(IExternalAccess exta)
-						{
-							exta.scheduleStep(new IComponentStep<Void>()
-							{
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									if(decode)
-									{
-//										System.out.println("dec: "+cl+" "+component.getComponentIdentifier()+" "+MessageService.this.component.getComponentIdentifier());
-										// Conversion via platform specific codecs
-										IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
-										for(Iterator it=fmessage.keySet().iterator(); it.hasNext(); )
-										{
-											String name = (String)it.next();
-											Object value = fmessage.get(name);
-																				
-											IContentCodec codec = messagetype.findContentCodec(compcodecs, fmessage, name);
-											if(codec==null)
-												codec = messagetype.findContentCodec(getContentCodecs(), fmessage, name);
-											
-											if(codec!=null)
-											{
-//												System.out.println("dec2: "+codec+fmessage);
-												try
-												{
-													final List<Exception>	errors	= new ArrayList<Exception>();
-													IErrorReporter	rep	= strictcom ? null :new IErrorReporter()
-													{
-														public void exceptionOccurred(Exception e)
-														{
-															errors.add(e);
-														}
-													};
-													Object val = codec.decode((byte[])value, cl, getContentCodecInfo(component.getComponentIdentifier()), rep);
-													
-													if(!errors.isEmpty())
-													{
-														logger.warning("Ignored errors during message decoding: "+errors);
-//														for(Exception e: errors)
-//														{
-//															e.printStackTrace();
-//														}
-													}
-													fmessage.put(name, val);
-												}
-												catch(Exception e)
-												{
-//													System.out.println("classloader: "+cl);
-//													e.printStackTrace();
-													if(!(e instanceof ContentException))
-													{
-														// Todo: find out why 50MB sized messages are sent... 
-														if(((byte[])value).length>3000)
-														{
-															byte[]	tmp = new byte[3000];
-															System.arraycopy(value, 0, tmp, 0, tmp.length);
-															logger.info("ContentException: "+((byte[])value).length+", "+fmessage+", "+new String(tmp, Charset.forName("UTF-8")));
-															value	= tmp;
-														}
-														e = new ContentException(new String((byte[])value, Charset.forName("UTF-8")), e);
-													}
-													fmessage.put(name, e);
-												}
-											}
-											
-											if(fmessage.get(name) instanceof byte[])
-											{
-												System.out.println("sfjkdghfkld\n"+new String((byte[])fmessage.get(name), Charset.forName("UTF-8")));
-											}
-										}
-									}
-									
-									try
-									{
-										component.receiveMessage(fmessage, messagetype);
-										ret.setResult(null);
-									}
-									catch(Exception e)
-									{
-										logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ fmessage.get(messagetype.getIdIdentifier())+", "+e);
-										
-										ret.setResult(null);
-										// todo: notify sender that message could not be delivered!
-										// Problem: there is no connection back to the sender, so that
-										// the only chance is sending a separate failure message.
-									}
-									
-									return IFuture.DONE;
-								}
-							});
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-							logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ msg.get(messagetype.getIdIdentifier()));
-							ret.setResult(null);
-						}
-					});
-				}
-				else
-				{
-					logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ msg.get(messagetype.getIdIdentifier()));
-					
-					ret.setResult(null);
-//					ret.setException(new RuntimeException("Message could not be delivered to local receiver: "+receiver));
-					
-					// todo: notify sender that message could not be delivered!
-					// Problem: there is no connection back to the sender, so that
-					// the only chance is sending a separate failure message.
-				}
+				});
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ msg.get(messagetype.getIdIdentifier())+", "+exception);
+				ret.setResult(null);
 			}
 		});
 			
@@ -2487,15 +2393,27 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				public void customResultAvailable(IComponentManagementService cms)
 				{
-					cms.getComponentAdapter(participant).addResultListener(new ExceptionDelegationResultListener<IComponentAdapter, Void>(ret)
+					cms.getExternalAccess(participant).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 					{
-						public void customResultAvailable(IComponentAdapter ca)
+						public void customResultAvailable(IExternalAccess ea)
 						{
-							AbstractComponentAdapter component = (AbstractComponentAdapter)ca;
-							if(component != null)
+							ea.scheduleStep(new IComponentStep<Void>()
 							{
-								component.receiveStream(fcon);
-							}							
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									ICommunicationFeature	com	= ia.getComponentFeature(ICommunicationFeature.class);
+									if(com!=null)
+									{
+										com.streamArrived(fcon);
+									}
+									else
+									{
+										ia.getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
+									}
+									
+									return IFuture.DONE;
+								}
+							});
 						}
 					});
 				}
@@ -2550,15 +2468,27 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				public void customResultAvailable(IComponentManagementService cms)
 				{
-					cms.getComponentAdapter(participant).addResultListener(new ExceptionDelegationResultListener<IComponentAdapter, Void>(ret)
+					cms.getExternalAccess(participant).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 					{
-						public void customResultAvailable(IComponentAdapter ca)
+						public void customResultAvailable(IExternalAccess ea)
 						{
-							AbstractComponentAdapter component = (AbstractComponentAdapter)ca;
-							if(component != null)
+							ea.scheduleStep(new IComponentStep<Void>()
 							{
-								component.receiveStream(fcon);
-							}							
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									ICommunicationFeature	com	= ia.getComponentFeature(ICommunicationFeature.class);
+									if(com!=null)
+									{
+										com.streamArrived(fcon);
+									}
+									else
+									{
+										ia.getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
+									}
+									
+									return IFuture.DONE;
+								}
+							});
 						}
 					});
 				}
@@ -2685,7 +2615,7 @@ public class MessageService extends BasicService implements IMessageService
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					SServiceProvider.getService(ia.getServiceProvider(), IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(ia.createResultListener(new IResultListener<IMessageAwarenessService>()
+						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IMessageAwarenessService>()
 					{
 						public void resultAvailable(IMessageAwarenessService result)
 						{
@@ -2815,6 +2745,75 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Decode a message.
+	 */
+	protected void decodeMessage(final Logger logger, final MessageType messagetype, final Map<String, Object> fmessage, ClassLoader cl)
+	{
+//							System.out.println("dec: "+cl+" "+component.getComponentIdentifier()+" "+MessageService.this.component.getComponentIdentifier());
+		// Conversion via platform specific codecs
+		IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
+		for(Iterator it=fmessage.keySet().iterator(); it.hasNext(); )
+		{
+			String name = (String)it.next();
+			Object value = fmessage.get(name);
+												
+			IContentCodec codec = messagetype.findContentCodec(compcodecs, fmessage, name);
+			if(codec==null)
+				codec = messagetype.findContentCodec(getContentCodecs(), fmessage, name);
+			
+			if(codec!=null)
+			{
+//									System.out.println("dec2: "+codec+fmessage);
+				try
+				{
+					final List<Exception>	errors	= new ArrayList<Exception>();
+					IErrorReporter	rep	= strictcom ? null :new IErrorReporter()
+					{
+						public void exceptionOccurred(Exception e)
+						{
+							errors.add(e);
+						}
+					};
+					Object val = codec.decode((byte[])value, cl, getContentCodecInfo(component.getComponentIdentifier()), rep);
+					
+					if(!errors.isEmpty())
+					{
+						logger.warning("Ignored errors during message decoding: "+errors);
+//											for(Exception e: errors)
+//											{
+//												e.printStackTrace();
+//											}
+					}
+					fmessage.put(name, val);
+				}
+				catch(Exception e)
+				{
+//										System.out.println("classloader: "+cl);
+//										e.printStackTrace();
+					if(!(e instanceof ContentException))
+					{
+						// Todo: find out why 50MB sized messages are sent... 
+						if(((byte[])value).length>3000)
+						{
+							byte[]	tmp = new byte[3000];
+							System.arraycopy(value, 0, tmp, 0, tmp.length);
+							logger.info("ContentException: "+((byte[])value).length+", "+fmessage+", "+new String(tmp, Charset.forName("UTF-8")));
+							value	= tmp;
+						}
+						e = new ContentException(new String((byte[])value, Charset.forName("UTF-8")), e);
+					}
+					fmessage.put(name, e);
+				}
+			}
+			
+			if(fmessage.get(name) instanceof byte[])
+			{
+				System.out.println("sfjkdghfkld\n"+new String((byte[])fmessage.get(name), Charset.forName("UTF-8")));
+			}
+		}
 	}
 }
 

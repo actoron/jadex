@@ -199,7 +199,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 	 *  Create a result listener that is executed on the
 	 *  component thread.
 	 */
-	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener);
+	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener)
+	{
+		// Todo
+		return null;
+	}
 	
 	//-------- IExecutable interface --------
 	

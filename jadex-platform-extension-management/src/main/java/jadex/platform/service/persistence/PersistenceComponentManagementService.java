@@ -1,23 +1,16 @@
 package jadex.platform.service.persistence;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInterpreter;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.persistence.IIdleHook;
 import jadex.bridge.service.types.persistence.IPersistenceService;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -29,7 +22,6 @@ import jadex.platform.service.cms.ComponentManagementService;
 import jadex.platform.service.cms.IntermediateResultListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -162,17 +154,18 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 			{
 				public void customResultAvailable(IExternalAccess exta)
 				{
-					final IComponentInterpreter	instance	= getComponentInstance(internalGetComponentAdapter(cid));
-					
-					// Fetch persistable state on component thread.
-					exta.scheduleImmediate(new IComponentStep<IPersistInfo>()
-					{
-						public IFuture<IPersistInfo> execute(IInternalAccess ia)
-						{
-							return new Future<IPersistInfo>(instance.getPersistableState());
-						}
-					})
-						.addResultListener(new DelegationResultListener<IPersistInfo>(fut));
+					// Todo
+//					final IComponentInterpreter	instance	= getComponentInstance(internalGetComponentAdapter(cid));
+//					
+//					// Fetch persistable state on component thread.
+//					exta.scheduleImmediate(new IComponentStep<IPersistInfo>()
+//					{
+//						public IFuture<IPersistInfo> execute(IInternalAccess ia)
+//						{
+//							return new Future<IPersistInfo>(instance.getPersistableState());
+//						}
+//					})
+//						.addResultListener(new DelegationResultListener<IPersistInfo>(fut));
 				}
 			});
 		}
@@ -239,51 +232,51 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 										resultlisteners.put(pi.getComponentDescription().getName(), reslis);
 									}
 		
-									// Todo: allow adapting component identifier (e.g. to changed platform suffix).
-									Future<Void>	init	= new Future<Void>();
-									final IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>>	tupfut	=
-										factory.createComponentInstance(pi.getComponentDescription(), getComponentAdapterFactory(), model, 
-										null, null, parent, null, copy, realtime, persist, pi, reslis, init);
-									
-									init.addResultListener(new ExceptionDelegationResultListener<Void, Void>(fut)
-									{
-										public void customResultAvailable(Void result)
-										{
-											tupfut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>, Void>(fut)
-											{
-												public void customResultAvailable(final Tuple2<IComponentInterpreter, IComponentAdapter> tup)
-												{
-													IComponentAdapter	pad	= internalGetComponentAdapter(parent.getComponentIdentifier());
-													if(Arrays.asList(((CMSComponentDescription)pad.getDescription()).getChildren()).contains(pi.getComponentDescription().getName()))
-													{
-														done(tup);											
-													}
-													
-													// If component hull no longer present, readd component at parent.
-													else
-													{
-														addSubcomponent(pad, pi.getComponentDescription(), model)
-															.addResultListener(new ExceptionDelegationResultListener<Void, Void>(fut)
-														{
-															public void customResultAvailable(Void result)
-															{
-																notifyListenersAdded(pi.getComponentDescription().getName(), pi.getComponentDescription());
-																done(tup);
-															}
-														});
-													}
-												}
-												
-												public void done(Tuple2<IComponentInterpreter, IComponentAdapter> tup)
-												{
-													adapters.put(pi.getComponentDescription().getName(), tup.getSecondEntity());
-													getComponentAdapterFactory().initialWakeup(tup.getSecondEntity());
-													
-													fut.setResult(null);
-												}
-											}));
-										}
-									});
+//									// Todo: allow adapting component identifier (e.g. to changed platform suffix).
+//									Future<Void>	init	= new Future<Void>();
+//									final IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>>	tupfut	=
+//										factory.createComponentInstance(pi.getComponentDescription(), getComponentAdapterFactory(), model, 
+//										null, null, parent, null, copy, realtime, persist, pi, reslis, init);
+//									
+//									init.addResultListener(new ExceptionDelegationResultListener<Void, Void>(fut)
+//									{
+//										public void customResultAvailable(Void result)
+//										{
+//											tupfut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>, Void>(fut)
+//											{
+//												public void customResultAvailable(final Tuple2<IComponentInterpreter, IComponentAdapter> tup)
+//												{
+//													IComponentAdapter	pad	= internalGetComponentAdapter(parent.getComponentIdentifier());
+//													if(Arrays.asList(((CMSComponentDescription)pad.getDescription()).getChildren()).contains(pi.getComponentDescription().getName()))
+//													{
+//														done(tup);											
+//													}
+//													
+//													// If component hull no longer present, readd component at parent.
+//													else
+//													{
+//														addSubcomponent(pad, pi.getComponentDescription(), model)
+//															.addResultListener(new ExceptionDelegationResultListener<Void, Void>(fut)
+//														{
+//															public void customResultAvailable(Void result)
+//															{
+//																notifyListenersAdded(pi.getComponentDescription().getName(), pi.getComponentDescription());
+//																done(tup);
+//															}
+//														});
+//													}
+//												}
+//												
+//												public void done(Tuple2<IComponentInterpreter, IComponentAdapter> tup)
+//												{
+//													adapters.put(pi.getComponentDescription().getName(), tup.getSecondEntity());
+//													getComponentAdapterFactory().initialWakeup(tup.getSecondEntity());
+//													
+//													fut.setResult(null);
+//												}
+//											}));
+//										}
+//									});
 								}
 							}));
 						}

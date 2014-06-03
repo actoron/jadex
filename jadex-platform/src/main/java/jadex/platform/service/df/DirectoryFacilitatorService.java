@@ -210,7 +210,7 @@ public class DirectoryFacilitatorService	implements IDF
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(provider.getServiceContainer(), IDF.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
+			SServiceProvider.getServices(provider.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -409,7 +409,7 @@ public class DirectoryFacilitatorService	implements IDF
 		final Future<Void> ret = new Future<Void>();
 		
 		final boolean[]	services	= new boolean[2];
-		SServiceProvider.getServiceUpwards(provider.getServiceContainer(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(provider.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -427,7 +427,7 @@ public class DirectoryFacilitatorService	implements IDF
 			}
 		});
 		
-		SServiceProvider.getService(provider.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(provider.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

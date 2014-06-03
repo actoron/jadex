@@ -511,11 +511,11 @@ public class Starter
 					{
 						public void customResultAvailable(Void result)
 						{
-//							startComponents(0, components, component.getInternalAccess())
-//								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
-//							{
-//								public void customResultAvailable(Void result)
-//								{
+							startComponents(0, components, component.getInternalAccess())
+								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
+							{
+								public void customResultAvailable(Void result)
+								{
 									if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
 									{
 										long startup = System.currentTimeMillis() - starttime;
@@ -523,15 +523,15 @@ public class Starter
 										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
 									}
 									fret.setResult(component.getInternalAccess().getExternalAccess());
-//								}
-//								
-//								public void exceptionOccurred(Exception exception)
-//								{
-//									// On exception in init: kill platform.
-//									component.getInternalAccess().getExternalAccess().killComponent();
-//									super.exceptionOccurred(exception);
-//								}
-//							});
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									// On exception in init: kill platform.
+									component.getInternalAccess().getExternalAccess().killComponent();
+									super.exceptionOccurred(exception);
+								}
+							});
 						}						
 					});
 					
