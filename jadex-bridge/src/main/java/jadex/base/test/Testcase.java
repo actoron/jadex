@@ -29,6 +29,14 @@ public class Testcase
 	}
 	
 	/**
+	 *  Create a new testcase.
+	 */
+	public Testcase(int cnt)
+	{
+		this.cnt = cnt;
+	}
+	
+	/**
 	 *  Create a testcase which is already performed.
 	 */
 	public Testcase(int cnt, TestReport[] reports)

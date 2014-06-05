@@ -37,7 +37,7 @@ public class UserAgent
 	@AgentBody
 	public void body()
 	{
-		Testcase tc = new Testcase();
+		Testcase tc = new Testcase(1);
 		
 		TestReport tr = new TestReport("#1", "Test if timeout annotations are respected in cascading service calls.");
 		IService1 ser1 = (IService1)agent.getRequiredService("ser1").get();
@@ -51,6 +51,7 @@ public class UserAgent
 			tr.setFailed("Exception occurred: "+e.getMessage());
 		}
 		
+		tc.addReport(tr);
 		agent.setResultValue("testresults", tc);
 		agent.killAgent();
 	}
