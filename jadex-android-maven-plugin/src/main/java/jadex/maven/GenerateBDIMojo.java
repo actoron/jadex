@@ -401,7 +401,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			
 			if (bdiFileFilter.accept(bdiFile))
 			{
-				String agentClassName = relativePath.replaceAll(File.separator, ".").replace(".class", "");
+				String agentClassName = relativePath.replace(File.separator, ".").replace(".class", "");
 
 				getLog().debug("Loading Model: " + relativePath);
 
@@ -552,7 +552,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		for (File bdiFile : allBDIFiles)
 		{
 			String relativePath = ResourceUtils.getRelativePath(bdiFile.getAbsolutePath(), absoluteOutput, File.separator);
-			String importPath = relativePath.replaceAll(File.separator, ".").replace(".class", "");
+			String importPath = relativePath.replace(File.separator, ".").replace(".class", "");
 			result.add(importPath);
 		}
 
