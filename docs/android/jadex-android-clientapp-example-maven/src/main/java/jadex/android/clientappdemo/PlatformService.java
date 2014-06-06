@@ -19,6 +19,7 @@ public class PlatformService extends JadexPlatformService
 {
 	private PlatformListener listener;
 	private Handler uiHandler;
+	private boolean	platformStarted;
 
 	public PlatformService()
 	{
@@ -80,6 +81,9 @@ public class PlatformService extends JadexPlatformService
 		{
 			listener = l;
 			l.platformStarting(); // because it's autostart.
+			if (platformStarted) {
+				l.platformStarted();
+			}
 		}
 	}
 
@@ -87,6 +91,7 @@ public class PlatformService extends JadexPlatformService
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
 		super.onPlatformStarted(platform);
+		this.platformStarted = true; // cache if no listener present
 		if (listener != null) {
 			listener.platformStarted();
 		}

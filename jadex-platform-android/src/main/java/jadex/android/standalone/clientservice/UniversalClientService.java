@@ -267,7 +267,7 @@ public class UniversalClientService extends Service
 				if (!isBound) {
 					Logger.d("Terminating Client Service: " + clientService);
 					clientService.onDestroy();
-					serviceInstances.remove(clientService);
+					serviceInstances.remove(clientService.getClass().getName());
 				}
 			}
 		}
