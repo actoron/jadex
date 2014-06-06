@@ -8,6 +8,7 @@ import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -1055,4 +1056,13 @@ public class RGoal extends RProcessableElement implements IGoal
 //         }
 //         out.close();
 //	}
+	
+	/**
+	 *  Get the parent plan.
+	 *  @return The parent plan.
+	 */
+	public IPlan getParent()
+	{
+		return parentplan;
+	}
 }

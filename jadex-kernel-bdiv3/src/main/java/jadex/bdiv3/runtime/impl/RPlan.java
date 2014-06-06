@@ -268,7 +268,16 @@ public class RPlan extends RElement implements IPlan
 	}
 	
 	/**
-	 * 
+	 *  Get the pojo plan of a plan.
+	 *  @return The pojo plan.
+	 */
+	public Object getPojoPlan()
+	{
+		return body instanceof ClassPlanBody? ((ClassPlanBody)body).getPojoPlan(): null;
+	}
+	
+	/**
+	 *  Execute a plan.
 	 */
 	public static void executePlan(RPlan rplan, IInternalAccess ia, ICommand<Boolean> resume)
 	{

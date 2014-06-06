@@ -310,7 +310,7 @@ public class BDIClassReader extends MicroClassReader
 				MGoal goal2	= new MGoal(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
 					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
 					goal.getRetryDelay(), goal.getRecurDelay(), goal.isSucceedOnPassed(), goal.isUnique(), goal.getDeliberation(), goal.getParameters(),
-					goal.getServiceParameterMappings(), goal.getServiceResultMappings()); // clone params?
+					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), new ArrayList<ClassInfo>(goal.getTriggerGoals())); // clone params?
 						
 				// Convert goal condition events
 				if(goal.getConditions()!=null)
@@ -1049,9 +1049,20 @@ public class BDIClassReader extends MicroClassReader
 			tmpcl = tmpcl.getSuperclass();
 		}
 		
+		List<ClassInfo> triggergoals = null;
+		Class<?>[] trgoals = goal.triggergoals();
+		if(trgoals!=null)
+		{
+			triggergoals = new ArrayList<ClassInfo>();
+			for(Class<?> trgoal: trgoals)
+			{
+				triggergoals.add(new ClassInfo(trgoal.getName()));
+			}
+		}
+		
 		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode().getString(), 
 			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.succeedonpassed(), goal.unique(), mdel, params,
-			spmappings.size()>0? spmappings: null, srmappings.size()>0? srmappings: null);
+			spmappings.size()>0? spmappings: null, srmappings.size()>0? srmappings: null, triggergoals);
 		
 		jadex.bdiv3.annotation.Publish pub = goal.publish();
 		if(!Object.class.equals(pub.type()))

@@ -92,7 +92,7 @@ public class ComponentTest extends TestCase
 				}
 			}
 			
-			if(tc!=null)
+			if(tc!=null && tc.getReports()!=null)
 			{
 				TestReport[]	reports	= tc.getReports();
 				if(tc.getTestCount()!=reports.length)

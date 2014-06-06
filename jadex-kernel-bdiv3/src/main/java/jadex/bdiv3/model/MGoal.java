@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3.annotation.GoalResult;
+import jadex.bridge.ClassInfo;
 import jadex.commons.MethodInfo;
 
 import java.lang.reflect.Field;
@@ -33,7 +34,6 @@ public class MGoal extends MClassBasedElement
 
 	/** Goal recur condition name. */
 	public static final String CONDITION_RECUR = "recur";
-
 
 	
 	/** Never exclude plan candidates from apl. */
@@ -70,6 +70,9 @@ public class MGoal extends MClassBasedElement
 	/** The deliberation. */
 	protected MDeliberation deliberation;
 	
+	/** The trigger (other goals) if this goal is used as plan. */
+	protected List<ClassInfo> triggergoals;
+	
 	/** The pojo result access (field or method). */
 	protected Object pojoresultreadaccess;
 	protected Object pojoresultwriteaccess;
@@ -92,7 +95,7 @@ public class MGoal extends MClassBasedElement
 	public MGoal(String name, String target, boolean posttoall, boolean randomselection, String excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
 		boolean succeedonpassed, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
-		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings)
+		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings, List<ClassInfo> triggergoals)
 	{
 		super(name, target, posttoall, randomselection, excludemode);
 		this.retry = retry;
@@ -105,6 +108,7 @@ public class MGoal extends MClassBasedElement
 		this.parameters = parameters;
 		this.spmappings = spmappings;
 		this.srmappings = srmappings;
+		this.triggergoals = triggergoals;
 		
 //		System.out.println("create: "+target);
 	}
@@ -436,7 +440,7 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
-	 * 
+	 *  Get the service result mapping.
 	 */
 	public MethodInfo getServiceResultMapping(String name)
 	{
@@ -459,6 +463,24 @@ public class MGoal extends MClassBasedElement
 	public Map<String, MethodInfo> getServiceResultMappings()
 	{
 		return srmappings;
+	}
+
+	/**
+	 *  Get the triggergoals.
+	 *  @return The triggergoals.
+	 */
+	public List<ClassInfo> getTriggerGoals()
+	{
+		return triggergoals;
+	}
+
+	/**
+	 *  Set the triggergoals.
+	 *  @param triggergoals The triggergoals to set.
+	 */
+	public void setTriggerGoals(List<ClassInfo> triggergoals)
+	{
+		this.triggergoals = triggergoals;
 	}
 	
 }

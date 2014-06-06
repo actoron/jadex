@@ -63,4 +63,9 @@ public interface IGoal
 	 *  Test if goal is finished.
 	 */
 	public boolean isFinished();
+	
+	/**
+	 *  Get the parent of the goal.
+	 */
+	public IPlan getParent();
 }
