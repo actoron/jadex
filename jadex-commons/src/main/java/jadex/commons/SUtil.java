@@ -2800,6 +2800,19 @@ public class SUtil
 	}
 	
 	/**
+	 *  Copy an array.
+	 */
+	public static <T> T[] copyArray(T[] original)
+	{
+		// Arrays.copyOf() not present in android 2.2 (version 8).
+		T[] copy = (T[]) Array.newInstance(original.getClass().getComponentType(), original.length);
+        System.arraycopy(original, 0, copy, 0, original.length);
+        
+        return copy;
+	}
+
+	
+	/**
 	 *  Get the source code base using a packagename and a filename.
 	 *  Looks at the filename and subtracts the package name.
 	 *  @param filename The filename.

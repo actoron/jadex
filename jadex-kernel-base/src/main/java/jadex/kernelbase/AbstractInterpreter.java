@@ -22,6 +22,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -30,7 +31,6 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -450,7 +450,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public RequiredServiceBinding[] getBindings()
 	{
-		return bindings != null ? Arrays.copyOf(bindings, bindings.length) : null;
+		return bindings != null ? SUtil.copyArray(bindings) : null;
 	}
 
 	/**

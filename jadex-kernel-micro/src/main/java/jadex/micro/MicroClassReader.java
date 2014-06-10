@@ -867,7 +867,7 @@ public class MicroClassReader
 			for(ProvidedServiceInfo psi: psis)
 			{
 				String val = psi.getImplementation().getValue();
-				if(psi.getImplementation().getClazz()!=null || (val!=null && !val.isEmpty() 
+				if(psi.getImplementation().getClazz()!=null || (val!=null && val.length()!=0 
 					&& (val.equals("$pojoagent") || val.equals("$pojoagent!=null? $pojoagent: $component"))))
 				{
 					Class<?> tt = psi.getType().getType(cl);
@@ -1509,7 +1509,7 @@ public class MicroClassReader
 			{
 				String val = values[i].value();
 				String clname = values[i].clazz().getName();
-				ret[i] = new UnparsedExpression(values[i].name(), clname, (val==null || val.isEmpty()) && clname!=null? clname+".class": val, null);
+				ret[i] = new UnparsedExpression(values[i].name(), clname, (val==null || val.length()==0) && clname!=null? clname+".class": val, null);
 			}
 		}
 		return ret;
@@ -1528,7 +1528,7 @@ public class MicroClassReader
 			{
 				String val = values[i].value();
 				String clname = values[i].clazz().getName();
-				String v = (val==null || val.isEmpty()) && clname!=null? clname+".class": val;
+				String v = (val==null || val.length()==0) && clname!=null? clname+".class": val;
 				ret.add(new UnparsedExpression(values[i].name(), (String)null, v, null));
 			}
 		}
