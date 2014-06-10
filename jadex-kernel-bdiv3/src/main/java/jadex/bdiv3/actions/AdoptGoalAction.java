@@ -1,12 +1,17 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
+import jadex.bdiv3.annotation.GoalParent;
+import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -60,14 +65,37 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 			
 			// inject goal elements
 			Class<?> cl = goal.getPojoElement().getClass();
-			Field[] fields = cl.getDeclaredFields();
-			for(Field f: fields)
+			
+			while(cl.isAnnotationPresent(Goal.class))
 			{
-				if(f.isAnnotationPresent(GoalAPI.class))
+				Field[] fields = cl.getDeclaredFields();
+				for(Field f: fields)
 				{
-					f.setAccessible(true);
-					f.set(goal.getPojoElement(), goal);
+					if(f.isAnnotationPresent(GoalAPI.class))
+					{
+						f.setAccessible(true);
+						f.set(goal.getPojoElement(), goal);
+					}
+					else if(f.isAnnotationPresent(GoalParent.class))
+					{
+						if(goal.getParent()!=null)
+						{
+							IPlan pa = goal.getParent();
+							Object pojopa = ((RPlan)pa).getPojoPlan();
+							if(SReflect.isSupertype(f.getType(), pa.getClass()))
+							{
+								f.setAccessible(true);
+								f.set(goal.getPojoElement(), pa);
+							}
+							else if(pojopa!=null && SReflect.isSupertype(f.getType(), pojopa.getClass()))
+							{
+								f.setAccessible(true);
+								f.set(goal.getPojoElement(), pojopa);
+							}
+						}
+					}
 				}
+				cl = cl.getSuperclass();
 			}
 			
 			ip.getCapability().addGoal(goal);

@@ -93,12 +93,18 @@ public @interface Goal
 	public boolean unique() default false;
 	
 	/**
-	 * 
+	 *  The deliberation settings.
 	 */
 	public Deliberation deliberation() default @Deliberation();
 	
 	/**
-	 * 
+	 *  The publication settings. Can be used to export goal
+	 *  as a component service.
 	 */
 	public Publish publish() default @Publish(type=Object.class);
+
+	/**
+	 *  The goal trigger. Used in case the goal should be used as plan for another goal.
+	 */
+	public Class<?>[] triggergoals() default {};
 }

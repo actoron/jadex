@@ -72,6 +72,7 @@ public class SokratesBDI
 		final Future<Void>	ret	= new Future<Void>();
 
 		strategy = agent.getConfiguration();
+		System.out.println("strategy is: "+strategy);
 		createGui(agent);
 		
 		System.out.println("Now puzzling:");

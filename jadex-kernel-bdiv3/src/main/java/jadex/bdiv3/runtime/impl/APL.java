@@ -10,6 +10,7 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -46,6 +47,9 @@ public class APL
 	
 	/** The mplan candidates. */
 	protected List<MPlan> precandidates;
+	
+	/** The mgoal candidates (in case a goal triggers another goal). */
+	protected List<MGoal> goalprecandidates;
 	
 //	/** The plan instance candidates. */
 //	protected List<RPlan> planinstancecandidates;
@@ -292,6 +296,29 @@ public class APL
 				}
 			}
 		}
+		
+		if(goalprecandidates==null)
+		{
+			goalprecandidates = new ArrayList<MGoal>();
+			List<MGoal> mgoals = ((MCapability)ip.getCapability().getModelElement()).getGoals();
+			if(mgoals!=null)
+			{
+				for(int i=0; i<mgoals.size(); i++)
+				{
+					MGoal mgoal = mgoals.get(i);
+					List<ClassInfo> trgoals = mgoal.getTriggerGoals();
+					
+					if(element instanceof RGoal && trgoals!=null)
+					{
+						if(trgoals.contains(element.getModelElement()))
+						{
+							goalprecandidates.add(mgoal);
+//							res.add(mplan);
+						}
+					}
+				}
+			}
+		}
 
 		final CollectionResultListener<MPlan> lis = new CollectionResultListener<MPlan>(precandidates.size(), true, new IResultListener<Collection<MPlan>>()
 		{
@@ -304,6 +331,7 @@ public class APL
 			{
 			}
 		});
+		
 		for(final MPlan mplan: precandidates)
 		{
 			// check precondition
