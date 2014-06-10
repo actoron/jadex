@@ -51,7 +51,7 @@ import java.util.List;
 /**
  *  Runtime element of a plan.
  */
-public class RPlan extends RElement implements IPlan
+public class RPlan extends RElement implements IPlan, IInternalPlan
 {
 	//-------- plan states --------
 	

@@ -35,8 +35,12 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 	{
 //		System.out.println("adopting: "+goal.getId()+" "+goal.getPojoElement().getClass().getName());
 		this.goal = goal;
-		if(goal.getParentPlan()!=null)
+		
+		// todo: support this also for a parent goal?!
+		if(goal.getParent() instanceof RPlan)
+		{
 			this.state = goal.getParentPlan().getLifecycleState();
+		}
 	}
 	
 	/**
@@ -45,7 +49,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 	 */
 	public boolean isValid()
 	{
-		return (state==null|| state.equals(goal.getParentPlan().getLifecycleState())) 
+		return (state==null || state.equals(goal.getParentPlan().getLifecycleState())) 
 			&& RGoal.GoalLifecycleState.NEW.equals(goal.getLifecycleState());
 	}
 	
@@ -80,8 +84,17 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 					{
 						if(goal.getParent()!=null)
 						{
-							IPlan pa = goal.getParent();
-							Object pojopa = ((RPlan)pa).getPojoPlan();
+							Object pa = goal.getParent();
+							Object pojopa = null;
+							if(pa instanceof RPlan)
+							{
+								pojopa = ((RPlan)pa).getPojoPlan();
+							}
+							else if(pa instanceof RGoal)
+							{
+								pojopa = ((RGoal)pa).getPojoElement();
+							}	
+								
 							if(SReflect.isSupertype(f.getType(), pa.getClass()))
 							{
 								f.setAccessible(true);

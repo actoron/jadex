@@ -3,6 +3,7 @@ package jadex.bdiv3.actions;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
@@ -12,6 +13,8 @@ import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.E;
 
 import java.util.List;
 
@@ -57,7 +60,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public IFuture<Void> execute(IInternalAccess ia)
+	public IFuture<Void> execute(final IInternalAccess ia)
 	{
 //		if(element.toString().indexOf("Analyze")!=-1)
 //			System.out.println("select candidates: "+element);
@@ -79,6 +82,32 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
 					RPlan.executePlan(rplan, ia, null);
 					ret.setResult(null);
+				}
+				// direct subgoal for goal
+				else if(cand instanceof MGoal)
+				{
+					final RGoal pagoal = (RGoal)element;
+					final MGoal mgoal = (MGoal)cand;
+					final Object pgoal = mgoal.createPojoInstance(ip, pagoal);
+					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal);
+					
+					rgoal.addListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+							// Set goal result on parent goal
+							Object res = RGoal.getGoalResult(pgoal, mgoal, ia.getClassLoader());
+							pagoal.setGoalResult(res, ia.getClassLoader(), null, null, rgoal);
+							pagoal.planFinished(ia, rgoal);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							pagoal.planFinished(ia, rgoal);
+						}
+					});
+					
+					RGoal.adoptGoal(rgoal, ia);
 				}
 				else if(cand.getClass().isAnnotationPresent(Plan.class))
 				{

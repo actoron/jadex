@@ -1,9 +1,12 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3.annotation.GoalResult;
+import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.ClassInfo;
 import jadex.commons.MethodInfo;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -72,6 +75,7 @@ public class MGoal extends MClassBasedElement
 	
 	/** The trigger (other goals) if this goal is used as plan. */
 	protected List<ClassInfo> triggergoals;
+	protected List<MGoal> mtriggergoals;
 	
 	/** The pojo result access (field or method). */
 	protected Object pojoresultreadaccess;
@@ -334,6 +338,50 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
+	 *  Create a pojo goal instance.
+	 */
+	public Object createPojoInstance(BDIAgentInterpreter ip, RGoal parent)
+	{
+		Object ret = null;
+		ClassLoader cl = ip.getClassLoader();
+		Class<?> pojocl = getTargetClass(cl);
+		if(pojocl!=null)
+		{
+			try
+			{
+				Constructor<?> c = pojocl.getDeclaredConstructor(new Class[0]);
+				ret = c.newInstance(new Object[0]);
+			}
+			catch(Exception e)
+			{
+				// Find constrcutor with smallest footprint
+				Constructor<?> sc = null;
+				Constructor<?>[] cs = pojocl.getDeclaredConstructors();
+				for(Constructor<?> c: cs)
+				{
+					if(sc==null || c.getParameterTypes().length<sc.getParameterTypes().length)
+					{
+						sc = c;
+					}
+				}
+				if(sc!=null)
+				{
+					try
+					{
+						Object[] pvals = ip.getInjectionValues(sc.getParameterTypes(), null, this, null, null, parent);
+						ret = sc.newInstance(pvals);
+					}
+					catch(Exception ex)
+					{
+						throw new RuntimeException(ex);
+					}
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Add a condition to the goal.
 	 */
 	public void addCondition(String type, MCondition cond)
@@ -483,4 +531,27 @@ public class MGoal extends MClassBasedElement
 		this.triggergoals = triggergoals;
 	}
 	
+	/**
+	 *  Get the triggergoals.
+	 *  @return The triggergoals.
+	 */
+	public List<MGoal> getTriggerMGoals(MCapability mcapa)
+	{
+		if(mtriggergoals==null && triggergoals!=null)
+		{
+			mtriggergoals = new ArrayList<MGoal>();
+			
+			for(ClassInfo cl: triggergoals)
+			{
+				MGoal mgoal = mcapa.getGoal(cl.getTypeName());
+				if(mgoal==null)
+				{
+					throw new RuntimeException("Goal not for for pojo class: "+cl);
+				}
+				mtriggergoals.add(mgoal);
+			}
+		}
+		
+		return mtriggergoals;
+	}
 }

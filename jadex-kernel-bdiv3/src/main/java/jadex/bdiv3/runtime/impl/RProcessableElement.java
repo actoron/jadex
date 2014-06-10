@@ -31,7 +31,7 @@ public abstract class RProcessableElement extends RElement
 	protected APL apl;
 	
 	/** The tried plans. */
-	protected List<RPlan> triedplans;
+	protected List<IInternalPlan> triedplans;
 	
 	/** The state. */
 	protected State state;
@@ -93,11 +93,11 @@ public abstract class RProcessableElement extends RElement
 	/**
 	 *  Add a tried plan.
 	 */
-	public void addTriedPlan(RPlan plan)
+	public void addTriedPlan(IInternalPlan plan)
 	{
 		if(triedplans==null)
 		{
-			triedplans = new ArrayList<RPlan>();
+			triedplans = new ArrayList<IInternalPlan>();
 		}
 		triedplans.add(plan);
 	}
@@ -106,7 +106,7 @@ public abstract class RProcessableElement extends RElement
 	 *  Get the triedplans.
 	 *  @return The triedplans.
 	 */
-	public List<RPlan> getTriedPlans()
+	public List<IInternalPlan> getTriedPlans()
 	{
 		return triedplans;
 	}
@@ -115,7 +115,7 @@ public abstract class RProcessableElement extends RElement
 	 *  Set the triedplans.
 	 *  @param triedplans The triedplans to set.
 	 */
-	public void setTriedPlans(List<RPlan> triedplans)
+	public void setTriedPlans(List<IInternalPlan> triedplans)
 	{
 		this.triedplans = triedplans;
 	}
@@ -139,7 +139,7 @@ public abstract class RProcessableElement extends RElement
 	}
 	
 	/**
-	 * 
+	 *  Set the state.
 	 */
 	public void setState(IInternalAccess ia, State state)
 	{
@@ -170,9 +170,9 @@ public abstract class RProcessableElement extends RElement
 	}
 
 	/**
-	 * 
+	 *  Called when plan execution has finished.
 	 */
-	public void planFinished(IInternalAccess ia, RPlan rplan)
+	public void planFinished(IInternalAccess ia, IInternalPlan rplan)
 	{
 		if(rplan!=null)
 		{
