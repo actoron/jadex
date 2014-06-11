@@ -825,7 +825,7 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 	 */
 	public void setGoalResult(Object result, ClassLoader cl, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
 	{
-		System.out.println("set goal result: "+result);
+//		System.out.println("set goal result: "+result);
 		
 		MGoal mgoal = (MGoal)getModelElement();
 		Object wa = mgoal.getPojoResultWriteAccess(cl);
