@@ -376,31 +376,31 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			return new Future<T>(new ComponentTerminatedException(id));
 		}
 
-		final Future<T> ret = new Future<T>();
+		final Future<T> fut = new Future<T>();
 		// Local?
 		if(cid.getPlatformName().equals(id.getPlatformName()))
 		{
 			SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(fut)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
 				{
-					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(fut)
 					{
 						public void customResultAvailable(IExternalAccess ea)
 						{
 							SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
-								.addResultListener(new DelegationResultListener<T>(ret)
+								.addResultListener(new DelegationResultListener<T>(fut)
 							{
 								public void customResultAvailable(T result)
 								{
 									if(shutdowned)
 									{
-										ret.setException(new ComponentTerminatedException(id));
+										fut.setException(new ComponentTerminatedException(id));
 									}
 									else
 									{
-										ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
+										fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
 											adapter, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
 									}
 								}
@@ -413,22 +413,22 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		else
 		{
 			SServiceProvider.getService(this, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, T>(ret)
+				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, T>(fut)
 			{
 				public void customResultAvailable(IRemoteServiceManagementService rms)
 				{
 					rms.getServiceProxy(cid, type, RequiredServiceInfo.SCOPE_LOCAL)
-						.addResultListener(new DelegationResultListener<T>(ret)
+						.addResultListener(new DelegationResultListener<T>(fut)
 					{
 						public void customResultAvailable(T result)
 						{
 							if(shutdowned)
 							{
-								ret.setException(new ComponentTerminatedException(id));
+								fut.setException(new ComponentTerminatedException(id));
 							}
 							else
 							{
-								ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
+								fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
 									adapter, (IService)result, null, new RequiredServiceInfo(type), null, realtime));
 							}
 						}
@@ -436,7 +436,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 			});
 		}
-		return ret;
+		
+		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 	
 	/**

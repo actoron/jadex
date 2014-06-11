@@ -18,7 +18,7 @@ import jadex.commons.future.IResultListener;
 import java.util.List;
 
 /**
- * 
+ *  Action for selecting a candidate from the APL.
  */
 public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 {
