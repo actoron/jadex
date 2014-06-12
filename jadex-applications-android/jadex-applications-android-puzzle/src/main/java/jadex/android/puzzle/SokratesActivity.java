@@ -110,7 +110,6 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 
 	SokratesListener sokratesListener = new SokratesListener()
 	{
-
 		@Override
 		public void setBoard(IBoard board)
 		{

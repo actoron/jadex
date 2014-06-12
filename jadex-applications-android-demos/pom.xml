@@ -51,6 +51,12 @@
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdiv3</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools-android</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -98,6 +104,7 @@
 				<includes>
 					<include>**/*.xml</include>
 					<include>**/*.bpmn</include>
+					<include>**/*.bpmn2</include>
 				</includes>
 			</resource>
 		</resources>

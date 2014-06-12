@@ -4,6 +4,7 @@ import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 /**
  * This Activity starts the BDI V3 puzzle implementation.
  */
+@Reference
 public class BDIV3DemoActivity extends JadexAndroidActivity
 {
 	/** Constructor */

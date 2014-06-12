@@ -5,8 +5,10 @@ import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Reference;
 import android.content.Intent;
 
+@Reference
 public class ControlCenterDemoActivity extends JadexAndroidActivity
 {
 	public ControlCenterDemoActivity()
