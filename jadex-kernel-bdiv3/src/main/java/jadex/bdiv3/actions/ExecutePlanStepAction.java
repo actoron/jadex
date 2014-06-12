@@ -125,7 +125,9 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 						ip.getCapability().removePlan(rplan);
 						Object reason = rplan.getReason();
 						if(reason instanceof RProcessableElement)
+						{
 							((RProcessableElement)reason).planFinished(ia, rplan);
+						}
 					}
 					
 					public void exceptionOccurred(Exception exception)

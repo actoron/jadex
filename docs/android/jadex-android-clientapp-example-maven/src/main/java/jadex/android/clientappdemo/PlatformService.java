@@ -27,8 +27,7 @@ public class PlatformService extends JadexPlatformService
 		// setPlatformKernels(KERNEL_MICRO, KERNEL_COMPONENT);
 		// setPlatformName("ClientAppDemo");
 		setSharedPlatform(true);
-		uiHandler = new Handler();
-
+		
 		registerEventReceiver(new EventReceiver<MyEvent>(MyEvent.class)
 		{
 			@Override
@@ -45,6 +44,13 @@ public class PlatformService extends JadexPlatformService
 				});
 			}
 		});
+	}
+	
+	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		uiHandler = new Handler();
 	}
 
 	@Override

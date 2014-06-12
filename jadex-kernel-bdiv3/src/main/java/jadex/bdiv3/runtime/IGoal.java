@@ -64,8 +64,8 @@ public interface IGoal
 	 */
 	public boolean isFinished();
 	
-	/**
-	 *  Get the parent of the goal.
-	 */
-	public IPlan getParent();
+//	/**
+//	 *  Get the parent of the goal.
+//	 */
+//	public IPlan getParent();
 }

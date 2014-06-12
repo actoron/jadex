@@ -392,7 +392,7 @@ public class RCapability extends RElement
 			System.out.println("--------");
 			for(RGoal goal: goals)
 			{
-				System.out.println("goal: "+goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState()+" "+goal.getParentPlan());
+				System.out.println("goal: "+goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState()+" "+goal.getParent());
 //				if(goal.getInhibitors()!=null)
 //				{
 //					for(RGoal g: goal.getInhibitors())
@@ -430,6 +430,12 @@ public class RCapability extends RElement
 		}
 	}
 	
+	/**
+	 * 
+	 * @param plan
+	 * @param orig
+	 * @param buf
+	 */
 	protected void determineValid(RPlan plan, RPlan orig, StringBuffer buf)
 	{
 		buf.append(plan.getId()+plan.aborted);

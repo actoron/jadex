@@ -632,7 +632,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		final MGoal mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null);
+		final RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, (RPlan)null);
 		rgoal.addListener(new ExceptionDelegationResultListener<Void, E>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -792,7 +792,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							throw new RuntimeException("Could not create initial goal: "+uexp);
 						}
 						
-						RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null);
+						RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, (RPlan)null);
 						RGoal.adoptGoal(rgoal, getInternalAccess());
 					}
 				}
@@ -1925,7 +1925,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 *  Get parameter values for injection into method and constructor calls.
 	 */
-	protected Object[] getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
+	public Object[] getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
 	{
 		return getInjectionValues(ptypes, anns, melement, event, rplan, rpe, null);
 	}

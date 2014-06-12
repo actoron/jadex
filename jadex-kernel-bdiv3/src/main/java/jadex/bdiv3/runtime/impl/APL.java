@@ -102,7 +102,7 @@ public class APL
 //	}
 	
 	/**
-	 * 
+	 *  Build the apl.
 	 */
 	public IFuture<Void> build(IInternalAccess ia)
 	{
@@ -230,7 +230,7 @@ public class APL
 	}
 	
 	/**
-	 * 
+	 *  Select candidates from the list of applicable plans.
 	 */
 	public List<Object> selectCandidates(MCapability mcapa)
 	{
@@ -253,7 +253,7 @@ public class APL
 	}
 	
 	/**
-	 * 
+	 *  Do build the apl by adding possible candidate plans.
 	 */
 	protected IFuture<List<Object>>	doBuild(IInternalAccess ia)
 	{
@@ -300,17 +300,18 @@ public class APL
 		if(goalprecandidates==null)
 		{
 			goalprecandidates = new ArrayList<MGoal>();
+			MCapability mcapa = (MCapability)ip.getCapability().getModelElement();
 			List<MGoal> mgoals = ((MCapability)ip.getCapability().getModelElement()).getGoals();
 			if(mgoals!=null)
 			{
 				for(int i=0; i<mgoals.size(); i++)
 				{
 					MGoal mgoal = mgoals.get(i);
-					List<ClassInfo> trgoals = mgoal.getTriggerGoals();
+					List<MGoal> trgoals = mgoal.getTriggerMGoals(mcapa);
 					
 					if(element instanceof RGoal && trgoals!=null)
 					{
-						if(trgoals.contains(element.getModelElement()))
+						if(trgoals.contains(((RGoal)element).getModelElement()))
 						{
 							goalprecandidates.add(mgoal);
 //							res.add(mplan);
@@ -320,9 +321,10 @@ public class APL
 			}
 		}
 
-		final CollectionResultListener<MPlan> lis = new CollectionResultListener<MPlan>(precandidates.size(), true, new IResultListener<Collection<MPlan>>()
+//		final CollectionResultListener<MPlan> lis = new CollectionResultListener<MPlan>(precandidates.size(), true, new IResultListener<Collection<MPlan>>()
+		final CollectionResultListener<Object> lis = new CollectionResultListener<Object>(precandidates.size()+goalprecandidates.size(), true, new IResultListener<Collection<Object>>()
 		{
-			public void resultAvailable(Collection<MPlan> result) 
+			public void resultAvailable(Collection<Object> result) 
 			{
 				ret.setResult(new ArrayList<Object>(result));
 			}
@@ -331,6 +333,12 @@ public class APL
 			{
 			}
 		});
+		
+		// add all goal types as they do not have preconditions (until now)
+		for(final MGoal mgoal: goalprecandidates)
+		{
+			lis.resultAvailable(mgoal);
+		}
 		
 		for(final MPlan mplan: precandidates)
 		{
@@ -488,7 +496,7 @@ public class APL
 	 */
 	protected static int getPriority(Object cand, MCapability mcapa)
 	{
-		MPlan mplan;
+		MPlan mplan = null;
 //		if(cand instanceof RWaitqueuePlan)
 //		{
 //			Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.waitqueuecandidate_has_plan);
@@ -502,12 +510,16 @@ public class APL
 		{
 			mplan = mcapa.getPlan(cand.getClass().getName());
 		}
-		else 
+		else if(cand instanceof MPlan)
 		{
 			mplan = (MPlan)cand;
 		}
-			
-		return mplan.getPriority();
+//		else if(cand instanceof MGoal)
+//		{
+//			mgoal = (MGoal)cand;
+//		}
+		
+		return mplan!=null? mplan.getPriority(): 0;
 	}
 
 	/**
@@ -538,7 +550,7 @@ public class APL
 	/**
 	 * 
 	 */
-	public void planFinished(RPlan rplan)
+	public void planFinished(IInternalPlan rplan)
 	{
 		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		String exclude = mpe.getExcludeMode();
@@ -556,12 +568,15 @@ public class APL
 		}
 		else
 		{
-			PlanLifecycleState state = rplan.getLifecycleState();
-			if(state.equals(RPlan.PlanLifecycleState.PASSED)
-				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)
-				|| (state.equals(RPlan.PlanLifecycleState.FAILED) 
-				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
+//			PlanLifecycleState state = rplan.getLifecycleState();
+			if((rplan.isPassed() && exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED))
+				|| (rplan.isFailed() && exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
 			{
+//			if(state.equals(RPlan.PlanLifecycleState.PASSED)
+//				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)
+//				|| (state.equals(RPlan.PlanLifecycleState.FAILED) 
+//				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
+//			{
 				candidates.remove(rplan.getCandidate());
 			}
 		}
