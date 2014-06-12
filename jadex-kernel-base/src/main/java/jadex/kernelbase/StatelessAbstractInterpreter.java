@@ -1000,7 +1000,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType().getType(getClassLoader(), getModel().getAllImports());
 					ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
 					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(getClassLoader(), getModel().getAllImports()), 
-						new ProvidedServiceImplementation(cs[i].getImplementation()), psi.getPublish());
+						new ProvidedServiceImplementation(cs[i].getImplementation()), cs[i].getPublish()!=null? cs[i].getPublish(): psi.getPublish());
 					sermap.put(key, newpsi);
 				}
 			}
