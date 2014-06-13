@@ -25,11 +25,11 @@ public interface IBpmnVisualModelReader
 	 *  @param emap Map of BPMN elements by ID.
 	 *  @param buffer Buffer map.
 	 */
-	public abstract void readElement(QName tag,
-									 Map<String, String> attrs,
-									 Map<String, String> laneparents,
-									 Map<String, MIdElement> emap,
-									 Map<String, Object> buffer);
+//	public abstract void readElement(QName tag,
+//									 Map<String, String> attrs,
+//									 Map<String, String> laneparents,
+//									 Map<String, MIdElement> emap,
+//									 Map<String, Object> buffer);
 	
 	/**
 	 *  Process the visual part of a standard BPMN shape.
