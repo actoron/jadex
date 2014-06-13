@@ -8,6 +8,7 @@ import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
 
@@ -23,6 +24,7 @@ import android.widget.Toast;
 /**
  * This Activity shows how to communicate with agents via Events.
  */
+@Reference
 public class EventDemoActivity extends JadexAndroidActivity
 {
 	//-------- attributes --------

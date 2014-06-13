@@ -5,6 +5,7 @@ import jadex.android.applications.demos.R;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
@@ -16,6 +17,7 @@ import android.widget.Button;
 /**
  * This Activity shows a sample BPMN Workflow beeing executed using Jadex.
  */
+@Reference
 public class BDIDemoActivity extends JadexAndroidActivity
 {
 	/** The Button to send a message to the agent **/

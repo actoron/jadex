@@ -5,11 +5,14 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
@@ -110,11 +113,11 @@ public class PojoAgentCreationAgent
 					Map<String, Object>	args	= new HashMap<String, Object>();
 					args.put("max", Integer.valueOf(max));
 					args.put("num", Integer.valueOf(num));
-					args.put("starttime", new Long(starttime));
-					args.put("startmem", new Long(startmem));
+					args.put("starttime", Long.valueOf(starttime));
+					args.put("startmem", Long.valueOf(startmem));
 					cms.createComponent(createPeerName(num+1, agent.getComponentIdentifier()),
 						PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-						new CreationInfo(args), null);
+						new CreationInfo(null, args, agent.getComponentDescription().getResourceIdentifier()), null);
 				}
 			});
 		}
@@ -158,11 +161,20 @@ public class PojoAgentCreationAgent
 									exta.scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("deletePeers")
-										public IFuture<Void> execute(IInternalAccess ia)
+										public IFuture<Void> execute(final IInternalAccess ia)
 										{
-											((PojoAgentCreationAgent)((PojoMicroAgent)ia).getPojoAgent())
-												.deletePeers(max, clock.getTime(), dur, pera, omem, upera);
-											return IFuture.DONE;
+											final Future<Void> ret = new Future<Void>();
+											ia.getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+											{
+												public void customResultAvailable(IClockService result)
+												{
+													((PojoAgentCreationAgent)((PojoMicroAgent)ia).getPojoAgent())
+														.deletePeers(max, result.getTime(), dur, pera, omem, upera);
+													ret.setResult(null);
+												}
+											});
+											return ret;
 										}
 									});
 								}

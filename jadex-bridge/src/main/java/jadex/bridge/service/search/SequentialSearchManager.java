@@ -236,8 +236,8 @@ public class SequentialSearchManager implements ISearchManager
 		
 //		final List<String>	search	= SEARCH.get();
 		
-		// Hack!!! Break call stack when it becomes too large.
-		if(callstack>1000)
+		// Hack!!! Break call stack when it becomes too large (limit ~150 for android devices?).	
+		if(callstack>100)
 		{
 			new Thread(new Runnable()
 			{
