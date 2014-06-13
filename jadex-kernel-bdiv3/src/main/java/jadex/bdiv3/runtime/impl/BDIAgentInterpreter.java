@@ -105,12 +105,7 @@ import java.util.StringTokenizer;
  *  - executing the enqueued steps
  */
 public class BDIAgentInterpreter extends MicroAgentInterpreter
-{
-	//-------- constants --------
-	
-	/** The capability separator. */
-	public static final String	CAPABILITY_SEPARATOR	= "/";
-	
+{	
 	//-------- attributes --------
 	
 	/** The bdi model. */
@@ -248,7 +243,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		Object	ret	= ((PojoBDIAgent)microagent).getPojoAgent();
 		if(name!=null)
 		{
-			StringTokenizer	stok	= new StringTokenizer(name, CAPABILITY_SEPARATOR);
+			StringTokenizer	stok	= new StringTokenizer(name, MElement.CAPABILITY_SEPARATOR);
 			while(stok.hasMoreTokens())
 			{
 				name	= stok.nextToken();
@@ -303,7 +298,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						if(source.equals(map.get(target)))
 						{
-							int	idx2	= target.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
+							int	idx2	= target.lastIndexOf(MElement.CAPABILITY_SEPARATOR);
 							String	capa2	= target.substring(0, idx2);
 							if(capa.equals(capa2))
 							{
@@ -376,7 +371,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		Future<Void>	ret	= new Future<Void>();
 		
-		int i	= info.getName()!=null ? info.getName().indexOf(CAPABILITY_SEPARATOR) : -1;
+		int i	= info.getName()!=null ? info.getName().indexOf(MElement.CAPABILITY_SEPARATOR) : -1;
 		Object	ocapa	= ((PojoBDIAgent)microagent).getPojoAgent();
 		String	capa	= null;
 		final IValueFetcher	oldfetcher	= getFetcher();
@@ -501,7 +496,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					Field	g	= agent.getClass().getDeclaredField("__globalname");
 					g.setAccessible(true);
 					globalname	= (String)g.get(agent);
-					globalname	= globalname==null ? f.getName() : globalname+CAPABILITY_SEPARATOR+f.getName();
+					globalname	= globalname==null ? f.getName() : globalname+MElement.CAPABILITY_SEPARATOR+f.getName();
 				}
 				catch(Exception e)
 				{
@@ -826,10 +821,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			if(evs!=null && !evs.isEmpty())
 			{
 				Object	ocapa	= agent;
-				int	i	= mbel.getName().indexOf(CAPABILITY_SEPARATOR);
+				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
 				if(i!=-1)
 				{
-					ocapa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)));
+					ocapa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
 				}
 				cap	= ocapa;
 
@@ -886,13 +881,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			
 			if(mbel.getUpdaterate()>0)
 			{
-				int	i	= mbel.getName().indexOf(CAPABILITY_SEPARATOR);
+				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
 				final String	name;
 				final Object	capa;
 				if(i!=-1)
 				{
-					capa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)));
-					name	= mbel.getName().substring(mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)+1); 
+					capa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
+					name	= mbel.getName().substring(mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)+1); 
 				}
 				else
 				{
@@ -1945,7 +1940,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		String	capaname	= null;
 		if(melement!=null)
 		{
-			int idx = melement.getName().lastIndexOf(CAPABILITY_SEPARATOR);
+			int idx = melement.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR);
 			if(idx!=-1)
 			{
 				capaname = melement.getName().substring(0, idx);
@@ -2035,7 +2030,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					String	source	= ((Event)anns[i][j]).value();
 					if(capaname!=null)
 					{
-						source	= capaname + CAPABILITY_SEPARATOR + source;
+						source	= capaname + MElement.CAPABILITY_SEPARATOR + source;
 					}
 					if(getBDIModel().getBeliefMappings().containsKey(source))
 					{
@@ -2587,7 +2582,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public static String getCapabilityPart(String name)
 	{
 		String ret = null;
-		int	idx = name.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
+		int	idx = name.lastIndexOf(MElement.CAPABILITY_SEPARATOR);
 		if(idx!=-1)
 		{
 			ret = name.substring(0, idx);
@@ -2608,7 +2603,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		if(idx==-1)
 		{	
-			idx = name.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
+			idx = name.lastIndexOf(MElement.CAPABILITY_SEPARATOR);
 		}
 		if(idx!=-1)
 		{	
@@ -2624,7 +2619,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		String capa = getCapabilityPart(name);
 		String pname = getNamePart(name);
-		return capa!=null? capa.replace(BDIAgentInterpreter.CAPABILITY_SEPARATOR, ".")+"."+pname: pname;
+		return capa!=null? capa.replace(MElement.CAPABILITY_SEPARATOR, ".")+"."+pname: pname;
 	}
 	
 	/**

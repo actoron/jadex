@@ -65,7 +65,7 @@ public class MGoal extends MClassBasedElement
 	protected long recurdelay;
 	
 	/** The procedual success flag. */
-	protected boolean succeedonpassed;
+	protected boolean orsuccess;
 	
 	/** The unique. */
 	protected boolean unique;
@@ -94,11 +94,11 @@ public class MGoal extends MClassBasedElement
 	protected Map<String, MethodInfo> srmappings;
 	
 	/**
-	 *  Create a new belief.
+	 *  Create a new goal model element.
 	 */
 	public MGoal(String name, String target, boolean posttoall, boolean randomselection, String excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
-		boolean succeedonpassed, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
+		boolean orsuccess, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
 		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings, List<ClassInfo> triggergoals)
 	{
 		super(name, target, posttoall, randomselection, excludemode);
@@ -106,7 +106,7 @@ public class MGoal extends MClassBasedElement
 		this.recur = recur;
 		this.retrydelay = retrydelay;
 		this.recurdelay = recurdelay;
-		this.succeedonpassed = succeedonpassed;
+		this.orsuccess = orsuccess;
 		this.unique = unique;
 		this.deliberation = deliberation;
 		this.parameters = parameters;
@@ -154,21 +154,21 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
-	 *  Get the succeed on passed.
-	 *  @return The succeedonpassed.
+	 *  Get the flag if is or success.
+	 *  @return The or success flag..
 	 */
-	public boolean isSucceedOnPassed()
+	public boolean isOrSuccess()
 	{
-		return succeedonpassed;
+		return orsuccess;
 	}
 
 	/**
-	 *  Set the succeed on passed.
-	 *  @param succeedonpassed The succeedonpassed to set.
+	 *  Set the or success.
+	 *  @param orsuccess The or success flag..
 	 */
-	public void setSucceedOnPassed(boolean succeedonpassed)
+	public void setOrSuccess(boolean orsuccess)
 	{
-		this.succeedonpassed = succeedonpassed;
+		this.orsuccess = orsuccess;
 	}
 
 	/**

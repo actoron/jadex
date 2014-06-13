@@ -70,8 +70,8 @@ public class MParameter extends MElement
 	 */
 	public Object getValue(BDIAgentInterpreter bai)
 	{
-		String	capaname	= getName().indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
-			? null : getName().substring(0, getName().lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
+		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
+			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
 		return getValue(bai.getCapabilityObject(capaname), bai.getClassLoader());
 	}
 

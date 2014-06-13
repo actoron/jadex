@@ -92,7 +92,7 @@ public class MovementCapability
 	 *  The walk goal.
 	 *  Walk around without target when nothing else to do.
 	 */
-	@Goal(succeedonpassed=false, excludemode=ExcludeMode.Never)
+	@Goal(orsuccess=false, excludemode=ExcludeMode.Never)
 	public class WalkAround
 	{
 		/**

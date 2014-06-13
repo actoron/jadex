@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.model.MElement;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.sensor.service.IMethodInvocationListener;
@@ -131,7 +132,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IService getProvidedService(String name)
 	{
-		return interpreter.getServiceContainer().getProvidedService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
+		return interpreter.getServiceContainer().getProvidedService(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name);
 	}
 	
 	/**
@@ -167,7 +168,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name)
 	{
-		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
+		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name);
 	}
 
 	/**
@@ -177,7 +178,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public ITerminableIntermediateFuture getRequiredServices(String name)
 	{
-		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
+		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name);
 	}
 	
 	/**
@@ -186,7 +187,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
-		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
+		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name);
 	}
 	
 	/**
@@ -195,7 +196,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
-		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind);
+		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, rebind);
 	}
 	
 	/**
@@ -204,7 +205,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name, boolean rebind, IRemoteFilter filter)
 	{
-		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind, filter);
+		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, rebind, filter);
 	}
 	
 	/**
@@ -213,7 +214,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IRemoteFilter filter)
 	{
-		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind, filter);
+		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, rebind, filter);
 	}
 	
 	/**

@@ -33,6 +33,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
@@ -240,9 +241,9 @@ public class BDIClassReader extends MicroClassReader
 							String	target	= mapping.target().equals("") ? source : mapping.target();
 							if(cap.getCapability().getBelief(target)==null)
 							{
-								throw new RuntimeException("No such belief for mapping from "+source+" to "+fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target);
+								throw new RuntimeException("No such belief for mapping from "+source+" to "+fields[i].getName()+MElement.CAPABILITY_SEPARATOR+target);
 							}
-							bdimodel.addBeliefMapping(fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping
+							bdimodel.addBeliefMapping(fields[i].getName()+MElement.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping
 						}
 						
 						bdimodel.addSubcapability(new FieldInfo(fields[i]), cap);
@@ -266,12 +267,12 @@ public class BDIClassReader extends MicroClassReader
 
 			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
 			{
-				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish());
+				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish());
 				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
 			}
 			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
 			{
-				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding(), rsi.getNFRProperties());
+				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+MElement.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding(), rsi.getNFRProperties());
 				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
 			}
 			
@@ -295,21 +296,21 @@ public class BDIClassReader extends MicroClassReader
 					bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
 					bel2.setSetter(bel.getSetter());
 				}
-				bel2.setName(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+bel.getName());
+				bel2.setName(name+MElement.CAPABILITY_SEPARATOR+bel.getName());
 				
 				bdimodel.getCapability().addBelief(bel2);
 			}
 			
 			for(String target: capa.getBeliefMappings().keySet())
 			{
-				bdimodel.addBeliefMapping(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target, name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
+				bdimodel.addBeliefMapping(name+MElement.CAPABILITY_SEPARATOR+target, name+MElement.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
 			}
 			
 			for(MGoal goal: capa.getCapability().getGoals())
 			{
-				MGoal goal2	= new MGoal(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
+				MGoal goal2	= new MGoal(name+MElement.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
 					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
-					goal.getRetryDelay(), goal.getRecurDelay(), goal.isSucceedOnPassed(), goal.isUnique(), goal.getDeliberation(), goal.getParameters(),
+					goal.getRetryDelay(), goal.getRecurDelay(), goal.isOrSuccess(), goal.isUnique(), goal.getDeliberation(), goal.getParameters(),
 					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), new ArrayList<ClassInfo>(goal.getTriggerGoals())); // clone params?
 						
 				// Convert goal condition events
@@ -333,7 +334,7 @@ public class BDIClassReader extends MicroClassReader
 			
 			for(MPlan plan : capa.getCapability().getPlans())
 			{
-				MPlan plan2	= new MPlan(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
+				MPlan plan2	= new MPlan(name+MElement.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
 					copyTrigger(bdimodel, name, plan.getTrigger()), copyTrigger(bdimodel, name, plan.getWaitqueue()),
 					plan.getPriority());
 				bdimodel.getCapability().addPlan(plan2);
@@ -646,7 +647,7 @@ public class BDIClassReader extends MicroClassReader
 			{
 				for(String event: trigger.getFactAddeds())
 				{
-					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+event;
 					trigger2.addFactAdded(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
 				}
 			}
@@ -654,7 +655,7 @@ public class BDIClassReader extends MicroClassReader
 			{
 				for(String event: trigger.getFactChangeds())
 				{
-					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+event;
 					trigger2.addFactChangeds(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
 				}
 			}
@@ -662,7 +663,7 @@ public class BDIClassReader extends MicroClassReader
 			{
 				for(String event: trigger.getFactRemoveds())
 				{
-					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+event;
 					trigger2.addFactRemoved(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
 				}
 			}
@@ -670,7 +671,7 @@ public class BDIClassReader extends MicroClassReader
 			{
 				for(MGoal goal: trigger.getGoals())
 				{
-					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName();
+					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+goal.getName();
 					trigger2.addGoal(bdimodel.getCapability().getGoal(mapped));
 				}
 			}
@@ -678,7 +679,7 @@ public class BDIClassReader extends MicroClassReader
 			{
 				for(MGoal goal: trigger.getGoalFinisheds())
 				{
-					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName();
+					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+goal.getName();
 					trigger2.addGoalFinished(bdimodel.getCapability().getGoal(mapped));
 				}
 			}
@@ -686,7 +687,7 @@ public class BDIClassReader extends MicroClassReader
 			{
 				for(MServiceCall ser: trigger.getServices())
 				{
-					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+ser.getName();
+					String	mapped	= capa+MElement.CAPABILITY_SEPARATOR+ser.getName();
 					trigger2.addService(bdimodel.getCapability().getService(mapped));
 				}
 			}
@@ -703,7 +704,7 @@ public class BDIClassReader extends MicroClassReader
 		List<String>	events	= new ArrayList<String>();
 		for(String event: evs)
 		{
-			String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+			String	mapped	= name+MElement.CAPABILITY_SEPARATOR+event;
 			events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
 		}
 		return events;
@@ -718,7 +719,7 @@ public class BDIClassReader extends MicroClassReader
 		for(EventType event: evs)
 		{
 			String[]	types	= event.getTypes().clone();
-			String	mapped = name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+types[types.length-1];
+			String	mapped = name+MElement.CAPABILITY_SEPARATOR+types[types.length-1];
 			types[types.length-1]	= bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped;
 			events.add(new EventType(types));
 		}
@@ -1061,7 +1062,7 @@ public class BDIClassReader extends MicroClassReader
 		}
 		
 		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode().getString(), 
-			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.succeedonpassed(), goal.unique(), mdel, params,
+			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.orsuccess(), goal.unique(), mdel, params,
 			spmappings.size()>0? spmappings: null, srmappings.size()>0? srmappings: null, triggergoals);
 		
 		jadex.bdiv3.annotation.Publish pub = goal.publish();
