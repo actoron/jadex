@@ -256,6 +256,7 @@
 			</properties>
 			<modules>
 <!-- 				Modules required for integration test -->
+				<module>jadex-android-maven-plugin</module>
 				<module>jadex-android-integration-test</module>
 				<module>jadex-android-testlauncher</module>
 			</modules>
