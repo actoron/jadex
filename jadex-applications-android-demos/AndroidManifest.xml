@@ -14,6 +14,7 @@
 			</intent-filter>
 		</activity>
 		<activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter"></activity>
+		<activity android:name="jadex.android.controlcenter.componentViewer.ComponentViewer"></activity>
 		<service android:name="jadex.android.service.JadexPlatformService" android:label="JadexPlatformService"></service>
 		<activity android:name=".event.EventDemoActivity"></activity>
 		<activity android:name=".benchmark.BenchmarkDemoActivity"></activity>

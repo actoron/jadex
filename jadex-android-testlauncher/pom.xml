@@ -88,6 +88,7 @@
 				<includes>
 					<include>**/*.xml</include>
 					<include>**/*.bpmn</include>
+					<include>**/*.bpmn2</include>
 				</includes>
 			</resource>
 		</resources>
@@ -108,12 +109,12 @@
 							<source>
 								<![CDATA[
 								println "Copying tests ..."
-								def dir = "${project.basedir}"
+								def dir = project.basedir.absolutePath.replace('\\','/');
 								def ln = System.getProperty('line.separator')
 
 								def path = dir + "/../jadex-platform-standalone-launch/src/test/java/"
 								def f = new File(path);
-								print "checking " + path + "... ";
+								println "checking " + path + "... ";
 
 								def target = new File(dir + "/target/generated-sources/tests/");
 								if (!target.exists()) {
