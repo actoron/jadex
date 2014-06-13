@@ -9,8 +9,6 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
-import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -222,7 +220,7 @@ public class APL
 	//-------- helper methods --------
 
 	/**
-	 * 
+	 *  Test if APL has more candidates.
 	 */
 	public boolean isEmpty()
 	{
@@ -548,7 +546,7 @@ public class APL
 	}
 	
 	/**
-	 * 
+	 *  After plan has finished the candidate will be removed from the APL.
 	 */
 	public void planFinished(IInternalPlan rplan)
 	{

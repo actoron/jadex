@@ -4,6 +4,8 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -31,10 +33,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ *  Goal instance implementation.
  */
 public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 {
+	//-------- attributes --------
+	
 	/** The lifecycle state. */
 	protected GoalLifecycleState lifecyclestate;
 
@@ -53,6 +57,8 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 
 	/** The internal access. */
 	protected IInternalAccess ia;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new rgoal. 
@@ -78,8 +84,10 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 		this.processingstate = GoalProcessingState.IDLE;
 	}
 
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Adopt a goal so that the agent tries pursuing it.
 	 */
 	public static void adoptGoal(RGoal rgoal, IInternalAccess ia)
 	{
@@ -726,11 +734,44 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 		boolean ret = false;
 		
 		// todo: perform goals
-		if(isProceduralGoal() && getMGoal().isSucceedOnPassed() 
-			&& getTriedPlans()!=null && !getTriedPlans().isEmpty())
+		if(isProceduralGoal() && getTriedPlans()!=null && !getTriedPlans().isEmpty())
 		{
-			IInternalPlan rplan = getTriedPlans().get(getTriedPlans().size()-1);
-			ret = rplan.isPassed();
+			// OR case
+			if(getMGoal().isOrSuccess())
+			{
+				IInternalPlan rplan = getTriedPlans().get(getTriedPlans().size()-1);
+				ret = rplan.isPassed();
+			}
+			// AND case
+			else
+			{
+				MCapability mcapa = getInterpreter().getBDIModel().getCapability();
+				
+				String capaname = getMGoal().getCapabilityName();
+				if(capaname!=null)
+				{
+					mcapa = getInterpreter().getBDIModel().getCapability(capaname);
+				}
+				
+				// No further candidate? Then is considered as succeeded
+				// todo: is it sufficient that one plan has succeeded or all?
+				// todo: what to do when rebuild?
+				if(getApplicablePlanList().isEmpty())
+				{
+					List<IInternalPlan> tps = getTriedPlans();
+					if(tps!=null && !tps.isEmpty())
+					{
+						for(IInternalPlan plan: tps)
+						{
+							if(plan.isPassed())
+							{
+								ret = true;
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
 		
 		return ret;
