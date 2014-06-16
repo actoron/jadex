@@ -23,6 +23,7 @@
 		<munge-generated-sources-dir>src/gen/java</munge-generated-sources-dir>
 	</properties>
 	
+	<!-- 
 	<repositories>
 		<repository>
 			<id>jadex-android</id>
@@ -42,7 +43,8 @@
 			<url>http://jadex.julakali.org/nexus/content/repositories/jadex-public-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
-
+	-->
+	
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
 		<!-- and remove the JRE from eclipse build path. -->
