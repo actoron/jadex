@@ -136,7 +136,7 @@ public class SBpmnModelReader
 			reader = (IStaxReaderWrapper) con.newInstance(new Object[] { in });
 		}
 		
-		LinkedList<XmlTag> tagstack = new LinkedList<XmlTag>();
+//		LinkedList<XmlTag> tagstack = new LinkedList<XmlTag>();
 		LinkedList<Map<String, String>> attrstack = new LinkedList<Map<String,String>>();
 		LinkedList<String> contentstack = new LinkedList<String>();
 		
@@ -189,7 +189,7 @@ public class SBpmnModelReader
 		    {
 		    	text = null;
 		    	
-		    	tagstack.push(reader.getXmlTag());
+//		    	tagstack.push(reader.getXmlTag());
 		    	
 //		    	Map<String, String> attrs = null;
 //		    	if (reader.getAttributeCount() > 0)
@@ -231,13 +231,13 @@ public class SBpmnModelReader
 		    	text = text != null? XmlUtil.unescapeString(text) : null;
 		    	contentstack.push(text);
 		    	text = null;
-		    	
-		    	if ("extension".equals(reader.getXmlTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
+		    	if (reader.getXmlTag() != null && "extension".equals(reader.getXmlTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
 	    		{
 	    			buffer.remove("extension");
 	    		}
 		    	
-		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, tagstack.pop(), tagstack, attrstack.pop(), contentstack.pop(), buffer, vreader);
+//		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, tagstack.pop(), tagstack, attrstack.pop(), contentstack.pop(), buffer, vreader);
+		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, reader.getClosedTag(), reader.getXmlTagStack(), attrstack.pop(), contentstack.pop(), buffer, vreader);
 		    }
 		}
 		
@@ -713,7 +713,6 @@ public class SBpmnModelReader
 												   Map<String, MIdElement> emap)
 	{
 		ClassLoader cl = model.getClassLoader();
-		
 //		if(tag.getLocalPart().equals("class"))
 //		{
 //			System.out.println("tagstack: "+tagstack);
