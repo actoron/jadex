@@ -1,9 +1,9 @@
 package jadex.commons.gui.future;
 
+import jadex.commons.SReflect;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.gui.SGUI;
 
 import java.util.Collection;
 
@@ -46,7 +46,7 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 		{
 			customResultAvailable(result);			
 		}
@@ -71,7 +71,7 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 //		exception.printStackTrace();
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
 			customExceptionOccurred(exception);			
@@ -96,7 +96,7 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 		{
 			customIntermediateResultAvailable(result);			
 		}
@@ -123,7 +123,7 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
     {
     	// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 		{
 			customFinished();
 		}
@@ -208,7 +208,7 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
 			customCommandAvailable(command);			

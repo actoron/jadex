@@ -287,7 +287,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testByteArray() throws Exception
 	{
-		byte[] data = "hello world".getBytes(Charset.forName("UTF-8"));
+		byte[] data = "hello world".getBytes("UTF-8");
 		
 		doWriteAndRead(data, new Comparator()
 		{
@@ -303,7 +303,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testBByteArray() throws Exception
 	{
-		byte[] tmp = "hello world".getBytes(Charset.forName("UTF-8"));
+		byte[] tmp = "hello world".getBytes("UTF-8");
 		Byte[] data = new Byte[tmp.length];
 		for(int i=0; i<tmp.length; i++)
 			data[i] = Byte.valueOf(tmp[i]);

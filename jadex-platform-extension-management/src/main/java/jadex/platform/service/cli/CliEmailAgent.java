@@ -33,7 +33,6 @@ import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -229,7 +228,7 @@ public class CliEmailAgent
 							final List<byte[]> authdata = new ArrayList<byte[]>();
 							for(int i=2; i<dgs.size(); i++)
 							{
-								byte[] dec = Base64.decode(dgs.get(i).getBytes(Charset.forName("UTF-8")));
+								byte[] dec = Base64.decode(dgs.get(i).getBytes("UTF-8"));
 								authdata.add(dec);
 	//							System.out.println("authdata: "+SUtil.arrayToString(dec));
 							}

@@ -79,6 +79,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Proxy;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -2350,10 +2351,24 @@ public class MessageService extends BasicService implements IMessageService
 														{
 															byte[]	tmp = new byte[3000];
 															System.arraycopy(value, 0, tmp, 0, tmp.length);
-															logger.info("ContentException: "+((byte[])value).length+", "+fmessage+", "+new String(tmp, Charset.forName("UTF-8")));
+															try
+															{
+																logger.info("ContentException: "+((byte[])value).length+", "+fmessage+", "+new String(tmp, "UTF-8"));
+															}
+															catch(UnsupportedEncodingException e1)
+															{
+																throw new RuntimeException(e1);
+															}
 															value	= tmp;
 														}
-														e = new ContentException(new String((byte[])value, Charset.forName("UTF-8")), e);
+														try
+														{
+															e = new ContentException(new String((byte[])value, "UTF-8"), e);
+														}
+														catch(UnsupportedEncodingException e1)
+														{
+															throw new RuntimeException(e1);
+														}
 													}
 													fmessage.put(name, e);
 												}
@@ -2361,7 +2376,14 @@ public class MessageService extends BasicService implements IMessageService
 											
 											if(fmessage.get(name) instanceof byte[])
 											{
-												System.out.println("sfjkdghfkld\n"+new String((byte[])fmessage.get(name), Charset.forName("UTF-8")));
+												try
+												{
+													System.out.println("sfjkdghfkld\n"+new String((byte[])fmessage.get(name), "UTF-8"));
+												}
+												catch(UnsupportedEncodingException e)
+												{
+													throw new RuntimeException(e);
+												}
 											}
 										}
 									}

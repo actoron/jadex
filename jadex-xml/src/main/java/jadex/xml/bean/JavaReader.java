@@ -385,7 +385,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						byte[] bytes = Base64.decode(((String)rawattributes.get("content")).getBytes(Charset.forName("UTF-8")));
+						byte[] bytes = Base64.decode(((String)rawattributes.get("content")).getBytes("UTF-8"));
 						return Byte.valueOf(bytes[0]);
 					}
 				}),

@@ -48,14 +48,13 @@ public class TestCodec implements IContentCodec, Serializable
 	 */
 	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info, IErrorReporter rep)
 	{
-		return "97".equals(new String(val, Charset.forName("UTF-8"))) ? Integer.valueOf(98) : Integer.valueOf(96);
-//		try
-//		{
-//			return Integer.valueOf(val);
-//		}
-//		catch(Exception e)
-//		{
-//			throw new RuntimeException("Decode error, no integer: "+val);
-//		}
+		try
+		{
+			return "97".equals(new String(val, "UTF-8")) ? Integer.valueOf(98) : Integer.valueOf(96);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 }

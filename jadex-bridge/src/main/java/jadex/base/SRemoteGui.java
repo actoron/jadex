@@ -1240,7 +1240,7 @@ public class SRemoteGui
 			{
 				try
 				{
-					SUtil.getOutForSystemIn().write(txt.getBytes(Charset.defaultCharset()));
+					SUtil.getOutForSystemIn().write(txt.getBytes(Charset.defaultCharset().name()));
 				}
 				catch(IOException e)
 				{

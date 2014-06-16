@@ -88,32 +88,6 @@ public class SGUI
 	/** This property can be set on components to be automatically adjusted to equal sizes. */
 	public static final String	AUTO_ADJUST	= "auto-adjust";
 	
-	/** This is set to true if the VM has a working GUI environment available. */
-	public static final boolean HAS_GUI;
-	static
-	{
-		boolean	hasgui;
-		if (SReflect.isAndroid()) 
-		{
-			hasgui = false;
-		} 
-		else 
-		{
-			try
-			{
-				hasgui = !(GraphicsEnvironment.isHeadless() ||
-						 	  GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length < 1);
-			}
-			catch(Error e)
-			{
-				// On system misconfigurations, Java throws an Error (grr).
-				hasgui = false;
-			}
-		}
-		HAS_GUI	= hasgui;
-	}
-		
-	
 	//-------- methods --------
 
 	/**

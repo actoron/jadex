@@ -136,6 +136,8 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	@SuppressWarnings("resource")
 	public void execute() throws MojoExecutionException, MojoFailureException
 	{
+		getLog().info("Generating BDI V3 Agents...");
+		
 		modelLoader = new MavenBDIModelLoader();
 		gen = new ByteKeepingASMBDIClassGenerator();
 		modelLoader.setGenerator(gen);
@@ -212,7 +214,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			throw new MojoExecutionException(e.getMessage());
+			throw new MojoExecutionException(e.toString());
 		}
 
 	}

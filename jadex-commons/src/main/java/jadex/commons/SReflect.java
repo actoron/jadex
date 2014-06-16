@@ -8,6 +8,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Array;
@@ -67,6 +68,9 @@ public class SReflect
 	/** String convertable types. */
 	protected static final Set convertabletypes;
 	
+	/** This is set to true if the VM has a working GUI environment available. */
+	public static final boolean HAS_GUI	= !isAndroid() && SNonAndroid.hasGui();
+	
 	static
 	{
 		basictypes	= Collections.synchronizedMap(new HashMap());
@@ -108,7 +112,7 @@ public class SReflect
 		convertabletypes.add(char.class);
 		convertabletypes.add(Character.class);
 	}
-	
+
 	//-------- methods --------
 	
 	/**

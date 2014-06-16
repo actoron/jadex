@@ -44,7 +44,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.SGUI;
 
 import java.io.File;
 import java.io.IOException;
@@ -994,7 +993,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																	
 																	activatedkernels.add(kernelmodel);
 																	
-																	if(SGUI.HAS_GUI)
+																	if(SReflect.HAS_GUI)
 																	{
 																		final IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
 																		{
