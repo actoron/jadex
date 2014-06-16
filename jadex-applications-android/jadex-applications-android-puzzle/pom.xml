@@ -158,15 +158,9 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											net.sourceforge.jadex
-										</groupId>
-										<artifactId>
-											jadex-android-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.0-SNAPSHOT,)
-										</versionRange>
+										<groupId>net.sourceforge.jadex</groupId>
+										<artifactId>jadex-android-maven-plugin</artifactId>
+										<version>{$project.version}</version>
 										<goals>
 											<goal>generateBDI</goal>
 										</goals>
