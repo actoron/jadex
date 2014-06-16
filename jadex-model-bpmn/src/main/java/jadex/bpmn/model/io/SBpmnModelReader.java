@@ -231,7 +231,7 @@ public class SBpmnModelReader
 		    	text = text != null? XmlUtil.unescapeString(text) : null;
 		    	contentstack.push(text);
 		    	text = null;
-		    	if (reader.getXmlTag() != null && "extension".equals(reader.getXmlTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
+		    	if (reader.getXmlTag() != null && "extension".equals(reader.getClosedTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
 	    		{
 	    			buffer.remove("extension");
 	    		}
