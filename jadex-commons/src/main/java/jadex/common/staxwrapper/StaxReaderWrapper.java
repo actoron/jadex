@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -25,7 +26,10 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 	protected XMLStreamReader reader;
 	
 	/** The current tag. */
-	protected XmlTag tag;
+	protected LinkedList<XmlTag> tagstack = new LinkedList<XmlTag>();
+	
+	/** The last tag that was closed. */
+	protected XmlTag closedtag;
 	
 	/** The current attributes. */
 	Map<String, String> attrs;
@@ -83,13 +87,21 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 			if (reader.getEventType() == XMLStreamConstants.START_ELEMENT && reader.getName() != null)
 			{
 				QName qname = reader.getName();
-				tag = new XmlTag(qname.getNamespaceURI(), qname.getLocalPart());
+				tagstack.push(new XmlTag(qname.getNamespaceURI(), qname.getLocalPart()));
 			}
-//			else
-//			{
-//				tag = null;
-//			}
 			
+			if (reader.getEventType() == XMLStreamConstants.END_ELEMENT && reader.getName() != null)
+			{
+				XmlTag tag = tagstack.peek();
+				if (tag != null)
+				{
+					if (tag.getNamespace().equals(reader.getName().getNamespaceURI()) &&
+						tag.getLocalPart().equals(reader.getLocalName()))
+					{
+						closedtag = tagstack.pop();
+					}
+				}
+			}
 	    	
 	    	if (reader.getEventType() == XMLStreamConstants.START_ELEMENT &&
 	    		reader.getAttributeCount() > 0)
@@ -118,7 +130,27 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 	 */
 	public XmlTag getXmlTag()
 	{
-		return tag;
+		return tagstack.peek();
+	}
+	
+	/**
+	 *  Get the XML tag struct of the last closed tag.
+	 *  
+	 *  @return Struct defining the tag.
+	 */
+	public XmlTag getClosedTag()
+	{
+		return closedtag;
+	}
+	
+	/**
+	 *  Get the XML tag stack.
+	 *  
+	 *  @return Stack defining the tags.
+	 */
+	public LinkedList<XmlTag> getXmlTagStack()
+	{
+		return tagstack;
 	}
 	
 	/**

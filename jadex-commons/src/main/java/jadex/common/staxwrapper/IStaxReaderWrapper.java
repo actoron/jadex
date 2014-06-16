@@ -1,5 +1,6 @@
 package jadex.common.staxwrapper;
 
+import java.util.LinkedList;
 import java.util.Map;
 
 public interface IStaxReaderWrapper
@@ -29,6 +30,20 @@ public interface IStaxReaderWrapper
 	 *  @return Struct defining the tag.
 	 */
 	public XmlTag getXmlTag();
+	
+	/**
+	 *  Get the XML tag struct of the last closed tag.
+	 *  
+	 *  @return Struct defining the tag.
+	 */
+	public XmlTag getClosedTag();
+	
+	/**
+	 *  Get the XML tag stack.
+	 *  
+	 *  @return Stack defining the tags.
+	 */
+	public LinkedList<XmlTag> getXmlTagStack();
 	
 	/**
 	 *  Returns the attributes.

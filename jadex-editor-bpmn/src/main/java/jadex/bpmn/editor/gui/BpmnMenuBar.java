@@ -468,6 +468,17 @@ public class BpmnMenuBar extends JMenuBar
 					try
 					{
 						File file = fc.getSelectedFile();
+						
+						for (int i = 0; i < editorwindow.getTabPane().getTabCount(); ++i)
+						{
+							BpmnEditorPanel panel = (BpmnEditorPanel) editorwindow.getTabPane().getComponentAt(i);
+							if (file.equals(panel.getModelContainer().getFile()))
+							{
+								editorwindow.getTabPane().setSelectedIndex(i);
+								return;
+							}
+						}
+						
 						editorwindow.loadModel(file);
 					}
 					catch (Exception e1)
