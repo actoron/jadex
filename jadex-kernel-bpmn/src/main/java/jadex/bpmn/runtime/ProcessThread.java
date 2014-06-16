@@ -845,7 +845,7 @@ public class ProcessThread	implements ITaskContext
 									if (getActivity().getParameters() == null ||
 										getActivity().getParameters().get(pname) == null ||
 										getActivity().getParameters().get(pname).getInitialValueString() == null ||
-										getActivity().getParameters().get(pname).getInitialValueString().isEmpty())
+										getActivity().getParameters().get(pname).getInitialValueString().length()==0)
 									{
 										throw new RuntimeException("Could not find data edge value for: "+de.getId());
 									}
