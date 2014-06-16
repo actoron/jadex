@@ -37,8 +37,17 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 		this.cinfo	= cinfo;
 	}
 	
+	/**
+	 *  Get the component access.
+	 */
+	public IInternalAccess getComponent()
+	{
+		return component;
+	}
+	
 	//-------- IComponentFeature interface / type level --------
 	
+
 	/**
 	 *  Get the predecessors, i.e. features that should be inited first.
 	 */

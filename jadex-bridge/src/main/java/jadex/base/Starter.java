@@ -182,28 +182,44 @@ public class Starter
 	/**
 	 *  Unescape a string.
 	 */
-   	protected static String        unescape(String str)
+   	protected static String unescape(String str)
     {
     	StringBuffer	buf	= new StringBuffer(str);
     	int	idx	= buf.indexOf("\\");
     	while(idx!=-1 && buf.length()>idx+1)
     	{
     		if(buf.charAt(idx+1)=='b')
+    		{
     			buf.replace(idx, idx+2, "\b");
+    		}
     		else if(buf.charAt(idx+1)=='t')
+    		{
     			buf.replace(idx, idx+2, "\t");
+    		}
     		else if(buf.charAt(idx+1)=='n')
+    		{
     			buf.replace(idx, idx+2, "\n");
+    		}
     		else if(buf.charAt(idx+1)=='f')
+    		{
     			buf.replace(idx, idx+2, "\f");
+    		}
     		else if(buf.charAt(idx+1)=='r')
+    		{
     			buf.replace(idx, idx+2, "\r");
+    		}
     		else if(buf.charAt(idx+1)=='"')
+    		{
     			buf.replace(idx, idx+2, "\"");
+    		}
     		else if(buf.charAt(idx+1)=='\'')
+    		{
     			buf.replace(idx, idx+2, "'");
+    		}
     		else if(buf.charAt(idx+1)=='\\')
+    		{
     			buf.replace(idx, idx+2, "\\");
+    		}
     		
         	idx	= buf.indexOf("\\", idx+1);
     	}
