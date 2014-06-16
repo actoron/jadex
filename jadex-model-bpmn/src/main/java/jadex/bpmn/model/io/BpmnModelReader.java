@@ -119,7 +119,7 @@ public class BpmnModelReader
 		types.add(type);
 		
 		type = createTypeInfo(String.class,
-							  new FirstPassPostProcessor()
+							  new IPostProcessor()
 							  {
 							      public Object postProcess(IContext context, Object object)
 							      {
@@ -128,6 +128,11 @@ public class BpmnModelReader
 							    	  rc.getFlowRefs().add((String) object);
 							    	  return IPostProcessor.DISCARD_OBJECT;
 							      }
+							      
+							    public int getPass()
+							    {
+							    	return 0;
+							    }
 							  },
 							  semuri,
 							  "flowNodeRef",
@@ -160,7 +165,7 @@ public class BpmnModelReader
 		types.add(type);
 		
 		type = createTypeInfo(MParameter.class,
-				new FirstPassPostProcessor()
+				new IPostProcessor()
 				{
 					public Object postProcess(IContext context, Object object)
 					{
@@ -168,6 +173,11 @@ public class BpmnModelReader
 						param.getInitialValue().setName(param.getName());
 						param.getInitialValue().getClazz().setTypeName(param.getClazz().getTypeName());
 						return object;
+					}
+					
+					public int getPass()
+					{
+						return 0;
 					}
 				},
 				exturi, "parameter",
@@ -318,7 +328,7 @@ public class BpmnModelReader
 	 *  Post processor which puts all elements in the element map.
 	 *
 	 */
-	protected static class ElementMapper extends FirstPassPostProcessor
+	protected static class ElementMapper implements IPostProcessor
 	{
 		/**
 		 *  Processes the element.
@@ -334,6 +344,14 @@ public class BpmnModelReader
 			}
 			
 			return object;
+		}
+
+		/**
+		 *  Pass.
+		 */
+		public int getPass()
+		{
+			return 0;
 		}
 	}
 	
