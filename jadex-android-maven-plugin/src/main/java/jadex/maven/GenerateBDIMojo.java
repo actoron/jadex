@@ -360,7 +360,10 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			{
 				inZip.close();
 			}
-			fos.close();
+			if(fos!=null)
+			{
+				fos.close();
+			}
 			fos = null;
 		}
 		catch (IOException e)
