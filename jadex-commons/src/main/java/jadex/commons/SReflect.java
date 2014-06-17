@@ -1906,7 +1906,16 @@ public class SReflect
 	{
 		if(isAndroid==null)
 		{
-			isAndroid	= Boolean.valueOf(classForName0("android.app.Activity", SReflect.class.getClassLoader())!=null);
+			try
+			{
+				SReflect.class.getClassLoader().loadClass("android.app.Activity");
+				isAndroid = Boolean.TRUE;
+			}
+			catch(Exception e)
+			{
+				isAndroid = Boolean.FALSE;
+			}
+//			isAndroid	= Boolean.valueOf(classForName0("android.app.Activity", SReflect.class.getClassLoader())!=null);
 		}
 		return isAndroid.booleanValue();
 	}
