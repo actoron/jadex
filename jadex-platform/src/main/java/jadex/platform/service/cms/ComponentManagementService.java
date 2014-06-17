@@ -562,8 +562,8 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 																	final ComponentIdentifier cid;
 																	
-//																	final IComponentAdapter pad = getParentAdapter(cinfo);
-																	IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
+																	final IPlatformComponentAccess pad = getParentAdapter(cinfo);
+																	IExternalAccess parent = pad.getInternalAccess().getExternalAccess();
 					
 																	IComponentIdentifier pacid = parent.getComponentIdentifier();
 																	String paname = pacid.getName().replace('@', '.');
@@ -590,7 +590,7 @@ public class ComponentManagementService implements IComponentManagementService
 //																		cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname, addresses, lmodel.getName());
 //																	}
 																	
-																	initinfos.put(cid, new InitInfo(null, null, cinfo, null, resfut, null));
+																	initinfos.put(cid, new InitInfo(null, null, cinfo, null, resfut));
 																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
@@ -622,7 +622,7 @@ public class ComponentManagementService implements IComponentManagementService
 																			logger.info("Started component: "+cid.getName());
 																			
 																			// Create the component instance.
-//																			final IComponentAdapter adapter;
+																			final IPlatformComponentAccess adapter;
 																			
 		//																	System.out.println("created: "+ad);
 																			
@@ -872,7 +872,7 @@ public class ComponentManagementService implements IComponentManagementService
 							// Try to find file for local type.
 							String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
 							filename	= null;
-//							IComponentAdapter pad = getParentAdapter(cinfo);
+							IComponentAdapter pad = getParentAdapter(cinfo);
 							IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
 							final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
 							for(int i=0; filename==null && i<subcomps.length; i++)
@@ -1148,29 +1148,29 @@ public class ComponentManagementService implements IComponentManagementService
 		return getInitInfo(paid);
 	}
 	
-//	/**
-//	 *  Get the adapter of the parent component.
-//	 */
-//	protected IComponentAdapter getParentAdapter(CreationInfo cinfo)
-//	{
-//		final IComponentIdentifier paid = getParentIdentifier(cinfo);
-//		IComponentAdapter adapter;
-//		adapter = (IComponentAdapter)adapters.get(paid);
-//		if(adapter==null)
-//		{
-//			InitInfo	pinfo = getParentInfo(cinfo);
-//			
-//			// Hack!!! happens when parent is killed while trying to create subcomponent (todo: integrate locking for destroy and create of component structure)
-//			if(pinfo==null)
-//			{
-//				throw new ComponentTerminatedException(paid);
-//			}
-//			
-//			adapter = pinfo.getAdapter();
-//		}
-//		
-//		return adapter;
-//	}
+	/**
+	 *  Get the adapter of the parent component.
+	 */
+	protected IPlatformComponentAccess getParentAdapter(CreationInfo cinfo)
+	{
+		final IComponentIdentifier paid = getParentIdentifier(cinfo);
+		IPlatformComponentAccess adapter;
+		adapter = adapters.get(paid);
+		if(adapter==null)
+		{
+			InitInfo	pinfo = getParentInfo(cinfo);
+			
+			// Hack!!! happens when parent is killed while trying to create subcomponent (todo: integrate locking for destroy and create of component structure)
+			if(pinfo==null)
+			{
+				throw new ComponentTerminatedException(paid);
+			}
+			
+			adapter = pinfo.getAdapter();
+		}
+		
+		return adapter;
+	}
 	
 //	/**
 //	 *  Get the desc of the parent component.
@@ -3251,8 +3251,8 @@ public class ComponentManagementService implements IComponentManagementService
 		/** The component description. */
 		protected IComponentDescription description;
 		
-//		/** The adapter. */
-//		protected IComponentAdapter adapter;
+		/** The adapter. */
+		protected IPlatformComponentAccess adapter;
 		
 		/** The creation info. */
 		protected CreationInfo info;
@@ -3268,20 +3268,20 @@ public class ComponentManagementService implements IComponentManagementService
 
 		//-------- constructors --------
 		
-//		/**
-//		 *  Create a new init info.
-//		 */
-//		public InitInfo(IComponentDescription description,
-//			IComponentAdapter adapter, CreationInfo info, IModelInfo model,
-//			Future<Void> initfuture, IComponentInterpreter instance)
-//		{
-//			this.description = description;
-//			this.adapter = adapter;
-//			this.info = info;
-//			this.model = model;
-//			this.initfuture = initfuture;
+		/**
+		 *  Create a new init info.
+		 */
+		public InitInfo(IComponentDescription description,
+			IPlatformComponentAccess adapter, CreationInfo info, IModelInfo model,
+			Future<Void> initfuture)
+		{
+			this.description = description;
+			this.adapter = adapter;
+			this.info = info;
+			this.model = model;
+			this.initfuture = initfuture;
 //			this.instance = instance;
-//		}
+		}
 
 		//-------- methods --------
 		
@@ -3303,14 +3303,14 @@ public class ComponentManagementService implements IComponentManagementService
 			this.description = description;
 		}
 
-//		/**
-//		 *  Get the adapter.
-//		 *  @return The adapter.
-//		 */
-//		public IComponentAdapter getAdapter()
-//		{
-//			return adapter;
-//		}
+		/**
+		 *  Get the adapter.
+		 *  @return The adapter.
+		 */
+		public IPlatformComponentAccess getAdapter()
+		{
+			return adapter;
+		}
 //
 //		/**
 //		 *  Set the adapter.
