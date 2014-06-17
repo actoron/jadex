@@ -231,6 +231,7 @@
 				<module>jadex-platform-android</module>
 				<module>jadex-runtimetools-android</module>
 				<module>jadex-platform-extension-webservice-android</module>
+				<module>jadex-kernel-bdiv3-android</module>
 				<!-- separated platform -->
 				<module>jadex-android-platformapp</module>
 				<!-- build tools -->

@@ -1,18 +1,12 @@
 package jadex.android.test;
 
 import jadex.android.AndroidContextManager;
-import jadex.android.commons.JadexDexClassLoader;
 import jadex.android.service.JadexPlatformManager;
 import jadex.base.test.impl.BrokenComponentTest;
 import jadex.bridge.ErrorReport;
-import jadex.commons.SUtil;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Collection;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,7 +16,6 @@ import android.test.AndroidTestRunner;
 import android.test.InstrumentationTestRunner;
 import android.test.suitebuilder.TestSuiteBuilder;
 import android.util.Log;
-import dalvik.system.PathClassLoader;
 
 public class JadexInstrumentor extends InstrumentationTestRunner
 {
@@ -62,10 +55,10 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			
 			
 			Test bdiTest = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", sourceDir);
-			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
+//			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
 
 			suite.addTest(bdiTest);
-			suite.addTest(microTest);
+//			suite.addTest(microTest);
 			
 		}
 		catch (Exception e)

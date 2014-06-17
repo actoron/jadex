@@ -89,7 +89,7 @@ public class ComponentTestSuite extends TestSuite
 			"-simulation", "true",
 			"-asyncexecution", "true",
 //			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-//			"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
+			"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
 			"-logging_level", "java.util.logging.Level.WARNING",
 //			"-debugfutures", "true",
 //			"-nostackcompaction", "true",
@@ -167,14 +167,14 @@ public class ComponentTestSuite extends TestSuite
 			
 			if(!exclude)
 			{
-				if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get(ts)).booleanValue())
+				try
 				{
-//					if(abspath.indexOf("INeg")!=-1)
-//						System.out.println("test");
-					if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get(ts)).booleanValue())
+					System.out.println("Building TestCase: " + abspath);
+					if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get(ts)).booleanValue())
 					{
-//						System.out.println("Building TestCase: " + abspath);
-						try
+//						if(abspath.indexOf("INeg")!=-1)
+//							System.out.println("test");
+						if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get(ts)).booleanValue())
 						{
 							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get(ts);
 							boolean istest = false;
@@ -196,6 +196,7 @@ public class ComponentTestSuite extends TestSuite
 								ComponentTest test = new ComponentTest(cms, model, this);
 								test.setName(abspath);
 								addTest(test);
+								System.out.println("Built TestCase: " + test);
 							}
 							else if(model.getReport()!=null)
 							{
@@ -204,6 +205,11 @@ public class ComponentTestSuite extends TestSuite
 									BrokenComponentTest test = new BrokenComponentTest(abspath, model.getReport());
 									test.setName(abspath);
 									addTest(test);
+									System.out.println("Built TestCase: " + test);
+								}
+								else
+								{
+									System.out.println("Error loading model: " + abspath);						
 								}
 							}
 							else
@@ -213,34 +219,48 @@ public class ComponentTestSuite extends TestSuite
 									ComponentStartTest test = new ComponentStartTest(cms, model, this);
 									test.setName(abspath);
 									addTest(test);
+									System.out.println("Built TestCase: " + test);
+								}
+								else
+								{
+									System.out.println("No test case: " + abspath);						
 								}
 							}
 						}
-						catch(final RuntimeException e)
+						else
 						{
-							BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
-							{
-								public String getErrorText()
-								{
-									StringWriter	sw	= new StringWriter();
-									e.printStackTrace(new PrintWriter(sw));
-									return "Error loading model: "+sw.toString();
-								}
-								
-								public String getErrorHTML()
-								{
-									return getErrorText();
-								}
-								
-								public Map<String, String> getDocuments()
-								{
-									return null;
-								}
-							});
-							test.setName(abspath);
-							addTest(test);							
+							System.out.println("Not startable: " + abspath);						
 						}
 					}
+					else
+					{
+						System.out.println("Not loadable: " + abspath);						
+					}
+				}
+				catch(final RuntimeException e)
+				{
+					BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
+					{
+						public String getErrorText()
+						{
+							StringWriter	sw	= new StringWriter();
+							e.printStackTrace(new PrintWriter(sw));
+							return "Error loading model: "+sw.toString();
+						}
+						
+						public String getErrorHTML()
+						{
+							return getErrorText();
+						}
+						
+						public Map<String, String> getDocuments()
+						{
+							return null;
+						}
+					});
+					test.setName(abspath);
+					addTest(test);
+					System.out.println("Built TestCase: " + test);
 				}
 			}
 		}
