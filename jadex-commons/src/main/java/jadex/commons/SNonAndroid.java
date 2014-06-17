@@ -1,6 +1,5 @@
 package jadex.commons;
 
-import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.ThreadSuspendable;
 
@@ -28,7 +27,6 @@ import java.util.TreeSet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -294,73 +292,74 @@ public class SNonAndroid
 	}
 
 	/**
-		 *  Workaround for AWT/Swing memory leaks.
-		 */
-		public static void	clearAWT()
+	 *  Workaround for AWT/Swing memory leaks.
+	 */
+	public static void	clearAWT()
+	{
+		// Java Bug not releasing the last focused window, see:
+		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
+		// http://bugs.sun.com/view_bug.do?bug_id=4726458
+		
+		final Future<Void>	disposed	= new Future<Void>();
+		
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			// Java Bug not releasing the last focused window, see:
-			// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
-			// http://bugs.sun.com/view_bug.do?bug_id=4726458
-			
-			final Future<Void>	disposed	= new Future<Void>();
-			
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
+				javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
 				{
-					javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+					public void actionPerformed(ActionEvent e)
 					{
-						public void actionPerformed(ActionEvent e)
+						final JFrame f	= new JFrame("dummy");
+						f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
+						f.setSize(100, 100);
+						f.setVisible(true);
+						
+						javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
 						{
-							final JFrame f	= new JFrame("dummy");
-							f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
-							f.setSize(100, 100);
-							f.setVisible(true);
-							
-							javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+							public void actionPerformed(ActionEvent e)
 							{
-								public void actionPerformed(ActionEvent e)
+								f.dispose();
+								javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
 								{
-									f.dispose();
-									javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+									public void actionPerformed(ActionEvent e)
 									{
-										public void actionPerformed(ActionEvent e)
-										{
-	//										System.out.println("cleanup dispose");
-											KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
-											disposed.setResult(null);
-										}
-									});
-									t.setRepeats(false);
-									t.start();
-	
-								}
-							});
-							t.setRepeats(false);
-							t.start();
-						}
-					});
-					t.setRepeats(false);
-					t.start();
-				}
-			});
-			
-			disposed.get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
-			
-	//		// Another bug not releasing the last drawn window.
-	//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
-	//		
-	//		try
-	//		{
-	//			Class<?> clazz	= Class.forName("sun.java2d.pipe.BufferedContext");
-	//			Field	field	= clazz.getDeclaredField("currentContext");
-	//			field.setAccessible(true);
-	//			field.set(null, null);
-	//		}
-	//		catch(Throwable e)
-	//		{
-	//			e.printStackTrace();
-	//		}
-	
-		}
+//										System.out.println("cleanup dispose");
+										KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+										disposed.setResult(null);
+									}
+								});
+								t.setRepeats(false);
+								t.start();
+
+							}
+						});
+						t.setRepeats(false);
+						t.start();
+					}
+				});
+				t.setRepeats(false);
+				t.start();
+			}
+		});
+		
+//		disposed.get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
+		disposed.get(new ThreadSuspendable(), 30000);
+		
+//		// Another bug not releasing the last drawn window.
+//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
+//		
+//		try
+//		{
+//			Class<?> clazz	= Class.forName("sun.java2d.pipe.BufferedContext");
+//			Field	field	= clazz.getDeclaredField("currentContext");
+//			field.setAccessible(true);
+//			field.set(null, null);
+//		}
+//		catch(Throwable e)
+//		{
+//			e.printStackTrace();
+//		}
+
+	}
 }

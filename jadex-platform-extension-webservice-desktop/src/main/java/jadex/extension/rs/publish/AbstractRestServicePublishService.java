@@ -1200,22 +1200,31 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			}
 			
 			ret.append("<html>");
+			ret.append("\n");
 			ret.append("<head>");
+			ret.append("\n");
 			ret.append(stylecss);
+			ret.append("\n");
 			ret.append(functionsjs);
+			ret.append("\n");
 	//		ret.append("<script src=\"functions.js\" type=\"text/javascript\"/>");
-			ret.append("<head>");
 			ret.append("</head>");
+			ret.append("\n");
 			ret.append("<body>");
+			ret.append("\n");
 			
 			ret.append("<div class=\"header\">");
+			ret.append("\n");
 			ret.append("<h1>");//Service Info for: ");
 			String ifacename = ((IService)service).getServiceIdentifier().getServiceType().getTypeName();
 			ret.append(SReflect.getUnqualifiedTypeName(ifacename));
 			ret.append("</h1>");
+			ret.append("\n");
 			ret.append("</div>");
+			ret.append("\n");
 
 			ret.append("<div class=\"middle\">");
+			ret.append("\n");
 			
 			UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
 			
@@ -1250,6 +1259,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 						Class<?>[] ptypes = method.getParameterTypes();
 						
 						ret.append("<div class=\"method\">");
+						ret.append("\n");
 						
 						ret.append("<div class=\"methodname\">");
 //						ret.append("<i><b>");
@@ -1268,6 +1278,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 						}
 						ret.append(")");
 						ret.append("</div>");
+						ret.append("\n");
 //						ret.append("</br>");
 						
 						ret.append("<div class=\"restproperties\">");
@@ -1311,6 +1322,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 						}
 //						ret.append("</br>");
 						ret.append("</div>");
+						ret.append("\n");
 
 						UriBuilder ub = ui.getBaseUriBuilder();
 						if(path!=null)
@@ -1322,6 +1334,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 							ret.append("<div class=\"servicelink\">");
 							ret.append(link);
 							ret.append("</div>");
+							ret.append("\n");
 							
 							// For post set the media type of the arguments.
 							ret.append("<form class=\"arguments\" action=\"").append(link).append("\" method=\"")
@@ -1330,6 +1343,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 							if(restmethod.equals(POST.class))
 								ret.append("onSubmit=\"return extract(this)\"");
 							ret.append(">");
+							ret.append("\n");
 							
 							for(int j=0; j<ptypes.length; j++)
 							{
@@ -1361,25 +1375,30 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 								ret.append("<option>").append(MediaType.TEXT_PLAIN).append("</option>");
 							}
 							ret.append("</select>");
+							ret.append("\n");
 							
 							ret.append("<input type=\"submit\" value=\"invoke\"/>");
 							ret.append("</form>");
+							ret.append("\n");
 						}
 						else
 						{
 							ret.append("<div class=\"servicelink\">");
 							ret.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
 							ret.append("</div>");
+							ret.append("\n");
 						}
 						
 						ret.append("</div>");
+						ret.append("\n");
 					}
 				}
 			}
 			
 			ret.append("</div>");
+			ret.append("\n");
 			
-			ret.append("<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">Jadex Active Components</span> <a class=\"jadexurl\" href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a> </div>");
+			ret.append("<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">Jadex Active Components</span> <a class=\"jadexurl\" href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a> </div>\n");
 		}
 		catch(Exception e)
 		{
@@ -1387,7 +1406,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			throw new RuntimeException(e);
 		}
 		
-		ret.append("</body></html>");
+		ret.append("</body>\n</html>\n");
 
 		return ret.toString();
 	}
