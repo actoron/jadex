@@ -72,7 +72,7 @@
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
 		<argument name="awareness" class="boolean">true</argument>
 		<!-- Specify the awareness agent discovery mechanisms (comma separated). -->
-		<argument name="awamechanisms" class="String">"Broadcast, Multicast, Message, Relay"</argument>
+		<argument name="awamechanisms" class="String">"Broadcast, Multicast, Message, Relay, Local"</argument>
 		<!-- The awareness delay in milliseconds -->
 		<argument name="awadelay" class="long">20000</argument>
 		<!-- Include entries for awareness agent. -->
