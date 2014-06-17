@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
 /**
  *  This agent creates call chains to check if monitoring event are created with correct
  *  origins and can be connected to chains.
@@ -78,7 +76,7 @@ public class TesterAgent implements ITestService
 //				}
 //			});
 			
-			SwingUtilities.invokeLater(new Runnable()
+			new Thread(new Runnable()
 			{
 				public void run()
 				{
@@ -105,7 +103,7 @@ public class TesterAgent implements ITestService
 						// avoid exception being printed during start test.
 					}
 				}
-			});
+			}).start();
 		}
 	}
 	

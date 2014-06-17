@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -225,7 +226,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		JarOutputStream jos = null;
 		try
 		{
-			jos = new JarOutputStream(new FileOutputStream(outputFile));
+			jos = new JarOutputStream(new FileOutputStream(outputFile), new Manifest());	// Empty manifest to avoid empty zip file.
 			
 			// System.out.println(outputDir.list());
 			for (File depDir : depDirs)
@@ -257,10 +258,11 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			}
 			catch (IOException e)
 			{
+				e.printStackTrace();
 			}
 		}
 
-		getLog().debug("written enhanced: " + outputFile.getName());
+		getLog().info("written enhanced: " + outputFile.getName());
 	}
 
 	private File enhanceJar(File in, File outputDir) throws IOException
@@ -461,12 +463,13 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 					catch (IOException e)
 					{
 						e.printStackTrace();
-						if (inputCl != null) {
-							inputCl.close();
-						}
-						if (outputCl != null) {
-							outputCl.close();
-						}
+						// URLClassLoader.close() not in JDK 1.6
+//						if (inputCl != null) {
+//							inputCl.close();
+//						}
+//						if (outputCl != null) {
+//							outputCl.close();
+//						}
 						throw new MojoExecutionException(e.getMessage());
 					}
 				}
@@ -485,8 +488,8 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 				}
 			}
 		}
-		inputCl.close();
-		outputCl.close();
+//		inputCl.close();
+//		outputCl.close();
 	}
 	
 	private void removeAndroidIncompatible(File path) throws IOException {

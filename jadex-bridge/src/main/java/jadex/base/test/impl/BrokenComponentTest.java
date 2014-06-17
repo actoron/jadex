@@ -57,7 +57,15 @@ public class BrokenComponentTest extends	TestCase
 	 */
 	public void run(TestResult result)
 	{
-		result.startTest(this);
+		try
+		{
+			result.startTest(this);
+		}
+		catch(IllegalStateException e)
+		{
+			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
+			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
+		}
 		
 		result.addError(this, new RuntimeException(error.getErrorText()));			
 
@@ -78,6 +86,6 @@ public class BrokenComponentTest extends	TestCase
 	 */
 	public String toString()
 	{
-		return comp!=null ? comp.getFullName() : filename;
+		return "broken: "+(comp!=null ? comp.getFullName() : filename);
 	}
 }
