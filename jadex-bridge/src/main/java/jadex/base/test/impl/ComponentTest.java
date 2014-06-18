@@ -62,16 +62,12 @@ public class ComponentTest extends TestCase
 	 */
 	public void run(TestResult result)
 	{
-		System.out.println("Starting test...");
-		System.out.println("Starting test: "+comp);
 		
 		if(suite.isAborted())
 		{
-			System.out.println("Aborted test: "+comp);
 			return;
 		}
 		
-		System.out.println("Starting...");
 		try
 		{
 			result.startTest(this);
@@ -81,7 +77,6 @@ public class ComponentTest extends TestCase
 			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
 			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
 		}
-		System.out.println("Started...");
 		
 		try
 		{
@@ -90,13 +85,10 @@ public class ComponentTest extends TestCase
 //			args.put("timeout", new Long(3000000));
 //			CreationInfo	ci	= new CreationInfo(args);
 			ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-			System.out.println("Creating component: "+comp);
 			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()));
 
 			// Evaluate the results.
-			System.out.println("Waiting for result: "+comp);
 			Map<String, Object>	res	= fut.getSecondResult();
-			System.out.println("Results received: "+comp);
 			Testcase	tc	= null;
 			for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )
 			{
@@ -128,16 +120,12 @@ public class ComponentTest extends TestCase
 				result.addFailure(this,  new AssertionFailedError("No test results provided by component: "+res));
 			}
 		}
-		catch(Throwable e)
+		catch(Exception e)
 		{
-			e.printStackTrace();
-			System.out.println("Exception: "+comp+", "+e);
 			result.addError(this, e);
 		}
 
-		System.out.println("Ending test: "+comp);
 		result.endTest(this);
-		System.out.println("Test ended: "+comp);
 
 		// Remove references to Jadex resources to aid GC cleanup.
 		cms	= null;

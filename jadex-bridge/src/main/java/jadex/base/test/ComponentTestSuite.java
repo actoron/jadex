@@ -89,7 +89,7 @@ public class ComponentTestSuite extends TestSuite
 			"-simulation", "true",
 			"-asyncexecution", "true",
 //			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-			"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
+//			"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
 			"-logging_level", "java.util.logging.Level.WARNING",
 //			"-debugfutures", "true",
 //			"-nostackcompaction", "true",
@@ -169,7 +169,6 @@ public class ComponentTestSuite extends TestSuite
 			{
 				try
 				{
-					System.out.println("Building TestCase: " + abspath);
 					if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get(ts)).booleanValue())
 					{
 //						if(abspath.indexOf("INeg")!=-1)
@@ -196,7 +195,6 @@ public class ComponentTestSuite extends TestSuite
 								ComponentTest test = new ComponentTest(cms, model, this);
 								test.setName(abspath);
 								addTest(test);
-								System.out.println("Built TestCase: " + test);
 							}
 							else if(model.getReport()!=null)
 							{
@@ -205,11 +203,6 @@ public class ComponentTestSuite extends TestSuite
 									BrokenComponentTest test = new BrokenComponentTest(abspath, model.getReport());
 									test.setName(abspath);
 									addTest(test);
-									System.out.println("Built TestCase: " + test);
-								}
-								else
-								{
-									System.out.println("Error loading model: " + abspath);						
 								}
 							}
 							else
@@ -219,22 +212,9 @@ public class ComponentTestSuite extends TestSuite
 									ComponentStartTest test = new ComponentStartTest(cms, model, this);
 									test.setName(abspath);
 									addTest(test);
-									System.out.println("Built TestCase: " + test);
-								}
-								else
-								{
-									System.out.println("No test case: " + abspath);						
 								}
 							}
 						}
-						else
-						{
-							System.out.println("Not startable: " + abspath);						
-						}
-					}
-					else
-					{
-						System.out.println("Not loadable: " + abspath);						
 					}
 				}
 				catch(final RuntimeException e)
@@ -260,7 +240,6 @@ public class ComponentTestSuite extends TestSuite
 					});
 					test.setName(abspath);
 					addTest(test);
-					System.out.println("Built TestCase: " + test);
 				}
 			}
 		}

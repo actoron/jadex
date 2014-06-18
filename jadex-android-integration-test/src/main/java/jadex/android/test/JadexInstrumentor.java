@@ -55,10 +55,10 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			
 			
 			Test bdiTest = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", sourceDir);
-//			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
+			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
 
 			suite.addTest(bdiTest);
-//			suite.addTest(microTest);
+			suite.addTest(microTest);
 			
 		}
 		catch (Exception e)

@@ -17,13 +17,15 @@
 		testcases using micro agents.
 	</description>
 
+	<!-- 
 	<repositories>
 	    <repository>
 			<id>xuggle repo</id>
 			<url>http://xuggle.googlecode.com/svn/trunk/repo/share/java/</url>
 		</repository>
 	</repositories>
-	
+	 -->
+	 
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
