@@ -62,24 +62,32 @@ public class ComponentTest extends TestCase
 	 */
 	public void run(TestResult result)
 	{
+		
 		if(suite.isAborted())
 		{
 			return;
 		}
 		
-		result.startTest(this);
-		
-		// Start the component.
-//		System.out.println("Starting test: "+comp);
-//		Map	args	= new HashMap();
-//		args.put("timeout", new Long(3000000));
-//		CreationInfo	ci	= new CreationInfo(args);
-
-		// Evaluate the results.
 		try
 		{
+			result.startTest(this);
+		}
+		catch(IllegalStateException e)
+		{
+			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
+			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
+		}
+		
+		try
+		{
+			// Start the component.
+//			Map	args	= new HashMap();
+//			args.put("timeout", new Long(3000000));
+//			CreationInfo	ci	= new CreationInfo(args);
 			ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()));
+
+			// Evaluate the results.
 			Map<String, Object>	res	= fut.getSecondResult();
 			Testcase	tc	= null;
 			for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )

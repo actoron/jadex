@@ -9,7 +9,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
+//import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.event.ActionEvent;
@@ -71,7 +71,7 @@ public class GuiOpenClosePlan extends Plan
 		});
 		frame.getContentPane().add("Center", button);
 		frame.pack();
-		frame.setLocation(SGUI.calculateMiddlePosition(frame));
+//		frame.setLocation(0,0); SGUI.calculateMiddlePosition(frame));
 		frame.setVisible(true);
 	}
 

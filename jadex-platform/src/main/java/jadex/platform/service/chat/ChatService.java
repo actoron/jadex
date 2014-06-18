@@ -49,6 +49,7 @@ import jadex.commons.future.TerminationCommand;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1327,7 +1328,16 @@ public class ChatService implements IChatService, IChatGuiService
 				setNickName(tmp);
 			tmp = props.getStringProperty("image");
 			if(tmp!=null)
-				setImage(Base64.decode(tmp.getBytes(Charset.forName("UTF-8"))));
+			{
+				try
+				{
+					setImage(Base64.decode(tmp.getBytes("UTF-8")));
+				}
+				catch(UnsupportedEncodingException e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
 			
 			called.setResultIfUndone(null);
 			
@@ -1343,7 +1353,16 @@ public class ChatService implements IChatService, IChatGuiService
 			// Only save as executing when in normal mode.
 			props.addProperty(new Property("nickname", nick));
 			if(image!=null)
-				props.addProperty(new Property("image", new String(Base64.encode(image), Charset.forName("UTF-8"))));
+			{
+				try
+				{
+					props.addProperty(new Property("image", new String(Base64.encode(image), "UTF-8")));
+				}
+				catch (UnsupportedEncodingException e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
 			return new Future<Properties>(props);
 		}
 	}

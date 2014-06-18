@@ -73,7 +73,7 @@ public class NuggetsCodec implements ICodec
 		
 		try
 		{
-			return ((String)otx.invoke(null, new Object[]{val, classloader})).getBytes(Charset.forName("UTF-8"));
+			return ((String)otx.invoke(null, new Object[]{val, classloader})).getBytes("UTF-8");
 		}
 		catch(Exception e)
 		{
@@ -97,7 +97,7 @@ public class NuggetsCodec implements ICodec
 			String	input;
 			if(bytes instanceof byte[])
 			{
-				input	= new String((byte[])bytes,  Charset.forName("UTF-8"));
+				input	= new String((byte[])bytes,  "UTF-8");
 			}
 			else
 			{
@@ -107,7 +107,7 @@ public class NuggetsCodec implements ICodec
 				int read;
 				while((read=is.read(buf))!=-1)
 				{
-					sbuf.append(new String(buf, 0, read, Charset.forName("UTF-8")));
+					sbuf.append(new String(buf, 0, read, "UTF-8"));
 				}
 				input	= sbuf.toString();
 			}

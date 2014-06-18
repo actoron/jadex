@@ -2,7 +2,6 @@ package jadex.launch.test;
 
 import jadex.base.Starter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
-import jadex.base.test.ComponentTestSuite;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -10,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SNonAndroid;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -76,7 +76,7 @@ public class JCCTest extends TestCase
 		jcc	= null;
 		cms	= null;
 		
-		ComponentTestSuite.clearAWT();
+		SNonAndroid.clearAWT();
 		
 //		try
 //		{

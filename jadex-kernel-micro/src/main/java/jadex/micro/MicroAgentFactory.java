@@ -343,7 +343,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							Logger.getLogger(MicroAgentFactory.class.toString()).warning(exception.getMessage());
+							exception.printStackTrace();
+							Logger.getLogger(MicroAgentFactory.class.toString()).warning(exception.toString());
 							ret.setResult(Boolean.FALSE);
 //							super.exceptionOccurred(exception);
 						}

@@ -22,7 +22,9 @@ import jadex.micro.annotation.Results;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ *  Agent that uses a goal with a goal as plan (direct subgoal).
+ */
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalGoalBDI
@@ -32,7 +34,7 @@ public class GoalGoalBDI
 	protected BDIAgent agent;
 		
 	/**
-	 * 
+	 *  The top level goal.
 	 */
 	@Goal(excludemode=Goal.ExcludeMode.WhenFailed)
 	public class TestGoal1
@@ -71,7 +73,7 @@ public class GoalGoalBDI
 	}
 	
 	/**
-	 * 
+	 *  The goal that is used as a plan.
 	 */
 	@Goal(triggergoals=TestGoal1.class)
 //	@GoalCreationCondition(trigger=@Trigger(goals=TestGoal1.class))

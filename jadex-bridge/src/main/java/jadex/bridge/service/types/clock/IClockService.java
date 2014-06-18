@@ -4,6 +4,7 @@ import java.util.TimerTask;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Uncached;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IThreadPool;
 
@@ -29,30 +30,35 @@ public interface IClockService extends IService
 	 *  Get the current time.
 	 *  @return The current time.
 	 */
+	@Uncached
 	public long getTime();
 	
 	/**
 	 *  Get the current tick.
 	 *  @return The current tick.
 	 */
+	@Uncached
 	public double getTick();
 	
 	/**
 	 *  Get the clocks start time.
 	 *  @return The start time.
 	 */
+	@Uncached
 	public long getStarttime();
 	
 	/**
 	 *  Get the clock delta.
 	 *  @return The clock delta.
 	 */
+	@Uncached
 	public long getDelta();
 	
 	/**
 	 *  Get the clock state.
 	 *  @return The clock state.
 	 */
+	@Uncached
 	public String getState();
 	
 	/**
@@ -66,6 +72,7 @@ public interface IClockService extends IService
 	 *  @return The clocks dilation.
 	 *  // Hack. Remove? only for continuous
 	 */
+	@Uncached
 	public double getDilation();
 	
 	/**
@@ -115,12 +122,14 @@ public interface IClockService extends IService
 	 *  Get the next timer.
 	 *  @return The next timer.
 	 */
+	@Uncached
 	public ITimer getNextTimer();
 
 	/**
 	 *  Get all active timers.
 	 *  @return The active timers.
 	 */
+	@Uncached
 	public ITimer[] getTimers();
 	
 	/**
@@ -139,12 +148,14 @@ public interface IClockService extends IService
 	 *  Get the clock type.
 	 *  @return The clock type.
 	 */
+	@Uncached
 	public String getClockType();
 	
 	/**
 	 *  Advance one event.
 	 *  @return True, if clock could be advanced.
 	 */
+	@Uncached
 	public boolean advanceEvent();
 
 	/**

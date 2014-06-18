@@ -1,7 +1,7 @@
 package jadex.commons.gui.future;
 
+import jadex.commons.SReflect;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.gui.SGUI;
 
 import java.awt.Component;
 import java.util.Collection;
@@ -69,7 +69,7 @@ public abstract class SwingIntermediateDefaultResultListener<E> extends SwingDef
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 		{
 			customIntermediateResultAvailable(result);			
 		}
@@ -92,7 +92,7 @@ public abstract class SwingIntermediateDefaultResultListener<E> extends SwingDef
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 		{
 			customFinished();			
 		}

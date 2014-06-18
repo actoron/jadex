@@ -8,6 +8,7 @@ import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 /**
@@ -48,7 +49,16 @@ public class JadexXMLCodec implements ICodec
 	{
 		byte[] ret = JavaWriter.objectToByteArray(val, classloader);
 		if(DEBUG)
-			System.out.println("encode message: "+(new String(ret, Charset.forName("UTF-8"))));
+		{
+			try
+			{
+				System.out.println("encode message: "+(new String(ret, "UTF-8")));
+			}
+			catch(UnsupportedEncodingException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 		return ret;
 	}
 
@@ -64,7 +74,16 @@ public class JadexXMLCodec implements ICodec
 			? JavaReader.objectFromByteArray((byte[])bytes, classloader, rep)
 			: JavaReader.objectFromInputStream((InputStream)bytes, classloader, rep);
 		if(DEBUG)
-			System.out.println("decode message: "+(new String((byte[])bytes, Charset.forName("UTF-8"))));
+		{
+			try
+			{
+				System.out.println("decode message: "+(new String((byte[])bytes, "UTF-8")));
+			}
+			catch(UnsupportedEncodingException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 		return ret;
 	}
 }

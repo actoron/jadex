@@ -160,53 +160,65 @@ public class SRemoteGui
 	public static IFuture<Void>	installRemoteCMSListener(final IExternalAccess access, final IComponentIdentifier cid, final IRemoteChangeListener rcl0, final String id0)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		
+		try
 		{
-			public void customResultAvailable(IComponentManagementService	cms)
+			// Can throw component terminated exception
+			IServiceProvider sp = access.getServiceProvider(); 
+		
+			SServiceProvider.getService(sp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
-//				IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				public void customResultAvailable(IComponentManagementService	cms)
 				{
-					public void customResultAvailable(IExternalAccess exta)
+	//				IComponentManagementService	cms	= (IComponentManagementService)result;
+					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 					{
-//						IExternalAccess	exta	= (IExternalAccess)result;
-						final IComponentIdentifier	icid	= cid;	// internal reference to cid, because java compiler stores final references in outmost object (grrr.)
-						final String	id	= id0;
-						final IRemoteChangeListener	rcl	= rcl0;
-						exta.scheduleStep(new IComponentStep<Void>()
+						public void customResultAvailable(IExternalAccess exta)
 						{
-							@Classname("installListener")
-							public IFuture<Void> execute(IInternalAccess ia)
+	//						IExternalAccess	exta	= (IExternalAccess)result;
+							final IComponentIdentifier	icid	= cid;	// internal reference to cid, because java compiler stores final references in outmost object (grrr.)
+							final String	id	= id0;
+							final IRemoteChangeListener	rcl	= rcl0;
+							exta.scheduleStep(new IComponentStep<Void>()
 							{
-								final Future<Void>	ret	= new Future<Void>();
-								try
+								@Classname("installListener")
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+									final Future<Void>	ret	= new Future<Void>();
+									try
 									{
-										public void customResultAvailable(IComponentManagementService cms)
+										SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 										{
-											RemoteCMSListener	rcmsl	= new RemoteCMSListener(icid, id, cms, rcl);
-											cms.addComponentListener(null, rcmsl);
-											ret.setResult(null);
-										}
-									}));
+											public void customResultAvailable(IComponentManagementService cms)
+											{
+												RemoteCMSListener	rcmsl	= new RemoteCMSListener(icid, id, cms, rcl);
+												cms.addComponentListener(null, rcmsl);
+												ret.setResult(null);
+											}
+										}));
+									}
+									catch(Exception e)
+									{
+										// Protect remote platform from execution errors.
+										Thread.dumpStack();
+										e.printStackTrace();
+										ret.setException(e);
+									}
+									return ret;
 								}
-								catch(Exception e)
-								{
-									// Protect remote platform from execution errors.
-									Thread.dumpStack();
-									e.printStackTrace();
-									ret.setException(e);
-								}
-								return ret;
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-		});
+							}).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					});
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
 		return ret;
 	}
 
@@ -1240,7 +1252,7 @@ public class SRemoteGui
 			{
 				try
 				{
-					SUtil.getOutForSystemIn().write(txt.getBytes(Charset.defaultCharset()));
+					SUtil.getOutForSystemIn().write(txt.getBytes(Charset.defaultCharset().name()));
 				}
 				catch(IOException e)
 				{

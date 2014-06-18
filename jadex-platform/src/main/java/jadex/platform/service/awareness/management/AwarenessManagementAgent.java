@@ -91,7 +91,8 @@ import java.util.TimerTask;
 	@ComponentType(name="Scanner", filename="jadex/platform/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
 	@ComponentType(name="Registry", filename="jadex/platform/service/awareness/discovery/registry/RegistryDiscoveryAgent.class"),
 	@ComponentType(name="Message", filename="jadex/platform/service/awareness/discovery/message/MessageDiscoveryAgent.class"),
-	@ComponentType(name="Relay", filename="jadex/platform/service/awareness/discovery/relay/RelayDiscoveryAgent.class")
+	@ComponentType(name="Relay", filename="jadex/platform/service/awareness/discovery/relay/RelayDiscoveryAgent.class"),
+	@ComponentType(name="Local", filename="jadex/platform/service/awareness/discovery/local/LocalDiscoveryAgent.class")
 })
 /**@Configurations(
 {

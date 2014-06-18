@@ -32,6 +32,8 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.security.MessageDigest;
@@ -3530,7 +3532,7 @@ public class SUtil
 	 */
 	public static void	moveFile(File source, File target)	throws IOException
 	{
-		Class filesclazz = null;
+		Class<?> filesclazz = null;
 		try
 		{
 			filesclazz = Class.forName("java.nio.file.Files");
@@ -3544,15 +3546,15 @@ public class SUtil
 			// Java 7+ mode
 			try
 			{
-				Class pathclazz = Class.forName("java.nio.file.Path");
-				Class copyoptionclazz = Class.forName("java.nio.file.CopyOption");
-				Class standardcopyoptionclazz = Class.forName("java.nio.file.StandardCopyOption");
+				Class<?> pathclazz = Class.forName("java.nio.file.Path");
+				Class<?> copyoptionclazz = Class.forName("java.nio.file.CopyOption");
+				Class<?> standardcopyoptionclazz = Class.forName("java.nio.file.StandardCopyOption");
 				Object atomicflag = standardcopyoptionclazz.getField("ATOMIC_MOVE").get(null);
 				Object replaceflag = standardcopyoptionclazz.getField("REPLACE_EXISTING").get(null);
 				Object moveoptions = Array.newInstance(copyoptionclazz, 2);
 				Array.set(moveoptions, 0, replaceflag);
 				Array.set(moveoptions, 1, atomicflag);
-				Class copyoptionarrayclazz = moveoptions.getClass();
+				Class<?> copyoptionarrayclazz = moveoptions.getClass();
 				Method movemethod = filesclazz.getMethod("move", pathclazz, pathclazz, copyoptionarrayclazz);
 				
 				Method topathmethod = File.class.getMethod("toPath", (Class<?>[]) null);
@@ -3590,6 +3592,53 @@ public class SUtil
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Reads a file into memory (byte array).
+	 *  Note: This only works for files smaller than 2GiB.
+	 *  
+	 * 	@param file The file.
+	 * 	@return Contents of the file.
+	 * 	@throws IOException Exception on IO errors.
+	 */
+	public static byte[] readFile(File file) throws IOException
+	{
+		FileInputStream fis = new FileInputStream(file);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try
+		{
+			FileChannel channel = fis.getChannel( );
+			MappedByteBuffer mbb = channel.map(FileChannel.MapMode.READ_ONLY, 0L, channel.size());
+			byte[] buf = new byte[4096];
+			while(mbb.hasRemaining())
+			{
+				int readbytes = Math.min(mbb.remaining(), 4096);
+			    mbb.get(buf, 0, readbytes);
+			    baos.write(buf, 0, readbytes);
+			}
+		}
+		catch (IOException e)
+		{
+			try
+			{
+				fis.close();
+			}
+			catch (Exception e1)
+			{
+			}
+			throw e;
+		}
+		
+		try
+		{
+			fis.close();
+		}
+		catch (Exception e)
+		{
+		}
+		
+		return baos.toByteArray();
 	}
 	
 	/**

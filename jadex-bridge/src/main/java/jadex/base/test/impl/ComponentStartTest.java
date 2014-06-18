@@ -76,7 +76,15 @@ public class ComponentStartTest extends	TestCase
 			return;
 		}
 		
-		result.startTest(this);
+		try
+		{
+			result.startTest(this);
+		}
+		catch(IllegalStateException e)
+		{
+			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
+			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
+		}
 		
 		// Start the component.
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());

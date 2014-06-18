@@ -1,8 +1,14 @@
 package jadex.commons;
 
-import jadex.commons.gui.SGUI;
+import jadex.commons.future.Future;
+import jadex.commons.future.ThreadSuspendable;
 
+import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.GraphicsEnvironment;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -18,6 +24,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
@@ -191,9 +199,28 @@ public class SNonAndroid
 	 */
 	public static boolean isGuiThread()
 	{
-		return SGUI.HAS_GUI && SwingUtilities.isEventDispatchThread();
+		return SReflect.HAS_GUI && SwingUtilities.isEventDispatchThread();
 	}
 	
+	/**
+	 *  Test if there is a gui available.
+	 */
+	public static boolean hasGui()
+	{
+		boolean hasgui;
+		try
+		{
+			hasgui = !(GraphicsEnvironment.isHeadless() ||
+					 	  GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length < 1);
+		}
+		catch(Error e)
+		{
+			// On system misconfigurations, Java throws an Error (grr).
+			hasgui = false;
+		}
+		return hasgui;
+	}
+
 	/**
 	 *  Get the home directory.
 	 */
@@ -262,5 +289,77 @@ public class SNonAndroid
 		}
 			
 		return res.isEmpty()? new String[0]: (String[])res.toArray(new String[res.size()]);
+	}
+
+	/**
+	 *  Workaround for AWT/Swing memory leaks.
+	 */
+	public static void	clearAWT()
+	{
+		// Java Bug not releasing the last focused window, see:
+		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
+		// http://bugs.sun.com/view_bug.do?bug_id=4726458
+		
+		final Future<Void>	disposed	= new Future<Void>();
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						final JFrame f	= new JFrame("dummy");
+						f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
+						f.setSize(100, 100);
+						f.setVisible(true);
+						
+						javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								f.dispose();
+								javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+//										System.out.println("cleanup dispose");
+										KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+										disposed.setResult(null);
+									}
+								});
+								t.setRepeats(false);
+								t.start();
+
+							}
+						});
+						t.setRepeats(false);
+						t.start();
+					}
+				});
+				t.setRepeats(false);
+				t.start();
+			}
+		});
+		
+//		disposed.get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
+		disposed.get(new ThreadSuspendable(), 30000);
+		
+//		// Another bug not releasing the last drawn window.
+//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
+//		
+//		try
+//		{
+//			Class<?> clazz	= Class.forName("sun.java2d.pipe.BufferedContext");
+//			Field	field	= clazz.getDeclaredField("currentContext");
+//			field.setAccessible(true);
+//			field.set(null, null);
+//		}
+//		catch(Throwable e)
+//		{
+//			e.printStackTrace();
+//		}
+
 	}
 }

@@ -101,7 +101,7 @@ public class StandaloneRelay
 //							System.out.println("hostip: '"+hostip+"'");
 //							System.out.println("hostname: '"+hostname+"'");
 							OutputStream	out	= new BufferedOutputStream(client.getOutputStream(), client.getSendBufferSize());
-							out.write("HTTP/1.0 200 OK\r\n\r\n".getBytes(Charset.forName("UTF-8")));
+							out.write("HTTP/1.0 200 OK\r\n\r\n".getBytes("UTF-8"));
 							handler.handleConnection(id, out);	// Hack!!! https?
 						}
 						else if(!get)

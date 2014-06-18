@@ -1,10 +1,10 @@
 package jadex.commons.gui.future;
 
+import jadex.commons.SReflect;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
-import jadex.commons.gui.SGUI;
 
 import java.util.logging.Logger;
 
@@ -44,7 +44,7 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
 			customResultAvailable(result);
@@ -70,7 +70,7 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 //		exception.printStackTrace();
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
 			customExceptionOccurred(exception);			
@@ -127,7 +127,7 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
 			customCommandAvailable(command);			
