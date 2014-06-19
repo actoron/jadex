@@ -236,6 +236,11 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 					for (File file : allFiles)
 					{
 						String relativePath = ResourceUtils.getRelativePath(file.getPath(), depDir.getPath(), File.separator);
+						if(!File.separator.equals("/"))
+						{
+							// Zip entries must use '/' as file separator.
+							relativePath	= relativePath.replace(File.separator, "/");
+						}
 						FileInputStream is = new FileInputStream(file);
 						ZipEntry zipEntry = new ZipEntry(relativePath);
 						jos.putNextEntry(zipEntry);
@@ -293,6 +298,11 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			for (File file : allFiles)
 			{
 				String relativePath = ResourceUtils.getRelativePath(file.getPath(), outputDir.getPath(), File.separator);
+				if(!File.separator.equals("/"))
+				{
+					// Zip entries must use '/' as file separator.
+					relativePath	= relativePath.replace(File.separator, "/");
+				}
 				FileInputStream is = new FileInputStream(file);
 				ZipEntry zipEntry = new ZipEntry(relativePath);
 				jos.putNextEntry(zipEntry);

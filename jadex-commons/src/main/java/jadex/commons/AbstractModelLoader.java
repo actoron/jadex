@@ -173,7 +173,9 @@ public abstract class AbstractModelLoader
 			}
 	
 			if(ret==null || ret.getInputStream()==null)
+			{
 				throw new IOException("File "+name+" not found in imports");//: "+SUtil.arrayToString(imports));
+			}
 		}
 		return ret;
 	}
