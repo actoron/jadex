@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -153,11 +155,6 @@ public class ComponentTestSuite extends TestSuite
 		List<String> scanForTestCases = scanForTestCases(root, path);
 		for (String abspath : scanForTestCases)
 		{	
-			if (SReflect.isAndroid()) {
-				// path-style identifier needed for Factories, but android doesn't use a
-				// classical classpath
-				abspath = abspath.replaceAll("\\.", "/") + ".class";
-			}
 			boolean	exclude	= false;
 						
 			for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
@@ -169,12 +166,15 @@ public class ComponentTestSuite extends TestSuite
 			{
 				try
 				{
+//					System.out.println("Check: "+abspath);
 					if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get(ts)).booleanValue())
 					{
+//						System.out.println("Loadable: "+abspath);
 //						if(abspath.indexOf("INeg")!=-1)
 //							System.out.println("test");
 						if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get(ts)).booleanValue())
 						{
+//							System.out.println("Startable: "+abspath);
 							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get(ts);
 							boolean istest = false;
 							if(model!=null && model.getReport()==null)
@@ -192,12 +192,14 @@ public class ComponentTestSuite extends TestSuite
 							
 							if(istest)
 							{
+//								System.out.println("Test: "+abspath);
 								ComponentTest test = new ComponentTest(cms, model, this);
 								test.setName(abspath);
 								addTest(test);
 							}
 							else if(model.getReport()!=null)
 							{
+//								System.out.println("Broken: "+abspath);
 								if(broken)
 								{
 									BrokenComponentTest test = new BrokenComponentTest(abspath, model.getReport());
@@ -207,6 +209,7 @@ public class ComponentTestSuite extends TestSuite
 							}
 							else
 							{
+//								System.out.println("Start: "+abspath);
 								if(start)
 								{
 									ComponentStartTest test = new ComponentStartTest(cms, model, this);
@@ -219,6 +222,7 @@ public class ComponentTestSuite extends TestSuite
 				}
 				catch(final RuntimeException e)
 				{
+//					System.out.println("Exception: "+abspath);
 					BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
 					{
 						public String getErrorText()
@@ -286,23 +290,41 @@ public class ComponentTestSuite extends TestSuite
 	{
 		List<String> result = new ArrayList<String>();
 		
-		List<File>	todo	= new LinkedList<File>();
-//		if(path.toString().indexOf("micro")!=-1)
-		todo.add(path);
-		
 		if (SReflect.isAndroid())
 		{
 			try
 			{
+				// Scan for resource files in .apk
+				String	template	= path.toString().replace('.', '/');
+				ZipFile	zip	= new ZipFile(root);
+				Enumeration< ? extends ZipEntry>	entries	= zip.entries();
+				while(entries.hasMoreElements())
+				{
+					ZipEntry	entry	= entries.nextElement();
+					String name	= entry.getName();
+					if(name.startsWith(template))
+					{
+						result.add(name);
+//						System.out.println("Found potential Testcase: "+name);
+					}
+				}
+				zip.close();
+				
+				// Scan for classes in .dex
 				Enumeration<String> dexEntries = SUtil.androidUtils().getDexEntries(root);
 				String nextElement;
-				while (dexEntries.hasMoreElements()) {
+				while(dexEntries.hasMoreElements())
+				{
 					nextElement = dexEntries.nextElement();
-					if (nextElement.toLowerCase().startsWith(path.toString().toLowerCase())) {
-//							&& nextElement.toLowerCase().split("\\.").length  (path.toString().split("\\.").length +1)) {
-						if (!nextElement.matches(".*\\$.*")) {
+					if(nextElement.toLowerCase().startsWith(path.toString().toLowerCase()))
+//						&& nextElement.toLowerCase().split("\\.").length  (path.toString().split("\\.").length +1))
+					{
+						if(!nextElement.matches(".*\\$.*"))
+						{
+							// path-style identifier needed for Factories, but android doesn't use a classical classpath
+							nextElement = nextElement.replaceAll("\\.", "/") + ".class";
 							result.add(nextElement);
-							System.out.println("Found potential Testcase: " + nextElement);
+//							System.out.println("Found potential Testcase: " + nextElement);
 						}
 					}
 				}
@@ -315,6 +337,10 @@ public class ComponentTestSuite extends TestSuite
 		}
 		else
 		{
+			List<File>	todo	= new LinkedList<File>();
+//			if(path.toString().indexOf("micro")!=-1)
+			todo.add(path);
+			
 			while(!todo.isEmpty())
 			{
 				File	file	= (File)todo.remove(0);

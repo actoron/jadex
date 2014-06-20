@@ -201,7 +201,7 @@ public class SBpmnModelReader
 //			    	}
 //		    	}
 		    	Map<String, String> attrs = reader.getAttributes();
-		    	attrstack.push(attrs);
+		    	attrstack.addFirst(attrs);
 		    	
 		    	if ("extension".equals(reader.getXmlTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
 	    		{
@@ -214,7 +214,7 @@ public class SBpmnModelReader
 		    	else if ("subProcess".equals(reader.getXmlTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
 		    	{
 		    		LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
-		    		sps.push(new MSubProcess());
+		    		sps.addFirst(new MSubProcess());
 		    	}
 		    }
 		    else if (reader.getEventType() == XmlUtil.CHARACTERS)
@@ -229,7 +229,7 @@ public class SBpmnModelReader
 		    {
 		    	text = text!=null && text.trim().length()>0? text.trim(): null;
 		    	text = text != null? XmlUtil.unescapeString(text) : null;
-		    	contentstack.push(text);
+		    	contentstack.addFirst(text);
 		    	text = null;
 		    	if (reader.getXmlTag() != null && "extension".equals(reader.getClosedTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
 	    		{
@@ -237,7 +237,7 @@ public class SBpmnModelReader
 	    		}
 		    	
 //		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, tagstack.pop(), tagstack, attrstack.pop(), contentstack.pop(), buffer, vreader);
-		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, reader.getClosedTag(), reader.getXmlTagStack(), attrstack.pop(), contentstack.pop(), buffer, vreader);
+		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, reader.getClosedTag(), reader.getXmlTagStack(), attrstack.removeFirst(), contentstack.removeFirst(), buffer, vreader);
 		    }
 		}
 		
@@ -381,7 +381,7 @@ public class SBpmnModelReader
 			if (MBpmnModel.SUBPROCESS.equals(ACT_TYPE_MAPPING.get(tag.getLocalPart())))
 			{
 				LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
-				act = sps.pop();
+				act = sps.removeFirst();
 				
 				String eventsp = attrs.get("triggeredByEvent");
 				if ((eventsp != null) && eventsp.equalsIgnoreCase("true"))
