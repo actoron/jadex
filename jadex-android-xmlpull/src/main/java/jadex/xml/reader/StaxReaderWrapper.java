@@ -109,7 +109,6 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 	 */
 	public void next()
 	{
-		int inttype;
 		try
 		{
 			inttype = parser.next();
@@ -122,14 +121,14 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 			}
 			throw new RuntimeException(e);
 		}
-		if (inttype != XmlPullParser.END_DOCUMENT)
+		if (inttype == XmlPullParser.END_DOCUMENT)
 		{
 			hasnext = false;
 		}
 		
 		if (inttype == XmlPullParser.START_TAG)
 		{
-			tagstack.push(new XmlTag(parser.getNamespace(), parser.getName()));
+			tagstack.addFirst(new XmlTag(parser.getNamespace(), parser.getName()));
 			if (parser.getAttributeCount() > 0)
 			{
 				attrs = new HashMap<String, String>(parser.getAttributeCount());
@@ -138,11 +137,15 @@ public class StaxReaderWrapper implements IStaxReaderWrapper
 		    		attrs.put(parser.getAttributeName(i), XmlUtil.unescapeString(parser.getAttributeValue(i)));
 		    	}
 			}
+			else
+			{
+				attrs = null;
+			}
 		}
 		
 		if (inttype == XmlPullParser.END_TAG)
 		{
-			closedtag = tagstack.pop();
+			closedtag = tagstack.removeFirst();
 		}
 	}
 	

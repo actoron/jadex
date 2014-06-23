@@ -57,6 +57,12 @@
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-gpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdiv3-android</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -89,13 +95,6 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-android</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>android</artifactId>
-			<version>2.2.1</version>
-			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>

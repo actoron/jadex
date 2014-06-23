@@ -16,13 +16,21 @@ public class GPMNTest	extends ComponentTestSuite
 	 */
 	public GPMNTest()	throws Exception
 	{
-		// Use gpmn application classes directory as classpath root,
-		super(new File("../jadex-applications-gpmn/target/classes/"),
-			new File("../jadex-applications-gpmn/target/classes"),
+		// Use classes directory as classpath root,
+		this("../jadex-applications-gpmn/target/classes/", "../jadex-applications-gpmn/target/classes");
+	}
+	
+	/**
+	 *  Constructor called by JadexInstrumentor for Android tests.
+	 */
+	public GPMNTest(String root, String path) throws Exception
+	{
+		super(new File(root), new File(path),
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
-				".bpmn"	// Only execute GPMN processes.
+				".bpmn",	// Only execute GPMN processes.
+				".bpmn2"	// Only execute GPMN processes.
 			});
 	}
 	

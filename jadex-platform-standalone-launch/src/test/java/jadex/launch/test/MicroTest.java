@@ -24,10 +24,7 @@ public class MicroTest	extends ComponentTestSuite
 	}
 	
 	/**
-	 * Constructor
-	 * @param path
-	 * @param root
-	 * @throws Exception
+	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
 	public MicroTest(String path, String root)	throws Exception
 	{

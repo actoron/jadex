@@ -22,10 +22,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 	}
 
 	/**
-	 * Constructor
-	 * @param path
-	 * @param root
-	 * @throws Exception
+	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
 	public BDIV3Test(String path, String root)	throws Exception
 	{
