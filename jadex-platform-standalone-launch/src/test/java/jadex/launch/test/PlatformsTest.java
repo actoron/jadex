@@ -44,7 +44,7 @@ public class PlatformsTest extends TestCase
 //		"-logging", "true",
 //		"-debugfutures", "true",
 //		"-nostackcompaction", "true",
-		"-platformname", "testcases",
+		"-platformname", "testcases_*",
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",

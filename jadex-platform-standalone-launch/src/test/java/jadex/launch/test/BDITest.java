@@ -75,16 +75,16 @@ public class BDITest	extends	ComponentTestSuite
 		return new BDITest();
 	}
 
-	public void cleanup(TestResult result)
-	{
-		try
-		{
-			Thread.sleep(3000000);
-		}
-		catch(InterruptedException e)
-		{
-		}
-		
-		super.cleanup(result);
-	}
+//	public void cleanup(TestResult result)
+//	{
+//		try
+//		{
+//			Thread.sleep(3000000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
+//		
+//		super.cleanup(result);
+//	}
 }
