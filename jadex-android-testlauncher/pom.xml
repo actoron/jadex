@@ -24,13 +24,14 @@
 			<artifactId>jadex-android-platformapp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!-- 		
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applications-bpmn</artifactId>
 			<version>${project.version}</version>
 		</dependency>
--->
+		
+		<!--
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applications-gpmn</artifactId>
@@ -72,7 +73,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-<!--		
+		-->
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applications-micro</artifactId>
@@ -116,35 +118,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
- -->
-<!--
-		<dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>android</artifactId>
-			<version>2.2.1</version>
-			<scope>provided</scope>
-		</dependency>
--->
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<excludes>
-					<exclude>**/.svn/*</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.bpmn</include>
-					<include>**/*.bpmn2</include>
-				</includes>
-			</resource>
-		</resources>
-
-		<plugins>
-		
-		<plugin>
+		<plugins>	
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>groovy-maven-plugin</artifactId>
 				<version>1.4</version>

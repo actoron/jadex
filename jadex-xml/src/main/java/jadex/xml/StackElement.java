@@ -183,6 +183,7 @@ public class StackElement
 		
 		if(parts==null)
 			parts = new ArrayList();
+//		System.out.println("Added content: '"+content+"'");
 
 		parts.add(content);
 	}

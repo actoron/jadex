@@ -111,16 +111,14 @@ public class PullParserReader extends AReader
 						// StaX: END_ELEMENT
 						handleEndTag(readcontext);
 						break;
-
-					case XmlPullParser.DOCDECL :
-						// StaX: DTD
 					case XmlPullParser.ENTITY_REF :
 						// StaX: ENTITY_REFERENCE
-						// workaround: Android Pull Parser handles %amp; as reference.
-						char[] textCharacters = readcontext.getParser().getTextCharacters(new int[2]);
-						if ("amp".equals(readcontext.getParser().getName())) {
-							handleContent(readcontext);
-						}
+						// Android Pull Parser handles entities as reference.
+						handleContent(readcontext);
+						break;
+						
+					case XmlPullParser.DOCDECL :
+						// StaX: DTD
 					case XmlPullParser.IGNORABLE_WHITESPACE :
 						// StaX: SPACE
 					case XmlPullParser.PROCESSING_INSTRUCTION :
