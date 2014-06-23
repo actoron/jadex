@@ -2,6 +2,7 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -51,6 +52,11 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 		this.finished = finished;
 		this.orig	= orig;
 		this.cnt = cnt;
+		
+		if(result instanceof IClockService)
+		{
+			System.out.println("sevuif");
+		}
 	}
 	
 	/**

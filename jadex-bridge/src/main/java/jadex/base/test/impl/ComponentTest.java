@@ -5,6 +5,7 @@ import jadex.base.test.ComponentTestSuite;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -29,8 +30,14 @@ public class ComponentTest extends TestCase
 	/** The component management system. */
 	protected IComponentManagementService	cms;
 	
-	/** The component. */
-	protected IModelInfo	comp;
+	/** The component model. */
+	protected String	filename;
+	
+	/** The component resource identifier. */
+	protected IResourceIdentifier	rid;
+	
+	/** The component full name. */
+	protected String	fullname;
 	
 	/** The test suite. */
 	protected ComponentTestSuite	suite;
@@ -43,7 +50,9 @@ public class ComponentTest extends TestCase
 	public ComponentTest(IComponentManagementService cms, IModelInfo comp, ComponentTestSuite suite)
 	{
 		this.cms	= cms;
-		this.comp	= comp;
+		this.filename	= comp.getFilename();
+		this.rid	= comp.getResourceIdentifier();
+		this.fullname	= comp.getFullName();
 		this.suite	= suite;
 	}
 	
@@ -85,7 +94,7 @@ public class ComponentTest extends TestCase
 //			args.put("timeout", new Long(3000000));
 //			CreationInfo	ci	= new CreationInfo(args);
 			ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()));
+			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
 
 			// Evaluate the results.
 			Map<String, Object>	res	= fut.getSecondResult();
@@ -129,7 +138,6 @@ public class ComponentTest extends TestCase
 
 		// Remove references to Jadex resources to aid GC cleanup.
 		cms	= null;
-		comp	= null;
 		suite	= null;
 	}
 	
@@ -144,6 +152,6 @@ public class ComponentTest extends TestCase
 	 */
 	public String toString()
 	{
-		return comp.getFullName();
+		return fullname;
 	}
 }

@@ -55,6 +55,7 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 //			Test singleTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases.stream.InitiatorAgent", sourceDir);
 //			suite.addTest(singleTest);
 			
+			// Make sure that also the dependencies are placed in pom.
 			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
 			Test bdiTest = createTest("jadex.launch.test.BDITest", "jadex.bdi.testcases", sourceDir);
 			Test bpmnTest = createTest("jadex.launch.test.BPMNTest", "jadex.bpmn.testcases", sourceDir);

@@ -1064,7 +1064,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 													
 													public void exceptionOccurred(Exception exception)
 													{
-														System.out.println("Starting kernel7: " + kernelmodel);
+//														System.out.println("Starting kernel7: " + kernelmodel);
 //														exception.printStackTrace();
 														ret.setException(exception);
 													}

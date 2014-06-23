@@ -1,13 +1,12 @@
 package jadex.micro.quickstart;
 
+import jadex.bridge.service.IService;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Date;
 
 /**
  *  Simple agent that uses globally available time services.
@@ -23,11 +22,12 @@ public class BlockingTimeUserAgent
 	@AgentService//(retrycnt=10, retrydelay=10000)
 	public void	addTimeService(ITimeService timeservice)
 	{
-		ISubscriptionIntermediateFuture<Date>	subscription	= timeservice.subscribe();
+		ISubscriptionIntermediateFuture<String>	subscription	= timeservice.subscribe();
 		while(subscription.hasNextIntermediateResult())
 		{
-			Date	date	= subscription.getNextIntermediateResult();
-			System.out.println("New time received from "+timeservice.getName()+": "+date);			
+			String	time	= subscription.getNextIntermediateResult();
+			String	platform	= ((IService)timeservice).getServiceIdentifier().getProviderId().getPlatformName();
+			System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
 		}
 	}
 }
