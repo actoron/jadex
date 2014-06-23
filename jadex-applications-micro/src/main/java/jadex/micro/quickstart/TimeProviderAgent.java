@@ -10,12 +10,14 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -24,8 +26,7 @@ import java.util.Set;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITimeService.class,
-	implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITimeService.class))
 public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 {
 	//-------- attributes --------
@@ -35,9 +36,12 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 	@Agent
 	protected IInternalAccess	agent;
 	
+	/** The location (determined at startup). */
+	protected String	location	= determineLocation();
+	
 	/** The subscriptions to be informed about the time. */
-	protected Set<SubscriptionIntermediateFuture<Date>>	subscriptions
-		= new LinkedHashSet<SubscriptionIntermediateFuture<Date>>();
+	protected Set<SubscriptionIntermediateFuture<String>>	subscriptions
+		= new LinkedHashSet<SubscriptionIntermediateFuture<String>>();
 	
 	//-------- agent lifecycle methods --------
 	
@@ -52,12 +56,12 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 		Date	d = new Date(System.currentTimeMillis()-System.currentTimeMillis()%5000);
 
 		// Notify all subscribers
-		for(SubscriptionIntermediateFuture<Date> subscriber: subscriptions)
+		for(SubscriptionIntermediateFuture<String> subscriber: subscriptions)
 		{
 			// Add the current time as intermediate result.
 			// The if-undone part is used to ignore errors,
 			// when subscription was cancelled in the mean time.
-			subscriber.addIntermediateResultIfUndone(d);
+			subscriber.addIntermediateResultIfUndone(d.toString());
 		}
 		
 		// Wait until the next full five seconds.
@@ -71,24 +75,24 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 	//-------- ITimeService interface --------
 	
 	/**
-	 *  Get the name of the platform, where the time service runs.
-	 *  Name is a constant value for each service, therefore it can be cached
+	 *  Get the location of the platform, where the time service runs.
+	 *  The location is a constant value for each service, therefore it can be cached
 	 *  and no future is needed.
 	 */
-	public String	getName()
+	public String	getLocation()
 	{
-		return agent.getComponentIdentifier().getPlatformName();
+		return location;
 	}
 	
 	/**
 	 *  Subscribe to the time service.
-	 *  Every couple of seconds, the current time will be
+	 *  Every couple of seconds, a string with the current time will be
 	 *  sent to the subscriber.
 	 */
-	public ISubscriptionIntermediateFuture<Date>	subscribe()
+	public ISubscriptionIntermediateFuture<String>	subscribe()
 	{
 		// Add a subscription to the set of subscriptions.
-		final SubscriptionIntermediateFuture<Date>	ret	= new SubscriptionIntermediateFuture<Date>();
+		final SubscriptionIntermediateFuture<String>	ret	= new SubscriptionIntermediateFuture<String>();
 		subscriptions.add(ret);
 		
 		ret.setTerminationCommand(new TerminationCommand()
@@ -104,6 +108,33 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 				subscriptions.remove(ret);
 			}
 		});
+		
+		return ret;
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Determine the location of the local platform.
+	 */
+	protected static String	determineLocation()
+	{
+		String	ret	= "unknown";
+		try
+		{
+			// Get geo location, e.g. "134.100.11.232","DE","Germany","04","Hamburg","Hamburg","","53.5500","10.0000","",""
+			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/csv").openStream(), "UTF-8");
+			scanner.findInLine("\"([^\"]*)\"");
+			scanner.findInLine("\"([^\"]*)\"");
+			scanner.findInLine("\"([^\"]*)\"");
+			ret	= scanner.match().group(1);	// Country
+			scanner.findInLine("\"([^\"]*)\"");
+			ret	= scanner.match().group(1) + ", " + ret;	// City
+			scanner.close();
+		}
+		catch(IOException e)
+		{
+		}
 		
 		return ret;
 	}
