@@ -213,7 +213,7 @@ public abstract class TestAgent
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
 				ci.setArguments(args);

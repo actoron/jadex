@@ -48,6 +48,7 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
@@ -306,7 +307,7 @@ public class SRemoteGui
 						public void customResultAvailable(IModelInfo result)
 						{
 							String	model	= SUtil.convertPathToRelative(name);
-							String	ridurl	= SUtil.convertPathToRelative(rid.getLocalIdentifier().getUrl().toString());
+							String	ridurl	= SUtil.convertPathToRelative(rid.getLocalIdentifier().getUri().toString());
 							ret.setResult(new Tuple2<String, String>(model, ridurl));
 						}
 						public void exceptionOccurred(Exception exception)
@@ -438,22 +439,29 @@ public class SRemoteGui
 										{
 											if(rid.getLocalIdentifier()!=null)
 											{
-												URL u1 = rid.getLocalIdentifier().getUrl();
-												String s1 = u1.toString();
-												String sufc = "classes";
-												if(s1.endsWith(sufc))
-													s1 = s1 + "/";
-												sufc = "classes/";
-												
-												if(s1.endsWith(sufc) && u1.getProtocol().equals("file"))
+												try
 												{
-													String st1 = s1.substring(0, s1.lastIndexOf(sufc));
-													if(st1.equals(st2))
+													URL u1 = rid.getLocalIdentifier().getUri().toURL();
+													String s1 = u1.toString();
+													String sufc = "classes";
+													if(s1.endsWith(sufc))
+														s1 = s1 + "/";
+													sufc = "classes/";
+													
+													if(s1.endsWith(sufc) && u1.getProtocol().equals("file"))
 													{
-														tmp = rid;
-	//														System.out.println("url: "+u1.getPath());
-														break;
+														String st1 = s1.substring(0, s1.lastIndexOf(sufc));
+														if(st1.equals(st2))
+														{
+															tmp = rid;
+		//														System.out.println("url: "+u1.getPath());
+															break;
+														}
 													}
+												}
+												catch(Exception e)
+												{
+													System.out.println("URL problem: "+rid.getLocalIdentifier());
 												}
 											}
 										}

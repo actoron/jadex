@@ -3,6 +3,7 @@ package jadex.bridge;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.SUtil;
 
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -16,8 +17,8 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	/** The component identifier. */
 	protected IComponentIdentifier cid;
 	
-	/** The URL. */
-	protected URL url;
+	/** The URI. */
+	protected URI uri;
 	
 	/** The host id. */
 	protected String hostid;
@@ -39,7 +40,17 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 */
 	public LocalResourceIdentifier(IComponentIdentifier cid, URL url)
 	{
-		this(cid, url, SUtil.getMacAddress());
+		this(cid, SUtil.toURI0(url));
+	}
+	
+	/**
+	 *  Create a resource identifier.
+	 *  @param cid The platform identifier.
+	 *  @param url The local URL.
+	 */
+	public LocalResourceIdentifier(IComponentIdentifier cid, URI uri)
+	{
+		this(cid, uri, SUtil.getMacAddress());
 	}
 		
 	/**
@@ -47,13 +58,13 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 *  @param cid The platform identifier.
 	 *  @param url The local URL.
 	 */
-	public LocalResourceIdentifier(IComponentIdentifier cid, URL url, String hostid)
+	public LocalResourceIdentifier(IComponentIdentifier cid, URI uri, String hostid)
 	{
 		if(cid==null)
 		{
 			throw new IllegalArgumentException("Cid must not null.");
 		}
-		if(url==null)
+		if(uri==null)
 		{
 			throw new IllegalArgumentException("Url must not null.");
 		}
@@ -61,18 +72,25 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		{
 			hostid = cid.getName(); // in case no mac is available use cid (strict as before)
 		}
-		if(url.toString().indexOf("..")!=-1)
+		if(uri.toString().indexOf("..")!=-1)
 		{
-			throw new IllegalArgumentException("Url must use canonical path: "+url);
+			throw new IllegalArgumentException("Url must use canonical path: "+uri);
 		}
-		if(url.getFile().startsWith("."))
+		try
 		{
-			throw new IllegalArgumentException("Url must be absolute: "+url);
+			if(uri.toURL().getFile().startsWith("."))
+			{
+				throw new IllegalArgumentException("Url must be absolute: "+uri);
+			}
+		}
+		catch(Exception e)
+		{
+			throw new IllegalArgumentException("Url must be absolute: "+uri);
 		}
 		
 		this.hostid = hostid;
 		this.cid = cid;
-		this.url = url;
+		this.uri = uri;
 	}
 
 	//-------- methods --------
@@ -87,12 +105,12 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	}
 	
 	/**
-	 *  Get the url.
-	 *  @return The resource url.
+	 *  Get the uri.
+	 *  @return The resource uri.
 	 */
-	public URL	getUrl()
+	public URI	getUri()
 	{
-		return url;
+		return uri;
 	}
 	
 	/**
@@ -117,9 +135,9 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 *  Set the url.
 	 *  @param url The resource url.
 	 */
-	public void	setUrl(URL url)
+	public void	setUri(URI uri)
 	{
-		this.url	= url;
+		this.uri	= uri;
 	}
 	
 	/**
@@ -140,7 +158,7 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		int result = 1;
 //		result = prime * result + (cid!=null? cid.hashCode(): 0);
 		result = prime * result + hostid.hashCode();
-		result = prime * result + url.hashCode();
+		result = prime * result + uri.hashCode();
 		return result;
 	}
 
@@ -157,7 +175,7 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 //			ret = SUtil.equals(getComponentIdentifier(), other.getComponentIdentifier())
 //				&& SUtil.equals(getUrl(), other.getUrl());
 			ret = SUtil.equals(getHostIdentifier(), other.getHostIdentifier())
-				&& SUtil.equals(getUrl(), other.getUrl());
+				&& SUtil.equals(getUri(), other.getUri());
 		}
 		return ret;
 	}
@@ -167,6 +185,6 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 */
 	public String	toString()
 	{
-		return url+"-"+hostid+"@"+cid;
+		return uri+"-"+hostid+"@"+cid;
 	}
 }

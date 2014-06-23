@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import java.net.URL;
+import java.net.URI;
 
 /**
  *  Interface for resource identification.
@@ -21,8 +21,8 @@ public interface ILocalResourceIdentifier
 	public String getHostIdentifier();
 	
 	/**
-	 *  Get the url.
-	 *  @return The resource url.
+	 *  Get the uri.
+	 *  @return The resource uri.
 	 */
-	public URL	getUrl();
+	public URI	getUri();
 }

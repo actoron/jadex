@@ -447,7 +447,7 @@ public class Starter
 //					URL url = model.getClass().getProtectionDomain().getCodeSource().getLocation();
 					ResourceIdentifier rid = (ResourceIdentifier)model.getResourceIdentifier();
 					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
-					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUrl()));
+					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUri()));
 					
 					initRescueThread(cid);
 					
