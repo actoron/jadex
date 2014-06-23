@@ -24,7 +24,7 @@ public class TimeUserAgent
 	
 	/** The time services are searched and set at agent startup. */
 	@AgentService
-	IIntermediateFuture<ITimeService>	timeservices;
+	private IIntermediateFuture<ITimeService>	timeservices;
 	
 	//-------- methods --------
 	

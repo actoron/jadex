@@ -459,7 +459,7 @@ public class ComponentManagementService implements IComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
 
-//		System.out.println("create compo: "+modelname);
+		System.out.println("create compo: "+modelname+" "+info);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
@@ -558,6 +558,7 @@ public class ComponentManagementService implements IComponentManagementService
 							public void customResultAvailable(final IResourceIdentifier rid)
 							{
 //								System.out.println("loading: "+modelname+" "+rid);
+
 								resolveFilename(modelname, cinfo, rid).addResultListener(createResultListener(new ExceptionDelegationResultListener<String, IComponentIdentifier>(inited)
 								{
 									public void customResultAvailable(final String model)
@@ -567,6 +568,7 @@ public class ComponentManagementService implements IComponentManagementService
 										{
 											public void customResultAvailable(final IComponentFactory factory)
 											{
+//												System.out.println("load: "+model+" "+rid);
 												factory.loadModel(model, cinfo.getImports(), rid)
 													.addResultListener(createResultListener(new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier>(inited)
 												{

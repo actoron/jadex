@@ -40,7 +40,7 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 */
 	public LocalResourceIdentifier(IComponentIdentifier cid, URL url)
 	{
-		this(cid, SUtil.toURI0(url));
+		this(cid, SUtil.toURI(url));
 	}
 	
 	/**
@@ -105,24 +105,6 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	}
 	
 	/**
-	 *  Get the uri.
-	 *  @return The resource uri.
-	 */
-	public URI	getUri()
-	{
-		return uri;
-	}
-	
-	/**
-	 *  Get the host identifier.
-	 *  @return The host identifier.
-	 */
-	public String	getHostIdentifier()
-	{
-		return hostid;
-	}
-	
-	/**
 	 *  Set the platform identifier belonging to the resource identifier.
 	 *  @param cid The component identifier of the platform. 
 	 */
@@ -132,12 +114,30 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	}
 	
 	/**
+	 *  Get the uri.
+	 *  @return The resource uri.
+	 */
+	public URI	getUri()
+	{
+		return uri;
+	}
+	
+	/**
 	 *  Set the url.
 	 *  @param url The resource url.
 	 */
 	public void	setUri(URI uri)
 	{
-		this.uri	= uri;
+		this.uri = uri;
+	}
+	
+	/**
+	 *  Get the host identifier.
+	 *  @return The host identifier.
+	 */
+	public String	getHostIdentifier()
+	{
+		return hostid;
 	}
 	
 	/**
@@ -158,7 +158,8 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		int result = 1;
 //		result = prime * result + (cid!=null? cid.hashCode(): 0);
 		result = prime * result + hostid.hashCode();
-		result = prime * result + uri.hashCode();
+		if(uri!=null) // hack due to old platforms sending with url :-(
+			result = prime * result + uri.hashCode();
 		return result;
 	}
 
