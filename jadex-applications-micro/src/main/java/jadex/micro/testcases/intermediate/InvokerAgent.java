@@ -211,7 +211,7 @@ public class InvokerAgent
 					public void customResultAvailable(final IClockService clock)
 					{
 						IResourceIdentifier	rid	= new ResourceIdentifier(
-							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
 						final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
 						CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);

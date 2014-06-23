@@ -6,6 +6,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.platform.service.dependency.maven.MavenDependencyResolverService;
 
@@ -64,7 +65,7 @@ public class JadexMavenRunner
 			Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rids[i], true).get(null);
 			for(IResourceIdentifier rid: dependencies.getSecondEntity().keySet())
 			{
-				urls.add(rid.getLocalIdentifier().getUrl());
+				urls.add(SUtil.toURL(rid.getLocalIdentifier().getUri()));
 			}
 		}
 		ClassLoader	cl	= new URLClassLoader(urls.toArray(new URL[urls.size()]), null);

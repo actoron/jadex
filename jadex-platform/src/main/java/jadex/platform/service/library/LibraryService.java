@@ -220,7 +220,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					else
 					{
 						// Check if file exists
-						if(checkUrl(rid.getLocalIdentifier().getUrl())==null)
+						if(checkUri(rid.getLocalIdentifier().getUri())==null)
 						{
 							ret.setException(new RuntimeException("Local rid url invalid: "+rid));
 						}
@@ -271,7 +271,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	
 	/**
 	 *  Remove a resource identifier.
-	 *  @param url The resource identifier.
+	 *  @param uri The resource identifier.
 	 */
 	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier parid, final IResourceIdentifier rid)
 	{
@@ -295,7 +295,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	
 	/** 
 	 *  Get the root resource identifier.
-	 *  @param url The url.
+	 *  @param uri The url.
 	 *  @return The corresponding resource identifier.
 	 */
 	public IResourceIdentifier getRootResourceIdentifier()
@@ -394,9 +394,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			Set<URI> nonmans = getInternalNonManagedURLs();
 			for(URI uri: nonmans)
 			{
-				URL url = SUtil.toURL0(uri);
-				if(url!=null)
-					mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null));
+				mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), SUtil.toURL(uri)), null));
 			}
 			deps.put(SYSTEMCPRID, mydeps);
 			
@@ -423,7 +421,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	
 	/**
 	 *  Add a new url.
-	 *  @param url The resource identifier.
+	 *  @param uri The resource identifier.
 	 */
 	public IFuture<IResourceIdentifier> addURL(final IResourceIdentifier parid, URL purl)
 	{
@@ -494,7 +492,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Add a top level url. A top level url will
 	 *  be available for all subordinated resources. 
-	 *  @param url The url.
+	 *  @param uri The url.
 	 */
 	public IFuture<Void> addTopLevelURL(@CheckNotNull URL purl)
 	{
@@ -585,7 +583,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				{
 					if(!rootrid.equals(result.get(i)))
 					{
-						res.add(result.get(i).getLocalIdentifier().getUrl());
+						URL url = SUtil.toURL0(result.get(i).getLocalIdentifier().getUri());
+						if(url!=null)
+							res.add(url);
 					}
 				}
 				
@@ -630,7 +630,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			ret.setResult(rootloader);
 //			System.out.println("root classloader: "+rid);
 		}
-		else if(isLocal(rid) && getInternalNonManagedURLs().contains(SUtil.toURI0(rid.getLocalIdentifier().getUrl())))
+		else if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
 		{
 			ret.setResult(baseloader);
 //			System.out.println("base classloader: "+rid);
@@ -718,7 +718,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		// pure global call followed by pure local call -> would mean rids have not been resolved
 		// pure local call followed by pure global call -> would mean rids have not been resolved
 		final IResourceIdentifier lrid = ResourceIdentifier.getLocalResourceIdentifier(rid);
-		if(isLocal(rid) && getInternalNonManagedURLs().contains(SUtil.toURI0(rid.getLocalIdentifier().getUrl())))
+		if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
 		{
 			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
 			notifyAdditionListeners(support, rid);
@@ -817,7 +817,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
 	{
 		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
-		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(SUtil.toURI0(rid.getLocalIdentifier().getUrl()));
+		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri());
 		
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 //		final URL url = rid.getLocalIdentifier().getSecondEntity();
@@ -910,7 +910,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		// special case that parid is local and already handled by baseloader
-		if(pacl==null && isLocal(parid) && getInternalNonManagedURLs().contains(SUtil.toURI0(parid.getLocalIdentifier().getUrl())))
+		if(pacl==null && isLocal(parid) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
 		{
 			pacl = rootloader;
 		}
@@ -945,7 +945,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		// special case that parid is local and already handled by baseloader
-		if(pacl==null && isLocal(parid) && getInternalNonManagedURLs().contains(SUtil.toURI0(parid.getLocalIdentifier().getUrl())))
+		if(pacl==null && isLocal(parid) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
 		{
 			pacl = rootloader;
 		}
@@ -1348,7 +1348,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			
 			if(SYSTEMCPRID.equals(a))
 			{
-				addTopLevelURL(b.getLocalIdentifier().getUrl());
+				addTopLevelURL(SUtil.toURL(b.getLocalIdentifier().getUri()));
 			}
 			else
 			{
@@ -1412,7 +1412,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 		if(rid!=null && rid.getLocalIdentifier()!=null)
 		{
-			ret.addProperty(new Property("lid_url", SUtil.convertPathToRelative(rid.getLocalIdentifier().getUrl().toString())));
+			ret.addProperty(new Property("lid_url", SUtil.convertPathToRelative(rid.getLocalIdentifier().getUri().toString())));
 			// todo: check if own platform cid?
 //			ret.addProperty(new Property("lid_cid", rid.getLocalIdentifier().getComponentIdentifier()));
 		}
@@ -1454,6 +1454,21 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 		
 		return gid!=null || lid!=null? new ResourceIdentifier(lid, gid): null;
+	}
+	
+	/**
+	 *  Check if a local url is backed by a file.
+	 */
+	protected URL checkUri(URI uri)
+	{
+		try
+		{
+			return checkUrl(uri.toURL());
+		}
+		catch(Exception e)
+		{
+			return null;
+		}
 	}
 	
 	/**

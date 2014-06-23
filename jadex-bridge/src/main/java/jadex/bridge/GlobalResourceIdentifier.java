@@ -5,6 +5,7 @@ package jadex.bridge;
 
 import jadex.bridge.service.annotation.Reference;
 
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -18,8 +19,8 @@ public class GlobalResourceIdentifier implements IGlobalResourceIdentifier
 	/** The id. */
 	protected String id;
 	
-	/** The URL. */
-	protected URL url;
+	/** The URI. */
+	protected URI uri;
 	
 	/** The version info. */
 	protected String versioninfo;
@@ -39,13 +40,13 @@ public class GlobalResourceIdentifier implements IGlobalResourceIdentifier
 	 *  @param cid The platform identifier.
 	 *  @param url The local URL.
 	 */
-	public GlobalResourceIdentifier(String id, URL url, String versioninfo)
+	public GlobalResourceIdentifier(String id, URI url, String versioninfo)
 	{
 		if(id==null)
 			throw new IllegalArgumentException("Id must not null.");
 		
 		this.id = id;
-		this.url = url;
+		this.uri = url;
 		this.versioninfo = versioninfo;
 	}
 	
@@ -66,9 +67,9 @@ public class GlobalResourceIdentifier implements IGlobalResourceIdentifier
 	 *  Get the url.
 	 *  @return The resource url.
 	 */
-	public URL getRepositoryInfo()
+	public URI getRepositoryInfo()
 	{
-		return url;
+		return uri;
 	}
 	
 	/**
@@ -84,9 +85,9 @@ public class GlobalResourceIdentifier implements IGlobalResourceIdentifier
 	 *  Set the repository info.
 	 *  @param info The info.
 	 */
-	public void setRepositoryInfo(URL url)
+	public void setRepositoryInfo(URI uri)
 	{
-		this.url = url;
+		this.uri = uri;
 	}
 	
 	/**
@@ -136,8 +137,8 @@ public class GlobalResourceIdentifier implements IGlobalResourceIdentifier
 	public String	toString()
 	{
 		String ret = id;
-		if(url!=null)
-			ret += " ("+url+")";
+		if(uri!=null)
+			ret += " ("+uri+")";
 		return ret;
 	}
 }

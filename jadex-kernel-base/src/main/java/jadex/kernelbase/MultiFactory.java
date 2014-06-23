@@ -222,7 +222,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								URL url = rid.getLocalIdentifier().getUrl();
+								URL url = SUtil.toURL(rid.getLocalIdentifier().getUri());
 								Collection affectedkernels = (Collection)kernelurls.remove(url);
 								if (affectedkernels != null)
 								{
@@ -245,7 +245,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					
 					public IFuture resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
 					{
-						final URL url = rid.getLocalIdentifier().getUrl();
+						final URL url = SUtil.toURL(rid.getLocalIdentifier().getUri());
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)

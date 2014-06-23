@@ -2160,6 +2160,17 @@ public class SUtil
 				throw new RuntimeException(e);
 			}
 		}
+		else if(url instanceof URI)
+		{
+			try
+			{
+				ret = ((URI)url).toURL();
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 		
 		return ret;
 	}
@@ -2187,6 +2198,9 @@ public class SUtil
 	 */
 	public static URI toURI0(URL url)
 	{
+		if(url==null)
+			return null;
+		
 		URI ret = null;
 		try
 		{
