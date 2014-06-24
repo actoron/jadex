@@ -87,7 +87,7 @@ public class CMSTestPlan extends Plan
 		create.getParameter("type").setValue(agenttype);
 		create.getParameter("cms").setValue(ams);
 		create.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
-		System.out.println("rid: "+getComponentDescription().getResourceIdentifier().getLocalIdentifier());
+//		System.out.println("rid: "+getComponentDescription().getResourceIdentifier().getLocalIdentifier());
 		IComponentIdentifier agent = null;
 		try
 		{

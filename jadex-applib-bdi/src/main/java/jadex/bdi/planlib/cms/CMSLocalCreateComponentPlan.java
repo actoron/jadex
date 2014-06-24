@@ -31,13 +31,13 @@ public class CMSLocalCreateComponentPlan extends Plan
 		Boolean	master	= (Boolean)getParameter("master").getValue();
 		IComponentIdentifier	parent	= (IComponentIdentifier)getParameter("parent").getValue();
 		IResourceIdentifier	rid	= (IResourceIdentifier)getParameter("rid").getValue();
+//		System.out.println("cms local create comp plan rid: "+rid);
 
 		try
 		{
 			// todo: support parent/master etc.
 			IFuture ret = ((IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this))
 				.createComponent(name, type, new CreationInfo(config, args, parent, suspend, master, null, null, null, null, null, null, null, rid), null);
-			System.out.println("create plan rid: "+rid);
 			IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 			getParameter("componentidentifier").setValue(aid);
 //			System.out.println("create ok: "+aid);

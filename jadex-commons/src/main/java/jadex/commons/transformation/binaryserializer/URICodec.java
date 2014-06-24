@@ -22,7 +22,7 @@ public class URICodec extends AbstractCodec
 	 */
 	public boolean isApplicable(Class<?> clazz)
 	{
-		return SReflect.isSupertype(URL.class, clazz);
+		return SReflect.isSupertype(URI.class, clazz);
 	}
 	
 	/**

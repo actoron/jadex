@@ -131,6 +131,24 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		this.uri = uri;
 	}
 	
+//	/**
+//	 *  Get the uri.
+//	 *  @return The resource uri.
+//	 */
+//	public URL	getUrl()
+//	{
+//		return SUtil.toURL0(uri);
+//	}
+//	
+//	/**
+//	 *  Set the url.
+//	 *  @param url The resource url.
+//	 */
+//	public void	setUrl(URL url)
+//	{
+//		this.uri = SUtil.toURI(url);
+//	}
+	
 	/**
 	 *  Get the host identifier.
 	 *  @return The host identifier.
