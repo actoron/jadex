@@ -18,7 +18,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -165,7 +164,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 				// Use polling as fallback.
 				watchservice = null;
 			}
