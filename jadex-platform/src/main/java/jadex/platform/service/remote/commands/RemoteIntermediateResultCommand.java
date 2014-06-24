@@ -52,11 +52,6 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 		this.finished = finished;
 		this.orig	= orig;
 		this.cnt = cnt;
-		
-		if(result instanceof IClockService)
-		{
-			System.out.println("sevuif");
-		}
 	}
 	
 	/**
