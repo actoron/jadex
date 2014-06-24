@@ -62,6 +62,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 
 /**
@@ -116,9 +118,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	
 	/** Kernel blacklist */
 	protected Set kernelblacklist;
-	
-	/** Package Separator */
-	protected char packageseparator;
 	
 	/** Unloadable kernel locations that may become loadable later. */
 	protected Set potentialkernellocations;
@@ -185,7 +184,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		this.extensionblacklist = new HashSet(baseextensionblacklist);
 		this.potentialkernellocations = new HashSet();
 		this.listeners = new ArrayList();
-		this.packageseparator = SReflect.isAndroid() ? '.' : '/';
 		started = false;
 	}
 	
@@ -222,7 +220,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								URL url = rid.getLocalIdentifier().getUrl();
+								URL url = SUtil.toURL(rid.getLocalIdentifier().getUri());
 								Collection affectedkernels = (Collection)kernelurls.remove(url);
 								if (affectedkernels != null)
 								{
@@ -245,7 +243,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					
 					public IFuture resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
 					{
-						final URL url = rid.getLocalIdentifier().getUrl();
+						final URL url = SUtil.toURL(rid.getLocalIdentifier().getUri());
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
@@ -871,7 +869,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		}
 		else
 		{
-			if(potentialurls.isEmpty() || isrecur)
+			if(potentialurls.isEmpty() && !hasLoadablePotentialKernels() || isrecur)
+//			if(!hasLoadablePotentialKernels() || isrecur)
 			{
 				ret.setResult(null);
 			}
@@ -891,6 +890,24 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					}
 				}));
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Check if there is a potential kernel that could be
+	 *  loaded when another kernel from cache is started. 
+	 */
+	protected boolean hasLoadablePotentialKernels()
+	{
+		boolean	ret	= false;
+		for(Object loc: potentialkernellocations)
+		{
+			ret	= getCacheKeyValueForModel((String)loc, kernellocationcache)!=null;
+			if(ret)
+			{
+				break;
 			}
 		}
 		return ret;
@@ -1138,7 +1155,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //					System.out.println(loc.substring(loc.lastIndexOf('/') + 1).toLowerCase().startsWith("kernel"));
 //				}
 				// For jar entries, strip directory part.
-				return loc.substring(loc.lastIndexOf(packageseparator) + 1).toLowerCase().startsWith("kernel");
+				return loc.substring(loc.lastIndexOf("/") + 1).toLowerCase().startsWith("kernel");
 			}
 		}, rid);
 	}
@@ -1159,7 +1176,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				if (obj instanceof String)
 				{
 					String loc = (String) obj;
-
+					
 					for (Object oblstr : baseextensionblacklist)
 					{
 						String blstr = (String) oblstr;
@@ -1413,19 +1430,28 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		List ret = new ArrayList();
 		try
 		{
-			Enumeration<String> dexEntries = SUtil.androidUtils().getDexEntries(apk);
-			
-			for (Enumeration<String> entries = dexEntries; entries
-					.hasMoreElements();)
+			// Scan for resource files in .apk
+			ZipFile	zip	= new ZipFile(apk);
+			Enumeration< ? extends ZipEntry>	entries	= zip.entries();
+			while(entries.hasMoreElements())
 			{
-				String entry = entries.nextElement();
-				if (filter.filter(entry)) {
-					if (!entry.endsWith("xml")) {
-						entry = entry + ".class";
-					}
+				String	entry	= entries.nextElement().getName();
+				if(filter.filter(entry))
+				{
 					ret.add(entry);
 				}
-					
+			}
+			
+			// Scan for classes in .dex
+			Enumeration<String> dexentries = SUtil.androidUtils().getDexEntries(apk);
+			while(dexentries.hasMoreElements())
+			{
+				String entry = dexentries.nextElement();
+				entry = entry.replace('.', '/') + ".class";
+				if(filter.filter(entry))
+				{
+					ret.add(entry);
+				}					
 			}
 		}
 		catch (IOException e)

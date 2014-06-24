@@ -168,9 +168,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	{
 		Object ret = null;
 		
-//		if(method.getName().indexOf("create")!=-1)
-//			System.out.println("goto");
-		
 //		final long callid = this.callid.getAndIncrement();
 //		comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), true, proxy, method, args, callid, null);
 		

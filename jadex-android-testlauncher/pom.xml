@@ -14,7 +14,7 @@
 	</parent>
 
 	<description>
-	
+		App that can contains the Jadex test agents. Does nothing. Started from external JUnit test launcher app.
 	</description>
 
 	<dependencies>
@@ -24,7 +24,57 @@
 			<artifactId>jadex-android-platformapp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-bpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!--
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-gpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-bdibpmn</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-base-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-bdi</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.toedter</groupId>
+					<artifactId>jcalendar</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-base-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		-->
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applications-micro</artifactId>
@@ -68,34 +118,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>android</artifactId>
-			<version>2.2.1</version>
-			<scope>provided</scope>
-		</dependency>
-
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<excludes>
-					<exclude>**/.svn/*</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.bpmn</include>
-					<include>**/*.bpmn2</include>
-				</includes>
-			</resource>
-		</resources>
-
-		<plugins>
-		
-		<plugin>
+		<plugins>	
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>groovy-maven-plugin</artifactId>
 				<version>1.4</version>
@@ -161,7 +188,16 @@
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
 				<extensions>true</extensions>
-				<!-- <configuration> -->
+				<!-- 
+				<configuration>
+					<dex>
+						<jvmArguments>
+							<argument>-Xms256m</argument>
+							<argument>-Xmx2048m</argument>
+						</jvmArguments>
+					</dex>
+				</configuration>
+				-->
 				<!-- <generateApk>true</generateApk> -->
 				<!-- <skip>true</skip> -->
 				<!-- </configuration> -->

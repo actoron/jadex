@@ -2160,6 +2160,17 @@ public class SUtil
 				throw new RuntimeException(e);
 			}
 		}
+		else if(url instanceof URI)
+		{
+			try
+			{
+				ret = ((URI)url).toURL();
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 		
 		return ret;
 	}
@@ -2187,6 +2198,9 @@ public class SUtil
 	 */
 	public static URI toURI0(URL url)
 	{
+		if(url==null)
+			return null;
+		
 		URI ret = null;
 		try
 		{
@@ -2195,6 +2209,26 @@ public class SUtil
 		catch(Exception e)
 		{
 			System.out.println("Problem with url conversion: "+url);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Convert a URL to a URI but ignore exceptions
+	 */
+	public static URI toURI(URL url)
+	{
+		if(url==null)
+			return null;
+		
+		URI ret = null;
+		try
+		{
+			ret = url.toURI();
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
 		}
 		return ret;
 	}

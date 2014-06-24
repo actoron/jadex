@@ -49,16 +49,26 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		
 		try
 		{
+			Thread.sleep(10000);
+			
 			// To execute a single test:
 //			Test singleTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases.stream.InitiatorAgent", sourceDir);
 //			suite.addTest(singleTest);
 			
-			
-			Test bdiTest = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", sourceDir);
+			// Make sure that also the dependencies are placed in pom.
 			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
+			Test bdiTest = createTest("jadex.launch.test.BDITest", "jadex.bdi.testcases", sourceDir);
+			Test bpmnTest = createTest("jadex.launch.test.BPMNTest", "jadex.bpmn.testcases", sourceDir);
+			Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", "jadex.bdibpmn.testcases", sourceDir);
+			Test gpmnTest = createTest("jadex.launch.test.GPMNTest", "jadex.gpmn.testcases", sourceDir);
+			Test bdiv3Test = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", sourceDir);
 
-			suite.addTest(bdiTest);
 			suite.addTest(microTest);
+			suite.addTest(bdiTest);
+			suite.addTest(bpmnTest);
+			suite.addTest(bdibpmnTest);
+			suite.addTest(gpmnTest);
+			suite.addTest(bdiv3Test);
 			
 		}
 		catch (Exception e)
@@ -70,12 +80,12 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			suite.addTest(error);
 		}
 		
-		if (suite.countTestCases() < 10) {
-			ErrorReport errorReport = new ErrorReport();
-			errorReport.setErrorText("Less than 10 Testcases found - Problem with loading them?");
-			BrokenComponentTest error = new BrokenComponentTest("creation", errorReport);
-			suite.addTest(error);
-		}
+//		if (suite.countTestCases() < 10) {
+//			ErrorReport errorReport = new ErrorReport();
+//			errorReport.setErrorText("Less than 10 Testcases found - Problem with loading them?");
+//			BrokenComponentTest error = new BrokenComponentTest("creation", errorReport);
+//			suite.addTest(error);
+//		}
 		
 		return suite;
 	}

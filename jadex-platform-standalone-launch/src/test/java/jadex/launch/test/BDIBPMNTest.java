@@ -16,13 +16,21 @@ public class BDIBPMNTest	extends ComponentTestSuite
 	 */
 	public BDIBPMNTest()	throws Exception
 	{
-		// Use bdibpmn application classes directory as classpath root,
-		super(new File("../jadex-applications-bdibpmn/target/classes/"),
-			new File("../jadex-applications-bdibpmn/target/classes"),
+		// Use BDI classes directory as classpath root,
+		this("../jadex-applications-bdibpmn/target/classes/", "../jadex-applications-bdibpmn/target/classes");
+	}
+	
+	/**
+	 *  Constructor called by JadexInstrumentor for Android tests.
+	 */
+	public BDIBPMNTest(String root, String path) throws Exception
+	{
+		super(new File(root), new File(path),
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
 				".bpmn",	// Only execute agents.
+				".bpmn2",	// Only execute agents.
 				"Carry",
 				"Producer",
 				"Sentry"

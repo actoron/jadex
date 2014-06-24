@@ -12,6 +12,7 @@ import jadex.commons.transformation.IObjectStringConverter;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
+import jadex.xml.IAttributeConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
@@ -24,6 +25,7 @@ import jadex.xml.writer.XMLWriterFactory;
 
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.sql.Timestamp;
@@ -253,6 +255,25 @@ public class JavaWriter
 				null
 			));
 			typeinfos.add(ti_url);
+			
+			// java.net.URL
+			TypeInfo ti_uri = new TypeInfo(null, new ObjectInfo(URI.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("uri", AccessInfo.THIS), new IAttributeConverter()
+				{
+					public String convertObject(Object val, Object context)
+					{
+						return val.toString();
+					}
+					
+					public Object convertString(String val, Object context) throws Exception
+					{
+						return new URI(val);
+					}
+				})},
+				null
+			));
+			typeinfos.add(ti_uri);
 			
 			// java.logging.Level
 			TypeInfo ti_level = new TypeInfo(null, new ObjectInfo(Level.class), 

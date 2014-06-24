@@ -13,11 +13,11 @@ public class BrokenComponentTest extends	TestCase
 {
 	//-------- attributes --------
 	
-	/** The component. */
-	protected IModelInfo	comp;
-	
-	/** The filename (if model could not be loaded). */
+	/** The component model. */
 	protected String	filename;
+	
+	/** The component full name. */
+	protected String	fullname;
 	
 	/** The error. */
 	protected IErrorReport	error;
@@ -29,7 +29,8 @@ public class BrokenComponentTest extends	TestCase
 	 */
 	public BrokenComponentTest(IModelInfo comp, IErrorReport error)
 	{
-		this.comp	= comp;
+		this.filename	= comp.getFilename();
+		this.fullname	= comp.getFullName();
 		this.error	= error;
 	}
 	
@@ -72,7 +73,6 @@ public class BrokenComponentTest extends	TestCase
 		result.endTest(this);
 		
 		// Remove references to Jadex resources to aid GC cleanup.
-		comp	= null;
 		error	= null;
 	}
 	
@@ -86,6 +86,6 @@ public class BrokenComponentTest extends	TestCase
 	 */
 	public String toString()
 	{
-		return "broken: "+(comp!=null ? comp.getFullName() : filename);
+		return "broken: "+(fullname!=null ? fullname : filename);
 	}
 }

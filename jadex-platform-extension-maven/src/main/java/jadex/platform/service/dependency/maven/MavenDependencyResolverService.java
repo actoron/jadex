@@ -294,7 +294,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 		// Resolve from local URL.
 		if(!rids.containsKey(rid) && rid.getLocalIdentifier()!=null && cid.equals(rid.getLocalIdentifier().getComponentIdentifier()))
 		{
-			Model model = loadModelSource(rid.getLocalIdentifier().getUrl());
+			Model model = loadModelSource(SUtil.toURL(rid.getLocalIdentifier().getUri()));
 			
 			if(model!=null)
 			{
@@ -431,7 +431,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			{
 				repourl = new URL(repos.get(0).getUrl());
 			}
-			IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, repourl, null); 
+			IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, repourl.toURI(), null); 
 			ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())), gid);
 			processAetherDependencies(deprid, rids, depnode);
 			deps.add(deprid);
@@ -556,7 +556,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 
 	/**
 	 *  Find the base directory
-	 * @param url
+	 * @param uri
 	 * @return
 	 */
 	protected static File findBasedir(File dir)

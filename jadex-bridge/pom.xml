@@ -17,44 +17,6 @@
 		interfaces and classes for active components and 
 		their management.  
 	</description>
-	
-	<!--
-	<properties>
-	    <timestamp>${maven.build.timestamp}</timestamp>
-	    <maven.build.timestamp.format>yyyyMMdd.HHmmss</maven.build.timestamp.format>
-	</properties>
-	
-	<build>
-	    <!- - Filter the version.properties file but nothing else - ->
-	    <resources>
-	        <resource>
-	            <directory>
-					src/main/java
-				</directory>
-				<filtering>
-					true
-				</filtering>
-				<includes>
-					<include>
-						jadex/bridge/version.properties
-					</include>
-				</includes>
-			</resource>
-	        <resource>
-	            <directory>
-					src/main/java
-				</directory>
-				<filtering>
-					false
-				</filtering>
-				<excludes>
-					<exclude>
-						jadex/bridge/version.properties
-					</exclude>
-				</excludes>
-			</resource>
-		</resources>    
-	</build> -->
 
 	<dependencies>
 		<dependency>

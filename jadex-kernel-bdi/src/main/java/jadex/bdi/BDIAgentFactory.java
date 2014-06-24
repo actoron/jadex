@@ -370,6 +370,9 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
+
+		if(filename.indexOf("Translation")!=-1)
+			System.out.println("load");
 		
 		if(libservice!=null)
 		{

@@ -279,7 +279,7 @@ public class ModelTreePanel extends FileTreePanel
 						{
 							public void run()
 							{
-								URL url = rid.getLocalIdentifier().getUrl();
+								URI uri = rid.getLocalIdentifier().getUri();
 								try
 								{
 									// Comparison of file/urls is hard.
@@ -288,7 +288,7 @@ public class ModelTreePanel extends FileTreePanel
 									// that is local to those filenames and can create and
 									// compare them.
 									
-									final String toremove = url.toURI().toString();
+									final String toremove = uri.toString();
 									
 									final RootNode root = (RootNode)getModel().getRoot();
 									final List children = root.getCachedChildren();
@@ -395,7 +395,7 @@ public class ModelTreePanel extends FileTreePanel
 								{
 									// Hack!!! Shouldn't use file when remote!?
 									System.out.println("adding root: "+rid);
-									File f = new File(rid.getLocalIdentifier().getUrl().toURI());
+									File f = new File(rid.getLocalIdentifier().getUri());
 //									addRootEntry(f.toURI().toURL(), f.getAbsolutePath(), rid);
 									RIDNode rn = (RIDNode)node;
 									rn.setFile(f);

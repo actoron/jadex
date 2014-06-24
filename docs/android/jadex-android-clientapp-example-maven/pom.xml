@@ -16,7 +16,7 @@
 	<description>
 	This project contains a demo of a jadex clientapp.
 	The Jadex platform app must be installed prior to running this application!
-	Must be build with maven.
+	Must be built with maven.
 	</description>
 
 	<dependencies>
@@ -71,26 +71,6 @@
 	</dependencies>
 
 	<build>
-		<resources>
-<!-- 			<resource> -->
-<!-- 				<directory>res</directory> -->
-<!-- 				<includes> -->
-<!-- 					<include>**/*.xml</include> -->
-<!-- 				</includes> -->
-<!-- 				<targetPath>userRes</targetPath> -->
-<!-- 			</resource> -->
-			<resource>
-				<directory>src/main/java</directory>
-				<excludes>
-					<exclude>**/.svn/*</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.bpmn</include>
-				</includes>
-			</resource>
-		</resources>
-
 		<plugins>
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>

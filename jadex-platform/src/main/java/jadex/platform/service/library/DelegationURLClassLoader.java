@@ -57,10 +57,10 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	public DelegationURLClassLoader(IResourceIdentifier rid, ClassLoader basecl, DelegationURLClassLoader[] delegates)
 	{
-		super(rid!=null && rid.getLocalIdentifier()!=null? new URL[]{rid.getLocalIdentifier().getUrl()}: new URL[0],
+		super(rid!=null && rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getUri()!=null? new URL[]{SUtil.toURL(rid.getLocalIdentifier().getUri())}: new URL[0],
 			// No parent class loader to avoid multiple lookups of unavailable classes (not supported on android)
 			SReflect.isAndroid()? basecl : null);
-		
+
 		this.rid = rid;
 		this.basecl	= basecl;
 		this.delegates = delegates==null? new ArrayList(): SUtil.arrayToList(delegates);

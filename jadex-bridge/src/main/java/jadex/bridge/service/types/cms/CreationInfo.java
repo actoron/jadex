@@ -339,6 +339,7 @@ public class CreationInfo
 	 */
 	public void setResourceIdentifier(IResourceIdentifier rid)
 	{
+		System.out.println("set rid: "+rid);
 		this.rid = rid;
 	}
 

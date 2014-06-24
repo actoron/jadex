@@ -161,7 +161,7 @@ public class JavaWrapperAgent	implements	IJavaWrapperService
 						{
 							try
 							{
-								JarFile	jar	= new JarFile(SUtil.getFile(rid.getLocalIdentifier().getUrl()));
+								JarFile	jar	= new JarFile(SUtil.getFile(SUtil.toURL(rid.getLocalIdentifier().getUri())));
 								String	main	= jar.getManifest().getMainAttributes().getValue("Main-Class");
 								jar.close();
 								Class<?>	clazz	= SReflect.classForName(main, cl);

@@ -33,4 +33,12 @@ public class XmlTag
 	{
 		return localpart;
 	}
+
+	/**
+	 *  Get a string representation.
+	 */
+	public String toString()
+	{
+		return "<"+getLocalPart()+">";
+	}
 }
