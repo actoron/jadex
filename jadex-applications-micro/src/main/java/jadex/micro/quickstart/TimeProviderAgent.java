@@ -129,6 +129,7 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 			scanner.findInLine("\"([^\"]*)\"");
 			ret	= scanner.match().group(1);	// Country
 			scanner.findInLine("\"([^\"]*)\"");
+			scanner.findInLine("\"([^\"]*)\"");
 			ret	= scanner.match().group(1) + ", " + ret;	// City
 			scanner.close();
 		}
