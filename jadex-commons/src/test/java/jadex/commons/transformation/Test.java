@@ -81,10 +81,12 @@ public abstract class Test extends TestCase
 		
 		try
 		{
+			testByte();
+			
 //			int cnt = 1000;
 			long start = System.currentTimeMillis();
 			for(int i=0; i<cnt; i++)
-				
+			{	
 //			while(true)
 //			{
 				testException();
@@ -156,7 +158,7 @@ public abstract class Test extends TestCase
 				testColor();
 				testImage();
 				testRectangle();
-//			}
+			}
 			long dur = System.currentTimeMillis()-start;
 			
 			System.out.println("Needed: "+dur+" for cnt="+cnt);
@@ -185,7 +187,7 @@ public abstract class Test extends TestCase
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
 		
-		System.out.println("written is:"+new String((byte[])written));
+//		System.out.println("written is:"+new String((byte[])written));
 		
 		Object ro = doRead(written);
 		
