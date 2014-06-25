@@ -73,6 +73,7 @@ public class BinarySerializer
 			ENCODER_HANDLERS.add(new RectangleCodec());
 		}
 		ENCODER_HANDLERS.add(new URLCodec());
+		ENCODER_HANDLERS.add(new URICodec());
 		ENCODER_HANDLERS.add(new TupleCodec());
 		ENCODER_HANDLERS.add(new DateCodec());
 		ENCODER_HANDLERS.add(new InetAddressCodec());

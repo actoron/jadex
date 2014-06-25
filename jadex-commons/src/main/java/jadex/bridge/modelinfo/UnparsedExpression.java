@@ -6,6 +6,8 @@ import jadex.bridge.ClassInfo;
 
 /**
  *  An unparsed expression for being able to transfer to other nodes.
+ *  
+ *  idea: allow storing also imports in the expression for later evaluation
  */
 public class UnparsedExpression
 {

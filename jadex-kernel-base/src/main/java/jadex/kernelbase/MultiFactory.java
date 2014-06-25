@@ -870,6 +870,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		else
 		{
 			if(potentialurls.isEmpty() && !hasLoadablePotentialKernels() || isrecur)
+//			if(!hasLoadablePotentialKernels() || isrecur)
 			{
 				ret.setResult(null);
 			}

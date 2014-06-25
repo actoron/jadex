@@ -223,11 +223,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public ITerminableIntermediateFuture<IService> getServiceProxies(final IComponentIdentifier cid, 
 		final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
-		if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().equals(IClockService.class))
-		{
-			System.out.println("sdklgud");
-		}
-		
 		final IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".0.getServiceProxies");
 		
@@ -347,10 +342,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope)
 	{
-		if(service.equals(IClockService.class))
-		{
-			System.out.println("klasfj");
-		}
 //		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
 		final Future<T>	ret	= new Future<T>();
 		getServiceProxies(cid, SServiceProvider.getSearchManager(false, scope), SServiceProvider.getVisitDecider(true, scope), 

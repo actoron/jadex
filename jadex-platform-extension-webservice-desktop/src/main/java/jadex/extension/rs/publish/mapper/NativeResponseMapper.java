@@ -2,6 +2,7 @@ package jadex.extension.rs.publish.mapper;
 
 import jadex.commons.SUtil;
 
+import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
@@ -32,10 +33,27 @@ public class NativeResponseMapper implements IValueMapper
 		if(o instanceof ResourceInfo)
 		{
 			ResourceInfo ri = (ResourceInfo)o;
-			o = SUtil.getResource0(ri.getPath(), null);
+			if(ri.getPath()!=null)
+			{
+				o = SUtil.getResource0(ri.getPath(), null);
+			}
+			else if(ri.getData()!=null)
+			{
+				o = new ByteArrayInputStream(ri.getData());
+			}
 			ResponseBuilder rb = Response.ok(o);
 			if(ri.getMediatype()!=null)
+			{
 				rb = rb.type(ri.getMediatype());
+			}
+			else if(ri.getPath()!=null)
+			{
+				String cttype = SUtil.guessContentTypeByFilename(ri.getPath());
+				if(cttype!=null)
+				{
+					rb = rb.type(cttype);
+				}
+			}
 			ret = rb.build();
 		}
 		else if(o instanceof String)

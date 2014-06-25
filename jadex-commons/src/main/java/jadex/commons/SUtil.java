@@ -99,6 +99,10 @@ public class SUtil
 
 	/** A Null value. */
 	public static final String		NULL					= "NULL";
+	
+	/** The mime types. */
+	protected volatile static Map<String, String> MIMETYPES;
+
 
 	// Thread local gives best multithread performance for date format access:
 	// http://www.javacodegeeks.com/2010/07/java-best-practices-dateformat-in.html
@@ -2212,6 +2216,26 @@ public class SUtil
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Convert a URL to a URI but ignore exceptions
+	 */
+	public static URI toURI(URL url)
+	{
+		if(url==null)
+			return null;
+		
+		URI ret = null;
+		try
+		{
+			ret = url.toURI();
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		return ret;
+	}
 
 
 	/**
@@ -4162,5 +4186,65 @@ public class SUtil
 		StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
 		return sw.toString();
+	}
+	
+
+	/**
+	 *  Guess the mime type by the file name.
+	 *  @param name The filename
+	 *  @return The mime type.
+	 */
+	public static String guessContentTypeByFilename(String name)
+	{
+		if(name == null)
+			return null;
+
+		int li = name.lastIndexOf('.');
+		if(li!=-1)
+		{
+			String ext = name.substring(li+1).toLowerCase();
+			if(MIMETYPES==null)
+			{
+				synchronized(SUtil.class)
+				{
+					if(MIMETYPES==null)
+					{
+						MIMETYPES = new HashMap<String, String>();
+						InputStream is = SUtil.class.getResourceAsStream("mimetypes.properties");
+						try
+						{
+							Properties props = new Properties();
+							props.load(is);
+							for(Object key: props.keySet())
+							{
+								String val = props.getProperty((String)key);
+								StringTokenizer st = new StringTokenizer(val, " ");
+								while(st.hasMoreTokens())
+								{
+									MIMETYPES.put(st.nextToken(), (String)key);
+								}
+							}
+						}
+						catch(IOException e)
+						{
+							throw new RuntimeException(e);
+						}
+						finally
+						{
+							try
+							{
+								is.close();
+							}
+							catch(IOException e)
+							{
+								throw new RuntimeException(e);
+							}
+						}
+					}
+				}
+			}
+			return MIMETYPES.get(ext);
+		}
+		return null;
 	}
 }

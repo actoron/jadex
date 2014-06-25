@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -81,11 +81,14 @@ public abstract class Test extends TestCase
 		
 		try
 		{
+			testByte();
+			
 //			int cnt = 1000;
 			long start = System.currentTimeMillis();
 			for(int i=0; i<cnt; i++)
+			{	
 //			while(true)
-			{
+//			{
 				testException();
 
 				testCertificate(); 
@@ -136,6 +139,7 @@ public abstract class Test extends TestCase
 				testUUID();
 				testInnerClass();
 				testURL();
+				testURI();
 				testLoggingLevel();
 				testLogRecord();
 				testInetAddress();
@@ -864,6 +868,17 @@ public abstract class Test extends TestCase
 	{
 //		URL url = new URL("http", "host", 4711, "file");
 		URL url = new URL("file:/C:/projects/jadex/jadex-applications-micro/target/classes/");
+		
+		doWriteAndRead(url);
+	}
+	
+	/**
+	 *  Test if URI transfer works.
+	 */
+	public void testURI() throws Exception
+	{
+//		URL url = new URL("http", "host", 4711, "file");
+		URI url = new URI("file:/C:/projects/jadex/jadex-applications-micro/target/classes/");
 		
 		doWriteAndRead(url);
 	}

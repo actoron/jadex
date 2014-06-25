@@ -16,7 +16,7 @@
 	<description>
 	This project contains the BDI based sokrates puzzle game for android.
 	The Jadex platform app must be installed prior to running this application!
-	Must be build with maven.
+	Must be built with maven.
 	</description>
 
 	<dependencies>

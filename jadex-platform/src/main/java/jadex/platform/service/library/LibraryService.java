@@ -187,6 +187,18 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	//-------- methods --------
 	
 	/**
+	 *  Check if rid has local part and if it is null.
+	 */
+	protected void checkLocalRid(IResourceIdentifier rid)
+	{
+		if(rid!=null && rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getUri()==null)
+		{
+			System.out.println("local null rid found: "+rid);
+//			throw new RuntimeException("local rid is null");
+		}
+	}
+	
+	/**
 	 *  Add a new resource identifier.
 	 *  @param parid The optional parent rid.
 	 *  @param orid The resource identifier.
@@ -195,7 +207,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		final IResourceIdentifier orid, final boolean workspace)
 	{
 //		System.out.println("adding: "+orid+" on: "+parid);
-
+		checkLocalRid(parid);
+		checkLocalRid(orid);
+		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 
 //		if(parid!=null && !rootloader.getAllResourceIdentifiers().contains(parid))
@@ -275,6 +289,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier parid, final IResourceIdentifier rid)
 	{
+		checkLocalRid(rid);
+		checkLocalRid(parid);
+		
 //		System.out.println("remove "+rid);
 		final Future<Void> ret = new Future<Void>();
 		
@@ -425,6 +442,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<IResourceIdentifier> addURL(final IResourceIdentifier parid, URL purl)
 	{
+		checkLocalRid(parid);
+		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 
 //		System.out.println("add url: "+url);
@@ -623,6 +642,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	@Excluded()
 	public IFuture<ClassLoader> getClassLoader(final IResourceIdentifier rid, boolean workspace)
 	{
+		checkLocalRid(rid);
 		final Future<ClassLoader> ret = new Future<ClassLoader>();
 		
 		if(rid==null || rid.equals(rootloader.getResourceIdentifier()))
@@ -816,6 +836,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, 
 		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
 	{
+		checkLocalRid(rid);
+		
 		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
 		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri());
 		
@@ -907,7 +929,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		if(rid==null)
 			throw new IllegalArgumentException("Rid must not null.");
-				
+		checkLocalRid(rid);		
+		checkLocalRid(parid);
+		
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		// special case that parid is local and already handled by baseloader
 		if(pacl==null && isLocal(parid) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))

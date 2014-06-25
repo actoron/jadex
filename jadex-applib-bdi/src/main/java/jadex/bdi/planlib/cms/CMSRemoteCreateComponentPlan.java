@@ -31,6 +31,8 @@ public class CMSRemoteCreateComponentPlan extends Plan
 		ca.setParent((IComponentIdentifier)getParameter("parent").getValue());
 		ca.setResourceIdentifier((IResourceIdentifier)getParameter("rid").getValue());
 
+//		System.out.println("cms remote create comp plan: "+getParameter("rid").getValue());
+		
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("cms").getValue());
 		req.getParameter("action").setValue(ca);

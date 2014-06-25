@@ -43,6 +43,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.Proxy;
 import java.util.Collection;
@@ -644,6 +645,17 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		final PublishInfo pi = info==null? null: info.getPublish();
 		if(pi!=null)
 		{
+			// Hack?! evaluate the publish id string 
+			try
+			{
+				String pid = (String)SJavaParser.evaluateExpression(pi.getPublishId(), instance.getModel().getAllImports(), instance.getFetcher(), instance.getClassLoader());
+				pi.setPublishId(pid);
+//				System.out.println("pid is now: "+pid);
+			}
+			catch(Exception e)
+			{
+			}
+			
 			getPublishService(instance, pi.getPublishType(), (Iterator<IPublishService>)null)
 				.addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
 			{
