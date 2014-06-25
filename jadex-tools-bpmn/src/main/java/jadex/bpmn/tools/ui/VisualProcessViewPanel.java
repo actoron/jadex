@@ -59,8 +59,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -489,11 +488,14 @@ public class VisualProcessViewPanel extends JPanel
 					Future<String>	ret	= new Future<String>();
 					try
 					{
-						File f	= new File(ia.getModel().getFilename());
-						String	content	= new Scanner(f, "UTF-8").useDelimiter("\\Z").next();
+						InputStream	is	= SUtil.getResource(ia.getModel().getFilename(), ia.getClassLoader());
+						Scanner	s	= new Scanner(is, "UTF-8");
+						s.useDelimiter("\\Z");
+						String	content	= s.next(); 
+						s.close();
 						ret.setResult(content);
 					}
-					catch(FileNotFoundException fnfe)
+					catch(Exception fnfe)
 					{
 						ret.setException(fnfe);
 					}
