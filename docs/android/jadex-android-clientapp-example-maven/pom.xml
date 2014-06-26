@@ -2,16 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>mygroup</groupId>
 	<artifactId>jadex-android-clientapp-example-maven</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>apk</packaging>
-	<name>jadex-applications-android-classloading</name>
-
-	<parent>
-		<groupId>net.sourceforge.jadex</groupId>
-		<artifactId>jadex-android-parent</artifactId>
-		<version>2.5-SNAPSHOT</version>
-		<relativePath>../../../jadex-android-parent/pom.xml</relativePath>
-	</parent>
 
 	<description>
 	This project contains a demo of a jadex clientapp.
@@ -19,48 +13,80 @@
 	Must be built with maven.
 	</description>
 
+	<properties>
+		<!-- Specify desired Jadex version here. -->
+		<jadex.version> 2.5-SNAPSHOT </jadex.version>
+	</properties>
+	
+	<!-- Additional repositories (only required when using snapshot and/or pro version of Jadex).
+	     You may use www0.activecomponents.org/..., www1.activecomponents.org/... to address mirrors directly. -->
+	<repositories>
+		<repository>
+			<id>jadex-snapshots</id>
+			<url>http://www1.activecomponents.org/nexus/content/repositories/snapshots</url>
+		</repository>
+	<!-- 
+		<repository>
+			<id>jadex-pro-snapshots</id>
+			<url>http://www1.activecomponents.org/nexus/content/repositories/pro-snapshots</url>
+		</repository>
+		<repository>
+			<id>jadex-pro-releases</id>
+			<url>http://www1.activecomponents.org/nexus/content/repositories/pro-releases</url>
+		</repository>
+	-->
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-platformclient</artifactId>
-			<version>${project.version}</version>
+			<version>${jadex.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-commons</artifactId>
-			<version>${project.version}</version>
+			<version>${jadex.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bpmn</artifactId>
-			<version>${project.version}</version>
+			<version>${jadex.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi</artifactId>
-			<version>${project.version}</version>
+			<version>${jadex.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools-android</artifactId>
-			<version>${project.version}</version>
+			<version>${jadex.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-extension-webservice-android</artifactId>
-			<version>${project.version}</version>
+			<version>${jadex.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+		<!-- 
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-platformapp</artifactId>
+			<version>${jadex.version}</version>
+			<scope>provided</scope>
+			<type>apk</type>
+		</dependency>
+		 -->
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
@@ -75,25 +101,37 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+					<assetsDirectory>${project.basedir}/assets</assetsDirectory>
+					<resourceDirectory>${project.basedir}/res</resourceDirectory>
+					<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
+					<sdk>
+						<path>${env.ANDROID_HOME}</path>
+						<platform>8</platform>
+					</sdk>
+					<undeployBeforeDeploy>false</undeployBeforeDeploy>
+					<generateApk>true</generateApk>
+					<dex>
+						<jvmArguments>
+							<jvmArgument>-Xms256m</jvmArgument>
+							<jvmArgument>-Xmx1500m</jvmArgument>
+						</jvmArguments>
+						<coreLibrary>false</coreLibrary>
+						<noLocals>false</noLocals>
+						<optimize>true</optimize>
+					</dex>
+					
+					<zipalign>true</zipalign>
+
+					<manifest>
+						<versionName>${project.version}</versionName>
+						<debuggable>true</debuggable>
+						<versionCodeAutoIncrement>true</versionCodeAutoIncrement>
+					</manifest>
+				</configuration>
 				<extensions>true</extensions>
-				<!-- <configuration> -->
-				<!-- <generateApk>true</generateApk> -->
-				<!-- <skip>true</skip> -->
-				<!-- </configuration> -->
-				<!-- <executions> -->
-				<!-- <execution> -->
-				<!-- <id>dex</id> -->
-				<!-- <goals> -->
-				<!-- <goal>dex</goal> -->
-				<!-- </goals> -->
-				<!-- </execution> -->
-				<!-- <execution> -->
-				<!-- <id>apk</id> -->
-				<!-- <goals> -->
-				<!-- <goal>apk</goal> -->
-				<!-- </goals> -->
-				<!-- </execution> -->
-				<!-- </executions> -->
 			</plugin>
 
 			<plugin>
