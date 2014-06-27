@@ -1,13 +1,20 @@
 package jadex.android.exampleproject.extended.agent;
 
 import jadex.android.exampleproject.MyEvent;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.AndroidMicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 /**
  *  Simple example agent that shows messages
@@ -17,10 +24,16 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices({
 	@ProvidedService(name="agentinterface", type=IAgentInterface.class)
 })
+@RequiredServices({
+	@RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+})
 @Service
-public class MyAgent extends AndroidMicroAgent implements IAgentInterface
+@Agent
+public class MyAgent	implements IAgentInterface
 {
-
+	/** Context service injected at startup. */
+	@AgentService
+	protected IContextService	context;
 	
 	//-------- methods --------
 	/**
@@ -37,9 +50,9 @@ public class MyAgent extends AndroidMicroAgent implements IAgentInterface
 	/**
 	 *  Called when the agent is killed.
 	 */
-	public IFuture<Void> agentKilled()
+	public IFuture<Void> agentKilled(IInternalAccess agent)
 	{
-		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying goodbye!");
+		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying goodbye!");
 		return IFuture.DONE;
 	}
 
@@ -53,7 +66,7 @@ public class MyAgent extends AndroidMicroAgent implements IAgentInterface
 	{
 		MyEvent myEvent = new MyEvent();
 		myEvent.setMessage(txt);
-		dispatchEvent(myEvent);
+		context.dispatchEvent(myEvent);
 	}
 
 

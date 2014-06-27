@@ -1,9 +1,11 @@
 package jadex.android.exampleproject.simple;
 
 import jadex.android.exampleproject.MyEvent;
-import jadex.commons.future.Future;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.IFuture;
-import jadex.micro.AndroidMicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 
 /**
@@ -11,26 +13,27 @@ import jadex.micro.annotation.Description;
  *  when it is started or stopped.
  */
 @Description("Sample Android Agent.")
-public class MyAgent extends AndroidMicroAgent
+@Agent
+public class MyAgent
 {
 	//-------- methods --------
 	
 	/**
 	 *  Called when the agent is started.
 	 */
-	public IFuture<Void> executeBody()
+	public IFuture<Void> executeBody(IInternalAccess agent)
 	{
-		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying hello!");
-		return new Future<Void>();
+		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying hello!", agent);
+		return IFuture.DONE;
 	}
 	
 
 	/**
 	 *  Called when the agent is killed.
 	 */
-	public IFuture<Void> agentKilled()
+	public IFuture<Void> agentKilled(IInternalAccess agent)
 	{
-		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying goodbye!");
+		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying goodbye!", agent);
 		return IFuture.DONE;
 	}
 
@@ -40,10 +43,13 @@ public class MyAgent extends AndroidMicroAgent
 	 *	Show a message on the device.  
 	 *  @param msg The message to be shown.
 	 */
-	protected void showAndroidMessage(String txt)
+	protected void showAndroidMessage(String txt, IInternalAccess agent)
 	{
 		MyEvent myEvent = new MyEvent();
 		myEvent.setMessage(txt);
-		dispatchEvent(myEvent);
+		
+		IContextService	cs	= agent.getServiceContainer().searchService(IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		
+		cs.dispatchEvent(myEvent).get();
 	}
 }
