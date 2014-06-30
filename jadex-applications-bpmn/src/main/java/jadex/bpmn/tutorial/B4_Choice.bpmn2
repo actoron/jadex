@@ -22,16 +22,10 @@
     <semantic:task name="Head\n" id="0/IPKPEiXj4830Cr">
       <semantic:incoming>ZOeZT0lv2fehmgIu</semantic:incoming>
       <semantic:outgoing>7MDZSXSSrPl1cbBy</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.examples.dataflow.A</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:task name="Tail" id="e6ri5a+yVsIRdEpx">
       <semantic:incoming>x9ERLGKTSfsDNML5</semantic:incoming>
       <semantic:outgoing>AAp3EN8bfMh4vlEX</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.examples.dataflow.A</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:endEvent id="i+Qc1NVz98+2Ek3v">
       <semantic:incoming>7MDZSXSSrPl1cbBy</semantic:incoming>

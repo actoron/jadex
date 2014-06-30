@@ -8,6 +8,8 @@
                       xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
+    <jadex:modelname>B5_Subprocess</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="yT7Z17sIj8orYBB4">
@@ -55,15 +57,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="hCAhYniK5ZBpAcjw">
         <dc:Bounds height="100.0" width="160.0" x="170.0" y="140.0"/>
-        <dc:Bounds height="100.0" width="160.0" x="230.0" y="130.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="u37TeMH5zZXinNGQ">
         <dc:Bounds height="100.0" width="160.0" x="390.0" y="140.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="7MDZSXSSrPl1cbBy">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="AAp3EN8bfMh4vlEX">
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="lmuFPs+QotE5fSye">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="iT1wEz//018T4WWv">
