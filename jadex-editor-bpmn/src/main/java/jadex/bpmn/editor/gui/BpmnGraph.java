@@ -1,7 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import java.util.Arrays;
-
 import jadex.bpmn.editor.gui.controllers.SValidation;
 import jadex.bpmn.editor.gui.layouts.EventHandlerLayout;
 import jadex.bpmn.editor.gui.layouts.LaneLayout;
@@ -21,12 +19,16 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.commons.collection.LRU;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.SwingUtilities;
 
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.layout.mxStackLayout;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
+import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxRectangle;
@@ -105,22 +107,28 @@ public class BpmnGraph extends mxGraph
 //			}
 //		});
 		
-		addListener(mxEvent.RESIZE_CELLS, new mxIEventListener()
+		addListener(mxEvent.CELLS_RESIZED, new mxIEventListener()
 		{
 			public void invoke(Object sender, mxEventObject evt)
 			{
-//				System.out.println(Arrays.toString(evt.getProperties().keySet().toArray()));
-				mxRectangle[] bounds = (mxRectangle[]) evt.getProperty("bounds");
-//				System.out.println(bounds.getWidth() + " " + bounds.getHeight());
 				Object[] cells = (Object[]) evt.getProperty("cells");
-//				System.out.println(bounds.length);
 				for (int i = 0; i < cells.length; ++i)
 				{
 					if (cells[i] instanceof VPool)
 					{
 						VPool vpool = (VPool) cells[i];
-						double xdiff = vpool.getPreviousGeometry().getX() - bounds[i].getX();
-						double ydiff = vpool.getPreviousGeometry().getY() - bounds[i].getY();
+//						System.out.println(vpool.getGeometry() + " " + vpool.getPreviousGeometry());
+						Integer startsize = (Integer) getStylesheet().getCellStyle(vpool.getStyle(), null).get(mxConstants.STYLE_STARTSIZE);
+						startsize = startsize != null? startsize : mxConstants.DEFAULT_STARTSIZE;
+						double minx = Double.MAX_VALUE;
+						double miny = Double.MAX_VALUE;
+						double maxx = 0.0;
+						double maxy = 0.0;
+						boolean leftresize = vpool.getPreviousGeometry().getX() != vpool.getGeometry().getX();
+						boolean topresize = vpool.getPreviousGeometry().getY() != vpool.getGeometry().getY();
+						double xdiff = vpool.getPreviousGeometry().getX() - vpool.getGeometry().getX();
+						double ydiff = vpool.getPreviousGeometry().getY() - vpool.getGeometry().getY();
+						List<VNode> innercells = new ArrayList<VNode>();
 						for (int j = 0; j < vpool.getChildCount(); ++j)
 						{
 							Object obj = vpool.getChildAt(j);
@@ -134,8 +142,24 @@ public class BpmnGraph extends mxGraph
 									{
 										VNode node = (VNode) lobj;
 										mxGeometry geo = node.getGeometry();
-										geo.setX(Math.max(0, geo.getX() + xdiff));
-										geo.setY(Math.max(0, geo.getY() + ydiff));
+										if (minx > geo.getX())
+										{
+											minx = geo.getX();
+										}
+										if (miny > geo.getY())
+										{
+											miny = geo.getY();
+										}
+										if (maxx < geo.getWidth() + geo.getX())
+										{
+											maxx = geo.getWidth() + geo.getX();
+										}
+										if (maxy < (mxConstants.SHADOW_OFFSETY + geo.getHeight() + geo.getY()))
+										{
+											maxy = mxConstants.SHADOW_OFFSETY + geo.getHeight() + geo.getY();
+										}
+										
+										innercells.add(node);
 									}
 								}
 							}
@@ -143,12 +167,90 @@ public class BpmnGraph extends mxGraph
 							{
 								VNode node = (VNode) obj;
 								mxGeometry geo = node.getGeometry();
-								geo.setX(Math.max(0, geo.getX() + xdiff));
-								geo.setY(Math.max(0, geo.getY() + ydiff));
+								if (minx > geo.getX())
+								{
+									minx = geo.getX();
+								}
+								if (miny > geo.getY())
+								{
+									miny = geo.getY();
+								}
+								if (maxx < geo.getWidth() + geo.getX())
+								{
+									maxx = geo.getWidth() + geo.getX();
+								}
+								if (maxy < (mxConstants.SHADOW_OFFSETY + geo.getHeight() + geo.getY()))
+								{
+									maxy = mxConstants.SHADOW_OFFSETY + geo.getHeight() + geo.getY();
+								}
+								
+								innercells.add(node);
 							}
 						}
-//						System.out.println(vpool.getPreviousGeometry().getRectangle());
-//						System.out.println(bounds[i]);
+						
+						if (!leftresize)
+						{
+							if (maxx > vpool.getGeometry().getWidth())
+							{
+								double diff = maxx - vpool.getGeometry().getWidth();
+								xdiff = -diff;
+								if ((minx + xdiff) < startsize)
+								{
+									xdiff += (startsize - (minx + xdiff));
+									diff += xdiff;
+									vpool.getGeometry().setWidth(vpool.getGeometry().getWidth() + diff);
+								}
+							}
+						}
+						else
+						{
+							if ((minx + xdiff) < startsize)
+							{
+								xdiff -= (minx + (xdiff - startsize));
+							}
+							if (vpool.getGeometry().getWidth() < (startsize + maxx - minx))
+							{
+								double diff = (startsize + maxx - minx) - vpool.getGeometry().getWidth();
+								vpool.getGeometry().setWidth(startsize + maxx - minx);
+								vpool.getGeometry().setX(vpool.getGeometry().getX() - diff);
+							}
+						}
+						if (!topresize)
+						{
+							if (maxy > vpool.getGeometry().getHeight())
+							{
+								double diff = maxy - vpool.getGeometry().getHeight();
+								ydiff = -diff;
+								if ((miny + ydiff) < 0)
+								{
+									ydiff += (miny + ydiff);
+									diff += ydiff;
+									vpool.getGeometry().setHeight(vpool.getGeometry().getHeight() + diff);
+								}
+							}
+						}
+						else
+						{
+							if ((miny + ydiff) < 0)
+							{
+								ydiff -= (miny + ydiff);
+							}
+							if (vpool.getGeometry().getHeight() < (maxy - miny))
+							{
+								double diff = (maxy - miny) - vpool.getGeometry().getHeight();
+								vpool.getGeometry().setHeight(maxy - miny);
+								vpool.getGeometry().setY(vpool.getGeometry().getY() - diff);
+							}
+						}
+						
+//						System.out.println(minx + " " + miny + " " + maxx + " " + maxy + " " + xdiff + " " + ydiff);
+						
+						for (VNode node : innercells)
+						{
+							mxGeometry geo = node.getGeometry();
+							geo.setX(geo.getX() + xdiff);
+							geo.setY(geo.getY() + ydiff);
+						}
 					}
 				}
 			}

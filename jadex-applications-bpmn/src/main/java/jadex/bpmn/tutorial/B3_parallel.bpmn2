@@ -14,23 +14,14 @@
     <semantic:task name="Task 2aI" id="iCPm4vVrOZZZWQKZ">
       <semantic:incoming>jGqBHedWaI2ZB9iI</semantic:incoming>
       <semantic:outgoing>Fq4kyfkUe20+nnM7</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.examples.dataflow.A</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:task name=" Task 2aII" id="1hIGhZsO/GYW1mjz">
       <semantic:incoming>XN+cUosJVTz+JDPB</semantic:incoming>
       <semantic:outgoing>mXU5dAf/UcjdycmZ</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.examples.dataflow.A</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:task name=" Task 1a" id="HTczYiF0awpGHn+5">
       <semantic:incoming>WOYDd3ci2DF53LS8</semantic:incoming>
       <semantic:outgoing>inlcMJMZoc5XiSwE</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.examples.dataflow.A</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:startEvent id="nbseML2wiKt9FkL3">
       <semantic:outgoing>WOYDd3ci2DF53LS8</semantic:outgoing>
@@ -51,9 +42,6 @@
     <semantic:task name=" Task 3a" id="oLsJaxJl2pzfnz2z">
       <semantic:incoming>XCIJ2u6GwNWodQgh</semantic:incoming>
       <semantic:outgoing>81TPXLB8rYU+vk5F</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.examples.dataflow.A</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:startEvent id="A4Pb0dHFH1keFssU">
       <semantic:outgoing>Zi5QE/SMkePXK+Yk</semantic:outgoing>
@@ -61,23 +49,14 @@
     <semantic:task name=" Task 1b" id="3cTiUk6ggM6eZQUk">
       <semantic:incoming>Zi5QE/SMkePXK+Yk</semantic:incoming>
       <semantic:outgoing>XaogcsiZpGuFcLrj</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.examples.dataflow.A</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:task name="Task" id="pc1RYwt/gAmYyRtK">
       <semantic:incoming>QuCM8gRumVH8/TTc</semantic:incoming>
       <semantic:outgoing>AaOv6arXPeGz1+V7</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.examples.dataflow.A</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:task name="Task 2b" id="oRBXsQl/8WctzzEg">
       <semantic:incoming>XaogcsiZpGuFcLrj</semantic:incoming>
       <semantic:outgoing>QuCM8gRumVH8/TTc</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>jadex.bpmn.examples.dataflow.A</jadex:class>
-      </semantic:extensionElements>
     </semantic:task>
     <semantic:endEvent id="XthJfbLgPL3NYGun">
       <semantic:incoming>AaOv6arXPeGz1+V7</semantic:incoming>
