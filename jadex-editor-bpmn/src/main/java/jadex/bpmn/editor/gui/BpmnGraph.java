@@ -111,13 +111,13 @@ public class BpmnGraph extends mxGraph
 		{
 			public void invoke(Object sender, mxEventObject evt)
 			{
-				Object[] cells = (Object[]) evt.getProperty("cells");
+				final Object[] cells = (Object[]) evt.getProperty("cells");
 				for (int i = 0; i < cells.length; ++i)
 				{
 					if (cells[i] instanceof VPool)
 					{
 						VPool vpool = (VPool) cells[i];
-//						System.out.println(vpool.getGeometry() + " " + vpool.getPreviousGeometry());
+						System.out.println(vpool.getGeometry() + " " + vpool.getPreviousGeometry());
 						if (vpool.getGeometry().getX() == vpool.getPreviousGeometry().getX() + vpool.getPreviousGeometry().getWidth() ||
 							vpool.getGeometry().getX() + vpool.getGeometry().getWidth() == vpool.getPreviousGeometry().getX())
 						{
@@ -235,7 +235,7 @@ public class BpmnGraph extends mxGraph
 								ydiff = -diff;
 								if ((miny + ydiff) < 0)
 								{
-									ydiff += (miny + ydiff);
+									ydiff += -(miny + ydiff);
 									diff += ydiff;
 									vpool.getGeometry().setHeight(vpool.getGeometry().getHeight() + diff);
 								}
@@ -255,7 +255,7 @@ public class BpmnGraph extends mxGraph
 							}
 						}
 						
-//						System.out.println(minx + " " + miny + " " + maxx + " " + maxy + " " + xdiff + " " + ydiff);
+//								System.out.println(minx + " " + miny + " " + maxx + " " + maxy + " " + xdiff + " " + ydiff);
 						
 						for (VNode node : innercells)
 						{
@@ -263,6 +263,10 @@ public class BpmnGraph extends mxGraph
 							geo.setX(geo.getX() + xdiff);
 							geo.setY(geo.getY() + ydiff);
 						}
+						Object[] selcells = getSelectionCells();
+						clearSelection();
+						refreshCellView(vpool);
+						setSelectionCells(selcells);
 					}
 				}
 			}
