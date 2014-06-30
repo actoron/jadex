@@ -78,7 +78,8 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		}
 		try
 		{
-			if(uri.toURL().getFile().startsWith("."))
+			if(uri.toURL().getFile().startsWith(".")
+				&& !uri.toURL().getFile().equals("./"))	// Hack for eclipse jar resource loader using "./" as main URL when exporting fat jar.
 			{
 				throw new IllegalArgumentException("Url must be absolute: "+uri);
 			}
