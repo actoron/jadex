@@ -200,24 +200,28 @@ public class SCreationController
 		{
 			if (mode.startsWith("EventStart"))
 			{
-				 if (ModelContainer.EDIT_MODE_EVENT_START_RULE.equals(mode))
-				 {
-					 List<MActivity> acts = ((MSubProcess)((VSubProcess) targetcell).getBpmnElement()).getActivities();
-					 if (acts != null)
-					 {
-						 for (MActivity act : acts)
-						 {
-							 if (MBpmnModel.EVENT_START_RULE.equals(act.getActivityType()))
-							 {
-								 return null;
-							 }
-						 }
-					 }
-				 }
-				 else
-				 {
-					 return null;
-				 }
+				if (ModelContainer.EDIT_MODE_EVENT_START_EMPTY.equals(mode))
+				{
+					return null;
+				}
+//				if (!ModelContainer.EDIT_MODE_EVENT_START_RULE.equals(mode))
+//				{
+//					List<MActivity> acts = ((MSubProcess)((VSubProcess) targetcell).getBpmnElement()).getActivities();
+//					if (acts != null)
+//					{
+//						for (MActivity act : acts)
+//						{
+//							if (MBpmnModel.EVENT_START_RULE.equals(act.getActivityType()))
+//							{
+//								return null;
+//							}
+//						}
+//					}
+//				}
+//				else
+//				{
+//					return null;
+//				}
 			}
 		}
 		

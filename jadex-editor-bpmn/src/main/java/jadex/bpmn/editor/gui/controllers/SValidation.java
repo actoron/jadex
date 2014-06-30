@@ -115,6 +115,12 @@ public class SValidation
 					{
 						return "Activities transferred into sub-processes cannot have sequence edges.";
 					}
+					
+					if (MSubProcess.SUBPROCESSTYPE_EVENT.equals(msubproc.getSubprocessType()) &&
+						MBpmnModel.EVENT_START_EMPTY.equals(mactivity.getActivityType()))
+					{
+						return "Empty start events not allowed in event subprocesses.";
+					}
 				}
 				else
 				{

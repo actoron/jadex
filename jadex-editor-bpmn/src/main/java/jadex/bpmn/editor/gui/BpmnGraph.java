@@ -118,6 +118,18 @@ public class BpmnGraph extends mxGraph
 					{
 						VPool vpool = (VPool) cells[i];
 //						System.out.println(vpool.getGeometry() + " " + vpool.getPreviousGeometry());
+						if (vpool.getGeometry().getX() == vpool.getPreviousGeometry().getX() + vpool.getPreviousGeometry().getWidth() ||
+							vpool.getGeometry().getX() + vpool.getGeometry().getWidth() == vpool.getPreviousGeometry().getX())
+						{
+							vpool.getGeometry().setWidth(vpool.getGeometry().getWidth() + vpool.getPreviousGeometry().getWidth());
+							vpool.getGeometry().setX(Math.min(vpool.getPreviousGeometry().getX(), vpool.getGeometry().getX()));
+						}
+						if (vpool.getGeometry().getY() == vpool.getPreviousGeometry().getY() + vpool.getPreviousGeometry().getHeight() ||
+							vpool.getGeometry().getY() + vpool.getGeometry().getHeight() == vpool.getPreviousGeometry().getY())
+						{
+							vpool.getGeometry().setHeight(vpool.getGeometry().getHeight() + vpool.getPreviousGeometry().getHeight());
+							vpool.getGeometry().setY(Math.min(vpool.getPreviousGeometry().getY(), vpool.getGeometry().getY()));
+						}
 						Integer startsize = (Integer) getStylesheet().getCellStyle(vpool.getStyle(), null).get(mxConstants.STYLE_STARTSIZE);
 						startsize = startsize != null? startsize : mxConstants.DEFAULT_STARTSIZE;
 						double minx = Double.MAX_VALUE;
