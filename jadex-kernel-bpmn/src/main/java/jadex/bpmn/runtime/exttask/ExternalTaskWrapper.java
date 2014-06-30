@@ -1,6 +1,7 @@
 package jadex.bpmn.runtime.exttask;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.ProcessThread;
@@ -98,6 +99,16 @@ public class ExternalTaskWrapper implements ITask
 			{
 				params.put(name, thread.getParameterValue(name));
 			}
+		}
+		
+		/**
+		 *  Get the model.
+		 *  @return	The bpmn model.
+		 */
+		public MBpmnModel getBpmnModel()
+		{
+			// todo: support this?!
+			throw new UnsupportedOperationException();
 		}
 		
 		/**

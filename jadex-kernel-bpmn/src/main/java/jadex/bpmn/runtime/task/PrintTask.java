@@ -10,8 +10,8 @@ import jadex.bpmn.model.task.annotation.TaskProperty;
  */
 @Task(description="The print task can be used for printing out a text on the console.",	
 	parameters=@TaskParameter(name="text", clazz=String.class, direction=TaskParameter.DIRECTION_IN,
-	description="The text parameter should contain the text to be printed."),
-	properties=@TaskProperty(name="external", clazz=boolean.class, initialvalue="false"))
+	description="The text parameter should contain the text to be printed."))//,
+//	properties=@TaskProperty(name="external", clazz=boolean.class, initialvalue="false"))
 public class PrintTask
 {
 	/**

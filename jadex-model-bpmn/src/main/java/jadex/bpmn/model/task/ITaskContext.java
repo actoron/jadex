@@ -1,6 +1,7 @@
 package jadex.bpmn.model.task;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 
 /**
  *  The task context contains the data available to
@@ -8,6 +9,12 @@ import jadex.bpmn.model.MActivity;
  */
 public interface ITaskContext
 {
+	/**
+	 *  Get the model.
+	 *  @return	The bpmn model.
+	 */
+	public MBpmnModel getBpmnModel();
+	
 	/**
 	 *  Get the model element.
 	 *  @return	The model of the task.

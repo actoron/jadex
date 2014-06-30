@@ -1,7 +1,10 @@
 package jadex.bpmn.runtime.task;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
@@ -32,6 +35,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.print.Paper;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -100,25 +104,20 @@ public class UserInteractionTask implements ITask
 		final int VALUE	= 2;
 		final int DIRECTION	= 3;
 		final int NEWVALUE	= 4;
-		final List<Object[]>	lparameters = new ArrayList<Object[]>();
 		
-		IndexMap<String, MParameter>	parameters	= task.getParameters();
-		if(parameters!=null)
+		IndexMap<String, MParameter> parameters	= task.getParameters();
+		MIdElement pa = task;
+		MBpmnModel model = context.getBpmnModel();
+		while(pa!=null && parameters==null || parameters.size()==0)
 		{
-			for(MParameter param: parameters.values())
+			pa = model.getParent(task);
+			if(pa instanceof MActivity)
 			{
-				Object	value	= context.getParameterValue(param.getName());
-				Class<?>	clazz	= param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports());
-				lparameters.add(new Object[]
-				{
-					param.getName(),
-					clazz,
-					value,
-					param.getDirection(),
-					value
-				});
+				parameters = ((MActivity)pa).getParameters();
 			}
 		}
+		
+		final List<Object[]> lparameters = parameters!=null && parameters.size()>0? extractParams(context, instance, parameters): null;
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -172,9 +171,10 @@ public class UserInteractionTask implements ITask
 							{
 								tf.addKeyListener(new KeyAdapter()
 								{
-									public void keyPressed(KeyEvent e)
+									public void keyReleased(KeyEvent e)
 									{
 										param[NEWVALUE]	= tf.getText();
+//										System.out.println("setting: "+tf.getText());
 									}
 								});
 							}
@@ -248,6 +248,7 @@ public class UserInteractionTask implements ITask
 											{
 												// Todo: access thread context for imports etc.!?
 												IParsedExpression	pex	= new JavaCCExpressionParser().parseExpression((String)param[NEWVALUE], null, null, null);
+//												System.out.println("setPVal: "+param[NAME]+" "+pex.getValue(null));
 												context.setParameterValue((String)param[NAME], pex.getValue(null));
 											}
 											catch(Exception ex)
@@ -302,5 +303,29 @@ public class UserInteractionTask implements ITask
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected List<Object[]> extractParams(ITaskContext context, IInternalAccess instance, IndexMap<String, MParameter> parameters)
+	{
+		final List<Object[]> lparameters = new ArrayList<Object[]>();
+		
+		for(MParameter param: parameters.values())
+		{
+			Object	value	= context.getParameterValue(param.getName());
+			Class<?>	clazz	= param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports());
+			lparameters.add(new Object[]
+			{
+				param.getName(),
+				clazz,
+				value,
+				param.getDirection(),
+				value
+			});
+		}
+		
+		return lparameters;
 	}
 }

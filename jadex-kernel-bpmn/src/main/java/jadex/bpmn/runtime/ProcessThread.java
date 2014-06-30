@@ -127,6 +127,15 @@ public class ProcessThread	implements ITaskContext
 	//-------- methods --------
 	
 	/**
+	 *  Get the model.
+	 *  @return	The bpmn model.
+	 */
+	public MBpmnModel getBpmnModel()
+	{
+		return instance.getModelElement();
+	}
+	
+	/**
 	 *  Get the id.
 	 *  @return The id.
 	 */

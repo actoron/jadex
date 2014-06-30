@@ -94,6 +94,12 @@ public class AutoCompleteCombo<T> extends JComboBox
 		});
 	}
 	
+//	public void setSelectedItem(Object anObject) 
+//	{
+//		System.out.println("sel: "+anObject);
+//		super.setSelectedItem(anObject);
+//	}
+	
 	/**
 	 * 
 	 */

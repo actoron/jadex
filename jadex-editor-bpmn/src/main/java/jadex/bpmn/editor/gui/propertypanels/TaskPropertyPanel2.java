@@ -76,11 +76,11 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 	{
 		super(container, task, selectedparameter);
 		
-		if(cbox.getItemCount()>0)
-		{
-			int idx = cbox.getSelectedIndex();
-			cbox.setSelectedIndex(idx!=-1? idx: 0);
-		}
+//		if(cbox.getItemCount()>0)
+//		{
+//			int idx = cbox.getSelectedIndex();
+//			cbox.setSelectedIndex(idx!=-1? idx: 0);
+//		}
 	}
 	
 	/**
