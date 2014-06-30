@@ -117,7 +117,7 @@ public class BpmnGraph extends mxGraph
 					if (cells[i] instanceof VPool)
 					{
 						VPool vpool = (VPool) cells[i];
-						System.out.println(vpool.getGeometry() + " " + vpool.getPreviousGeometry());
+//						System.out.println(vpool.getGeometry() + " " + vpool.getPreviousGeometry());
 						if (vpool.getGeometry().getX() == vpool.getPreviousGeometry().getX() + vpool.getPreviousGeometry().getWidth() ||
 							vpool.getGeometry().getX() + vpool.getGeometry().getWidth() == vpool.getPreviousGeometry().getX())
 						{
