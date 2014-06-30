@@ -1,5 +1,7 @@
 package jadex.bpmn.editor.gui;
 
+import java.util.Arrays;
+
 import jadex.bpmn.editor.gui.controllers.SValidation;
 import jadex.bpmn.editor.gui.layouts.EventHandlerLayout;
 import jadex.bpmn.editor.gui.layouts.LaneLayout;
@@ -10,6 +12,7 @@ import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VMessagingEdge;
+import jadex.bpmn.editor.model.visual.VNode;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
@@ -22,7 +25,11 @@ import javax.swing.SwingUtilities;
 
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.layout.mxStackLayout;
+import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxLayoutManager;
 import com.mxgraph.view.mxStylesheet;
@@ -97,6 +104,56 @@ public class BpmnGraph extends mxGraph
 //				orderCells(true, cells);
 //			}
 //		});
+		
+		addListener(mxEvent.RESIZE_CELLS, new mxIEventListener()
+		{
+			public void invoke(Object sender, mxEventObject evt)
+			{
+//				System.out.println(Arrays.toString(evt.getProperties().keySet().toArray()));
+				mxRectangle[] bounds = (mxRectangle[]) evt.getProperty("bounds");
+//				System.out.println(bounds.getWidth() + " " + bounds.getHeight());
+				Object[] cells = (Object[]) evt.getProperty("cells");
+//				System.out.println(bounds.length);
+				for (int i = 0; i < cells.length; ++i)
+				{
+					if (cells[i] instanceof VPool)
+					{
+						VPool vpool = (VPool) cells[i];
+						double xdiff = vpool.getPreviousGeometry().getX() - bounds[i].getX();
+						double ydiff = vpool.getPreviousGeometry().getY() - bounds[i].getY();
+						for (int j = 0; j < vpool.getChildCount(); ++j)
+						{
+							Object obj = vpool.getChildAt(j);
+							if (obj instanceof VLane)
+							{
+								VLane lane = (VLane) obj;
+								for (int k = 0; k < lane.getChildCount(); ++k)
+								{
+									Object lobj = lane.getChildAt(k);
+									if (lobj instanceof VNode)
+									{
+										VNode node = (VNode) lobj;
+										mxGeometry geo = node.getGeometry();
+										geo.setX(Math.max(0, geo.getX() + xdiff));
+										geo.setY(Math.max(0, geo.getY() + ydiff));
+									}
+								}
+							}
+							else if (obj instanceof VNode)
+							{
+								VNode node = (VNode) obj;
+								mxGeometry geo = node.getGeometry();
+								geo.setX(Math.max(0, geo.getX() + xdiff));
+								geo.setY(Math.max(0, geo.getY() + ydiff));
+							}
+						}
+//						System.out.println(vpool.getPreviousGeometry().getRectangle());
+//						System.out.println(bounds[i]);
+					}
+				}
+			}
+		});
+		
 		setStylesheet(sheet);
 		activate();
 	}

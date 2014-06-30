@@ -1,9 +1,12 @@
 package jadex.bpmn.editor.model.visual;
 
+import com.mxgraph.model.mxGeometry;
 import com.mxgraph.view.mxGraph;
 
 public class VPool extends VNamedNode
 {
+	/** Previous geometry since the last set. */
+	protected mxGeometry previousgeometry;
 	
 	/**
 	 * Creates a new pool.
@@ -14,6 +17,26 @@ public class VPool extends VNamedNode
 	{
 		super(graph, VPool.class.getSimpleName());
 		setConnectable(false);
+	}
+	
+	/**
+	 *  Sets a new geometry, preserving the previous.
+	 */
+	public void setGeometry(mxGeometry geometry)
+	{
+		previousgeometry = getGeometry();
+		super.setGeometry(geometry);
+//		(new RuntimeException()).printStackTrace();
+	}
+	
+	/**
+	 * Returns the previous geometry.
+	 * 
+	 * @return The previous geometry.
+	 */
+	public mxGeometry getPreviousGeometry()
+	{
+		return previousgeometry;
 	}
 	
 	/**
