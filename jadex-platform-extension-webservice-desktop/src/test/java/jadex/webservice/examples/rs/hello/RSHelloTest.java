@@ -30,7 +30,7 @@ public class RSHelloTest //extends TestCase
 	private IServiceIdentifier sid;
 	
 	@Before
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		hello = new Hello();
 		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class);
@@ -90,7 +90,7 @@ public class RSHelloTest //extends TestCase
 //	}
 
 	@After
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		pservice.unpublishService(sid);
 	}
