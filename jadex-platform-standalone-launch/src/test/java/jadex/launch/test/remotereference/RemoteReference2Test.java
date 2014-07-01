@@ -14,20 +14,28 @@ import jadex.commons.future.ThreadSuspendable;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
 
 /**
  *  Test if a remote references are correctly transferred and mapped back.
  */
-public class RemoteReference2Test extends TestCase
+public class RemoteReference2Test //extends TestCase
 {
+	@Rule 
+	public TestName name = new TestName();
+
+	
+	@Test
 	public void	testRemoteReference()
 	{
 		long timeout	= BasicService.getLocalDefaultTimeout();
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		// Underscore in platform name assures both platforms use same password.
-		String	pid	= SUtil.createUniqueId(getName(), 3)+"-*";
+		String	pid	= SUtil.createUniqueId(name.getMethodName(), 3)+"-*";
 		
 		// Start platform1 used for remote access.
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", pid,
@@ -71,7 +79,7 @@ public class RemoteReference2Test extends TestCase
 		ILocalService	service2	= search.searchService("dummy").get(sus, timeout);
 		
 		// Remote reference should be mapped back to remote provided service proxy.
-		assertEquals(service1, service2);
+		Assert.assertEquals(service1, service2);
 
 		// Kill platforms and end test case.
 		platform2.killComponent().get(sus, timeout);

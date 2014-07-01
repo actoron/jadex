@@ -23,13 +23,14 @@ import jadex.tools.jcc.PlatformControlCenter;
 
 import javax.swing.SwingUtilities;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  *  Test if all JCC plugins can be activated.
  */
-public class JCCTest extends TestCase
+public class JCCTest //extends TestCase
 {
+	@Test
 	public void	testJCC()
 	{
 //		System.err.println("starting platform");

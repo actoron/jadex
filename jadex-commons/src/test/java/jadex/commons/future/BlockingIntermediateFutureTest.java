@@ -2,13 +2,15 @@ package jadex.commons.future;
 
 import java.util.Iterator;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *  Test blocking access to intermediate future.
  */
-public class BlockingIntermediateFutureTest extends TestCase
+public class BlockingIntermediateFutureTest //extends TestCase
 {
+	@Test
 	public void testBlockingIteration()
 	{
 		IntermediateFuture<String>	fut	= new IntermediateFuture<String>();
@@ -126,27 +128,27 @@ public class BlockingIntermediateFutureTest extends TestCase
 				// Retrieve first two results (should be non-blocking)
 				for(int i=1; i<=2 && fut.hasNextIntermediateResult(); i++)
 				{
-					assertEquals("result"+i, fut.getNextIntermediateResult());
+					Assert.assertEquals("result"+i, fut.getNextIntermediateResult());
 				}
-				assertEquals(false, suspended);
+				Assert.assertEquals(false, suspended);
 	
 				// Retrieve next result (should be blocking)
-				assertEquals("result3", fut.getNextIntermediateResult());
-				assertEquals(true, suspended);
+				Assert.assertEquals("result3", fut.getNextIntermediateResult());
+				Assert.assertEquals(true, suspended);
 	
 				// Check for next result (should be blocking on check)
 				suspended	= false;
-				assertEquals(true, fut.hasNextIntermediateResult());
-				assertEquals(true, suspended);
+				Assert.assertEquals(true, fut.hasNextIntermediateResult());
+				Assert.assertEquals(true, suspended);
 				suspended	= false;
-				assertEquals("result4", fut.getNextIntermediateResult());
-				assertEquals(false, suspended);
+				Assert.assertEquals("result4", fut.getNextIntermediateResult());
+				Assert.assertEquals(false, suspended);
 				
 				// Check for graceful exit (should block until finished)
 				if(exit)
 				{
-					assertEquals(false, fut.hasNextIntermediateResult());					
-					assertEquals(true, suspended);
+					Assert.assertEquals(false, fut.hasNextIntermediateResult());					
+					Assert.assertEquals(true, suspended);
 					suspended	= false;
 				}
 				
@@ -156,11 +158,11 @@ public class BlockingIntermediateFutureTest extends TestCase
 					try
 					{
 						fut.getNextIntermediateResult();
-						assertTrue(false);	// Should throw exception above.
+						Assert.assertTrue(false);	// Should throw exception above.
 					}
 					catch(RuntimeException e)
 					{
-						assertEquals(true, suspended);
+						Assert.assertEquals(true, suspended);
 						suspended	= false;
 					}
 				}
@@ -169,14 +171,14 @@ public class BlockingIntermediateFutureTest extends TestCase
 				try
 				{
 					fut.getNextIntermediateResult();
-					assertTrue(false);	// Should throw exception above.
+					Assert.assertTrue(false);	// Should throw exception above.
 				}
 				catch(RuntimeException e)
 				{
-					assertEquals(false, suspended);
+					Assert.assertEquals(false, suspended);
 				}
-				assertEquals(false, fut.hasNextIntermediateResult());					
-				assertEquals(false, suspended);
+				Assert.assertEquals(false, fut.hasNextIntermediateResult());					
+				Assert.assertEquals(false, suspended);
 			}
 			catch(Throwable t)
 			{
@@ -224,27 +226,27 @@ public class BlockingIntermediateFutureTest extends TestCase
 				// Retrieve first two results (should be non-blocking)
 				for(int i=1; i<=2 && it.hasNext(); i++)
 				{
-					assertEquals("result"+i, it.next());
+					Assert.assertEquals("result"+i, it.next());
 				}
-				assertEquals(false, suspended);
+				Assert.assertEquals(false, suspended);
 	
 				// Retrieve next result (should be blocking)
-				assertEquals("result3", it.next());
-				assertEquals(true, suspended);
+				Assert.assertEquals("result3", it.next());
+				Assert.assertEquals(true, suspended);
 	
 				// Check for next result (should be blocking on check)
 				suspended	= false;
-				assertEquals(true, it.hasNext());
-				assertEquals(true, suspended);
+				Assert.assertEquals(true, it.hasNext());
+				Assert.assertEquals(true, suspended);
 				suspended	= false;
-				assertEquals("result4", it.next());
-				assertEquals(false, suspended);
+				Assert.assertEquals("result4", it.next());
+				Assert.assertEquals(false, suspended);
 				
 				// Check for graceful exit (should block until finished)
 				if(exit)
 				{
-					assertEquals(false, it.hasNext());
-					assertEquals(true, suspended);
+					Assert.assertEquals(false, it.hasNext());
+					Assert.assertEquals(true, suspended);
 					suspended	= false;
 				}
 				
@@ -254,11 +256,11 @@ public class BlockingIntermediateFutureTest extends TestCase
 					try
 					{
 						it.next();
-						assertTrue(false);	// Should throw exception above.
+						Assert.assertTrue(false);	// Should throw exception above.
 					}
 					catch(RuntimeException e)
 					{
-						assertEquals(true, suspended);
+						Assert.assertEquals(true, suspended);
 						suspended	= false;
 					}
 				}
@@ -267,14 +269,14 @@ public class BlockingIntermediateFutureTest extends TestCase
 				try
 				{
 					it.next();
-					assertTrue(false);	// Should throw exception above.
+					Assert.assertTrue(false);	// Should throw exception above.
 				}
 				catch(RuntimeException e)
 				{
-					assertEquals(false, suspended);
+					Assert.assertEquals(false, suspended);
 				}
-				assertEquals(false, it.hasNext());					
-				assertEquals(false, suspended);
+				Assert.assertEquals(false, it.hasNext());					
+				Assert.assertEquals(false, suspended);
 			}
 			catch(Throwable t)
 			{

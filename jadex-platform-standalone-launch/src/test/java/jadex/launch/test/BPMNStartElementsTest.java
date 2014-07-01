@@ -14,10 +14,11 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class BPMNStartElementsTest extends TestCase
+public class BPMNStartElementsTest //extends TestCase
 {
+	@Test
 	public void testStartActivities() throws MalformedURLException
 	{
 //		System.err.println("starting platform");
