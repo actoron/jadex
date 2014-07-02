@@ -125,7 +125,7 @@ public class SBpmnModelReader
 		IStaxReaderWrapper reader = null;
 		if (!SReflect.isAndroid())
 		{
-			Class<?> clazz = SReflect.classForName("jadex.common.staxwrapper.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
+			Class<?> clazz = SReflect.classForName("jadex.commons.staxwrapper.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
 			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
 			reader = (IStaxReaderWrapper) con.newInstance(new Object[] { in });
 		}
