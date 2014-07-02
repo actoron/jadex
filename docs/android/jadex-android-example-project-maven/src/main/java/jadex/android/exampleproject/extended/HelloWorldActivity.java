@@ -3,13 +3,9 @@ package jadex.android.exampleproject.extended;
 import jadex.android.exampleproject.R;
 import jadex.android.exampleproject.extended.MyJadexService.MyPlatformListener;
 import jadex.android.exampleproject.extended.MyJadexService.MyServiceInterface;
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IResultListener;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -95,13 +91,11 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 		myService.setPlatformListener(new MyPlatformListener()
 		{
 			
-			@Override
 			public void onPlatformStarting()
 			{
 				runOnUiThread(new Runnable()
 				{
 					
-					@Override
 					public void run()
 					{
 						textView.setText(R.string.starting);
@@ -109,7 +103,6 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 				});
 			}
 			
-			@Override
 			public void onPlatformStarted()
 			{
 				platformId = myService.getPlatformId();
@@ -122,7 +115,6 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 				});
 			}
 
-			@Override
 			public void onHelloWorldAgentStarted(final String name)
 			{
 				runOnUiThread(new Runnable()
@@ -142,7 +134,6 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 	/**
 	 * Called when MyJadexService disconnects (because we called unbind or stop)
 	 */
-	@Override
 	public void onServiceDisconnected(ComponentName name)
 	{
 		this.myService = null;
@@ -187,7 +178,6 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 							myService.stopPlatforms();
 							runOnUiThread(new Runnable()
 							{
-								@Override
 								public void run()
 								{
 									refreshButtons();

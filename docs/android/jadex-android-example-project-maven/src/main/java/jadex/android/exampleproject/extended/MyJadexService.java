@@ -8,7 +8,6 @@ import jadex.android.exampleproject.extended.agent.MyAgent;
 import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import android.content.Intent;
 import android.os.Binder;
@@ -87,13 +86,11 @@ public class MyJadexService extends JadexPlatformService
 		registerEventReceiver(new EventReceiver<MyEvent>(MyEvent.class)
 		{
 
-			@Override
 			public void receiveEvent(final MyEvent event)
 			{
 				handler.post(new Runnable()
 				{
 					
-					@Override
 					public void run()
 					{
 						Toast.makeText(MyJadexService.this, event.getMessage(), Toast.LENGTH_LONG).show();
@@ -136,8 +133,6 @@ public class MyJadexService extends JadexPlatformService
 		
 		startComponent("HelloWorldAgent " + num, MyAgent.class).addResultListener(new DefaultResultListener<IComponentIdentifier>()
 		{
-
-			@Override
 			public void resultAvailable(IComponentIdentifier result)
 			{
 				if (listener != null) {
