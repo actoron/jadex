@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  *  Test if the platform terminates itself.
  */
-public class MultiPlatformsTest extends TestCase 
+public class MultiPlatformsTest //extends TestCase 
 {
 	/**
 	 * 
@@ -43,6 +43,7 @@ public class MultiPlatformsTest extends TestCase
 	 *  Perform the test.
 	 * @throws Exception 
 	 */
+	@Test
 	public void	testMultiplePlatforms() throws Exception
 	{
 		
