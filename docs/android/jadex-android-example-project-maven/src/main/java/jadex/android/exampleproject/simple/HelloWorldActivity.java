@@ -144,7 +144,6 @@ public class HelloWorldActivity extends JadexAndroidActivity
 							stopPlatforms();
 							runOnUiThread(new Runnable()
 							{
-								@Override
 								public void run()
 								{
 									refreshButtons();
@@ -198,13 +197,11 @@ public class HelloWorldActivity extends JadexAndroidActivity
 		registerEventReceiver(new EventReceiver<MyEvent>(MyEvent.class)
 		{
 	
-			@Override
 			public void receiveEvent(final MyEvent event)
 			{
 				runOnUiThread(new Runnable()
 				{
 					
-					@Override
 					public void run()
 					{
 						Toast.makeText(HelloWorldActivity.this, event.getMessage(), Toast.LENGTH_LONG).show();

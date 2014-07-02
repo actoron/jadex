@@ -71,7 +71,6 @@ public class MyAgent	implements IAgentInterface
 
 
 
-	@Override
 	public void callAgent(String message)
 	{
 		showAndroidMessage("I was called with: " + message);
