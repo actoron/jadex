@@ -898,9 +898,19 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void addProperty(String name, String value)
 	{
+		addProperty(name, value, true);
+	}
+	
+	/**
+	 *  Add a simple string-based property.
+	 *  @param name Property name.
+	 *  @param value The string value.
+	 */
+	public void addProperty(String name, String value, boolean string)
+	{
 		MProperty mprop = new MProperty();
 		mprop.setName(name);
-		UnparsedExpression uexp = new UnparsedExpression(name, String.class, "\"" + value + "\"", null);
+		UnparsedExpression uexp = new UnparsedExpression(name, String.class, string? "\"" + value + "\"": value, null);
 		SJavaParser.parseExpression(uexp, null, MActivity.class.getClassLoader());
 		mprop.setInitialValue(uexp); 
 		addProperty(mprop);

@@ -120,7 +120,8 @@ public class SPropertyPanelFactory
 				 MBpmnModel.EVENT_END_MESSAGE.equals(((MActivity) velement.getBpmnElement()).getActivityType())))// &&
 //				 ((MActivity) velement.getBpmnElement()).isThrowing())
 			{
-				ret = new MessageEventPropertyPanel(container, (VActivity) velement);
+//				ret = new MessageEventPropertyPanel(container, (VActivity) velement);
+				ret = new MessageEventPropertyPanel2(container, (VActivity) velement);
 			}
 			if (velement instanceof VActivity &&
 				(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(((MActivity) velement.getBpmnElement()).getActivityType()) || 

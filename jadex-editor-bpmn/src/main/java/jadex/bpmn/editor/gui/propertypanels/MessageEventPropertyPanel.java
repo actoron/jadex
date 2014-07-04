@@ -35,6 +35,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.AbstractTableModel;
 
+/**
+ *  Property for message events.
+ */
 public class MessageEventPropertyPanel extends BasePropertyPanel
 {
 	/** Names for the parameter table columns. */
@@ -96,6 +99,11 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 	/** The parameter table. */
 	protected JTable paramtable;
 	
+	/**
+	 *  Create a new panel.
+	 *  @param container The model container.
+	 *  @param vmsgevent The vactivity.
+	 */
 	public MessageEventPropertyPanel(ModelContainer container, VActivity vmsgevent)
 	{
 		super("Message Event", container);
