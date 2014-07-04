@@ -24,11 +24,11 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.common.staxwrapper.IStaxReaderWrapper;
-import jadex.common.staxwrapper.XmlUtil;
-import jadex.common.staxwrapper.XmlTag;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.commons.staxwrapper.IStaxReaderWrapper;
+import jadex.commons.staxwrapper.XmlTag;
+import jadex.commons.staxwrapper.XmlUtil;
 import jadex.javaparser.SJavaParser;
 
 import java.awt.geom.Point2D;
@@ -125,7 +125,7 @@ public class SBpmnModelReader
 		IStaxReaderWrapper reader = null;
 		if (!SReflect.isAndroid())
 		{
-			Class<?> clazz = SReflect.classForName("jadex.common.staxwrapper.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
+			Class<?> clazz = SReflect.classForName("jadex.commons.staxwrapper.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
 			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
 			reader = (IStaxReaderWrapper) con.newInstance(new Object[] { in });
 		}

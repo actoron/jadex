@@ -1,8 +1,8 @@
 package jadex.xml.reader;
 
-import jadex.common.staxwrapper.IStaxReaderWrapper;
-import jadex.common.staxwrapper.XmlTag;
-import jadex.common.staxwrapper.XmlUtil;
+import jadex.commons.staxwrapper.IStaxReaderWrapper;
+import jadex.commons.staxwrapper.XmlTag;
+import jadex.commons.staxwrapper.XmlUtil;
 import jadex.xml.SXML;
 
 import java.io.IOException;

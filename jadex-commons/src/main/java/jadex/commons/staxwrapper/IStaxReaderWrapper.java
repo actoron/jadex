@@ -1,4 +1,4 @@
-package jadex.common.staxwrapper;
+package jadex.commons.staxwrapper;
 
 import java.util.LinkedList;
 import java.util.Map;
