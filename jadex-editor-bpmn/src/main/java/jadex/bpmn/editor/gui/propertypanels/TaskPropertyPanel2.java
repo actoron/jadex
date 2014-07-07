@@ -81,6 +81,8 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 //			int idx = cbox.getSelectedIndex();
 //			cbox.setSelectedIndex(idx!=-1? idx: 0);
 //		}
+		
+		cbox.setSelectedItem(getBpmnTask().getClazz());
 	}
 	
 	/**
@@ -108,68 +110,19 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 		final ClassLoader cl = getModelContainer().getProjectClassLoader()!=null? getModelContainer().getProjectClassLoader()
 			: TaskPropertyPanel.class.getClassLoader();
 			
+		// Hack, side effect
+		descarea = new JEditorPane("text/html", "");
+		final JScrollPane descpane = new JScrollPane(descarea);
+		
 		// Hack, side effect :-(
 		cbox = new AutoCompleteCombo(null, cl);
 		final FixedClassInfoComboModel model = new FixedClassInfoComboModel(cbox, -1, new ArrayList<ClassInfo>(modelcontainer.getTaskClasses()));
 		cbox.setModel(model);
 		cbox.setEditor(new ComboBoxEditor(model));
 		cbox.setRenderer(new ClassInfoComboBoxRenderer());
-//		cbox.setEditor(new MetalComboBoxEditor()//BasicComboBoxEditor()
-//		{
-//			Object val;
-//			public void setItem(Object obj)
-//			{
-//				if(obj==null || SUtil.equals(val, obj))
-//					return;
-//				
-//				String text = obj instanceof ClassInfo? model.convertToString((ClassInfo)obj): "";
-//			    if(text!=null && !text.equals(editor.getText())) 
-//			    {
-//			    	val = obj;
-//			    	editor.setText(text);
-//			    }
-//			}
-//			
-//			public Object getItem()
-//			{
-//				return val;
-//			}
-//		});
-//		cbox.setRenderer(new BasicComboBoxRenderer()
-//		{
-//			public Component getListCellRendererComponent(JList list, Object value,
-//				int index, boolean isSelected, boolean cellHasFocus)
-//			{
-//				ClassInfo ci = (ClassInfo)value;
-//				Class<?> cl = ci.getType(modelcontainer.getProjectClassLoader());
-//				String txt = null;
-//				if(cl!=null)
-//				{
-//					txt = SReflect.getInnerClassName(cl)+" - "+cl.getPackage().getName();
-//				}
-//				else
-//				{
-//					String fn = ci.getTypeName();
-//					int idx = fn.lastIndexOf(".");
-//					if(idx!=-1)
-//					{
-//						String cn = fn.substring(idx+1);
-//						String pck = fn.substring(0, idx);
-//						txt = cn+" - "+pck;
-//					}
-//					else
-//					{
-//						txt = fn;
-//					}
-//				}
-//				return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
-//			}
-//		});
 		
 		if(getBpmnTask().getClazz()!=null)
 		{
-			cbox.setSelectedItem(getBpmnTask().getClazz());
-			
 			if(getBpmnTask().getProperties()==null || getBpmnTask().getProperties().size()==0)
 			{
 				TaskMetaInfo info = getTaskMetaInfo(getBpmnTask().getClazz().getTypeName());
@@ -191,25 +144,6 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 //			initTaskProperties(getBpmnTask().getClazz());
 //			System.out.println("setting: "+getBpmnTask().getClazz());
 		}
-		
-//		JButton sel = new JButton("...");
-//		sel.addActionListener(new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				Class<?> clazz = ClassSearchPanel.showDialog(modelcontainer.getProjectClassLoader(), null, TaskPropertyPanel.this);
-//				if(clazz!=null)
-//					cbox.setSelectedItem(clazz.getName());
-////				cbox.addItem(clazz.getName());
-//			}
-//		});
-		
-//		column.add(label, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST, 
-//			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
-//		column.add(cbox, new GridBagConstraints(1, y, 1, 1, 1, 1, GridBagConstraints.WEST, 
-//			GridBagConstraints.HORIZONTAL, new Insets(2,2,2,2), 0, 0));
-//		column.add(sel, new GridBagConstraints(2, y++, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-//			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
 		
 		JPanel cboxpanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -243,12 +177,7 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 		gc.fill = GridBagConstraints.NONE;
 		cboxpanel.add(externalcheckbox);
 		
-		
 		configureAndAddInputLine(column, label, cboxpanel, y++, SUtil.createHashMap(new String[]{"second_fill"}, new Object[]{GridBagConstraints.HORIZONTAL}));
-		
-		// Hack, side effect
-		descarea = new JEditorPane("text/html", "");
-		final JScrollPane descpane = new JScrollPane(descarea);
 		
 		gc = new GridBagConstraints();
 		gc.gridx = 0;

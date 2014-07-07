@@ -141,7 +141,7 @@ public class ServicePoolTask implements ITask
 	public static final String generateExpressionString(int colnum, List<MappingEntry> entries)
 	{
 		StringBuffer buf = new StringBuffer();
-		if (colnum == 2)
+		if(colnum == 2)
 		{
 			buf.append("new Boolean[]{");
 		}
@@ -187,6 +187,10 @@ public class ServicePoolTask implements ITask
 			}
 			buf.replace(buf.length() - 1, buf.length(), "}");
 //			buf.append("}");
+		}
+		else
+		{
+			buf.append("}");
 		}
 		
 		

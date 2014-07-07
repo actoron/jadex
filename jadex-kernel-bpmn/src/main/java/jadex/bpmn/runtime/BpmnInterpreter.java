@@ -16,7 +16,6 @@ import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventEndSignalActivityHandler;
 import jadex.bpmn.runtime.handler.EventEndTerminateActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateErrorActivityHandler;
-import jadex.bpmn.runtime.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateNotificationHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateRuleHandler;
@@ -434,7 +433,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		{
 			public void resultAvailable(Void result)
 			{
-				final Map<MSubProcess, MActivity> evtsubstarts = bpmnmodel.getEventSubProcessStartEventMapping();
+				final Map<MSubProcess, List<MActivity>> evtsubstarts = bpmnmodel.getEventSubProcessStartEventMapping();
 				
 				if(!evtsubstarts.isEmpty())
 				{
@@ -452,54 +451,57 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 								}
 							});
 							
-							for(Map.Entry<MSubProcess, MActivity> evtsubentry : evtsubstarts.entrySet())
+							for(Map.Entry<MSubProcess, List<MActivity>> evtsubentry : evtsubstarts.entrySet())
 							{
-								String[] eventtypes = (String[])evtsubentry.getValue().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
-								UnparsedExpression	upex	= evtsubentry.getValue().getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
-								Map<String, Object>	params	= null; 
-								if(upex!=null)
+								for(MActivity mact: evtsubentry.getValue())
 								{
-									IParsedExpression	exp	= SJavaParser.parseExpression(upex, getModel().getAllImports(), getClassLoader());
-									for(String param: exp.getParameters())
+									String[] eventtypes = (String[])mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+									UnparsedExpression	upex	= mact.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
+									Map<String, Object>	params	= null; 
+									if(upex!=null)
 									{
-										if(hasContextVariable(param))
+										IParsedExpression	exp	= SJavaParser.parseExpression(upex, getModel().getAllImports(), getClassLoader());
+										for(String param: exp.getParameters())
 										{
-											Object	val	= getContextVariable(param);
-											if(val!=null)	// omit null values (also excludes '$event')
+											if(hasContextVariable(param))
 											{
-												if(params==null)
+												Object	val	= getContextVariable(param);
+												if(val!=null)	// omit null values (also excludes '$event')
 												{
-													params	= new LinkedHashMap<String, Object>();
+													if(params==null)
+													{
+														params	= new LinkedHashMap<String, Object>();
+													}
+													params.put(param, val);
 												}
-												params.put(param, val);
 											}
 										}
 									}
-								}
-								
-								final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), evtsubentry.getValue());
-								final IExternalAccess exta = getExternalAccess();
-								IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, false, new IResultCommand<IFuture<Void>, Object>()
-								{
-									public IFuture<Void> execute(final Object event)
+									
+									final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), mact);
+									final IExternalAccess exta = getExternalAccess();
+									IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, false, new IResultCommand<IFuture<Void>, Object>()
 									{
-										return exta.scheduleStep(new IComponentStep<Void>()
+										public IFuture<Void> execute(final Object event)
 										{
-											public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+											return exta.scheduleStep(new IComponentStep<Void>()
 											{
-												BpmnInterpreter ip = (BpmnInterpreter)ia;
-												ProcessThread thread = new ProcessThread(fevtsubentry.getFirstEntity(), 
-													ip.getTopLevelThread(), ip);
-												ip.getTopLevelThread().addThread(thread);
-												ProcessThread subthread = new ProcessThread(fevtsubentry.getSecondEntity(), thread, ip);
-												thread.addThread(subthread);
-												subthread.setOrCreateParameterValue("$event", event);
-												return IFuture.DONE;
-											}
-										});
-									}
-								});
-								fut.addResultListener(crl);
+												public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+												{
+													BpmnInterpreter ip = (BpmnInterpreter)ia;
+													ProcessThread thread = new ProcessThread(fevtsubentry.getFirstEntity(), 
+														ip.getTopLevelThread(), ip);
+													ip.getTopLevelThread().addThread(thread);
+													ProcessThread subthread = new ProcessThread(fevtsubentry.getSecondEntity(), thread, ip);
+													thread.addThread(subthread);
+													subthread.setOrCreateParameterValue("$event", event);
+													return IFuture.DONE;
+												}
+											});
+										}
+									});
+									fut.addResultListener(crl);
+								}
 							}
 						}
 						
@@ -1694,7 +1696,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			ret	= fut;
 			Class<?>	type	= info.getType().getType(getClassLoader(), model.getAllImports());
 			Method[]	meths	= type.getMethods();
-			Map<Method, MActivity>	methods	= new HashMap<Method, MActivity>(); // method -> event.
+			Map<String, MActivity>	methods	= new HashMap<String, MActivity>(); // method -> event.
 			for(int i=0; !fut.isDone() && i<meths.length; i++)
 			{
 				Collection<MActivity>	es	= events.getCollection(meths[i].getName());
@@ -1709,7 +1711,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 						}
 						else
 						{
-							methods.put(meths[i], event);
+							methods.put(meths[i].toString(), event);
 						}
 					}
 				}

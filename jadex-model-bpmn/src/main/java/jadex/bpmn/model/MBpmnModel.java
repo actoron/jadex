@@ -9,6 +9,7 @@ import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -17,7 +18,6 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.javaparser.SJavaParser;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -256,7 +256,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		
 		modelinfo.setStartable(true);
 		
-		final Map<MSubProcess, MActivity> evtsubstarts = getEventSubProcessStartEventMapping();
+		final Map<MSubProcess, List<MActivity>> evtsubstarts = getEventSubProcessStartEventMapping();
 		if(evtsubstarts!=null)
 		{
 			ProvidedServiceInfo[] psis = modelinfo.getProvidedServices();
@@ -269,23 +269,40 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 				}
 			}
 			
-			for(Map.Entry<MSubProcess, MActivity> entry: evtsubstarts.entrySet())
+			for(Map.Entry<MSubProcess, List<MActivity>> entry: evtsubstarts.entrySet())
 			{
-				MActivity mact = entry.getValue();
-				if(MBpmnModel.EVENT_START_MESSAGE.equals(mact.getActivityType()))
+				Class<?> iface = null;
+				
+				List<MActivity> macts = entry.getValue();
+				for(MActivity mact: macts)
 				{
-					if(mact.hasPropertyValue("iface"))
+					if(MBpmnModel.EVENT_START_MESSAGE.equals(mact.getActivityType()))
 					{
-						UnparsedExpression uexp = mact.getPropertyValue("iface");
-						Class<?> iface = (Class<?>)SJavaParser.parseExpression(uexp, getModelInfo().getAllImports(), cl).getValue(null);
-						if(!haspsis.contains(iface))
+						if(mact.hasPropertyValue("iface"))
 						{
-//							String method = mact.getPropertyValueString("method");
-//							ProvidedServiceImplementation psim = new ProvidedServiceImplementation(null, "");
-							ProvidedServiceInfo psi = new ProvidedServiceInfo("internal_"+iface.getName(), iface, null, null);
-							modelinfo.addProvidedService(psi);
+							if(iface==null)
+							{
+								UnparsedExpression uexp = mact.getPropertyValue("iface");
+								iface = (Class<?>)SJavaParser.parseExpression(uexp, getModelInfo().getAllImports(), cl).getValue(null);
+							}
+							
+							if(iface!=null && !haspsis.contains(iface))
+							{
+								// found interface without provided service impl
+								break;
+							}
 						}
 					}
+				}
+				
+				if(iface!=null && !haspsis.contains(iface))
+				{
+					String exp = "java.lang.reflect.Proxy.newProxyInstance($component.getClassLoader()," 
+						+ "new Class[]{"+iface.getName()+".class"
+						+ "}, new jadex.bpmn.runtime.ProcessServiceInvocationHandler($component, \""+entry.getKey().getId()+"\"))";
+					ProvidedServiceImplementation psim = new ProvidedServiceImplementation(null, exp, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
+					ProvidedServiceInfo psi = new ProvidedServiceInfo("internal_"+iface.getName(), iface, psim, null);
+					modelinfo.addProvidedService(psi);
 				}
 			}
 		}
@@ -1808,6 +1825,16 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get an activity by id.
+	 *  @param id The id.
+	 *  @return The activity.
+	 */
+	public MActivity getActivityById(String id)
+	{
+		return getAllActivities().get(id);
 	}
 	
 	/**
