@@ -20,6 +20,7 @@ import jadex.bpmn.runtime.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateNotificationHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateRuleHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateServiceActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.handler.EventMultipleStepHandler;
 import jadex.bpmn.runtime.handler.EventStartRuleHandler;
@@ -151,7 +152,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// i.e. the creation of a workflow is not supported. 
 		activityhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_TIMER, new EventIntermediateTimerActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventIntermediateMessageActivityHandler());
+//		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventIntermediateServiceActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_MULTIPLE, new EventIntermediateMultipleActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_RULE, new EventStartRuleHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_SIGNAL, new EventIntermediateNotificationHandler());
@@ -160,7 +162,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// Options: empty, message, rule, timer, error, signal, multi, link, compensation, cancel
 		// Missing: link, compensation, cancel
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_EMPTY, new DefaultActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
+//		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateServiceActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateRuleHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new EventIntermediateErrorActivityHandler());
@@ -174,7 +177,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		activityhandlers.put(MBpmnModel.EVENT_END_TERMINATE, new EventEndTerminateActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_END_MESSAGE, new EventIntermediateMessageActivityHandler());
+//		activityhandlers.put(MBpmnModel.EVENT_END_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_MESSAGE, new EventIntermediateServiceActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_SIGNAL, new EventEndSignalActivityHandler());
 
 		DEFAULT_ACTIVITY_HANDLERS = Collections.unmodifiableMap(activityhandlers);
@@ -1655,6 +1659,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		ProvidedServiceImplementation	impl	= info.getImplementation();
 		
 		// Service implementation inside BPMN: find start events for service methods.
+		// Find service without implementation
 		if(impl!=null && impl.getValue()==null && impl.getClazz()==null && info.getName()!=null)
 		{
 			// Build map of potentially matching events: method name -> {list of matching signal event activities}

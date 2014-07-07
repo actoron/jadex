@@ -110,7 +110,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 				
 				Class<?> ifacecl = iface.getType(cl);
 					
-				setProperty("iface", iface==null? null: iface.toString(), false);
+				setProperty("iface", iface==null? null: iface.toString()+".class", false);
 				
 				if(iface!=null)
 				{
@@ -151,6 +151,8 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 	 */
 	protected void setProperty(String name, String value, boolean string)
 	{
+//		System.out.println("setProp: "+name+" "+value+" "+string);
+		
 		if(value==null)
 		{
 			vact.getMActivity().removeProperty(name);
@@ -160,7 +162,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 			MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get(name): null;
 			if(mprop==null)
 			{
-				vact.getMActivity().addProperty("method", value, string);
+				vact.getMActivity().addProperty(name, value, string);
 			}
 			else
 			{
@@ -179,26 +181,33 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 		MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get("iface"): null;
 		if(mprop!=null)
 		{
-			final ClassLoader cl = getModelContainer().getProjectClassLoader()!=null? getModelContainer().getProjectClassLoader()
-				: ProvidedServicePropertyPanel.class.getClassLoader();
-			Class<?> iface = (Class<?>)SJavaParser.parseExpression(mprop.getInitialValue(), getModel().getModelInfo().getAllImports(), cl).getValue(null);
-			ibox.setSelectedItem(new ClassInfo(iface.getName()));
-			
-			mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get("method"): null;
-			if(mprop!=null)
+			try
 			{
-				String mname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), getModel().getModelInfo().getAllImports(), cl).getValue(null);
-				if(mname!=null)
+				final ClassLoader cl = getModelContainer().getProjectClassLoader()!=null? getModelContainer().getProjectClassLoader()
+					: ProvidedServicePropertyPanel.class.getClassLoader();
+				Class<?> iface = (Class<?>)SJavaParser.parseExpression(mprop.getInitialValue(), getModel().getModelInfo().getAllImports(), cl).getValue(null);
+				ibox.setSelectedItem(new ClassInfo(iface.getName()));
+				
+				mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get("method"): null;
+				if(mprop!=null)
 				{
-					for(Method m: iface.getDeclaredMethods())
+					String mname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), getModel().getModelInfo().getAllImports(), cl).getValue(null);
+					if(mname!=null)
 					{
-						if(mname.equals(m.toString()))
+						for(Method m: iface.getDeclaredMethods())
 						{
-							mbox.setSelectedItem(m);
-							break;
+							if(mname.equals(m.toString()))
+							{
+								mbox.setSelectedItem(m);
+								break;
+							}
 						}
 					}
 				}
+			}
+			catch(Exception e)
+			{
+				System.out.println("Refresh problem: "+e);
 			}
 		}
 	}

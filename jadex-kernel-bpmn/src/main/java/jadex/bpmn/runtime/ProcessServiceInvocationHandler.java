@@ -27,17 +27,17 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	//-------- attributes --------
 	
 	/** The process instance. */
-	protected BpmnInterpreter	instance;
+	protected BpmnInterpreter instance;
 	
 	/** The method / event mapping. */
-	protected Map	events;
+	protected Map<Method, MActivity> events;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new process service invocation handler.
 	 */
-	public ProcessServiceInvocationHandler(BpmnInterpreter instance, Map events)
+	public ProcessServiceInvocationHandler(BpmnInterpreter instance, Map<Method, MActivity> events)
 	{
 		this.instance	= instance;
 		this.events	= events;
@@ -48,15 +48,13 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Called when a method is invoked on a proxy.
 	 */
-	public Object invoke(Object proxy, Method method, Object[] args)	throws Throwable
+	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		MActivity	act	= (MActivity)events.get(method);
-//		ThreadContext	tc	= instance.getThreadContext();
+		MActivity act = events.get(method);
 		ProcessThread	thread	= new ProcessThread(act, instance.getTopLevelThread(), instance);
 		instance.getTopLevelThread().addThread(thread);
-//		tc.addThread(thread);
 
 		String[] params	= act.getPropertyNames();
 		for(int i=0; i<params.length; i++)

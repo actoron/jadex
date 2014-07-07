@@ -17,7 +17,8 @@
         <semantic:outgoing>B8NvyQ3DpJBHbika</semantic:outgoing>
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
-          <jadex:property name="method">jadex.micro.testcases.IBService</jadex:property>
+          <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
+          <jadex:property name="method">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.tutorial.IBService.add(int,int)&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:task name="Method 1" id="EIIUyDRP37T+GbVt">
@@ -39,6 +40,10 @@
       <semantic:startEvent id="8t+uPx2Ybl6pQUAV">
         <semantic:outgoing>gkpmA0Jeo+713iXM</semantic:outgoing>
         <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
+          <jadex:property name="method">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.tutorial.IBService.sub(int,int)&quot;</jadex:property>
+        </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:endEvent id="dXojUkOKANVBrm25">
         <semantic:incoming>dK03HWtXwwUegxHB</semantic:incoming>
@@ -54,8 +59,8 @@
         <semantic:outgoing>4DdtrGFKVof6uS49</semantic:outgoing>
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
-          <jadex:property name="iface">jadex.bpmn.testcases.IAService</jadex:property>
           <jadex:property name="method">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.testcases.IAService.test()&quot;</jadex:property>
+          <jadex:property name="iface">jadex.bpmn.testcases.IAService.class</jadex:property>
         </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:task name="Method 1" id="HSjAxDflhY3JYSiV">

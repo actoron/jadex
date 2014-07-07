@@ -7,16 +7,21 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BiHashMap;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.javaparser.SJavaParser;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -250,6 +255,40 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 //			modelinfo.setImports((String[])imports.toArray(new String[imports.size()]));
 		
 		modelinfo.setStartable(true);
+		
+		final Map<MSubProcess, MActivity> evtsubstarts = getEventSubProcessStartEventMapping();
+		if(evtsubstarts!=null)
+		{
+			ProvidedServiceInfo[] psis = modelinfo.getProvidedServices();
+			Set<Class<?>> haspsis = new HashSet<Class<?>>();
+			if(psis!=null)
+			{
+				for(ProvidedServiceInfo psi: psis)
+				{
+					haspsis.add(psi.getType().getType(cl));
+				}
+			}
+			
+			for(Map.Entry<MSubProcess, MActivity> entry: evtsubstarts.entrySet())
+			{
+				MActivity mact = entry.getValue();
+				if(MBpmnModel.EVENT_START_MESSAGE.equals(mact.getActivityType()))
+				{
+					if(mact.hasPropertyValue("iface"))
+					{
+						UnparsedExpression uexp = mact.getPropertyValue("iface");
+						Class<?> iface = (Class<?>)SJavaParser.parseExpression(uexp, getModelInfo().getAllImports(), cl).getValue(null);
+						if(!haspsis.contains(iface))
+						{
+//							String method = mact.getPropertyValueString("method");
+//							ProvidedServiceImplementation psim = new ProvidedServiceImplementation(null, "");
+							ProvidedServiceInfo psi = new ProvidedServiceInfo("internal_"+iface.getName(), iface, null, null);
+							modelinfo.addProvidedService(psi);
+						}
+					}
+				}
+			}
+		}
 	}
 	
 //	/**
