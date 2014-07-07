@@ -165,7 +165,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	protected Map<String, MActivity> allactivities;
 	
 	/** The cached event subprocess start events of the model. */
-	protected Map<MSubProcess, MActivity> eventsubprocessstartevents;
+	protected Map<MSubProcess, List<MActivity>> eventsubprocessstartevents;
 	
 	/** The cached instance-matched events that require waiting. */
 	protected List<MActivity> waitingevents;
@@ -1602,14 +1602,19 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		{
 			initMatchedStartEventCache();
 		}
-		return new ArrayList<MActivity>(eventsubprocessstartevents.values());
+		List<MActivity> ret = new ArrayList<MActivity>();
+		for (List<MActivity> acts : eventsubprocessstartevents.values())
+		{
+			ret.addAll(acts);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Returns a mapping from event subprocesses to their start events.
 	 *  @return The mapping
 	 */
-	public Map<MSubProcess, MActivity> getEventSubProcessStartEventMapping()
+	public Map<MSubProcess, List<MActivity>> getEventSubProcessStartEventMapping()
 	{
 		if(eventsubprocessstartevents == null)
 		{
@@ -1636,7 +1641,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	protected void initMatchedStartEventCache()
 	{
-		eventsubprocessstartevents = new HashMap<MSubProcess, MActivity>();
+		eventsubprocessstartevents = new HashMap<MSubProcess, List<MActivity>>();
 		typematchedstartevents = new ArrayList<MActivity>();
 		waitingevents = new ArrayList<MActivity>();
 		List<MActivity> starteventtriggers = new ArrayList<MActivity>();
@@ -1674,7 +1679,14 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 					contained = true;
 					if (MSubProcess.SUBPROCESSTYPE_EVENT.equals(subproc.getSubprocessType()))
 					{
-						eventsubprocessstartevents.put(subproc, startevent);
+//						eventsubprocessstartevents.put(subproc, startevent);
+						List<MActivity> acts = eventsubprocessstartevents.get(subproc);
+						if (acts == null)
+						{
+							acts = new ArrayList<MActivity>();
+							eventsubprocessstartevents.put(subproc, acts);
+						}
+						acts.add(startevent);
 					}
 					else
 					{
