@@ -174,7 +174,8 @@ public class ServiceCallTask implements ITask
 		Method met = null;
 		for(Method meth : methods)
 		{
-			if(meth.toString().equals(fmethod))
+			// for old models keep both checks
+			if(meth.toString().equals(fmethod) || SReflect.getMethodSignature(meth).equals(fmethod))
 			{
 				met = meth;
 				break;
@@ -601,10 +602,7 @@ public class ServiceCallTask implements ITask
 				{
 					String reqname = (String)cbsername.getSelectedItem();
 					
-					MProperty mprop = task.getProperties().get(PROPERTY_SERVICE);
-					UnparsedExpression uexp = new UnparsedExpression(null, 
-						String.class, "\""+reqname+"\"", null);
-					mprop.setInitialValue(uexp);
+					task.setProperty(PROPERTY_SERVICE, reqname, true);
 					
 					if(reqname!=null && model.getRequiredService(reqname)!=null)
 					{
@@ -620,6 +618,7 @@ public class ServiceCallTask implements ITask
 							DefaultComboBoxModel mo = ((DefaultComboBoxModel)cbmethodname.getModel());
 							mo.removeAllElements();
 							Method[] ms = type.getMethods();
+							mo.addElement(null);
 							for(Method m: ms)
 							{
 								mo.addElement(m);
@@ -637,13 +636,7 @@ public class ServiceCallTask implements ITask
 				public void actionPerformed(ActionEvent e)
 				{
 					Method method = (Method)cbmethodname.getSelectedItem();
-					
-//					System.out.println("setting: "+method);
-					
-					MProperty mprop = task.getProperties().get(PROPERTY_METHOD);
-					UnparsedExpression uexp = new UnparsedExpression(null, 
-						String.class, method!=null? "\""+method.toString()+"\"": "null", null);
-					mprop.setInitialValue(uexp);
+					task.setProperty(PROPERTY_METHOD, method==null? null: SReflect.getMethodSignature(method), true);
 				}
 			});
 			
@@ -652,14 +645,7 @@ public class ServiceCallTask implements ITask
 				public void actionPerformed(ActionEvent e)
 				{
 					ClassInfo ci = (ClassInfo)cbranking.getSelectedItem();
-					if(ci!=null)
-					{
-	//					System.out.println("setting: "+method);
-						MProperty mprop = task.getProperties().get(PROPERTY_RANKING);
-						UnparsedExpression uexp = new UnparsedExpression(null, 
-							String.class, "\""+ci.toString()+"\"", null);
-						mprop.setInitialValue(uexp);
-					}
+					task.setProperty(PROPERTY_RANKING, ci==null || ci.toString().length()==0? null: ci.toString(), true);
 				}
 			});
 			
@@ -701,7 +687,7 @@ public class ServiceCallTask implements ITask
 //					System.out.println("sel item: "+sername);
 				
 					mprop = task.getProperties().get(PROPERTY_METHOD);
-					if(mprop.getInitialValue()!=null)
+					if(mprop!=null && mprop.getInitialValue()!=null)
 					{
 						String methodname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
 //						System.out.println(task.getName()+" "+mprop.getInitialValueString());
@@ -716,7 +702,7 @@ public class ServiceCallTask implements ITask
 								Method[] ms = type.getMethods();
 								for(Method m: ms)
 								{
-									if(m.toString().equals(methodname))
+									if(SReflect.getMethodSignature(m).equals(methodname))
 									{
 										cbmethodname.setSelectedItem(m);
 		//								System.out.println("sel item2: "+methodname);

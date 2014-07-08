@@ -311,14 +311,15 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 								public void actionPerformed(ActionEvent e)
 								{
 									String val = tf.getText();
-									if(val.length()>0)
-									{
-										IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
-										MProperty mprop = mprops.get(pmi.getName());
-										UnparsedExpression uexp = new UnparsedExpression(null, 
-											pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), val, null);
-										mprop.setInitialValue(uexp);
-									}
+									getBpmnTask().setProperty(pmi.getName(), val, false);
+//									if(val.length()>0)
+//									{
+//										IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
+//										MProperty mprop = mprops.get(pmi.getName());
+//										UnparsedExpression uexp = new UnparsedExpression(null, 
+//											pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), val, null);
+//										mprop.setInitialValue(uexp);
+//									}
 								}
 							});
 						}
@@ -340,37 +341,34 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 				
 				String taskname = taskcl.getTypeName();
 				
-				// change task class
-				getBpmnTask().setClazz(taskcl);
-
-				// and renew properties
-//				TaskMetaInfo info = getTaskMetaInfo(taskname);
-//				initTaskProperties(taskcl);
-
+				// renew properties
 				if(!taskcl.equals(getBpmnTask().getClazz()))
 				{
 					IndexMap<String, MProperty> props = getBpmnTask().getProperties();
 					if(props!=null)
 						props.clear();
 	
-					TaskMetaInfo info = getTaskMetaInfo(taskname);
-					if(info!=null)
-					{
-						List<PropertyMetaInfo> pmis = info.getPropertyInfos();
-						if(pmis!=null)
-						{
-							for(PropertyMetaInfo pmi: pmis)
-							{
-								UnparsedExpression uexp = new UnparsedExpression(null, 
-									pmi.getClazz().getType(cl), pmi.getInitialValue(), null);
-								MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
-								getBpmnTask().addProperty(mprop);
-							}
-						}
+//					TaskMetaInfo info = getTaskMetaInfo(taskname);
+//					if(info!=null)
+//					{
+//						List<PropertyMetaInfo> pmis = info.getPropertyInfos();
+//						if(pmis!=null)
+//						{
+//							for(PropertyMetaInfo pmi: pmis)
+//							{
+//								UnparsedExpression uexp = new UnparsedExpression(null, 
+//									pmi.getClazz().getType(cl), pmi.getInitialValue(), null);
+//								MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
+//								getBpmnTask().addProperty(mprop);
+//							}
+//						}
 						
 						pbut.setEnabled(getTaskMetaInfo(taskname) != null);
-					}
+//					}
 				}
+				
+				// change task class
+				getBpmnTask().setClazz(taskcl);
 				
 				processTaskInfos(taskname, descarea);
 				
@@ -392,31 +390,31 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 		return proppanel;
 	}
 	
-	/**
-	 * 
-	 */
-	protected void initTaskProperties(ClassInfo taskcl)
-	{
-		if(taskcl==null)
-			return;
-		IndexMap<String, MProperty> props = getBpmnTask().getProperties();
-		if(props!=null)
-			props.clear();
-
-		TaskMetaInfo info = getTaskMetaInfo(taskcl.getTypeName());
-		if(info!=null)
-		{
-			List<PropertyMetaInfo> pmis = info.getPropertyInfos();
-			if(pmis!=null)
-			{
-				for(PropertyMetaInfo pmi: pmis)
-				{
-					UnparsedExpression uexp = new UnparsedExpression(null, 
-						pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), pmi.getInitialValue(), null);
-					MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
-					getBpmnTask().addProperty(mprop);
-				}
-			}
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	protected void initTaskProperties(ClassInfo taskcl)
+//	{
+//		if(taskcl==null)
+//			return;
+//		IndexMap<String, MProperty> props = getBpmnTask().getProperties();
+//		if(props!=null)
+//			props.clear();
+//
+//		TaskMetaInfo info = getTaskMetaInfo(taskcl.getTypeName());
+//		if(info!=null)
+//		{
+//			List<PropertyMetaInfo> pmis = info.getPropertyInfos();
+//			if(pmis!=null)
+//			{
+//				for(PropertyMetaInfo pmi: pmis)
+//				{
+//					UnparsedExpression uexp = new UnparsedExpression(null, 
+//						pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), pmi.getInitialValue(), null);
+//					MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
+//					getBpmnTask().addProperty(mprop);
+//				}
+//			}
+//		}
+//	}
 }

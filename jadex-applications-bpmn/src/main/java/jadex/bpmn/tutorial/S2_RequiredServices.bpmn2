@@ -20,11 +20,9 @@
       <semantic:outgoing>2uhMQcfXPPVuWqKu</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.ServiceCallTask</jadex:class>
-        <jadex:parameter direction="in" name="param0" type="java.lang.String">&quot;User&quot;</jadex:parameter>
         <jadex:parameter direction="out" name="return" type="java.lang.String"/>
         <jadex:property name="service" type="java.lang.String">&quot;aser&quot;</jadex:property>
-        <jadex:property name="method" type="java.lang.String">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.testcases.IAService.test()&quot;</jadex:property>
-        <jadex:property name="ranking" type="java.lang.String">null</jadex:property>
+        <jadex:property name="method">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.testcases.IAService.test()&quot;</jadex:property>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:startEvent id="3700sONKzCJbzaHJ">

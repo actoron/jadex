@@ -2,20 +2,19 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Invocation handler for mapping service requests to
@@ -66,7 +65,7 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		
 		List<MActivity> macts = evtsubstarts.get(proc);
 		
-		Map<String, MActivity> events = new HashMap<String, MActivity>();
+		events = new HashMap<String, MActivity>();
 				
 		Class<?> iface = null;
 		for(MActivity mact: macts)
@@ -81,7 +80,9 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 						iface = (Class<?>)SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), instance.getClassLoader()).getValue(null);
 					}
 					
-					String method = mact.getPropertyValueString("method");
+					UnparsedExpression uexp = mact.getPropertyValue("method");
+					String method = (String)SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), instance.getClassLoader()).getValue(null);
+//					String method = mact.getPropertyValue("method");
 					events.put(method, mact);
 				}
 			}
@@ -97,14 +98,20 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		MActivity act = events.get(method.toString());
+		MActivity act = events.get(SReflect.getMethodSignature(method));
+		if(act==null)
+			act = events.get(method.toString());
 		ProcessThread	thread	= new ProcessThread(act, instance.getTopLevelThread(), instance);
 		instance.getTopLevelThread().addThread(thread);
 
-		String[] params	= act.getPropertyNames();
-		for(int i=0; i<params.length; i++)
+		List<MParameter> params	= act.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
+//		String[] params	= act.getPropertyNames();
+		if(params!=null && args!=null)
 		{
-			thread.setOrCreateParameterValue(params[i], args[i]);
+			for(int i=0; i<params.size() && i<args.length; i++)
+			{
+				thread.setOrCreateParameterValue(params.get(i).getName(), args[i]);
+			}
 		}
 		thread.setOrCreateParameterValue(THREAD_PARAMETER_SERVICE_RESULT, ret);
 		

@@ -110,7 +110,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 				
 				Class<?> ifacecl = iface.getType(cl);
 					
-				setProperty("iface", iface==null? null: iface.toString()+".class", false);
+				vact.getMActivity().setProperty("iface", iface==null? null: iface.toString()+".class", false);
 				
 				if(iface!=null)
 				{
@@ -139,39 +139,39 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 			{
 				Method method = (Method)mbox.getSelectedItem();
 				
-				setProperty("method", method==null? null: method.toString(), true);
+				vact.getMActivity().setProperty("method", method==null? null: SReflect.getMethodSignature(method), true);
 			}
 		});
 		
 		return pp;
 	}
 	
-	/**
-	 * 
-	 */
-	protected void setProperty(String name, String value, boolean string)
-	{
-//		System.out.println("setProp: "+name+" "+value+" "+string);
-		
-		if(value==null)
-		{
-			vact.getMActivity().removeProperty(name);
-		}
-		else
-		{
-			MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get(name): null;
-			if(mprop==null)
-			{
-				vact.getMActivity().addProperty(name, value, string);
-			}
-			else
-			{
-				UnparsedExpression uexp = new UnparsedExpression(null, 
-					String.class, string? "\""+value+"\"": value, null);
-				mprop.setInitialValue(uexp);
-			}
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	protected void setProperty(String name, String value, boolean string)
+//	{
+////		System.out.println("setProp: "+name+" "+value+" "+string);
+//		
+//		if(value==null)
+//		{
+//			vact.getMActivity().removeProperty(name);
+//		}
+//		else
+//		{
+//			MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get(name): null;
+//			if(mprop==null)
+//			{
+//				vact.getMActivity().addProperty(name, value, string);
+//			}
+//			else
+//			{
+//				UnparsedExpression uexp = new UnparsedExpression(null, 
+//					String.class, string? "\""+value+"\"": value, null);
+//				mprop.setInitialValue(uexp);
+//			}
+//		}
+//	}
 	
 	/**
 	 * 
@@ -196,7 +196,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 					{
 						for(Method m: iface.getDeclaredMethods())
 						{
-							if(mname.equals(m.toString()))
+							if(mname.equals(SReflect.getMethodSignature(m)))
 							{
 								mbox.setSelectedItem(m);
 								break;
