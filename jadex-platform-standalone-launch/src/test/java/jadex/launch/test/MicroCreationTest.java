@@ -25,16 +25,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  *  Test if the platform terminates itself.
  */
-public class MicroCreationTest extends TestCase
+public class MicroCreationTest //extends TestCase
 {
 	/**
 	 *  Test method.
 	 */
+	@Test
 	public void	testMicroCreation() throws Exception
 	{
 		long timeout	= BasicService.getLocalDefaultTimeout();

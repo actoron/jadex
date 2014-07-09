@@ -898,9 +898,19 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void addProperty(String name, String value)
 	{
+		addProperty(name, value, true);
+	}
+	
+	/**
+	 *  Add a simple string-based property.
+	 *  @param name Property name.
+	 *  @param value The string value.
+	 */
+	public void addProperty(String name, String value, boolean string)
+	{
 		MProperty mprop = new MProperty();
 		mprop.setName(name);
-		UnparsedExpression uexp = new UnparsedExpression(name, String.class, "\"" + value + "\"", null);
+		UnparsedExpression uexp = new UnparsedExpression(name, String.class, string? "\"" + value + "\"": value, null);
 		SJavaParser.parseExpression(uexp, null, MActivity.class.getClassLoader());
 		mprop.setInitialValue(uexp); 
 		addProperty(mprop);
@@ -924,6 +934,36 @@ public class MActivity extends MAssociationTarget
 	{
 		if(properties!=null)
 			removeProperty(prop.getName());
+	}
+	
+	/**
+	 *  Set a property value:
+	 *  a) val==null -> remove property
+	 *  b) val!=null && !hasProp(name) -> addProp(name, val)
+	 *  c) val!=null && hasProp(name) -> setInitialVal(val)
+	 */
+	public void setProperty(String name, String value, boolean string)
+	{
+//		System.out.println("setProp: "+name+" "+value+" "+string);
+		
+		if(value==null)
+		{
+			removeProperty(name);
+		}
+		else
+		{
+			MProperty mprop = getProperties()!=null? getProperties().get(name): null;
+			if(mprop==null)
+			{
+				addProperty(name, value, string);
+			}
+			else
+			{
+				UnparsedExpression uexp = new UnparsedExpression(null, 
+					String.class, string? "\""+value+"\"": value, null);
+				mprop.setInitialValue(uexp);
+			}
+		}
 	}
 	
 	/**

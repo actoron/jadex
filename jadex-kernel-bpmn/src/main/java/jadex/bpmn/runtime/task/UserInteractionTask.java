@@ -4,7 +4,6 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MParameter;
-import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
@@ -35,7 +34,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.print.Paper;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -108,9 +106,9 @@ public class UserInteractionTask implements ITask
 		IndexMap<String, MParameter> parameters	= task.getParameters();
 		MIdElement pa = task;
 		MBpmnModel model = context.getBpmnModel();
-		while(pa!=null && parameters==null || parameters.size()==0)
+		while(pa!=null && (parameters==null || parameters.size()==0))
 		{
-			pa = model.getParent(task);
+			pa = model.getParent(pa);
 			if(pa instanceof MActivity)
 			{
 				parameters = ((MActivity)pa).getParameters();
@@ -126,7 +124,7 @@ public class UserInteractionTask implements ITask
 				final JOptionPane	pane;
 				JComponent	message;
 				
-				if(!lparameters.isEmpty())
+				if(lparameters!=null && !lparameters.isEmpty())
 				{
 					Insets	insets	= new Insets(2,2,2,2);
 					message	= new JPanel(new GridBagLayout());
@@ -238,38 +236,40 @@ public class UserInteractionTask implements ITask
 			                else
 			                {
 			                	// Write changed value, if any.
-			                	for(Object[] param: lparameters)
+			                	if(lparameters!=null)
 			                	{
-			                		if(!SUtil.equals(param[VALUE], param[NEWVALUE]))
-			                		{
-			                			if(param[NEWVALUE] instanceof String)
-			                			{
-											try
-											{
-												// Todo: access thread context for imports etc.!?
-												IParsedExpression	pex	= new JavaCCExpressionParser().parseExpression((String)param[NEWVALUE], null, null, null);
-//												System.out.println("setPVal: "+param[NAME]+" "+pex.getValue(null));
-												context.setParameterValue((String)param[NAME], pex.getValue(null));
-											}
-											catch(Exception ex)
-											{
-												// Hack!!! Fallback: if no expression entered for string, use value directly.
-												if(param[TYPE].equals(String.class))
+				                	for(Object[] param: lparameters)
+				                	{
+				                		if(!SUtil.equals(param[VALUE], param[NEWVALUE]))
+				                		{
+				                			if(param[NEWVALUE] instanceof String)
+				                			{
+												try
 												{
-													context.setParameterValue((String)param[NAME], param[NEWVALUE]);
+													// Todo: access thread context for imports etc.!?
+													IParsedExpression	pex	= new JavaCCExpressionParser().parseExpression((String)param[NEWVALUE], null, null, null);
+	//												System.out.println("setPVal: "+param[NAME]+" "+pex.getValue(null));
+													context.setParameterValue((String)param[NAME], pex.getValue(null));
 												}
-												else
+												catch(Exception ex)
 												{
-													ex.printStackTrace();
+													// Hack!!! Fallback: if no expression entered for string, use value directly.
+													if(param[TYPE].equals(String.class))
+													{
+														context.setParameterValue((String)param[NAME], param[NEWVALUE]);
+													}
+													else
+													{
+														ex.printStackTrace();
+													}
 												}
-											}
-			                			}
-			                			else
-			                			{
-											context.setParameterValue((String)param[NAME], param[NEWVALUE]);
-			                				
-			                			}
-			                		}
+				                			}
+				                			else
+				                			{
+												context.setParameterValue((String)param[NAME], param[NEWVALUE]);
+				                			}
+				                		}
+				                	}
 			                	}
 			                	
 			                	ret.setResultIfUndone(null);
@@ -298,7 +298,10 @@ public class UserInteractionTask implements ITask
 		{
 			public void run()
 			{
-				dialog.dispose();
+				if(dialog!=null)
+				{
+					dialog.dispose();
+				}
 				ret.setResult(null);
 			}
 		});

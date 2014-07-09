@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>S1_ProvidedServices</jadex:modelname>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="h+5zbIZCq1kqcVgt">
+    <semantic:subProcess name="Service B" id="PDiITEFBW/u0FejX" triggeredByEvent="true">
+      <semantic:startEvent id="AWoEEebCXTss6X2s">
+        <semantic:outgoing>B8NvyQ3DpJBHbika</semantic:outgoing>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
+          <jadex:property name="method">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.tutorial.IBService.add(int,int)&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:startEvent>
+      <semantic:task name="Method 1" id="EIIUyDRP37T+GbVt">
+        <semantic:incoming>B8NvyQ3DpJBHbika</semantic:incoming>
+        <semantic:outgoing>dK03HWtXwwUegxHB</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service B - method 2&quot;</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:task name="Method 2" id="SZYm7jv3Bit8uZxc">
+        <semantic:incoming>gkpmA0Jeo+713iXM</semantic:incoming>
+        <semantic:outgoing>hCmn6earoHTmDtA6</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service B - method 2&quot;</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:startEvent id="8t+uPx2Ybl6pQUAV">
+        <semantic:outgoing>gkpmA0Jeo+713iXM</semantic:outgoing>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
+          <jadex:property name="method">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.tutorial.IBService.sub(int,int)&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:startEvent>
+      <semantic:endEvent id="dXojUkOKANVBrm25">
+        <semantic:incoming>dK03HWtXwwUegxHB</semantic:incoming>
+        <semantic:messageEventDefinition/>
+      </semantic:endEvent>
+      <semantic:endEvent id="LxP3XYiJRbz8g0MS">
+        <semantic:incoming>hCmn6earoHTmDtA6</semantic:incoming>
+        <semantic:messageEventDefinition/>
+      </semantic:endEvent>
+    </semantic:subProcess>
+    <semantic:subProcess name="Service A" id="BLhKFbd+HLIvEnKU" triggeredByEvent="true">
+      <semantic:startEvent id="M0ETx6cYjmHk/hoH">
+        <semantic:outgoing>4DdtrGFKVof6uS49</semantic:outgoing>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="method">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.testcases.IAService.test()&quot;</jadex:property>
+          <jadex:property name="iface">jadex.bpmn.testcases.IAService.class</jadex:property>
+        </semantic:extensionElements>
+      </semantic:startEvent>
+      <semantic:task name="Method 1" id="HSjAxDflhY3JYSiV">
+        <semantic:incoming>4DdtrGFKVof6uS49</semantic:incoming>
+        <semantic:outgoing>uFWlOF7UPObuF9uy</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service A - method 1&quot;</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:endEvent id="m5vdqhI00xqP2LF7">
+        <semantic:incoming>uFWlOF7UPObuF9uy</semantic:incoming>
+        <semantic:messageEventDefinition/>
+      </semantic:endEvent>
+    </semantic:subProcess>
+    <semantic:sequenceFlow sourceRef="AWoEEebCXTss6X2s" targetRef="EIIUyDRP37T+GbVt" id="B8NvyQ3DpJBHbika">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="EIIUyDRP37T+GbVt" targetRef="dXojUkOKANVBrm25" id="dK03HWtXwwUegxHB">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="SZYm7jv3Bit8uZxc" targetRef="LxP3XYiJRbz8g0MS" id="hCmn6earoHTmDtA6">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="8t+uPx2Ybl6pQUAV" targetRef="SZYm7jv3Bit8uZxc" id="gkpmA0Jeo+713iXM">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="M0ETx6cYjmHk/hoH" targetRef="HSjAxDflhY3JYSiV" id="4DdtrGFKVof6uS49">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="HSjAxDflhY3JYSiV" targetRef="m5vdqhI00xqP2LF7" id="uFWlOF7UPObuF9uy">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="h+5zbIZCq1kqcVgt">
+        <dc:Bounds height="630.0" width="1200.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="PDiITEFBW/u0FejX" isExpanded="true">
+        <dc:Bounds height="300.0" width="480.0" x="140.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="AWoEEebCXTss6X2s">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EIIUyDRP37T+GbVt">
+        <dc:Bounds height="100.0" width="160.0" x="150.0" y="20.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SZYm7jv3Bit8uZxc">
+        <dc:Bounds height="100.0" width="160.0" x="150.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="8t+uPx2Ybl6pQUAV">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="190.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="dXojUkOKANVBrm25">
+        <dc:Bounds height="40.0" width="40.0" x="360.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LxP3XYiJRbz8g0MS">
+        <dc:Bounds height="40.0" width="40.0" x="360.0" y="190.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="BLhKFbd+HLIvEnKU" isExpanded="true">
+        <dc:Bounds height="200.0" width="480.0" x="140.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="M0ETx6cYjmHk/hoH">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="80.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="HSjAxDflhY3JYSiV">
+        <dc:Bounds height="100.0" width="160.0" x="150.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="m5vdqhI00xqP2LF7">
+        <dc:Bounds height="40.0" width="40.0" x="360.0" y="80.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="B8NvyQ3DpJBHbika">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="gkpmA0Jeo+713iXM">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="dK03HWtXwwUegxHB">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="hCmn6earoHTmDtA6">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="4DdtrGFKVof6uS49">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="uFWlOF7UPObuF9uy">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

@@ -2936,7 +2936,15 @@ public class SUtil
 	{
 		if(NIS==null || (System.currentTimeMillis()-NISTIME)>30000)
 		{
-			NIS = Collections.list(NetworkInterface.getNetworkInterfaces());
+			Enumeration<NetworkInterface>	nis	= NetworkInterface.getNetworkInterfaces();
+			if(nis!=null)
+			{
+				NIS = Collections.list(nis);
+			}
+			else
+			{
+				NIS	= Collections.emptyList();
+			}
 			NISTIME	= System.currentTimeMillis();
 		}
 		return NIS;

@@ -28,6 +28,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -449,7 +450,7 @@ public class Starter
 					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
 					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUri()));
 					
-					initRescueThread(cid);
+					initRescueThread(cid, compargs);
 					
 					cfac.getComponentType(configfile, null, model.getResourceIdentifier())
 						.addResultListener(new ExceptionDelegationResultListener<String, IExternalAccess>(ret)
@@ -796,8 +797,22 @@ public class Starter
 	/**
 	 *  Init the rescue thread for a platform..
 	 */
-	public synchronized static void initRescueThread(IComponentIdentifier cid)
+	public synchronized static void initRescueThread(IComponentIdentifier cid, Map<String, Object> compargs)
 	{
+		IThreadPool	tp	= null;
+		if(compargs.get("threadpoolclass")!=null)
+		{
+			try
+			{
+				tp	= (IThreadPool)SReflect.classForName(
+					(String)compargs.get("threadpoolclass"), Starter.class.getClassLoader()).newInstance();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
 		assert cid.getParent()==null;
 		if(rescuethreads==null)
 		{
@@ -806,7 +821,7 @@ public class Starter
 		
 		final BlockingQueue bq = new BlockingQueue();
 		final IComponentIdentifier fcid = cid;
-		Thread rescuethread = new Thread(new Runnable()
+		Runnable	run	= new Runnable()
 		{
 			public void run()
 			{
@@ -829,12 +844,20 @@ public class Starter
 				{
 				}
 			}
-		}, "rescue_thread_"+cid.getName());
-		Tuple2<BlockingQueue, Thread> tup = new Tuple2<BlockingQueue, Thread>(bq, rescuethread);
-		rescuethreads.put(cid, tup);
-		// rescue thread must not be daemon, otherwise shutdown code like writing platform settings might be interrupted by vm exit. 
-//		rescuethread.setDaemon(true);
-		rescuethread.start();
+		};
+		if(tp!=null)
+		{
+			tp.execute(run);
+		}
+		else
+		{
+			Thread rescuethread =new Thread(run, "rescue_thread_"+cid.getName());
+			Tuple2<BlockingQueue, Thread> tup = new Tuple2<BlockingQueue, Thread>(bq, rescuethread);
+			rescuethreads.put(cid, tup);
+			// rescue thread must not be daemon, otherwise shutdown code like writing platform settings might be interrupted by vm exit. 
+	//		rescuethread.setDaemon(true);
+			rescuethread.start();
+		}
 	}
 	
 	/**

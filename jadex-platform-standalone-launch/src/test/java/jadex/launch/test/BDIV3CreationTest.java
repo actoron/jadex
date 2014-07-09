@@ -20,16 +20,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  *  Test if the bdi v3 creation test works.
  */
-public class BDIV3CreationTest extends TestCase
+public class BDIV3CreationTest //extends TestCase
 {
 	/**
 	 *  Test bdi v3 creation.
 	 */
+	@Test
 	public void	testBDICreation() throws Exception
 	{
 		long timeout	= BasicService.getLocalDefaultTimeout();

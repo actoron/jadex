@@ -1,4 +1,4 @@
-package jadex.common.staxwrapper;
+package jadex.commons.staxwrapper;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

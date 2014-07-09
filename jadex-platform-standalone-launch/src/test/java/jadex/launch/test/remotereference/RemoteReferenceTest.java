@@ -13,7 +13,8 @@ import jadex.commons.future.ThreadSuspendable;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *  Test if a remote references are correctly transferred and mapped back.
@@ -23,8 +24,9 @@ import junit.framework.TestCase;
  *  
  *  Tests if the result of the remote search yields the same local service proxy.
  */
-public class RemoteReferenceTest extends TestCase
+public class RemoteReferenceTest //extends TestCase
 {
+	@Test
 	public void	testRemoteReference()
 	{
 		long timeout	= BasicService.getLocalDefaultTimeout();
@@ -63,7 +65,7 @@ public class RemoteReferenceTest extends TestCase
 		ILocalService	service2	= search.searchService("dummy").get(sus, timeout);
 		
 		// Remote reference should be mapped back to local provided service proxy.
-		assertSame(service1, service2);
+		Assert.assertSame(service1, service2);
 
 		// Kill platforms and end test case.
 		platform1.killComponent().get(sus, timeout);

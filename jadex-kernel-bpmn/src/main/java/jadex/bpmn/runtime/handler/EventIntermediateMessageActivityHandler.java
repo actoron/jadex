@@ -27,7 +27,7 @@ import java.util.StringTokenizer;
 /**
  *  Handler for message events.
  */
-public class EventIntermediateMessageActivityHandler	extends DefaultActivityHandler
+public class EventIntermediateMessageActivityHandler extends DefaultActivityHandler
 {
 	//-------- constants --------
 	

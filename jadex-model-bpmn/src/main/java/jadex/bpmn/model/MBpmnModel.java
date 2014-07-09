@@ -7,16 +7,21 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BiHashMap;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.javaparser.SJavaParser;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -160,7 +165,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	protected Map<String, MActivity> allactivities;
 	
 	/** The cached event subprocess start events of the model. */
-	protected Map<MSubProcess, MActivity> eventsubprocessstartevents;
+	protected Map<MSubProcess, List<MActivity>> eventsubprocessstartevents;
 	
 	/** The cached instance-matched events that require waiting. */
 	protected List<MActivity> waitingevents;
@@ -250,6 +255,57 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 //			modelinfo.setImports((String[])imports.toArray(new String[imports.size()]));
 		
 		modelinfo.setStartable(true);
+		
+		final Map<MSubProcess, List<MActivity>> evtsubstarts = getEventSubProcessStartEventMapping();
+		if(evtsubstarts!=null)
+		{
+			ProvidedServiceInfo[] psis = modelinfo.getProvidedServices();
+			Set<Class<?>> haspsis = new HashSet<Class<?>>();
+			if(psis!=null)
+			{
+				for(ProvidedServiceInfo psi: psis)
+				{
+					haspsis.add(psi.getType().getType(cl));
+				}
+			}
+			
+			for(Map.Entry<MSubProcess, List<MActivity>> entry: evtsubstarts.entrySet())
+			{
+				Class<?> iface = null;
+				
+				List<MActivity> macts = entry.getValue();
+				for(MActivity mact: macts)
+				{
+					if(MBpmnModel.EVENT_START_MESSAGE.equals(mact.getActivityType()))
+					{
+						if(mact.hasPropertyValue("iface"))
+						{
+							if(iface==null)
+							{
+								UnparsedExpression uexp = mact.getPropertyValue("iface");
+								iface = (Class<?>)SJavaParser.parseExpression(uexp, getModelInfo().getAllImports(), cl).getValue(null);
+							}
+							
+							if(iface!=null && !haspsis.contains(iface))
+							{
+								// found interface without provided service impl
+								break;
+							}
+						}
+					}
+				}
+				
+				if(iface!=null && !haspsis.contains(iface))
+				{
+					String exp = "java.lang.reflect.Proxy.newProxyInstance($component.getClassLoader()," 
+						+ "new Class[]{"+iface.getName()+".class"
+						+ "}, new jadex.bpmn.runtime.ProcessServiceInvocationHandler($component, \""+entry.getKey().getId()+"\"))";
+					ProvidedServiceImplementation psim = new ProvidedServiceImplementation(null, exp, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
+					ProvidedServiceInfo psi = new ProvidedServiceInfo("internal_"+iface.getName(), iface, psim, null);
+					modelinfo.addProvidedService(psi);
+				}
+			}
+		}
 	}
 	
 //	/**
@@ -1563,14 +1619,19 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		{
 			initMatchedStartEventCache();
 		}
-		return new ArrayList<MActivity>(eventsubprocessstartevents.values());
+		List<MActivity> ret = new ArrayList<MActivity>();
+		for (List<MActivity> acts : eventsubprocessstartevents.values())
+		{
+			ret.addAll(acts);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Returns a mapping from event subprocesses to their start events.
 	 *  @return The mapping
 	 */
-	public Map<MSubProcess, MActivity> getEventSubProcessStartEventMapping()
+	public Map<MSubProcess, List<MActivity>> getEventSubProcessStartEventMapping()
 	{
 		if(eventsubprocessstartevents == null)
 		{
@@ -1597,7 +1658,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	protected void initMatchedStartEventCache()
 	{
-		eventsubprocessstartevents = new HashMap<MSubProcess, MActivity>();
+		eventsubprocessstartevents = new HashMap<MSubProcess, List<MActivity>>();
 		typematchedstartevents = new ArrayList<MActivity>();
 		waitingevents = new ArrayList<MActivity>();
 		List<MActivity> starteventtriggers = new ArrayList<MActivity>();
@@ -1635,7 +1696,14 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 					contained = true;
 					if (MSubProcess.SUBPROCESSTYPE_EVENT.equals(subproc.getSubprocessType()))
 					{
-						eventsubprocessstartevents.put(subproc, startevent);
+//						eventsubprocessstartevents.put(subproc, startevent);
+						List<MActivity> acts = eventsubprocessstartevents.get(subproc);
+						if (acts == null)
+						{
+							acts = new ArrayList<MActivity>();
+							eventsubprocessstartevents.put(subproc, acts);
+						}
+						acts.add(startevent);
 					}
 					else
 					{
@@ -1757,6 +1825,16 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get an activity by id.
+	 *  @param id The id.
+	 *  @return The activity.
+	 */
+	public MActivity getActivityById(String id)
+	{
+		return getAllActivities().get(id);
 	}
 	
 	/**
