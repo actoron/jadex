@@ -336,7 +336,8 @@ public class VisualProcessViewPanel extends JPanel
 							// Double click on element toggles breakpoint
 							if(sels.size()==0 && e.getClickCount()==2 && elem.getBpmnElement() instanceof MActivity)
 							{
-								toggleBreakPoint(((MActivity)elem.getBpmnElement()).getBreakpointId());
+//								toggleBreakPoint(((MActivity)elem.getBpmnElement()).getBreakpointId());
+								toggleBreakPoint(((MActivity)elem.getBpmnElement()).getId());
 							}
 						}
 					}
@@ -1086,7 +1087,7 @@ public class VisualProcessViewPanel extends JPanel
 		return ret;
 	}
 	
-	 /**
+	/**
      *  Find the velement of the graph that fits to the bpmn id.
      *  @param cell The start cell.
      *  @param brpid The activity id.
@@ -1098,7 +1099,8 @@ public class VisualProcessViewPanel extends JPanel
     	if(cell instanceof VElement)
 		{
 			VElement ve = (VElement)cell;
-			if(ve.getBpmnElement() instanceof MActivity && ((MActivity)ve.getBpmnElement()).getBreakpointId().equals(brpid))
+//			if(ve.getBpmnElement() instanceof MActivity && ((MActivity)ve.getBpmnElement()).getBreakpointId().equals(brpid))
+			if(ve.getBpmnElement() instanceof MActivity && ((MActivity)ve.getBpmnElement()).getId().equals(brpid))
 			{
 				ret = ve;
 			}

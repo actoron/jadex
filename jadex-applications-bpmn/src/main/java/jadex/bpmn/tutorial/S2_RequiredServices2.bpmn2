@@ -11,7 +11,7 @@
     <jadex:modelname>S2_RequiredServices</jadex:modelname>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:requiredservices>
-      <jadex:requiredservice name="aser" interface="jadex.bpmn.testcases.IAService" scope="platform" dynamic="false" create="false"/>
+      <jadex:requiredservice name="bser" interface="jadex.bpmn.tutorial.IBService" scope="platform" dynamic="false" create="false"/>
     </jadex:requiredservices>
   </semantic:extension>
   <semantic:process name="Pool" id="b2bhX5CuQxrrP0NY">
@@ -20,9 +20,11 @@
       <semantic:outgoing>2uhMQcfXPPVuWqKu</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.ServiceCallTask</jadex:class>
-        <jadex:parameter direction="out" name="return" type="java.lang.String"/>
-        <jadex:property name="service" type="java.lang.String">&quot;aser&quot;</jadex:property>
-        <jadex:property name="method">&quot;IFuture&lt;String&gt; test()&quot;</jadex:property>
+        <jadex:parameter direction="in" name="param0" type="int">2</jadex:parameter>
+        <jadex:parameter direction="in" name="param1" type="int">3</jadex:parameter>
+        <jadex:parameter direction="out" name="return" type="java.lang.Integer"/>
+        <jadex:property name="service" type="java.lang.String">&quot;bser&quot;</jadex:property>
+        <jadex:property name="method">&quot;IFuture&lt;Integer&gt; add(int, int)&quot;</jadex:property>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:startEvent id="3700sONKzCJbzaHJ">
@@ -46,8 +48,8 @@
     <semantic:sequenceFlow sourceRef="25exlacVByHneXks" targetRef="WrgZX0KRRQ0kyoEE" id="2JqHhCSjcuRndl5B">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
-      <jadex:dataFlow id="hS+lQ65zHayRBL10" sourceRef="fTRr1Rz+O5OcB41/" sourceParam="return" targetRef="25exlacVByHneXks" targetParam="text">
-        <jadex:dataFlowValueMapping>&quot;S2 received: &quot;+$value</jadex:dataFlowValueMapping>
+      <jadex:dataFlow id="HwoS8yef5WvcM6Sc" sourceRef="fTRr1Rz+O5OcB41/" sourceParam="return" targetRef="25exlacVByHneXks" targetParam="text">
+        <jadex:dataFlowValueMapping>&quot;Received: &quot;+$value</jadex:dataFlowValueMapping>
       </jadex:dataFlow>
     </semantic:extensionElements>
   </semantic:process>
@@ -72,10 +74,10 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="2uhMQcfXPPVuWqKu">
       </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="hS+lQ65zHayRBL10">
-      </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="2JqHhCSjcuRndl5B">
       </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="HwoS8yef5WvcM6Sc">
+      </di:Edge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </semantic:definitions>

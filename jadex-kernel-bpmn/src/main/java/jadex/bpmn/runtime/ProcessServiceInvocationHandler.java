@@ -104,15 +104,16 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		ProcessThread	thread	= new ProcessThread(act, instance.getTopLevelThread(), instance);
 		instance.getTopLevelThread().addThread(thread);
 
-		List<MParameter> params	= act.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
+//		List<MParameter> params	= act.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
 //		String[] params	= act.getPropertyNames();
-		if(params!=null && args!=null)
-		{
-			for(int i=0; i<params.size() && i<args.length; i++)
-			{
-				thread.setOrCreateParameterValue(params.get(i).getName(), args[i]);
-			}
-		}
+//		if(params!=null && args!=null)
+//		{
+//			for(int i=0; i<params.size() && i<args.length; i++)
+//			{
+//				thread.setOrCreateParameterValue(params.get(i).getName(), args[i]);
+//			}
+//		}
+		thread.setOrCreateParameterValue("$callargs", args);
 		thread.setOrCreateParameterValue(THREAD_PARAMETER_SERVICE_RESULT, ret);
 		
 		instance.step(act, instance, thread, null);

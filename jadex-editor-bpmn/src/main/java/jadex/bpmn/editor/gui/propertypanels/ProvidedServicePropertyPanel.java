@@ -30,6 +30,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
@@ -46,6 +48,9 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 	/** The method combo box. */
 	protected JComboBox mbox;
 	
+	/** The return param text field. */
+	protected JTextField tfreturn;
+	
 	/**
 	 *  Create a new panel.
 	 *  @param container The model container.
@@ -53,19 +58,26 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 	 */
 	public ProvidedServicePropertyPanel(ModelContainer container, VActivity vact)
 	{
-		super("Message Event", container);
+		super(null, container);
 		this.vact = vact;
 		setLayout(new BorderLayout());
 		
-		add(createServicePanel(), BorderLayout.CENTER);
-		
-		refresh();
+		if(!vact.getMActivity().isThrowing())
+		{
+			add(createStartServicePanel(), BorderLayout.CENTER);
+			refreshStart();
+		}
+		else
+		{
+			add(createEndServicePanel(), BorderLayout.CENTER);
+			refreshEnd();
+		}
 	}
 	
 	/**
 	 * 
 	 */
-	protected JPanel createServicePanel()
+	protected JPanel createStartServicePanel()
 	{
 		PropertiesPanel pp = new PropertiesPanel();
 
@@ -146,37 +158,32 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 		return pp;
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	protected void setProperty(String name, String value, boolean string)
-//	{
-////		System.out.println("setProp: "+name+" "+value+" "+string);
-//		
-//		if(value==null)
-//		{
-//			vact.getMActivity().removeProperty(name);
-//		}
-//		else
-//		{
-//			MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get(name): null;
-//			if(mprop==null)
-//			{
-//				vact.getMActivity().addProperty(name, value, string);
-//			}
-//			else
-//			{
-//				UnparsedExpression uexp = new UnparsedExpression(null, 
-//					String.class, string? "\""+value+"\"": value, null);
-//				mprop.setInitialValue(uexp);
-//			}
-//		}
-//	}
+	/**
+	 * 
+	 */
+	protected JPanel createEndServicePanel()
+	{
+		PropertiesPanel pp = new PropertiesPanel();
+
+		tfreturn = pp.createTextField("Return value:");
+		tfreturn.setEditable(true);
+		
+		tfreturn.getDocument().addDocumentListener(new DocumentAdapter()
+		{
+			public void update(DocumentEvent e)
+			{
+				String txt = tfreturn.getText();
+				vact.getMActivity().setProperty("returnparam", txt.length()==0? null: txt, false);
+			}
+		});
+		
+		return pp;
+	}
 	
 	/**
 	 * 
 	 */
-	protected void refresh()
+	protected void refreshStart()
 	{
 		MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get("iface"): null;
 		if(mprop!=null)
@@ -209,6 +216,18 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 			{
 				System.out.println("Refresh problem: "+e);
 			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void refreshEnd()
+	{
+		MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get("returnparam"): null;
+		if(mprop!=null)
+		{
+			tfreturn.setText(mprop.getInitialValueString());
 		}
 	}
 }

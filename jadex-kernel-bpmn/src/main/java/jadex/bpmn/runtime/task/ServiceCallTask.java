@@ -216,31 +216,12 @@ public class ServiceCallTask implements ITask
 				ComposedEvaluator<Object> ranker = new ComposedEvaluator<Object>();
 				ranker.addEvaluator(eval);
 				
-//				process.getServiceContainer().getRequiredServices(service)
-//					.addResultListener(new ServiceRankingResultListener<Object>(ranker, null, 
-//					new ExceptionDelegationResultListener<Collection<Object>, Void>(ret)
-//				{
-//					public void customResultAvailable(Collection<Object> results)
-//					{
-//						System.out.println("services: "+results);
-//						if(results.isEmpty())
-//						{
-//							ret.setException(new ServiceNotFoundException(fservice));
-//						}
-//						else
-//						{
-//							invokeService(process, fmethod, fservice, fresultparam, args, context, results.iterator().next())
-//								.addResultListener(new DelegationResultListener<Void>(ret));
-//						}
-//					}
-//				}));
-				
 				process.getServiceContainer().getRequiredServices(service)
 					.addResultListener(new ServiceRankingResultListener<Object>(new ExceptionDelegationResultListener<Collection<Tuple2<Object, Double>>, Void>(ret)
 				{
 					public void customResultAvailable(Collection<Tuple2<Object, Double>> results)
 					{
-						System.out.println("services: "+results);
+//						System.out.println("services: "+results);
 						if(results.isEmpty())
 						{
 							ret.setException(new ServiceNotFoundException(fservice));
@@ -275,7 +256,7 @@ public class ServiceCallTask implements ITask
 	}
 	
 	/**
-	 * 
+	 *  Invoke the service.
 	 */
 	protected IFuture<Void> invokeService(final IInternalAccess process, String fmethod, String fservice, final String fresultparam, 
 		List<Object> args, final ITaskContext context, Object service, Method m)
@@ -291,7 +272,7 @@ public class ServiceCallTask implements ITask
 				{
 					public void customResultAvailable(Object result)
 					{
-						System.out.println("result is: "+result);
+//						System.out.println("result is: "+result);
 						if(fresultparam!=null)
 							context.setParameterValue(fresultparam, result);
 						ret.setResult(null);
@@ -495,7 +476,7 @@ public class ServiceCallTask implements ITask
 							// todo check parameter types?
 							for(Method m: ms)
 							{
-								if(m.toString().equals(methodname))
+								if(SReflect.getMethodSignature(m).equals(methodname) || m.toString().equals(methodname))
 								{
 									List<String> names = modelcontainer.getParameterNames(m);
 									String retname = modelcontainer.getReturnValueName(m);

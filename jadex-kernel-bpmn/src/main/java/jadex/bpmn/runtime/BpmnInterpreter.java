@@ -1021,7 +1021,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				System.out.println("Threads: "+getTopLevelThread().getAllThreads());
 			}
 			
-			isatbreakpoint	= bps.contains(pt.getActivity().getBreakpointId());
+//			isatbreakpoint	= bps.contains(pt.getActivity().getBreakpointId());
+			isatbreakpoint	= bps.contains(pt.getActivity().getId());
 		}
 		return isatbreakpoint;
 	}
@@ -1598,7 +1599,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 		String poolname = thread.getActivity()!=null && thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null;
 		String parentid = thread.getParent()!=null? thread.getParent().getId(): null;
-		String actname = thread.getActivity()!=null? thread.getActivity().getBreakpointId(): null;
+//		String actname = thread.getActivity()!=null? thread.getActivity().getBreakpointId(): null;
+		String actname = thread.getActivity()!=null? thread.getActivity().getName(): null;
 		String actid = thread.getActivity()!=null? thread.getActivity().getId(): null;
 		String lanename =  thread.getActivity()!=null && thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null;
 		String ex = thread.getException()!=null ? thread.getException().toString() : "";

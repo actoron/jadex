@@ -1023,17 +1023,17 @@ public class MActivity extends MAssociationTarget
 		this.lane	= lane;
 	}
 
-	/**
-	 *  Get a string to identify this activity in a tool such as the debugger.
-	 *  @return A unique but nicely readable name.
-	 */
-	public String getBreakpointId()
-	{
-		String	name	= getName();
-		if(name==null)
-			name	= getActivityType()+"("+getId()+")";
-		return name;
-	}
+//	/**
+//	 *  Get a string to identify this activity in a tool such as the debugger.
+//	 *  @return A unique but nicely readable name.
+//	 */
+//	public String getBreakpointId()
+//	{
+//		String	name	= getName();
+//		if(name==null)
+//			name	= getActivityType()+"("+getId()+")";
+//		return name;
+//	}
 
 	/**
 	 *  Get the eventhandler.
