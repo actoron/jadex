@@ -3418,6 +3418,46 @@ public class SUtil
 	}
 	
 	/**
+	 *  Encodes a set of data as a Base16 String (hex).
+	 *  
+	 * 	@param data The data.
+	 * 	@return Base16-encoded String.
+	 */
+	public static String base16Encode(byte[] data)
+	{
+		StringBuilder ret = new StringBuilder();
+		for (byte b : data)
+		{
+			int ib = b & 0xFF;
+			if (ib > 16)
+			{
+				ret.append("0");
+			}
+			ret.append(Integer.toHexString(ib));
+		}
+		return ret.toString();
+	}
+	
+	/**
+	 *  Decodes a Base16-encoded String and returns the data.
+	 *  
+	 * 	@param data The encoded data.
+	 *  @return The decoded data.
+	 */
+	public static byte[] base16Decode(String data)
+	{
+		byte[] ret = new byte[data.length() >> 1];
+		for (int i = 0; i < ret.length; ++i)
+		{
+			int val = i * 2;
+			String sub = data.substring(val, val + 2);
+			val = Integer.valueOf(sub, 16);
+			ret[i] = (byte) val;
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Taken from ant.
 	 *  Split a command line.
 	 * 
