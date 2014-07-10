@@ -2,6 +2,7 @@ package jadex.bpmn.editor.model.visual;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.editor.gui.SHelper;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
@@ -321,8 +322,22 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				VDataEdge vedge = createDataEdge();
 				VActivity sact = (VActivity) vmap.get(dedge.getSource().getId());
 				VActivity tact = (VActivity) vmap.get(dedge.getTarget().getId());
-				vedge.setSource(sact.getOutputParameterPort(dedge.getSourceParameter()));
-				vedge.setTarget(tact.getInputParameterPort(dedge.getTargetParameter()));
+				if (SHelper.isVisualEvent(sact))
+				{
+					vedge.setSource(sact);
+				}
+				else
+				{
+					vedge.setSource(sact.getOutputParameterPort(dedge.getSourceParameter()));
+				}
+				if (SHelper.isVisualEvent(tact))
+				{
+					vedge.setTarget(tact);
+				}
+				else
+				{
+					vedge.setTarget(tact.getInputParameterPort(dedge.getTargetParameter()));
+				}
 				vedge.setBpmnElement(dedge);
 				
 				if (waypoints != null)

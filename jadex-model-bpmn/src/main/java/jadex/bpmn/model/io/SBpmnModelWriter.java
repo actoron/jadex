@@ -41,7 +41,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 41;
+	public static final int BUILD = 42;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -950,11 +950,11 @@ public class SBpmnModelWriter
 			out.print("\" sourceRef=\"");
 			out.print(escapeString(dedge.getSource().getId()));
 			out.print("\" sourceParam=\"");
-			out.print(escapeString(dedge.getSourceParameter()));
+			out.print(escapeString(handleNullStr(dedge.getSourceParameter())));
 			out.print("\" targetRef=\"");
 			out.print(escapeString(dedge.getTarget().getId()));
 			out.print("\" targetParam=\"");
-			out.print(escapeString(dedge.getTargetParameter()));
+			out.print(escapeString(handleNullStr(dedge.getTargetParameter())));
 			
 			if (dedge.getParameterMapping() != null &&
 				dedge.getParameterMapping().getValue() != null &&
@@ -1473,6 +1473,20 @@ public class SBpmnModelWriter
 			sb.append(INDENT_STRING);
 		}
 		return sb.toString();
+	}
+	
+	/** Returns an empty string for null and null for an empty string. */
+	public static final String handleNullStr(String input)
+	{
+		if (input == null)
+		{
+			input = "";
+		}
+		else if (input.length() == 0)
+		{
+			input = null;
+		}
+		return input;
 	}
 	
 	/** Carriage return. */

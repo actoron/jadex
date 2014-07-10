@@ -1161,8 +1161,8 @@ public class SBpmnModelReader
 			MActivity tgt = (MActivity)emap.get(attrs.get("targetRef"));
 			edge.setSource(src);
 			edge.setTarget(tgt);
-			edge.setSourceParameter(attrs.get("sourceParam"));
-			edge.setTargetParameter(attrs.get("targetParam"));
+			edge.setSourceParameter(SBpmnModelWriter.handleNullStr(attrs.get("sourceParam")));
+			edge.setTargetParameter(SBpmnModelWriter.handleNullStr(attrs.get("targetParam")));
 			
 			String expstr = (String) buffer.remove("dataFlowValueMapping");
 			if(expstr!=null && expstr.length()>0)
@@ -1174,9 +1174,9 @@ public class SBpmnModelReader
 			}
 			
 			if (src != null &&
-				tgt != null &&
-				src.getParameters().get(edge.getSourceParameter()) != null &&
-				tgt.getParameters().get(edge.getTargetParameter()) != null)
+				tgt != null)// &&
+//				src.getParameters().get(edge.getSourceParameter()) != null &&
+//				tgt.getParameters().get(edge.getTargetParameter()) != null)
 			{
 			
 				if(src != null)

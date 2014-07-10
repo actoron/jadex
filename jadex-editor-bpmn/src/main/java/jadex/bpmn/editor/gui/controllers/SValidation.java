@@ -261,7 +261,11 @@ public class SValidation
 	public static String getDataEdgeValidationError(Object source, Object target)
 	{
 		String error = null;
-		if (!(source instanceof VOutParameter) || !(target instanceof VInParameter))
+//		if (!(source instanceof VOutParameter) || !(target instanceof VInParameter))
+		if (!((source instanceof VOutParameter && target instanceof VInParameter) ||
+			 ((source instanceof VOutParameter || target instanceof VInParameter) &&
+			  (SHelper.isVisualEvent(source) || SHelper.isVisualEvent(target)) ||
+			 (SHelper.isVisualEvent(source) || SHelper.isVisualEvent(target)))))
 		{
 			error = "Data edges can only connect an output parameter with an input parameter.";
 		}
@@ -291,13 +295,13 @@ public class SValidation
 			}
 		}
 		
-		if (error == null)
-		{
-			if (((VInParameter) target).getEdgeCount() > 0)
-			{
-				error = "Only one incoming data edge allowed.";
-			}
-		}
+//		if (error == null)
+//		{
+//			if (((mxICell) target).getEdgeCount() > 0)
+//			{
+//				error = "Only one incoming data edge allowed.";
+//			}
+//		}
 		
 		return error;
 	}

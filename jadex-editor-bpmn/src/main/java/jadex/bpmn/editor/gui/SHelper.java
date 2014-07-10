@@ -354,4 +354,17 @@ public class SHelper
 		
 		return ret;
 	}
+	
+	/** Checks if an object is a visual event. */
+	public static final boolean isVisualEvent(Object obj)
+	{
+		boolean ret = false;
+		if (obj instanceof VActivity)
+		{
+			VActivity vactivity = (VActivity) obj;
+			MActivity mactivity = vactivity.getMActivity();
+			ret = mactivity != null && mactivity.getActivityType() != null && mactivity.getActivityType().startsWith("Event");
+		}
+		return ret;
+	}
 }

@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.SHelper;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
@@ -11,6 +12,7 @@ import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VMessagingEdge;
+import jadex.bpmn.editor.model.visual.VNamedNode;
 import jadex.bpmn.editor.model.visual.VNode;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
@@ -456,9 +458,12 @@ public class SCreationController
 			modelcontainer.setDirty(true);
 			ret = vedge;
 		}
-		else if (source instanceof VOutParameter && target instanceof VInParameter)
+		else if ((source instanceof VOutParameter && target instanceof VInParameter) ||
+				 ((source instanceof VOutParameter || target instanceof VInParameter) &&
+				 (SHelper.isVisualEvent(source) || SHelper.isVisualEvent(target)) ||
+				 (SHelper.isVisualEvent(source) || SHelper.isVisualEvent(target))))
 		{
-			ret = createDataEdge(graph, modelcontainer.getIdGenerator(), (VOutParameter) source, (VInParameter) target, modelcontainer.getSettings().isDirectSequenceAutoConnect());
+			ret = createDataEdge(graph, modelcontainer.getIdGenerator(), (VNamedNode) source, (VNamedNode) target, modelcontainer.getSettings().isDirectSequenceAutoConnect());
 		}
 		
 		return ret;
@@ -643,24 +648,47 @@ public class SCreationController
 	 * 	@param target Edge target.
 	 * 	@return The edge.
 	 */
-	protected static final VDataEdge createDataEdge(final BpmnGraph graph, IdGenerator idgenerator, VOutParameter source, VInParameter target, boolean autoseqedge)
+	protected static final VDataEdge createDataEdge(final BpmnGraph graph, IdGenerator idgenerator, VNamedNode src, VNamedNode tgt, boolean autoseqedge)
 	{
-		final VActivity vtactivity = (VActivity) target.getParent();
-		VActivity vsactivity = (VActivity) source.getParent();
+		VActivity tmpvact = null;
+		String tparamname = null;
+		if (tgt instanceof VInParameter)
+		{
+			tmpvact = (VActivity) tgt.getParent();
+			tparamname = ((VInParameter) tgt).getParameter().getName();
+		}
+		else
+		{
+			tmpvact = (VActivity) tgt;
+		}
+		final VActivity vtactivity = tmpvact;
+		
+		String sparamname = null;
+		if (src instanceof VOutParameter)
+		{
+			tmpvact = (VActivity) src.getParent();
+			sparamname = ((VOutParameter) src).getParameter().getName();
+		}
+		else
+		{
+			tmpvact = (VActivity) src;
+		}
+		VActivity vsactivity = tmpvact;
+		
 		MActivity sactivity = (MActivity) vsactivity.getBpmnElement();
 		MActivity tactivity = (MActivity) vtactivity.getBpmnElement();
 		
 		MDataEdge dedge = new MDataEdge();
 		dedge.setId(idgenerator.generateId());
 		dedge.setSource(sactivity);
-		dedge.setSourceParameter(source.getParameter().getName());
+		dedge.setSourceParameter(sparamname);
 		dedge.setTarget(tactivity);
-		dedge.setTargetParameter(target.getParameter().getName());
+		dedge.setTargetParameter(tparamname);
 		
 		VDataEdge vedge = new VDataEdge(graph);
 		vedge.setBpmnElement(dedge);
-		vedge.setSource(source);
-		vedge.setTarget(target);
+		vedge.setSource(src);
+		vedge.setTarget(tgt);
 		
 		graph.delayedRefreshCellView(vtactivity);
 		
