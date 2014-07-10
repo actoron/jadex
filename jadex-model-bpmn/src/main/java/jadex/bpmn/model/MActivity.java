@@ -937,6 +937,36 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Set a property value:
+	 *  a) val==null -> remove property
+	 *  b) val!=null && !hasProp(name) -> addProp(name, val)
+	 *  c) val!=null && hasProp(name) -> setInitialVal(val)
+	 */
+	public void setProperty(String name, String value, boolean string)
+	{
+//		System.out.println("setProp: "+name+" "+value+" "+string);
+		
+		if(value==null)
+		{
+			removeProperty(name);
+		}
+		else
+		{
+			MProperty mprop = getProperties()!=null? getProperties().get(name): null;
+			if(mprop==null)
+			{
+				addProperty(name, value, string);
+			}
+			else
+			{
+				UnparsedExpression uexp = new UnparsedExpression(null, 
+					String.class, string? "\""+value+"\"": value, null);
+				mprop.setInitialValue(uexp);
+			}
+		}
+	}
+	
+	/**
 	 *  Create a string representation of this activity.
 	 *  @return A string representation of this activity.
 	 */
@@ -993,17 +1023,17 @@ public class MActivity extends MAssociationTarget
 		this.lane	= lane;
 	}
 
-	/**
-	 *  Get a string to identify this activity in a tool such as the debugger.
-	 *  @return A unique but nicely readable name.
-	 */
-	public String getBreakpointId()
-	{
-		String	name	= getName();
-		if(name==null)
-			name	= getActivityType()+"("+getId()+")";
-		return name;
-	}
+//	/**
+//	 *  Get a string to identify this activity in a tool such as the debugger.
+//	 *  @return A unique but nicely readable name.
+//	 */
+//	public String getBreakpointId()
+//	{
+//		String	name	= getName();
+//		if(name==null)
+//			name	= getActivityType()+"("+getId()+")";
+//		return name;
+//	}
 
 	/**
 	 *  Get the eventhandler.

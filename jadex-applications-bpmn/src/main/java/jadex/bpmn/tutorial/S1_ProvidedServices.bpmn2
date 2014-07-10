@@ -17,7 +17,8 @@
         <semantic:outgoing>B8NvyQ3DpJBHbika</semantic:outgoing>
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
-          <jadex:property name="method">jadex.micro.testcases.IBService</jadex:property>
+          <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
+          <jadex:property name="method">&quot;IFuture&lt;Integer&gt; add(int, int)&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:task name="Method 1" id="EIIUyDRP37T+GbVt">
@@ -25,7 +26,9 @@
         <semantic:outgoing>dK03HWtXwwUegxHB</semantic:outgoing>
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service B - method 2&quot;</jadex:parameter>
+          <jadex:parameter direction="inout" name="param0" type="java.lang.Integer">$callargs[0]</jadex:parameter>
+          <jadex:parameter direction="inout" name="param1" type="java.lang.Integer">$callargs[1]</jadex:parameter>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service B - method 1: &quot;+param0+&quot; &quot;+param1</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
       <semantic:task name="Method 2" id="SZYm7jv3Bit8uZxc">
@@ -33,20 +36,30 @@
         <semantic:outgoing>hCmn6earoHTmDtA6</semantic:outgoing>
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service B - method 2&quot;</jadex:parameter>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service B - method 2: &quot;+param0+&quot; &quot;+param1</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
       <semantic:startEvent id="8t+uPx2Ybl6pQUAV">
         <semantic:outgoing>gkpmA0Jeo+713iXM</semantic:outgoing>
         <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
+          <jadex:property name="method">&quot;IFuture&lt;Integer&gt; sub(int, int)&quot;</jadex:property>
+        </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:endEvent id="dXojUkOKANVBrm25">
         <semantic:incoming>dK03HWtXwwUegxHB</semantic:incoming>
         <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="returnparam">param0+param1</jadex:property>
+        </semantic:extensionElements>
       </semantic:endEvent>
       <semantic:endEvent id="LxP3XYiJRbz8g0MS">
         <semantic:incoming>hCmn6earoHTmDtA6</semantic:incoming>
         <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="returnparam">param0-param1</jadex:property>
+        </semantic:extensionElements>
       </semantic:endEvent>
     </semantic:subProcess>
     <semantic:subProcess name="Service A" id="BLhKFbd+HLIvEnKU" triggeredByEvent="true">
@@ -54,8 +67,8 @@
         <semantic:outgoing>4DdtrGFKVof6uS49</semantic:outgoing>
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
-          <jadex:property name="iface">jadex.bpmn.testcases.IAService</jadex:property>
-          <jadex:property name="method">&quot;public abstract jadex.commons.future.IFuture jadex.bpmn.testcases.IAService.test()&quot;</jadex:property>
+          <jadex:property name="method">&quot;IFuture&lt;String&gt; test()&quot;</jadex:property>
+          <jadex:property name="iface">jadex.bpmn.testcases.IAService.class</jadex:property>
         </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:task name="Method 1" id="HSjAxDflhY3JYSiV">
@@ -63,12 +76,15 @@
         <semantic:outgoing>uFWlOF7UPObuF9uy</semantic:outgoing>
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service A - method 1&quot;</jadex:parameter>
+          <jadex:parameter direction="inout" name="text" type="java.lang.String">&quot;Service A - method 1&quot;</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
       <semantic:endEvent id="m5vdqhI00xqP2LF7">
         <semantic:incoming>uFWlOF7UPObuF9uy</semantic:incoming>
         <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="returnparam">text</jadex:property>
+        </semantic:extensionElements>
       </semantic:endEvent>
     </semantic:subProcess>
     <semantic:sequenceFlow sourceRef="AWoEEebCXTss6X2s" targetRef="EIIUyDRP37T+GbVt" id="B8NvyQ3DpJBHbika">
