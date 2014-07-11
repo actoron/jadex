@@ -104,9 +104,16 @@ public class VDataEdge extends VEdge
 		mxICell ret = null;
 		if (getSource() != null)
 		{
-			if (getSource().getParent() != null)
+			if (getSource() instanceof VOutParameter)
 			{
-				ret = getSource().getParent().getParent();
+				if (getSource().getParent() != null)
+				{
+					ret = getSource().getParent().getParent();
+				}
+			}
+			else
+			{
+				ret = getSource().getParent();
 			}
 		}
 		return ret;
