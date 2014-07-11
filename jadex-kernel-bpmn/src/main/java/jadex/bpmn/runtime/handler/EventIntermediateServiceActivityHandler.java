@@ -1,7 +1,10 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.List;
+
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessServiceInvocationHandler;
@@ -28,8 +31,9 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 	{
 		//boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
 		
-		boolean service = thread.hasPropertyValue("iface") || thread.hasPropertyValue("returnparam");
-
+//		boolean service = thread.hasPropertyValue("iface") || thread.hasPropertyValue("returnparam");
+		boolean service = activity.hasProperty("iface") || activity.hasParameter("returnparam");
+		
 		if(!service)
 		{
 			super.execute(activity, instance, thread);
@@ -73,6 +77,12 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 	protected void sendReturnValue(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 		Future<Object> ret	= (Future<Object>)thread.getParameterValue(ProcessServiceInvocationHandler.THREAD_PARAMETER_SERVICE_RESULT);
+		
+		List<MDataEdge> des = activity.getIncomingDataEdges();
+		if(des!=null)
+		{
+			MDataEdge de = des.get(0);
+		}
 		
 		UnparsedExpression uexp = activity.getPropertyValue("returnparam");
 		IParsedExpression exp = SJavaParser.parseExpression(uexp, instance.getModel().getAllImports(), instance.getClassLoader());

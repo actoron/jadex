@@ -6,10 +6,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
 import jadex.commons.gui.autocombo.ClassInfoComboBoxRenderer;
@@ -27,8 +24,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -180,17 +177,37 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 	{
 		PropertiesPanel pp = new PropertiesPanel();
 
-		tfreturn = pp.createTextField("Return value:");
-		tfreturn.setEditable(true);
+		final JCheckBox jb = pp.createCheckBox("Service call: ");
+		jb.setEnabled(true);
+		jb.setSelected(vact.getMActivity().hasParameter("returnparam"));
 		
-		tfreturn.getDocument().addDocumentListener(new DocumentAdapter()
+		jb.addActionListener(new ActionListener()
 		{
-			public void update(DocumentEvent e)
+			public void actionPerformed(ActionEvent e)
 			{
-				String txt = tfreturn.getText();
-				vact.getMActivity().setProperty("returnparam", txt.length()==0? null: txt, false);
+				if(jb.isSelected())
+				{
+					vact.getMActivity().setParameter("returnparam", "", Object.class, false, MParameter.DIRECTION_INOUT);
+				}
+				else
+				{
+					vact.getMActivity().removeParameter("returnparam");
+				}
 			}
 		});
+		
+//		tfreturn = pp.createTextField("Return value:");
+//		tfreturn.setEditable(true);
+//		
+//		tfreturn.getDocument().addDocumentListener(new DocumentAdapter()
+//		{
+//			public void update(DocumentEvent e)
+//			{
+//				String txt = tfreturn.getText();
+////				vact.getMActivity().setParameter("returnparam", txt.length()==0? null: txt, false, MParameter.DIRECTION_INOUT);
+//				vact.getMActivity().setProperty("returnparam", txt.length()==0? null: txt, false);
+//			}
+//		});
 		
 		return pp;
 	}

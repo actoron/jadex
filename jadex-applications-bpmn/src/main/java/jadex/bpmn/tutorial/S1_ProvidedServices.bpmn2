@@ -28,8 +28,8 @@
         <semantic:outgoing>dK03HWtXwwUegxHB</semantic:outgoing>
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-          <jadex:parameter direction="inout" name="param0" type="java.lang.Integer">$callargs[0]</jadex:parameter>
-          <jadex:parameter direction="inout" name="param1" type="java.lang.Integer">$callargs[1]</jadex:parameter>
+          <jadex:parameter direction="inout" name="param0" type="java.lang.Integer"/>
+          <jadex:parameter direction="inout" name="param1" type="java.lang.Integer"/>
           <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service B - method 1: &quot;+param0+&quot; &quot;+param1</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
@@ -53,7 +53,7 @@
         <semantic:incoming>dK03HWtXwwUegxHB</semantic:incoming>
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
-          <jadex:property name="returnparam">param0+param1</jadex:property>
+          <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
         </semantic:extensionElements>
       </semantic:endEvent>
       <semantic:endEvent id="LxP3XYiJRbz8g0MS">
@@ -104,6 +104,9 @@
     <semantic:extensionElements>
       <jadex:dataFlow id="ubRYMDACim4brswJ" sourceRef="AWoEEebCXTss6X2s" sourceParam="param0" targetRef="EIIUyDRP37T+GbVt" targetParam="param0"/>
       <jadex:dataFlow id="HUa2iQ6m39wAe1jb" sourceRef="AWoEEebCXTss6X2s" sourceParam="param1" targetRef="EIIUyDRP37T+GbVt" targetParam="param1"/>
+      <jadex:dataFlow id="CD5FbioCR+Q1fJXy" sourceRef="EIIUyDRP37T+GbVt" sourceParam="param0" targetRef="dXojUkOKANVBrm25" targetParam="returnparam">
+        <jadex:dataFlowValueMapping>param0+param1</jadex:dataFlowValueMapping>
+      </jadex:dataFlow>
       <jadex:dataFlow id="ccNv2FkqQgUnxFfC" sourceRef="HSjAxDflhY3JYSiV" sourceParam="text" targetRef="m5vdqhI00xqP2LF7" targetParam=""/>
     </semantic:extensionElements>
   </semantic:process>
@@ -156,6 +159,8 @@
       <di:Edge type="data" jadexElement="ubRYMDACim4brswJ">
       </di:Edge>
       <di:Edge type="data" jadexElement="HUa2iQ6m39wAe1jb">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="CD5FbioCR+Q1fJXy">
       </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="4DdtrGFKVof6uS49">
       </bpmndi:BPMNEdge>

@@ -18,6 +18,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 
+/**
+ *  Panel for data edges.
+ */
 public class DataEdgePropertyPanel extends BasePropertyPanel
 {
 	/** The column names for the mapping table */
@@ -78,9 +81,8 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 				}
 			}
 			
-			if(getBpmnDataEdge().getParameterMapping() != null)
+			if(getBpmnDataEdge().getSourceParameter() != null)
 			{
-//				textarea.setText(getBpmnDataEdge().getSourceParameter() != null? getBpmnDataEdge().getSourceParameter() : "");
 				pbox.setSelectedItem(getBpmnDataEdge().getSourceParameter());
 			}
 			
@@ -109,27 +111,72 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 		}
 		
 		// Target parameter name.
-		if (edge.getTarget() instanceof VActivity)
+		if(edge.getTarget() instanceof VActivity)
 		{
 			label = new JLabel("Target Parameter");
-			textarea = new JTextArea();
+//			textarea = new JTextArea();
+//			
+//			if (getBpmnDataEdge().getParameterMapping() != null)
+//			{
+//				textarea.setText(getBpmnDataEdge().getTargetParameter() != null? getBpmnDataEdge().getTargetParameter() : "");
+//			}
+//			
+//			textarea.getDocument().addDocumentListener(new DocumentAdapter()
+//			{
+//				public void update(DocumentEvent e)
+//				{
+//					String name = getText(e.getDocument());
+//					name = name.length() == 0 ? null : name;
+//					getBpmnDataEdge().setTargetParameter(name);
+//					modelcontainer.setDirty(true);
+//				}
+//			});
+//			configureAndAddInputLine(column, label, textarea, y++);
 			
-			if (getBpmnDataEdge().getParameterMapping() != null)
+//			MActivity src = (MActivity)((VActivity)edge.getSource()).getMActivity();
+			MActivity target = (MActivity)((VActivity)edge.getTarget()).getMActivity();
+			
+			label = new JLabel("Target Parameter");
+			final JComboBox pbox = new JComboBox();
+			pbox.addItem(null);
+			//textarea = new JTextArea();
+			
+			List<MParameter> params = target.getParameters(new String[]{MParameter.DIRECTION_INOUT, MParameter.DIRECTION_OUT});
+			if(params!=null)
 			{
-				textarea.setText(getBpmnDataEdge().getTargetParameter() != null? getBpmnDataEdge().getTargetParameter() : "");
+				for(MParameter param: params)
+				{
+					pbox.addItem(param.getName());
+				}
 			}
 			
-			textarea.getDocument().addDocumentListener(new DocumentAdapter()
+			if(getBpmnDataEdge().getTargetParameter() != null)
 			{
-				public void update(DocumentEvent e)
+				pbox.setSelectedItem(getBpmnDataEdge().getTargetParameter());
+			}
+			
+			pbox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					String name = getText(e.getDocument());
+					String name = (String)pbox.getSelectedItem();
 					name = name.length() == 0 ? null : name;
 					getBpmnDataEdge().setTargetParameter(name);
 					modelcontainer.setDirty(true);
 				}
 			});
-			configureAndAddInputLine(column, label, textarea, y++);
+			
+//			textarea.getDocument().addDocumentListener(new DocumentAdapter()
+//			{
+//				public void update(DocumentEvent e)
+//				{
+//					String name = getText(e.getDocument());
+//					name = name.length() == 0 ? null : name;
+//					getBpmnDataEdge().setSourceParameter(name);
+//					modelcontainer.setDirty(true);
+//				}
+//			});
+			configureAndAddInputLine(column, label, pbox, y++);
 		}
 		
 //		label = new JLabel("Index Mapping");

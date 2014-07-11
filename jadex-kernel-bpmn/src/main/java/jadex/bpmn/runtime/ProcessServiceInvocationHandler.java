@@ -113,6 +113,13 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 //				thread.setOrCreateParameterValue(params.get(i).getName(), args[i]);
 //			}
 //		}
+		
+		for(int i=0; i<args.length; i++)
+		{
+//			MParameter mparam = act.getParameter("param"+i);
+			thread.setOrCreateParameterValue("param"+i, args[i]);
+		}
+		
 		thread.setOrCreateParameterValue("$callargs", args);
 		thread.setOrCreateParameterValue(THREAD_PARAMETER_SERVICE_RESULT, ret);
 		

@@ -593,6 +593,14 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Get a parameter by name.
+	 */
+	public MParameter getParameter(String name)
+	{
+		return parameters!=null? parameters.get(name): null;
+	}
+	
+	/**
 	 *  Get the parameters.
 	 *  @return The parameters.
 	 */
@@ -697,7 +705,6 @@ public class MActivity extends MAssociationTarget
 	
 	/**
 	 *  Sets the parameters.
-	 *  
 	 *  @param parameters The parameters.
 	 */
 	public void setParameters(IndexMap<String, MParameter> parameters)
@@ -732,6 +739,16 @@ public class MActivity extends MAssociationTarget
 	{
 		if(parameters!=null)
 			parameters.removeValue(param.getName());
+	}
+	
+	/**
+	 *  Remove a parameter.
+	 *  @param param The parameter.
+	 */
+	public void removeParameter(String name)
+	{
+		if(parameters!=null)
+			parameters.removeValue(name);
 	}
 	
 	/**
@@ -972,6 +989,36 @@ public class MActivity extends MAssociationTarget
 				UnparsedExpression uexp = new UnparsedExpression(null, 
 					String.class, string? "\""+value+"\"": value, null);
 				mprop.setInitialValue(uexp);
+			}
+		}
+	}
+	
+	/**
+	 *  Set a parameter value:
+	 *  a) val==null -> remove property
+	 *  b) val!=null && !hasProp(name) -> addProp(name, val)
+	 *  c) val!=null && hasProp(name) -> setInitialVal(val)
+	 */
+	public void setParameter(String name, String value, Class<?> type, boolean string, String direction)
+	{
+//		System.out.println("setProp: "+name+" "+value+" "+string);
+		
+		if(value==null)
+		{
+			removeParameter(name);
+		}
+		else
+		{
+			MParameter mpara = getParameters()!=null? getParameters().get(name): null;
+			UnparsedExpression uexp = new UnparsedExpression(null, 
+				String.class, string? "\""+value+"\"": value, null);
+			if(mpara==null)
+			{
+				addParameter(new MParameter(direction, new ClassInfo(type), name, uexp));
+			}
+			else
+			{
+				mpara.setInitialValue(uexp);
 			}
 		}
 	}
