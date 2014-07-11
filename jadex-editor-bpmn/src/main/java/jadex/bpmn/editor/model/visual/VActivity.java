@@ -216,7 +216,11 @@ public class VActivity extends VNamedNode
 	public void setBpmnElement(MIdElement bpmnelement)
 	{
 		super.setBpmnElement(bpmnelement);
-		createParameterObjects();
+		if (MBpmnModel.TASK.equals(getMActivity().getActivityType()) ||
+			MBpmnModel.SUBPROCESS.equals(getMActivity().getActivityType()))
+		{
+			createParameterObjects();
+		}
 	}
 	
 	/**
