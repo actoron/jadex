@@ -458,10 +458,11 @@ public class SCreationController
 			modelcontainer.setDirty(true);
 			ret = vedge;
 		}
-		else if ((source instanceof VOutParameter && target instanceof VInParameter) ||
+		else if (((source instanceof VOutParameter && target instanceof VInParameter) ||
 				 ((source instanceof VOutParameter || target instanceof VInParameter) &&
 				 (SHelper.isVisualEvent(source) || SHelper.isVisualEvent(target)) ||
-				 (SHelper.isVisualEvent(source) || SHelper.isVisualEvent(target))))
+				 (SHelper.isVisualEvent(source) || SHelper.isVisualEvent(target)))) &&
+				 source != null && target != null)
 		{
 			ret = createDataEdge(graph, modelcontainer.getIdGenerator(), (VNamedNode) source, (VNamedNode) target, modelcontainer.getSettings().isDirectSequenceAutoConnect());
 		}
