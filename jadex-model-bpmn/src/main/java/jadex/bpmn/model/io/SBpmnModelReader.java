@@ -526,6 +526,15 @@ public class SBpmnModelReader
 				}
 			}
 			
+			if(buffer.containsKey("parameters"))
+			{
+				List<MParameter> params = (List<MParameter>) buffer.remove("parameters");
+				for(MParameter param : params)
+				{
+					evt.addParameter(param);
+				}
+			}
+			
 			evt.setActivityType(acttype);
 			
 			connectActivityEdges(evt, buffer, emap);
