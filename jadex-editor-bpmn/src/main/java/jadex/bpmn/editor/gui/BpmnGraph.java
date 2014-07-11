@@ -373,6 +373,7 @@ public class BpmnGraph extends mxGraph
 			}
 		}
 		
+//		System.out.println("IsVisible: " + cell + " " + ret);
 		return ret;
 	}
 

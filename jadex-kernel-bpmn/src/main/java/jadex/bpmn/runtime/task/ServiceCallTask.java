@@ -650,6 +650,7 @@ public class ServiceCallTask implements ITask
 				cbsername.removeActionListener(al);
 			if(reqs!=null)
 			{
+				mo.addElement(null);
 				for(int i=0; i<reqs.length; i++)
 				{
 					mo.addElement(reqs[i].getName());

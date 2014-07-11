@@ -100,6 +100,8 @@
     <semantic:sequenceFlow sourceRef="HSjAxDflhY3JYSiV" targetRef="m5vdqhI00xqP2LF7" id="uFWlOF7UPObuF9uy">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
+      <jadex:dataFlow id="k2DWIhHI/B51aVrf" sourceRef="M0ETx6cYjmHk/hoH" sourceParam="" targetRef="HSjAxDflhY3JYSiV" targetParam="text"/>
+      <jadex:dataFlow id="ccNv2FkqQgUnxFfC" sourceRef="HSjAxDflhY3JYSiV" sourceParam="text" targetRef="m5vdqhI00xqP2LF7" targetParam=""/>
     </semantic:extensionElements>
   </semantic:process>
   <bpmndi:BPMNDiagram>
@@ -148,10 +150,14 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="hCmn6earoHTmDtA6">
       </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="k2DWIhHI/B51aVrf">
+      </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="4DdtrGFKVof6uS49">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="uFWlOF7UPObuF9uy">
       </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="ccNv2FkqQgUnxFfC">
+      </di:Edge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </semantic:definitions>
