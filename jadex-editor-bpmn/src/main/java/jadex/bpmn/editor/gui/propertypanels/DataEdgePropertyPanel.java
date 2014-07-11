@@ -1,11 +1,18 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MDataEdge;
+import jadex.bpmn.model.MParameter;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -53,27 +60,52 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 		configureAndAddInputLine(column, label, textarea, y++);
 		
 		// Source parameter name.
-		if (edge.getSource() instanceof VActivity)
+		if(edge.getSource() instanceof VActivity)
 		{
-			label = new JLabel("Source Parameter");
-			textarea = new JTextArea();
+			MActivity src = (MActivity)((VActivity)edge.getSource()).getMActivity();
 			
-			if (getBpmnDataEdge().getParameterMapping() != null)
+			label = new JLabel("Source Parameter");
+			final JComboBox pbox = new JComboBox();
+			pbox.addItem(null);
+			//textarea = new JTextArea();
+			
+			List<MParameter> params = src.getParameters(new String[]{MParameter.DIRECTION_INOUT, MParameter.DIRECTION_OUT});
+			if(params!=null)
 			{
-				textarea.setText(getBpmnDataEdge().getSourceParameter() != null? getBpmnDataEdge().getSourceParameter() : "");
+				for(MParameter param: params)
+				{
+					pbox.addItem(param.getName());
+				}
 			}
 			
-			textarea.getDocument().addDocumentListener(new DocumentAdapter()
+			if(getBpmnDataEdge().getParameterMapping() != null)
 			{
-				public void update(DocumentEvent e)
+//				textarea.setText(getBpmnDataEdge().getSourceParameter() != null? getBpmnDataEdge().getSourceParameter() : "");
+				pbox.setSelectedItem(getBpmnDataEdge().getSourceParameter());
+			}
+			
+			pbox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					String name = getText(e.getDocument());
+					String name = (String)pbox.getSelectedItem();
 					name = name.length() == 0 ? null : name;
 					getBpmnDataEdge().setSourceParameter(name);
 					modelcontainer.setDirty(true);
 				}
 			});
-			configureAndAddInputLine(column, label, textarea, y++);
+			
+//			textarea.getDocument().addDocumentListener(new DocumentAdapter()
+//			{
+//				public void update(DocumentEvent e)
+//				{
+//					String name = getText(e.getDocument());
+//					name = name.length() == 0 ? null : name;
+//					getBpmnDataEdge().setSourceParameter(name);
+//					modelcontainer.setDirty(true);
+//				}
+//			});
+			configureAndAddInputLine(column, label, pbox, y++);
 		}
 		
 		// Target parameter name.

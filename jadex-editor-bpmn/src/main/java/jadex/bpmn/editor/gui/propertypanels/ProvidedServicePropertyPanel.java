@@ -3,6 +3,7 @@ package jadex.bpmn.editor.gui.propertypanels;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -151,7 +152,21 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 			{
 				Method method = (Method)mbox.getSelectedItem();
 				
-				vact.getMActivity().setProperty("method", method==null? null: SReflect.getMethodSignature(method), true);
+				MActivity mact = vact.getMActivity();
+				mact.setProperty("method", method==null? null: SReflect.getMethodSignature(method), true);
+				
+				mact.removeParameters();
+				if(method!=null)
+				{
+					Class<?>[] ptypes = method.getParameterTypes();
+					if(ptypes!=null)
+					{
+						for(int i=0; i<ptypes.length; i++)
+						{
+							mact.addParameter(new MParameter(MParameter.DIRECTION_OUT, new ClassInfo(ptypes[i]), "param"+i, null));
+						}
+					}
+				}
 			}
 		});
 		

@@ -735,6 +735,16 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Remove a parameter.
+	 *  @param param The parameter.
+	 */
+	public void removeParameters()
+	{
+		if(parameters!=null)
+			parameters.clear();
+	}
+	
+	/**
 	 *  Legacy conversion from unparsed expression.
 	 * 
 	 *  @param name Name

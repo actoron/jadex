@@ -17,6 +17,8 @@
         <semantic:outgoing>B8NvyQ3DpJBHbika</semantic:outgoing>
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
+          <jadex:parameter direction="out" name="param0" type="int"/>
+          <jadex:parameter direction="out" name="param1" type="int"/>
           <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
           <jadex:property name="method">&quot;IFuture&lt;Integer&gt; add(int, int)&quot;</jadex:property>
         </semantic:extensionElements>
@@ -100,7 +102,8 @@
     <semantic:sequenceFlow sourceRef="HSjAxDflhY3JYSiV" targetRef="m5vdqhI00xqP2LF7" id="uFWlOF7UPObuF9uy">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
-      <jadex:dataFlow id="k2DWIhHI/B51aVrf" sourceRef="M0ETx6cYjmHk/hoH" sourceParam="" targetRef="HSjAxDflhY3JYSiV" targetParam="text"/>
+      <jadex:dataFlow id="ubRYMDACim4brswJ" sourceRef="AWoEEebCXTss6X2s" sourceParam="param0" targetRef="EIIUyDRP37T+GbVt" targetParam="param0"/>
+      <jadex:dataFlow id="HUa2iQ6m39wAe1jb" sourceRef="AWoEEebCXTss6X2s" sourceParam="param1" targetRef="EIIUyDRP37T+GbVt" targetParam="param1"/>
       <jadex:dataFlow id="ccNv2FkqQgUnxFfC" sourceRef="HSjAxDflhY3JYSiV" sourceParam="text" targetRef="m5vdqhI00xqP2LF7" targetParam=""/>
     </semantic:extensionElements>
   </semantic:process>
@@ -150,7 +153,9 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="hCmn6earoHTmDtA6">
       </bpmndi:BPMNEdge>
-      <di:Edge type="data" jadexElement="k2DWIhHI/B51aVrf">
+      <di:Edge type="data" jadexElement="ubRYMDACim4brswJ">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="HUa2iQ6m39wAe1jb">
       </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="4DdtrGFKVof6uS49">
       </bpmndi:BPMNEdge>
