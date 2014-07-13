@@ -721,7 +721,24 @@ public class ProcessThread	implements ITaskContext
 	{
 //		System.out.println("before: "+getActivity());
 
-		if(MBpmnModel.TASK.equals(getActivity().getActivityType())
+		if(getActivity().getActivityType()!=null && getActivity().getActivityType().indexOf("Event")!=-1)
+		{
+			// Just pass on data edge params in case of event
+			Map<String, Object>	passedparams = getDataEdgeValues();
+			IndexMap<String, MParameter> params = getActivity().getParameters();
+			if(params!=null)
+			{
+				for(Iterator<MParameter> it=params.values().iterator(); it.hasNext(); )
+				{
+					MParameter param = (MParameter)it.next();
+					if(passedparams.containsKey(param.getName()))
+					{
+						setParameterValue(param.getName(), passedparams.get(param.getName()));
+					}
+				}
+			}
+		}
+		else if(MBpmnModel.TASK.equals(getActivity().getActivityType())
 			|| getActivity() instanceof MSubProcess)
 		{
 			// Handle parameter passing in edge inscriptions.
@@ -822,46 +839,48 @@ public class ProcessThread	implements ITaskContext
 				else 
 				{
 					// Try to find data edges
-					List<MDataEdge> ds = getActivity().getIncomingDataEdges();
-					if(ds!=null)
-					{
-						passedparams = new HashMap<String, Object>();
-						
-						for(MDataEdge de: ds)
-						{
-							if(dataedges!=null)
-							{
-								if(dataedges.containsKey(de.getId()))
-								{
-									String pname = de.getTargetParameter();
-									// Value is consumed -> remove?!
-									Object val = dataedges.remove(de.getId());
-								
-									// if already contains value must be identical
-									if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
-										throw new RuntimeException("Different edges have different values");
-								
-									passedparams.put(pname, val);
-								}
-								else if (de.getSource() == null)
-								{
-									// Argument data edge
-									passedparams.put(de.getTargetParameter(), instance.getArguments().get(de.getSourceParameter()));
-								}
-								else
-								{
-									String pname = de.getTargetParameter();
-									if (getActivity().getParameters() == null ||
-										getActivity().getParameters().get(pname) == null ||
-										getActivity().getParameters().get(pname).getInitialValueString() == null ||
-										getActivity().getParameters().get(pname).getInitialValueString().length()==0)
-									{
-										throw new RuntimeException("Could not find data edge value for: "+de.getId());
-									}
-								}
-							}
-						}
-					}
+					passedparams = getDataEdgeValues();
+					
+//					List<MDataEdge> ds = getActivity().getIncomingDataEdges();
+//					if(ds!=null)
+//					{
+//						passedparams = new HashMap<String, Object>();
+//						
+//						for(MDataEdge de: ds)
+//						{
+//							if(dataedges!=null)
+//							{
+//								if(dataedges.containsKey(de.getId()))
+//								{
+//									String pname = de.getTargetParameter();
+//									// Value is consumed -> remove?!
+//									Object val = dataedges.remove(de.getId());
+//								
+//									// if already contains value must be identical
+//									if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
+//										throw new RuntimeException("Different edges have different values");
+//								
+//									passedparams.put(pname, val);
+//								}
+//								else if (de.getSource() == null)
+//								{
+//									// Argument data edge
+//									passedparams.put(de.getTargetParameter(), instance.getArguments().get(de.getSourceParameter()));
+//								}
+//								else
+//								{
+//									String pname = de.getTargetParameter();
+//									if (getActivity().getParameters() == null ||
+//										getActivity().getParameters().get(pname) == null ||
+//										getActivity().getParameters().get(pname).getInitialValueString() == null ||
+//										getActivity().getParameters().get(pname).getInitialValueString().length()==0)
+//									{
+//										throw new RuntimeException("Could not find data edge value for: "+de.getId());
+//									}
+//								}
+//							}
+//						}
+//					}
 				}
 			}
 			
@@ -929,15 +948,67 @@ public class ProcessThread	implements ITaskContext
 	}
 	
 	/**
+	 * 
+	 */
+	protected Map<String, Object> getDataEdgeValues()
+	{
+		Map<String, Object> passedparams = null;
+		
+		// Try to find data edges
+		List<MDataEdge> ds = getActivity().getIncomingDataEdges();
+		if(ds!=null)
+		{
+			passedparams = new HashMap<String, Object>();
+			
+			for(MDataEdge de: ds)
+			{
+				if(dataedges!=null)
+				{
+					if(dataedges.containsKey(de.getId()))
+					{
+						String pname = de.getTargetParameter();
+						// Value is consumed -> remove?!
+						Object val = dataedges.remove(de.getId());
+					
+						// if already contains value must be identical
+						if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
+							throw new RuntimeException("Different edges have different values");
+					
+						passedparams.put(pname, val);
+					}
+					else if (de.getSource() == null)
+					{
+						// Argument data edge
+						passedparams.put(de.getTargetParameter(), instance.getArguments().get(de.getSourceParameter()));
+					}
+					else
+					{
+						String pname = de.getTargetParameter();
+						if (getActivity().getParameters() == null ||
+							getActivity().getParameters().get(pname) == null ||
+							getActivity().getParameters().get(pname).getInitialValueString() == null ||
+							getActivity().getParameters().get(pname).getInitialValueString().length()==0)
+						{
+							throw new RuntimeException("Could not find data edge value for: "+de.getId());
+						}
+					}
+				}
+			}
+		}
+		
+		return passedparams;
+	}
+	
+	/**
 	 *  Remove in parameters after step.
 	 *  @param instance	The calling BPMN instance.
 	 */
 	public  void updateParametersAfterStep(MActivity activity, BpmnInterpreter instance)
 	{
-//		System.out.println("after: "+activity.getId());
+//		System.out.println("after: "+activity);
 		
-//		System.out.println("after: "+act);
-		if(activity!=null && (MBpmnModel.TASK.equals(activity.getActivityType()) || activity instanceof MSubProcess))
+		if(activity!=null && (MBpmnModel.TASK.equals(activity.getActivityType()) 
+			|| activity instanceof MSubProcess || activity.getActivityType().indexOf("Event")!=-1))
 		{
 			// Add parameter value for each out edge using the edge id
 			List<MDataEdge> des = activity.getOutgoingDataEdges();
@@ -1020,14 +1091,17 @@ public class ProcessThread	implements ITaskContext
 				}
 			}
 			
-			// Remove all in parameters
-			List<MParameter> params = activity.getParameters(new String[]{MParameter.DIRECTION_IN});
-			for(int i=0; i<params.size(); i++)
+			// Remove all in parameters (not in case of events)
+			if(activity.getActivityType().indexOf("Event")==-1)
 			{
-				MParameter inp = (MParameter)params.get(i);
-				removeParameterValue(inp.getName());
-//				System.out.println("Removed thread param value: "+inp.getName());
-			}			
+				List<MParameter> params = activity.getParameters(new String[]{MParameter.DIRECTION_IN});
+				for(int i=0; i<params.size(); i++)
+				{
+					MParameter inp = (MParameter)params.get(i);
+					removeParameterValue(inp.getName());
+	//				System.out.println("Removed thread param value: "+inp.getName());
+				}
+			}
 		}
 	}
 	

@@ -66,7 +66,12 @@ public class NativeResponseMapper implements IValueMapper
 		}
 		else if(o instanceof URI)
 		{
-			ret = Response.status(Status.SEE_OTHER).location((URI)o).build();
+			URI uri = (URI)o;
+			if(uri.toString().indexOf(":")==-1)
+			{
+				uri = new URI("http://"+uri.toString());
+			}
+			ret = Response.status(Status.SEE_OTHER).location(uri).build();
 		}
 		
 		return ret;

@@ -78,16 +78,12 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 	{
 		Future<Object> ret	= (Future<Object>)thread.getParameterValue(ProcessServiceInvocationHandler.THREAD_PARAMETER_SERVICE_RESULT);
 		
-		List<MDataEdge> des = activity.getIncomingDataEdges();
-		if(des!=null)
-		{
-			MDataEdge de = des.get(0);
-		}
+		Object res = thread.getParameterValue("returnparam");
 		
-		UnparsedExpression uexp = activity.getPropertyValue("returnparam");
-		IParsedExpression exp = SJavaParser.parseExpression(uexp, instance.getModel().getAllImports(), instance.getClassLoader());
-		IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
-		Object res = exp.getValue(fetcher);
+//		UnparsedExpression uexp = activity.getPropertyValue("returnparam");
+//		IParsedExpression exp = SJavaParser.parseExpression(uexp, instance.getModel().getAllImports(), instance.getClassLoader());
+//		IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
+//		Object res = exp.getValue(fetcher);
 		
 		ret.setResult(res);
 	}
