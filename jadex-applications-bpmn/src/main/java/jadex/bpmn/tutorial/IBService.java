@@ -1,6 +1,7 @@
 package jadex.bpmn.tutorial;
 
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 
 /**
  * 
@@ -16,4 +17,9 @@ public interface IBService
 	 * 
 	 */
 	public IFuture<Integer> sub(int a, int b);
+	
+	/**
+	 * 
+	 */
+	public IIntermediateFuture<Integer> count();
 }

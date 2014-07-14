@@ -1,20 +1,13 @@
 package jadex.bpmn.runtime.handler;
 
-import java.util.List;
-
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessServiceInvocationHandler;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.ProcessThreadValueFetcher;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.IValueFetcher;
 import jadex.commons.future.Future;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SJavaParser;
+import jadex.commons.future.IntermediateFuture;
 
 /**
  * 
@@ -80,11 +73,17 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 		
 		Object res = thread.getParameterValue("returnparam");
 		
-//		UnparsedExpression uexp = activity.getPropertyValue("returnparam");
-//		IParsedExpression exp = SJavaParser.parseExpression(uexp, instance.getModel().getAllImports(), instance.getClassLoader());
-//		IValueFetcher fetcher = new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
-//		Object res = exp.getValue(fetcher);
-		
-		ret.setResult(res);
+		if(ret instanceof IntermediateFuture)
+		{
+			((IntermediateFuture)ret).addIntermediateResult(res);
+			if(activity.getActivityType().indexOf("End")!=-1)
+			{
+				((IntermediateFuture)ret).setFinished();
+			}
+		}
+		else
+		{
+			ret.setResult(res);
+		}
 	}
 }
