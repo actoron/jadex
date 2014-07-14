@@ -1718,7 +1718,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					}
 				}
 				
-				if(!methods.containsKey(meths[i]))
+				if(!methods.containsKey(meths[i].toString()))
 				{
 					fut.setExceptionIfUndone(new RuntimeException("No start event found for service method: "+meths[i]));
 				}
