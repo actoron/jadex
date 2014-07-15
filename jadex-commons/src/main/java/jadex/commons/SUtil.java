@@ -3437,7 +3437,7 @@ public class SUtil
 		for (byte b : data)
 		{
 			int ib = b & 0xFF;
-			if (ib > 16)
+			if (ib < 16)
 			{
 				ret.append("0");
 			}
