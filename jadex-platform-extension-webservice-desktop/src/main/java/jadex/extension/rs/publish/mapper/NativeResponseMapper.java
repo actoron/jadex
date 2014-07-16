@@ -62,7 +62,15 @@ public class NativeResponseMapper implements IValueMapper
 		}
 		else if(o instanceof Exception)
 		{
-			ret = Response.ok(SUtil.getExceptionStacktrace((Exception)o)).build();
+			if(isDebug())
+			{
+				ret = Response.ok(SUtil.getExceptionStacktrace((Exception)o)).build();
+			}
+			else
+			{
+				ret = Response.status(Status.INTERNAL_SERVER_ERROR).entity("<html><head></head>" +
+					"<body><h1>500 Internal server error</h1></body></html>").build();
+			}
 		}
 		else if(o instanceof URI)
 		{
@@ -83,5 +91,25 @@ public class NativeResponseMapper implements IValueMapper
 	public Object extractContent(Object value)
 	{
 		return value;
+	}
+	
+	/**
+	 *  Test if is in debug mode.
+	 */
+	protected boolean isDebug()
+	{
+		boolean ret = false;
+		String debug = System.getProperty("EVDEBUG", System.getenv("EVDEBUG"));
+		if(debug!=null)
+		{
+			try
+			{
+				ret = Boolean.parseBoolean(debug);
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		return ret;
 	}
 }
