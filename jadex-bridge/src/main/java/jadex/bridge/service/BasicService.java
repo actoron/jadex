@@ -46,7 +46,6 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 		if(dtoprop!=null)
 		{
 			System.out.println("Property jadex.deftimeout is deprecated. Use jadex_deftimeout instead.");
-
 		}
 		else
 		{
