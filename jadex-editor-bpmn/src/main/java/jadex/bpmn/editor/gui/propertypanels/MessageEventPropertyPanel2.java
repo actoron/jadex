@@ -5,6 +5,7 @@ import jadex.bpmn.editor.model.visual.VActivity;
 
 import java.awt.BorderLayout;
 
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 /**
@@ -20,7 +21,7 @@ public class MessageEventPropertyPanel2 extends BasePropertyPanel
 	{
 		super("Message Event Properties", container);
 		setLayout(new BorderLayout());
-		
+	
 		add(createTabPanel(vact), BorderLayout.CENTER);
 	}
 	

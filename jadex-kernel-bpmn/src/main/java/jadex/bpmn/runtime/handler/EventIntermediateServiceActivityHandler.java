@@ -25,7 +25,7 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 		//boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
 		
 //		boolean service = thread.hasPropertyValue("iface") || thread.hasPropertyValue("returnparam");
-		boolean service = activity.hasProperty("iface") || activity.hasParameter("returnparam");
+		boolean service = activity.hasProperty(MActivity.ISSERVICE);// || activity.hasParameter(MActivity.RETURNPARAM);
 		
 		if(!service)
 		{
@@ -45,7 +45,8 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 				if(MBpmnModel.EVENT_START_MESSAGE.equals(activity.getActivityType()) &&
 					thread.getParent().getParent()==null	// check that parent thread is the top thread.
 					|| (thread.getParent().getModelElement() instanceof MSubProcess
-					&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getParent().getModelElement()).getSubprocessType())))
+					&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getParent().getModelElement()).getSubprocessType()))
+					|| (activity.isEventHandler()))
 				{
 					doExecute(activity, instance, thread);
 					instance.step(activity, instance, thread, null);
@@ -71,12 +72,14 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 	{
 		Future<Object> ret	= (Future<Object>)thread.getParameterValue(ProcessServiceInvocationHandler.THREAD_PARAMETER_SERVICE_RESULT);
 		
-		Object res = thread.getParameterValue("returnparam");
+		boolean hasret = activity.getIncomingDataEdges()!=null && activity.getIncomingDataEdges().size()>0;
+		Object res = hasret? thread.getParameterValue(MActivity.RETURNPARAM): null;
 		
 		if(ret instanceof IntermediateFuture)
 		{
-			((IntermediateFuture)ret).addIntermediateResult(res);
-			if(activity.getActivityType().indexOf("End")!=-1)
+			if(hasret)
+				((IntermediateFuture)ret).addIntermediateResult(res);
+			if(activity.isEndEvent())
 			{
 				((IntermediateFuture)ret).setFinished();
 			}

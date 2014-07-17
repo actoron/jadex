@@ -33,6 +33,18 @@ public class MActivity extends MAssociationTarget
 {
 	protected static final MethodInfo MI_NOTFOUND = new MethodInfo();
 
+	/** Constant for the return parameter name. */
+	public static final String RETURNPARAM = "returnparam";
+	
+	/** The interface name. */
+	public static final String IFACE = "iface";
+	
+	/** The method name. */
+	public static final String METHOD = "method";
+	
+	/** Is service constant. */
+	public static final String ISSERVICE = "isService";
+	
 	//-------- attributes --------
 	
 	/** The lane description. */
@@ -1136,6 +1148,51 @@ public class MActivity extends MAssociationTarget
 	public boolean isEvent()
 	{
 		return getActivityType().startsWith("Event");
+	}
+	
+	/**
+	 *  Test if activity is a start event.
+	 *  @return True, if is event.
+	 */
+	public boolean isStartEvent()
+	{
+		return isEvent() && getActivityType().indexOf("Start")!=-1;
+	}
+	
+	/**
+	 *  Test if activity is a end event.
+	 *  @return True, if is event.
+	 */
+	public boolean isEndEvent()
+	{
+		return isEvent() && getActivityType().indexOf("End")!=-1;
+	}
+	
+	/**
+	 *  Test if activity is an intermediate event.
+	 *  @return True, if is event.
+	 */
+	public boolean isIntermediateEvent()
+	{
+		return isEvent() && getActivityType().indexOf("Intermediate")!=-1;
+	}
+	
+	/**
+	 *  Test if activity is event.
+	 *  @return True, if is event.
+	 */
+	public boolean isMessageEvent()
+	{
+		return isEvent() && getActivityType().indexOf("Message")!=-1;
+	}
+	
+	/**
+	 *  Test if activity is event.
+	 *  @return True, if is event.
+	 */
+	public boolean isSignalEvent()
+	{
+		return isEvent() && getActivityType().indexOf("Signal")!=-1;
 	}
 	
 	/**

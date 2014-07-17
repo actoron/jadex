@@ -726,7 +726,7 @@ public class ProcessThread	implements ITaskContext
 			// Just pass on data edge params in case of event
 			Map<String, Object>	passedparams = getDataEdgeValues();
 			IndexMap<String, MParameter> params = getActivity().getParameters();
-			if(params!=null)
+			if(params!=null && passedparams!=null)
 			{
 				for(Iterator<MParameter> it=params.values().iterator(); it.hasNext(); )
 				{

@@ -10,12 +10,13 @@ import jadex.bpmn.model.task.ITaskPropertyGui;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskProperty;
 import jadex.bpmn.model.task.annotation.TaskPropertyGui;
+import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.task.ServiceCallTask.ServiceCallTaskGui;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.nonfunctional.search.IServiceEvaluator;
 import jadex.bridge.nonfunctional.search.ServiceRankingResultListener;
@@ -28,6 +29,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
 import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
@@ -266,6 +269,60 @@ public class ServiceCallTask implements ITask
 		try
 		{
 			Object	val	= m.invoke(service, args.toArray());
+			if(val instanceof IIntermediateFuture)
+			{
+				MActivity mact = context.getActivity();
+				List<MActivity> handlers = mact.getEventHandlers();
+				MActivity handler = null;
+				if(handlers!=null)
+				{
+					for(MActivity h: handlers)
+					{
+						if(h.isMessageEvent())
+						{
+							handler = h;
+							break;
+						}
+					}
+				}
+				
+				final MActivity fhandler = handler;
+				((IIntermediateFuture<Object>)val).addResultListener(new IntermediateDefaultResultListener<Object>()
+				{
+					protected List<Object> results;
+					public void intermediateResultAvailable(Object result)
+					{
+						if(fhandler!=null)
+						{
+							// Hack! Need to start threads from 'user' task. Should be done in a handler.
+							BpmnInterpreter ip = (BpmnInterpreter)process;
+							ProcessThread th = (ProcessThread)context;
+							ProcessThread pat = th.getParent();
+							ProcessThread thread = new ProcessThread(fhandler, pat, ip);
+							thread.setParameterValue(MActivity.RETURNPARAM, result);
+							pat.addThread(thread);
+						}
+						else
+						{
+							if(results==null)
+								results = new ArrayList<Object>();
+							results.add(result);
+						}
+					}
+					
+					public void finished()
+					{
+						if(fresultparam!=null)
+							context.setParameterValue(fresultparam, results);
+						ret.setResult(null);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
 			if(val instanceof IFuture)
 			{
 				((IFuture<Object>)val).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)

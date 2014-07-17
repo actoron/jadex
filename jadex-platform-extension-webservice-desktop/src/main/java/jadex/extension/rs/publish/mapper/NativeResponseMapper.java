@@ -3,12 +3,13 @@ package jadex.extension.rs.publish.mapper;
 import jadex.commons.SUtil;
 
 import java.io.ByteArrayInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Response.StatusType;
 
 /**
  *  The native response mapper allows for sending back native response objects.
@@ -67,7 +68,8 @@ public class NativeResponseMapper implements IValueMapper
 			}
 			else
 			{
-				ret = Response.status(Status.INTERNAL_SERVER_ERROR).entity("<html><head></head><body><h1>500 Internal server error</h1></body></html>").build();
+				ret = Response.status(Status.INTERNAL_SERVER_ERROR).entity("<html><head></head>" +
+					"<body><h1>500 Internal server error</h1></body></html>").build();
 			}
 		}
 		else if(o instanceof URI)
