@@ -29,7 +29,6 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
@@ -60,7 +59,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 		this.vact = vact;
 		setLayout(new BorderLayout());
 		
-		if(!vact.getMActivity().isThrowing())
+		if(!vact.getMActivity().isThrowing() && !vact.getMActivity().isEventHandler())
 		{
 			add(createStartServicePanel(), BorderLayout.CENTER);
 			refreshStart();
@@ -68,7 +67,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 		else
 		{
 			add(createEndServicePanel(), BorderLayout.CENTER);
-			refreshEnd();
+//			refreshEnd();
 		}
 	}
 	
@@ -120,7 +119,8 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 				
 				Class<?> ifacecl = iface.getType(cl);
 					
-				vact.getMActivity().setProperty("iface", iface==null? null: iface.toString()+".class", false);
+				vact.getMActivity().setProperty(MActivity.IFACE, iface==null? null: iface.toString()+".class", false);
+				vact.getMActivity().setProperty(MActivity.ISSERVICE, iface==null? null: "true", true);
 				
 				if(iface!=null)
 				{
@@ -179,7 +179,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 
 		final JCheckBox jb = pp.createCheckBox("Service call: ");
 		jb.setEnabled(true);
-		jb.setSelected(vact.getMActivity().hasParameter("returnparam"));
+		jb.setSelected(vact.getMActivity().hasParameter(MActivity.RETURNPARAM));
 		
 		jb.addActionListener(new ActionListener()
 		{
@@ -187,11 +187,13 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 			{
 				if(jb.isSelected())
 				{
-					vact.getMActivity().setParameter("returnparam", "", Object.class, false, MParameter.DIRECTION_INOUT);
+					vact.getMActivity().setParameter(MActivity.RETURNPARAM, "", Object.class, false, MParameter.DIRECTION_INOUT);
+					vact.getMActivity().setProperty(MActivity.ISSERVICE, "true", true);
 				}
 				else
 				{
-					vact.getMActivity().removeParameter("returnparam");
+					vact.getMActivity().removeParameter(MActivity.RETURNPARAM);
+					vact.getMActivity().setProperty(MActivity.ISSERVICE, null, true);
 				}
 			}
 		});
@@ -209,6 +211,12 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 //			}
 //		});
 		
+//		MProperty mprop = vact.getMActivity().getParameters()!=null? vact.getMActivity().getParameters().get(MActivity.RETURNPARAM): null;
+//		if(mprop!=null)
+//		{
+//			tfreturn.setText(mprop.getInitialValueString());
+//		}
+		
 		return pp;
 	}
 	
@@ -217,7 +225,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 	 */
 	protected void refreshStart()
 	{
-		MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get("iface"): null;
+		MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get(MActivity.IFACE): null;
 		if(mprop!=null)
 		{
 			try
@@ -251,15 +259,15 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	protected void refreshEnd()
-	{
-		MProperty mprop = vact.getMActivity().getProperties()!=null? vact.getMActivity().getProperties().get("returnparam"): null;
-		if(mprop!=null)
-		{
-			tfreturn.setText(mprop.getInitialValueString());
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	protected void refreshEnd()
+//	{
+//		MProperty mprop = vact.getMActivity().getParameters()!=null? vact.getMActivity().getParameters().get(MActivity.RETURNPARAM): null;
+//		if(mprop!=null)
+//		{
+//			tfreturn.setText(mprop.getInitialValueString());
+//		}
+//	}
 }

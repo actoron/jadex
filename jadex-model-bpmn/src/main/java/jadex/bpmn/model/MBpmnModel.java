@@ -279,11 +279,11 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 				{
 					if(MBpmnModel.EVENT_START_MESSAGE.equals(mact.getActivityType()))
 					{
-						if(mact.hasPropertyValue("iface"))
+						if(mact.hasPropertyValue(MActivity.IFACE))
 						{
 							if(iface==null)
 							{
-								UnparsedExpression uexp = mact.getPropertyValue("iface");
+								UnparsedExpression uexp = mact.getPropertyValue(MActivity.IFACE);
 								iface = (Class<?>)SJavaParser.parseExpression(uexp, getModelInfo().getAllImports(), cl).getValue(null);
 							}
 							
@@ -595,7 +595,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 								List<MActivity>	handlers = mact.getEventHandlers();
 								if(handlers!=null)
 								{
-									for(int k=0; j<handlers.size(); k++)
+									for(int k=0; k<handlers.size(); k++)
 									{
 										MActivity mhact = (MActivity)handlers.get(k);
 										allactivities.put(mhact.getId(), mhact);

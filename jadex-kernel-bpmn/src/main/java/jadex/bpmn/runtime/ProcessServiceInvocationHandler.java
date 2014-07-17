@@ -2,10 +2,10 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.javaparser.SJavaParser;
@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *  Invocation handler for mapping service requests to
@@ -72,15 +73,15 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		{
 			if(MBpmnModel.EVENT_START_MESSAGE.equals(mact.getActivityType()))
 			{
-				if(mact.hasPropertyValue("iface"))
+				if(mact.hasPropertyValue(MActivity.IFACE))
 				{
 					if(iface==null)
 					{
-						UnparsedExpression uexp = mact.getPropertyValue("iface");
+						UnparsedExpression uexp = mact.getPropertyValue(MActivity.IFACE);
 						iface = (Class<?>)SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), instance.getClassLoader()).getValue(null);
 					}
 					
-					UnparsedExpression uexp = mact.getPropertyValue("method");
+					UnparsedExpression uexp = mact.getPropertyValue(MActivity.METHOD);
 					String method = (String)SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), instance.getClassLoader()).getValue(null);
 //					String method = mact.getPropertyValue("method");
 					events.put(method, mact);
@@ -96,7 +97,18 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
-		Future<Void> ret = new Future<Void>();
+		// Drop goal when future is terminated from service caller
+		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null)
+		{
+//			public void terminate(Exception reason, IResultListener<Void> terminate)
+//			{
+//				System.out.println("terminated call: "+fgoal);
+//				ip.dropGoal(fgoal);
+//				super.terminate(reason, terminate);
+//			}
+		});
+		
+//		Future<Void> ret = new Future<Void>();
 		
 		MActivity act = events.get(SReflect.getMethodSignature(method));
 		if(act==null)
@@ -114,10 +126,13 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 //			}
 //		}
 		
-		for(int i=0; i<args.length; i++)
+		if(args!=null)
 		{
-//			MParameter mparam = act.getParameter("param"+i);
-			thread.setOrCreateParameterValue("param"+i, args[i]);
+			for(int i=0; i<args.length; i++)
+			{
+	//			MParameter mparam = act.getParameter("param"+i);
+				thread.setOrCreateParameterValue("param"+i, args[i]);
+			}
 		}
 		
 		thread.setOrCreateParameterValue("$callargs", args);
