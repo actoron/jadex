@@ -13,6 +13,7 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -81,7 +82,7 @@ public class SBpmnModelReader
 			}
 		}
 		
-		ACT_TYPE_MAPPING.put("userTask", MBpmnModel.TASK);
+		ACT_TYPE_MAPPING.put("userTask", MTask.TASK);
 		
 	}
 	
@@ -388,6 +389,10 @@ public class SBpmnModelReader
 				{
 					((MSubProcess) act).setSubprocessType(MSubProcess.SUBPROCESSTYPE_EVENT);
 				}
+			}
+			else if (MTask.TASK.equals(ACT_TYPE_MAPPING.get(tag.getLocalPart())))
+			{
+				act = new MTask();
 			}
 			else
 			{

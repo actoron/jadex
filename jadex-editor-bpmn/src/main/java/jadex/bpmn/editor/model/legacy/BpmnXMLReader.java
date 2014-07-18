@@ -8,7 +8,6 @@ import jadex.bpmn.model.MAssociation;
 import jadex.bpmn.model.MAssociationTarget;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
-import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MEdge;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
@@ -17,6 +16,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -60,6 +60,7 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectReaderHandler;
@@ -505,14 +506,33 @@ public class BpmnXMLReader
 					return type.endsWith("Activity");
 				}
 			}), 
-			new ObjectInfo(MActivity.class, new ActivityPostProcessor()),
+//			new ObjectInfo(MActivity.class, new ActivityPostProcessor()),
+			new ObjectInfo(new IBeanObjectCreator()
+			{
+				public Object createObject(IContext context, Map rawattributes)
+						throws Exception
+				{
+					MActivity ret = null;
+					Object at = rawattributes.get("activityType");
+					if (at == null || MTask.TASK.equals(at))
+					{
+						ret = new MTask();
+					}
+					else
+					{
+						ret = new MActivity();
+					}
+					return ret;
+				}
+			}, new ActivityPostProcessor()),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("name", "description")),
 			new AttributeInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new AttributeInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
 			new AttributeInfo(new AccessInfo("lanes", "laneDescription")),
 			new AttributeInfo(new AccessInfo("associations", "associationsDescription")),
-			new AttributeInfo(new AccessInfo("activityType", "activityType", null, MBpmnModel.TASK)),
+//			new AttributeInfo(new AccessInfo("activityType", "activityType", null, MBpmnModel.TASK)),
+			new AttributeInfo(new AccessInfo("activityType", "activityType", null, MTask.TASK)),
 			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			},
 			new SubobjectInfo[]{

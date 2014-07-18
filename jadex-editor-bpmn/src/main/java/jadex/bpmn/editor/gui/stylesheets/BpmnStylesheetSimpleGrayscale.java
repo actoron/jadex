@@ -7,6 +7,7 @@ import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MTask;
 
 import com.mxgraph.util.mxConstants;
 
@@ -25,7 +26,7 @@ public class BpmnStylesheetSimpleGrayscale extends BpmnStylesheetColor
 		
 		styles.get(VPool.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, white);
 		styles.get(VLane.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, white);
-		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK).put(mxConstants.STYLE_FILLCOLOR, white);
+		styles.get(VActivity.class.getSimpleName() + "_" + MTask.TASK).put(mxConstants.STYLE_FILLCOLOR, white);
 		styles.get(VOutParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, white);
 		styles.get(VInParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, white);
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS).put(mxConstants.STYLE_FILLCOLOR, white);

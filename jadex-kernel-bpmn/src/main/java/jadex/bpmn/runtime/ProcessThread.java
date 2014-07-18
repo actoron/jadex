@@ -8,6 +8,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.handler.ICancelable;
@@ -738,8 +739,10 @@ public class ProcessThread	implements ITaskContext
 				}
 			}
 		}
-		else if(MBpmnModel.TASK.equals(getActivity().getActivityType())
-			|| getActivity() instanceof MSubProcess)
+//		else if(MBpmnModel.TASK.equals(getActivity().getActivityType())
+//			|| getActivity() instanceof MSubProcess)
+		else if(getActivity() instanceof MTask
+				|| getActivity() instanceof MSubProcess)
 		{
 			// Handle parameter passing in edge inscriptions.
 			Map<String, Object>	passedparams = null;
@@ -1007,7 +1010,7 @@ public class ProcessThread	implements ITaskContext
 	{
 //		System.out.println("after: "+activity);
 		
-		if(activity!=null && (MBpmnModel.TASK.equals(activity.getActivityType()) 
+		if(activity!=null && (activity instanceof MTask 
 			|| activity instanceof MSubProcess || activity.getActivityType().indexOf("Event")!=-1))
 		{
 			// Add parameter value for each out edge using the edge id

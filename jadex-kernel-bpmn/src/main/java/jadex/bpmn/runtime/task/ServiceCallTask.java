@@ -606,7 +606,14 @@ public class ServiceCallTask implements ITask
 									}
 									if(!pret.equals(Void.class) && !pret.equals(void.class))
 									{
-										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, new ClassInfo(pret), retname==null? "return": retname, null, null));
+										if(SReflect.isSupertype(IIntermediateFuture.class, m.getReturnType()))
+										{
+											ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, new ClassInfo("java.util.Collection<" + SReflect.getClass(pret).getName() + ">"), retname==null? "return": retname, null, null));
+										}
+										else
+										{
+											ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, new ClassInfo(pret), retname==null? "return": retname, null, null));
+										}
 									}
 								}
 							}

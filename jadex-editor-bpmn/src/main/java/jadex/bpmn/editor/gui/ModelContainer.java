@@ -6,6 +6,7 @@ import jadex.bpmn.editor.gui.Settings.FileFilter;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MTask;
 import jadex.bpmn.model.io.IdGenerator;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
@@ -61,7 +62,7 @@ public class ModelContainer implements IModelContainer
 	public static final String EDIT_MODE_LANE = "Lane";
 	
 	/** Edit mode for adding tasks. */
-	public static final String EDIT_MODE_TASK = MBpmnModel.TASK;
+	public static final String EDIT_MODE_TASK = MTask.TASK; //MBpmnModel.TASK;
 	
 	/** Edit mode for adding tasks. */
 	public static final String EDIT_MODE_SUBPROCESS = MBpmnModel.SUBPROCESS;

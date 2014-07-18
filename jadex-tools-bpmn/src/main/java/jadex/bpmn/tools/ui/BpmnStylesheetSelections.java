@@ -5,6 +5,7 @@ import jadex.bpmn.editor.gui.stylesheets.EventShape;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class BpmnStylesheetSelections extends BpmnStylesheetColorGradient
 		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
 		putCellStyle(BreakpointMarker.class.getSimpleName(), style);
 		
-		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK);
+		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MTask.TASK);
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS);
 		addWaitingEntry(VExternalSubProcess.class.getSimpleName());
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE);
@@ -52,7 +53,7 @@ public class BpmnStylesheetSelections extends BpmnStylesheetColorGradient
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_BOUNDARY");
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_END");
 		
-		addReadyEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK);
+		addReadyEntry(VActivity.class.getSimpleName() + "_" + MTask.TASK);
 		addReadyEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS);
 		addReadyEntry(VExternalSubProcess.class.getSimpleName());
 		addReadyEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE);

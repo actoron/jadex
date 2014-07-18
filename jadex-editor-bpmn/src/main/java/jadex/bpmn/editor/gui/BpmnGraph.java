@@ -17,6 +17,7 @@ import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MTask;
 import jadex.commons.collection.LRU;
 
 import java.util.ArrayList;
@@ -31,7 +32,6 @@ import com.mxgraph.model.mxICell;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxLayoutManager;
 import com.mxgraph.view.mxStylesheet;
@@ -413,10 +413,14 @@ public class BpmnGraph extends mxGraph
 						(!model.isEdge(cell) && !isCellCollapsed(cell));
 			}
 		}
+//		else if (cell instanceof VActivity &&
+//				 ((VActivity) cell).getBpmnElement() != null &&
+//				 (cell instanceof VExternalSubProcess ||
+//				 MBpmnModel.TASK.equals(((MActivity) ((VActivity) cell).getBpmnElement()).getActivityType())))
 		else if (cell instanceof VActivity &&
 				 ((VActivity) cell).getBpmnElement() != null &&
 				 (cell instanceof VExternalSubProcess ||
-				 MBpmnModel.TASK.equals(((MActivity) ((VActivity) cell).getBpmnElement()).getActivityType())))
+				 ((VActivity) cell).getBpmnElement() instanceof MTask))
 		{
 			/* Tasks are never drop targets, even if they contain children, they will be all event handlers. */
 			ret = false;
@@ -598,7 +602,9 @@ public class BpmnGraph extends mxGraph
 				((VElement) parent).getBpmnElement() instanceof MActivity)
 			{
 				MActivity mparent = (MActivity) ((VElement) parent).getBpmnElement();
-				if (MBpmnModel.TASK.equals(mparent.getActivityType()) ||
+//				if (MBpmnModel.TASK.equals(mparent.getActivityType()) ||
+//					MBpmnModel.SUBPROCESS.equals(mparent.getActivityType()))
+				if (mparent instanceof MTask ||
 					MBpmnModel.SUBPROCESS.equals(mparent.getActivityType()))
 				{
 					return evtlayout;
