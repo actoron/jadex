@@ -38,7 +38,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	//-------- constants --------
 	
 	/** Constant for task. */
-//	public static final String TASK = "Task";
+	public static final String TASK = "Task";
 
 	/** Constant for sub process. */
 	public static final String SUBPROCESS = "SubProcess";
