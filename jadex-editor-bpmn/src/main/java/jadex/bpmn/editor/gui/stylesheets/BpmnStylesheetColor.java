@@ -11,6 +11,7 @@ import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MTask;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -110,7 +111,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 	public static final Map<String, Dimension> DEFAULT_ACTIVITY_SIZES = new HashMap<String, Dimension>();
 	static
 	{
-		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.TASK, new Dimension(160, 100));
+//		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.TASK, new Dimension(160, 100));
+		DEFAULT_ACTIVITY_SIZES.put(MTask.TASK, new Dimension(160, 100));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, new Dimension(480, 200));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Event", new Dimension(480, 200));
 		DEFAULT_ACTIVITY_SIZES.put(VExternalSubProcess.class.getSimpleName(), new Dimension(160, 100));
@@ -488,7 +490,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_CENTER);
 		style.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
-		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK, style);
+//		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK, style);
+		putCellStyle(VActivity.class.getSimpleName() + "_" + MTask.TASK, style);
 		
 		style = new HashMap<String, Object>(style);
 		style.put(mxConstants.STYLE_FILLCOLOR, EXTERNAL_SUBPROCESS_COLOR);

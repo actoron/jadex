@@ -10,6 +10,7 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -89,7 +90,7 @@ public class VActivity extends VNamedNode
 		}
 		else
 		{
-			ret +=  MBpmnModel.TASK;
+			ret += MTask.TASK;// MBpmnModel.TASK;
 		}
 		return ret;
 	}
@@ -216,7 +217,9 @@ public class VActivity extends VNamedNode
 	public void setBpmnElement(MIdElement bpmnelement)
 	{
 		super.setBpmnElement(bpmnelement);
-		if (MBpmnModel.TASK.equals(getMActivity().getActivityType()) ||
+//		if (MBpmnModel.TASK.equals(getMActivity().getActivityType()) ||
+//			MBpmnModel.SUBPROCESS.equals(getMActivity().getActivityType()))
+		if (getMActivity() instanceof MTask ||
 			MBpmnModel.SUBPROCESS.equals(getMActivity().getActivityType()))
 		{
 			createParameterObjects();

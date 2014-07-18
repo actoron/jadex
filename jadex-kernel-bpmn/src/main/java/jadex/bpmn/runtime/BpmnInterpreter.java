@@ -10,6 +10,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
@@ -135,7 +136,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		Map<String, IActivityHandler> activityhandlers = new HashMap<String, IActivityHandler>();
 		
 		// Task/Subprocess handler.
-		activityhandlers.put(MBpmnModel.TASK, new TaskActivityHandler());
+//		activityhandlers.put(MBpmnModel.TASK, new TaskActivityHandler());
+		activityhandlers.put(MTask.TASK, new TaskActivityHandler());
 		activityhandlers.put(MBpmnModel.SUBPROCESS, new SubProcessActivityHandler());
 	
 		// Gateway handler.
@@ -1536,11 +1538,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					// to have an edge with a mapping. Otherwise the parameter
 					// value with be deleted in process thread updateParametersBeforeStep().
 					
-					MActivity act = new MActivity();
+					MActivity act = new MTask();
 					act.setName("External Step Activity: "+(cnt++));
 					act.setClazz(new ClassInfo(ExecuteStepTask.class));
 					act.addParameter(new MParameter(MParameter.DIRECTION_IN, new ClassInfo(Object[].class), "step", null));
-					act.setActivityType(MBpmnModel.TASK);
+//					act.setActivityType(MBpmnModel.TASK);
 					MSequenceEdge edge = new MSequenceEdge();
 					edge.setTarget(act);
 					UnparsedExpression exp = new UnparsedExpression(null, (Class<?>) null, "step", null);

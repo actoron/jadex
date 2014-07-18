@@ -12,6 +12,7 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -59,7 +60,7 @@ public class SBpmnModelWriter
 	public static final Map<String, String> ACT_TYPE_MAPPING = new HashMap<String, String>();
 	static
 	{
-		ACT_TYPE_MAPPING.put(MBpmnModel.TASK, "task");
+		ACT_TYPE_MAPPING.put(MTask.TASK, "task");
 		ACT_TYPE_MAPPING.put(MBpmnModel.SUBPROCESS, "subProcess");
 		ACT_TYPE_MAPPING.put(MBpmnModel.GATEWAY_PARALLEL, "parallelGateway");
 		ACT_TYPE_MAPPING.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, "exclusiveGateway");

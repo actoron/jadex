@@ -6,14 +6,15 @@ import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
-import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MTask;
 
 /**
  *  Factory for generating appropriate property panels.
@@ -75,11 +76,16 @@ public class SPropertyPanelFactory
 //				}
 //				ret = new TaskPropertyPanel(container, act, selectedparameter);
 //			}
-			else if ((velement instanceof VActivity && MBpmnModel.TASK.equals(((MActivity) velement.getBpmnElement()).getActivityType())) ||
-				  (velement instanceof VSubProcess) ||
-				  (velement instanceof VExternalSubProcess) ||
-				  (velement instanceof VInParameter) ||
-				  (velement instanceof VOutParameter))
+//			else if ((velement instanceof VActivity && MBpmnModel.TASK.equals(((MActivity) velement.getBpmnElement()).getActivityType())) ||
+//				  (velement instanceof VSubProcess) ||
+//				  (velement instanceof VExternalSubProcess) ||
+//				  (velement instanceof VInParameter) ||
+//				  (velement instanceof VOutParameter))
+			else if (velement.getBpmnElement() instanceof MTask ||
+					 (velement instanceof VSubProcess) ||
+					 (velement instanceof VExternalSubProcess) ||
+					 (velement instanceof VInParameter) ||
+					 (velement instanceof VOutParameter))
 			{
 				VActivity act = null;
 				MParameter selectedparameter = null;

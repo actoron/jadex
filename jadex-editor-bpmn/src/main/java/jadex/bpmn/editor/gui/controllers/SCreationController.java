@@ -29,6 +29,7 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bpmn.model.io.IdGenerator;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -174,8 +175,11 @@ public class SCreationController
 	{
 		if (mode.endsWith(ModelContainer.BOUNDARY_EVENT))
 		{
+//			if (!(targetcell instanceof VActivity) ||
+//			   !(MBpmnModel.TASK.equals(((MActivity) ((VActivity) targetcell).getBpmnElement()).getActivityType()) ||
+//				 MBpmnModel.SUBPROCESS.equals(((MActivity) ((VActivity) targetcell).getBpmnElement()).getActivityType())))
 			if (!(targetcell instanceof VActivity) ||
-			   !(MBpmnModel.TASK.equals(((MActivity) ((VActivity) targetcell).getBpmnElement()).getActivityType()) ||
+			   !(((VActivity) targetcell).getBpmnElement() instanceof MTask ||
 				 MBpmnModel.SUBPROCESS.equals(((MActivity) ((VActivity) targetcell).getBpmnElement()).getActivityType())))
 			{
 				modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);

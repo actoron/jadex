@@ -11,6 +11,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 
 import java.util.HashSet;
 import java.util.List;
@@ -235,15 +236,24 @@ public class SValidation
 		{
 			MActivity sact = (MActivity) ((VActivity) source).getBpmnElement();
 			MActivity tact = (MActivity) ((VActivity) target).getBpmnElement();
+//			if (((sact.getActivityType().startsWith("Event") &&
+//				sact.getActivityType().endsWith("Message") &&
+//				sact.isThrowing() &&
+//				tact.getActivityType().startsWith("Event") &&
+//				tact.getActivityType().endsWith("Message") &&
+//				!tact.isThrowing()) ||
+//				MBpmnModel.TASK.equals(sact.getActivityType()) &&
+//				MBpmnModel.TASK.equals(tact.getActivityType())) ||
+//				SValidation.areMessageEventsConnectable(source, target))
 			if (((sact.getActivityType().startsWith("Event") &&
-				sact.getActivityType().endsWith("Message") &&
-				sact.isThrowing() &&
-				tact.getActivityType().startsWith("Event") &&
-				tact.getActivityType().endsWith("Message") &&
-				!tact.isThrowing()) ||
-				MBpmnModel.TASK.equals(sact.getActivityType()) &&
-				MBpmnModel.TASK.equals(tact.getActivityType())) ||
-				SValidation.areMessageEventsConnectable(source, target))
+					sact.getActivityType().endsWith("Message") &&
+					sact.isThrowing() &&
+					tact.getActivityType().startsWith("Event") &&
+					tact.getActivityType().endsWith("Message") &&
+					!tact.isThrowing()) ||
+					sact instanceof MTask &&
+					tact instanceof MTask) ||
+					SValidation.areMessageEventsConnectable(source, target))
 			{
 				return null;
 			}
