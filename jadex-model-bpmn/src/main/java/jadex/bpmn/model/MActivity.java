@@ -45,6 +45,10 @@ public class MActivity extends MAssociationTarget
 	/** Is service constant. */
 	public static final String ISSERVICE = "isService";
 	
+	/** Constant for the return parameter name. */
+	public static final String ISSEQUENTIAL = "isSequential";
+
+	
 	//-------- attributes --------
 	
 	/** The lane description. */

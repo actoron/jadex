@@ -1242,6 +1242,8 @@ public class ProcessThread	implements ITaskContext
 				thread.getInstance().getActivityHandler(act).cancel(act, thread.getInstance(), thread);
 			}
 			thread.setActivity(null);
+			// Notify the thread itself that it has finished
+			thread.notifyFinished();
 			
 			boolean rem = getSubthreads().remove(thread);
 //			thread.setThreadContext(null);
@@ -1490,6 +1492,13 @@ public class ProcessThread	implements ITaskContext
 		this.loopcmd = loopcmd;
 	}
 
+	/**
+	 *  Method that can be used to determine (override) that the thread is finished.
+	 */
+	public void notifyFinished()
+	{
+	}
+	
 	/**
 	 *  Create a string representation of this process thread.
 	 *  @return A string representation of this process thread.

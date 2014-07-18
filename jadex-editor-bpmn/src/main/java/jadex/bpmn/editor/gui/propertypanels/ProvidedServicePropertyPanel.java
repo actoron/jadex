@@ -198,6 +198,28 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 			}
 		});
 		
+		if(vact.getMActivity().isEventHandler())
+		{
+			final JCheckBox cbs = pp.createCheckBox("Sequential result execution: ");
+			cbs.setEnabled(true);
+			cbs.setSelected(vact.getMActivity().hasProperty(MActivity.ISSEQUENTIAL));
+			
+			cbs.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if(cbs.isSelected())
+					{
+						vact.getMActivity().setProperty(MActivity.ISSEQUENTIAL, "true", true);
+					}
+					else
+					{
+						vact.getMActivity().setProperty(MActivity.ISSEQUENTIAL, null, true);
+					}
+				}
+			});
+		}
+		
 //		tfreturn = pp.createTextField("Return value:");
 //		tfreturn.setEditable(true);
 //		

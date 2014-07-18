@@ -30,6 +30,7 @@
       <semantic:extensionElements>
         <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
         <jadex:property name="isService">&quot;true&quot;</jadex:property>
+        <jadex:property name="isSequential">&quot;true&quot;</jadex:property>
       </semantic:extensionElements>
     </semantic:boundaryEvent>
     <semantic:startEvent id="3700sONKzCJbzaHJ">

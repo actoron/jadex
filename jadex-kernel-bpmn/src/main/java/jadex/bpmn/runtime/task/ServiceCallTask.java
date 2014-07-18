@@ -286,44 +286,93 @@ public class ServiceCallTask implements ITask
 					}
 				}
 				
-				final MActivity fhandler = handler;
-				((IIntermediateFuture<Object>)val).addResultListener(new IntermediateDefaultResultListener<Object>()
+				if(handler!=null)
 				{
-					protected List<Object> results;
-					public void intermediateResultAvailable(Object result)
+					final boolean isseq = handler.hasProperty(MActivity.ISSEQUENTIAL);
+					final List<ProcessThread> queue = isseq? new ArrayList<ProcessThread>(): null;
+					final MActivity fhandler = handler;
+					((IIntermediateFuture<Object>)val).addResultListener(new IntermediateDefaultResultListener<Object>()
 					{
-						if(fhandler!=null)
+						protected List<Object> results;
+						boolean finished = false;
+						int opencalls = 0; 
+						
+						public void intermediateResultAvailable(Object result)
 						{
-							// Hack! Need to start threads from 'user' task. Should be done in a handler.
-							BpmnInterpreter ip = (BpmnInterpreter)process;
-							ProcessThread th = (ProcessThread)context;
-							ProcessThread pat = th.getParent();
-							ProcessThread thread = new ProcessThread(fhandler, pat, ip);
-							thread.setParameterValue(MActivity.RETURNPARAM, result);
-							pat.addThread(thread);
+							opencalls++;
+							
+							if(fhandler!=null)
+							{
+								// Hack! Need to start threads from 'user' task. Should be done in a handler.
+								BpmnInterpreter ip = (BpmnInterpreter)process;
+								ProcessThread th = (ProcessThread)context;
+								ProcessThread pat = th.getParent();
+								ProcessThread thread = new ProcessThread(fhandler, pat, ip)
+								{
+									public void notifyFinished() 
+									{
+										opencalls--;
+										
+										if(isseq)
+										{
+											queue.remove(this);
+											ProcessThread next = queue.size()>0? queue.get(0): null;
+											if(next!=null)
+											{
+												next.setWaiting(false);
+											}
+											else if(opencalls==0 && finished)
+											{
+												if(fresultparam!=null)
+													context.setParameterValue(fresultparam, results);
+												ret.setResult(null);
+											}
+										}
+									}
+								};
+								
+								thread.setParameterValue(MActivity.RETURNPARAM, result);
+								pat.addThread(thread);
+								
+//								System.out.println("queue: "+queue);
+								if(isseq)
+								{
+									// Set waiting if not first thread
+									if(queue.size()>0)
+									{	
+										thread.setWaiting(true);
+									}
+									queue.add(thread);
+								}
+							}
+							else
+							{
+								// no handler added, ie. collect values and wait for finished
+								if(results==null)
+									results = new ArrayList<Object>();
+								results.add(result);
+							}
 						}
-						else
+						
+						public void finished()
 						{
-							if(results==null)
-								results = new ArrayList<Object>();
-							results.add(result);
+							finished = true;
+							if(opencalls==0)
+							{
+								if(fresultparam!=null)
+									context.setParameterValue(fresultparam, results);
+								ret.setResult(null);
+							}
 						}
-					}
-					
-					public void finished()
-					{
-						if(fresultparam!=null)
-							context.setParameterValue(fresultparam, results);
-						ret.setResult(null);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
 			}
-			if(val instanceof IFuture)
+			else if(val instanceof IFuture)
 			{
 				((IFuture<Object>)val).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 				{
