@@ -45,8 +45,11 @@ public class MActivity extends MAssociationTarget
 	/** Is service constant. */
 	public static final String ISSERVICE = "isService";
 	
-	/** Constant for the return parameter name. */
+	/** Constant for the sequential result execution mode . */
 	public static final String ISSEQUENTIAL = "isSequential";
+
+	/** Constant for the result param name. */
+	public static final String RESULTNAME = "resultName";
 
 	
 	//-------- attributes --------

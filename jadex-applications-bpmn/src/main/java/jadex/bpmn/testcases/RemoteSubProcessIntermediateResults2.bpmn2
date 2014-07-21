@@ -103,6 +103,7 @@
         <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
         <jadex:property name="isService">&quot;true&quot;</jadex:property>
         <jadex:property name="isSequential">&quot;true&quot;</jadex:property>
+        <jadex:property name="resultName">out</jadex:property>
       </semantic:extensionElements>
     </semantic:boundaryEvent>
     <semantic:task name="result" id="_JQERAUEOEeGYyvkANn-TCw">

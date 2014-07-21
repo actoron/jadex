@@ -3,8 +3,10 @@ package jadex.bpmn.editor.gui.propertypanels;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.gui.PropertiesPanel;
@@ -29,6 +31,7 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
@@ -66,7 +69,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 		}
 		else
 		{
-			add(createEndServicePanel(), BorderLayout.CENTER);
+			add(createEndServicePanel(container), BorderLayout.CENTER);
 //			refreshEnd();
 		}
 	}
@@ -173,7 +176,7 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 	/**
 	 * 
 	 */
-	protected JPanel createEndServicePanel()
+	protected JPanel createEndServicePanel(ModelContainer container)
 	{
 		PropertiesPanel pp = new PropertiesPanel();
 
@@ -218,6 +221,27 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 					}
 				}
 			});
+			
+			MIdElement pa = container.getBpmnModel().getParent(vact.getMActivity());
+//			if(pa instanceof MSubProcess)
+			{
+				final JTextField tfn = pp.createTextField("Result parameter name: ");
+				tfn.setEditable(true);
+				if(vact.getMActivity().hasProperty(MActivity.RESULTNAME))
+				{
+					String name = vact.getMActivity().getPropertyValueString(MActivity.RESULTNAME);
+					tfn.setText(name);
+				}
+				
+				tfn.getDocument().addDocumentListener(new DocumentAdapter()
+				{
+					public void update(DocumentEvent e)
+					{
+						String txt = tfn.getText();
+						vact.getMActivity().setProperty(MActivity.RESULTNAME, txt.length()==0? null: txt, false);
+					}
+				});
+			}
 		}
 		
 //		tfreturn = pp.createTextField("Return value:");

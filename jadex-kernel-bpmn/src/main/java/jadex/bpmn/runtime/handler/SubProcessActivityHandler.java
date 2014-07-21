@@ -304,8 +304,15 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 										
 										if(act.isMessageEvent())
 										{
-											// todo: check if reacts to return val
-											handler = act;
+											String trig = null;
+											if(act.hasProperty(MActivity.RESULTNAME))
+											{
+												trig = (String)act.getPropertyValueString(MActivity.RESULTNAME);
+											}
+											if(trig == null || param.equals(trig))
+											{
+												handler = act;
+											}
 										}
 										else
 										{
@@ -319,21 +326,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 											   (trig == null || param.equals(trig)))
 											{
 												handler = act;
-												ProcessThread newthread	= thread.createCopy();
-												updateParameters(newthread);
-												// todo: allow this, does not work because handler is used for waiting for service calls!
-	//											newthread.setActivity(act);
-												newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
-												thread.getParent().addThread(newthread);
-												
-	//											ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-	//												thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
-	//											instance.notifyListeners(cce);
-												
-//												if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-//												{
-//													instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
-//												}
 											}
 										}
 									}
@@ -357,6 +349,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 									{
 										newthread.setLastEdge((MSequenceEdge)handler.getOutgoingSequenceEdges().get(0));
 									}
+									
 									thread.getParent().addThread(newthread);
 								}
 								
