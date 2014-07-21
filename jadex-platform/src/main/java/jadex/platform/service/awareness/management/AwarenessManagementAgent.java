@@ -86,13 +86,13 @@ import java.util.TimerTask;
 	/* if[android]
 	@ComponentType(name = "Bluetooth", filename = "jadex/platform/service/awareness/discovery/bluetoothp2p/BluetoothP2PDiscoveryAgent.class"),
 	end[android]*/
-	@ComponentType(name="Broadcast", filename="jadex/platform/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
-	@ComponentType(name="Multicast", filename="jadex/platform/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
-	@ComponentType(name="Scanner", filename="jadex/platform/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
-	@ComponentType(name="Registry", filename="jadex/platform/service/awareness/discovery/registry/RegistryDiscoveryAgent.class"),
-	@ComponentType(name="Message", filename="jadex/platform/service/awareness/discovery/message/MessageDiscoveryAgent.class"),
-	@ComponentType(name="Relay", filename="jadex/platform/service/awareness/discovery/relay/RelayDiscoveryAgent.class"),
-	@ComponentType(name="Local", filename="jadex/platform/service/awareness/discovery/local/LocalDiscoveryAgent.class")
+	@ComponentType(name="broadcast", filename="jadex/platform/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
+	@ComponentType(name="multicast", filename="jadex/platform/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
+	@ComponentType(name="scanner", filename="jadex/platform/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
+	@ComponentType(name="registry", filename="jadex/platform/service/awareness/discovery/registry/RegistryDiscoveryAgent.class"),
+	@ComponentType(name="message", filename="jadex/platform/service/awareness/discovery/message/MessageDiscoveryAgent.class"),
+	@ComponentType(name="relay", filename="jadex/platform/service/awareness/discovery/relay/RelayDiscoveryAgent.class"),
+	@ComponentType(name="local", filename="jadex/platform/service/awareness/discovery/local/LocalDiscoveryAgent.class")
 })
 /**@Configurations(
 {
@@ -227,7 +227,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 							while(stok.hasMoreTokens())
 							{
 	//							System.out.println("mecha: "+mechas[i]);
-								cms.createComponent(null, stok.nextToken(), info, null).addResultListener(lis);
+								String	mech	= stok.nextToken().toLowerCase();
+								cms.createComponent(mech, mech, info, null).addResultListener(lis);
 							}
 						}
 					});
