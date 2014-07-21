@@ -283,49 +283,127 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								String	param	= ((CMSIntermediateResultEvent)cse).getName();
 								Object	value	= ((CMSIntermediateResultEvent)cse).getValue();
 								
-								// Only set result value in thread when out parameter exists.
 								if(activity.getParameters()!=null && activity.getParameters().get(param)!=null)
 								{
 									String	dir	= activity.getParameters().get(param).getDirection();
 									if(MParameter.DIRECTION_INOUT.equals(dir) || MParameter.DIRECTION_OUT.equals(dir))
 									{
 										thread.setParameterValue(param, value);
-
-										// Todo: event handlers should also react to internal subprocesses???
-										List<MActivity> handlers = activity.getEventHandlers();
-										if(handlers!=null)
-										{
-											for(int i=0; i<handlers.size(); i++)
-											{
-												MActivity act = handlers.get(i);
-												String trig = null;
-												if (act.hasProperty(MBpmnModel.SIGNAL_EVENT_TRIGGER))
-												{
-													trig = (String) thread.getPropertyValue(MBpmnModel.SIGNAL_EVENT_TRIGGER, act);
-												}
-												if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL) &&
-												   (trig == null || param.equals(trig)))
-												{
-													ProcessThread newthread	= thread.createCopy();
-													updateParameters(newthread);
-													// todo: allow this, does not work because handler is used for waiting for service calls!
-//													newthread.setActivity(act);
-													newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
-													thread.getParent().addThread(newthread);
-													
-//													ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-//														thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
-//													instance.notifyListeners(cce);
-													
-													if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-													{
-														instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
-													}
-												}
-											}
-										}									
 									}
-								}								
+								}
+								
+								// Todo: event handlers should also react to internal subprocesses???
+								List<MActivity> handlers = activity.getEventHandlers();
+								
+								MActivity handler = null;
+								if(handlers!=null)
+								{
+									for(int i=0; i<handlers.size() && handler==null; i++)
+									{
+										MActivity act = handlers.get(i);
+										
+										if(act.isMessageEvent())
+										{
+											// todo: check if reacts to return val
+											handler = act;
+										}
+										else
+										{
+											String trig = null;
+											if(act.hasProperty(MBpmnModel.SIGNAL_EVENT_TRIGGER))
+											{
+												trig = (String)thread.getPropertyValue(MBpmnModel.SIGNAL_EVENT_TRIGGER, act);
+											}
+											
+											if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL) &&
+											   (trig == null || param.equals(trig)))
+											{
+												handler = act;
+												ProcessThread newthread	= thread.createCopy();
+												updateParameters(newthread);
+												// todo: allow this, does not work because handler is used for waiting for service calls!
+	//											newthread.setActivity(act);
+												newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
+												thread.getParent().addThread(newthread);
+												
+	//											ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
+	//												thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
+	//											instance.notifyListeners(cce);
+												
+//												if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//												{
+//													instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+//												}
+											}
+										}
+									}
+								}		
+
+								if(handler!=null)
+								{
+									ProcessThread newthread	= thread.createCopy();
+									updateParameters(newthread);
+									
+									// todo: allow this, does not work because handler is used for waiting for service calls!
+									if(handler.isMessageEvent())
+									{
+										newthread.setActivity(handler);
+										if(handler.hasParameter(MActivity.RETURNPARAM))
+										{
+											newthread.setParameterValue(MActivity.RETURNPARAM, value);
+										}
+									}
+									else
+									{
+										newthread.setLastEdge((MSequenceEdge)handler.getOutgoingSequenceEdges().get(0));
+									}
+									thread.getParent().addThread(newthread);
+								}
+								
+//								// Only set result value in thread when out parameter exists.
+//								if(activity.getParameters()!=null && activity.getParameters().get(param)!=null)
+//								{
+//									String	dir	= activity.getParameters().get(param).getDirection();
+//									if(MParameter.DIRECTION_INOUT.equals(dir) || MParameter.DIRECTION_OUT.equals(dir))
+//									{
+//										thread.setParameterValue(param, value);
+//
+//										// Todo: event handlers should also react to internal subprocesses???
+//										List<MActivity> handlers = activity.getEventHandlers();
+//										if(handlers!=null)
+//										{
+//											for(int i=0; i<handlers.size(); i++)
+//											{
+//												MActivity act = handlers.get(i);
+//												String trig = null;
+//												if(act.hasProperty(MBpmnModel.SIGNAL_EVENT_TRIGGER))
+//												{
+//													trig = (String) thread.getPropertyValue(MBpmnModel.SIGNAL_EVENT_TRIGGER, act);
+//												}
+//												
+//												if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL) &&
+//												   (trig == null || param.equals(trig)))
+//												{
+//													ProcessThread newthread	= thread.createCopy();
+//													updateParameters(newthread);
+//													// todo: allow this, does not work because handler is used for waiting for service calls!
+////													newthread.setActivity(act);
+//													newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
+//													thread.getParent().addThread(newthread);
+//													
+////													ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
+////														thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
+////													instance.notifyListeners(cce);
+//													
+//													if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//													{
+//														instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+//													}
+//												}
+//											}
+//										}									
+//									}
+//								}								
 							}
 						}
 						
