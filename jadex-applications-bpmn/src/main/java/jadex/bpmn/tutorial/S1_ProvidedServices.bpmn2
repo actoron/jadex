@@ -79,7 +79,7 @@
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
           <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service C - method 3&quot;</jadex:parameter>
-          <jadex:parameter direction="inout" name="cnt" type="">cnt==null? 0: cnt+1</jadex:parameter>
+          <jadex:parameter direction="inout" name="cnt" type="">0</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
       <semantic:intermediateThrowEvent id="CM2YXVq9jNbjX/vx">
@@ -160,6 +160,9 @@
         <jadex:dataFlowValueMapping>param0+param1</jadex:dataFlowValueMapping>
       </jadex:dataFlow>
       <jadex:dataFlow id="kbJosNYbUy5svUwk" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="CM2YXVq9jNbjX/vx" targetParam="returnparam"/>
+      <jadex:dataFlow id="AWxOGZe8V1sQ8gBC" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="/09zsgGkEnkWC1wR" targetParam="text">
+        <jadex:dataFlowValueMapping>cnt+1</jadex:dataFlowValueMapping>
+      </jadex:dataFlow>
       <jadex:dataFlow id="ccNv2FkqQgUnxFfC" sourceRef="HSjAxDflhY3JYSiV" sourceParam="text" targetRef="m5vdqhI00xqP2LF7" targetParam=""/>
     </semantic:extensionElements>
   </semantic:process>
@@ -241,6 +244,10 @@
       <bpmndi:BPMNEdge bpmnElement="MgwEUOGUo3I7MySH">
       </bpmndi:BPMNEdge>
       <di:Edge type="data" jadexElement="kbJosNYbUy5svUwk">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="AWxOGZe8V1sQ8gBC">
+        <di:waypoint x="330.0" y="300.0"/>
+        <di:waypoint x="140.0" y="300.0"/>
       </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="4DdtrGFKVof6uS49">
       </bpmndi:BPMNEdge>
