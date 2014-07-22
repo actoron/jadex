@@ -239,7 +239,7 @@ public abstract class AbstractSendTask implements ISendTask
 			ITransport transport = (ITransport)getTransports().get(i);
 			for(String address: addresses)
 			{
-				if(transport.isApplicable(address) && transport.isNonFunctionalSatisfied(getNonFunctionalProperties()))
+				if(transport.isApplicable(address) && transport.isNonFunctionalSatisfied(getNonFunctionalProperties(), address))
 				{
 					interest++;
 					sendpairs.add(new Tuple2<ITransport, String>(transport, address));
