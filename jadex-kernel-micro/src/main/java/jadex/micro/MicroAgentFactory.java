@@ -3,12 +3,14 @@ package jadex.micro;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
@@ -21,6 +23,7 @@ import jadex.kernelbase.IBootstrapFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -341,6 +344,17 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		return new Future<String>(model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null);
 	}
 	
+	/**
+	 *  Get the component features for a model.
+	 *  @param model The component model.
+	 *  @return The component features.
+	 */
+	public IFuture<Collection<IComponentFeature>> getComponentFeatures(IModelInfo model)
+	{
+		// Todo: kernel-specific features.
+		return new Future<Collection<IComponentFeature>>(SComponentFactory.DEFAULT_FEATURES);
+	}
+
 //	/**
 //	 * Create a component interpreter.
 //	 * @param model The component model.

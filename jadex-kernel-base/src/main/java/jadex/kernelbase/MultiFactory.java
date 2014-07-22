@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IService;
@@ -26,6 +27,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.IFilter;
@@ -567,44 +569,45 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		return Collections.EMPTY_MAP;
 	}
 
+//	/**
+//	 * Create a component instance.
+//	 * 
+//	 * @param factory	The component adapter factory.
+//	 * @param model	The component model.
+//	 * @param config	The name of the configuration (or null for default configuration)
+//	 * @param arguments	The arguments for the component as name/value pairs.
+//	 * @param parent	The parent component (if any).
+//	 * @return An instance of a component and the corresponding adapter.
+//	 */
+//	@Excluded
+//	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
+//			final IPlatformComponentFactory factory, final IModelInfo model, final String config,
+//			final Map<String, Object> arguments, final IExternalAccess parent,
+//			final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
+//			final IPersistInfo persistinfo,
+//			final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret)
+//	{
 	/**
-	 * Create a component instance.
-	 * 
-	 * @param factory
-	 *            The component adapter factory.
-	 * @param model
-	 *            The component model.
-	 * @param config
-	 *            The name of the configuration (or null for default
-	 *            configuration)
-	 * @param arguments
-	 *            The arguments for the component as name/value pairs.
-	 * @param parent
-	 *            The parent component (if any).
-	 * @return An instance of a component and the corresponding adapter.
+	 *  Get the component features for a model.
+	 *  @param model The component model.
+	 *  @return The component features.
 	 */
-	@Excluded
-	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
-			final IPlatformComponentFactory factory, final IModelInfo model, final String config,
-			final Map<String, Object> arguments, final IExternalAccess parent,
-			final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
-			final IPersistInfo persistinfo,
-			final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret)
+	public IFuture<Collection<IComponentFeature>> getComponentFeatures(final IModelInfo model)
 	{
 //		System.out.println("createComponentInstance: "+model.getName());
 		
 //		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
 		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model.getFilename(), factorycache);
 		if(fac != null)
-			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, ret);
+			return fac.getComponentFeatures(model);
 		
-		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>> res = new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
+		final Future<Collection<IComponentFeature>> res = new Future<Collection<IComponentFeature>>();
 		
 		findKernel(model.getFilename(), null, model.getResourceIdentifier()).addResultListener(ia.createResultListener(new DelegationResultListener(res)
 		{
 			public void customResultAvailable(Object result)
 			{
-				((IComponentFactory)result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, ret).addResultListener(new DelegationResultListener(res));
+				((IComponentFactory)result).getComponentFeatures(model).addResultListener(new DelegationResultListener(res));
 			}
 		}));
 		return res;

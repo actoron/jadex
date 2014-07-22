@@ -4,9 +4,14 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.impl.ArgumentsComponentFeature;
+import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.component.impl.SubcomponentsComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentFactorySelector;
+import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -17,7 +22,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -29,6 +36,23 @@ import java.util.Map;
  */
 public class SComponentFactory
 {
+	//-------- todo: move somewhere else? --------
+	
+	/** The default component features. */
+	public static final Collection<IComponentFeature>	DEFAULT_FEATURES;
+	
+	static
+	{
+		Collection<IComponentFeature>	def_features	= new ArrayList<IComponentFeature>();
+		def_features.add(new ExecutionComponentFeature());
+		def_features.add(new ArgumentsComponentFeature());
+		def_features.add(new ProvidedServicesComponentFeature());
+		def_features.add(new SubcomponentsComponentFeature());
+		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
+	}
+	
+	//-------- methods --------
+	
 	/**
 	 * Load an component model.
 	 * @param model The model.

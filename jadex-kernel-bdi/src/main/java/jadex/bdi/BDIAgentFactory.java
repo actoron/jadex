@@ -9,12 +9,11 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -22,9 +21,8 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
@@ -44,10 +42,9 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -253,86 +250,97 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	//-------- IAgentFactory interface --------
 	
 	/**
-	 * Create a component instance.
-	 * @param adapter The component adapter.
-	 * @param model The component model.
-	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the agent as name/value pairs.
-	 * @param parent The parent component (if any).
-	 * @return An instance of a component.
+	 *  Get the component features for a model.
+	 *  @param model The component model.
+	 *  @return The component features.
 	 */
-	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IPlatformComponentFactory factory, final IModelInfo modelinfo, 
-		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, boolean persist,
-		final IPersistInfo persistinfo,
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
+	public IFuture<Collection<IComponentFeature>> getComponentFeatures(IModelInfo model)
 	{
-//		System.out.println("create: "+modelinfo.getFilename());
-		
-		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>> ret = new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
-		
-		if(libservice!=null)
-		{
-			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
-				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInterpreter, IComponentAdapter>>(ret)
-			{
-				public void customResultAvailable(ClassLoader cl)
-				{
-					try
-					{
-				//		OAVAgentModel amodel = (OAVAgentModel)model;
-						OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
-							new Object[]{modelinfo.getResourceIdentifier(), root});
-						
-						// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-						OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
-				//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
-						tmodel.addTypeModel(amodel.getState().getTypeModel());
-						tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-						IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
-						state.addSubstate(amodel.getState());
-						
-//						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
-						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init);
-						ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
-					}
-					catch(Exception e)
-					{
-						ret.setException(e);
-					}
-				}
-			});
-		}
-		
-		// For platform bootstrapping
-		else
-		{
-			try
-			{
-				ClassLoader cl = getClass().getClassLoader();
-		//		OAVAgentModel amodel = (OAVAgentModel)model;
-				OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
-					new Object[]{modelinfo.getResourceIdentifier(), root});
-				
-				// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-				OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
-		//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
-				tmodel.addTypeModel(amodel.getState().getTypeModel());
-				tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-				IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
-				state.addSubstate(amodel.getState());
-				
-//				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
-				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init);
-				ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
-		}
-		
-		return ret;
+		// Todo: kernel-specific features.
+		return new Future<Collection<IComponentFeature>>(SComponentFactory.DEFAULT_FEATURES);
 	}
+
+//	/**
+//	 * Create a component instance.
+//	 * @param adapter The component adapter.
+//	 * @param model The component model.
+//	 * @param config The name of the configuration (or null for default configuration) 
+//	 * @param arguments The arguments for the agent as name/value pairs.
+//	 * @param parent The parent component (if any).
+//	 * @return An instance of a component.
+//	 */
+//	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IPlatformComponentFactory factory, final IModelInfo modelinfo, 
+//		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, boolean persist,
+//		final IPersistInfo persistinfo,
+//		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
+//	{
+////		System.out.println("create: "+modelinfo.getFilename());
+//		
+//		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>> ret = new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
+//		
+//		if(libservice!=null)
+//		{
+//			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
+//				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInterpreter, IComponentAdapter>>(ret)
+//			{
+//				public void customResultAvailable(ClassLoader cl)
+//				{
+//					try
+//					{
+//				//		OAVAgentModel amodel = (OAVAgentModel)model;
+//						OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
+//							new Object[]{modelinfo.getResourceIdentifier(), root});
+//						
+//						// Create type model for agent instance (e.g. holding dynamically loaded java classes).
+//						OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
+//				//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
+//						tmodel.addTypeModel(amodel.getState().getTypeModel());
+//						tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+//						IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
+//						state.addSubstate(amodel.getState());
+//						
+////						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
+//						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init);
+//						ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
+//					}
+//					catch(Exception e)
+//					{
+//						ret.setException(e);
+//					}
+//				}
+//			});
+//		}
+//		
+//		// For platform bootstrapping
+//		else
+//		{
+//			try
+//			{
+//				ClassLoader cl = getClass().getClassLoader();
+//		//		OAVAgentModel amodel = (OAVAgentModel)model;
+//				OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
+//					new Object[]{modelinfo.getResourceIdentifier(), root});
+//				
+//				// Create type model for agent instance (e.g. holding dynamically loaded java classes).
+//				OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
+//		//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
+//				tmodel.addTypeModel(amodel.getState().getTypeModel());
+//				tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+//				IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
+//				state.addSubstate(amodel.getState());
+//				
+////				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
+//				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init);
+//				ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	// Needed for gpmn factory
 	/**

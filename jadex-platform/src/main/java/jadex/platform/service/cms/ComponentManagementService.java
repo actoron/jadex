@@ -13,6 +13,8 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
@@ -99,8 +101,8 @@ public class ComponentManagementService implements IComponentManagementService
 	/** The logger. */
 	protected Logger logger;
 
-	/** The components (id->component adapter). */
-	protected Map<IComponentIdentifier, IPlatformComponentAccess> adapters;
+	/** The components (id->component). */
+	protected Map<IComponentIdentifier, IInternalAccess> components;
 	
 	/** The cleanup commands for the components (component id -> cleanup command). */
 	protected Map<IComponentIdentifier, CleanupCommand> ccs;
@@ -172,7 +174,7 @@ public class ComponentManagementService implements IComponentManagementService
 		this.persist	= persist;
 		this.uniqueids = uniqueids;
 		
-		this.adapters = SCollection.createHashMap();
+		this.components = SCollection.createHashMap();
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
 //		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");
@@ -541,11 +543,6 @@ public class ComponentManagementService implements IComponentManagementService
 												factory.loadModel(model, cinfo.getImports(), rid)
 													.addResultListener(createResultListener(new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier>(inited)
 												{
-													public void exceptionOccurred(Exception exception)
-													{
-														super.exceptionOccurred(exception);
-													}
-														
 													public void customResultAvailable(final IModelInfo lmodel)
 													{
 														if(lmodel.getReport()!=null)
@@ -564,33 +561,13 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 																	final ComponentIdentifier cid;
 																	
-																	final IPlatformComponentAccess pad = getParentAdapter(cinfo);
-																	IExternalAccess parent = pad.getInternalAccess().getExternalAccess();
+																	final IInternalAccess pad = getParentComponent(cinfo);
+																	IExternalAccess parent = pad.getExternalAccess();
 					
 																	IComponentIdentifier pacid = parent.getComponentIdentifier();
 																	String paname = pacid.getName().replace('@', '.');
 																	
 																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname, addresses);
-																	
-//																	if(name!=null)
-//																	{
-//																		cid = new ComponentIdentifier(name+"@"+paname, addresses);
-//																		if(adapters.containsKey(cid) || initinfos.containsKey(cid))
-//																		{
-//		//																	de.printStackTrace();
-//																			inited.setException(new ComponentCreationException("Component "+cid+" already exists.", ComponentCreationException.REASON_COMPONENT_EXISTS, cid));
-//																			return;
-//		//																	throw new RuntimeException("Component "+cid+" already exists.");
-//																		}
-////																		if(msgservice!=null)
-////																		{
-////																			cid.setAddresses(msgservice.getAddresses());
-////																		}
-//																	}
-//																	else
-//																	{
-//																		cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname, addresses, lmodel.getName());
-//																	}
 																	
 																	initinfos.put(cid, new InitInfo(null, null, cinfo, null, resfut));
 																	
@@ -637,7 +614,7 @@ public class ComponentManagementService implements IComponentManagementService
 				//															ad.setState(IComponentDescription.STATE_SUSPENDED);
 																			
 					//														System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
-																			adapters.put(cid, adapter);
+																			components.put(cid, adapter);
 																			// Removed in resumeComponent()
 				//																initinfos.remove(cid);
 																			
@@ -747,7 +724,7 @@ public class ComponentManagementService implements IComponentManagementService
 																			{
 																				public void run()
 																				{
-																					adapters.remove(cid);
+																					components.remove(cid);
 																					removeInitInfo(cid);
 																					
 																					IntermediateResultListener reslis = resultlisteners.remove(cid);
@@ -791,48 +768,67 @@ public class ComponentManagementService implements IComponentManagementService
 																	}));
 																	
 																	// Create component and wakeup for init.
-																	// Use first configuration if no config specified.
-																	String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
-																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
-																						
+																	factory.getComponentFeatures(lmodel)
+																		.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeature>, IComponentIdentifier>(inited)
+																	{
+																		public void customResultAvailable(Collection<IComponentFeature> features)
+																		{
+																			// Use first configuration if no config specified.
+																			String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
+																				: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
+																			ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, realtime, copy);
+																			IPlatformComponentAccess	component	= new PlatformComponent();
+																			
+																			// Run init on component thread (hack!!! assumes that execution features works before init)
+																			IExecutionFeature exe	= component.getInternalAccess().getComponentFeature(IExecutionFeature.class);
+																			exe.scheduleImmediate(new IComponentStep<Void>()
+																			{
+																				public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia)
+																				{
+																					component.init(cci, features).addResultListener(new ExceptionDelegationResultListener<Void, IComponentIdentifier>(inited));																					
+																				}
+																			});
+																		}
+																	});
+
 																	IPersistInfo persistinfo = null;
-//																	factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-//																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, persist, persistinfo, reslis, resfut)
-//																		.addResultListener(createResultListener(new IResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>>()
-//																	{
-//																		public void resultAvailable(Tuple2<IComponentInterpreter, IComponentAdapter> comp)
-//																		{
-//																			// Store (invalid) desc, adapter and info for children
-//																			// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
-//				//															System.out.println("infos: "+ad.getName());
-//																			InitInfo ii = getInitInfo(cid);
-//																			ii.setDescription(ad);
-//																			ii.setInfo(cinfo);
-//																			ii.setInstance(comp.getFirstEntity());
-//																			ii.setAdapter(comp.getSecondEntity());
-//																			ii.setModel(lmodel);
-//		//																	initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, resfut, comp.getFirstEntity()});
-//																			
-//																			try
-//																			{
-//																				// Start the init procedure by waking up the adapter.
-//																				getComponentAdapterFactory().initialWakeup(comp.getSecondEntity());
-//																			}
-//																			catch(RuntimeException e)
-//																			{
-//																				exceptionOccurred(e);
-//																			}
-//																		}
-//																		
-//																		public void exceptionOccurred(Exception exception)
-//																		{
-//																			// Init problem might be notified already in other future.
-//																			if(!resfut.isDone())
-//																			{
-//																				inited.setExceptionIfUndone(exception);
-//																			}
-//																		}
-//																	}));
+																	factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
+																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, persist, persistinfo, reslis, resfut)
+																		.addResultListener(createResultListener(new IResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>>()
+																	{
+																		public void resultAvailable(Tuple2<IComponentInterpreter, IComponentAdapter> comp)
+																		{
+																			// Store (invalid) desc, adapter and info for children
+																			// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
+				//															System.out.println("infos: "+ad.getName());
+																			InitInfo ii = getInitInfo(cid);
+																			ii.setDescription(ad);
+																			ii.setInfo(cinfo);
+																			ii.setInstance(comp.getFirstEntity());
+																			ii.setAdapter(comp.getSecondEntity());
+																			ii.setModel(lmodel);
+		//																	initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, resfut, comp.getFirstEntity()});
+																			
+																			try
+																			{
+																				// Start the init procedure by waking up the adapter.
+																				getComponentAdapterFactory().initialWakeup(comp.getSecondEntity());
+																			}
+																			catch(RuntimeException e)
+																			{
+																				exceptionOccurred(e);
+																			}
+																		}
+																		
+																		public void exceptionOccurred(Exception exception)
+																		{
+																			// Init problem might be notified already in other future.
+																			if(!resfut.isDone())
+																			{
+																				inited.setExceptionIfUndone(exception);
+																			}
+																		}
+																	}));
 //																}
 //															}));
 														}
@@ -874,7 +870,7 @@ public class ComponentManagementService implements IComponentManagementService
 							// Try to find file for local type.
 							String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
 							filename	= null;
-							IPlatformComponentAccess pad = getParentAdapter(cinfo);
+							IPlatformComponentAccess pad = getParentComponent(cinfo);
 							IExternalAccess parent = pad.getInternalAccess().getExternalAccess();
 							final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
 							for(int i=0; filename==null && i<subcomps.length; i++)
@@ -1151,14 +1147,13 @@ public class ComponentManagementService implements IComponentManagementService
 	}
 	
 	/**
-	 *  Get the adapter of the parent component.
+	 *  Get the parent component.
 	 */
-	protected IPlatformComponentAccess getParentAdapter(CreationInfo cinfo)
+	protected IInternalAccess getParentComponent(CreationInfo cinfo)
 	{
 		final IComponentIdentifier paid = getParentIdentifier(cinfo);
-		IPlatformComponentAccess adapter;
-		adapter = adapters.get(paid);
-		if(adapter==null)
+		IInternalAccess component	= components.get(paid);
+		if(component==null)
 		{
 			InitInfo	pinfo = getParentInfo(cinfo);
 			
@@ -1168,10 +1163,10 @@ public class ComponentManagementService implements IComponentManagementService
 				throw new ComponentTerminatedException(paid);
 			}
 			
-			adapter = pinfo.getAdapter();
+			component = pinfo.getComponent();
 		}
 		
-		return adapter;
+		return component;
 	}
 	
 //	/**
@@ -2550,7 +2545,7 @@ public class ComponentManagementService implements IComponentManagementService
 	{
 		Future<IComponentDescription[]> fut = new Future<IComponentDescription[]>();
 		
-		IComponentDescription[] ret = new IComponentDescription[adapters.size()];
+		IComponentDescription[] ret = new IComponentDescription[components.size()];
 		int i=0;
 //		for(Iterator<IComponentAdapter> it=adapters.values().iterator(); i<ret.length; i++)
 //		{
@@ -2578,7 +2573,7 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				IComponentIdentifier[] ret;
 				
-				ret = (IComponentIdentifier[])adapters.keySet().toArray(new IComponentIdentifier[adapters.size()]);
+				ret = (IComponentIdentifier[])components.keySet().toArray(new IComponentIdentifier[components.size()]);
 				
 				if(ret.length>0)
 				{
@@ -2745,7 +2740,7 @@ public class ComponentManagementService implements IComponentManagementService
 			platformname = agent.getComponentIdentifier().getName();
 		ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
 		
-		if(uniqueids || adapters.containsKey(ret) || initinfos.containsKey(ret))
+		if(uniqueids || components.containsKey(ret) || initinfos.containsKey(ret))
 		{
 			String key = localname+"@"+platformname;
 			
@@ -2763,7 +2758,7 @@ public class ComponentManagementService implements IComponentManagementService
 					ret = new ComponentIdentifier(localname+cnt+"@"+platformname, addresses); // Hack?!
 				}
 			}
-			while(adapters.containsKey(ret) || initinfos.containsKey(ret) || cfs.containsKey(ret));
+			while(components.containsKey(ret) || initinfos.containsKey(ret) || cfs.containsKey(ret));
 		}
 		
 		return ret;
@@ -2849,7 +2844,7 @@ public class ComponentManagementService implements IComponentManagementService
 														public void customResultAvailable(String[] addresses)
 														{
 															((ComponentIdentifier)agent.getComponentIdentifier()).setAddresses(addresses);
-															adapters.put(agent.getComponentIdentifier(), IPlatformComponentAccess.LOCAL.get());
+															components.put(agent.getComponentIdentifier(), agent);
 															ret.setResult(null);
 														}
 													}));
@@ -3248,13 +3243,11 @@ public class ComponentManagementService implements IComponentManagementService
 	{
 		//-------- attributes --------
 		
-		// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
-		
 		/** The component description. */
 		protected IComponentDescription description;
 		
-		/** The adapter. */
-		protected IPlatformComponentAccess adapter;
+		/** The component. */
+		protected IInternalAccess component;
 		
 		/** The creation info. */
 		protected CreationInfo info;
@@ -3265,24 +3258,20 @@ public class ComponentManagementService implements IComponentManagementService
 		/** The init future. */
 		protected Future<Void> initfuture;
 		
-//		/** The component instance. */
-//		protected IComponentInterpreter instance;
-
 		//-------- constructors --------
 		
 		/**
 		 *  Create a new init info.
 		 */
 		public InitInfo(IComponentDescription description,
-			IPlatformComponentAccess adapter, CreationInfo info, IModelInfo model,
+			IInternalAccess component, CreationInfo info, IModelInfo model,
 			Future<Void> initfuture)
 		{
 			this.description = description;
-			this.adapter = adapter;
+			this.component = component;
 			this.info = info;
 			this.model = model;
 			this.initfuture = initfuture;
-//			this.instance = instance;
 		}
 
 		//-------- methods --------
@@ -3297,31 +3286,13 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 
 		/**
-		 *  Set the description.
-		 *  @param description The description to set.
-		 */
-		public void setDescription(IComponentDescription description)
-		{
-			this.description = description;
-		}
-
-		/**
 		 *  Get the adapter.
 		 *  @return The adapter.
 		 */
-		public IPlatformComponentAccess getAdapter()
+		public IInternalAccess getComponent()
 		{
-			return adapter;
+			return component;
 		}
-//
-//		/**
-//		 *  Set the adapter.
-//		 *  @param adapter The adapter to set.
-//		 */
-//		public void setAdapter(IComponentAdapter adapter)
-//		{
-//			this.adapter = adapter;
-//		}
 
 		/**
 		 *  Get the info.
@@ -3330,15 +3301,6 @@ public class ComponentManagementService implements IComponentManagementService
 		public CreationInfo getInfo()
 		{
 			return info;
-		}
-
-		/**
-		 *  Set the info.
-		 *  @param info The info to set.
-		 */
-		public void setInfo(CreationInfo info)
-		{
-			this.info = info;
 		}
 
 		/**
@@ -3351,15 +3313,6 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 
 		/**
-		 *  Set the model.
-		 *  @param model The model to set.
-		 */
-		public void setModel(IModelInfo model)
-		{
-			this.model = model;
-		}
-
-		/**
 		 *  Get the initfuture.
 		 *  @return The initfuture.
 		 */
@@ -3367,33 +3320,6 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			return initfuture;
 		}
-
-		/**
-		 *  Set the initfuture.
-		 *  @param initfuture The initfuture to set.
-		 */
-		public void setInitFuture(Future<Void> initfuture)
-		{
-			this.initfuture = initfuture;
-		}
-
-//		/**
-//		 *  Get the instance.
-//		 *  @return The instance.
-//		 */
-//		public IComponentInterpreter getInstance()
-//		{
-//			return instance;
-//		}
-//
-//		/**
-//		 *  Set the instance.
-//		 *  @param instance The instance to set.
-//		 */
-//		public void setInstance(IComponentInterpreter instance)
-//		{
-//			this.instance = instance;
-//		}
 	}
 	
 	/**

@@ -11,16 +11,13 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
-import jadex.bridge.component.impl.ArgumentsComponentFeature;
-import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.component.impl.SubcomponentsComponentFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.SServiceProvider;
@@ -35,6 +32,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
+import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -46,7 +44,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,21 +59,6 @@ import java.util.logging.Logger;
  */
 public class Starter
 {
-	//-------- todo: move somewhere else? --------
-	
-	/** The default component features. */
-	public static final Collection<IComponentFeature>	DEFAULT_FEATURES;
-	
-	static
-	{
-		Collection<IComponentFeature>	def_features	= new ArrayList<IComponentFeature>();
-		def_features.add(new ExecutionComponentFeature());
-		def_features.add(new ArgumentsComponentFeature());
-		def_features.add(new ProvidedServicesComponentFeature());
-		def_features.add(new SubcomponentsComponentFeature());
-		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
-	}
-	
 	//-------- constants --------
 
 	/** The default platform configuration. */
@@ -524,8 +506,8 @@ public class Starter
 					boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
 	
 					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, realtime, copy);
-					
-					component.init(cci, DEFAULT_FEATURES).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+					Collection<IComponentFeature>	features	= cfac.getComponentFeatures(model).get();
+					component.init(cci, features).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
@@ -556,9 +538,10 @@ public class Starter
 					// Execute init steps of root component on main thread (i.e. platform)
 					// until platform is ready to run by itself.
 					boolean again = true;
+					IExecutable	ie	= (IExecutable)component.getInternalAccess().getComponentFeature(IExecutionFeature.class);
 					while(again && !ret.isDone())
 					{
-						again = component.executeStep();
+						again = ie.execute();
 						
 //						// When adapter not running, process open future notifications as if on platform thread.
 //						if(!again)

@@ -40,6 +40,12 @@ import java.util.logging.Logger;
  */
 public class PlatformComponent implements IPlatformComponentAccess, IInternalAccess
 {
+//	//-------- constants -------- 
+//	
+//	/** The currently executing component (if any). */
+//	// Provided for fast caller/callee context-switching avoiding to use cms.
+//	public static final ThreadLocal<IInternalAccess>	LOCAL	= new ThreadLocal<IInternalAccess>();
+//	
 	//-------- attributes --------
 	
 	/** The creation info. */
@@ -113,17 +119,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IInternalAccess	getInternalAccess()
 	{
 		return this;
-	}
-	
-	/**
-	 *  Execute a step of the component.
-	 *  Used for platform bootstrapping, until execution service is running.
-	 *  
-	 *  @return true, if component wants to be executed again. 
-	 */
-	public boolean executeStep()
-	{
-		return false;
 	}
 	
 	//-------- IInternalAccess interface --------

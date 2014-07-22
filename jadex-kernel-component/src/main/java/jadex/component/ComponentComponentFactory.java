@@ -1,33 +1,24 @@
 package jadex.component;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentInterpreter;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IPlatformComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.factory.IComponentFactoryExtensionService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.kernelbase.CacheableKernelModel;
 import jadex.kernelbase.IBootstrapFactory;
 
 import java.io.IOException;
@@ -285,65 +276,76 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	}
 	
 	/**
-	 * Create a component instance.
-	 * @param adapter The component adapter.
-	 * @param model The component model.
-	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the component as name/value pairs.
-	 * @param parent The parent component (if any).
-	 * @return An instance of a component.
+	 *  Get the component features for a model.
+	 *  @param model The component model.
+	 *  @return The component features.
 	 */
-	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IPlatformComponentFactory factory, 
-		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
-		final IPersistInfo persistinfo,
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
+	public IFuture<Collection<IComponentFeature>> getComponentFeatures(IModelInfo model)
 	{
-		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
-		
-		if(libservice!=null)
-		{
-			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
-				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInterpreter, IComponentAdapter>>(ret)
-			{
-				public void customResultAvailable(ClassLoader cl)
-				{
-					try
-					{
-						CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, 
-							new Object[]{modelinfo.getResourceIdentifier(), getServiceIdentifier().getProviderId().getRoot()});
-						ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, 
-							arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl);
-						ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
-					}
-					catch(Exception e)
-					{
-						ret.setException(e);
-					}
-}
-			});
-		}
-		
-		// For platform ootstrapping 
-		else
-		{
-			try
-			{
-				ClassLoader cl = getClass().getClassLoader();
-				CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, 
-					new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-				ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent,
-					arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl);
-				ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
-		}
-		
-		return ret;
+		// Todo: kernel-specific features.
+		return new Future<Collection<IComponentFeature>>(SComponentFactory.DEFAULT_FEATURES);
 	}
+	
+//	/**
+//	 * Create a component instance.
+//	 * @param adapter The component adapter.
+//	 * @param model The component model.
+//	 * @param config The name of the configuration (or null for default configuration) 
+//	 * @param arguments The arguments for the component as name/value pairs.
+//	 * @param parent The parent component (if any).
+//	 * @return An instance of a component.
+//	 */
+//	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IPlatformComponentFactory factory, 
+//		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, 
+//		final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
+//		final IPersistInfo persistinfo,
+//		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
+//	{
+//		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
+//		
+//		if(libservice!=null)
+//		{
+//			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
+//				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInterpreter, IComponentAdapter>>(ret)
+//			{
+//				public void customResultAvailable(ClassLoader cl)
+//				{
+//					try
+//					{
+//						CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, 
+//							new Object[]{modelinfo.getResourceIdentifier(), getServiceIdentifier().getProviderId().getRoot()});
+//						ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, 
+//							arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl);
+//						ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+//					}
+//					catch(Exception e)
+//					{
+//						ret.setException(e);
+//					}
+//}
+//			});
+//		}
+//		
+//		// For platform ootstrapping 
+//		else
+//		{
+//			try
+//			{
+//				ClassLoader cl = getClass().getClassLoader();
+//				CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, 
+//					new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
+//				ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent,
+//					arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl);
+//				ret.setResult(new Tuple2<IComponentInterpreter, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
+//		}
+//		
+//		return ret;
+//	}
 		
 	/**
 	 *  Test if a model can be loaded by the factory.

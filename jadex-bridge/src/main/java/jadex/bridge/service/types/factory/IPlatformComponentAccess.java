@@ -12,12 +12,6 @@ import java.util.Collection;
  */
 public interface IPlatformComponentAccess
 {
-	//-------- constants -------- 
-	
-	/** The currently executing component (if any). */
-	// Provided for fast caller/callee context-switching avoiding to use cms.
-	public static final ThreadLocal<IPlatformComponentAccess>	LOCAL	= new ThreadLocal<IPlatformComponentAccess>();
-	
 	//-------- methods --------
 	
 	/**
@@ -35,12 +29,4 @@ public interface IPlatformComponentAccess
 	 *  @return An internal access exposing user operations of the component.
 	 */
 	public IInternalAccess	getInternalAccess();
-	
-	/**
-	 *  Execute a step of the component.
-	 *  Used for platform bootstrapping, until execution service is running.
-	 *  
-	 *  @return true, if component wants to be executed again. 
-	 */
-	public boolean executeStep();
 }
