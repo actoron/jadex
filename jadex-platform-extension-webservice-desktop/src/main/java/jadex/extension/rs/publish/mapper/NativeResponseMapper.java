@@ -62,7 +62,7 @@ public class NativeResponseMapper implements IValueMapper
 		}
 		else if(o instanceof Exception)
 		{
-			if(isDebug())
+			if(!isProduction())
 			{
 				ret = Response.ok(SUtil.getExceptionStacktrace((Exception)o)).build();
 			}
@@ -96,15 +96,15 @@ public class NativeResponseMapper implements IValueMapper
 	/**
 	 *  Test if is in debug mode.
 	 */
-	protected boolean isDebug()
+	protected boolean isProduction()
 	{
 		boolean ret = false;
-		String debug = System.getProperty("EVDEBUG", System.getenv("EVDEBUG"));
-		if(debug!=null)
+		String pro = System.getProperty("production", System.getenv("production"));
+		if(pro!=null)
 		{
 			try
 			{
-				ret = Boolean.parseBoolean(debug);
+				ret = Boolean.parseBoolean(pro);
 			}
 			catch(Exception e)
 			{

@@ -108,7 +108,7 @@ public class StreamProviderAgent implements IStreamService
 	@SecureTransmission
 	public IFuture<Long> passSecureInputStream(IInputConnection con)
 	{
-		System.out.println("rec: "+con.getNonFunctionalProperties());
+//		System.out.println("rec: "+con.getNonFunctionalProperties());
 		Map<String, Object> props = con.getNonFunctionalProperties();
 		Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
 		if(sec==null || !sec.booleanValue())
