@@ -25,25 +25,25 @@ public class ProxyInfo
 	//-------- attributes --------
 	
 	/** The target class. */
-	protected List targetinterfaces;
+	protected List<Class<?>> targetinterfaces;
 		
 	/** The excluded methods. */
-	protected Set excluded;
+	protected Set<MethodInfo> excluded;
 	
 	/** The uncached methods. */
-	protected Set uncached;
+	protected Set<MethodInfo> uncached;
 
 	/** The synchronous methods. */
-	protected Set synchronous;
+	protected Set<MethodInfo> synchronous;
 	
 	/** The replacements for methods (method-info -> replacement method). */
-	protected Map replacements;
+	protected Map<MethodInfo, IMethodReplacement> replacements;
 	
 	/** The timeouts for methods (method-info -> long). */
-	protected Map timeouts;
+	protected Map<MethodInfo, Long> timeouts;
 	
 	/** The secure transport methods. */
-	protected Set secure;
+	protected Set<MethodInfo> secure;
 	
 	//-------- constructors --------
 	
@@ -57,7 +57,7 @@ public class ProxyInfo
 	/**
 	 *  Create a new proxy info.
 	 */
-	public ProxyInfo(Class[] targetinterfaces)
+	public ProxyInfo(Class<?>[] targetinterfaces)
 	{
 		setTargetInterfaces(targetinterfaces);
 	}
@@ -87,7 +87,7 @@ public class ProxyInfo
 	 *  Get the timeouts
 	 *  @return The timeouts.
 	 */
-	public Map getMethodTimeouts()
+	public Map<MethodInfo, Long> getMethodTimeouts()
 	{
 		return timeouts;
 	}
@@ -96,7 +96,7 @@ public class ProxyInfo
 	 *  Set the timeouts.
 	 *  @param timeouts	The timeouts.
 	 */
-	public void setMethodTimeouts(Map timeouts)
+	public void setMethodTimeouts(Map<MethodInfo, Long> timeouts)
 	{
 		this.timeouts = timeouts;
 	}
@@ -126,7 +126,7 @@ public class ProxyInfo
 	public void addMethodTimeout(MethodInfo m, long timeout)
 	{
 		if(timeouts==null)
-			timeouts = new HashMap();
+			timeouts = new HashMap<MethodInfo, Long>();
 		timeouts.put(m, Long.valueOf(timeout));
 	}
 		
@@ -134,7 +134,7 @@ public class ProxyInfo
 	 *  Get the replacements
 	 *  @return The replacements.
 	 */
-	public Map getMethodReplacements()
+	public Map<MethodInfo, IMethodReplacement> getMethodReplacements()
 	{
 		return replacements;
 	}
@@ -143,7 +143,7 @@ public class ProxyInfo
 	 *  Set the replacements.
 	 *  @param replacements	The replacements.
 	 */
-	public void setMethodReplacements(Map replacements)
+	public void setMethodReplacements(Map<MethodInfo, IMethodReplacement> replacements)
 	{
 		this.replacements = replacements;
 	}
@@ -154,7 +154,7 @@ public class ProxyInfo
 	public void addMethodReplacement(MethodInfo method, IMethodReplacement replacement)
 	{
 		if(replacements==null)
-			replacements = new HashMap();
+			replacements = new HashMap<MethodInfo, IMethodReplacement>();
 		replacements.put(method, replacement);
 	}
 	
@@ -185,7 +185,7 @@ public class ProxyInfo
 	 *  Get the target remote interfaces.
 	 *  @return the target remote interfaces.
 	 */
-	public Class[] getTargetInterfaces()
+	public Class<?>[] getTargetInterfaces()
 	{
 		return targetinterfaces==null? SUtil.EMPTY_CLASS_ARRAY: (Class[])targetinterfaces.toArray(new Class[targetinterfaces.size()]);
 	}
@@ -194,7 +194,7 @@ public class ProxyInfo
 	 *  Set the target remote interfaces.
 	 *  @param targetinterfaces The targetinterfaces to set.
 	 */
-	public void setTargetInterfaces(Class[] targetinterfaces)
+	public void setTargetInterfaces(Class<?>[] targetinterfaces)
 	{
 		if(this.targetinterfaces!=null)
 			this.targetinterfaces.clear();
@@ -211,13 +211,13 @@ public class ProxyInfo
 	 *  Add a target interface.
 	 *  @param targetinterface The target interface.
 	 */
-	public void addTargetInterface(Class targetinterface)
+	public void addTargetInterface(Class<?> targetinterface)
 	{
 		// Might be null, when class not available locally.
 		if(targetinterface!=null)
 		{
 			if(targetinterfaces==null)
-				targetinterfaces = new ArrayList();
+				targetinterfaces = new ArrayList<Class<?>>();
 			targetinterfaces.add(targetinterface);
 		}
 	}
@@ -226,7 +226,7 @@ public class ProxyInfo
 	 *  Get the excluded.
 	 *  @return the excluded.
 	 */
-	public Set getExcludedMethods()
+	public Set<MethodInfo> getExcludedMethods()
 	{
 		return excluded;
 	}
@@ -235,7 +235,7 @@ public class ProxyInfo
 	 *  Set the excluded.
 	 *  @param excluded The excluded to set.
 	 */
-	public void setExcludedMethods(Set excluded)
+	public void setExcludedMethods(Set<MethodInfo> excluded)
 	{
 		this.excluded = excluded;
 	}
@@ -247,7 +247,7 @@ public class ProxyInfo
 	public void addExcludedMethod(MethodInfo m)
 	{
 		if(excluded==null)
-			excluded = new HashSet();
+			excluded = new HashSet<MethodInfo>();
 		excluded.add(m);
 	}
 	
@@ -265,7 +265,7 @@ public class ProxyInfo
 	 *  Get the uncached.
 	 *  @return the uncached.
 	 */
-	public Set getUncachedMethods()
+	public Set<MethodInfo> getUncachedMethods()
 	{
 		return uncached;
 	}
@@ -274,7 +274,7 @@ public class ProxyInfo
 	 *  Set the uncached.
 	 *  @param uncached The uncached to set.
 	 */
-	public void setUncachedMethods(Set uncached)
+	public void setUncachedMethods(Set<MethodInfo> uncached)
 	{
 		this.uncached = uncached;
 	}
@@ -286,7 +286,7 @@ public class ProxyInfo
 	public void addUncachedMethod(MethodInfo m)
 	{
 		if(uncached==null)
-			uncached = new HashSet();
+			uncached = new HashSet<MethodInfo>();
 		uncached.add(m);
 	}
 	
@@ -304,7 +304,7 @@ public class ProxyInfo
 	 *  Get the synchronous.
 	 *  @return the synchronous.
 	 */
-	public Set getSynchronousMethods()
+	public Set<MethodInfo> getSynchronousMethods()
 	{
 		return synchronous;
 	}
@@ -313,7 +313,7 @@ public class ProxyInfo
 	 *  Set the synchronous.
 	 *  @param synchronous The synchronous to set.
 	 */
-	public void setSynchronousMethods(Set synchronous)
+	public void setSynchronousMethods(Set<MethodInfo> synchronous)
 	{
 		this.synchronous = synchronous;
 	}
@@ -325,7 +325,7 @@ public class ProxyInfo
 	public void addSynchronousMethod(MethodInfo m)
 	{
 		if(synchronous==null)
-			synchronous = new HashSet();
+			synchronous = new HashSet<MethodInfo>();
 		synchronous.add(m);
 	}
 	
@@ -343,7 +343,7 @@ public class ProxyInfo
 	 *  Get the secure.
 	 *  @return the secure.
 	 */
-	public Set getSecureMethods()
+	public Set<MethodInfo> getSecureMethods()
 	{
 		return secure;
 	}
@@ -352,7 +352,7 @@ public class ProxyInfo
 	 *  Set the secure.
 	 *  @param secure The secure to set.
 	 */
-	public void setSecureMethods(Set secure)
+	public void setSecureMethods(Set<MethodInfo> secure)
 	{
 		this.secure = secure;
 	}
@@ -364,7 +364,7 @@ public class ProxyInfo
 	public void addSecureMethod(MethodInfo m)
 	{
 		if(secure==null)
-			secure = new HashSet();
+			secure = new HashSet<MethodInfo>();
 		secure.add(m);
 	}
 	

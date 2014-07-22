@@ -371,7 +371,6 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 //			}
 //		}
 //        if(cnt>0)
-//        	System.out.println("hhhhttt");
         
 		JButton jlb = new JadexLogoButton(toolbar);
 		toolbar.addSeparator();
@@ -398,8 +397,6 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 //				cnt++;
 //			}
 //		}
-//        if(cnt>1)
-//        	System.out.println("hhhhttt");
         
 //        System.out.println("comps: "+toolbar.getComponentCount());
     }

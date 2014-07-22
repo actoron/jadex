@@ -238,15 +238,18 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 						for(Iterator<IComponentFactory> it=facts.iterator(); it.hasNext(); )
 						{
 							Object o = it.next();
+							// fixed bug in IMarshalService getRemoteInterfaces
 							if(!(o instanceof IComponentFactory))
 							{
-								System.out.println("debug: "+o);
-								SUtil.arrayToString("interfaces:"+o.getClass().getInterfaces());
+								System.out.println("Skipping component factory: "+o);
+								continue;
+//								System.out.println("debug: "+o);
+//								SUtil.arrayToString("interfaces:"+o.getClass().getInterfaces());
 							}
 							
 							IComponentFactory fac = (IComponentFactory)o;//it.next();
 							
-							String[] fts = fac.getComponentTypes();
+							final String[] fts = fac.getComponentTypes();
 							
 							// add new file types
 							for(int i=0; i<fts.length; i++)
@@ -254,14 +257,20 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 								supported.add(fts[i]);
 								if(!filetypes.containsKey(fts[i]))
 								{
+									final String name = fts[i];
 									final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(fts[i], true);
 									fac.getComponentTypeIcon(fts[i]).addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
 									{
 										public void resultAvailable(byte[] img)
 										{
-											if(ff==null)
-												System.out.println("hhh");
-											ff.setIcon(new ImageIcon(img));
+											if(ff!=null && img!=null)
+											{
+												ff.setIcon(new ImageIcon(img));
+											}
+											else
+											{
+												System.out.println("Icon not found for: "+name);
+											}
 										}
 										
 										public void exceptionOccurred(Exception exception)

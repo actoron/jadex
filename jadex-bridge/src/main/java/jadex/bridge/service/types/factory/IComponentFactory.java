@@ -8,6 +8,7 @@ import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -27,6 +28,7 @@ import java.util.Map;
  *  is needed but if shortcut notations are used it is unknown where the
  *  file is located.
  */
+@Service
 public interface IComponentFactory
 {
 	/**
