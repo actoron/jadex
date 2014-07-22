@@ -56,69 +56,6 @@ public class ServiceCallAgent	extends TestAgent
 	
 	//-------- methods --------
 	
-	/**
-	 *  The agent body.
-	 */
-	protected IFuture<Void> performTests(final Testcase tc)
-	{
-		final Future<Void>	ret	= new Future<Void>();
-		
-		IFuture<IComponentManagementService>	fut	= agent.getServiceContainer().getRequiredService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
-			{
-				test(cms, true).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
-				{
-					public void customResultAvailable(TestReport result)
-					{
-						tc.addReport(result);
-						createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-						{
-							public void customResultAvailable(final IExternalAccess exta)
-							{
-								createProxy(cms, exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-								{
-									public void customResultAvailable(IComponentIdentifier result)
-									{
-										SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
-											.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-										{
-											public void customResultAvailable(IComponentManagementService cms2)
-											{
-												test(cms2, false).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
-												{
-													public void customResultAvailable(TestReport result)
-													{
-														tc.addReport(result);
-														ret.setResult(null);
-													}
-												});
-											}
-										}));
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Create a proxy for the remote platform.
-	 */
-	protected IFuture<IComponentIdentifier>	createProxy(IComponentManagementService local, IExternalAccess remote)
-	{
-		Map<String, Object>	args = new HashMap<String, Object>();
-		args.put("component", remote.getComponentIdentifier());
-		CreationInfo ci = new CreationInfo(args);
-		return local.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null);
-
-	}
 	
 	/**
 	 *  Perform tests.

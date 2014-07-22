@@ -35,7 +35,7 @@ import java.util.Collection;
 @ComponentTypes(@ComponentType(name="test", clazz=ProviderAgent.class))
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class UserAgent
+public class ListenerAgent
 {
 	@AgentBody
 	public IFuture<Void> body(final IInternalAccess agent)
