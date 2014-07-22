@@ -1,8 +1,11 @@
-package jadex.bridge.component;
+package jadex.bridge.component.impl;
 
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.execution.IExecutionService;

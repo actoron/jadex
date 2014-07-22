@@ -16,6 +16,7 @@ import jadex.bridge.MessageFailureException;
 import jadex.bridge.ServiceTerminatedException;
 import jadex.bridge.component.ICommunicationFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalCommunicationFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -59,7 +60,6 @@ import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.awareness.discovery.message.IMessageAwarenessService;
-import jadex.platform.service.cms.AbstractComponentAdapter;
 import jadex.platform.service.message.streams.AbstractConnectionHandler;
 import jadex.platform.service.message.streams.AckInfo;
 import jadex.platform.service.message.streams.InitInfo;
@@ -2274,7 +2274,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ICommunicationFeature	com	= ia.getComponentFeature(ICommunicationFeature.class);
+						IInternalCommunicationFeature	com	= (IInternalCommunicationFeature)ia.getComponentFeature(ICommunicationFeature.class);
 						
 						if(com!=null)
 						{
@@ -2401,7 +2401,7 @@ public class MessageService extends BasicService implements IMessageService
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									ICommunicationFeature	com	= ia.getComponentFeature(ICommunicationFeature.class);
+									IInternalCommunicationFeature	com	= (IInternalCommunicationFeature)ia.getComponentFeature(ICommunicationFeature.class);
 									if(com!=null)
 									{
 										com.streamArrived(fcon);
@@ -2476,7 +2476,7 @@ public class MessageService extends BasicService implements IMessageService
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									ICommunicationFeature	com	= ia.getComponentFeature(ICommunicationFeature.class);
+									IInternalCommunicationFeature	com	= (IInternalCommunicationFeature)ia.getComponentFeature(ICommunicationFeature.class);
 									if(com!=null)
 									{
 										com.streamArrived(fcon);

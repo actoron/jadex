@@ -5,5 +5,5 @@ package jadex.bridge.component;
  */
 public interface ISubcomponentsFeature
 {
-	// Todo...
+	// Todo: create subcomponent?
 }

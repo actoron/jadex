@@ -1,6 +1,9 @@
-package jadex.bridge.component;
+package jadex.bridge.component.impl;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;

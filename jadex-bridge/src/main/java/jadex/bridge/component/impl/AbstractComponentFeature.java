@@ -1,6 +1,8 @@
-package jadex.bridge.component;
+package jadex.bridge.component.impl;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IComponentFeature;
 import jadex.commons.future.IFuture;
 
 import java.util.Collections;

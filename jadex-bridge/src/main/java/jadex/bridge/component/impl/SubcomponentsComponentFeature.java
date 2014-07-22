@@ -1,7 +1,11 @@
-package jadex.bridge.component;
+package jadex.bridge.component.impl;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -10,6 +14,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.CollectionResultListener;
@@ -29,7 +34,7 @@ import java.util.Map;
 /**
  *  This feature provides subcomponents.
  */
-public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	implements ISubcomponentsFeature
+public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	implements ISubcomponentsFeature, IInternalSubcomponentsFeature
 {
 	//-------- constructors --------
 	
@@ -220,5 +225,15 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		}
 		
 		return ret;
+	}
+	
+	//-------- IInternalSubcomponentsFeature interface -------
+	
+	/**
+	 *  Called, when a subcomponent has been created.
+	 */
+	public IFuture<Void>	componentCreated(IComponentDescription desc, IModelInfo model)
+	{
+		return IFuture.DONE;
 	}
 }

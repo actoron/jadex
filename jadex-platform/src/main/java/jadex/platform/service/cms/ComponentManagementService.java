@@ -14,6 +14,8 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
+import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
@@ -872,8 +874,8 @@ public class ComponentManagementService implements IComponentManagementService
 							// Try to find file for local type.
 							String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
 							filename	= null;
-							IComponentAdapter pad = getParentAdapter(cinfo);
-							IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
+							IPlatformComponentAccess pad = getParentAdapter(cinfo);
+							IExternalAccess parent = pad.getInternalAccess().getExternalAccess();
 							final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
 							for(int i=0; filename==null && i<subcomps.length; i++)
 							{
@@ -1189,7 +1191,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected boolean isRemoteComponent(IComponentIdentifier cid)
 	{
-		return !cid.getPlatformName().equals(root.getComponentIdentifier().getName());
+		return !cid.getPlatformName().equals(agent.getComponentIdentifier().getName());
 	}
 	
 	/**
@@ -1686,27 +1688,28 @@ public class ComponentManagementService implements IComponentManagementService
 //		listener.resultAvailable(this, ad);
 	}
 	
-//	/**
-//	 *  Add a new component to its parent.
-//	 */
-//	protected IFuture<Void>	addSubcomponent(IComponentAdapter pad, IComponentDescription ad, IModelInfo lmodel)
-//	{
-//		CMSComponentDescription padesc	= (CMSComponentDescription)pad.getDescription();
-//		padesc.addChild(ad.getName());
-//		
-////		if(padesc.isAutoShutdown() && !ad.isDaemon())
-////		if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
-//		// cannot check parent shutdown state because could be still uninited
-//		if(!ad.isDaemon())
-//		{
-//			Integer	childcount	= (Integer)childcounts.get(padesc.getName());
-//			int cc = childcount!=null ? childcount.intValue()+1 : 1;
-//			childcounts.put(padesc.getName(), Integer.valueOf(cc));
-//		}
-//		
-//		// Register component at parent.
-//		return getComponentInstance(pad).componentCreated(ad, lmodel);
-//	}
+	/**
+	 *  Add a new component to its parent.
+	 */
+	protected IFuture<Void>	addSubcomponent(IPlatformComponentAccess pad, IComponentDescription ad, IModelInfo lmodel)
+	{
+		CMSComponentDescription padesc	= (CMSComponentDescription)pad.getInternalAccess().getComponentDescription();
+		padesc.addChild(ad.getName());
+		
+//		if(padesc.isAutoShutdown() && !ad.isDaemon())
+//		if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+		// cannot check parent shutdown state because could be still uninited
+		if(!ad.isDaemon())
+		{
+			Integer	childcount	= (Integer)childcounts.get(padesc.getName());
+			int cc = childcount!=null ? childcount.intValue()+1 : 1;
+			childcounts.put(padesc.getName(), Integer.valueOf(cc));
+		}
+		
+		// Register component at parent.
+		return ((IInternalSubcomponentsFeature)pad.getInternalAccess().getComponentFeature(ISubcomponentsFeature.class))
+			.componentCreated(ad, lmodel);
+	}
 	
 	/**
 	 *  Execute a step of a suspended component.
@@ -2170,7 +2173,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 			)
 		{
-			getExternalAccess(ci.getParent()==null? root.getComponentIdentifier(): ci.getParent(), true)
+			getExternalAccess(ci.getParent()==null? agent.getComponentIdentifier(): ci.getParent(), true)
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IResourceIdentifier>(ret)
 			{
 				public void customResultAvailable(IExternalAccess ea)
@@ -2247,8 +2250,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IComponentIdentifier getParentIdentifier(CreationInfo ci)
 	{
-		IComponentIdentifier rt = root.getComponentIdentifier();
-		IComponentIdentifier ret = ci==null? rt: ci.getParent()==null? rt: ci.getParent(); 
+		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : agent.getComponentIdentifier(); 
 //		System.out.println("parent id: "+ret);
 		return ret;
 	}
@@ -2602,7 +2604,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IFuture<IComponentIdentifier> getRootIdentifier()
 	{
-		return new Future<IComponentIdentifier>(root.getComponentIdentifier());
+		return new Future<IComponentIdentifier>(agent.getComponentIdentifier());
 	}
 	
 	/**
@@ -2847,7 +2849,7 @@ public class ComponentManagementService implements IComponentManagementService
 														public void customResultAvailable(String[] addresses)
 														{
 															((ComponentIdentifier)agent.getComponentIdentifier()).setAddresses(addresses);
-//															adapters.put(agent.getComponentIdentifier(), root);
+															adapters.put(agent.getComponentIdentifier(), IPlatformComponentAccess.LOCAL.get());
 															ret.setResult(null);
 														}
 													}));
