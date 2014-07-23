@@ -62,11 +62,13 @@ public class RemoteDirNode extends RemoteFileNode
 	 */
 	protected void	searchChildren()
 	{
+		System.out.println("searchChildren: "+file.getFilename());
 		listFiles().addResultListener(new SwingResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				Collection files = (Collection)result;
+				System.out.println("received results: "+files.size());
 //				CollectionResultListener lis = new CollectionResultListener(files==null? 0: files.size(), true, 
 //					new DefaultResultListener()
 //				{
@@ -103,7 +105,10 @@ public class RemoteDirNode extends RemoteFileNode
 					if(node!=null)
 					{
 //						lis.resultAvailable(node);
-						nodes.add(node);
+						if(!nodes.contains(node))
+						{
+							nodes.add(node);
+						}
 					}
 					else
 					{

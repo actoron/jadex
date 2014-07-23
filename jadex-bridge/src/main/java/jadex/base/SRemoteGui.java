@@ -820,6 +820,8 @@ public class SRemoteGui
 					final Map<String, Collection<FileData>> rjfentries = new LinkedHashMap<String, Collection<FileData>>();
 					MultiCollection zipentries = jad.createEntries();
 					
+					final int size = zipentries.size();
+					
 					final CollectionResultListener<Tuple2<String, RemoteJarFile>> lis = new CollectionResultListener<Tuple2<String, RemoteJarFile>>(zipentries.size(), 
 						true, new ExceptionDelegationResultListener<Collection<Tuple2<String, RemoteJarFile>>, Collection<FileData>>(ret)
 					{
@@ -827,7 +829,7 @@ public class SRemoteGui
 						{
 							for(Tuple2<String, RemoteJarFile> tmp: result)
 							{
-								Collection<FileData>	dir	= rjfentries.get(tmp.getFirstEntity());
+								Collection<FileData> dir = rjfentries.get(tmp.getFirstEntity());
 								if(dir==null)
 								{
 									dir	= new ArrayList<FileData>();
@@ -840,9 +842,23 @@ public class SRemoteGui
 							Collection<FileData> files = rjf.listFiles();
 							ret.setResult(files);
 						}
+					})//);
+					{
+						int cnt = 0;
+						public void resultAvailable(Tuple2<String, RemoteJarFile> result)
+						{
+							System.out.println("cnt: "+(++cnt)+"/"+size);
+							super.resultAvailable(result);
+						}
 						
-					});
+						public void exceptionOccurred(Exception exception) 
+						{
+							System.out.println("cnt: "+(++cnt)+"/"+size);
+							super.exceptionOccurred(exception);
+						}
+					};
 	
+					
 					for(Iterator<?> it=zipentries.keySet().iterator(); it.hasNext(); )
 					{
 						final String name = (String)it.next();
@@ -854,7 +870,9 @@ public class SRemoteGui
 							String ename = entry.getName();
 							int	slash = ename.lastIndexOf("/", ename.length()-2);
 							ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
-	//						System.out.println("ename: "+ename+" "+entry.getName());
+							
+//							System.out.println("ename: "+ename+" "+entry.getName()+" "+(cnt++)+"/"+size);
+							
 							final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
 								entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
 							
@@ -897,7 +915,20 @@ public class SRemoteGui
 					
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener<Collection<FileData>>(ret));
+		}).addResultListener(new DelegationResultListener<Collection<FileData>>(ret)
+		{
+			public void customResultAvailable(Collection<FileData> result)
+			{
+				System.out.println("fini: "+result.size());
+				super.customResultAvailable(result);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				super.exceptionOccurred(exception);
+			}
+		});
 		
 		return ret;
 	}

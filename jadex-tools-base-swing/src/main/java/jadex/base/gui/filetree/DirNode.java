@@ -80,7 +80,12 @@ public class DirNode extends FileNode
 					if(node!=null)
 					{
 //						lis.resultAvailable(node);
-						nodes.add(node);
+						// Problem with jars which are always case sensitive
+						// but files are not depending on the file system
+						if(!nodes.contains(node))
+						{
+							nodes.add(node);
+						}
 					}
 					else
 					{
