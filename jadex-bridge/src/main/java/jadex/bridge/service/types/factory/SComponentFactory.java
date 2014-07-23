@@ -1,20 +1,28 @@
 package jadex.bridge.service.types.factory;
 
+import jadex.bridge.ComponentResultListener;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Collection;
@@ -29,6 +37,37 @@ import java.util.Map;
  */
 public class SComponentFactory
 {
+	/**
+	 *  Check if a component is necessary.
+	 *  @param target The target component identifier.
+	 *  @return The 
+	 */
+	public static boolean isComponentStepNecessary(IComponentIdentifier target)
+	{
+		IComponentIdentifier cid = IComponentIdentifier.LOCAL.get();
+		return cid==null? true: !cid.equals(target);
+	}
+	
+	/**
+	 *  Create a result listener which is executed as an component step.
+	 *  @param The original listener to be called.
+	 *  @return The listener.
+	 */
+	public static <T> IResultListener<T> createResultListener(IResultListener<T> listener, IExternalAccess ea)
+	{
+		return new ComponentResultListener<T>(listener, ea);
+	}
+
+//	/**
+//	 *  Create a result listener which is executed as an component step.
+//	 *  @param The original listener to be called.
+//	 *  @return The listener.
+//	 */
+//	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener, IExternalAccess ea)
+//	{
+//		return new IntermediateComponentResultListener<T>(listener, ea);
+//	}
+	
 	/**
 	 * Load an component model.
 	 * @param model The model.
@@ -142,22 +181,58 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture<Boolean> isModelType(IExternalAccess exta, final String model, final Collection allowedtypes, final IResourceIdentifier rid)
+	public static IFuture<Boolean> isModelType(final IExternalAccess exta, final String model, final Collection allowedtypes, final IResourceIdentifier rid)
 	{
-		Future<Boolean> ret = new Future<Boolean>();
+		return new Future<Boolean>(Boolean.TRUE);
+		
+//		IFuture<Boolean> ret = null;
+//		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
+//		{
+////			System.out.println("direct isModelType");
+//			ret = isModelType(model, allowedtypes, rid, exta);
+//		}
+//		else
+//		{
+//			System.out.println("stepped isModelTypes");
+//			ret = (IFuture<Boolean>)exta.scheduleStep(new IComponentStep<Boolean>()
+//			{
+//				@Classname("isModelType")
+//				public IFuture<Boolean> execute(IInternalAccess ia)
+//				{
+//					return isModelType(model, allowedtypes, rid, exta);
+//				}
+//				
+//				// For debugging intermediate future bug. Used in MicroAgentInterpreter
+//				public String toString()
+//				{
+//					return "IsModelType("+model+")";
+//				}
+//			});
+//		}
+//		return ret;
+	}
+	
+	/**
+	 * Test if a model can be loaded by the factory.
+	 * @param model The model.
+	 * @return True, if model can be loaded.
+	 */
+	private static IFuture<Boolean> isModelType(final String model, final Collection allowedtypes, final IResourceIdentifier rid, final IExternalAccess ea)//IInternalAccess ia)
+	{
+//		Future<Boolean> ret = new Future<Boolean>();
 //		if(model.endsWith("application.xml"))
 //			System.out.println("model1:"+model);
 		
-		exta.scheduleStep(new IComponentStep<Boolean>()
-		{
-			@Classname("isModelType")
-			public IFuture<Boolean> execute(final IInternalAccess ia)
-			{
+//		exta.scheduleStep(new IComponentStep<Boolean>()
+//		{
+//			@Classname("isModelType")
+//			public IFuture<Boolean> execute(final IInternalAccess ia)
+//			{
 //				if(model.endsWith("application.xml"))
 //					System.out.println("model2:"+model);
 				final Future<Boolean> ret = new Future<Boolean>();
-				SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
+				SServiceProvider.getServices(ea.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> facs)
 					{
@@ -169,8 +244,8 @@ public class SComponentFactory
 						}
 						else
 						{
-							checkComponentType(model, facs.toArray(new IComponentFactory[0]), 0, ia, rid, allowedtypes)
-								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+							checkComponentType(model, facs.toArray(new IComponentFactory[0]), 0, ea, rid, allowedtypes)
+								.addResultListener(createResultListener(new DelegationResultListener<Boolean>(ret), ea));
 						}
 					}
 					
@@ -185,19 +260,19 @@ public class SComponentFactory
 							super.exceptionOccurred(exception);
 						}
 					}
-				}));
+				}, ea));
 				return ret;
-			}
-		}).addResultListener(new DelegationResultListener(ret));
-
-		return ret;
+//			}
+//		}).addResultListener(new DelegationResultListener(ret));
+//
+//		return ret;
 	}
 
 	/**
 	 * 
 	 */
 	protected static IFuture checkComponentType(final String model, final IComponentFactory[] facts, final int i, 
-		final IInternalAccess ia, final IResourceIdentifier rid, final Collection allowedtypes)
+		final IExternalAccess ea, final IResourceIdentifier rid, final Collection allowedtypes)
 	{
 		final Future ret = new Future();
 		if(i>=facts.length)
@@ -207,7 +282,7 @@ public class SComponentFactory
 		else
 		{
 			facts[i].getComponentType(model, null, rid)
-				.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				.addResultListener(createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -217,11 +292,11 @@ public class SComponentFactory
 					}
 					else
 					{
-						checkComponentType(model, facts, i+1, ia, rid, allowedtypes)
-							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+						checkComponentType(model, facts, i+1, ea, rid, allowedtypes)
+							.addResultListener(createResultListener(new DelegationResultListener(ret), ea));
 					}
 				}
-			}));
+			}, ea));
 		}
 		return ret;
 	}

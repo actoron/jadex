@@ -1,6 +1,7 @@
 package jadex.base;
 
 import jadex.base.test.Testcase;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -21,6 +22,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
@@ -67,6 +69,18 @@ import java.util.zip.ZipEntry;
 public class SRemoteGui
 {
 	//-------- methods --------
+	
+	/**
+	 *  Check if a component is necessary.
+	 *  @param target The target component identifier.
+	 *  @return The 
+	 */
+	public static boolean isComponentStepNecessary(IComponentIdentifier target)
+	{
+//		return true;
+		IComponentIdentifier cid = IComponentIdentifier.LOCAL.get();
+		return cid==null? true: !cid.equals(target);
+	}
 	
 	/**
 	 *  Get the service infos for a component.
@@ -147,7 +161,7 @@ public class SRemoteGui
 						return IFuture.DONE;
 					}
 				})
-					.addResultListener(new DelegationResultListener<Void>(ret));
+				.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		
@@ -659,11 +673,45 @@ public class SRemoteGui
 	 */
 	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IRemoteFilter filter, IExternalAccess exta)
 	{
-		return (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+		IIntermediateFuture<FileData> ret = null;
+		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
 		{
-			@Classname("listFiles")
-			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+//			System.out.println("direct listFiles");
+			ret = listFiles(dir, filter);
+		}
+		else
+		{
+//			System.out.println("stepped listFiles");
+			ret = (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
 			{
+				@Classname("listFiles")
+				public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+				{
+					return  listFiles(dir, filter);
+				}
+				
+				// For debugging intermediate future bug. Used in MicroAgentInterpreter
+//				public String toString()
+//				{
+//					return "ListFiles("+dir+")";
+//				}
+			});
+		}
+		return ret;
+	}
+	
+	/**
+	 *  List files in a directory matching a filter (if any).
+	 *  @param dir	The directory.
+	 *  @param filter	The filter or null for all files.
+	 */
+	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IRemoteFilter filter)
+	{
+//		return (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+//		{
+//			@Classname("listFiles")
+//			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+//			{
 				IntermediateFuture<FileData>	ret	= new IntermediateFuture<FileData>();
 				try
 				{
@@ -674,7 +722,7 @@ public class SRemoteGui
 						final CollectionResultListener<FileData> lis = new CollectionResultListener<FileData>(files.length, true, new DelegationResultListener<Collection<FileData>>(ret));
 						for(final File file: files)
 						{
-							if(filter==null)
+							if(filter==null && true)
 							{
 								lis.resultAvailable(new FileData(file));
 							}
@@ -716,14 +764,14 @@ public class SRemoteGui
 				}
 
 				return ret;
-			}
-			
-			// For debugging intermediate future bug. Used in MicroAgentInterpreter
-			public String toString()
-			{
-				return "ListFiles("+dir+")";
-			}
-		});
+//			}
+//			
+//			// For debugging intermediate future bug. Used in MicroAgentInterpreter
+//			public String toString()
+//			{
+//				return "ListFiles("+dir+")";
+//			}
+//		});
 	}
 	
 //	/**
@@ -801,16 +849,50 @@ public class SRemoteGui
 //	}
 
 	/**
-	 *	List files of a remote jar file
+	 *  List files in a directory matching a filter (if any).
+	 *  @param dir	The directory.
+	 *  @param filter	The filter or null for all files.
 	 */
 	public static IIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IRemoteFilter filter, IExternalAccess exta)
 	{
-		IntermediateFuture<FileData> ret = new IntermediateFuture<FileData>();
-		exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+		IIntermediateFuture<FileData> ret = null;
+		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
 		{
-			@Classname("listJarFileEntries")
-			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+			System.out.println("direct listJarFileEntries");
+			ret = listJarFileEntries(file, filter);
+		}
+		else
+		{
+			System.out.println("stepped listJarFileEntries");
+			ret = (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
 			{
+				@Classname("listJarFileEntries")
+				public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+				{
+					return  listJarFileEntries(file, filter);
+				}
+				
+//				// For debugging intermediate future bug. Used in MicroAgentInterpreter
+//				public String toString()
+//				{
+//					return "ListJarFileEntries("+file+")";
+//				}
+			});
+		}
+		return ret;
+	}
+	
+	/**
+	 *	List files of a remote jar file
+	 */
+	public static IIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IRemoteFilter filter)
+	{
+//		IntermediateFuture<FileData> ret = new IntermediateFuture<FileData>();
+//		exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+//		{
+//			@Classname("listJarFileEntries")
+//			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+//			{
 				final IntermediateFuture<FileData> ret = new IntermediateFuture<FileData>();
 				try
 				{
@@ -914,23 +996,23 @@ public class SRemoteGui
 				}
 					
 				return ret;
-			}
-		}).addResultListener(new DelegationResultListener<Collection<FileData>>(ret)
-		{
-			public void customResultAvailable(Collection<FileData> result)
-			{
-				System.out.println("fini: "+result.size());
-				super.customResultAvailable(result);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-				super.exceptionOccurred(exception);
-			}
-		});
-		
-		return ret;
+//			}
+//		}).addResultListener(new DelegationResultListener<Collection<FileData>>(ret)
+//		{
+//			public void customResultAvailable(Collection<FileData> result)
+//			{
+//				System.out.println("fini: "+result.size());
+//				super.customResultAvailable(result);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				exception.printStackTrace();
+//				super.exceptionOccurred(exception);
+//			}
+//		});
+//		
+//		return ret;
 	}
 	
 	/**
