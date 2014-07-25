@@ -6,9 +6,6 @@ import java.nio.ByteBuffer;
 /**
  *  A growable byte buffer similar to ByteArrayOutputStream but allowing
  *  access to all written parts of the array.
- *  
- * @author jander
- *
  */
 public class GrowableByteBuffer
 {

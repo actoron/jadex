@@ -1,7 +1,6 @@
 package jadex.base;
 
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -20,9 +19,9 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.deployment.BunchFileData;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.deployment.IDeploymentService;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
@@ -35,6 +34,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -42,15 +42,16 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
@@ -853,9 +854,9 @@ public class SRemoteGui
 	 *  @param dir	The directory.
 	 *  @param filter	The filter or null for all files.
 	 */
-	public static IIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IRemoteFilter filter, IExternalAccess exta)
+	public static ISubscriptionIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IRemoteFilter filter, IExternalAccess exta)
 	{
-		IIntermediateFuture<FileData> ret = null;
+		ISubscriptionIntermediateFuture<FileData> ret = null;
 		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
 		{
 			System.out.println("direct listJarFileEntries");
@@ -864,10 +865,10 @@ public class SRemoteGui
 		else
 		{
 			System.out.println("stepped listJarFileEntries");
-			ret = (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+			ret = (ISubscriptionIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
 			{
 				@Classname("listJarFileEntries")
-				public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+				public ISubscriptionIntermediateFuture<FileData> execute(IInternalAccess ia)
 				{
 					return  listJarFileEntries(file, filter);
 				}
@@ -885,15 +886,17 @@ public class SRemoteGui
 	/**
 	 *	List files of a remote jar file
 	 */
-	public static IIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IRemoteFilter filter)
+	public static ISubscriptionIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IRemoteFilter filter)
 	{
+		final long start = System.currentTimeMillis();
+		
 //		IntermediateFuture<FileData> ret = new IntermediateFuture<FileData>();
 //		exta.scheduleStep(new IComponentStep<Collection<FileData>>()
 //		{
 //			@Classname("listJarFileEntries")
 //			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
 //			{
-				final IntermediateFuture<FileData> ret = new IntermediateFuture<FileData>();
+				final SubscriptionIntermediateFuture<FileData> ret = new SubscriptionIntermediateFuture<FileData>();
 				try
 				{
 					final JarAsDirectory jad = new JarAsDirectory(file.getPath());
@@ -904,12 +907,18 @@ public class SRemoteGui
 					
 					final int size = zipentries.size();
 					
-					final CollectionResultListener<Tuple2<String, RemoteJarFile>> lis = new CollectionResultListener<Tuple2<String, RemoteJarFile>>(zipentries.size(), 
-						true, new ExceptionDelegationResultListener<Collection<Tuple2<String, RemoteJarFile>>, Collection<FileData>>(ret)
+					final List<Tuple2<String, RemoteJarFile>> ires = new ArrayList<Tuple2<String, RemoteJarFile>>(); 
+//					final List<RemoteJarFile> ires = new ArrayList<RemoteJarFile>(); 
+					
+					final CounterResultListener<Tuple2<String, RemoteJarFile>> lis = new CounterResultListener<Tuple2<String, RemoteJarFile>>(zipentries.size(), 
+						true, new ExceptionDelegationResultListener<Void, Collection<FileData>>(ret)
 					{
-						public void customResultAvailable(Collection<Tuple2<String, RemoteJarFile>> result)
+						public void customResultAvailable(Void result)
 						{
-							for(Tuple2<String, RemoteJarFile> tmp: result)
+							long dur = System.currentTimeMillis()-start;
+							System.out.println("Needed for listJarFileEntries: "+dur/1000);
+							
+							for(Tuple2<String, RemoteJarFile> tmp: ires)
 							{
 								Collection<FileData> dir = rjfentries.get(tmp.getFirstEntity());
 								if(dir==null)
@@ -919,25 +928,55 @@ public class SRemoteGui
 								}
 								dir.add(tmp.getSecondEntity());
 							}
+							
 							RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
 								FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
 							Collection<FileData> files = rjf.listFiles();
-							ret.setResult(files);
+							System.out.println("size is: "+files.size());
+							
+							BunchFileData dat = new BunchFileData(files);
+//							BunchFileData dat = new BunchFileData((Collection)ires);
+							ret.addIntermediateResult(dat);
+							ret.setFinished();
 						}
+						
 					})//);
 					{
-						int cnt = 0;
 						public void resultAvailable(Tuple2<String, RemoteJarFile> result)
-						{
-							System.out.println("cnt: "+(++cnt)+"/"+size);
+						{	
+							ires.add(result);
+//							if(ires.size()%500==0)
+//							{
+//								for(FileData tmp: ires)
+//								{
+//									RemoteJarFile rf = (RemoteJarFile)tmp;
+//									Collection<FileData> dir = rjfentries.get(rf);
+//									if(dir==null)
+//									{
+//										dir	= new ArrayList<FileData>();
+//										rjfentries.put(rf.getPathName(), dir);
+//									}
+//									dir.add(rf);
+//								}
+//								RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
+//									FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
+//								Collection<FileData> files = rjf.listFiles();
+								
+//								BunchFileData dat = new BunchFileData(files);
+//								BunchFileData dat = new BunchFileData((Collection)ires);
+//								ret.addIntermediateResult(dat);
+//								ires.clear();
+//							}
 							super.resultAvailable(result);
 						}
 						
-						public void exceptionOccurred(Exception exception) 
-						{
-							System.out.println("cnt: "+(++cnt)+"/"+size);
-							super.exceptionOccurred(exception);
-						}
+//						public void customExceptionOccurred(Exception exception) 
+//						{
+//							if(cnt%1000==0)
+//								System.out.println("cnt: "+cnt+"/"+size);
+//							cnt++;
+//							super.exceptionOccurred(exception);
+//						}
 					};
 	
 					
@@ -946,10 +985,12 @@ public class SRemoteGui
 						final String name = (String)it.next();
 						Collection<?> childs = (Collection<?>)zipentries.get(name);
 	//					System.out.println("childs: "+childs);
+						
 						for(Iterator<?> it2=childs.iterator(); it2.hasNext(); )
 						{
 							ZipEntry entry = (ZipEntry)it2.next();
 							String ename = entry.getName();
+//							System.out.println("eq: "+name+" "+ename);
 							int	slash = ename.lastIndexOf("/", ename.length()-2);
 							ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
 							

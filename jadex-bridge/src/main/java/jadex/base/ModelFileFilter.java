@@ -136,6 +136,8 @@ public class ModelFileFilter implements IRemoteFilter
 	 */
 	public IFuture<Boolean> filter(Object obj)
 	{
+//		return new Future<Boolean>(Boolean.TRUE);
+		
 		final Future<Boolean> ret =  new Future<Boolean>();
 		
 		if(obj instanceof File)
@@ -147,9 +149,11 @@ public class ModelFileFilter implements IRemoteFilter
 			}
 			else
 			{
-				String	furl	= SUtil.toURL(file.getAbsolutePath()).toString();
+				String furl = SUtil.toURL(file.getAbsolutePath()).toString();
+//				ret.setResult(Boolean.TRUE);
+				
 				if(furl.startsWith("jar:"))
-					furl	= furl.substring(4);
+					furl = furl.substring(4);
 				IResourceIdentifier	rid	= null;
 				for(Iterator<URL> it=rids.keySet().iterator(); rid==null && it.hasNext(); )
 				{
@@ -166,9 +170,8 @@ public class ModelFileFilter implements IRemoteFilter
 					System.out.println("no rid for url: "+furl+", "+rids);
 				}
 				
-				ret.setResult(Boolean.TRUE);
-//				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
-//					.addResultListener(new DelegationResultListener<Boolean>(ret));
+				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
+					.addResultListener(new DelegationResultListener<Boolean>(ret));
 			}
 		}
 		else

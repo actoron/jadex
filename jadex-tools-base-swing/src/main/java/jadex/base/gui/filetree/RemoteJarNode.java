@@ -1,14 +1,14 @@
 package jadex.base.gui.filetree;
 
-import java.util.Collection;
-
 import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+
+import java.util.Collection;
 
 import javax.swing.JTree;
 
@@ -34,14 +34,26 @@ public class RemoteJarNode extends RemoteDirNode
 	/**
 	 *	Get a file filter according to current file type settings. 
 	 */
-	protected IIntermediateFuture<FileData> listFiles()
+	protected ISubscriptionIntermediateFuture<FileData> listFiles()
 	{
 		System.out.println("ListFiles started");
 		final long start = System.currentTimeMillis();
-		IIntermediateFuture<FileData> ret = SRemoteGui.listJarFileEntries(file, factory.getFileFilter(), exta);
 		
-		ret.addResultListener(new IResultListener<Collection<FileData>>()
+		ISubscriptionIntermediateFuture<FileData> ret = SRemoteGui.listJarFileEntries(file, factory.getFileFilter(), exta);
+		
+		ret.addResultListener(new IIntermediateResultListener<FileData>()
 		{
+			public void intermediateResultAvailable(FileData result)
+			{
+				System.out.print(".");
+			}
+			
+			public void finished()
+			{
+				long dur = System.currentTimeMillis()-start;
+				System.out.println("ListFiles needed: "+dur/1000);
+			}
+				
 			public void resultAvailable(Collection<FileData> result)
 			{
 				long dur = System.currentTimeMillis()-start;

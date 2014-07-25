@@ -103,7 +103,6 @@ public class SUtil
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
 
-
 	// Thread local gives best multithread performance for date format access:
 	// http://www.javacodegeeks.com/2010/07/java-best-practices-dateformat-in.html
 	
@@ -2089,6 +2088,9 @@ public class SUtil
 	 */
 	public static URL toURL(Object url)
 	{
+//		System.out.println(url);
+//		long start = System.currentTimeMillis();
+		
 		URL	ret	= null;
 		boolean	jar	= false;
 		if(url instanceof String)
@@ -2098,7 +2100,7 @@ public class SUtil
 			{
 				try
 				{
-					string	= URLDecoder.decode(string, "UTF-8");
+					string = URLDecoder.decode(string, "UTF-8");
 				}
 				catch(UnsupportedEncodingException e)
 				{
@@ -2112,14 +2114,14 @@ public class SUtil
 			
 			if(url==null)
 			{
-				File file	= new File(string);
+				File file = new File(string);
 				if(file.exists())
 				{
 					url	= file;
 				}
 				else
 				{
-					file	= new File(System.getProperty("user.dir"), string);
+					file = new File(System.getProperty("user.dir"), string);
 					if(file.exists())
 					{
 						url	= file;
@@ -2149,8 +2151,62 @@ public class SUtil
 			{
 				String	abs	= ((File)url).getAbsolutePath();
 				String	rel	= SUtil.convertPathToRelative(abs);
-				ret	= abs.equals(rel) ? new File(abs).getCanonicalFile().toURI().toURL()
-					: new File(System.getProperty("user.dir"), rel).getCanonicalFile().toURI().toURL();
+				
+				if(abs.equals(rel))
+				{
+					if(abs.contains(".."))
+					{
+						ret = new File(abs).getCanonicalFile().toURI().toURL();
+					}
+					else
+					{
+						ret = new File(abs).getAbsoluteFile().toURI().toURL();
+					}
+				}
+				else
+				{
+					File basedir = new File(System.getProperty("user.dir"));
+					
+					while(true)
+					{
+						int cut = 0;
+						if(rel.startsWith(".."))
+						{
+							cut = 2;
+						}
+						else if(rel.startsWith("/..") || rel.startsWith("\\.."))
+						{
+							cut = 3;
+						}
+						else if(rel.startsWith("\\\\.."))
+						{
+							cut = 4;
+						}
+						
+						if(cut>0)
+						{
+							basedir = basedir.getParentFile();
+							rel = rel.substring(cut);
+						}
+						else
+						{
+							break;
+						}
+					}
+					
+					if(rel.contains(".."))
+					{
+						ret = new File(basedir, rel).getCanonicalFile().toURI().toURL();
+					}
+					else
+					{
+						ret = new File(basedir, rel).getAbsoluteFile().toURI().toURL();
+					}
+					
+				}
+				
+//				ret	= abs.equals(rel) ? new File(abs).getCanonicalFile().toURI().toURL()
+//					: new File(System.getProperty("user.dir"), rel).getCanonicalFile().toURI().toURL();
 				if(jar)
 				{
 					if(ret.toString().endsWith("!"))
@@ -2176,8 +2232,12 @@ public class SUtil
 			}
 		}
 		
+//		long dur = System.currentTimeMillis()-start;
+		
 		return ret;
 	}
+	
+	
 	
 	
 	/**
@@ -2237,7 +2297,6 @@ public class SUtil
 		return ret;
 	}
 
-
 	/**
 	 * Main method for testing. / public static void main(String[] args) {
 	 * String res1 = getRelativePath("c:/a/b/c", "c:/a/d"); String res2 =
@@ -2267,8 +2326,20 @@ public class SUtil
 	
 	public static void main(String[] args)
 	{
-		String res = SUtil.makeConform("uniique-dialogservice.de/ues4/rc?f=https://plus.google.com/+targobank?koop_id=mar_vermoegen18");
-		System.out.println(res);
+//		String res = SUtil.makeConform("uniique-dialogservice.de/ues4/rc?f=https://plus.google.com/+targobank?koop_id=mar_vermoegen18");
+//		System.out.println(res);
+		
+//		String tst = "jar:file:/C:/projects/jadexgit/jadex-platform-standalone-launch/../../inno/vemaproda-eventsystem/target/vemaproda-eventsystem-0.5-SNAPSHOT.jar!/org/codehaus/plexus/context/ContextMapAdapter.class";
+		String tst = "C:\\Users\\Lars\\bpmntutorial2\\bpmntutorial\\target\\classes\\B1_simple.bpmn2";
+		
+		long start = System.currentTimeMillis();
+		
+		for(int i=0; i<30000; i++)
+		{
+			SUtil.toURL(tst);
+		}
+		
+		System.out.println("needed: "+(System.currentTimeMillis()-start)/1000);
 	}
 	
 	/**
@@ -4295,4 +4366,6 @@ public class SUtil
 		}
 		return null;
 	}
+	
+	
 }
