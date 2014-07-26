@@ -3,11 +3,11 @@ package jadex.bdiv3;
 import jadex.bdiv3.asm.AsmNodeHelper;
 import jadex.commons.SReflect;
 
-import org.kohsuke.asm4.tree.AbstractInsnNode;
-import org.kohsuke.asm4.tree.FieldNode;
-import org.kohsuke.asm4.tree.InsnList;
-import org.kohsuke.asm4.tree.LineNumberNode;
-import org.kohsuke.asm4.tree.MethodNode;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.LineNumberNode;
+import org.objectweb.asm.tree.MethodNode;
 
 public abstract class NodeHelper
 {

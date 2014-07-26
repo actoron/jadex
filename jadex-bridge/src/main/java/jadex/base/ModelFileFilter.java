@@ -166,9 +166,9 @@ public class ModelFileFilter implements IRemoteFilter
 					System.out.println("no rid for url: "+furl+", "+rids);
 				}
 				
-				ret.setResult(Boolean.TRUE);
-//				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
-//					.addResultListener(new DelegationResultListener<Boolean>(ret));
+//				ret.setResult(Boolean.TRUE);
+				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
+					.addResultListener(new DelegationResultListener<Boolean>(ret));
 			}
 		}
 		else
