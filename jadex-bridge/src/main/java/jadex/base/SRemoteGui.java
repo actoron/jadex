@@ -902,7 +902,7 @@ public class SRemoteGui
 					final JarAsDirectory jad = new JarAsDirectory(file.getPath());
 					jad.refresh();
 									
-					final Map<String, Collection<FileData>> rjfentries = new LinkedHashMap<String, Collection<FileData>>();
+//					final Map<String, Collection<FileData>> rjfentries = new LinkedHashMap<String, Collection<FileData>>();
 					MultiCollection zipentries = jad.createEntries();
 					
 					final int size = zipentries.size();
@@ -918,23 +918,23 @@ public class SRemoteGui
 							long dur = System.currentTimeMillis()-start;
 							System.out.println("Needed for listJarFileEntries: "+dur/1000);
 							
-							for(Tuple2<String, RemoteJarFile> tmp: ires)
-							{
-								Collection<FileData> dir = rjfentries.get(tmp.getFirstEntity());
-								if(dir==null)
-								{
-									dir	= new ArrayList<FileData>();
-									rjfentries.put(tmp.getFirstEntity(), dir);
-								}
-								dir.add(tmp.getSecondEntity());
-							}
+//							for(Tuple2<String, RemoteJarFile> tmp: ires)
+//							{
+//								Collection<FileData> dir = rjfentries.get(tmp.getFirstEntity());
+//								if(dir==null)
+//								{
+//									dir	= new ArrayList<FileData>();
+//									rjfentries.put(tmp.getFirstEntity(), dir);
+//								}
+//								dir.add(tmp.getSecondEntity());
+//							}
+//							
+//							RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
+//								FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
+//							Collection<FileData> files = rjf.listFiles();
+//							System.out.println("size is: "+files.size());
 							
-							RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
-								FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
-							Collection<FileData> files = rjf.listFiles();
-							System.out.println("size is: "+files.size());
-							
-							BunchFileData dat = new BunchFileData(files);
+							BunchFileData dat = new BunchFileData(ires);
 //							BunchFileData dat = new BunchFileData((Collection)ires);
 							ret.addIntermediateResult(dat);
 							ret.setFinished();
@@ -945,28 +945,13 @@ public class SRemoteGui
 						public void resultAvailable(Tuple2<String, RemoteJarFile> result)
 						{	
 							ires.add(result);
-//							if(ires.size()%500==0)
-//							{
-//								for(FileData tmp: ires)
-//								{
-//									RemoteJarFile rf = (RemoteJarFile)tmp;
-//									Collection<FileData> dir = rjfentries.get(rf);
-//									if(dir==null)
-//									{
-//										dir	= new ArrayList<FileData>();
-//										rjfentries.put(rf.getPathName(), dir);
-//									}
-//									dir.add(rf);
-//								}
-//								RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
-//									FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
-//								Collection<FileData> files = rjf.listFiles();
-								
-//								BunchFileData dat = new BunchFileData(files);
-//								BunchFileData dat = new BunchFileData((Collection)ires);
-//								ret.addIntermediateResult(dat);
-//								ires.clear();
-//							}
+							if(ires.size()%500==0)
+							{
+								System.out.println("sending: "+ires.size());
+								BunchFileData dat = new BunchFileData((Collection)ires);
+								ret.addIntermediateResult(dat);
+								ires.clear();
+							}
 							super.resultAvailable(result);
 						}
 						
@@ -996,10 +981,12 @@ public class SRemoteGui
 							
 //							System.out.println("ename: "+ename+" "+entry.getName()+" "+(cnt++)+"/"+size);
 							
+//							final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
+//								entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
 							final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
-								entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
+								entry.isDirectory(), ename, null, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
 							
-							if(filter!=null)
+							if(filter!=null && false)
 							{
 								filter.filter(jad.getFile(entry.getName())).addResultListener(new IResultListener<Boolean>()
 								{

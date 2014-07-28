@@ -1,8 +1,10 @@
 package jadex.bridge.service.types.deployment;
 
+import jadex.base.RemoteJarFile;
+import jadex.commons.Tuple2;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  *  Collection of filedata for bulk transfer.
@@ -10,7 +12,7 @@ import java.util.List;
 public class BunchFileData extends FileData
 {
 	/** The data. */
-	protected Collection<FileData> entries;
+	protected Collection<Tuple2<String, RemoteJarFile>> entries;
 	
 	/**
 	 *  Create a new file data.
@@ -22,16 +24,16 @@ public class BunchFileData extends FileData
 	/**
 	 *  Create a new file data.
 	 */
-	public BunchFileData(Collection<FileData> entries)
+	public BunchFileData(Collection<Tuple2<String, RemoteJarFile>> entries)
 	{
-		this.entries = entries;
+		this.entries = new ArrayList<Tuple2<String, RemoteJarFile>>(entries);
 	}
 
 	/**
 	 *  Get the entries.
 	 *  @return The entries.
 	 */
-	public Collection<FileData> getEntries()
+	public Collection<Tuple2<String, RemoteJarFile>> getEntries()
 	{
 		return entries;
 	}
@@ -40,7 +42,7 @@ public class BunchFileData extends FileData
 	 *  Set the entries.
 	 *  @param entries The entries to set.
 	 */
-	public void setEntries(Collection<FileData> entries)
+	public void setEntries(Collection<Tuple2<String, RemoteJarFile>> entries)
 	{
 		this.entries = entries;
 	}
@@ -49,11 +51,11 @@ public class BunchFileData extends FileData
 	 *  Add an entry.
 	 *  @param entry The entry.
 	 */
-	public void addEntry(FileData entry)
+	public void addEntry(Tuple2<String, RemoteJarFile> entry)
 	{
 		if(entries==null)
-			entries = new ArrayList<FileData>();
+			entries = new ArrayList<Tuple2<String, RemoteJarFile>>();
 		entries.add(entry);
 	}
-	
+
 }

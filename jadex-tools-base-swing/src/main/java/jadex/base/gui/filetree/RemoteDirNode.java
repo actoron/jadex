@@ -7,6 +7,8 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.BunchFileData;
 import jadex.bridge.service.types.deployment.FileData;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.SortedList;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -14,8 +16,12 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -57,6 +63,9 @@ public class RemoteDirNode extends RemoteFileNode
 		final List nodes = new SortedList(DirNode.FILENODE_COMPARATOR, true);
 		listFiles().addResultListener(new SwingIntermediateResultListener<FileData>(new IIntermediateResultListener<FileData>()
 		{
+			Map<String, Collection<FileData>> rjfentries = new LinkedHashMap<String, Collection<FileData>>();
+			List<FileData> entries = new ArrayList<FileData>();
+			
 			public void resultAvailable(Collection<FileData> result)
 			{
 				for(FileData file: result)
@@ -77,28 +86,46 @@ public class RemoteDirNode extends RemoteFileNode
 				{
 					BunchFileData dat = (BunchFileData)file;
 					
-					for(FileData d: dat.getEntries())
+					for(Tuple2<String, RemoteJarFile> tmp: dat.getEntries())
 					{
-						ISwingTreeNode node = getModel().getNode(d.toString());//.getAbsolutePath());
-						if(node!=null)
+						Collection<FileData> dir = rjfentries.get(tmp.getFirstEntity());
+						if(dir==null)
 						{
-	//						lis.resultAvailable(node);
-							if(!nodes.contains(node))
-							{
-								nodes.add(node);
-							}
+							dir	= new ArrayList<FileData>();
+							rjfentries.put(tmp.getFirstEntity(), dir);
 						}
-						else
-						{
-							nodes.add(factory.createNode(RemoteDirNode.this, getModel(), tree, d, iconcache, exta, factory));
-						}
+						RemoteJarFile rjn = tmp.getSecondEntity();
+						rjn.setJarEntries(rjfentries);
+						dir.add(rjn);
 					}
-					setChildren(nodes);
 				}
 				else
 				{
-					List nodes = new SortedList(DirNode.FILENODE_COMPARATOR, true);
-					ISwingTreeNode node = getModel().getNode(file.toString());//.getAbsolutePath());
+					entries.add(file);
+				}
+			}
+			
+		    public void finished()
+		    {
+		    	Collection<FileData> files = null;
+		    	
+		    	if(rjfentries.size()>0)
+		    	{
+//		    		RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
+//						FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
+		    		RemoteJarFile rjf = new RemoteJarFile(file.getFilename(), null, true, 
+						null, rjfentries, "/", 0, File.separatorChar, 0, rjfentries.size());
+					files = rjf.listFiles();
+					System.out.println("size is: "+files.size());
+		    	}
+		    	else if(entries.size()>0)
+		    	{
+		    		files = entries;
+		    	}
+		    	
+		    	for(FileData d: files)
+				{
+					ISwingTreeNode node = getModel().getNode(d.toString());//.getAbsolutePath());
 					if(node!=null)
 					{
 //						lis.resultAvailable(node);
@@ -109,14 +136,10 @@ public class RemoteDirNode extends RemoteFileNode
 					}
 					else
 					{
-						nodes.add(factory.createNode(RemoteDirNode.this, getModel(), tree, file, iconcache, exta, factory));
+						nodes.add(factory.createNode(RemoteDirNode.this, getModel(), tree, d, iconcache, exta, factory));
 					}
-					setChildren(nodes);
 				}
-			}
-			
-		    public void finished()
-		    {
+		    	
 		    	setChildren(nodes);
 		    }
 		}));
