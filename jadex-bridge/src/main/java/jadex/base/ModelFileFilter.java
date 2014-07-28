@@ -167,8 +167,18 @@ public class ModelFileFilter implements IRemoteFilter
 				}
 				
 //				ret.setResult(Boolean.TRUE);
+				
+				final long start = System.currentTimeMillis();
 				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
-					.addResultListener(new DelegationResultListener<Boolean>(ret));
+					.addResultListener(new DelegationResultListener<Boolean>(ret)
+				{
+					public void customResultAvailable(Boolean val)
+					{
+						long dur = System.currentTimeMillis()-start;
+						System.out.println("Needed isModelType: "+dur);
+						super.customResultAvailable(val);
+					}
+				});
 			}
 		}
 		else

@@ -225,7 +225,7 @@ public class SequentialSearchManager implements ISearchManager
 	{
 		// If terminated return
 		
-//		if(start.getId().getName().indexOf("Hello")!=-1 && context.selector instanceof TypeResultSelector && ((TypeResultSelector)context.selector).getType().getName().indexOf("IMon")!=-1)
+//		if(context.selector instanceof TypeResultSelector && ((TypeResultSelector)context.selector).getType().getName().indexOf("IComponent")!=-1)
 //			System.out.println("processNode: "+context+", "+source+", "+provider);
 
 //		if(provider!=null && provider.getId().toString().startsWith("Lars-PC"))

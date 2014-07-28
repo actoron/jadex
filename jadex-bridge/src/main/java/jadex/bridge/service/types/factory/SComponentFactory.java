@@ -46,6 +46,7 @@ public class SComponentFactory
 	{
 		IComponentIdentifier cid = IComponentIdentifier.LOCAL.get();
 		return cid==null? true: !cid.equals(target);
+//		return true;
 	}
 	
 	/**
@@ -181,7 +182,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture<Boolean> isModelType(final IExternalAccess exta, final String model, final Collection allowedtypes, final IResourceIdentifier rid)
+	public static IFuture<Boolean> isModelType(final IExternalAccess exta, final String model, final Collection<String> allowedtypes, final IResourceIdentifier rid)
 	{
 //		return new Future<Boolean>(Boolean.TRUE);
 		
@@ -217,8 +218,10 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	private static IFuture<Boolean> isModelType(final String model, final Collection allowedtypes, final IResourceIdentifier rid, final IExternalAccess ea)//IInternalAccess ia)
+	private static IFuture<Boolean> isModelType(final String model, final Collection<String> allowedtypes, final IResourceIdentifier rid, final IExternalAccess ea)//IInternalAccess ia)
 	{
+//		return new Future<Boolean>(Boolean.TRUE);
+		
 //		Future<Boolean> ret = new Future<Boolean>();
 //		if(model.endsWith("application.xml"))
 //			System.out.println("model1:"+model);
@@ -230,12 +233,17 @@ public class SComponentFactory
 //			{
 //				if(model.endsWith("application.xml"))
 //					System.out.println("model2:"+model);
+		
+				final long start = System.currentTimeMillis(); 
 				final Future<Boolean> ret = new Future<Boolean>();
 				SServiceProvider.getServices(ea.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> facs)
 					{
+						long dur = System.currentTimeMillis()-start; 
+						System.out.println("needed search: "+dur);
+						
 //						if(model.endsWith("application.xml"))
 //							System.out.println("model3:"+model);
 						if(facs.size()==0)
@@ -262,6 +270,7 @@ public class SComponentFactory
 					}
 				}, ea));
 				return ret;
+		
 //			}
 //		}).addResultListener(new DelegationResultListener(ret));
 //
@@ -271,10 +280,14 @@ public class SComponentFactory
 	/**
 	 * 
 	 */
-	protected static IFuture checkComponentType(final String model, final IComponentFactory[] facts, final int i, 
-		final IExternalAccess ea, final IResourceIdentifier rid, final Collection allowedtypes)
+	protected static IFuture<Boolean> checkComponentType(final String model, final IComponentFactory[] facts, final int i, 
+		final IExternalAccess ea, final IResourceIdentifier rid, final Collection<String> allowedtypes)
 	{
-		final Future ret = new Future();
+		final Future<Boolean> ret = new Future<Boolean>();
+		
+//		ret.setResult(Boolean.TRUE);
+//		return ret;
+		
 		if(i>=facts.length)
 		{
 			ret.setResult(Boolean.FALSE);
@@ -282,9 +295,9 @@ public class SComponentFactory
 		else
 		{
 			facts[i].getComponentType(model, null, rid)
-				.addResultListener(createResultListener(new DelegationResultListener(ret)
+				.addResultListener(createResultListener(new ExceptionDelegationResultListener<String, Boolean>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(String result)
 				{
 					if(result!=null)
 					{
@@ -293,7 +306,7 @@ public class SComponentFactory
 					else
 					{
 						checkComponentType(model, facts, i+1, ea, rid, allowedtypes)
-							.addResultListener(createResultListener(new DelegationResultListener(ret), ea));
+							.addResultListener(createResultListener(new DelegationResultListener<Boolean>(ret), ea));
 					}
 				}
 			}, ea));

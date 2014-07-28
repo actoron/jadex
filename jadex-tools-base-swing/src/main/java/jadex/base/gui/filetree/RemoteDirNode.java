@@ -123,22 +123,25 @@ public class RemoteDirNode extends RemoteFileNode
 		    		files = entries;
 		    	}
 		    	
-		    	for(FileData d: files)
-				{
-					ISwingTreeNode node = getModel().getNode(d.toString());//.getAbsolutePath());
-					if(node!=null)
+		    	if(files!=null)
+		    	{
+			    	for(FileData d: files)
 					{
-//						lis.resultAvailable(node);
-						if(!nodes.contains(node))
+						ISwingTreeNode node = getModel().getNode(d.toString());//.getAbsolutePath());
+						if(node!=null)
 						{
-							nodes.add(node);
+	//						lis.resultAvailable(node);
+							if(!nodes.contains(node))
+							{
+								nodes.add(node);
+							}
+						}
+						else
+						{
+							nodes.add(factory.createNode(RemoteDirNode.this, getModel(), tree, d, iconcache, exta, factory));
 						}
 					}
-					else
-					{
-						nodes.add(factory.createNode(RemoteDirNode.this, getModel(), tree, d, iconcache, exta, factory));
-					}
-				}
+		    	}
 		    	
 		    	setChildren(nodes);
 		    }

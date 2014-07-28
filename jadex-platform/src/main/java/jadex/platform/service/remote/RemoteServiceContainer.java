@@ -9,6 +9,7 @@ import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.TypeResultSelector;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -59,7 +60,7 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 	{
 		final TerminableIntermediateFuture<IService> ret = new TerminableIntermediateFuture<IService>();
 		
-//		if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("IProxy")!=-1)
+//		if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("IComp")!=-1)
 //		{
 //			System.out.println(((TypeResultSelector)selector).getType().getName());
 //			System.out.println("search: "+componentid);
@@ -67,6 +68,9 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 		
 		super.getServices(manager, decider, selector).addResultListener(new IResultListener<Collection<IService>>()
 		{
+			// Search own local proxy services and afterwards
+			// for remote services using rms.getServiceProxies
+			
 			public void resultAvailable(Collection<IService> result)
 			{
 				// If should not search remotely or not inited (no rms)
@@ -90,6 +94,13 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 					}
 					
 					// Hack! Use user search manager.
+//					System.out.println("remote search at: "+componentid);
+					
+//					if(selector instanceof TypeResultSelector)// && ((TypeResultSelector)selector).getType().getName().indexOf("IComp")!=-1)
+//					{
+//						System.out.println("remote search at: "+componentid+" "+((TypeResultSelector)selector).getType().getName());
+//					}
+					
 					final ITerminableIntermediateFuture<IService> fut = rms.getServiceProxies(componentid, SServiceProvider.sequentialmanager, decider, selector);
 					
 					// Propagate termination to remote site

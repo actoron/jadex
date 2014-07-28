@@ -801,7 +801,7 @@ public class SServiceProvider
 		}
 		else if(multiple || RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
-			ret	= parallelmanager;
+			ret	= sequentialmanager;//parallelmanager;
 		}
 		else
 		{

@@ -910,7 +910,7 @@ public class SRemoteGui
 					final List<Tuple2<String, RemoteJarFile>> ires = new ArrayList<Tuple2<String, RemoteJarFile>>(); 
 //					final List<RemoteJarFile> ires = new ArrayList<RemoteJarFile>(); 
 					
-					final CounterResultListener<Tuple2<String, RemoteJarFile>> lis = new CounterResultListener<Tuple2<String, RemoteJarFile>>(zipentries.size(), 
+					final CounterResultListener<Tuple2<String, RemoteJarFile>> lis = new CounterResultListener<Tuple2<String, RemoteJarFile>>(1, //zipentries.size(), 
 						true, new ExceptionDelegationResultListener<Void, Collection<FileData>>(ret)
 					{
 						public void customResultAvailable(Void result)
@@ -986,7 +986,7 @@ public class SRemoteGui
 							final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
 								entry.isDirectory(), ename, null, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
 							
-							if(filter!=null && false)
+							if(filter!=null)
 							{
 								filter.filter(jad.getFile(entry.getName())).addResultListener(new IResultListener<Boolean>()
 								{
@@ -1012,7 +1012,11 @@ public class SRemoteGui
 							{
 								lis.resultAvailable(new Tuple2<String, RemoteJarFile>(name, tmp));							
 							}
+							
+//							break;
 						}
+						
+//						break;
 					}
 				}
 				catch(Exception e)
