@@ -72,6 +72,8 @@ public class UserAgent
 			});
 		}
 		
+		fut.get(sus);
+		
 		cms.createComponent(UserAgent.class.getName()+".class", null).get(sus);
 	}
 }

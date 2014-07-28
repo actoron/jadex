@@ -82,16 +82,17 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	 */
 	public DefaultPoolStrategy(int workercnt, int desfree, long maxwait, int maxcnt, boolean defer)
 	{
-		this.workercnt = workercnt;
-		this.capacity = workercnt;
-		this.desfree = desfree;
-		this.maxwait = maxwait;
-		this.maxcnt = maxcnt;
-		this.dodeferdec = defer;
-		this.waitings = new LinkedList<Double>();
-		
-		// Can't defer creation when threads are blocking as it might cause deadlocks
-		this.dodeferinc	= false;
+		this(workercnt, desfree, maxwait, maxcnt, false, defer);
+//		this.workercnt = workercnt;
+//		this.capacity = workercnt;
+//		this.desfree = desfree;
+//		this.maxwait = maxwait;
+//		this.maxcnt = maxcnt;
+//		this.dodeferdec = defer;
+//		this.waitings = new LinkedList<Double>();
+//		
+//		// Can't defer creation when threads are blocking as it might cause deadlocks
+//		this.dodeferinc	= false;
 	}
 
 	/**
@@ -164,7 +165,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 //			System.out.println("Capacity(tA2): "+capacity+" "+workercnt);
 		}
 		
-//		System.out.println("Capacity: "+capacity+" "+workercnt);
+		System.out.println("Capacity: "+capacity+" "+workercnt);
 		
 		return ret;
 	}
