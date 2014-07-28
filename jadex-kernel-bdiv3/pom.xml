@@ -60,10 +60,16 @@
 		</dependency>-->
 		
 		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm-all</artifactId>
+			<version>5.0.3</version>
+		</dependency>
+		
+		<!--  <dependency>
 			<groupId>org.kohsuke</groupId>
 			<artifactId>asm4</artifactId>
 			<version>4.0</version>
-		</dependency>
+		</dependency>-->
 		
 		<dependency>
 			<groupId>javassist</groupId>

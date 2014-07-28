@@ -2,7 +2,7 @@ package jadex.bdiv3.asm;
 
 import jadex.bdiv3.OpcodeHelper;
 
-import org.kohsuke.asm4.Opcodes;
+import org.objectweb.asm.Opcodes;
 
 public class AsmOpcodeHelper extends OpcodeHelper
 {

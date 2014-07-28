@@ -2,10 +2,10 @@ package jadex.bdiv3.asm;
 
 import jadex.bdiv3.NodeHelper;
 
-import org.kohsuke.asm4.Opcodes;
-import org.kohsuke.asm4.Type;
-import org.kohsuke.asm4.tree.FieldNode;
-import org.kohsuke.asm4.tree.MethodNode;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.MethodNode;
 
 public class AsmNodeHelper extends NodeHelper
 {

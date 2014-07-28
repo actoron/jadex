@@ -723,7 +723,7 @@ public class SRemoteGui
 						final CollectionResultListener<FileData> lis = new CollectionResultListener<FileData>(files.length, true, new DelegationResultListener<Collection<FileData>>(ret));
 						for(final File file: files)
 						{
-							if(filter==null && true)
+							if(filter==null)
 							{
 								lis.resultAvailable(new FileData(file));
 							}

@@ -91,8 +91,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					}
 				}
 			}
-			
-			// Todo: support LOOPING in editor.
 			else if(MSubProcess.SUBPROCESSTYPE_SEQUENTIAL.equals(proc.getSubprocessType()))// || thread.hasPropertyValue("items"))
 			{
 //				throw new UnsupportedOperationException("Looping subprocess not yet supported: "+activity+", "+instance);

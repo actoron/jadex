@@ -82,9 +82,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
-
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -934,12 +931,15 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			con.connect();
 			if(HttpServletResponse.SC_OK==con.getResponseCode())
 			{
-				JSONObject jo = (JSONObject)JSONValue.parse(con.getInputStream());
-				ret = (Integer)jo.get("leasetime");
-				if(ret==null)
-				{
-					ret = Integer.valueOf(0);
-				}
+				// todo: fixme
+				
+//				JSONObject jo = (JSONObject)JSONValue.parse(con.getInputStream());
+//				ret = (Integer)jo.get("leasetime");
+//				if(ret==null)
+//				{
+//					ret = Integer.valueOf(0);
+//				}
+				ret = 30;
 			}
 		}
 		catch(Exception e)

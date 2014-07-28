@@ -183,33 +183,33 @@ public class SComponentFactory
 	 */
 	public static IFuture<Boolean> isModelType(final IExternalAccess exta, final String model, final Collection allowedtypes, final IResourceIdentifier rid)
 	{
-		return new Future<Boolean>(Boolean.TRUE);
+//		return new Future<Boolean>(Boolean.TRUE);
 		
-//		IFuture<Boolean> ret = null;
-//		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
-//		{
-////			System.out.println("direct isModelType");
-//			ret = isModelType(model, allowedtypes, rid, exta);
-//		}
-//		else
-//		{
-//			System.out.println("stepped isModelTypes");
-//			ret = (IFuture<Boolean>)exta.scheduleStep(new IComponentStep<Boolean>()
-//			{
-//				@Classname("isModelType")
-//				public IFuture<Boolean> execute(IInternalAccess ia)
-//				{
-//					return isModelType(model, allowedtypes, rid, exta);
-//				}
-//				
-//				// For debugging intermediate future bug. Used in MicroAgentInterpreter
-//				public String toString()
-//				{
-//					return "IsModelType("+model+")";
-//				}
-//			});
-//		}
-//		return ret;
+		IFuture<Boolean> ret = null;
+		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
+		{
+//			System.out.println("direct isModelType");
+			ret = isModelType(model, allowedtypes, rid, exta);
+		}
+		else
+		{
+			System.out.println("stepped isModelTypes");
+			ret = (IFuture<Boolean>)exta.scheduleStep(new IComponentStep<Boolean>()
+			{
+				@Classname("isModelType")
+				public IFuture<Boolean> execute(IInternalAccess ia)
+				{
+					return isModelType(model, allowedtypes, rid, exta);
+				}
+				
+				// For debugging intermediate future bug. Used in MicroAgentInterpreter
+				public String toString()
+				{
+					return "IsModelType("+model+")";
+				}
+			});
+		}
+		return ret;
 	}
 	
 	/**

@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.kohsuke.asm4.ClassReader;
-import org.kohsuke.asm4.Type;
-import org.kohsuke.asm4.tree.ClassNode;
-import org.kohsuke.asm4.tree.LocalVariableNode;
-import org.kohsuke.asm4.tree.MethodNode;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.LocalVariableNode;
+import org.objectweb.asm.tree.MethodNode;
 
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;

@@ -38,10 +38,10 @@ import java.util.jar.JarEntry;
 
 import javax.swing.SwingUtilities;
 
-import org.kohsuke.asm4.AnnotationVisitor;
-import org.kohsuke.asm4.ClassReader;
-import org.kohsuke.asm4.ClassVisitor;
-import org.kohsuke.asm4.Opcodes;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
 
 import com.mxgraph.view.mxStylesheet;
 
