@@ -97,7 +97,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		}
 		
 		ITerminableIntermediateFuture<IService>	ret	= manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
-//		final String	search	= "search: "+manager+", "+decider+", "+selector+"\n";
+//		final String	search	= "search: "+manager+", "+decider+", "+selector;
+//		if(search.indexOf("IMonitoring")!=-1)
+//		{
+//			System.out.println(search);
+//		}
 //		SEARCHES.add(search);
 //		ret.addResultListener(new IResultListener<Collection<IService>>()
 //		{

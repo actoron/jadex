@@ -3,9 +3,6 @@ package jadex.base.relay;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -269,111 +266,92 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void serveMap(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		String[]	colors	= new String[]{"black", "brown", "green", "purple", "yellow", "blue", "gray", "orange", "red", "white"};
+		StringBuffer markers	= new StringBuffer();
+		Set<String> positions	= new HashSet<String>();
+		int	cnt	= 0;
+		
+		// Add markers for locally connected platforms
 		List<PlatformInfo>	pinfos	= new ArrayList<PlatformInfo>();
 		pinfos.addAll(Arrays.asList(handler.getCurrentPlatforms()));
 		PlatformInfo[]	infos	= pinfos.toArray(new PlatformInfo[0]);
-		PeerEntry[]	peers	= handler.getCurrentPeers();
-		StringBuffer markers	= new StringBuffer();
-		String[]	colors	= new String[]{"black", "brown", "green", "purple", "yellow", "blue", "gray", "orange", "red", "white"};
-		Set<String> positions	= new HashSet<String>();
+		cnt = addMarkers(infos, markers, colors, positions, cnt);
 
-		// Add markers for locally connected platforms
+		// Add markers for remotely connected platforms
+		PeerEntry[]	peers	= handler.getCurrentPeers();
+		if(peers.length>0)
+		{
+			for(int j=0; j<peers.length && markers.length()+250<2048; j++)	// hack!!! make sure url length stays below 2048 character limit. 
+			{
+				PlatformInfo[]	infos2	= peers[j].getPlatformInfos();
+				cnt	= addMarkers(infos2, markers, colors, positions, cnt);
+			}
+		}
+
+		// Use scale=2 for larger pictures in spite of 640 pixel limitS
+		int	width	= Integer.valueOf(request.getParameter("width"))/2;
+		int	height	= Integer.valueOf(request.getParameter("height"))/2;
+		String	url	= "http://maps.googleapis.com/maps/api/staticmap?scale=2&size="+width+"x"+height+"&sensor=false"+markers;
+		
+		// Copy content to output stream. (against google policies?)
+//		HttpURLConnection	con	= (HttpURLConnection)new URL(url).openConnection();
+//    	response.setContentType(con.getContentType());
+//    	response.setContentLength(con.getContentLength());
+//    	InputStream	in	= con.getInputStream();
+//		byte[]	buf	= new byte[8192];  
+//		int	len;
+//		while((len=in.read(buf)) != -1)
+//		{
+//			response.getOutputStream().write(buf, 0, len);
+//		}
+//		in.close();
+		
+		// Redirect (allowed by google?)
+		response.sendRedirect(url);
+	}
+	
+	/**
+	 *  Add markers for given platform infos.
+	 */
+	protected int addMarkers(PlatformInfo[] infos, StringBuffer markers, String[] colors, Set<String> positions, int cnt)
+	{
 		if(infos.length>0)
 		{
 			for(int i=0; i<infos.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
 			{
 				if(infos[i].getPosition()!=null && !positions.contains(infos[i].getPosition()))
 				{
-					if(i<9)
+					if(cnt<9)
 					{
-						// Add labelled markers for first 1..9 entries
+						// Add labeled markers for first 1..9 entries
 						markers.append("&markers=size:mid|label:");
-						markers.append(i+1);
+						markers.append(cnt+1);
 						markers.append("|color:");
-						markers.append(colors[Math.abs(infos[i].getAwarenessInfo().getSender().getName().hashCode())%colors.length]);
+						markers.append(colors[Math.abs(infos[i].getId().hashCode())%colors.length]);
 						markers.append("|");
 						markers.append(infos[i].getPosition());
 						positions.add(infos[i].getPosition());
 					}
-					else if(i==9)
+					else if(cnt==9)
 					{
-						// Add unlabelled markers for each unique position of remaining entries
+						// Add unlabeled markers for each unique position of remaining entries
 						markers.append("&markers=size:mid|color:");
-						markers.append(colors[Math.abs(infos[i].getAwarenessInfo().getSender().getName().hashCode())%colors.length]);
+						markers.append(colors[Math.abs(infos[i].getId().hashCode())%colors.length]);
 						markers.append("|");
 						markers.append(infos[i].getPosition());
 						positions.add(infos[i].getPosition());
 					}
 					else
 					{
-						// Add unlabelled markers for each unique position of remaining entries
+						// Add unlabeled markers for each unique position of remaining entries
 						markers.append("|");
 						markers.append(infos[i].getPosition());
 						positions.add(infos[i].getPosition());
 					}
+					cnt++;
 				}
 			}
 		}
-		int	cnt	= infos.length;
-
-		// Add markers for remotely connected platforms
-		if(peers.length>0)
-		{
-			for(int j=0; j<peers.length && markers.length()+250<2048; j++)	// hack!!! make sure url length stays below 2048 character limit. 
-			{
-				PlatformInfo[]	infos2	= peers[j].getPlatformInfos();
-				for(int i=0; i<infos2.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
-				{
-					if(infos2[i].getPosition()!=null)
-					{
-						if(i+cnt<9)
-						{
-							// Add labelled markers for first 1..9 entries
-							markers.append("&markers=size:mid|label:");
-							markers.append(i+cnt+1);
-							markers.append("|color:");
-							markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
-							markers.append("|");
-							markers.append(infos2[i].getPosition());
-							positions.add(infos2[i].getPosition());
-						}
-						else if(i+cnt==9)
-						{
-							// Add unlabelled markers for each unique position of remaining entries
-							markers.append("&markers=size:mid|color:");
-							markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
-							markers.append("|");
-							markers.append(infos2[i].getPosition());
-							positions.add(infos2[i].getPosition());
-						}
-						else if(!positions.contains(infos2[i].getPosition()))
-						{
-							// Add unlabelled markers for each unique position of remaining entries
-							markers.append("|");
-							markers.append(infos2[i].getPosition());
-							positions.add(infos2[i].getPosition());
-						}
-					}
-				}
-				cnt	+= infos2.length;
-			}
-		}
-
-		int	width	= Integer.valueOf(request.getParameter("width"));
-		int	height	= Integer.valueOf(request.getParameter("height"));
-		URL	url	= new URL("http://maps.googleapis.com/maps/api/staticmap?size="+width+"x"+height+"&sensor=false"+markers);
-		HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
-    	response.setContentType(con.getContentType());
-    	response.setContentLength(con.getContentLength());
-        	
-		// Copy content to output stream.
-    	InputStream	in	= con.getInputStream();
-		byte[]	buf	= new byte[8192];  
-		int	len;
-		while((len=in.read(buf)) != -1)
-		{
-			response.getOutputStream().write(buf, 0, len);
-		}
-		in.close();
+		return cnt;
 	}
 }

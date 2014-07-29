@@ -54,6 +54,8 @@ public class MicroTest	extends ComponentTestSuite
 			"messagequeue\\User",
 			"messagequeue/replicated/User",
 			"messagequeue\\replicated\\User",
+			"search/User",
+			"search\\User",
 			"ServicePrey",
 			"ChatE3Agent",
 			"TimeUserAgent",
