@@ -87,43 +87,43 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		// Hack, necessary because getService() is not a service call and the first contained
-		// service call (getChildren) will reset the call context afterwards :-(
-		final ServiceCall cur = CallAccess.getCurrentInvocation();
-		final ServiceCall next = CallAccess.getNextInvocation();
-		
-		Map<String, Object>	props	= new HashMap<String, Object>();
-//		props.put("method", context.getMethod().getName());
-		
-		ServiceCall sc = CallAccess.getOrCreateNextInvocation(props);
-		sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
-		sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
-		
-		CallAccess.setCurrentInvocation(sc); 
-		
-//		if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
-//			System.out.println("start shut in mon: "+context.getObject());
-		
-//		if(context.getMethod().getName().indexOf("log")!=-1)
-//			System.out.println("log");
-		
-		getter.getService().addResultListener(new ExceptionDelegationResultListener<IMonitoringService, Void>(ret)
+		if(getComponent().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 		{
-			public void customResultAvailable(IMonitoringService monser)
+			// Hack, necessary because getService() is not a service call and the first contained
+			// service call (getChildren) will reset the call context afterwards :-(
+			final ServiceCall cur = CallAccess.getCurrentInvocation();
+			final ServiceCall next = CallAccess.getNextInvocation();
+			
+			Map<String, Object>	props	= new HashMap<String, Object>();
+	//		props.put("method", context.getMethod().getName());
+			
+			ServiceCall sc = CallAccess.getOrCreateNextInvocation(props);
+			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
+			sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
+			
+			CallAccess.setCurrentInvocation(sc); 
+			
+	//		if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
+	//			System.out.println("start shut in mon: "+context.getObject());
+			
+	//		if(context.getMethod().getName().indexOf("log")!=-1)
+	//			System.out.println("log");
+			
+			getter.getService().addResultListener(new ExceptionDelegationResultListener<IMonitoringService, Void>(ret)
 			{
-//				if(context.getMethod().getName().indexOf("log")!=-1)
-//					System.out.println("log");
-				
-//				if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
-//					System.out.println("end shut in mon: "+context.getObject());
-				
-				CallAccess.setCurrentInvocation(cur); 
-				CallAccess.setNextInvocation(next);
-				
-				// Publish event if monitoring service was found
-				if(monser!=null)
+				public void customResultAvailable(IMonitoringService monser)
 				{
-					if(getComponent().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+	//				if(context.getMethod().getName().indexOf("log")!=-1)
+	//					System.out.println("log");
+					
+	//				if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
+	//					System.out.println("end shut in mon: "+context.getObject());
+					
+					CallAccess.setCurrentInvocation(cur); 
+					CallAccess.setNextInvocation(next);
+					
+					// Publish event if monitoring service was found
+					if(monser!=null)
 					{
 						// todo: clock?
 	//					if(context.getMethod().getName().indexOf("test")!=-1)
@@ -149,12 +149,16 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 							}
 						});
 					}
+					
+					context.invoke().addResultListener(new ReturnValueResultListener(ret, context));
 				}
-				
-				context.invoke().addResultListener(new ReturnValueResultListener(ret, context));
-			}
-		});
-	
+			});
+		}
+		else
+		{
+			context.invoke().addResultListener(new ReturnValueResultListener(ret, context));
+		}
+		
 		return ret;
 	}
 	
@@ -186,30 +190,30 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 		 */
 		public void customResultAvailable(Void result)
 		{
-			// Hack, necessary because getService() is not a service call and the first contained
-			// service call (getChildren) will reset the call context afterwards :-(
-			final ServiceCall cur = CallAccess.getCurrentInvocation();
-			final ServiceCall next = CallAccess.getNextInvocation();
-			
-//			Map<String, Object>	props	= new HashMap<String, Object>();
-//			props.put("method5", sic.getMethod().getName());
-			
-			ServiceCall sc = CallAccess.getOrCreateNextInvocation();
-			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
-			sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
-			
-			CallAccess.setCurrentInvocation(sc); 
-
-			getter.getService().addResultListener(new IResultListener<IMonitoringService>()
+			if(getComponent().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 			{
-				public void resultAvailable(IMonitoringService monser)
+				// Hack, necessary because getService() is not a service call and the first contained
+				// service call (getChildren) will reset the call context afterwards :-(
+				final ServiceCall cur = CallAccess.getCurrentInvocation();
+				final ServiceCall next = CallAccess.getNextInvocation();
+				
+	//			Map<String, Object>	props	= new HashMap<String, Object>();
+	//			props.put("method5", sic.getMethod().getName());
+				
+				ServiceCall sc = CallAccess.getOrCreateNextInvocation();
+				sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
+				sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
+				
+				CallAccess.setCurrentInvocation(sc); 
+	
+				getter.getService().addResultListener(new IResultListener<IMonitoringService>()
 				{
-					CallAccess.setCurrentInvocation(cur); 
-					CallAccess.setNextInvocation(next);
-
-					if(monser!=null)
+					public void resultAvailable(IMonitoringService monser)
 					{
-						if(getComponent().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+						CallAccess.setCurrentInvocation(cur); 
+						CallAccess.setNextInvocation(next);
+	
+						if(monser!=null)
 						{
 							// todo: clock?
 							long end = System.currentTimeMillis();
@@ -218,19 +222,23 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 							monser.publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(),
 								sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end, PublishEventLevel.MEDIUM));
 						}
+						ReturnValueResultListener.super.customResultAvailable(null);
 					}
-					ReturnValueResultListener.super.customResultAvailable(null);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					CallAccess.setCurrentInvocation(cur); 
-					CallAccess.setNextInvocation(next);
-
-					// never happens
-					ReturnValueResultListener.super.exceptionOccurred(exception);
-				}
-			});
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						CallAccess.setCurrentInvocation(cur); 
+						CallAccess.setNextInvocation(next);
+	
+						// never happens
+						ReturnValueResultListener.super.exceptionOccurred(exception);
+					}
+				});
+			}
+			else
+			{
+				ReturnValueResultListener.super.customResultAvailable(null);
+			}
 		}
 	}
 }

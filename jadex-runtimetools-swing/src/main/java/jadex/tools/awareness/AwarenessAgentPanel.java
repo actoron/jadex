@@ -28,8 +28,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +42,7 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -49,10 +53,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -120,7 +126,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	protected EditableList	excludes;
 	
 	/** The complete awareness panel. */
-	protected JPanel panel;
+	protected JComponent panel;
 	
 	/** The apply button. */
 	protected JButton	buapply;
@@ -146,7 +152,73 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		this.component = component;
 		this.helper = new AwarenessManagementAgentHelper(component);
 		
-		this.panel = new JPanel(new GridBagLayout());
+		JPanel	mainpanel = new JPanel(new GridBagLayout());
+		final JLabel	map	= new JLabel("No map available.", JLabel.CENTER);
+		this.panel	= new JTabbedPane();
+		panel.add(mainpanel, "Main");
+		panel.add(map, "Map");
+		
+		map.addComponentListener(new ComponentAdapter()
+		{
+			public void componentResized(ComponentEvent e)
+			{
+				loadMap();
+			}
+			
+			public void componentShown(ComponentEvent e)
+			{
+				loadMap();
+			}	
+		
+			protected void loadMap()
+			{
+				map.setIcon(null);
+				map.setText("Loading map. Please wait...");
+				map.repaint();
+				panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						boolean	done	= false;
+						for(String adr: component.getComponentIdentifier().getAddresses())
+						{
+							if(adr.startsWith("relay-http"))
+							{
+								adr	= adr.substring(6) + (adr.endsWith("/") ? "" : "/") + "map?width="+map.getWidth()+"&height="+map.getHeight();
+//								System.out.println("adr: "+adr);
+								try
+								{
+									map.setIcon(new ImageIcon(new URL(adr)));
+									map.setText(null);
+									map.repaint();
+									done	= true;
+									break;
+								}
+								catch(Exception ex)
+								{
+//									ex.printStackTrace();
+									map.setIcon(null);
+									map.setText("Error while loading map: "+ex.toString());
+									map.repaint();
+									done	= true;
+									break;
+								}
+							}
+						}
+						
+						if(!done)
+						{
+							map.setText("Could not load map.");
+							map.repaint();					
+						}
+
+						panel.setCursor(Cursor.getDefaultCursor());
+					}
+				});
+			}
+		});
 		
 		this.timerdelay = 5000;
 				
@@ -405,15 +477,15 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		gbc.gridy	= 0;
 		gbc.gridwidth	= 2;
-		panel.add(pprosettings, gbc);
+		mainpanel.add(pprosettings, gbc);
 		gbc.gridwidth	= 1;
 
 		gbc.weightx	= 1;
 		gbc.gridwidth	= 1;
 		gbc.gridheight	= 2;
 		gbc.insets	= new Insets(2,2,2,2);
-		panel.add(pincludes, gbc);
-		panel.add(pexcludes, gbc);
+		mainpanel.add(pincludes, gbc);
+		mainpanel.add(pexcludes, gbc);
 		gbc.insets	= new Insets(0,0,0,0);
 		gbc.gridheight	= 1;
 		
@@ -421,16 +493,16 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		gbc.gridx	= 0;
 		gbc.gridwidth	= 2;
 		gbc.weightx	= 0;
-		panel.add(pdissettings, gbc);
+		mainpanel.add(pdissettings, gbc);
 		gbc.gridx	= GridBagConstraints.RELATIVE;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 				
 		gbc.gridy++;
-		panel.add(pdismechs, gbc);
+		mainpanel.add(pdismechs, gbc);
 		
 		gbc.gridy++;
 		gbc.weighty	= 1;
-		panel.add(pdisinfos, gbc);
+		mainpanel.add(pdisinfos, gbc);
 		
 		gbc.gridy++;
 		gbc.weightx	= 0;
@@ -439,7 +511,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		gbc.fill	= GridBagConstraints.NONE;
 		gbc.anchor	= GridBagConstraints.EAST;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
-		panel.add(prefresh, gbc);
+		mainpanel.add(prefresh, gbc);
 				
 		
 		updateDiscoveryMechanisms();
