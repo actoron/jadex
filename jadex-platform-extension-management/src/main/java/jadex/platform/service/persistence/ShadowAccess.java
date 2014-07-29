@@ -25,6 +25,7 @@ import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.persistence.ISwapService;
@@ -999,6 +1000,11 @@ public class ShadowAccess implements IExternalAccess
 		}
 		
 		public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public LocalServiceRegistry getServiceRegistry() 
 		{
 			throw new UnsupportedOperationException();
 		}

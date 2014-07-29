@@ -14,6 +14,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
@@ -331,9 +332,10 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 * @return An instance of a component.
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, final IModelInfo model, 
-		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] binding, final boolean copy, final boolean realtime, final boolean persist,
+		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] binding, 
+		final boolean copy, final boolean realtime, final boolean persist,
 		final IPersistInfo persistinfo,
-		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
+		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited, final LocalServiceRegistry registry)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
@@ -350,7 +352,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 					{
 						BDIModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
 						BDIAgentInterpreter mai = new BDIAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST, 
-							null, cl), arguments, config, parent, binding, copy, realtime, persist, persistinfo, listener, inited);
+							null, cl), arguments, config, parent, binding, copy, realtime, persist, persistinfo, listener, inited, registry);
 						res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
 					}
 					catch(Exception e)
@@ -369,7 +371,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 				ClassLoader	cl	= getClass().getClassLoader();
 				BDIModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
 				BDIAgentInterpreter mai = new BDIAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST, 
-					null, cl), arguments, config, parent, binding, copy, realtime, persist, persistinfo, listener, inited);
+					null, cl), arguments, config, parent, binding, copy, realtime, persist, persistinfo, listener, inited, registry);
 				res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
 			}
 			catch(Exception e)

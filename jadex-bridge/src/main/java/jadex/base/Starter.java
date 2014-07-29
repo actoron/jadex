@@ -17,6 +17,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -508,7 +509,7 @@ public class Starter
 									boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
 									boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
 									// what about platform result listener?!
-									cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, realtime, persist, null, null, future)
+									cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, realtime, persist, null, null, future, new LocalServiceRegistry(""))
 										.addResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, IExternalAccess>(ret)
 									{
 										public void customResultAvailable(Tuple2<IComponentInstance, IComponentAdapter> root)
@@ -530,7 +531,7 @@ public class Starter
 												{
 													IComponentAdapter.LOCAL.set(adapter);
 													IComponentIdentifier.LOCAL.set(cid);
-													again	= FutureHelper.notifyStackedListeners();
+													again = FutureHelper.notifyStackedListeners();
 													IComponentIdentifier.LOCAL.set(null);
 													IComponentAdapter.LOCAL.set(null);
 												}

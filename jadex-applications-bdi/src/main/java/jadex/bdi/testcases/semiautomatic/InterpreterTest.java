@@ -69,7 +69,7 @@ public class InterpreterTest
 				{
 				}
 			});
-			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, null, config, true, true, null, ret);
+			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, null, config, true, true, null, ret, null);
 			interpreter.getAgentAdapter().wakeup();
 			
 	//		System.out.println("Agent execution finished.");
@@ -115,7 +115,7 @@ class ComponentAdapter implements IComponentAdapter
 	
 	public ComponentAdapter(final IComponentInstance interpreter)
 	{
-		container = new ComponentServiceContainer(this, "platform", null, false);
+		container = new ComponentServiceContainer(this, "platform", null, false, null);
 		// Todo: move test to somewhere more useful? (jadex-launch?)
 		// Todo: actually test something useful...
 //		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);

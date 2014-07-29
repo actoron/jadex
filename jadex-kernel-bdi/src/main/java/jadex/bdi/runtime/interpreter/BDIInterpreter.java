@@ -41,6 +41,7 @@ import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -267,6 +268,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The monitoring service getter. */
 	protected ServiceGetter<IMonitoringService> getter;
 	
+	/** The service registry .*/
+	protected LocalServiceRegistry registry;
+
+	
 	//-------- constructors --------
 	
 	/**
@@ -278,7 +283,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
 		final String config, final Map<String, Object> arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, 
-		final Map kernelprops, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
+		final Map kernelprops, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited, LocalServiceRegistry registry)
 	{	
 		this.initthread = Thread.currentThread();
 		
@@ -293,6 +298,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 		this.copy = copy;
 		this.realtime = realtime;
+		this.registry = registry;
 //		this.resultlistener = resultlistener;
 		this.inited = inited;
 		this.emitlevelsub = PublishEventLevel.OFF;
@@ -2132,7 +2138,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public IServiceContainer createServiceContainer()
 	{
 		assert container==null;
-		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess(), isRealtime());
+		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess(), isRealtime(), getServiceRegistry());
 	}
 	
 	/**
@@ -2563,5 +2569,14 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public void invalidateAccess(boolean terminate)
 	{
 		// Todo...
+	}
+	
+	/**
+	 *  Get the service registry.
+	 *  @return The service registry.
+	 */
+	public LocalServiceRegistry getServiceRegistry() 
+	{
+		return registry;
 	}
 }

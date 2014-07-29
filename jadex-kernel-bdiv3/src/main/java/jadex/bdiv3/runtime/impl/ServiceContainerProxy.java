@@ -17,6 +17,7 @@ import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.IResultCommand;
@@ -445,5 +446,14 @@ public class ServiceContainerProxy implements IServiceContainer
 	public boolean hasMethodListeners(IServiceIdentifier sid, MethodInfo mi)
 	{
 		return interpreter.getServiceContainer().hasMethodListeners(sid, mi);
+	}
+	
+	/**
+	 *  Get the service registry.
+	 *  @return The service registry.
+	 */
+	public LocalServiceRegistry getServiceRegistry() 
+	{
+		return interpreter.getServiceContainer().getServiceRegistry();
 	}
 }

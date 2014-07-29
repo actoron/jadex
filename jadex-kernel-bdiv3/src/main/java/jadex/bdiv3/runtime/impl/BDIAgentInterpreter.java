@@ -41,6 +41,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -129,9 +130,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		final BDIModel model, Class<?> agentclass, final Map<String, Object> args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		IPersistInfo persistinfo,
-		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
+		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited, LocalServiceRegistry registry)
 	{
-		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, persist, persistinfo, listener, inited);
+		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, persist, persistinfo, listener, inited, registry);
 		this.bdimodel = model;
 		this.capa = new RCapability(bdimodel.getCapability());
 	}

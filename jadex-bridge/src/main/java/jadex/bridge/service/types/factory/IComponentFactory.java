@@ -9,6 +9,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -107,6 +108,6 @@ public interface IComponentFactory
 		IComponentAdapterFactory factory, IModelInfo model, String config, Map<String, Object> arguments, 
 		IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		IPersistInfo persistinfo, 
-		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> init);
+		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> init, @Reference LocalServiceRegistry registry);
 
 }

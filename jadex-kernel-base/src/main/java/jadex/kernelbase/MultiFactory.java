@@ -19,6 +19,7 @@ import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -84,7 +85,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	
 	/** Kernel default locations */
 	protected Map kerneldefaultlocations;
-	
 	
 	/** Cache of known factories */
 	protected Map factorycache;
@@ -365,6 +365,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //				}));
 			}
 		}));
+		
 		return ret;
 	}
 	
@@ -586,14 +587,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			final Map<String, Object> arguments, final IExternalAccess parent,
 			final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
 			final IPersistInfo persistinfo,
-			final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret)
+			final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret, final LocalServiceRegistry registry)
 	{
 //		System.out.println("createComponentInstance: "+model.getName());
 		
 //		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
 		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model.getFilename(), factorycache);
 		if(fac != null)
-			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, ret);
+			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, ret, registry);
 		
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
@@ -601,7 +602,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void customResultAvailable(Object result)
 			{
-				((IComponentFactory)result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, ret).addResultListener(new DelegationResultListener(res));
+				((IComponentFactory)result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, ret, registry).addResultListener(new DelegationResultListener(res));
 			}
 		}));
 		return res;
@@ -764,7 +765,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			public void customResultAvailable(Object result)
 			{
 				final Collection factories = ((Collection)result);
-				factories.remove(MultiFactory.this);
 				final IResultListener factorypicker = ia.createResultListener(new CollectionResultListener(factories.size(), true, ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -778,9 +778,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						}
 					}
 				})));
+				
 				for (Iterator it = factories.iterator(); it.hasNext(); )
 				{
 					final IComponentFactory factory = (IComponentFactory)it.next();
+					if(((IService)factory).getServiceIdentifier().equals(sid))
+					{
+//						System.out.println("removed: "+factory);
+						factorypicker.exceptionOccurred(new RuntimeException());
+						continue;
+					}
+					
 //					System.out.println("Trying isloadable :" + factory + " for " + model);
 					factory.isLoadable(model, imports, rid).addResultListener(ia.createResultListener(new IResultListener()
 					{
@@ -794,6 +802,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						
 						public void exceptionOccurred(Exception exception)
 						{
+							exception.printStackTrace();
 							factorypicker.exceptionOccurred(exception);
 						}
 					}));

@@ -160,6 +160,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return new Future<Void>(new ComponentTerminatedException(id));
 		final Future<Void> ret = new Future<Void>();
 		
+		// Hack!!! Must make cms available before init for boottrapping of service container of platform
+		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IComponentManagementService")!=-1)
+		{
+			getServiceRegistry().addService(service);
+		}
+		
 		getServiceTypes(service.getServiceIdentifier()).addResultListener(new ExceptionDelegationResultListener<Collection<Class<?>>, Void>(ret)
 		{
 			public void customResultAvailable(Collection<Class<?>> servicetypes)
@@ -198,6 +204,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 								{
 									public void customResultAvailable(Void result)
 									{
+										getServiceRegistry().addService(service);
 										serviceStarted(service).addResultListener(new DelegationResultListener<Void>(ret));
 									}
 								});
@@ -299,6 +306,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //											if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
 //												System.out.println("Terminated service: "+sid);
 											getLogger().info("Terminated service: "+sid);
+											
+											getServiceRegistry().removeService(fservice);
+											
 											serviceShutdowned(fservice).addResultListener(new DelegationResultListener<Void>(ret));
 										}
 										
@@ -390,6 +400,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						public void resultAvailable(Void result)
 						{
 							getLogger().info("Started service: "+is.getServiceIdentifier());
+							
+							getServiceRegistry().addService(is);
+							
 							serviceStarted(is).addResultListener(new DelegationResultListener<Void>(ret)
 							{
 								public void customResultAvailable(Void result)

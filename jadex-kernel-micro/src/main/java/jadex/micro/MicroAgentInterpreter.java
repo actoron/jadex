@@ -21,6 +21,7 @@ import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -107,9 +108,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		final MicroModel model, Class<?> microclass, final Map<String, Object> args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		final IPersistInfo persistinfo,
-		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
+		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited,
+		LocalServiceRegistry registry)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, registry);
 		
 		this.micromodel = model;
 		

@@ -29,7 +29,6 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -166,9 +165,6 @@ public class ComponentManagementService implements IComponentManagementService
 	
 	/** The cid count. */
 	protected Map<String, Integer> cidcounts;
-	
-	/** The service registry. */
-	protected LocalServiceRegistry registry;
 	
     //-------- constructors --------
 
@@ -832,7 +828,7 @@ public class ComponentManagementService implements IComponentManagementService
 																						
 																	IPersistInfo persistinfo = null;
 																	factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, persist, persistinfo, reslis, resfut)
+																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, persist, persistinfo, reslis, resfut, agent.getServiceContainer().getServiceRegistry())
 																		.addResultListener(createResultListener(new IResultListener<Tuple2<IComponentInstance, IComponentAdapter>>()
 																	{
 																		public void resultAvailable(Tuple2<IComponentInstance, IComponentAdapter> comp)
@@ -1000,12 +996,9 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				public void customResultAvailable(Collection<IComponentFactory> facts)
 				{
-					factories = facts;//(Collection)result;
+//					factories = facts;//(Collection)result;
 					if(!facts.isEmpty())
-					{
-						// Remove fallback factory when first real factory is found.
-						componentfactory	= null;
-						
+					{						
 						// Reorder factories to assure that delegating multi loaders are last (if present).
 						if(facts.size()>1)
 						{
@@ -1020,6 +1013,8 @@ public class ComponentManagementService implements IComponentManagementService
 								else
 								{
 									singles.add(fac);
+									// Remove fallback factory when first real factory is found.
+									componentfactory = null;
 								}
 							}
 							facts	= singles;

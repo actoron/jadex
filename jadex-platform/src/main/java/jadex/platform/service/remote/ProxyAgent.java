@@ -143,7 +143,7 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 		// Hack!!! Can not be done in agentCreated, because service container is created first. 
 		this.rcid	= (IComponentIdentifier)args.get("component");
 		
-		return new RemoteServiceContainer(rcid, getAgentAdapter(), this);
+		return new RemoteServiceContainer(rcid, getAgentAdapter(), this, getInterpreter().getServiceRegistry());
 	}
 	
 	//-------- IProxyAgentService interface --------

@@ -12,6 +12,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
@@ -297,7 +298,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, 
 		final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
 		final IPersistInfo persistinfo,
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
+		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, final LocalServiceRegistry registry)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
@@ -313,7 +314,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 						CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, 
 							new Object[]{modelinfo.getResourceIdentifier(), getServiceIdentifier().getProviderId().getRoot()});
 						ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, 
-							arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl);
+							arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl, registry);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
 					catch(Exception e)
@@ -333,7 +334,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 				CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, 
 					new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
 				ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent,
-					arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl);
+					arguments, bindings, copy, realtime, persist, persistinfo, resultlistener, init, cl, registry);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}
 			catch(Exception e)

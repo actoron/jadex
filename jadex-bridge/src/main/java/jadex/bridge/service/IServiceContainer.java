@@ -6,6 +6,7 @@ import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
@@ -46,6 +47,12 @@ public interface IServiceContainer extends IServiceProvider
 	 *  Get the current state for snapshot or persistence.
 	 */
 	public ServiceContainerPersistInfo	getPersistInfo();
+	
+	/**
+	 *  Get the service registry.
+	 *  @return The service registry.
+	 */
+	public LocalServiceRegistry getServiceRegistry();
 	
 	/**
 	 *  Restore a container from a persited state,

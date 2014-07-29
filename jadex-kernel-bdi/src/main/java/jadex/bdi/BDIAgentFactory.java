@@ -21,6 +21,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
@@ -265,7 +266,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, final IModelInfo modelinfo, 
 		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, boolean persist,
 		final IPersistInfo persistinfo,
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
+		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, final LocalServiceRegistry registry)
 	{
 //		System.out.println("create: "+modelinfo.getFilename());
 		
@@ -293,7 +294,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 						state.addSubstate(amodel.getState());
 						
 //						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
-						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init);
+						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init, registry);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 					}
 					catch(Exception e)
@@ -323,7 +324,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 				state.addSubstate(amodel.getState());
 				
 //				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
-				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init);
+				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init, registry);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 			}
 			catch(Exception e)
@@ -346,7 +347,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	 * @return An instance of a component.
 	 */
 	public Tuple2<IComponentInstance, IComponentAdapter> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
-		String config, Map<String, Object> arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> ret)
+		String config, Map<String, Object> arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> ret, LocalServiceRegistry registry)
 	{
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -357,7 +358,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		state.addSubstate(amodel.getState());
 		
 //		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, ret);
-		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, ret);
+		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, ret, registry);
 		return new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter());
 	}
 	
@@ -682,4 +683,6 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		});
 		return ret;
 	}
+	
+	
 }

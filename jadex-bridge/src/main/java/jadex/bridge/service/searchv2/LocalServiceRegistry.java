@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,12 +19,18 @@ public class LocalServiceRegistry
 	/** The map of published services sorted by type. */
 	protected Map<ClassInfo, Set<IService>> services;
 	
+	public LocalServiceRegistry(String tst)
+	{
+	}
+	
 	/**
 	 *  Add a service to the registry.
 	 *  @param sid The service id.
 	 */
 	public synchronized void addService(IService service)
 	{
+//		System.out.println("added: "+service.getServiceIdentifier().getServiceType());
+		
 		if(services==null)
 		{
 			services = new HashMap<ClassInfo, Set<IService>>();
@@ -52,6 +59,14 @@ public class LocalServiceRegistry
 			{
 				sers.remove(service);
 			}
+			else
+			{
+				System.out.println("Could not remove service from registry: "+service.getServiceIdentifier());
+			}
+		}
+		else
+		{
+			System.out.println("Could not remove service from registry: "+service.getServiceIdentifier());
 		}
 	}
 	
@@ -82,7 +97,7 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> Set<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
+	public synchronized <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
 	{
 		Set<T> ret = null;
 		if(services!=null)
@@ -109,6 +124,10 @@ public class LocalServiceRegistry
 	protected boolean checkService(IComponentIdentifier cid, IService ser, String scope)
 	{
 		boolean ret = false;
+		if(scope==null)
+		{
+			scope = RequiredServiceInfo.SCOPE_APPLICATION;
+		}
 		
 		if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope) || RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
@@ -155,7 +174,7 @@ public class LocalServiceRegistry
 		{
 			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
 			
-			while(target!=null)
+			while(cid!=null)
 			{
 				if(target.equals(cid))
 				{
@@ -164,7 +183,7 @@ public class LocalServiceRegistry
 				}
 				else
 				{
-					target = target.getParent();
+					cid = cid.getParent();
 				}
 			}
 		}

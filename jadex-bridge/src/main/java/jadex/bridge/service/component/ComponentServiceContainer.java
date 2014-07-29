@@ -21,6 +21,7 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -84,20 +85,23 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/** The max number of preserved req service providers. */
 	protected int maxreq;
 	
+	/** The service registry .*/
+	protected LocalServiceRegistry registry;
+	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new service container.
 	 */
-	public ComponentServiceContainer(IComponentAdapter adapter, String type, IInternalAccess instance, boolean realtime)
+	public ComponentServiceContainer(IComponentAdapter adapter, String type, IInternalAccess instance, boolean realtime, LocalServiceRegistry registry)
 	{
-		this(adapter, type, instance, realtime, 50);
+		this(adapter, type, instance, realtime, registry, 50);
 	}
 	
 	/**
 	 *  Create a new service container.
 	 */
-	public ComponentServiceContainer(IComponentAdapter adapter, String type, IInternalAccess instance, boolean realtime, int maxreq)
+	public ComponentServiceContainer(IComponentAdapter adapter, String type, IInternalAccess instance, boolean realtime, LocalServiceRegistry registry, int maxreq)
 	{
 		super(adapter.getComponentIdentifier());
 		
@@ -109,6 +113,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		this.instance = instance;
 		this.realtime	= realtime;
 		this.maxreq = maxreq;
+		this.registry = registry;
 	}
 	
 	//-------- interface methods --------
@@ -910,5 +915,14 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	protected Logger getLogger()
 	{
 		return adapter.getLogger();
+	}
+	
+	/**
+	 *  Get the service registry.
+	 *  @return The service registry.
+	 */
+	public LocalServiceRegistry getServiceRegistry()
+	{
+		return registry;
 	}
 }

@@ -10,6 +10,7 @@ import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.TypeResultSelector;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -43,9 +44,9 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
-	public RemoteServiceContainer(IComponentIdentifier remotecid, IComponentAdapter adapter, IInternalAccess instance)
+	public RemoteServiceContainer(IComponentIdentifier remotecid, IComponentAdapter adapter, IInternalAccess instance, LocalServiceRegistry registry)
 	{
-		super(adapter, "remote", instance, true);
+		super(adapter, "remote", instance, true, registry);
 		this.componentid = remotecid;
 	}
 	

@@ -51,6 +51,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -227,9 +228,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map<String, Object> arguments, 
 		String config, final IExternalAccess parent, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers, 
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
-		IServiceContainer container)
+		IServiceContainer container, LocalServiceRegistry registry)
 	{
-		super(null, model.getModelInfo(), config, null, parent, null, true, true, false, null, null);
+		super(null, model.getModelInfo(), config, null, parent, null, true, true, false, null, null, registry);
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? new BpmnInstanceFetcher(this, fetcher) :null;
 		this.adapter = adapter;
@@ -259,9 +260,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		String config, final IExternalAccess parent, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers, 
 		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		IPersistInfo persistinfo,
-		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
+		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited, LocalServiceRegistry registry)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, registry);
 		this.inited = inited;
 		
 		if(persistinfo==null)

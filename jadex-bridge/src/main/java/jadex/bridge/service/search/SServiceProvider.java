@@ -7,6 +7,7 @@ import jadex.bridge.nonfunctional.search.IServiceRanker;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener2;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -41,6 +42,8 @@ import java.util.Map;
 public class SServiceProvider
 {	
 	//-------- constants --------
+	
+	public static boolean registrysearch = false;
 	
 	/** The sequential search manager. */
 	public static final ISearchManager sequentialmanager = new SequentialSearchManager();
@@ -237,76 +240,93 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 //		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
 		
-		try
+		if(registrysearch && provider instanceof IServiceContainer)
 		{
-			provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
-				new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter))
-					.addResultListener(new IIntermediateResultListener<IService>()
+			IServiceContainer container = (IServiceContainer)provider;
+			T ser = container.getServiceRegistry().searchService(type, provider.getId(), scope);
+			if(ser!=null)
 			{
-				public void intermediateResultAvailable(IService result)
-				{
-//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
-//						System.out.println("ir: "+result);
-					ret.setResult(result);
-				}
-				
-				public void finished()
-				{
-//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
-//						System.out.println("fin");
-					if(!ret.isDone())
-					{
-						ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()+" in "+provider.getId())
-						{
-//							public void printStackTrace()
-//							{
-//								Thread.dumpStack();
-//								super.printStackTrace();
-//							}
-						});
-					}
-				}
-				
-				public void resultAvailable(Collection<IService> result)
-				{
-//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
-//						System.out.println("ra: "+result);
-					Collection<IService> res = (Collection<IService>)result;
-					if(res==null || res.size()==0)
-					{
-	//					provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
-	//						new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
-	//						.addResultListener(new DefaultResultListener()
-	//					{
-	//						public void resultAvailable(Object result)
-	//						{
-	//							System.out.println("rrr: "+result);
-	//						}
-	//					});
-						exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()+" scope: "+scope));
-					}
-					else
-					{
-						ret.setResult(res.iterator().next());
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-//					if(type.toString().indexOf("IFile")!=-1)
-//						System.out.println("Ex result: "+exception);
-					if(!ret.isDone())
-					{
-						ret.setException(exception);
-					}
-				}
-			});
+				ret.setResult(ser);
+			}
+			else
+			{
+				if(type.getName().indexOf("Remote")!=-1)
+					System.out.println("service not found: "+type.getName());
+				ret.setException(new ServiceNotFoundException(type.getName()));
+			}
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			try
+			{
+				provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
+					new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter))
+						.addResultListener(new IIntermediateResultListener<IService>()
+				{
+					public void intermediateResultAvailable(IService result)
+					{
+	//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
+	//						System.out.println("ir: "+result);
+						ret.setResult(result);
+					}
+					
+					public void finished()
+					{
+	//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
+	//						System.out.println("fin");
+						if(!ret.isDone())
+						{
+							ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()+" in "+provider.getId())
+							{
+	//							public void printStackTrace()
+	//							{
+	//								Thread.dumpStack();
+	//								super.printStackTrace();
+	//							}
+							});
+						}
+					}
+					
+					public void resultAvailable(Collection<IService> result)
+					{
+	//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
+	//						System.out.println("ra: "+result);
+						Collection<IService> res = (Collection<IService>)result;
+						if(res==null || res.size()==0)
+						{
+		//					provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
+		//						new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
+		//						.addResultListener(new DefaultResultListener()
+		//					{
+		//						public void resultAvailable(Object result)
+		//						{
+		//							System.out.println("rrr: "+result);
+		//						}
+		//					});
+							exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()+" scope: "+scope));
+						}
+						else
+						{
+							ret.setResult(res.iterator().next());
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+	//					if(type.toString().indexOf("IFile")!=-1)
+	//						System.out.println("Ex result: "+exception);
+						if(!ret.isDone())
+						{
+							ret.setException(exception);
+						}
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
-		
 		return ret;
 	}
 	
@@ -480,16 +500,33 @@ public class SServiceProvider
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
 //		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
 		
-		try
+		if(registrysearch && provider instanceof IServiceContainer)
 		{
-			ITerminableIntermediateFuture fut = provider.getServices(getSearchManager(true, scope), 
-				getVisitDecider(false, scope),
-				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter));
-			fut.addResultListener(new TerminableIntermediateDelegationResultListener(ret, fut));
+			IServiceContainer container = (IServiceContainer)provider;
+			Collection<T> sers = container.getServiceRegistry().searchServices(type, provider.getId(), scope);
+			
+//			if(sers!=null && sers.size()>0)
+//			{
+				ret.setResult(sers==null? Collections.EMPTY_SET: sers);
+//			}
+//			else
+//			{
+//				ret.setException(new ServiceNotFoundException(type.getName()));
+//			}
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			try
+			{
+				ITerminableIntermediateFuture fut = provider.getServices(getSearchManager(true, scope), 
+					getVisitDecider(false, scope),
+					new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter));
+				fut.addResultListener(new TerminableIntermediateDelegationResultListener(ret, fut));
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
 		
 		return ret;
@@ -801,7 +838,7 @@ public class SServiceProvider
 		}
 		else if(multiple || RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
-			ret	= sequentialmanager;//parallelmanager;
+			ret	= parallelmanager;
 		}
 		else
 		{
