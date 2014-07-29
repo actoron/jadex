@@ -3,9 +3,6 @@ package jadex.base.relay;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -332,7 +329,7 @@ public class RelayServlet extends HttpServlet
 							markers.append("&markers=size:mid|label:");
 							markers.append(i+cnt+1);
 							markers.append("|color:");
-							markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
+							markers.append(colors[Math.abs(infos2[i].getAwarenessInfo().getSender().getName().hashCode())%colors.length]);
 							markers.append("|");
 							markers.append(infos2[i].getPosition());
 							positions.add(infos2[i].getPosition());
@@ -341,7 +338,7 @@ public class RelayServlet extends HttpServlet
 						{
 							// Add unlabelled markers for each unique position of remaining entries
 							markers.append("&markers=size:mid|color:");
-							markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
+							markers.append(colors[Math.abs(infos2[i].getAwarenessInfo().getSender().getName().hashCode())%colors.length]);
 							markers.append("|");
 							markers.append(infos2[i].getPosition());
 							positions.add(infos2[i].getPosition());
@@ -359,21 +356,25 @@ public class RelayServlet extends HttpServlet
 			}
 		}
 
-		int	width	= Integer.valueOf(request.getParameter("width"));
-		int	height	= Integer.valueOf(request.getParameter("height"));
-		URL	url	= new URL("http://maps.googleapis.com/maps/api/staticmap?size="+width+"x"+height+"&sensor=false"+markers);
-		HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
-    	response.setContentType(con.getContentType());
-    	response.setContentLength(con.getContentLength());
-        	
-		// Copy content to output stream.
-    	InputStream	in	= con.getInputStream();
-		byte[]	buf	= new byte[8192];  
-		int	len;
-		while((len=in.read(buf)) != -1)
-		{
-			response.getOutputStream().write(buf, 0, len);
-		}
-		in.close();
+		// Use scale=2 for larger pictures in spite of 640 pixel limitS
+		int	width	= Integer.valueOf(request.getParameter("width"))/2;
+		int	height	= Integer.valueOf(request.getParameter("height"))/2;
+		String	url	= "http://maps.googleapis.com/maps/api/staticmap?scale=2&size="+width+"x"+height+"&sensor=false"+markers;
+		
+		// Copy content to output stream. (against google policies?)
+//		HttpURLConnection	con	= (HttpURLConnection)new URL(url).openConnection();
+//    	response.setContentType(con.getContentType());
+//    	response.setContentLength(con.getContentLength());
+//    	InputStream	in	= con.getInputStream();
+//		byte[]	buf	= new byte[8192];  
+//		int	len;
+//		while((len=in.read(buf)) != -1)
+//		{
+//			response.getOutputStream().write(buf, 0, len);
+//		}
+//		in.close();
+		
+		// Redirect (allowed by google?)
+		response.sendRedirect(url);
 	}
 }
