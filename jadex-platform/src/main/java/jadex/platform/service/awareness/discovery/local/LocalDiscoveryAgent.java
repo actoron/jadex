@@ -231,6 +231,8 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 			{
 				lastpostedfile.delete();
 			}
+			
+			lastpostedfile = outfile;
 		}
 		catch (Exception e)
 		{
