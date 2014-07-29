@@ -29,6 +29,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -165,6 +166,9 @@ public class ComponentManagementService implements IComponentManagementService
 	
 	/** The cid count. */
 	protected Map<String, Integer> cidcounts;
+	
+	/** The service registry. */
+	protected LocalServiceRegistry registry;
 	
     //-------- constructors --------
 

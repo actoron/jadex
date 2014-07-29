@@ -3,7 +3,6 @@ package jadex.bridge.service.searchv2;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 
 import java.util.HashMap;
@@ -12,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ *  Local service registry.
  */
 public class LocalServiceRegistry
 {
@@ -23,7 +22,7 @@ public class LocalServiceRegistry
 	 *  Add a service to the registry.
 	 *  @param sid The service id.
 	 */
-	public void addService(IService service)
+	public synchronized void addService(IService service)
 	{
 		if(services==null)
 		{
@@ -44,7 +43,7 @@ public class LocalServiceRegistry
 	 *  Remove a service from the registry.
 	 *  @param sid The service id.
 	 */
-	public void removeService(IService service)
+	public synchronized void removeService(IService service)
 	{
 		if(services!=null)
 		{
@@ -59,40 +58,158 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public <T> Set<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
+	public synchronized <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope)
+	{
+		T ret = null;
+		if(services!=null)
+		{
+			Set<IService> sers = services.get(new ClassInfo(type));
+			if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
+			{
+				for(IService ser: sers)
+				{
+					if(checkService(cid, ser, scope))
+					{
+						ret = (T)ser;
+						break;
+					}
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Search for services.
+	 */
+	public synchronized <T> Set<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope)
 	{
 		Set<T> ret = null;
 		if(services!=null)
 		{
 			Set<IService> sers = services.get(new ClassInfo(type));
-			if(sers!=null && sers.size()>0)
+			if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 			{
 				ret = new HashSet<T>();
 				for(IService ser: sers)
 				{
-					if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope) || RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+					if(checkService(cid, ser, scope))
 					{
 						ret.add((T)ser);
-					}
-					else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
-					{
-						IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-						if(target.getPlatformName().equals(cid.getPlatformName())) 
-						{
-							String tln = target.getLocalName();
-							String cln = cid.getLocalName();
-							
-//							int idx = cln.indexOf(".");
-//							if(idx!=-1)
-//							{
-//								String paname = name.substring(at+1, idx);
-//								String pfname = name.substring(idx+1);
-//							}
-						}
 					}
 				}
 			}
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Check if service is ok with respect to scope.
+	 */
+	protected boolean checkService(IComponentIdentifier cid, IService ser, String scope)
+	{
+		boolean ret = false;
+		
+		if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope) || RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		{
+			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		{
+			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
+			ret = target.getPlatformName().equals(cid.getPlatformName())
+				&& getApplicationName(target).equals(getApplicationName(cid));
+		}
+		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		{
+			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
+			ret = target.getPlatformName().equals(cid.getPlatformName())
+				&& getApplicationName(target).equals(getApplicationName(cid));
+		}
+		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		{
+			// only the component itself
+			ret = ser.getServiceIdentifier().getProviderId().equals(cid);
+		}
+		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		{
+			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
+			
+			String subname = getSubcomponentName(target);
+			ret = target.getName().endsWith(subname);
+			
+//			while(target!=null)
+//			{
+//				if(target.equals(parent))
+//				{
+//					ret.add((T)ser);
+//					break;
+//				}
+//				else
+//				{
+//					target = target.getParent();
+//				}
+//			}
+		}
+		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
+		{
+			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
+			
+			while(target!=null)
+			{
+				if(target.equals(cid))
+				{
+					ret = true;
+					break;
+				}
+				else
+				{
+					target = target.getParent();
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the application name. Equals the local component name in case it is a child of the platform.
+	 *  broadcast@awa.plat1 -> awa
+	 *  @return The application name.
+	 */
+	public static String getApplicationName(IComponentIdentifier cid)
+	{
+		String ret = cid.getName();
+		int idx;
+		// If it is a direct subcomponent
+		if((idx = ret.lastIndexOf('.')) != -1)
+		{
+			// cut off platform name
+			ret = ret.substring(0, idx);
+			// cut off local name 
+			if((idx = ret.indexOf('@'))!=-1)
+				ret = ret.substring(idx + 1);
+			if((idx = ret.indexOf('.'))!=-1)
+				ret = ret.substring(idx + 1);
+		}
+		else
+		{
+			ret = cid.getLocalName();
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the subcomponent name.
+	 *  @param cid The component id.
+	 *  @return The subcomponent name.
+	 */
+	public static String getSubcomponentName(IComponentIdentifier cid)
+	{
+		String ret = cid.getName();
+		int idx;
+		if((idx = ret.indexOf('@'))!=-1)
+			ret = ret.substring(idx + 1);
 		return ret;
 	}
 }

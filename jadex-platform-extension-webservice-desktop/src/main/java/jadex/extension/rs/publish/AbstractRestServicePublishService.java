@@ -1327,7 +1327,9 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 						UriBuilder ub = ui.getBaseUriBuilder();
 						if(path!=null)
 							ub.path(path.value());
-						String link = ub.build((Object[])null).toString();
+//						System.out.println("path1: "+path);
+						String link = ub.build((Map)Collections.EMPTY_MAP).toString();
+//						System.out.println("path2: "+path);
 						
 						if(ptypes.length>0)
 						{

@@ -63,4 +63,11 @@ public interface IComponentIdentifier
 	 *  @return The root identifier.
 	 */
 	public IComponentIdentifier getRoot();
+	
+//	/**
+//	 *  Get the application name. Equals the local component name in case it is a child of the platform.
+//	 *  broadcast@awa.plat1 -> awa
+//	 *  @return The application name.
+//	 */
+//	public String getApplicationName();
 }
