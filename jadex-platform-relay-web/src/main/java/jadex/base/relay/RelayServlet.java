@@ -266,93 +266,25 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void serveMap(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		String[]	colors	= new String[]{"black", "brown", "green", "purple", "yellow", "blue", "gray", "orange", "red", "white"};
+		StringBuffer markers	= new StringBuffer();
+		Set<String> positions	= new HashSet<String>();
+		int	cnt	= 0;
+		
+		// Add markers for locally connected platforms
 		List<PlatformInfo>	pinfos	= new ArrayList<PlatformInfo>();
 		pinfos.addAll(Arrays.asList(handler.getCurrentPlatforms()));
 		PlatformInfo[]	infos	= pinfos.toArray(new PlatformInfo[0]);
-		PeerEntry[]	peers	= handler.getCurrentPeers();
-		StringBuffer markers	= new StringBuffer();
-		String[]	colors	= new String[]{"black", "brown", "green", "purple", "yellow", "blue", "gray", "orange", "red", "white"};
-		Set<String> positions	= new HashSet<String>();
-
-		// Add markers for locally connected platforms
-		if(infos.length>0)
-		{
-			for(int i=0; i<infos.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
-			{
-				if(infos[i].getPosition()!=null && !positions.contains(infos[i].getPosition()))
-				{
-					if(i<9)
-					{
-						// Add labelled markers for first 1..9 entries
-						markers.append("&markers=size:mid|label:");
-						markers.append(i+1);
-						markers.append("|color:");
-						markers.append(colors[Math.abs(infos[i].getAwarenessInfo().getSender().getName().hashCode())%colors.length]);
-						markers.append("|");
-						markers.append(infos[i].getPosition());
-						positions.add(infos[i].getPosition());
-					}
-					else if(i==9)
-					{
-						// Add unlabelled markers for each unique position of remaining entries
-						markers.append("&markers=size:mid|color:");
-						markers.append(colors[Math.abs(infos[i].getAwarenessInfo().getSender().getName().hashCode())%colors.length]);
-						markers.append("|");
-						markers.append(infos[i].getPosition());
-						positions.add(infos[i].getPosition());
-					}
-					else
-					{
-						// Add unlabelled markers for each unique position of remaining entries
-						markers.append("|");
-						markers.append(infos[i].getPosition());
-						positions.add(infos[i].getPosition());
-					}
-				}
-			}
-		}
-		int	cnt	= infos.length;
+		cnt = addMarkers(infos, markers, colors, positions, cnt);
 
 		// Add markers for remotely connected platforms
+		PeerEntry[]	peers	= handler.getCurrentPeers();
 		if(peers.length>0)
 		{
 			for(int j=0; j<peers.length && markers.length()+250<2048; j++)	// hack!!! make sure url length stays below 2048 character limit. 
 			{
 				PlatformInfo[]	infos2	= peers[j].getPlatformInfos();
-				for(int i=0; i<infos2.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
-				{
-					if(infos2[i].getPosition()!=null)
-					{
-						if(i+cnt<9)
-						{
-							// Add labelled markers for first 1..9 entries
-							markers.append("&markers=size:mid|label:");
-							markers.append(i+cnt+1);
-							markers.append("|color:");
-							markers.append(colors[Math.abs(infos2[i].getAwarenessInfo().getSender().getName().hashCode())%colors.length]);
-							markers.append("|");
-							markers.append(infos2[i].getPosition());
-							positions.add(infos2[i].getPosition());
-						}
-						else if(i+cnt==9)
-						{
-							// Add unlabelled markers for each unique position of remaining entries
-							markers.append("&markers=size:mid|color:");
-							markers.append(colors[Math.abs(infos2[i].getAwarenessInfo().getSender().getName().hashCode())%colors.length]);
-							markers.append("|");
-							markers.append(infos2[i].getPosition());
-							positions.add(infos2[i].getPosition());
-						}
-						else if(!positions.contains(infos2[i].getPosition()))
-						{
-							// Add unlabelled markers for each unique position of remaining entries
-							markers.append("|");
-							markers.append(infos2[i].getPosition());
-							positions.add(infos2[i].getPosition());
-						}
-					}
-				}
-				cnt	+= infos2.length;
+				cnt	= addMarkers(infos2, markers, colors, positions, cnt);
 			}
 		}
 
@@ -376,5 +308,50 @@ public class RelayServlet extends HttpServlet
 		
 		// Redirect (allowed by google?)
 		response.sendRedirect(url);
+	}
+	
+	/**
+	 *  Add markers for given platform infos.
+	 */
+	protected int addMarkers(PlatformInfo[] infos, StringBuffer markers, String[] colors, Set<String> positions, int cnt)
+	{
+		if(infos.length>0)
+		{
+			for(int i=0; i<infos.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
+			{
+				if(infos[i].getPosition()!=null && !positions.contains(infos[i].getPosition()))
+				{
+					if(cnt<9)
+					{
+						// Add labeled markers for first 1..9 entries
+						markers.append("&markers=size:mid|label:");
+						markers.append(cnt+1);
+						markers.append("|color:");
+						markers.append(colors[Math.abs(infos[i].getId().hashCode())%colors.length]);
+						markers.append("|");
+						markers.append(infos[i].getPosition());
+						positions.add(infos[i].getPosition());
+					}
+					else if(cnt==9)
+					{
+						// Add unlabeled markers for each unique position of remaining entries
+						markers.append("&markers=size:mid|color:");
+						markers.append(colors[Math.abs(infos[i].getId().hashCode())%colors.length]);
+						markers.append("|");
+						markers.append(infos[i].getPosition());
+						positions.add(infos[i].getPosition());
+					}
+					else
+					{
+						// Add unlabeled markers for each unique position of remaining entries
+						markers.append("|");
+						markers.append(infos[i].getPosition());
+						positions.add(infos[i].getPosition());
+					}
+					cnt++;
+				}
+			}
+		}
+		return cnt;
 	}
 }
