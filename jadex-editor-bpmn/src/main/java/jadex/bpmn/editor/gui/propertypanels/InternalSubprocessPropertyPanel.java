@@ -60,13 +60,15 @@ public class InternalSubprocessPropertyPanel extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public InternalSubprocessPropertyPanel(final ModelContainer container, VActivity task, MParameter selectedparameter)
+	public InternalSubprocessPropertyPanel(final ModelContainer container, Object selection)
 	{
 		super(null, container);
 		
 		assert SwingUtilities.isEventDispatchThread();
 
 		setLayout(new BorderLayout());
+		
+		VActivity task = BasePropertyPanel.getActivityAndSelectedParameter(selection).getFirstEntity();
 		
 		this.task = task;
 

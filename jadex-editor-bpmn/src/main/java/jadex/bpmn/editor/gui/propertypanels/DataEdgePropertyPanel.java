@@ -33,9 +33,10 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public DataEdgePropertyPanel(ModelContainer container, VDataEdge edge)
+	public DataEdgePropertyPanel(ModelContainer container, Object selection)
 	{
 		super("Data Edge", container);
+		VDataEdge edge = (VDataEdge) selection;
 		this.dataedge = edge;
 		
 		int y = 0;

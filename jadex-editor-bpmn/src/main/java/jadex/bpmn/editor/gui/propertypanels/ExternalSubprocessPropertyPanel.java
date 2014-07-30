@@ -36,9 +36,9 @@ public class ExternalSubprocessPropertyPanel extends InternalSubprocessPropertyP
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public ExternalSubprocessPropertyPanel(final ModelContainer container, VActivity task, MParameter selectedparameter)
+	public ExternalSubprocessPropertyPanel(final ModelContainer container, Object selection)
 	{
-		super(container, task, selectedparameter);
+		super(container, selection);
 	}
 	
 	/**

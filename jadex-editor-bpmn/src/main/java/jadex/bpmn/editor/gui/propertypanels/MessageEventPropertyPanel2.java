@@ -17,9 +17,10 @@ public class MessageEventPropertyPanel2 extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public MessageEventPropertyPanel2(final ModelContainer container, final VActivity vact)
+	public MessageEventPropertyPanel2(final ModelContainer container, Object selection)
 	{
 		super("Message Event Properties", container);
+		VActivity vact = (VActivity) selection;
 		setLayout(new BorderLayout());
 	
 		add(createTabPanel(vact), BorderLayout.CENTER);

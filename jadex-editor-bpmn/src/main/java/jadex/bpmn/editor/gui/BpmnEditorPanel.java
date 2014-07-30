@@ -1,7 +1,6 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.gui.controllers.SelectionController;
-import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.commons.gui.JSplitPanel;
 
 import java.awt.BorderLayout;
@@ -90,7 +89,8 @@ public class BpmnEditorPanel extends JSplitPanel
 		};
 		setBottomComponent(propertypanelcontainer);
 		modelcontainer.setPropertypanelcontainer(propertypanelcontainer);
-		modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
+//		modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
+		modelcontainer.setPropertyPanel(modelcontainer.getSettings().getPropertyPanelFactory().createPanel(modelcontainer, null));
 		graph.getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
 	}
 	
