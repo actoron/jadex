@@ -43,7 +43,7 @@ public class SServiceProvider
 {	
 	//-------- constants --------
 	
-	public static boolean registrysearch = false;
+	public static boolean registrysearch = true;
 	
 	/** The sequential search manager. */
 	public static final ISearchManager sequentialmanager = new SequentialSearchManager();
