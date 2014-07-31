@@ -184,7 +184,7 @@ public class BinarySerializer
 		{
 			errorreporter = new DefaultErrorReporter();
 		}
-		IDecodingContext context = new DecodingContext(val, postprocessors, usercontext, classloader, errorreporter);
+		IDecodingContext context = new DecodingContext(val, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter);
 		return decodeObject(context);
 	}
 	
@@ -227,7 +227,7 @@ public class BinarySerializer
 		//if (postprocessors != null)
 			//handlers.addAll(postprocessors);
 		
-		IDecodingContext context = new DecodingContext(buffer, postprocessors, usercontext, classloader, errorreporter, offset);
+		IDecodingContext context = new DecodingContext(buffer, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter, offset);
 		return decodeObject(context);
 	}
 	
@@ -269,11 +269,12 @@ public class BinarySerializer
 	protected static Object decodeRawObject(Class<?> clazz, IDecodingContext context)
 	{
 		Object dobject = null;
-		for (int i = 0; i < DECODER_HANDLERS.size(); ++i)
+		List<IDecoderHandler> decoderhandlers = context.getDecoderHandlers();
+		for (int i = 0; i < decoderhandlers.size(); ++i)
 		{
-			if (DECODER_HANDLERS.get(i).isApplicable(clazz))
+			if (decoderhandlers.get(i).isApplicable(clazz))
 			{
-				dobject = DECODER_HANDLERS.get(i).decode(clazz, context);
+				dobject = decoderhandlers.get(i).decode(clazz, context);
 				break;
 			}
 		}

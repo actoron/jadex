@@ -9,6 +9,8 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 	/** The classloader */
 	protected ClassLoader classloader;
 	
+	protected List<IDecoderHandler> decoderhandlers;
+	
 	/** A user context. */
 	protected Object usercontext;
 
@@ -30,8 +32,11 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 	/**
 	 *  Initializes the context.
 	 */
-	public AbstractDecodingContext(List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
+	public AbstractDecodingContext(List<IDecoderHandler> decoderhandlers, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
 	{
+		if (decoderhandlers == null)
+			System.out.println("FAL");
+		this.decoderhandlers = decoderhandlers;
 		this.postprocessors = postprocessors;
 		this.usercontext = usercontext;
 		this.classloader = classloader;
@@ -46,6 +51,16 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 	public ClassLoader getClassloader()
 	{
 		return classloader;
+	}
+	
+	/**
+	 *  Returns the handlers used to decode objects.
+	 *  
+	 *  @return The handlers.
+	 */
+	public List<IDecoderHandler> getDecoderHandlers()
+	{
+		return decoderhandlers;
 	}
 	
 	/**

@@ -6,6 +6,7 @@ import jadex.commons.transformation.traverser.Traverser;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -70,8 +71,13 @@ public class ArrayCodec2 extends AbstractCodec
 			else if (boolean.class.equals(compclass))
 			{
 				boolean[] array = (boolean[]) object;
+				byte[] packed = new byte[(int) Math.ceil(array.length / 8.0)];
+				context.read(packed);
 				for (int i = 0; i < array.length; ++i)
-					array[i] = context.readBoolean();
+				{
+					byte mask = (byte) ((1 << (7 - (i % 8))) & 0xFF);
+					array[i] = ((packed[i >> 3] & mask) & 0xFF) > 0;
+				}
 			}
 			else if (float.class.equals(compclass))
 			{
@@ -215,8 +221,16 @@ public class ArrayCodec2 extends AbstractCodec
 		{
 			boolean[] array = (boolean[]) obj;
 			ec.writeVarInt(array.length);
+			byte[] packed = new byte[(int) Math.ceil(array.length / 8.0)];
 			for (int i = 0; i < array.length; ++i)
-				ec.writeBoolean(array[i]);
+			{
+				if (array[i])
+				{
+					byte mask = (byte) ((1 << (7 - (i % 8))) & 0xFF);
+					packed[i >>> 3] |= mask;
+				}
+			}
+			ec.write(packed);
 		}
 		else if (float.class.equals(compclass))
 		{

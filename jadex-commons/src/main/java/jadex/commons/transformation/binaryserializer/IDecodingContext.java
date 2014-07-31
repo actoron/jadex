@@ -1,5 +1,6 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,13 @@ public interface IDecodingContext
 	 * @return The classloader.
 	 */
 	public ClassLoader getClassloader();
+	
+	/**
+	 *  Returns the handlers used to decode objects.
+	 *  
+	 *  @return The handlers.
+	 */
+	public List<IDecoderHandler> getDecoderHandlers();
 	
 	/**
 	 *  Gets the error reporter.

@@ -43,6 +43,12 @@ public interface IEncodingContext
 	public void setIgnoreNextClassWrite(boolean state);
 	
 	/**
+	 *  Writes a byte.
+	 *  @param b The byte.
+	 */
+	public void writeByte(byte b);
+	
+	/**
 	 *  Writes a byte array.
 	 *  @param b The byte array.
 	 */
