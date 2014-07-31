@@ -23,7 +23,6 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.TypeResultSelector;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -50,9 +49,9 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.binaryserializer.DecodingContext;
-import jadex.commons.transformation.binaryserializer.EncodingContext;
+import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
+import jadex.commons.transformation.binaryserializer.IDecodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.message.MessageService;
@@ -1293,7 +1292,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ProxyReference.class.equals(clazz);
 			}
 			
-			public Object decode(Class<?> clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, IDecodingContext context)
 			{
 				try
 				{
@@ -1315,7 +1314,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ServiceInputConnectionProxy.class.equals(clazz);
 			}
 			
-			public Object decode(Class<?> clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, IDecodingContext context)
 			{
 				try
 				{
@@ -1339,7 +1338,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ServiceOutputConnectionProxy.class.equals(clazz);
 			}
 			
-			public Object decode(Class<?> clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, IDecodingContext context)
 			{
 				try
 				{
@@ -1434,8 +1433,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					IComponentIdentifier receiver = ((AbstractRemoteCommand)((EncodingContext)context).getRootObject()).getReceiver();
-					return rrm.getProxyReference(object, receiver, ((EncodingContext)context).getClassLoader());
+					IComponentIdentifier receiver = ((AbstractRemoteCommand)((IEncodingContext)context).getRootObject()).getReceiver();
+					return rrm.getProxyReference(object, receiver, ((IEncodingContext)context).getClassLoader());
 				}
 				catch(Exception e)
 				{
@@ -1454,7 +1453,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					AbstractRemoteCommand com = (AbstractRemoteCommand)((EncodingContext)context).getRootObject();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)((IEncodingContext)context).getRootObject();
 					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
 					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(
 						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
@@ -1483,7 +1482,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					AbstractRemoteCommand com = (AbstractRemoteCommand)((EncodingContext)context).getRootObject();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)((IEncodingContext)context).getRootObject();
 					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
 					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(
 						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());

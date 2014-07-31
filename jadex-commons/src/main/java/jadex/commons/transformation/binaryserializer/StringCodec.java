@@ -29,7 +29,7 @@ public class StringCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		String ret = context.readString();
 		return ret;
@@ -38,7 +38,7 @@ public class StringCodec extends AbstractCodec
 	/**
 	 *  References handling not needed, handled by string pool.
 	 */
-	public void recordKnownDecodedObject(Object object, DecodingContext context)
+	public void recordKnownDecodedObject(Object object, IDecodingContext context)
 	{
 	}
 	
@@ -58,14 +58,14 @@ public class StringCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		ec.writeString((String)object);
 		
 		return object;
 	}
 	
-	public boolean canReference(Object object, Class<?> clazz, EncodingContext ec)
+	public boolean canReference(Object object, Class<?> clazz, IEncodingContext ec)
 	{
 		return false;
 	}

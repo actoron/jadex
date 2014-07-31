@@ -45,7 +45,7 @@ public class BeanCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		Object bean = null;
 		boolean isanonclass = context.readBoolean();
@@ -123,7 +123,7 @@ public class BeanCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The finished object.
 	 */
-	public Object decodeSubObjects(Object object, Class<?> clazz, DecodingContext context)
+	public Object decodeSubObjects(Object object, Class<?> clazz, IDecodingContext context)
 	{
 		if(object != null)
 		{
@@ -180,7 +180,7 @@ public class BeanCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		if (!nonanonclasscache.contains(clazz))
 		{
@@ -271,7 +271,7 @@ public class BeanCodec extends AbstractCodec
 	 * 
 	 */
 	public static void writeBeanProperties(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec, IBeanIntrospector intro)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec, IBeanIntrospector intro)
 	{
 		Map props = intro.getBeanProperties(clazz, true, false);
 		
@@ -305,7 +305,7 @@ public class BeanCodec extends AbstractCodec
 	/**
 	 * 
 	 */
-	public static void readBeanProperties(Object object, Class clazz, DecodingContext context, IBeanIntrospector intro)
+	public static void readBeanProperties(Object object, Class clazz, IDecodingContext context, IBeanIntrospector intro)
 	{
 		Map props = intro.getBeanProperties(clazz, true, false);
 		int size = (int) context.readVarInt();

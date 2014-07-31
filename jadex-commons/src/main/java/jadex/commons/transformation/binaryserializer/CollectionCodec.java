@@ -36,7 +36,7 @@ public class CollectionCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		Collection coll = null;
 		try
@@ -73,7 +73,7 @@ public class CollectionCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The finished object.
 	 */
-	public Object decodeSubObjects(Object object, Class<?> clazz, DecodingContext context)
+	public Object decodeSubObjects(Object object, Class<?> clazz, IDecodingContext context)
 	{
 		Collection coll = (Collection) object;
 		int length = (int) context.readVarInt();
@@ -101,7 +101,7 @@ public class CollectionCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		ec.writeVarInt(((Collection) object).size());
 		

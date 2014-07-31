@@ -29,7 +29,7 @@ public class StackTraceElementCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		return new StackTraceElement((String)BinarySerializer.decodeObject(context), (String)BinarySerializer.decodeObject(context), 
 				(String)BinarySerializer.decodeObject(context), (int)context.readSignedVarInt());
@@ -52,7 +52,7 @@ public class StackTraceElementCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		StackTraceElement ste = (StackTraceElement)object;
 		traverser.doTraverse(ste.getClassName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);

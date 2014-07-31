@@ -31,7 +31,7 @@ public class LegacyMethodInfoEncoder implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		EncodingContext ec = (EncodingContext) context;
+		IEncodingContext ec = (IEncodingContext) context;
 		
 		traversed.put(object, traversed.size());
 		

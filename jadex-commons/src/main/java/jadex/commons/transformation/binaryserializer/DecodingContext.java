@@ -6,30 +6,16 @@ import jadex.commons.transformation.STransformation;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Context for decoding a binary-encoded object.
  *
  */
-public class DecodingContext
+public class DecodingContext extends AbstractDecodingContext
 {
-	/** The postprocessors. */
-	protected List<IDecoderHandler> postprocessors;
-	
-	/** The last decoded object */
-	protected Object lastobject;
-	
-	/** A user context. */
-	protected Object usercontext;
-	
 	/** The content being decoded.*/
 	protected byte[] content;
-	
-	/** The classloader */
-	protected ClassLoader classloader;
 	
 	/** The current offset */
 	protected int offset;
@@ -50,15 +36,6 @@ public class DecodingContext
 	/** The current bit position within the bitfield */
 	protected byte bitpos;
 	
-	/** Already known objects */
-	protected Map<Integer, Object> knownobjects;
-	
-	/** The current class name. */
-	protected String currentclassname;
-	
-	/** Error Reporter */
-	protected IErrorReporter errorreporter;
-	
 	/**
 	 * Creates a new DecodingContext.
 	 * @param classloader The classloader.
@@ -76,84 +53,17 @@ public class DecodingContext
 	 */
 	public DecodingContext(byte[] content, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, int offset)
 	{
+		super(postprocessors, usercontext, classloader, errorreporter);
 		this.content = content;
-		this.postprocessors = postprocessors;
-		this.classloader = classloader;
-		this.usercontext = usercontext;
 		this.offset = offset;
 		this.stringpool = new ArrayList<String>();
 		this.classnamepool = new ArrayList<String>();
 		this.pkgpool = new ArrayList<String>();
 		//this.stringpool.addAll(BinarySerializer.DEFAULT_STRINGS);
-		this.knownobjects = new HashMap<Integer, Object>();
 		this.bitfield = 0;
 		this.bitpos = 8;
-		this.errorreporter = errorreporter;
 	}
 	
-	/**
-	 *  Returns the handlers used for post-processing.
-	 *  @return Post-processing handlers.
-	 */
-	public List<IDecoderHandler> getPostProcessors()
-	{
-		return postprocessors;
-	}
-	
-	/**
-	 *  Returns the known objects.
-	 *  @return Known objects.
-	 */
-	public Map<Integer, Object> getKnownObjects()
-	{
-		return knownobjects;
-	}
-	
-	/**
-	 *  Returns the last object decoded.
-	 *  @return The last object decoded.
-	 */
-	public Object getLastObject()
-	{
-		return lastobject;
-	}
-	
-	/**
-	 *  Returns the user context.
-	 *  @return The user context.
-	 */
-	public Object getUserContext()
-	{
-		return usercontext;
-	}
-
-	/**
-	 *  Sets the last object decoded.
-	 *  @param lastobject The last object decoded.
-	 */
-	public void setLastObject(Object lastobject)
-	{
-		this.lastobject = lastobject;
-	}
-	
-	/**
-	 *  Gets the current class name.
-	 *  @return The current class name.
-	 */
-	public String getCurrentClassName()
-	{
-		return this.currentclassname;
-	}
-	
-	/**
-	 *  Gets the error reporter.
-	 *  @return The error reporter.
-	 */
-	public IErrorReporter getErrorReporter()
-	{
-		return errorreporter;
-	}
-
 	/**
 	 * Increases the offset.
 	 * @param val The value to increase the offset.
@@ -170,15 +80,6 @@ public class DecodingContext
 	public int getOffset()
 	{
 		return offset;
-	}
-	
-	/**
-	 * Gets the classloader.
-	 * @return The classloader.
-	 */
-	public ClassLoader getClassloader()
-	{
-		return classloader;
 	}
 	
 	/**
@@ -200,6 +101,16 @@ public class DecodingContext
 	}*/
 	
 	/**
+	 *  Reads a byte from the buffer.
+	 *  
+	 *  @return A byte.
+	 */
+	public byte readByte()
+	{
+		return content[offset++];
+	}
+	
+	/**
 	 *  Reads a number of bytes from the buffer.
 	 *  
 	 *  @param count Number of bytes.
@@ -213,6 +124,19 @@ public class DecodingContext
 		offset += count;
 		
 		return ret;
+	}
+	
+	/**
+	 *  Reads a number of bytes from the buffer and fills the array.
+	 *  
+	 *  @param array The byte array.
+	 *  @return The byte array for convenience.
+	 */
+	public byte[] read(byte[] array)
+	{
+		System.arraycopy(content, offset, array, 0, array.length);
+		offset += array.length;
+		return array;
 	}
 	
 	/**
@@ -287,7 +211,7 @@ public class DecodingContext
 		
 		ret	= STransformation.getClassname(ret);
 			
-		currentclassname = ret;
+		setCurrentClassName(ret);
 		return ret;
 	}
 	

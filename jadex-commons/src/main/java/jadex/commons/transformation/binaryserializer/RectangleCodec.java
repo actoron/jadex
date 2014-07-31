@@ -31,9 +31,11 @@ public class RectangleCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
-		ByteBuffer buf = context.getByteBuffer(16);
+		byte[] abuf = new byte[16];
+		context.read(abuf);
+		ByteBuffer buf = ByteBuffer.wrap(abuf);
 		buf.order(ByteOrder.BIG_ENDIAN);
 		int x = buf.getInt();
 		int y = buf.getInt();
@@ -58,15 +60,17 @@ public class RectangleCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		Rectangle r = (Rectangle)object;
-		ByteBuffer buf = ec.getByteBuffer(16);
+		byte[] abuf = new byte[16];
+		ByteBuffer buf = ByteBuffer.wrap(abuf);
 		buf.order(ByteOrder.BIG_ENDIAN);
 		buf.putInt(r.x);
 		buf.putInt(r.y);
 		buf.putInt(r.width);
 		buf.putInt(r.height);
+		ec.write(abuf);
 		
 		return object;
 	}

@@ -16,7 +16,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		EncodingContext ec = (EncodingContext) context;
+		IEncodingContext ec = (IEncodingContext) context;
 		
 		if(canReference(object, clazz, ec))
 			traversed.put(object, traversed.size());
@@ -38,7 +38,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	protected Object runPreProcessors(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
 	{
-		List<ITraverseProcessor> preprocessors = ((EncodingContext) context).getPreprocessors();
+		List<ITraverseProcessor> preprocessors = ((IEncodingContext) context).getPreprocessors();
 		//System.out.println(preprocessors);
 		if (preprocessors != null)
 		{
@@ -61,7 +61,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param ec The encoding context.
 	 *  @return True, if the codec allows referencing.
 	 */
-	public boolean canReference(Object object, Class<?> clazz, EncodingContext ec)
+	public boolean canReference(Object object, Class<?> clazz, IEncodingContext ec)
 	{
 		return true;
 	}
@@ -74,7 +74,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param ec The encoding context.
 	 *  @return True, if a reference has been encoded, false otherwise.
 	 */
-//	public int encodeReference(Object object, Class clazz, EncodingContext ec)
+//	public int encodeReference(Object object, Class clazz, IEncodingContext ec)
 //	{
 //		Integer ref = ec.getKnownObjects().get(object);
 //		if (ref != null)
@@ -94,7 +94,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  Encode the object.
 	 */
 	public abstract Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec);
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec);
 	
 	/**
 	 *  Decodes an object.
@@ -102,7 +102,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param context The decoding context.
 	 *  @return The decoded object.
 	 */
-	public Object decode(Class<?> clazz, DecodingContext context)
+	public Object decode(Class<?> clazz, IDecodingContext context)
 	{
 		Object ret = createObject(clazz, context);
 		// Remap class in case there was a search for the correct inner class.
@@ -122,12 +122,12 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public abstract Object createObject(Class<?> clazz, DecodingContext context);
+	public abstract Object createObject(Class<?> clazz, IDecodingContext context);
 	
 	/**
 	 *  Record object as known during decoding, allows different behavior if needed.
 	 */
-	public void recordKnownDecodedObject(Object object, DecodingContext context)
+	public void recordKnownDecodedObject(Object object, IDecodingContext context)
 	{
 		context.getKnownObjects().put(context.getKnownObjects().size(), object);
 	}
@@ -140,7 +140,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param context The decoding context.
 	 *  @return The finished object.
 	 */
-	public Object decodeSubObjects(Object object, Class<?> clazz, DecodingContext context)
+	public Object decodeSubObjects(Object object, Class<?> clazz, IDecodingContext context)
 	{
 		return object;
 	}

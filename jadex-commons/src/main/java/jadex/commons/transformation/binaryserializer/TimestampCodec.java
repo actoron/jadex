@@ -28,9 +28,11 @@ public class TimestampCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
-		ByteBuffer buf = context.getByteBuffer(8);
+		byte[] abuf = new byte[8];
+		context.read(abuf);
+		ByteBuffer buf = ByteBuffer.wrap(abuf);
 		buf.order(ByteOrder.BIG_ENDIAN);
 		Timestamp ret = new Timestamp(buf.getLong());
 		return ret;
@@ -52,12 +54,14 @@ public class TimestampCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		long time = ((Timestamp)object).getTime();
-		ByteBuffer buf = ec.getByteBuffer(8);
+		byte[] abuf = new byte[8];
+		ByteBuffer buf = ByteBuffer.wrap(abuf);
 		buf.order(ByteOrder.BIG_ENDIAN);
 		buf.putLong(time);
+		ec.write(abuf);
 		return object;
 	}
 }

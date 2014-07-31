@@ -14,7 +14,7 @@ import java.util.StringTokenizer;
  *  Context for encoding (serializing) an object in a binary format.
  *
  */
-public class EncodingContext
+public class EncodingContext extends AbstractEncodingContext
 {	
 	/** Cache for class names. */
 	protected Map<Class<?>, String> classnamecache = new HashMap<Class<?>, String>();
@@ -34,23 +34,11 @@ public class EncodingContext
 	/** The package fragment pool. */
 	protected Map<String, Integer> pkgpool;
 	
-	/** A user context. */
-	protected Object usercontext;
-	
-	/** The preprocessors. */
-	protected List<ITraverseProcessor> preprocessors;
-	
-	/** The classloader */
-	protected ClassLoader classloader;
-	
 	/** The current bit position within the bitfield */
 	protected byte bitpos;
 	
 	/** The current bitfield position in the buffer*/
 	protected int bitfieldpos;
-	
-	/** Flag indicating class names should be written (can be temporarily disable for one write). */
-	protected boolean writeclass;
 	
 	/** The root object. */
 	protected Object rootobject;
@@ -63,11 +51,7 @@ public class EncodingContext
 	 */
 	public EncodingContext(Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
 	{
-		this.rootobject = rootobject;
-		this.usercontext = usercontext;
-		this.preprocessors = preprocessors;
-		this.classloader = classloader;
-		this.writeclass = true;
+		super(rootobject, usercontext, preprocessors, classloader);
 		buffer = new GrowableByteBuffer();
 		classidcache = new HashMap<Class<?>, Integer>();
 		stringpool = new HashMap<String, Integer>();
@@ -86,51 +70,6 @@ public class EncodingContext
 	public byte[] getBytes()
 	{
 		return buffer.toByteArray();
-	}
-	
-	/**
-	 *  Get the rootobject.
-	 *  @return the rootobject.
-	 */
-	public Object getRootObject()
-	{
-		return rootobject;
-	}
-
-	/**
-	 *  Returns the user context.
-	 *  @return The user context.
-	 */
-	public Object getUserContext()
-	{
-		return usercontext;
-	}
-	
-	/**
-	 *  Returns the preprocessors.
-	 *  @return The preprocessors
-	 */
-	public List<ITraverseProcessor> getPreprocessors()
-	{
-		return preprocessors;
-	}
-	
-	/**
-	 * Gets the classloader.
-	 * @return The classloader.
-	 */
-	public ClassLoader getClassLoader()
-	{
-		return classloader;
-	}
-	
-	/**
-	 *  Puts the context in a state where the next call to
-	 *  writeClass is ignored.
-	 */
-	public void ignoreNextClassWrite()
-	{
-		writeclass = false;
 	}
 	
 	/**
@@ -182,7 +121,7 @@ public class EncodingContext
 	public void writeClass(Class<?> clazz)
 	{
 
-		if(writeclass)
+		if(!isIgnoreNextClassWrite())
 		{
 			Integer classid = classidcache.get(clazz);
 			if (classid == null)
@@ -198,7 +137,7 @@ public class EncodingContext
 		}
 		else
 		{
-			writeclass = true;
+			setIgnoreNextClassWrite(false);
 		}
 	}
 	
