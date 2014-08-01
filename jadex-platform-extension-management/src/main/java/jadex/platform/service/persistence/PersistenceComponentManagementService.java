@@ -219,7 +219,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 				public void customResultAvailable(final IExternalAccess parent)
 				{
 					// cinfo only needed for imports -> can be empty as model name is fully qualified.
-					getComponentFactory(pi.getModelFileName(), new CreationInfo(), pi.getComponentDescription().getResourceIdentifier())
+					getComponentFactory(pi.getModelFileName(), new CreationInfo(), pi.getComponentDescription().getResourceIdentifier(), false, false)
 						.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Void>(fut)
 					{
 						public void customResultAvailable(final IComponentFactory factory)

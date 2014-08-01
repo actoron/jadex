@@ -9,6 +9,7 @@ import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -127,7 +128,7 @@ public class DispatchSubprocessTask	implements ITask
 			{
 				public void firstResultAvailable(final IComponentIdentifier cid)
 				{
-					SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(instance.createResultListener(new IResultListener<IComponentManagementService>()
 					{
 						public void resultAvailable(IComponentManagementService cms)

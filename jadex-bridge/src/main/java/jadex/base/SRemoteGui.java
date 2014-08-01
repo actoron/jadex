@@ -104,7 +104,7 @@ public class SRemoteGui
 				{
 					final RequiredServiceInfo[]	ris	= ia.getServiceContainer().getRequiredServiceInfos();
 	//				final IServiceIdentifier[] sid
-					IIntermediateFuture<IService>	ds	= SServiceProvider.getDeclaredServices(ia.getServiceContainer());
+					IIntermediateFuture<IService>	ds	= SServiceProvider.getDeclaredServices((IServiceProvider)ia.getServiceContainer());
 					ds.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, Object[]>(ret)
 					{
 						public void customResultAvailable(Collection<IService> result)
@@ -204,7 +204,7 @@ public class SRemoteGui
 									final Future<Void>	ret	= new Future<Void>();
 									try
 									{
-										SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 											.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 										{
 											public void customResultAvailable(IComponentManagementService cms)
@@ -262,7 +262,7 @@ public class SRemoteGui
 								final Future<Void>	ret	= new Future<Void>();
 								try
 								{
-									SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 										.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 									{
 										public void customResultAvailable(IComponentManagementService cms)
@@ -1082,7 +1082,7 @@ public class SRemoteGui
 												{
 													if(model!=null && model.getReport()==null)
 													{
-														SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+														SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 															.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Boolean>(ret)
 														{
 															public void customResultAvailable(ILibraryService ls)
@@ -1228,7 +1228,7 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
 					{
 						public void customResultAvailable(final ILibraryService ls)

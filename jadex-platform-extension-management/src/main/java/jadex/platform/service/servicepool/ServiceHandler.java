@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -431,7 +432,7 @@ public class ServiceHandler implements InvocationHandler
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IComponentManagementService> fut = SServiceProvider.getService(component.getServiceContainer(), 
+		IFuture<IComponentManagementService> fut = SServiceProvider.getService((IServiceProvider)component.getServiceContainer(), 
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		fut.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
@@ -467,7 +468,7 @@ public class ServiceHandler implements InvocationHandler
 		}
 		else
 		{
-			SServiceProvider.getService(component.getServiceContainer(), 
+			SServiceProvider.getService((IServiceProvider)component.getServiceContainer(), 
 				IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DelegationResultListener<IClockService>(ret)
 			{

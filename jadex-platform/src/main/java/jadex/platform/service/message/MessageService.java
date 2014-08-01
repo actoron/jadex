@@ -18,6 +18,7 @@ import jadex.bridge.ServiceTerminatedException;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -2706,7 +2707,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					SServiceProvider.getService(ia.getServiceContainer(), IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(ia.createResultListener(new IResultListener<IMessageAwarenessService>()
 					{
 						public void resultAvailable(IMessageAwarenessService result)

@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -227,7 +228,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 								{
 									Class<?> cl = type.getType(ia.getClassLoader(), ia.getModel().getAllImports());
 									
-									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(ia.getServiceContainer(), cl, scope);
+									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), cl, scope);
 									res.addResultListener(new IIntermediateResultListener<IService>()
 									{
 										int cnt = 0;	

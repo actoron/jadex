@@ -13,6 +13,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IRemoteMessageListener;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageListener;
@@ -230,7 +231,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			@Classname("installListener")
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DefaultResultListener(ia.getLogger())
 				{
 					public void resultAvailable(Object result)

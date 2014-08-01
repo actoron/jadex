@@ -7,6 +7,7 @@ import jadex.bridge.fipa.DFComponentDescription;
 import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.fipa.SearchConstraints;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -210,7 +211,7 @@ public class DirectoryFacilitatorService	implements IDF
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(provider.getServiceContainer(), IDF.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
+			SServiceProvider.getServices((IServiceProvider)provider.getServiceContainer(), IDF.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -409,7 +410,7 @@ public class DirectoryFacilitatorService	implements IDF
 		final Future<Void> ret = new Future<Void>();
 		
 		final boolean[]	services	= new boolean[2];
-		SServiceProvider.getServiceUpwards(provider.getServiceContainer(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards((IServiceProvider)provider.getServiceContainer(), IComponentManagementService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -427,7 +428,7 @@ public class DirectoryFacilitatorService	implements IDF
 			}
 		});
 		
-		SServiceProvider.getService(provider.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)provider.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

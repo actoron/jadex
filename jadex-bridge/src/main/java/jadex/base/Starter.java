@@ -775,7 +775,7 @@ public class Starter
 		
 		if(i<components.size())
 		{
-			SServiceProvider.getServiceUpwards(instance.getServiceContainer(), IComponentManagementService.class)
+			SServiceProvider.getServiceUpwards(instance.getExternalAccess().getServiceProvider(), IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)

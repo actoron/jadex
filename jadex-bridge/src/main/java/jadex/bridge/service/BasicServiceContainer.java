@@ -1,5 +1,6 @@
 package jadex.bridge.service;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -39,7 +40,7 @@ import java.util.logging.Logger;
  *  services. It allows for starting/shutdowning the container and fetching
  *  service by their type/name.
  */
-public abstract class BasicServiceContainer implements  IServiceContainer
+public abstract class BasicServiceContainer implements  IServiceContainer, IServiceProvider
 {	
 	//-------- attributes --------
 	
@@ -161,16 +162,20 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return new Future<Void>(new ComponentTerminatedException(id));
 		final Future<Void> ret = new Future<Void>();
 		
-		// Hack!!! Must make cms available before init for boottrapping of service container of platform
-		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IComponentManagementService")!=-1)
-		{
-			getServiceRegistry().addService(service);
-		}
-		
 		getServiceTypes(service.getServiceIdentifier()).addResultListener(new ExceptionDelegationResultListener<Collection<Class<?>>, Void>(ret)
 		{
-			public void customResultAvailable(Collection<Class<?>> servicetypes)
+			public void customResultAvailable(final Collection<Class<?>> servicetypes)
 			{
+//				// Hack!!! Must make cms available before init for bootstrapping of service container of platform
+//				if(started && (service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IComponentManagementService")!=-1
+//					|| service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IMessageService")!=-1))
+//				{
+//					for(Class<?> key: servicetypes)
+//					{
+//						getServiceRegistry().addService(new ClassInfo(key), service);
+//					}
+//				}
+				
 				synchronized(this)
 				{
 					if(services==null)
@@ -194,28 +199,36 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						serviceinfos = Collections.synchronizedMap(new HashMap<IServiceIdentifier, ProvidedServiceInfo>());
 					}
 					serviceinfos.put(service.getServiceIdentifier(), info);
+				}
 					
-					if(started)
+				if(started)
+				{
+					service.setComponentAccess(getComponent()).addResultListener(new DelegationResultListener<Void>(ret)
 					{
-						service.setComponentAccess(getComponent()).addResultListener(new DelegationResultListener<Void>(ret)
+						public void customResultAvailable(Void result)
 						{
-							public void customResultAvailable(Void result)
+							service.startService().addResultListener(new DelegationResultListener<Void>(ret)
 							{
-								service.startService().addResultListener(new DelegationResultListener<Void>(ret)
+								public void customResultAvailable(Void result)
 								{
-									public void customResultAvailable(Void result)
+									for(Class<?> key: servicetypes)
 									{
-										getServiceRegistry().addService(service);
-										serviceStarted(service).addResultListener(new DelegationResultListener<Void>(ret));
+										getServiceRegistry().addService(new ClassInfo(key), service);
 									}
-								});
-							};
-						});
-					}
-					else
+									serviceStarted(service).addResultListener(new DelegationResultListener<Void>(ret));
+								}
+							});
+						};
+					});
+				}
+				else
+				{
+					// Make services available for init of subcomponents, but not visible to outside until component is running.
+					for(Class<?> key: servicetypes)
 					{
-						ret.setResult(null);
+						getServiceRegistry().addService(new ClassInfo(key), service);
 					}
+					ret.setResult(null);
 				}
 			}
 		});
@@ -308,7 +321,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //												System.out.println("Terminated service: "+sid);
 											getLogger().info("Terminated service: "+sid);
 											
-											getServiceRegistry().removeService(fservice);
+											for(Class<?> key: servicetypes)
+											{
+												getServiceRegistry().removeService(new ClassInfo(key), fservice);
+											}
 											
 											serviceShutdowned(fservice).addResultListener(new DelegationResultListener<Void>(ret));
 										}
@@ -401,8 +417,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						public void resultAvailable(Void result)
 						{
 							getLogger().info("Started service: "+is.getServiceIdentifier());
-							
-							getServiceRegistry().addService(is);
 							
 							serviceStarted(is).addResultListener(new DelegationResultListener<Void>(ret)
 							{
@@ -1148,7 +1162,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public boolean equals(Object obj)
 	{
-		return obj instanceof IServiceContainer && ((IServiceContainer)obj).getId().equals(getId());
+		return obj instanceof IServiceContainer && ((IServiceProvider)obj).getId().equals(getId());
 	}
 	
 	/**

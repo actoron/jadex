@@ -2,6 +2,7 @@ package jadex.platform.service.simulation;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -91,7 +92,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	deregistered	= new Future<Void>();
-		SServiceProvider.getService(access.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)access.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(access.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -140,7 +141,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		SServiceProvider.getService(access.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)access.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(access.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -170,7 +171,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			{
 				final boolean[]	services	= new boolean[2];
 
-				SServiceProvider.getService(access.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService((IServiceProvider)access.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -193,7 +194,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					}
 				}));
 						
-				SServiceProvider.getService(access.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService((IServiceProvider)access.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -381,7 +382,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				SServiceProvider.getServiceUpwards(access.getServiceContainer(), IThreadPoolService.class)
+				SServiceProvider.getServiceUpwards((IServiceProvider)access.getServiceContainer(), IThreadPoolService.class)
 					.addResultListener(access.createResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)

@@ -11,6 +11,7 @@ import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -98,7 +99,7 @@ public class CreateComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+		SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 			instance.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -271,7 +272,7 @@ public class CreateComponentTask implements ITask
 		{
 			public void resultAvailable(final IComponentIdentifier cid)
 			{
-				SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, 
+				SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IComponentManagementService.class, 
 					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(IComponentManagementService cms)

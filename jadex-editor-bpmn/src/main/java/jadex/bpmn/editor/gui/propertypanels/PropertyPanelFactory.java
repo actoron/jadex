@@ -339,7 +339,7 @@ public class PropertyPanelFactory
 			}
 			else
 			{
-				Logger.getGlobal().warning("Property panel class not found, skipping: " + classstring);
+				Logger.getAnonymousLogger().warning("Property panel class not found, skipping: " + classstring);
 			}
 		}
 	}
@@ -365,15 +365,15 @@ public class PropertyPanelFactory
 				}
 				catch (InvocationTargetException e)
 				{
-					Logger.getGlobal().warning("Constructor " + tup.getSecondEntity().toString() + " did not work, trying alternatives.");
+					Logger.getAnonymousLogger().warning("Constructor " + tup.getSecondEntity().toString() + " did not work, trying alternatives.");
 				}
 				catch (IllegalAccessException e)
 				{
-					Logger.getGlobal().warning("Constructor " + tup.getSecondEntity().toString() + " did not work, trying alternatives.");
+					Logger.getAnonymousLogger().warning("Constructor " + tup.getSecondEntity().toString() + " did not work, trying alternatives.");
 				}
 				catch (InstantiationException e)
 				{
-					Logger.getGlobal().warning("Constructor " + tup.getSecondEntity().toString() + " did not work, trying alternatives.");
+					Logger.getAnonymousLogger().warning("Constructor " + tup.getSecondEntity().toString() + " did not work, trying alternatives.");
 				}
 			}
 		}

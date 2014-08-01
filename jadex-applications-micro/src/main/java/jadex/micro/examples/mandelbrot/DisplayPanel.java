@@ -3,6 +3,7 @@ package jadex.micro.examples.mandelbrot;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
@@ -391,7 +392,7 @@ public class DisplayPanel extends JComponent
 									{
 										// do not depend on hosting component!
 //										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
-										IFuture<IComponentManagementService>	fut	= SServiceProvider.getServiceUpwards(ia.getServiceContainer(), IComponentManagementService.class);
+										IFuture<IComponentManagementService>	fut	= SServiceProvider.getServiceUpwards((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class);
 										fut.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
 										{
 											public void resultAvailable(IComponentManagementService cms)

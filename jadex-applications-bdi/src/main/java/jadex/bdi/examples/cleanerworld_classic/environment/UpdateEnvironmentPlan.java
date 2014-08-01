@@ -11,6 +11,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.fipa.Done;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
@@ -93,7 +94,7 @@ public class UpdateEnvironmentPlan extends Plan
 	 */
 	protected void searchEnvironmentAgent()
 	{
-		IDF df = (IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class);
+		IDF df = (IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getServiceContainer(), IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 

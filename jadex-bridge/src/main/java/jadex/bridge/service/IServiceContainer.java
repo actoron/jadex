@@ -25,7 +25,7 @@ import java.util.Collection;
 // move search method from IServiceProvider to IExternalAccess 
 // use external access for searching
 // make this interface the public interface for internal usage of provider 
-public interface IServiceContainer extends IServiceProvider
+public interface IServiceContainer //extends IServiceProvider
 {	
 	//-------- internal admin methods --------
 	

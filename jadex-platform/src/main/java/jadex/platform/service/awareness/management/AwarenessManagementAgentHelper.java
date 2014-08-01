@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -24,13 +25,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * Helper class for AwarenessSettings. Provides common functionality that can be
  * used by different GUI implementations.
  */
 public class AwarenessManagementAgentHelper
 {
-	private IExternalAccess component;
+	private IExternalAccess	component;
 
 	public AwarenessManagementAgentHelper(IExternalAccess component)
 	{
@@ -40,10 +42,8 @@ public class AwarenessManagementAgentHelper
 	/**
 	 * Enables or disables Discovery Mechanisms.
 	 * 
-	 * @param type
-	 *            Name of the Awareness Subcomponent
-	 * @param on
-	 *            activates/deactivates the mechanism if true/false.
+	 * @param type Name of the Awareness Subcomponent
+	 * @param on activates/deactivates the mechanism if true/false.
 	 * @return Void
 	 */
 	public IFuture<Void> setDiscoveryMechanismState(final String type, final boolean on)
@@ -54,74 +54,68 @@ public class AwarenessManagementAgentHelper
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				final Future<Void> ret = new Future<Void>();
-				getChildrenAccesses(ia).addResultListener(
-						ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
+				getChildrenAccesses(ia).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
+				{
+					public void customResultAvailable(Collection<IExternalAccess> subs)
+					{
+						IComponentIdentifier found = null;
+						for(Iterator<IExternalAccess> it = subs.iterator(); it.hasNext();)
 						{
-							public void customResultAvailable(Collection<IExternalAccess> subs)
+							IExternalAccess exta = it.next();
+							if(type.equals(exta.getLocalType()))
 							{
-								IComponentIdentifier found = null;
-								for (Iterator<IExternalAccess> it = subs.iterator(); it.hasNext();) {
-									IExternalAccess exta = it.next();
-									if (type.equals(exta.getLocalType())) {
-										found = exta.getComponentIdentifier();
-										break;
-									}
-								}
+								found = exta.getComponentIdentifier();
+								break;
+							}
+						}
 
-								// Start relay mechanism agent
-								if (on && found == null) {
-									SServiceProvider
-											.getService(ia.getServiceContainer(), IComponentManagementService.class,
-													RequiredServiceInfo.SCOPE_GLOBAL)
-											.addResultListener(
-													ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(
-															ret)
-													{
-														public void customResultAvailable(IComponentManagementService cms)
-														{
-															CreationInfo info = new CreationInfo(ia.getComponentIdentifier());
-															cms.createComponent(null, type, info, null).addResultListener(
-																	new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-																	{
-																		public void customResultAvailable(IComponentIdentifier result)
-																		{
-																			ret.setResult(null);
-																		}
-																	});
-														};
-													}));
-								}
+						// Start relay mechanism agent
+						if(on && found == null)
+						{
+							SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
+								ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+								{
+									public void customResultAvailable(IComponentManagementService cms)
+									{
+										CreationInfo info = new CreationInfo(ia.getComponentIdentifier());
+										cms.createComponent(null, type, info, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+										{
+											public void customResultAvailable(IComponentIdentifier result)
+											{
+												ret.setResult(null);
+											}
+										});
+									};
+								}));
+						}
 
-								// Stop relay mechanism agent
-								else if (!on && found != null) {
-									final IComponentIdentifier cid = found;
-									SServiceProvider
-											.getService(ia.getServiceContainer(), IComponentManagementService.class,
-													RequiredServiceInfo.SCOPE_GLOBAL)
-											.addResultListener(
-													ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(
-															ret)
-													{
-														public void customResultAvailable(IComponentManagementService cms)
-														{
-															cms.destroyComponent(cid).addResultListener(
-																	new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
-																	{
-																		public void customResultAvailable(Map<String, Object> result)
-																		{
-																			ret.setResult(null);
-																		}
-																	});
-														};
-													}));
-								}
+						// Stop relay mechanism agent
+						else if(!on && found != null)
+						{
+							final IComponentIdentifier cid = found;
+							SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
+								ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+								{
+									public void customResultAvailable(IComponentManagementService cms)
+									{
+										cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+										{
+											public void customResultAvailable(Map<String, Object> result)
+											{
+												ret.setResult(null);
+											}
+										});
+									};
+								}));
+						}
 
-								// No change required.
-								else {
-									ret.setResult(null);
-								}
-							};
-						}));
+						// No change required.
+						else
+						{
+							ret.setResult(null);
+						}
+					};
+				}));
 				return ret;
 			}
 		});
@@ -139,7 +133,7 @@ public class AwarenessManagementAgentHelper
 			@Classname("refreshSettings")
 			public IFuture<AwarenessSettingsData> execute(IInternalAccess ia)
 			{
-				AwarenessManagementAgent agent = (AwarenessManagementAgent) ia;
+				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 				AwarenessSettingsData ret = new AwarenessSettingsData();
 				// Object[] ai = agent.getAddressInfo();
 				// ret.address = (InetAddress)ai[0];
@@ -167,7 +161,7 @@ public class AwarenessManagementAgentHelper
 			@Classname("getDiscoveryInfos")
 			public IFuture<DiscoveryInfo[]> execute(IInternalAccess ia)
 			{
-				AwarenessManagementAgent agent = (AwarenessManagementAgent) ia;
+				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 				return new Future<DiscoveryInfo[]>(agent.getDiscoveryInfos());
 			}
 		});
@@ -187,20 +181,20 @@ public class AwarenessManagementAgentHelper
 			{
 				final Future<Set<String>> ret = new Future<Set<String>>();
 
-				getChildrenAccesses(ia).addResultListener(
-						ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Set<String>>(ret)
+				getChildrenAccesses(ia).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Set<String>>(ret)
+				{
+					public void customResultAvailable(Collection<IExternalAccess> result)
+					{
+						Set<String> res = new HashSet<String>();
+						for(Iterator<IExternalAccess> it = result.iterator(); it.hasNext();)
 						{
-							public void customResultAvailable(Collection<IExternalAccess> result)
-							{
-								Set<String> res = new HashSet<String>();
-								for (Iterator<IExternalAccess> it = result.iterator(); it.hasNext();) {
-									IExternalAccess child = it.next();
-									// System.out.println("child: "+child.getLocalType()+" "+child.getComponentIdentifier());
-									res.add(child.getLocalType());
-								}
-								ret.setResult(res);
-							}
-						}));
+							IExternalAccess child = it.next();
+							// System.out.println("child: "+child.getLocalType()+" "+child.getComponentIdentifier());
+							res.add(child.getLocalType());
+						}
+						ret.setResult(res);
+					}
+				}));
 
 				return ret;
 			}
@@ -210,8 +204,7 @@ public class AwarenessManagementAgentHelper
 	/**
 	 * Transfers new Settings to the Agent.
 	 * 
-	 * @param settings
-	 *            The new {@link AwarenessSettingsData}
+	 * @param settings The new {@link AwarenessSettingsData}
 	 * @return {@link Void}
 	 */
 	public IFuture<Void> setSettings(final AwarenessSettingsData settings)
@@ -221,7 +214,7 @@ public class AwarenessManagementAgentHelper
 			@Classname("applySettings")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				AwarenessManagementAgent agent = (AwarenessManagementAgent) ia;
+				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 				// agent.setAddressInfo(settings.address, settings.port);
 				agent.setDelay(settings.delay);
 				agent.setFastAwareness(settings.fast);
@@ -237,11 +230,10 @@ public class AwarenessManagementAgentHelper
 	/**
 	 * Creates or deletes a local proxy for a given remote component.
 	 * 
-	 * @param cid
-	 *            {@link ComponentIdentifier} of the component to create/delete
-	 *            the proxy for
-	 * @param create
-	 *            true if proxy should be created, false if it should be deleted
+	 * @param cid {@link ComponentIdentifier} of the component to create/delete
+	 *        the proxy for
+	 * @param create true if proxy should be created, false if it should be
+	 *        deleted
 	 * @return Void
 	 */
 	public IFuture<Void> createOrDeleteProxy(final IComponentIdentifier cid, final boolean create)
@@ -252,9 +244,9 @@ public class AwarenessManagementAgentHelper
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IFuture<Void> ret;
-				AwarenessManagementAgent agent = (AwarenessManagementAgent) ia;
+				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 				DiscoveryInfo dif = agent.getDiscoveryInfo(cid);
-				if(create && dif != null) 
+				if(create && dif != null)
 				{
 					final Future<Void> fut = new Future<Void>();
 					ret = fut;
@@ -264,57 +256,58 @@ public class AwarenessManagementAgentHelper
 						{
 							fut.setResult(null);
 						}
+
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("hhhuuu: "+exception);
+							System.out.println("hhhuuu: " + exception);
 							super.exceptionOccurred(exception);
 						}
 					});
-				} 
-				else if(dif != null) 
+				}
+				else if(dif != null)
 				{
 					ret = agent.deleteProxy(dif);
-				} 
-				else 
+				}
+				else
 				{
 					ret = IFuture.DONE;
 				}
 				return ret;
-//				return IFuture.DONE;
+				// return IFuture.DONE;
 			}
 		});
 	}
 
 	/**
-	 *  Get the children (if any).
-	 *  @return The children.
+	 * Get the children (if any).
+	 * 
+	 * @return The children.
 	 */
 	public static IFuture<Collection<IExternalAccess>> getChildrenAccesses(final IInternalAccess component)
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
-		
-		SServiceProvider.getServiceUpwards(component.getServiceContainer(), IComponentManagementService.class)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService result)
+
+		SServiceProvider.getServiceUpwards((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class).addResultListener(
+			new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
-				cms.getChildren(component.getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
+				public void customResultAvailable(IComponentManagementService result)
 				{
-					public void customResultAvailable(IComponentIdentifier[] children)
+					final IComponentManagementService cms = (IComponentManagementService)result;
+
+					cms.getChildren(component.getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
 					{
-						IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
-							new DelegationResultListener<Collection<IExternalAccess>>(ret));
-						for(int i=0; !ret.isDone() && i<children.length; i++)
+						public void customResultAvailable(IComponentIdentifier[] children)
 						{
-							cms.getExternalAccess(children[i]).addResultListener(crl);
+							IResultListener<IExternalAccess> crl = new CollectionResultListener<IExternalAccess>(children.length, true, new DelegationResultListener<Collection<IExternalAccess>>(ret));
+							for(int i = 0; !ret.isDone() && i < children.length; i++)
+							{
+								cms.getExternalAccess(children[i]).addResultListener(crl);
+							}
 						}
-					}
-				});
-			}
-		});
-		
+					});
+				}
+			});
+
 		return ret;
 	}
 }

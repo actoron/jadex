@@ -43,7 +43,7 @@ public class LocalServiceRegistry
 	 *  Add a service to the registry.
 	 *  @param sid The service id.
 	 */
-	public synchronized void addService(IService service)
+	public synchronized void addService(ClassInfo key, IService service)
 	{
 		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("Factory")!=-1)
 			System.out.println("added: "+service.getServiceIdentifier().getServiceType() + service.getServiceIdentifier().getProviderId());
@@ -53,11 +53,11 @@ public class LocalServiceRegistry
 			services = new HashMap<ClassInfo, Set<IService>>();
 		}
 		
-		Set<IService> sers = services.get(service.getServiceIdentifier().getServiceType());
+		Set<IService> sers = services.get(key);
 		if(sers==null)
 		{
 			sers = new HashSet<IService>();
-			services.put(service.getServiceIdentifier().getServiceType(), sers);
+			services.put(key, sers);
 		}
 		
 		sers.add(service);
@@ -67,23 +67,23 @@ public class LocalServiceRegistry
 	 *  Remove a service from the registry.
 	 *  @param sid The service id.
 	 */
-	public synchronized void removeService(IService service)
+	public synchronized void removeService(ClassInfo key, IService service)
 	{
 		if(services!=null)
 		{
-			Set<IService> sers = services.get(service.getServiceIdentifier().getServiceType());
+			Set<IService> sers = services.get(key);
 			if(sers!=null)
 			{
 				sers.remove(service);
 			}
 			else
 			{
-				System.out.println("Could not remove service from registry: "+service.getServiceIdentifier());
+				System.out.println("Could not remove service from registry: "+key+", "+service.getServiceIdentifier());
 			}
 		}
 		else
 		{
-			System.out.println("Could not remove service from registry: "+service.getServiceIdentifier());
+			System.out.println("Could not remove service from registry: "+key+", "+service.getServiceIdentifier());
 		}
 	}
 	

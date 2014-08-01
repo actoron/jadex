@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ComponentSuspendable;
@@ -160,7 +161,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		if(clock==null)
 		{
-			SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService((IServiceProvider)getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DefaultResultListener<IClockService>(logger)
 			{
 				public void resultAvailable(IClockService result)
@@ -422,7 +423,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		return SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
 		if(cms==null || cms.getException()!=null)
 		{
-			cms	= SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
+			cms	= SServiceProvider.getServiceUpwards((IServiceProvider)getServiceContainer(), IComponentManagementService.class);
 			cms.addResultListener(new IResultListener<IComponentManagementService>()
 			{
 				public void resultAvailable(IComponentManagementService result)

@@ -78,7 +78,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope)
 	{
-		return interpreter.getServiceContainer().getServices(type, scope);
+		return ((IServiceProvider)interpreter.getServiceContainer()).getServices(type, scope);
 	}
 	
 	/**
@@ -88,7 +88,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture<IService> getService(ClassInfo type, String scope)
 	{
-		return interpreter.getServiceContainer().getService(type, scope);
+		return ((IServiceProvider)interpreter.getServiceContainer()).getService(type, scope);
 	}
 	
 	/**
@@ -98,7 +98,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture<IService> getService(IServiceIdentifier sid)
 	{
-		return interpreter.getServiceContainer().getService(sid);
+		return ((IServiceProvider)interpreter.getServiceContainer()).getService(sid);
 	}
 	
 	/**
@@ -108,7 +108,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture<Collection<IService>> getDeclaredServices()
 	{
-		return interpreter.getServiceContainer().getDeclaredServices();
+		return ((IServiceProvider)interpreter.getServiceContainer()).getDeclaredServices();
 	}
 	
 	/**
@@ -346,7 +346,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IComponentIdentifier	getId()
 	{
-		return interpreter.getServiceContainer().getId();
+		return ((IServiceProvider)interpreter.getServiceContainer()).getId();
 	}
 	
 	/**
@@ -355,7 +355,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public String	getType()
 	{
-		return interpreter.getServiceContainer().getType();
+		return ((IServiceProvider)interpreter.getServiceContainer()).getType();
 	}
 
 	/**
