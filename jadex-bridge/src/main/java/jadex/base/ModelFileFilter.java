@@ -175,7 +175,7 @@ public class ModelFileFilter implements IRemoteFilter
 					public void customResultAvailable(Boolean val)
 					{
 						long dur = System.currentTimeMillis()-start;
-						System.out.println("Needed isModelType: "+dur);
+//						System.out.println("Needed isModelType: "+dur);
 						super.customResultAvailable(val);
 					}
 				});

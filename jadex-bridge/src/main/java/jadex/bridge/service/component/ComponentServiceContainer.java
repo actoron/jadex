@@ -136,6 +136,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope)
 	{
+		if(type==null)
+			return new TerminableIntermediateFuture<IService>(new IllegalArgumentException("Type must not null."));
+		
 		Class<?> cl = type.getType(instance.getClassLoader());
 		return (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(getServiceProvider(), cl, scope, null);
 	}
@@ -147,6 +150,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture<IService> getService(ClassInfo type, String scope)
 	{
+		if(type==null)
+			return new Future<IService>(new IllegalArgumentException("Type must not null."));
+
 		Class<?> cl = type.getType(instance.getClassLoader());
 		return (IFuture<IService>)SServiceProvider.getService(getServiceProvider(), cl, scope);
 	}
@@ -159,6 +165,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	public IFuture<IService> getService(IServiceIdentifier sid)
 	{
 		Future<IService> ret = new Future<IService>();
+		
+		if(sid==null)
+			return new Future<IService>(new IllegalArgumentException("Service id must not null."));
 		
 		if(services!=null && sid!=null)
 		{

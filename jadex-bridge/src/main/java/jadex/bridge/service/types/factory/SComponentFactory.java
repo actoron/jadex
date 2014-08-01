@@ -240,7 +240,7 @@ public class SComponentFactory
 					public void customResultAvailable(Collection<IComponentFactory> facs)
 					{
 						long dur = System.currentTimeMillis()-start; 
-						System.out.println("needed search: "+dur);
+//						System.out.println("needed search: "+dur);
 						
 //						if(model.endsWith("application.xml"))
 //							System.out.println("model3:"+model);
