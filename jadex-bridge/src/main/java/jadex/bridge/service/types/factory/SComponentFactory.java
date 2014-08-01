@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -379,14 +380,37 @@ public class SComponentFactory
 			public IFuture<byte[]> execute(final IInternalAccess ia)
 			{
 				final Future<byte[]> ret = new Future<byte[]>();
-				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(type))
+				SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(type))
 //				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
 					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Object, byte[]>(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)result;
-//						System.out.println("fac: "+type+" "+fac);
+						Collection<IComponentFactory> facs = (Collection<IComponentFactory>)result;
+//						System.out.println("facs: "+type+" "+facs);
+						
+						IComponentFactory fac = null;
+						if(facs.size()>1)
+						{
+							for(IComponentFactory tmp: facs)
+							{
+								Map<String, Object> ps = tmp.getProperties(null);
+//								if(ps!=null && ps.containsKey(MultiFactory.MULTIFACTORY))
+								if(ps==null || !ps.containsKey("multifactory"))
+								{
+									fac = tmp;
+									break;
+								}
+							}
+						}
+						else
+						{
+							fac = facs.iterator().next();
+						}
+						
+//						System.out.println("selected: "+fac);
+						
+//						IComponentFactory fac = (IComponentFactory)result;
 						fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener<byte[]>(ret)
 						{
 							public void customResultAvailable(byte[] result)

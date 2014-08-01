@@ -6,7 +6,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IService;
@@ -63,7 +62,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -147,6 +145,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** The library service. */
 	protected ILibraryService libservice;
 
+	public static final String MULTIFACTORY = "multifactory";
+	
+	public static final Map<String, Object> props = SUtil.createHashMap(new String[]{MULTIFACTORY}, new Object[]{Boolean.TRUE});
+	
 	/**
 	 *  Creates a new MultiFactory.
 	 *  @param ia Component internal access.
@@ -550,6 +552,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture getComponentTypeIcon(String type)
 	{
+//		System.out.println("multi factory icon: "+type+" "+iconcache.containsKey(type));
+		
 		return new Future(iconcache.get(type));
 	}
 
@@ -575,7 +579,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public Map getProperties(String type)
 	{
-		return Collections.EMPTY_MAP;
+//		return Collections.EMPTY_MAP;
+		return props;
 	}
 
 	/**
@@ -1063,6 +1068,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																			{
 																				public void resultAvailable(byte[] result)
 																				{
+//																					System.out.println("adding icon: "+types[fi]);
 																					iconcache.put(types[fi], result);
 																					typecounter.resultAvailable(null);
 																				}

@@ -369,23 +369,28 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  Get a default icon for a file type.
 	 */
 	public IFuture<byte[]> getComponentTypeIcon(String type)
-	{
+	{		
 		Future<byte[]>	ret	= new Future<byte[]>();
 		if(type.equals(FILETYPE_MICROAGENT))
 		{
 			try
 			{
 				ret.setResult(ICON.getData());
+//				System.out.println("icon for micro: "+ICON.getData().length);
 			}
 			catch(IOException e)
 			{
+				e.printStackTrace();
 				ret.setException(e);
 			}
 		}
 		else
 		{
+			System.out.println("not found: "+type);
 			ret.setResult(null);
 		}
+		
+		
 		return ret;
 	}	
 

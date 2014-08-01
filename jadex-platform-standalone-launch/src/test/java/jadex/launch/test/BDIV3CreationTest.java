@@ -37,7 +37,7 @@ public class BDIV3CreationTest //extends TestCase
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
-			"-logging", "true",
+			"-logging", "false",
 			"-libpath", "new String[]{\""+new File("../jadex-applications-bdiv3/target/classes").toURI().toURL().toString()+"\"}",
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
@@ -114,5 +114,14 @@ public class BDIV3CreationTest //extends TestCase
 //		catch(InterruptedException e)
 //		{
 //		}
+	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		BDIV3CreationTest test = new BDIV3CreationTest();
+		test.testBDICreation();
 	}
 }
