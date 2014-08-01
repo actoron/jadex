@@ -1334,7 +1334,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		return ret;
 	}
-	protected AtomicInteger count = new AtomicInteger(0);
+	
 	/**
 	 *  Searches an URL, accepts both directory and .jar-based URLs.
 	 *  @param url The URL.
