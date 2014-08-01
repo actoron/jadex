@@ -5,8 +5,8 @@ import java.util.Map;
 
 import jadex.commons.MethodInfo;
 import jadex.commons.transformation.binaryserializer.AbstractCodec;
-import jadex.commons.transformation.binaryserializer.DecodingContext;
-import jadex.commons.transformation.binaryserializer.EncodingContext;
+import jadex.commons.transformation.binaryserializer.IDecodingContext;
+import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
@@ -39,7 +39,7 @@ public class LegacyMethodInfoEncoder extends AbstractCodec
 	 */
 	public Object encode(Object object, Class<?> clazz,
 			List<ITraverseProcessor> processors, Traverser traverser,
-			Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		ec.writeBoolean(false);
 		
@@ -62,7 +62,7 @@ public class LegacyMethodInfoEncoder extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		throw new UnsupportedOperationException("Encoder mode only.");
 	}

@@ -20,7 +20,7 @@ import jadex.bpmn.model.MTask;
  *  Factory for generating appropriate property panels.
  *
  */
-public class SPropertyPanelFactory
+public class SLegacyPropertyPanelFactory
 {
 	/** An empty panel. */
 	public static final BasePropertyPanel EMPTY_PANEL = new BasePropertyPanel(null, null);
@@ -44,7 +44,7 @@ public class SPropertyPanelFactory
 			VElement velement = (VElement) selection;
 			if (velement instanceof VPool || velement instanceof VLane)
 			{
-				ret = new BpmnPropertyPanel(container);
+				ret = new BpmnPropertyPanel(container, selection);
 			}
 			else if ((velement instanceof VActivity &&
 					((MActivity) velement.getBpmnElement()).getActivityType() != null &&
@@ -87,33 +87,17 @@ public class SPropertyPanelFactory
 					 (velement instanceof VInParameter) ||
 					 (velement instanceof VOutParameter))
 			{
-				VActivity act = null;
-				MParameter selectedparameter = null;
-				if (velement instanceof VInParameter)
-				{
-					act = (VActivity) ((VInParameter) velement).getParent();
-					selectedparameter = ((VInParameter) velement).getParameter();
-				}
-				else if (velement instanceof VOutParameter)
-				{
-					act = (VActivity) ((VOutParameter) velement).getParent();
-					selectedparameter = ((VOutParameter) velement).getParameter();
-				}
-				else
-				{
-					act = (VActivity) velement;
-				}
 				if(velement instanceof VExternalSubProcess)
 				{
-					ret = new ExternalSubprocessPropertyPanel(container, act, selectedparameter);
+					ret = new ExternalSubprocessPropertyPanel(container, selection);
 				}
 				else if(velement instanceof VSubProcess)
 				{
-					ret = new InternalSubprocessPropertyPanel(container, act, selectedparameter);
+					ret = new InternalSubprocessPropertyPanel(container, selection);
 				}
 				else
 				{
-					ret = new TaskPropertyPanel2(container, act, selectedparameter);
+					ret = new TaskPropertyPanel2(container, selection);
 				}
 			}
 			else if (velement instanceof VActivity && ((MActivity) velement.getBpmnElement()).getActivityType().contains("Timer"))
@@ -163,7 +147,7 @@ public class SPropertyPanelFactory
 		}
 		else if (selection == null)
 		{
-			ret = new BpmnPropertyPanel(container);
+			ret = new BpmnPropertyPanel(container, selection);
 		}
 		
 		return ret;

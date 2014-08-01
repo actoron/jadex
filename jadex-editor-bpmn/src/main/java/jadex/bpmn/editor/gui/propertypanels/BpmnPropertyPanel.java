@@ -159,7 +159,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	/** Start elements list selection listener */
 	protected ListSelectionListener listselectionlistener;
 	
-	public BpmnPropertyPanel(ModelContainer container)
+	public BpmnPropertyPanel(ModelContainer container, Object selection)
 	{
 		super(null, container);
 		this.modelcontainer = container;

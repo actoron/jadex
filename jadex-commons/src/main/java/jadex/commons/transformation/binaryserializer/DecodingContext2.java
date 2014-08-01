@@ -3,8 +3,9 @@ package jadex.commons.transformation.binaryserializer;
 
 import jadex.commons.transformation.STransformation;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +13,10 @@ import java.util.List;
  * Context for decoding a binary-encoded object.
  *
  */
-public class DecodingContext extends AbstractDecodingContext
+public class DecodingContext2 extends AbstractDecodingContext
 {
-	/** The content being decoded.*/
-	protected byte[] content;
-	
-	/** The current offset */
-	protected int offset;
+	/** The stream being decoded.*/
+	protected InputStream is;
 	
 	/** The String pool. */
 	//protected Map<Integer, String> stringpool;
@@ -30,20 +28,14 @@ public class DecodingContext extends AbstractDecodingContext
 	/** The package fragment pool. */
 	protected List<String> pkgpool;
 	
-	/** The current bitfield (used for boolean values). */
-	protected byte bitfield;
-	
-	/** The current bit position within the bitfield */
-	protected byte bitpos;
-	
 	/**
 	 * Creates a new DecodingContext.
 	 * @param classloader The classloader.
 	 * @param content The content being decoded.
 	 */
-	public DecodingContext(byte[] content, List<IDecoderHandler> decoderhandlers, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
+	public DecodingContext2(InputStream is, List<IDecoderHandler> decoderhandlers, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
 	{
-		this(content, decoderhandlers, postprocessors, usercontext, classloader, errorreporter, 0);
+		this(is, decoderhandlers, postprocessors, usercontext, classloader, errorreporter, 0);
 	}
 	
 	/**
@@ -51,44 +43,14 @@ public class DecodingContext extends AbstractDecodingContext
 	 * @param content The content being decoded.
 	 * @param offset The offset.
 	 */
-	public DecodingContext(byte[] content, List<IDecoderHandler> decoderhandlers, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, int offset)
+	public DecodingContext2(InputStream is, List<IDecoderHandler> decoderhandlers, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, int offset)
 	{
 		super(decoderhandlers, postprocessors, usercontext, classloader, errorreporter);
-		this.content = content;
-		this.offset = offset;
+		this.is = is;
 		this.stringpool = new ArrayList<String>();
 		this.classnamepool = new ArrayList<String>();
 		this.pkgpool = new ArrayList<String>();
 		//this.stringpool.addAll(BinarySerializer.DEFAULT_STRINGS);
-		this.bitfield = 0;
-		this.bitpos = 8;
-	}
-	
-	/**
-	 * Increases the offset.
-	 * @param val The value to increase the offset.
-	 */
-	public void incOffset(int val)
-	{
-		this.offset += val;
-	}
-	
-	/**
-	 * Gets the current offset.
-	 * @param offset The offset.
-	 */
-	public int getOffset()
-	{
-		return offset;
-	}
-	
-	/**
-	 * Gets the content being decoded.
-	 * @return The content.
-	 */
-	public byte[] getContent()
-	{
-		return content;
 	}
 	
 	/**
@@ -107,7 +69,20 @@ public class DecodingContext extends AbstractDecodingContext
 	 */
 	public byte readByte()
 	{
-		return content[offset++];
+		int ret = 0;
+		try
+		{
+			ret = is.read();
+			if (ret == -1)
+			{
+				throw new RuntimeException("Stream ended unexpectedly during read.");
+			}
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		return (byte) ret;
 	}
 	
 	/**
@@ -120,8 +95,7 @@ public class DecodingContext extends AbstractDecodingContext
 	{
 		byte[] ret = new byte[count];
 		
-		System.arraycopy(content, offset, ret, 0, count);
-		offset += count;
+		read(ret);
 		
 		return ret;
 	}
@@ -134,8 +108,19 @@ public class DecodingContext extends AbstractDecodingContext
 	 */
 	public byte[] read(byte[] array)
 	{
-		System.arraycopy(content, offset, array, 0, array.length);
-		offset += array.length;
+		int read = 0;
+		while (read < array.length)
+		{
+			try
+			{
+				read += is.read(array, read, array.length - read);
+			}
+			catch (IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
 		return array;
 	}
 	
@@ -145,30 +130,7 @@ public class DecodingContext extends AbstractDecodingContext
 	 */
 	public boolean readBoolean()
 	{
-		if (bitpos > 7)
-		{
-			bitfield = content[offset];
-			++offset;
-			bitpos = 0;
-		}
-		
-		boolean ret = ((bitfield >>> bitpos) & 1) == 1? true: false;
-		++bitpos;
-		
-		return ret;
-	}
-	
-	/**
-	 *  Gets a ByteBuffer window of the content.
-	 *  
-	 *  @param length The length in bytes.
-	 *  @return The ByteBuffer.
-	 */
-	public ByteBuffer getByteBuffer(int length)
-	{
-		ByteBuffer ret = ByteBuffer.wrap(content, offset, length);
-		offset += length;
-		return ret;
+		return readByte() > 0;
 	}
 	
 	/**
@@ -232,7 +194,8 @@ public class DecodingContext extends AbstractDecodingContext
 			int length = (int) readVarInt();
 			try
 			{
-				ret = new String(content, offset, length, "UTF-8");
+				byte[] content = read(length);
+				ret = new String(content, "UTF-8");
 			}
 			catch (UnsupportedEncodingException e)
 			{
@@ -242,7 +205,6 @@ public class DecodingContext extends AbstractDecodingContext
 			{
 				throw new RuntimeException(e);
 			}
-			offset += length;
 			stringpool.add(ret);
 		}
 		return ret;
@@ -254,10 +216,25 @@ public class DecodingContext extends AbstractDecodingContext
 	 */
 	public long readVarInt()
 	{
-		byte ext = VarInt.getExtensionSize(content, offset);
-		long ret = VarInt.decodeWithKnownSize(content, offset, ext);
-		offset += (ext + 1);
-		return ret;
+		byte fb = readByte(); //VarInt.getExtensionSize(content, offset);
+		byte ext = VarInt.getExtensionSize(fb);
+		byte[] content = new byte[ext + 1];
+		content[0] = fb;
+		
+		int read = 0;
+		while (read < ext)
+		{
+			try
+			{
+				read += is.read(content, read + 1, content.length - read - 1);
+			}
+			catch (IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return VarInt.decodeWithKnownSize(content, 0, ext);
 	}
 	
 	/**
@@ -266,10 +243,12 @@ public class DecodingContext extends AbstractDecodingContext
 	 */
 	public long readSignedVarInt()
 	{
-		boolean neg = readBoolean();
-		byte ext = VarInt.getExtensionSize(content, offset);
-		long ret = VarInt.decodeWithKnownSize(content, offset, ext);
-		offset += (ext + 1);
+		long ret = readVarInt();
+		long mask = Long.highestOneBit(ret);
+		mask |= mask >> 1;
+		boolean neg = (Long.bitCount(ret & mask)) > 1;
+		ret = ret & (~mask);
+		
 		if (neg)
 			ret = -ret;
 		return ret;

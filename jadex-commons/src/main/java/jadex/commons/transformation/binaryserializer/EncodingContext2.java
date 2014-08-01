@@ -3,6 +3,8 @@ package jadex.commons.transformation.binaryserializer;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -14,13 +16,13 @@ import java.util.StringTokenizer;
  *  Context for encoding (serializing) an object in a binary format.
  *
  */
-public class EncodingContext extends AbstractEncodingContext
+public class EncodingContext2 extends AbstractEncodingContext
 {	
 	/** Cache for class names. */
 	protected Map<Class<?>, String> classnamecache = new HashMap<Class<?>, String>();
 	
 	/** The binary output */
-	protected GrowableByteBuffer buffer;
+	protected OutputStream os;
 		
 	/** The string pool. */
 	protected Map<String, Integer> stringpool;
@@ -34,39 +36,22 @@ public class EncodingContext extends AbstractEncodingContext
 	/** The package fragment pool. */
 	protected Map<String, Integer> pkgpool;
 	
-	/** The current bit position within the bitfield */
-	protected byte bitpos;
-	
-	/** The current bitfield position in the buffer*/
-	protected int bitfieldpos;
-	
 	/**
 	 *  Creates an encoding context.
 	 *  @param usercontext A user context.
 	 *  @param preprocessors The preprocessors.
 	 *  @param classloader The classloader.
 	 */
-	public EncodingContext(Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
+	public EncodingContext2(OutputStream os, Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
 	{
 		super(rootobject, usercontext, preprocessors, classloader);
-		buffer = new GrowableByteBuffer();
+		this.os = os;
 		classidcache = new HashMap<Class<?>, Integer>();
 		stringpool = new HashMap<String, Integer>();
 		//for (int i = 0; i < BinarySerializer.DEFAULT_STRINGS.size(); ++i)
 			//stringpool.put(BinarySerializer.DEFAULT_STRINGS.get(i), i);
 		classnamepool = new HashMap<String, Integer>();
 		pkgpool = new HashMap<String, Integer>();
-		bitpos = 0;
-		bitfieldpos = -1;
-	}
-	
-	/**
-	 *  Returns the encoded bytes.
-	 *  @return The bytes.
-	 */
-	public byte[] getBytes()
-	{
-		return buffer.toByteArray();
 	}
 	
 	/**
@@ -75,7 +60,14 @@ public class EncodingContext extends AbstractEncodingContext
 	 */
 	public void writeByte(byte b)
 	{
-		buffer.write(b);
+		try
+		{
+			os.write(b);
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -84,16 +76,14 @@ public class EncodingContext extends AbstractEncodingContext
 	 */
 	public void write(byte[] b)
 	{
-		buffer.write(b);
-	}
-	
-	/**
-	 *  Reserves a byte buffer on the stream.
-	 *  
-	 */
-	public ByteBuffer getByteBuffer(int length)
-	{
-		return buffer.getByteBuffer(length);
+		try
+		{
+			os.write(b);
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -102,22 +92,14 @@ public class EncodingContext extends AbstractEncodingContext
 	 */
 	public void writeBoolean(boolean bool)
 	{
-		//byte val = (byte) ((Boolean.TRUE.equals(bool))? 1 : 0);
-		byte val = (byte) (bool? 1 : 0);
-		if (bitfieldpos < 0)
+		try
 		{
-			bitfieldpos = buffer.getPosition();
-			buffer.reserveSpace(1);
+			os.write(bool? 1 : 0);
 		}
-		if (bitpos > 7)
+		catch (IOException e)
 		{
-			//buffer.writeTo(bitfieldpos, bitfield);
-			bitpos = 0;
-			bitfieldpos = buffer.getPosition();
-			buffer.reserveSpace(1);
+			throw new RuntimeException(e);
 		}
-		buffer.getBufferAccess()[bitfieldpos] |= (byte) (val << bitpos);
-		++bitpos;
 	}
 	
 	/**
@@ -191,14 +173,6 @@ public class EncodingContext extends AbstractEncodingContext
 				}
 				writeString(classname);
 			}
-			
-			/*String classname = classnamecache.get(clazz);
-			if (classname == null)
-			{
-				classname = SReflect.getClassName(clazz);
-				classnamecache.put(clazz, classname);
-			}
-			writeString(classname);*/
 		}
 		else
 		{
@@ -226,7 +200,7 @@ public class EncodingContext extends AbstractEncodingContext
 				byte[] encodedString = string.getBytes("UTF-8");
 				
 				writeVarInt(encodedString.length);
-				buffer.write(encodedString);
+				write(encodedString);
 			}
 			catch (UnsupportedEncodingException e)
 			{
@@ -245,10 +219,14 @@ public class EncodingContext extends AbstractEncodingContext
 	 */
 	public void writeVarInt(long value)
 	{
-		int size = VarInt.getEncodedSize(value);
-		int pos = buffer.getPosition();
-		buffer.reserveSpace(size);
-		VarInt.encode(value, buffer.getBufferAccess(), pos, size);
+		try
+		{
+		write(VarInt.encode(value));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -258,7 +236,13 @@ public class EncodingContext extends AbstractEncodingContext
 	public void writeSignedVarInt(long value)
 	{
 		boolean neg = value < 0;
-		writeBoolean(neg);
-		writeVarInt(Math.abs(value));
+		value = Math.abs(value);
+		long mask = Long.highestOneBit(value) << 2;
+		if (neg)
+		{
+			mask |= mask >> 1;
+		}
+		value = value | (mask);
+		writeVarInt(value);
 	}
 }

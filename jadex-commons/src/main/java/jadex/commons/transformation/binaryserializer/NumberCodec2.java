@@ -15,16 +15,16 @@ import java.util.Set;
  *  boolean values and char values.
  *
  */
-public class NumberCodec extends AbstractCodec
+public class NumberCodec2 extends AbstractCodec
 {
 	/** Default Instance */
-	public static final NumberCodec INSTANCE = new NumberCodec();
+	public static final NumberCodec2 INSTANCE = new NumberCodec2();
 	
 	/** The types this processor can handle. */
-	protected static final Set TYPES;
+	protected static final Set<Class<?>> TYPES;
 	static
 	{
-		TYPES = new HashSet();
+		TYPES = new HashSet<Class<?>>();
 		TYPES.add(Boolean.class);
 		TYPES.add(boolean.class);
 		TYPES.add(Integer.class);
@@ -60,19 +60,20 @@ public class NumberCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		Object ret = null;
 		
 		if (Byte.class.equals(clazz) || byte.class.equals(clazz))
-			ret = context.read(1)[0];
+			ret = context.readByte();
 		else if (Boolean.class.equals(clazz) || boolean.class.equals(clazz))
 			ret = context.readBoolean();
 		else if (Character.class.equals(clazz) || char.class.equals(clazz))
 			ret = Character.valueOf((char) context.readVarInt());
 		else if (Short.class.equals(clazz) || short.class.equals(clazz))
 		{
-			byte[] in = context.read(2);
+			byte[] in = new byte[2];
+			context.read(in);
 			ByteBuffer buff = ByteBuffer.wrap(in);
 			buff.order(ByteOrder.BIG_ENDIAN);
 			ret = buff.getShort();
@@ -87,21 +88,24 @@ public class NumberCodec extends AbstractCodec
 		}
 		else if (Long.class.equals(clazz) || long.class.equals(clazz))
 		{
-			byte[] in = context.read(8);
+			byte[] in = new byte[8];
+			context.read(in);
 			ByteBuffer buff = ByteBuffer.wrap(in);
 			buff.order(ByteOrder.BIG_ENDIAN);
 			ret = buff.getLong();
 		}
 		else if (Float.class.equals(clazz) || float.class.equals(clazz))
 		{
-			byte[] in = context.read(4);
+			byte[] in = new byte[4];
+			context.read(in);
 			ByteBuffer buff = ByteBuffer.wrap(in);
 			buff.order(ByteOrder.BIG_ENDIAN);
 			ret = buff.getFloat();
 		}
 		else // Double
 		{
-			byte[] in = context.read(8);
+			byte[] in = new byte[8];
+			context.read(in);
 			ByteBuffer buff = ByteBuffer.wrap(in);
 			buff.order(ByteOrder.BIG_ENDIAN);
 			ret = buff.getDouble();
@@ -113,7 +117,7 @@ public class NumberCodec extends AbstractCodec
 	/**
 	 *  References handling not needed.
 	 */
-	public void recordKnownDecodedObject(Object object, DecodingContext context)
+	public void recordKnownDecodedObject(Object object, IDecodingContext context)
 	{
 		//if (!(object instanceof Boolean || object instanceof Byte))
 			//super.recordKnownDecodedObject(object, context);
@@ -135,7 +139,7 @@ public class NumberCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		if (object instanceof Byte)
 			ec.write(new byte[] {(Byte) object});
@@ -145,9 +149,11 @@ public class NumberCodec extends AbstractCodec
 			ec.writeVarInt(((Character) object).charValue());
 		else if (object instanceof Short)
 		{
-			ByteBuffer buff = ec.getByteBuffer(2);
+			byte[] abuf = new byte[2];
+			ByteBuffer buff = ByteBuffer.wrap(abuf);
 			buff.order(ByteOrder.BIG_ENDIAN);
 			buff.putShort((Short) object);
+			ec.write(abuf);
 		}
 		else if (object instanceof Integer)
 		{
@@ -159,21 +165,27 @@ public class NumberCodec extends AbstractCodec
 		}
 		else if (object instanceof Long)
 		{
-			ByteBuffer buff = ec.getByteBuffer(8);
+			byte[] abuf = new byte[8];
+			ByteBuffer buff = ByteBuffer.wrap(abuf);
 			buff.order(ByteOrder.BIG_ENDIAN);
 			buff.putLong((Long) object);
+			ec.write(abuf);
 		}
 		else if (object instanceof Float)
 		{
-			ByteBuffer buff = ec.getByteBuffer(4);
+			byte[] abuf = new byte[4];
+			ByteBuffer buff = ByteBuffer.wrap(abuf);
 			buff.order(ByteOrder.BIG_ENDIAN);
 			buff.putFloat((Float) object);
+			ec.write(abuf);
 		}
-		else
+		else // Double
 		{
-			ByteBuffer buff = ec.getByteBuffer(8);
+			byte[] abuf = new byte[8];
+			ByteBuffer buff = ByteBuffer.wrap(abuf);
 			buff.order(ByteOrder.BIG_ENDIAN);
 			buff.putDouble((Double) object);
+			ec.write(abuf);
 		}
 		
 		return object;
@@ -187,7 +199,7 @@ public class NumberCodec extends AbstractCodec
 	 *  @param ec The encoding context.
 	 *  @return True, if a reference has been encoded, false otherwise.
 	 */
-	/*protected boolean encodeReference(Object object, Class clazz, EncodingContext ec)
+	/*protected boolean encodeReference(Object object, Class clazz, IEncodingContext ec)
 	{
 		return false;
 		//if (object instanceof Boolean || object instanceof Byte)
@@ -196,7 +208,7 @@ public class NumberCodec extends AbstractCodec
 		//return super.encodeReference(object, clazz, ec);
 	}*/
 	
-	public boolean canReference(Object object, Class<?> clazz, EncodingContext ec)
+	public boolean canReference(Object object, Class<?> clazz, IEncodingContext ec)
 	{
 		return false;
 	}

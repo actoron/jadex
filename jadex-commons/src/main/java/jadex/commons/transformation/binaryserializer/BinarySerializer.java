@@ -58,9 +58,9 @@ public class BinarySerializer
 	static
 	{
 		ENCODER_HANDLERS = new ArrayList<ITraverseProcessor>();
-		ENCODER_HANDLERS.add(new NumberCodec());
+		ENCODER_HANDLERS.add(new LegacyNumberCodec());
 		ENCODER_HANDLERS.add(new StringCodec());
-		ENCODER_HANDLERS.add(new ArrayCodec());
+		ENCODER_HANDLERS.add(new LegacyArrayCodec());
 		ENCODER_HANDLERS.add(new ClassCodec());
 		ENCODER_HANDLERS.add(new CollectionCodec());
 		ENCODER_HANDLERS.add(new EnumerationCodec());
@@ -140,14 +140,14 @@ public class BinarySerializer
 	public static byte[] objectToByteArray(Object val, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> encoderhandlers, Object usercontext, ClassLoader classloader)
 	{
 		encoderhandlers = encoderhandlers == null? ENCODER_HANDLERS : encoderhandlers;
-		EncodingContext context = new EncodingContext(val, usercontext, preprocessors, classloader);
+		IEncodingContext context = new EncodingContext(val, usercontext, preprocessors, classloader);
 		
 		Traverser traverser = new Traverser()
 		{
 			public void handleDuplicate(Object object, Class<?> clazz, Object match,
 				List<ITraverseProcessor> processors, boolean clone, Object context)
 			{
-				EncodingContext ec = (EncodingContext)context;
+				IEncodingContext ec = (IEncodingContext)context;
 				int ref = ((Integer)match).intValue();
 				ec.writeClassname(REFERENCE_MARKER);
 				ec.writeVarInt(ref);
@@ -159,7 +159,7 @@ public class BinarySerializer
 			public Object handleNull(Class<?> clazz,
 				List<ITraverseProcessor> processors, boolean clone, Object context)
 			{
-				EncodingContext ec = (EncodingContext)context;
+				IEncodingContext ec = (IEncodingContext)context;
 				ec.writeClassname(NULL_MARKER);
 				return null;
 			}
@@ -167,7 +167,7 @@ public class BinarySerializer
 		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
 		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), encoderhandlers, false, null, context);
 		
-		return context.getBytes();
+		return ((EncodingContext) context).getBytes();
 	}
 	
 	/**
@@ -184,7 +184,7 @@ public class BinarySerializer
 		{
 			errorreporter = new DefaultErrorReporter();
 		}
-		DecodingContext context = new DecodingContext(val, postprocessors, usercontext, classloader, errorreporter);
+		IDecodingContext context = new DecodingContext(val, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter);
 		return decodeObject(context);
 	}
 	
@@ -227,7 +227,7 @@ public class BinarySerializer
 		//if (postprocessors != null)
 			//handlers.addAll(postprocessors);
 		
-		DecodingContext context = new DecodingContext(buffer, postprocessors, usercontext, classloader, errorreporter, offset);
+		IDecodingContext context = new DecodingContext(buffer, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter, offset);
 		return decodeObject(context);
 	}
 	
@@ -236,7 +236,7 @@ public class BinarySerializer
 	 *  @param context The decoding context.
 	 *  @return Decoded object.
 	 */
-	protected static Object decodeObject(DecodingContext context)
+	protected static Object decodeObject(IDecodingContext context)
 	{
 		String classname = context.readClassname();
 		
@@ -266,14 +266,15 @@ public class BinarySerializer
 	 *  @param context The decoding context.
 	 *  @return Decoded object.
 	 */
-	protected static Object decodeRawObject(Class<?> clazz, DecodingContext context)
+	protected static Object decodeRawObject(Class<?> clazz, IDecodingContext context)
 	{
 		Object dobject = null;
-		for (int i = 0; i < DECODER_HANDLERS.size(); ++i)
+		List<IDecoderHandler> decoderhandlers = context.getDecoderHandlers();
+		for (int i = 0; i < decoderhandlers.size(); ++i)
 		{
-			if (DECODER_HANDLERS.get(i).isApplicable(clazz))
+			if (decoderhandlers.get(i).isApplicable(clazz))
 			{
-				dobject = DECODER_HANDLERS.get(i).decode(clazz, context);
+				dobject = decoderhandlers.get(i).decode(clazz, context);
 				break;
 			}
 		}
