@@ -110,7 +110,7 @@ public class SServiceProvider
 			}
 			else
 			{
-				container.getServiceRegistry().searchGlobalService(type).addResultListener(new DelegationResultListener<T>(ret));
+				container.getServiceRegistry().searchGlobalService(type, provider.getId()).addResultListener(new DelegationResultListener<T>(ret));
 			}
 		}
 		else
@@ -316,7 +316,7 @@ public class SServiceProvider
 			}
 			else
 			{
-				container.getServiceRegistry().searchGlobalServices(type).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				container.getServiceRegistry().searchGlobalServices(type, provider.getId()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 			}
 		}
 		else

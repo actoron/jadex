@@ -749,7 +749,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		}
 		else
 		{
-			ret.setException(new ServiceNotFoundException("name="+info.getName()+", interface="+info.getType().getTypeName()+", no component creation possible"));
+			ret.setException(new ServiceNotFoundException("agent="+ia.getComponentIdentifier()+", name="+info.getName()+", interface="+info.getType().getTypeName()+", no component creation possible"));
 		}
 		
 		return ret;
@@ -864,7 +864,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 //		return service;
 //		if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
 		
-		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
