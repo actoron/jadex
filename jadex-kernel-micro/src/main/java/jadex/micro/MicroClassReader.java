@@ -73,6 +73,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -515,8 +516,12 @@ public class MicroClassReader
 					UnparsedExpression[] exps = createUnparsedExpressions(props);
 					
 					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), Object.class.equals(p.mapping())? null: p.mapping(), exps);
+					
+					props = vals[i].properties();
+					List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(createUnparsedExpressions(props))) : null;
+					
 					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? 
-						vals[i].name(): null, vals[i].type(), impl, pi);
+						vals[i].name(): null, vals[i].type(), impl, pi, serprops);
 				
 					if(vals[i].name().length()==0 || !psers.containsKey(vals[i].name()))
 					{
@@ -694,7 +699,11 @@ public class MicroClassReader
 								Publish p = provs[j].publish();
 								PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
 									p.mapping(), createUnparsedExpressions(p.properties()));
-								ProvidedServiceInfo psi = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi);
+								
+								NameValue[] props = provs[j].properties();
+								List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(createUnparsedExpressions(props))) : null;
+								
+								ProvidedServiceInfo psi = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi, serprops);
 		//						configinfo.setProvidedServices(psis);
 								configinfo.addProvidedService(psi);
 							}
@@ -879,7 +888,7 @@ public class MicroClassReader
 			for(Class<?> iface: serifaces)
 			{
 				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(null, "$pojoagent!=null? $pojoagent: $component", Implementation.PROXYTYPE_DECOUPLED, null, null);
-				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, iface, impl, null);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, iface, impl, null, null);
 				modelinfo.addProvidedService(psi);
 			}
 		}

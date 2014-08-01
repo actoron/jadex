@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IService;
@@ -449,6 +450,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
+//		Collection tfactories = SServiceProvider.getServices((IServiceProvider) ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION).get();
+//		if (tfactories.size() <= 1)
+//		{
+//			System.out.println(ServiceCall.getCurrentInvocation().getCaller());
+//			System.out.println("FALSEs");
+//			return new Future<Boolean>(false);
+//		}
 //		if(model.endsWith("BDI.class"))
 //			System.out.println("isLoadable: "+model);
 
@@ -769,19 +777,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			
 			public void customResultAvailable(Object result)
 			{
-				Collection tfactories = ((Collection)result);
-				
-				boolean unloaded = tfactories.size() < 2;
-				while (unloaded)
-				{
-					tfactories = SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-					System.out.println(tfactories);
-					if (tfactories.size() > 1)
-						unloaded = false;
-					ia.waitForDelay(100).get();
-				}
-				
-				final Collection factories = tfactories;
+				final Collection factories = (Collection) result;
 				
 				final IResultListener factorypicker = ia.createResultListener(new CollectionResultListener(factories.size(), true, ia.createResultListener(new DefaultResultListener()
 				{
@@ -1330,7 +1326,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. " + count.getAndIncrement());
+//					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. " + count.getAndIncrement());
 					resultAvailable(null);
 				}
 			}));

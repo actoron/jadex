@@ -86,6 +86,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -267,7 +268,7 @@ public class BDIClassReader extends MicroClassReader
 
 			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
 			{
-				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish());
+				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish(), psi.getProperties());
 				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
 			}
 			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
@@ -527,7 +528,11 @@ public class BDIClassReader extends MicroClassReader
 							Publish p = provs[j].publish();
 							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
 								p.mapping(), createUnparsedExpressions(p.properties()));
-							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi);
+							
+							NameValue[] props = provs[j].properties();
+							List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(createUnparsedExpressions(props))) : null;
+							
+							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi, serprops);
 							configinfo.setProvidedServices(psis);
 						}
 						
@@ -607,7 +612,7 @@ public class BDIClassReader extends MicroClassReader
 			
 			ProvidedServiceImplementation psi = new ProvidedServiceImplementation(null, buf.toString(), 
 				BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
-			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null));
+			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null));
 		}
 		
 		// Create enhanced classes if not already present.

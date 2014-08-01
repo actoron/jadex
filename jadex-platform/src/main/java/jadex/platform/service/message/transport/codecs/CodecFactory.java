@@ -68,11 +68,16 @@ public class CodecFactory
 		if(codecs==null)
 		{
 			// dynamically decide if JadexXMLCodec is available
+//			codecs = !SReflect.isAndroid()
+//				? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class, JadexBinaryCodec2.class,}
+//				: SUtil.androidUtils().hasXmlSupport()
+//						? new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec2.class, JadexBinaryCodec.class, JadexXMLCodec.class}
+//						: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec2.class, JadexBinaryCodec.class};
 			codecs = !SReflect.isAndroid()
-				? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class}
-				: SUtil.androidUtils().hasXmlSupport()
-						? new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class, JadexXMLCodec.class}
-						: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
+					? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class}
+					: SUtil.androidUtils().hasXmlSupport()
+							? new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class, JadexXMLCodec.class}
+							: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
 		}
 		for(int i=0; i<codecs.length; i++)
 		{

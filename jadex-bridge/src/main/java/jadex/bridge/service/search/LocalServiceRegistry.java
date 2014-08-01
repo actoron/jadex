@@ -78,7 +78,7 @@ public class LocalServiceRegistry
 		if(excluded!=null && excluded.contains(ser.getServiceIdentifier().getProviderId()) && cid!=null)
 		{
 			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-			ret = getDotName(target).endsWith(getDotName(cid));
+			ret = getDotName(cid).endsWith(getDotName(target));
 		}
 		return ret;
 	}
@@ -89,8 +89,8 @@ public class LocalServiceRegistry
 	 */
 	public synchronized void addService(ClassInfo key, IService service)
 	{
-		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("Factory")!=-1)
-			System.out.println("added: "+service.getServiceIdentifier().getServiceType() + service.getServiceIdentifier().getProviderId());
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("Factory")!=-1)
+//			System.out.println("added: "+service.getServiceIdentifier().getServiceType() + service.getServiceIdentifier().getProviderId());
 		
 		if(services==null)
 		{

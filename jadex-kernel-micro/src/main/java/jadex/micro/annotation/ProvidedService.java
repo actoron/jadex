@@ -33,4 +33,9 @@ public @interface ProvidedService
 	 *  Publish details.
 	 */
 	public Publish publish() default @Publish(publishid="", publishtype=IPublishService.PUBLISH_WS, mapping=Object.class);
+	
+	/**
+	 *  Properties for the provided service.
+	 */
+	public NameValue[] properties() default {};
 }
