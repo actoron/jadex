@@ -1,6 +1,7 @@
 package jadex.micro.tutorial;
 
-import jadex.bridge.service.component.ComponentFactorySelector;
+import jadex.bridge.FactoryFilter;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.future.IFuture;
@@ -29,8 +30,12 @@ public class ChatC4Agent
 	@AgentBody
 	public void executeBody()
 	{
+//		IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent.getServiceContainer(), 
+//			new ComponentFactorySelector(MicroAgentFactory.FILETYPE_MICROAGENT));
+		
 		IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent.getServiceContainer(), 
-			new ComponentFactorySelector(MicroAgentFactory.FILETYPE_MICROAGENT));
+			IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT));
+		
 		factory.addResultListener(agent.createResultListener(new IResultListener<IComponentFactory>()
 		{
 			public void resultAvailable(IComponentFactory result)

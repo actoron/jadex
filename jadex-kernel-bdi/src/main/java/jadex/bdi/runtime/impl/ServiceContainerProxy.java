@@ -1,6 +1,7 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.sensor.service.IMethodInvocationListener;
@@ -14,14 +15,9 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
-import jadex.bridge.service.searchv2.LocalServiceRegistry;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.commons.IRemoteFilter;
-import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -73,6 +69,46 @@ public class ServiceContainerProxy implements IServiceContainer
 	public IFuture shutdown()
 	{
 		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope)
+	{
+		return interpreter.getServiceContainer().getServices(type, scope);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<IService> getService(ClassInfo type, String scope)
+	{
+		return interpreter.getServiceContainer().getService(type, scope);
+	}
+	
+	/**
+	 *  Get a service per id.
+	 *  @param sid The service id.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<IService> getService(IServiceIdentifier sid)
+	{
+		return interpreter.getServiceContainer().getService(sid);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<Collection<IService>> getDeclaredServices()
+	{
+		return interpreter.getServiceContainer().getDeclaredServices();
 	}
 	
 	/**
@@ -276,33 +312,33 @@ public class ServiceContainerProxy implements IServiceContainer
 		return interpreter.getServiceContainer().getInterceptors(service);
 	}
 
-	/**
-	 *  Get all services of a type.
-	 *  @param type The class.
-	 *  @return The corresponding services.
-	 */
-	public ITerminableIntermediateFuture<IService>	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
-	{
-		return interpreter.getServiceContainer().getServices(manager, decider, selector);
-	}
+//	/**
+//	 *  Get all services of a type.
+//	 *  @param type The class.
+//	 *  @return The corresponding services.
+//	 */
+//	public ITerminableIntermediateFuture<IService>	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+//	{
+//		return interpreter.getServiceContainer().getServices(manager, decider, selector);
+//	}
 	
-	/**
-	 *  Get the parent service container.
-	 *  @return The parent container.
-	 */
-	public IFuture<IServiceProvider>	getParent()
-	{
-		return interpreter.getServiceContainer().getParent();
-	}
-	
-	/**
-	 *  Get the children container.
-	 *  @return The children container.
-	 */
-	public IFuture<Collection<IServiceProvider>>	getChildren()
-	{
-		return interpreter.getServiceContainer().getChildren();
-	}
+//	/**
+//	 *  Get the parent service container.
+//	 *  @return The parent container.
+//	 */
+//	public IFuture<IServiceProvider>	getParent()
+//	{
+//		return interpreter.getServiceContainer().getParent();
+//	}
+//	
+//	/**
+//	 *  Get the children container.
+//	 *  @return The children container.
+//	 */
+//	public IFuture<Collection<IServiceProvider>>	getChildren()
+//	{
+//		return interpreter.getServiceContainer().getChildren();
+//	}
 	
 	/**
 	 *  Get the globally unique id of the provider.

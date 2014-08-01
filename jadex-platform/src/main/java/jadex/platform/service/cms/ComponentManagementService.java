@@ -5,6 +5,7 @@ import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentStep;
@@ -26,7 +27,6 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.clock.IClockService;
@@ -280,7 +280,8 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				public void customResultAvailable(final ILibraryService ls)
 				{
-					IFuture<IComponentFactory> fut = SServiceProvider.getService(agent.getServiceContainer(), new ComponentFactorySelector(filename, null, rid));
+					IFuture<IComponentFactory> fut =SServiceProvider.getService(agent.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(filename, null, rid));
+//					IFuture<IComponentFactory> fut = SServiceProvider.getService(agent.getServiceContainer(), new ComponentFactorySelector(filename, null, rid));
 					fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 					{
 						public void customResultAvailable(IComponentFactory factory)
@@ -2476,6 +2477,20 @@ public class ComponentManagementService implements IComponentManagementService
 			ret.setResult(descs);
 		}
 		
+		ret.addResultListener(new IResultListener<IComponentDescription[]>()
+		{
+			public void resultAvailable(IComponentDescription[] result)
+			{
+				System.out.println("found childs: "+cid+" "+SUtil.arrayToString(result));
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof ClassCastException)
+					exception.printStackTrace();
+				System.out.println("exe: "+exception);
+			}
+		});
+		
 		return ret;
 	}
 	
@@ -3229,9 +3244,34 @@ public class ComponentManagementService implements IComponentManagementService
 			public void customResultAvailable(IRemoteServiceManagementService rms)
 			{
 				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(createResultListener(new DelegationResultListener(ret)));
+					.addResultListener(createResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							if(!(result instanceof IComponentManagementService))
+								System.out.println("aaaa");
+							super.customResultAvailable(result);
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							super.exceptionOccurred(exception);
+						}
+					}));
 			}
 		}));
+		
+//		ret.addResultListener(new IResultListener<IComponentManagementService>() 
+//		{
+//			public void resultAvailable(IComponentManagementService result)
+//			{
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
+//				exception.printStackTrace();
+//			}
+//		});
+		
 		return ret;
 	}
 	

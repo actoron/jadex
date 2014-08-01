@@ -9,7 +9,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.searchv2.LocalServiceRegistry;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;

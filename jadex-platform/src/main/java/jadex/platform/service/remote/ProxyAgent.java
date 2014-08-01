@@ -17,6 +17,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -44,6 +45,7 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	//-------- attributes --------
 	
 	/**  The remote component identifier. */
+	@AgentArgument("component")
 	protected IComponentIdentifier	rcid;
 	
 	/** The remote cms. */
@@ -134,17 +136,17 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 //		return ret;
 //	}
 	
-	/**
-	 *  Get the service container.
-	 *  @return The service container.
-	 */
-	public IServiceContainer createServiceContainer(Map<String, Object> args)
-	{
-		// Hack!!! Can not be done in agentCreated, because service container is created first. 
-		this.rcid	= (IComponentIdentifier)args.get("component");
-		
-		return new RemoteServiceContainer(rcid, getAgentAdapter(), this, getInterpreter().getServiceRegistry());
-	}
+//	/**
+//	 *  Get the service container.
+//	 *  @return The service container.
+//	 */
+//	public IServiceContainer createServiceContainer(Map<String, Object> args)
+//	{
+//		// Hack!!! Can not be done in agentCreated, because service container is created first. 
+//		this.rcid	= (IComponentIdentifier)args.get("component");
+//		
+//		return new RemoteServiceContainer(rcid, getAgentAdapter(), this, getInterpreter().getServiceRegistry());
+//	}
 	
 	//-------- IProxyAgentService interface --------
 	
@@ -153,7 +155,8 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	 */
 	public IFuture<IComponentIdentifier>	getRemoteComponentIdentifier()
 	{
-		return new Future<IComponentIdentifier>(((RemoteServiceContainer)getServiceContainer()).getRemoteComponentIdentifier());
+//		return new Future<IComponentIdentifier>(((RemoteServiceContainer)getServiceContainer()).getRemoteComponentIdentifier());
+		return new Future<IComponentIdentifier>(rcid);
 	}
 
 	/**
@@ -162,7 +165,8 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	 */
 	public IFuture<Void>	setRemoteComponentIdentifier(IComponentIdentifier cid)
 	{
-		((RemoteServiceContainer)getServiceContainer()).setRemoteComponentIdentifier(cid);
+//		((RemoteServiceContainer)getServiceContainer()).setRemoteComponentIdentifier(cid);
+		rcid = cid;
 		return IFuture.DONE;
 	}
 	

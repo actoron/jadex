@@ -11,7 +11,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
-import jadex.bridge.service.searchv2.LocalServiceRegistry;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;

@@ -1,5 +1,6 @@
 package jadex.bridge.service.component;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -19,9 +20,9 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -49,6 +50,7 @@ import jadex.javaparser.SJavaParser;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -85,6 +87,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/** The max number of preserved req service providers. */
 	protected int maxreq;
 	
+	
 	/** The service registry .*/
 	protected LocalServiceRegistry registry;
 	
@@ -117,6 +120,85 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	}
 	
 	//-------- interface methods --------
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope)
+	{
+		Class<?> cl = type.getType(instance.getClassLoader());
+		return (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(this, cl, scope, null);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<IService> getService(ClassInfo type, String scope)
+	{
+		Class<?> cl = type.getType(instance.getClassLoader());
+		return (IFuture<IService>)SServiceProvider.getService(this, cl, scope);
+	}
+	
+	/**
+	 *  Get a service per id.
+	 *  @param sid The service id.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<IService> getService(IServiceIdentifier sid)
+	{
+		Future<IService> ret = new Future<IService>();
+		
+		if(services!=null && sid!=null)
+		{
+			loop:
+			for(Class<?> cl: services.keySet())
+			{
+				Collection<IInternalService> sers = services.get(cl);
+				for(IInternalService ser: sers)
+				{
+					if(ser.getServiceIdentifier().equals(sid))
+					{
+						ret.setResult(ser);
+						break loop;
+					}
+				}
+			}
+		}
+
+		if(!ret.isDone())
+		{
+			ret.setException(new ServiceNotFoundException("For service identifier: "+sid));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<Collection<IService>> getDeclaredServices()
+	{
+		Future<Collection<IService>> ret = new Future<Collection<IService>>();
+		Set<IService> res = new HashSet<IService>();
+		
+		if(services!=null)
+		{
+			for(Class<?> cl: services.keySet())
+			{
+				Collection<IInternalService> sers = services.get(cl);
+				res.addAll(sers);
+			}
+		}
+		
+		ret.setResult(res);
+		return ret;
+	}
 	
 	/**
 	 *  Get a multi service.
@@ -351,7 +433,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 
 		final IntermediateFuture<T>	fut	= new IntermediateFuture<T>();
-		SServiceProvider.getServices(this, type, scope).addResultListener(new IntermediateDelegationResultListener(fut)
+		SServiceProvider.getServices(this, type, scope, null).addResultListener(new IntermediateDelegationResultListener(fut)
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
@@ -747,7 +829,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		
 		if(services==null)
 		{
-			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance.getServiceContainer(), IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance.getServiceContainer(), IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM, null);
 			fut.addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
 			{
 				public void customResultAvailable(Collection<IPublishService> result)
