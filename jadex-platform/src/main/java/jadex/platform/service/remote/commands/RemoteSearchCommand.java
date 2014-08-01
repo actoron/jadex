@@ -10,6 +10,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -118,40 +119,53 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 */
 	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		try
 		{
-			Security	sec	= null;
-			
 			// Try to find security level.
 			// Todo: support other result selectors!?
 			if(type!=null)
 			{
-				List<Class<?>>	classes	= new ArrayList<Class<?>>();
-				Class<?> typecl = type.getType(component.getClassLoader());
-				classes.add(typecl);
-				for(int i=0; sec==null && i<classes.size(); i++)
+				rrm.getLibraryService().getClassLoader(null).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
-					Class<?>	clazz	= classes.get(i);
-					sec	= clazz.getAnnotation(Security.class);
-					if(sec==null)
+					public void customResultAvailable(ClassLoader result)
 					{
-						classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
-						if(clazz.getSuperclass()!=null)
+						Security	sec	= null;
+						List<Class<?>>	classes	= new ArrayList<Class<?>>();
+						Class<?> typecl = type.getType(result);
+						classes.add(typecl);
+						for(int i=0; sec==null && i<classes.size(); i++)
 						{
-							classes.add(clazz.getSuperclass());
+							Class<?>	clazz	= classes.get(i);
+							sec	= clazz.getAnnotation(Security.class);
+							if(sec==null)
+							{
+								classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
+								if(clazz.getSuperclass()!=null)
+								{
+									classes.add(clazz.getSuperclass());
+								}
+							}
 						}
+						// Default to max security if not found.
+						securitylevel	= sec!=null ? sec.value() : Security.PASSWORD;
+						
+						ret.setResult(null);
 					}
-				}
+				});
 			}
-			// Default to max security if not found.
-			securitylevel	= sec!=null ? sec.value() : Security.PASSWORD;
-			
-			return IFuture.DONE;
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		catch(Exception e)
 		{
-			return new Future<Void>(e);
+			ret.setException(e);
 		}
+		
+		return ret;
 	}
 
 	/**

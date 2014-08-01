@@ -364,7 +364,7 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> IFuture<T> searchGlobalService(Class<T> type)
+	public synchronized <T> IFuture<T> searchGlobalService(Class<T> type, IComponentIdentifier cid)
 	{
 		Future<T> ret = new Future<T>();
 		
@@ -377,7 +377,7 @@ public class LocalServiceRegistry
 			{
 				for(IService ser: sers)
 				{
-					if(isIncluded(null, ser))
+					if(isIncluded(cid, ser))
 					{
 						res = (T)ser;
 						break;
@@ -401,7 +401,7 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type)
+	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid)
 	{
 //		System.out.println("Search global services: "+type);
 		
@@ -414,7 +414,7 @@ public class LocalServiceRegistry
 			{
 				for(IService ser: sers)
 				{
-					if(isIncluded(null, ser))
+					if(isIncluded(cid, ser))
 					{
 						ret.addIntermediateResult((T)ser);
 					}
