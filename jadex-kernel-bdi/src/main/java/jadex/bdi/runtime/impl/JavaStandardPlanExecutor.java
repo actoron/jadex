@@ -7,6 +7,7 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -877,7 +878,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	public static IFuture<IPlanExecutor>	createPlanExecutor(IInternalAccess comp)
 	{
 		final Future<IPlanExecutor>	ret	= new Future<IPlanExecutor>();
-		SServiceProvider.getService(comp.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)comp.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, IPlanExecutor>(ret)
 		{
 			public void customResultAvailable(IThreadPoolService threadpool)

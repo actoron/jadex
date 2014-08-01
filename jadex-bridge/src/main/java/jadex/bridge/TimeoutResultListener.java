@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
@@ -170,7 +171,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				SServiceProvider.getServiceUpwards(ia.getServiceContainer(), IClockService.class)
+				SServiceProvider.getServiceUpwards((IServiceProvider)ia.getServiceContainer(), IClockService.class)
 					.addResultListener(ia.createResultListener(new DefaultResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService clock)

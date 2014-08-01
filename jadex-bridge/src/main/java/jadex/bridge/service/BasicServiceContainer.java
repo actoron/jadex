@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  *  services. It allows for starting/shutdowning the container and fetching
  *  service by their type/name.
  */
-public abstract class BasicServiceContainer implements  IServiceContainer
+public abstract class BasicServiceContainer implements  IServiceContainer, IServiceProvider
 {	
 	//-------- attributes --------
 	
@@ -162,7 +162,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		final Future<Void> ret = new Future<Void>();
 		
 		// Hack!!! Must make cms available before init for boottrapping of service container of platform
-		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IComponentManagementService")!=-1)
+		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IComponentManagementService")!=-1
+			|| service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IMessageService")!=-1)
 		{
 			getServiceRegistry().addService(service);
 		}
@@ -1148,7 +1149,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public boolean equals(Object obj)
 	{
-		return obj instanceof IServiceContainer && ((IServiceContainer)obj).getId().equals(getId());
+		return obj instanceof IServiceContainer && ((IServiceProvider)obj).getId().equals(getId());
 	}
 	
 	/**

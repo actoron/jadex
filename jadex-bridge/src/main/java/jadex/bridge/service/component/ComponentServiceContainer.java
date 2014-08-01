@@ -119,6 +119,14 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		this.registry = registry;
 	}
 	
+	/**
+	 * 
+	 */
+	protected IServiceProvider getServiceProvider()
+	{
+		return (IServiceProvider)this;
+	}
+	
 	//-------- interface methods --------
 	
 	/**
@@ -129,7 +137,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope)
 	{
 		Class<?> cl = type.getType(instance.getClassLoader());
-		return (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(this, cl, scope, null);
+		return (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(getServiceProvider(), cl, scope, null);
 	}
 	
 	/**
@@ -140,7 +148,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	public IFuture<IService> getService(ClassInfo type, String scope)
 	{
 		Class<?> cl = type.getType(instance.getClassLoader());
-		return (IFuture<IService>)SServiceProvider.getService(this, cl, scope);
+		return (IFuture<IService>)SServiceProvider.getService(getServiceProvider(), cl, scope);
 	}
 	
 	/**
@@ -307,7 +315,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 
 		final Future<T>	fut	= new Future<T>();
-		SServiceProvider.getService(this, type).addResultListener(new DelegationResultListener(fut)
+		SServiceProvider.getService(getServiceProvider(), type).addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -339,7 +347,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 
 		final Future<T>	fut	= new Future<T>();
-		SServiceProvider.getService(this, type, scope).addResultListener(new DelegationResultListener(fut)
+		SServiceProvider.getService(getServiceProvider(), type, scope).addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -371,7 +379,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 
 		final Future<T>	fut	= new Future<T>();
-		SServiceProvider.getServiceUpwards(this, type).addResultListener(new DelegationResultListener(fut)
+		SServiceProvider.getServiceUpwards(getServiceProvider(), type).addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -402,7 +410,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 
 		final IntermediateFuture<T>	fut	= new IntermediateFuture<T>();
-		SServiceProvider.getServices(this, type).addResultListener(new IntermediateDelegationResultListener(fut)
+		SServiceProvider.getServices(getServiceProvider(), type).addResultListener(new IntermediateDelegationResultListener(fut)
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
@@ -433,7 +441,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 
 		final IntermediateFuture<T>	fut	= new IntermediateFuture<T>();
-		SServiceProvider.getServices(this, type, scope, null).addResultListener(new IntermediateDelegationResultListener(fut)
+		SServiceProvider.getServices(getServiceProvider(), type, scope, null).addResultListener(new IntermediateDelegationResultListener(fut)
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
@@ -468,7 +476,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		// Local?
 		if(cid.getPlatformName().equals(id.getPlatformName()))
 		{
-			SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
+			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(fut)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -500,7 +508,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 		else
 		{
-			SServiceProvider.getService(this, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, T>(fut)
 			{
 				public void customResultAvailable(IRemoteServiceManagementService rms)
@@ -651,7 +659,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			throw new ComponentTerminatedException(id);
 		}
 			
-		return new DefaultServiceFetcher(this, instance, realtime);
+		return new DefaultServiceFetcher(getServiceProvider(), instance, realtime);
 	}
 	
 	/**
@@ -672,7 +680,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		final Future<Void> ret = new Future<Void>();
 		
 //		System.out.println("search clock: "+getId());
-		SServiceProvider.getServiceUpwards(ComponentServiceContainer.this, IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService result)
@@ -829,7 +837,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		
 		if(services==null)
 		{
-			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance.getServiceContainer(), IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM, null);
+			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices((IServiceProvider)instance.getServiceContainer(), IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM, null);
 			fut.addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
 			{
 				public void customResultAvailable(Collection<IPublishService> result)
@@ -885,7 +893,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 		else
 		{
-			SServiceProvider.getService(instance.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Class<?>>(ret)
 			{
 				public void customResultAvailable(ILibraryService ls)

@@ -2,6 +2,7 @@ package jadex.bdi.testcases.semiautomatic;
 
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -28,7 +29,7 @@ public class ServicesPlan extends Plan
 		waitFor(500);
 		
 		// Call service internally
-		IPrintHelloService phs = (IPrintHelloService)SServiceProvider.getService(getServiceContainer(), 
+		IPrintHelloService phs = (IPrintHelloService)SServiceProvider.getService((IServiceProvider)getServiceContainer(), 
 			IPrintHelloService.class, RequiredServiceInfo.SCOPE_LOCAL).get(this);
 		phs.printHello();
 		

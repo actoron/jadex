@@ -4,6 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IPersistInfo;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.persistence.IPersistenceService;
@@ -41,7 +42,7 @@ public class PersistableAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(agent.getServiceContainer(), IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)agent.getServiceContainer(), IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IPersistenceService, Void>(ret)
 		{
 			public void customResultAvailable(IPersistenceService result)

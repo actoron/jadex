@@ -3,6 +3,7 @@ package jadex.platform.service.security;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -73,7 +74,7 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 		final IComponentIdentifier cid = new ComponentIdentifier(name);
 		
 		// Try to fetch certificate from other platforms
-		SServiceProvider.getServices(secser.getComponent().getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+		SServiceProvider.getServices((IServiceProvider)secser.getComponent().getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(new IIntermediateResultListener<ISecurityService>()
 		{
 			protected int ongoing;

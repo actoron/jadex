@@ -45,7 +45,7 @@ public class LocalServiceRegistry
 	 */
 	public synchronized void addService(IService service)
 	{
-//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IRemote")!=-1)
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ICompo")!=-1)
 //			System.out.println("added: "+service.getServiceIdentifier().getServiceType());
 		
 		if(services==null)

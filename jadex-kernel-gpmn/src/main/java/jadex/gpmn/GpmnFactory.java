@@ -12,6 +12,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.LocalServiceRegistry;
@@ -93,7 +94,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public GpmnFactory(IInternalAccess access, Map properties)
 	{
-		super(access.getServiceContainer().getId(), IComponentFactory.class, properties);
+		super(((IServiceProvider)access.getServiceContainer()).getId(), IComponentFactory.class, properties);
 		
 		this.fproperties	= properties;
 		this.ia = access;
@@ -109,7 +110,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 //		final IFuture<Void> sfuture = super.startService();
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -117,7 +118,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 				libservice = (ILibraryService)result;
 //				libservice.addLibraryServiceListener(libservicelistener);
 				
-				SServiceProvider.getService(ia.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
+				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

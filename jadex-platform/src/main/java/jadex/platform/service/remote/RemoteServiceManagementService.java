@@ -373,13 +373,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope)
 	{
-		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
+//		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
 		final Future<T>	ret	= new Future<T>();
 		getServiceProxies(cid, service, scope, false).addResultListener(new ExceptionDelegationResultListener<Collection<T>, T>(ret)
 		{
 			public void customResultAvailable(Collection<T> result)
 			{
-				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
+//				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
 				if(result!=null && !result.isEmpty())
 				{
 					T o = result.iterator().next();
@@ -393,7 +393,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("getServiceProxy end ex: "+cid+" "+service.getName());
+//				System.out.println("getServiceProxy end ex: "+cid+" "+service.getName());
 				super.exceptionOccurred(exception);
 			}
 		});
@@ -865,7 +865,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							msg.put(SFipa.CONVERSATION_ID, callid);
 							msg.put(SFipa.X_NONFUNCTIONAL, nonfunc);
 							
-							getResourceIdentifier(ia.getServiceContainer(), ((AbstractRemoteCommand)content).getSender())
+							getResourceIdentifier((IServiceProvider)ia.getServiceContainer(), ((AbstractRemoteCommand)content).getSender())
 								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Object>(future)
 							{
 								public void customResultAvailable(IResourceIdentifier rid)

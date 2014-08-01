@@ -4,6 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -68,7 +69,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				
 //				SyncResultListener	listener	= new SyncResultListener();
 				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-					getServiceContainer(), IComponentManagementService.class).get(this);
+					(IServiceProvider)getServiceContainer(), IComponentManagementService.class).get(this);
 				IFuture ret = ces.createComponent(null, type, new CreationInfo(config, args[i], getComponentDescription().getResourceIdentifier()), null);
 				IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 				agents.add(aid);
@@ -101,7 +102,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				
 //				SyncResultListener	listener	= new SyncResultListener();
 				IComponentManagementService ces	= (IComponentManagementService)SServiceProvider.getServiceUpwards(
-					getServiceContainer(), IComponentManagementService.class).get(this);
+					(IServiceProvider)getServiceContainer(), IComponentManagementService.class).get(this);
 				IFuture ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
 				ret.get(this);
 //				listener.waitForResult();

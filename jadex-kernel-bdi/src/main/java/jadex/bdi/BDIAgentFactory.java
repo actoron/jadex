@@ -17,6 +17,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -139,7 +140,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	public BDIAgentFactory(Map<String, Object> props, IInternalAccess component)
 	{
 //		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
-		super(component.getServiceContainer().getId(), IComponentFactory.class, null);
+		super(((IServiceProvider)component.getServiceContainer()).getId(), IComponentFactory.class, null);
 		this.myprops = props;
 		this.component	= component;
 	}
@@ -159,7 +160,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.component = component;
-		this.providerid = component.getServiceContainer().getId();
+		this.providerid = ((IServiceProvider)component.getServiceContainer()).getId();
 		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
 		return startService();
 	}
@@ -178,7 +179,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 			{
 				public void customResultAvailable(Void result)
 				{
-					SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService((IServiceProvider)component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(component.createResultListener(new DelegationResultListener(fut)
 					{
 						public void customResultAvailable(Object result)
