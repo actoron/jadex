@@ -3,6 +3,7 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Authenticated;
 import jadex.bridge.service.component.ServiceInvocationContext;
@@ -122,7 +123,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		Object[] t = new Object[]{context.getCaller().getPlatformPrefix(), classname, methodname, args};
 		final byte[] content = BinarySerializer.objectToByteArray(t, null);
 		
-		SServiceProvider.getService(getComponent().getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)getComponent().getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService sser)
@@ -198,7 +199,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 				{
 					// if not contained in direct names check virtual name mappings
 					final String[] virtuals = au.virtuals();
-					SServiceProvider.getService(ia.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 					{
 						public void customResultAvailable(ISecurityService sser)
@@ -244,7 +245,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		Object[] t = new Object[]{callername, classname, methodname, args};
 		final byte[] content = BinarySerializer.objectToByteArray(t, null);
 		
-		SServiceProvider.getService(ia.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService sser)

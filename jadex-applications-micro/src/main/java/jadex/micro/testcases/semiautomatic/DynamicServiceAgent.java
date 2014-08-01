@@ -24,7 +24,7 @@ public class DynamicServiceAgent extends MicroAgent
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				addService("dummyservice", IDummyService.class, new DummyService(getServiceContainer()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+				addService("dummyservice", IDummyService.class, new DummyService((IServiceProvider)getServiceContainer()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 				waitFor(3000, this);
 				return IFuture.DONE;
 			}

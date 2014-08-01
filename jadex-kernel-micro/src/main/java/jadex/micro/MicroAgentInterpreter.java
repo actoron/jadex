@@ -14,6 +14,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -1286,7 +1287,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		final Future<T> ret = new Future<T>();
 		
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

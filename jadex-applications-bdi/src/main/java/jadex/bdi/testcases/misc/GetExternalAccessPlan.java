@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -39,7 +40,7 @@ public class GetExternalAccessPlan extends Plan
 
 		// Create component.
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-			.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).get(this);
+			.getServiceUpwards((IServiceProvider)getServiceContainer(), IComponentManagementService.class).get(this);
 		IComponentIdentifier cid = new ComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
 		Map	args	= new HashMap();
 		args.put("future", wait);

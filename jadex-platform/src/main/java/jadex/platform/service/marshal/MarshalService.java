@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -350,7 +351,7 @@ public class MarshalService extends BasicService implements IMarshalService
 			boolean localret = ret;
 			boolean remoteret = ret;
 		
-			Class cl = object.getClass();
+			Class<?> cl = object.getClass();
 			// Avoid creating list for frequent case that class is already contained
 			boolean[] isref = (boolean[])references.get(cl);
 			if(isref!=null)
@@ -361,12 +362,12 @@ public class MarshalService extends BasicService implements IMarshalService
 			}
 			else
 			{
-				List todo = new ArrayList();
+				List<Class<?>> todo = new ArrayList<Class<?>>();
 				todo.add(cl);
 				isref = null;
 				while(todo.size()>0 && isref==null)
 				{
-					Class clazz = (Class)todo.remove(0);
+					Class<?> clazz = (Class<?>)todo.remove(0);
 					isref = (boolean[])references.get(clazz);
 					if(isref!=null)
 					{
@@ -395,10 +396,10 @@ public class MarshalService extends BasicService implements IMarshalService
 							}
 							else
 							{
-								Class superclazz = clazz.getSuperclass();
+								Class<?> superclazz = clazz.getSuperclass();
 								if(superclazz!=null && !superclazz.equals(Object.class))
 									todo.add(superclazz);
-								Class[] interfaces = clazz.getInterfaces();
+								Class<?>[] interfaces = clazz.getInterfaces();
 								for(int i=0; i<interfaces.length; i++)
 								{
 									todo.add(interfaces[i]);

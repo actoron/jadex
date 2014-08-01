@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
@@ -87,17 +88,17 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		STransformation.registerClass(DefaultEqualsMethodReplacement.class);
 		STransformation.registerClass(DefaultHashcodeMethodReplacement.class);
 		
-		SServiceProvider.getService(getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{
 			public void customResultAvailable(final ILibraryService libservice)
 			{
-				SServiceProvider.getService(getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService((IServiceProvider)getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
 				{
 					public void customResultAvailable(final IMarshalService marshalservice)
 					{
-						SServiceProvider.getService(getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService((IServiceProvider)getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 						{
 							public void customResultAvailable(final IMessageService msgservice)

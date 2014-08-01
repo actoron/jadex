@@ -3,6 +3,7 @@ package jadex.bridge.sensor.service;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ServiceInvocationContext;
@@ -49,7 +50,7 @@ public class ExecutionTimeProperty extends TimedProperty
 		{
 			this.sid = service.getServiceIdentifier();
 		
-			SServiceProvider.getService(comp.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService((IServiceProvider)comp.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener<IClockService>()
 			{
 				public void resultAvailable(IClockService result)

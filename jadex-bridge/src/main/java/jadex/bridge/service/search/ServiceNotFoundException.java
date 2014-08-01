@@ -11,6 +11,10 @@ public class ServiceNotFoundException extends RuntimeException
 	public ServiceNotFoundException(String message)
 	{
 		super(message);
+//		if(message!=null && message.indexOf("Pull")!=-1)
+//		{
+//			System.out.println("hhhggg");
+//		}
 	}
 	
 //	public void printStackTrace()

@@ -114,7 +114,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
-		this.provider = component.getServiceContainer();
+		this.provider = (IServiceProvider)component.getServiceContainer();
 		this.providerid = provider.getId();
 		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
 		return startService();

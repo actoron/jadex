@@ -140,7 +140,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getInterpreter().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)getInterpreter().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(getInterpreter().createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -171,7 +171,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getInterpreter().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)getInterpreter().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(getInterpreter().createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

@@ -13,6 +13,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -82,7 +83,7 @@ public class ServicePoolTask implements ITask
 	{
 		final Future<Void>	ret	= new Future<Void>();
 
-		SServiceProvider.getService(process.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)process.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(process.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -93,7 +94,7 @@ public class ServicePoolTask implements ITask
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
 					{
-						SServiceProvider.getService(process.getServiceContainer(), cid, IServicePoolService.class)
+						SServiceProvider.getService((IServiceProvider)process.getServiceContainer(), cid, IServicePoolService.class)
 							.addResultListener(process.createResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 						{
 							public void customResultAvailable(IServicePoolService sps)

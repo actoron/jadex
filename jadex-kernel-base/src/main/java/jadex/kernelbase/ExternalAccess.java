@@ -86,7 +86,7 @@ public class ExternalAccess implements IExternalAccess
 		this.interpreter = interpreter;
 		this.cid	= interpreter.getComponentIdentifier();
 		this.adapter = interpreter.getComponentAdapter();
-		this.provider = interpreter.getServiceContainer();
+		this.provider = (IServiceProvider)interpreter.getServiceContainer();
 		this.tostring = cid.getLocalName();
 	}
 
@@ -562,7 +562,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService((IServiceProvider)interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -600,7 +600,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService((IServiceProvider)interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)

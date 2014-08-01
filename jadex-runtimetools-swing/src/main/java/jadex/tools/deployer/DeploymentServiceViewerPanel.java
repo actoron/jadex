@@ -14,6 +14,7 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -224,7 +225,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	/**
 	 * 
 	 */
-	protected IFuture<IExternalAccess> getJCCAccess(IServiceContainer container, final IComponentIdentifier cid)
+	protected IFuture<IExternalAccess> getJCCAccess(IServiceProvider container, final IComponentIdentifier cid)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		SServiceProvider.getService(container, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
