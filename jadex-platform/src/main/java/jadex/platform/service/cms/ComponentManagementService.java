@@ -658,6 +658,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		public void resultAvailable(Void result)
 																		{
 																			logger.info("Started component: "+cid.getName());
+																			agent.getServiceContainer().getServiceRegistry().removeExcludedComponent(cid);
 																			
 																			// Create the component instance.
 																			final IComponentAdapter adapter;
@@ -848,9 +849,7 @@ public class ComponentManagementService implements IComponentManagementService
 																			ii.setAdapter(comp.getSecondEntity());
 																			ii.setModel(lmodel);
 		//																	initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, resfut, comp.getFirstEntity()});
-																			
-																			agent.getServiceContainer().getServiceRegistry().removeExcludedComponent(cid);
-																			
+																																		
 																			try
 																			{
 																				// Start the init procedure by waking up the adapter.

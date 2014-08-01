@@ -80,8 +80,8 @@ public class SServiceProvider
 			return ret;
 		}
 		
-//		if(type.toString().indexOf("IComponentM")!=-1 && scope.equals("upwards"))
-//			System.out.println("here22");
+		if(type.toString().indexOf("IAuto")!=-1)
+			System.out.println("here22");
 		
 //		synchronized(profiling)
 //		{
