@@ -39,6 +39,50 @@ public class LocalServiceRegistry
 	/** The map of published services sorted by type. */
 	protected Map<ClassInfo, Set<IService>> services;
 	
+	/** The excluded components. */
+	protected Set<IComponentIdentifier> excluded;
+	
+	/**
+	 *  Add an excluded component. 
+	 *  @param The component identifier.
+	 */
+	public synchronized void addExcludedComponent(IComponentIdentifier cid)
+	{
+		if(excluded==null)
+		{
+			excluded = new HashSet<IComponentIdentifier>();
+		}
+		excluded.add(cid);
+	}
+	
+	/**
+	 *  Remove an excluded component. 
+	 *  @param The component identifier.
+	 */
+	public synchronized void removeExcludedComponent(IComponentIdentifier cid)
+	{
+		if(excluded!=null)
+		{
+			excluded.remove(cid);
+		}
+	}
+	
+	/**
+	 *  Test if a service is included.
+	 *  @param ser The service.
+	 *  @return True if is included.
+	 */
+	public synchronized boolean isIncluded(IComponentIdentifier cid, IService ser)
+	{
+		boolean ret = true;
+		if(excluded!=null && excluded.contains(ser.getServiceIdentifier().getProviderId()) && cid!=null)
+		{
+			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
+			ret = getDotName(target).endsWith(getDotName(cid));
+		}
+		return ret;
+	}
+	
 	/**
 	 *  Add a service to the registry.
 	 *  @param sid The service id.
@@ -333,8 +377,11 @@ public class LocalServiceRegistry
 			{
 				for(IService ser: sers)
 				{
-					res = (T)ser;
-					break;
+					if(isIncluded(null, ser))
+					{
+						res = (T)ser;
+						break;
+					}
 				}
 			}
 		}
@@ -367,7 +414,10 @@ public class LocalServiceRegistry
 			{
 				for(IService ser: sers)
 				{
-					ret.addIntermediateResult((T)ser);
+					if(isIncluded(null, ser))
+					{
+						ret.addIntermediateResult((T)ser);
+					}
 				}
 			}
 		}
@@ -399,6 +449,12 @@ public class LocalServiceRegistry
 	protected boolean checkService(IComponentIdentifier cid, IService ser, String scope)
 	{
 		boolean ret = false;
+		
+		if(!isIncluded(cid, ser))
+		{
+			return ret;
+		}
+		
 		if(scope==null)
 		{
 			scope = RequiredServiceInfo.SCOPE_APPLICATION;
@@ -417,8 +473,7 @@ public class LocalServiceRegistry
 		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
 		{
 			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-			ret = target.getPlatformName().equals(cid.getPlatformName())
-				&& getApplicationName(target).equals(getApplicationName(cid));
+			ret = getDotName(target).endsWith(getDotName(cid));
 		}
 		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
 		{
@@ -497,7 +552,7 @@ public class LocalServiceRegistry
 						public void resultAvailable(IComponentIdentifier rcid)
 						{
 							IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);	
-							IFuture<Collection<T>> rsers = rms.getServiceProxies(rcid, type, RequiredServiceInfo.SCOPE_GLOBAL);
+							IFuture<Collection<T>> rsers = rms.getServiceProxies(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM);
 							rsers.addResultListener(new IResultListener<Collection<T>>()
 							{
 								public void resultAvailable(Collection<T> result)
@@ -580,7 +635,7 @@ public class LocalServiceRegistry
 						public void resultAvailable(IComponentIdentifier rcid)
 						{
 							IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);	
-							IFuture<T> rsers = rms.getServiceProxy(rcid, type, RequiredServiceInfo.SCOPE_GLOBAL);
+							IFuture<T> rsers = rms.getServiceProxy(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM);
 							rsers.addResultListener(new IResultListener<T>()
 							{
 								public void resultAvailable(T result)
@@ -666,5 +721,13 @@ public class LocalServiceRegistry
 		if((idx = ret.indexOf('@'))!=-1)
 			ret = ret.substring(idx + 1);
 		return ret;
+	}
+	
+	/**
+	 *  
+	 */
+	public static String getDotName(IComponentIdentifier cid)
+	{
+		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
 	}
 }

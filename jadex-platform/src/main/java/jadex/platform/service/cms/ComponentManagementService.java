@@ -605,6 +605,9 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname, addresses);
 																	
+																	// Defer component services being found from registry
+																	agent.getServiceContainer().getServiceRegistry().addExcludedComponent(cid);
+																	
 //																	if(name!=null)
 //																	{
 //																		cid = new ComponentIdentifier(name+"@"+paname, addresses);
@@ -845,6 +848,8 @@ public class ComponentManagementService implements IComponentManagementService
 																			ii.setAdapter(comp.getSecondEntity());
 																			ii.setModel(lmodel);
 		//																	initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, resfut, comp.getFirstEntity()});
+																			
+																			agent.getServiceContainer().getServiceRegistry().removeExcludedComponent(cid);
 																			
 																			try
 																			{
