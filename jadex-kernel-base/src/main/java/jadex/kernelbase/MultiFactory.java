@@ -61,6 +61,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -103,6 +104,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	
 	/** Set of kernels that have been active at one point */
 	protected Set activatedkernels;
+	
+	/** Flag if active kernels has changed. */
+	protected boolean activekernelsdirty = true;
 	
 	/** Currently supported types */
 	protected Set componenttypes;
@@ -764,7 +768,20 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			
 			public void customResultAvailable(Object result)
 			{
-				final Collection factories = ((Collection)result);
+				Collection tfactories = ((Collection)result);
+				
+				boolean unloaded = tfactories.size() < 2;
+				while (unloaded)
+				{
+					tfactories = SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+					System.out.println(tfactories);
+					if (tfactories.size() > 1)
+						unloaded = false;
+					ia.waitForDelay(100).get();
+				}
+				
+				final Collection factories = tfactories;
+				
 				final IResultListener factorypicker = ia.createResultListener(new CollectionResultListener(factories.size(), true, ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -981,6 +998,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 													public void resultAvailable(Object result)
 													{
 //														System.out.println("Killed kernel4: " + kernelmodel);
+														activekernelsdirty = true;
 														for(int i = 0; i < kexts.length; ++i)
 															factorycache.remove(kexts[i]);
 													}
@@ -1100,7 +1118,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //		System.out.println("searchPotentialURLs: "+rid+", "+potentialurls);
 		
 		final Future ret = new Future();
-		examineKernelModels(new ArrayList(potentialkernellocations), rid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		IResultListener reslis = ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -1140,7 +1158,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					}));
 				}
 			}
-		}));
+		});
+		
+		if (activekernelsdirty)
+		{
+			activekernelsdirty = false;
+			examineKernelModels(new ArrayList(potentialkernellocations), rid).addResultListener(reslis);
+		}
+		else
+		{
+			reslis.resultAvailable(null);
+		}
 		
 		return ret;
 	}
@@ -1301,7 +1329,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				
 				public void exceptionOccurred(Exception exception)
 				{
-//					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. ");
+					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. " + count.getAndIncrement());
 					resultAvailable(null);
 				}
 			}));
@@ -1309,7 +1337,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		return ret;
 	}
-
+	protected AtomicInteger count = new AtomicInteger(0);
 	/**
 	 *  Searches an URL, accepts both directory and .jar-based URLs.
 	 *  @param url The URL.
