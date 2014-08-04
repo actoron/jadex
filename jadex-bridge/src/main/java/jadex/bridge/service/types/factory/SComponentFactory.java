@@ -398,7 +398,7 @@ public class SComponentFactory
 					public void customResultAvailable(Object result)
 					{
 						Collection<IComponentFactory> facs = (Collection<IComponentFactory>)result;
-//						System.out.println("facs: "+type+" "+facs);
+						System.out.println("facs: "+type+" "+facs);
 						
 						IComponentFactory fac = null;
 						if(facs.size()>1)
@@ -430,6 +430,7 @@ public class SComponentFactory
 //								f.add(new JLabel(new ImageIcon(result)), BorderLayout.CENTER);
 //								f.pack();
 //								f.show();
+//								System.out.println("found icon: "+type+" "+result.length);
 								super.customResultAvailable(result);
 							}
 						}
@@ -450,7 +451,19 @@ public class SComponentFactory
 				}));
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener<byte[]>(ret));
+		}).addResultListener(new DelegationResultListener<byte[]>(ret)
+		{
+			public void customResultAvailable(byte[] result)
+			{
+				System.out.println("found icon: "+type+" "+(result==null? "null": result.length));
+				super.customResultAvailable(result);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("exec: "+exception);
+				super.exceptionOccurred(exception);
+			}
+		});
 		
 		return ret;
 	}

@@ -21,6 +21,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -140,21 +141,19 @@ public class LocalServiceRegistry
 			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
 		
 		T ret = null;
-		if(services!=null)
+		Set<IService> sers = getServices(type);
+		if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
-			Set<IService> sers = services.get(new ClassInfo(type));
-			if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
+			for(IService ser: sers)
 			{
-				for(IService ser: sers)
+				if(checkService(cid, ser, scope))
 				{
-					if(checkService(cid, ser, scope))
-					{
-						ret = (T)ser;
-						break;
-					}
+					ret = (T)ser;
+					break;
 				}
 			}
 		}
+		
 		return ret;
 	}
 	
@@ -167,21 +166,19 @@ public class LocalServiceRegistry
 			throw new IllegalArgumentException("For global searches async method searchGlobalServices has to be used.");
 		
 		Set<T> ret = null;
-		if(services!=null)
+		Set<IService> sers = getServices(type);
+		if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 		{
-			Set<IService> sers = services.get(new ClassInfo(type));
-			if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
+			ret = new HashSet<T>();
+			for(IService ser: sers)
 			{
-				ret = new HashSet<T>();
-				for(IService ser: sers)
+				if(checkService(cid, ser, scope))
 				{
-					if(checkService(cid, ser, scope))
-					{
-						ret.add((T)ser);
-					}
+					ret.add((T)ser);
 				}
 			}
 		}
+		
 		return ret;
 	}
 	
@@ -198,18 +195,11 @@ public class LocalServiceRegistry
 		}
 		else
 		{
-			if(services!=null)
+			Set<T> sers = (Set<T>)getServices(type);
+			if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 			{
-				Set<T> sers = (Set<T>)services.get(new ClassInfo(type));
-				if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
-				{
-					Iterator<T> it = sers.iterator();
-					searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
-				}
-				else
-				{
-					ret.setException(new ServiceNotFoundException(type.getName()));
-				}
+				Iterator<T> it = sers.iterator();
+				searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
 			}
 			else
 			{
@@ -364,36 +354,49 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> IFuture<T> searchGlobalService(Class<T> type, IComponentIdentifier cid)
+	public synchronized <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IRemoteFilter<T> filter)
 	{
-		Future<T> ret = new Future<T>();
+		final Future<T> ret = new Future<T>();
 		
 		T res = null;
 		
-		if(services!=null)
+		searchService(type, cid, RequiredServiceInfo.SCOPE_PLATFORM, filter).addResultListener(new IResultListener<T>()
 		{
-			Set<IService> sers = services.get(new ClassInfo(type));
-			if(sers!=null && sers.size()>0)
+			public void resultAvailable(T result)
 			{
-				for(IService ser: sers)
-				{
-					if(isIncluded(cid, ser))
-					{
-						res = (T)ser;
-						break;
-					}
-				}
+				ret.setResult(result);
 			}
-		}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				searchRemoteService(type, filter).addResultListener(new DelegationResultListener<T>(ret));
+			}
+		});
 		
-		if(res==null)
-		{
-			searchRemoteService(type).addResultListener(new DelegationResultListener<T>(ret));
-		}
-		else
-		{
-			ret.setResult(res);
-		}
+//		if(services!=null)
+//		{
+//			Set<IService> sers = services.get(new ClassInfo(type));
+//			if(sers!=null && sers.size()>0)
+//			{
+//				for(IService ser: sers)
+//				{
+//					if(isIncluded(cid, ser))
+//					{
+//						res = (T)ser;
+//						break;
+//					}
+//				}
+//			}
+//		}
+		
+//		if(res==null)
+//		{
+//			searchRemoteService(type).addResultListener(new DelegationResultListener<T>(ret));
+//		}
+//		else
+//		{
+//			ret.setResult(res);
+//		}
 		
 		return ret;
 	}
@@ -401,28 +404,21 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid)
+	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IRemoteFilter<T> filter)
 	{
 //		System.out.println("Search global services: "+type);
 		
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		
-		if(services!=null)
+		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, true, new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
 		{
-			Set<IService> sers = services.get(new ClassInfo(type));
-			if(sers!=null && sers.size()>0)
+			public void customResultAvailable(Void result)
 			{
-				for(IService ser: sers)
-				{
-					if(isIncluded(cid, ser))
-					{
-						ret.addIntermediateResult((T)ser);
-					}
-				}
+				ret.setFinished();
 			}
-		}
+		});
 		
-		searchRemoteServices(type).addResultListener(new IntermediateDefaultResultListener<T>()
+		searchServices(type, cid, RequiredServiceInfo.SCOPE_PLATFORM, filter).addResultListener(new IntermediateDefaultResultListener<T>()
 		{
 			public void intermediateResultAvailable(T result)
 			{
@@ -431,12 +427,45 @@ public class LocalServiceRegistry
 			
 			public void finished()
 			{
-				ret.setFinished();
+				lis.resultAvailable(null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setFinished();
+				lis.resultAvailable(null);
+			}
+		});
+		
+//		if(services!=null)
+//		{
+//			Set<IService> sers = services.get(new ClassInfo(type));
+//			if(sers!=null && sers.size()>0)
+//			{
+//				for(IService ser: sers)
+//				{
+//					if(isIncluded(cid, ser))
+//					{
+//						ret.addIntermediateResult((T)ser);
+//					}
+//				}
+//			}
+//		}
+		
+		searchRemoteServices(type, filter).addResultListener(new IntermediateDefaultResultListener<T>()
+		{
+			public void intermediateResultAvailable(T result)
+			{
+				ret.addIntermediateResult(result);
+			}
+			
+			public void finished()
+			{
+				lis.resultAvailable(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				lis.resultAvailable(null);
 			}
 		});
 		
@@ -526,7 +555,7 @@ public class LocalServiceRegistry
 	 *  @param type The type.
 	 *  @param scope The scope.
 	 */
-	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final Class<T> type)
+	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final Class<T> type, final IRemoteFilter<T> filter)
 	{
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		
@@ -552,7 +581,7 @@ public class LocalServiceRegistry
 						public void resultAvailable(IComponentIdentifier rcid)
 						{
 							IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);	
-							IFuture<Collection<T>> rsers = rms.getServiceProxies(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM);
+							IFuture<Collection<T>> rsers = rms.getServiceProxies(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 							rsers.addResultListener(new IResultListener<Collection<T>>()
 							{
 								public void resultAvailable(Collection<T> result)
@@ -609,13 +638,13 @@ public class LocalServiceRegistry
 	 *  @param type The type.
 	 *  @param scope The scope.
 	 */
-	protected <T> IFuture<T> searchRemoteService(final Class<T> type)
+	protected <T> IFuture<T> searchRemoteService(final Class<T> type, final IRemoteFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		
 		if(services!=null)
 		{
-			Set<IService> sers = services.get(new ClassInfo(IProxyAgentService.class));
+			Set<IService> sers = getServices(IProxyAgentService.class);
 			if(sers!=null && sers.size()>0)
 			{
 				final CounterResultListener<Void> clis = new CounterResultListener<Void>(sers.size(), new ExceptionDelegationResultListener<Void, T>(ret)
@@ -635,7 +664,7 @@ public class LocalServiceRegistry
 						public void resultAvailable(IComponentIdentifier rcid)
 						{
 							IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);	
-							IFuture<T> rsers = rms.getServiceProxy(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM);
+							IFuture<T> rsers = rms.getServiceProxy(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 							rsers.addResultListener(new IResultListener<T>()
 							{
 								public void resultAvailable(T result)
@@ -678,8 +707,32 @@ public class LocalServiceRegistry
 	 */
 	protected <T> T getService(Class<T> type)
 	{
-		Set<T> sers = (Set<T>)services.get(new ClassInfo(type));
+		Set<T> sers = services==null? null: (Set<T>)services.get(new ClassInfo(type));
 		return sers==null || sers.size()==0? null: (T)sers.iterator().next();
+	}
+	
+	/**
+	 * 
+	 */
+	protected Set<IService> getServices(Class<?> type)
+	{
+		Set<IService> ret = Collections.EMPTY_SET;;
+		if(services!=null)
+		{
+			if(type!=null)
+			{
+				ret = services.get(new ClassInfo(type));
+			}
+			else
+			{
+				ret = new HashSet<IService>();
+				for(ClassInfo t: services.keySet())
+				{
+					ret.addAll(services.get(t));
+				}
+			}
+		}
+		return ret;
 	}
 	
 	/**

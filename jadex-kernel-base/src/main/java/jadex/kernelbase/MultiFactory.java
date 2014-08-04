@@ -784,6 +784,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			public void customResultAvailable(Object result)
 			{
 				final Collection factories = (Collection) result;
+//				System.out.println("found factories: "+result);
 				
 				final IResultListener factorypicker = ia.createResultListener(new CollectionResultListener(factories.size(), true, ia.createResultListener(new DefaultResultListener()
 				{

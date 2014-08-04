@@ -522,7 +522,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			{
 				public void customResultAvailable(IRemoteServiceManagementService rms)
 				{
-					rms.getServiceProxy(cid, type, RequiredServiceInfo.SCOPE_LOCAL)
+					rms.getServiceProxy(cid, type, RequiredServiceInfo.SCOPE_LOCAL, null)
 						.addResultListener(new DelegationResultListener<T>(fut)
 					{
 						public void customResultAvailable(T result)

@@ -80,8 +80,8 @@ public class SServiceProvider
 			return ret;
 		}
 		
-		if(type.toString().indexOf("IAuto")!=-1)
-			System.out.println("here22");
+//		if(type.toString().indexOf("IAuto")!=-1)
+//			System.out.println("here22");
 		
 //		synchronized(profiling)
 //		{
@@ -98,19 +98,27 @@ public class SServiceProvider
 			IServiceContainer container = (IServiceContainer)provider;
 			if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			{
-				T ser = container.getServiceRegistry().searchService(type, provider.getId(), scope);
-				if(ser!=null)
+				// todo
+				if(filter==null)
 				{
-					ret.setResult(ser);
+					T ser = container.getServiceRegistry().searchService(type, provider.getId(), scope);
+					if(ser!=null)
+					{
+						ret.setResult(ser);
+					}
+					else
+					{
+						ret.setException(new ServiceNotFoundException(type.getName()));
+					}
 				}
 				else
 				{
-					ret.setException(new ServiceNotFoundException(type.getName()));
+					container.getServiceRegistry().searchService(type, provider.getId(), scope, filter).addResultListener(new DelegationResultListener<T>(ret));
 				}
 			}
 			else
 			{
-				container.getServiceRegistry().searchGlobalService(type, provider.getId()).addResultListener(new DelegationResultListener<T>(ret));
+				container.getServiceRegistry().searchGlobalService(type, provider.getId(), filter).addResultListener(new DelegationResultListener<T>(ret));
 			}
 		}
 		else
@@ -311,12 +319,19 @@ public class SServiceProvider
 			
 			if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			{
-				Collection<T> sers = container.getServiceRegistry().searchServices(type, provider.getId(), scope);
-				ret.setResult(sers==null? Collections.EMPTY_SET: sers);
+				if(filter==null)
+				{
+					Collection<T> sers = container.getServiceRegistry().searchServices(type, provider.getId(), scope);
+					ret.setResult(sers==null? Collections.EMPTY_SET: sers);
+				}
+				else
+				{
+					container.getServiceRegistry().searchServices(type, provider.getId(), scope, filter).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				}
 			}
 			else
 			{
-				container.getServiceRegistry().searchGlobalServices(type, provider.getId()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				container.getServiceRegistry().searchGlobalServices(type, provider.getId(), filter).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 			}
 		}
 		else

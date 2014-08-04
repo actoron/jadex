@@ -3223,7 +3223,7 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			public void customResultAvailable(IRemoteServiceManagementService rms)
 			{
-				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, null)
 					.addResultListener(createResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)

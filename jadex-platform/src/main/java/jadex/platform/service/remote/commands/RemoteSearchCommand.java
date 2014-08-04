@@ -10,6 +10,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -65,6 +66,9 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	/** The scope. */
 	protected String scope;
 	
+	/** The filter. */
+	protected IRemoteFilter filter;
+	
 	//-------- constructors --------
 	
 	/**
@@ -91,7 +95,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  Create a new remote search command.
 	 */
 	public RemoteSearchCommand(IComponentIdentifier providerid, Class<?> type, 
-		boolean multiple, String scope, String callid)
+		boolean multiple, String scope, String callid, IRemoteFilter<?> filter)
 	{
 		if(type==null)
 			System.out.println("type is null");
@@ -101,6 +105,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 		this.multiple = multiple;
 		this.scope = scope;
 		this.callid = callid;
+		this.filter = filter;
 	}
 
 	//-------- methods --------
@@ -242,7 +247,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 								{
 									Class<?> cl = type.getType(ia.getClassLoader(), ia.getModel().getAllImports());
 									
-									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), cl, scope);
+									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), cl, scope, filter);
 									res.addResultListener(new IIntermediateResultListener<IService>()
 									{
 										int cnt = 0;	
