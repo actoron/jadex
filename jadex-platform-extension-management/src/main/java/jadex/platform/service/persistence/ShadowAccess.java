@@ -753,12 +753,12 @@ public class ShadowAccess implements IExternalAccess
 		 *  @param type The class.
 		 *  @return The corresponding services.
 		 */
-		public ITerminableIntermediateFuture<IService> getServices(final ClassInfo type, final String scope)
+		public ITerminableIntermediateFuture<IService> getServices(final ClassInfo type, final String scope, final IRemoteFilter<IService> filter)
 		{
 			final TerminableIntermediateDelegationFuture<IService>	ret	= new TerminableIntermediateDelegationFuture<IService>();
 			try
 			{
-				ITerminableIntermediateFuture<IService>	fut = (ITerminableIntermediateFuture<IService>)access.getServiceProvider().getServices(type, scope);
+				ITerminableIntermediateFuture<IService>	fut = (ITerminableIntermediateFuture<IService>)access.getServiceProvider().getServices(type, scope, filter);
 				fut.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(ret, fut));
 			}
 			catch(ComponentPersistedException e)
@@ -769,7 +769,7 @@ public class ShadowAccess implements IExternalAccess
 					{
 						try
 						{
-							ITerminableIntermediateFuture<IService>	fut = (ITerminableIntermediateFuture<IService>)access.getServiceProvider().getServices(type, scope);
+							ITerminableIntermediateFuture<IService>	fut = (ITerminableIntermediateFuture<IService>)access.getServiceProvider().getServices(type, scope, filter);
 							fut.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(ret, fut));
 						}
 						catch(Exception e)
@@ -791,12 +791,12 @@ public class ShadowAccess implements IExternalAccess
 		 *  @param type The class.
 		 *  @return The corresponding services.
 		 */
-		public IFuture<IService> getService(final ClassInfo type, final String scope)
+		public IFuture<IService> getService(final ClassInfo type, final String scope, final IRemoteFilter<IService> filter)
 		{
 			final Future<IService>	ret	= new Future<IService>();
 			try
 			{
-				IFuture<IService>	fut = (IFuture<IService>)access.getServiceProvider().getService(type, scope);
+				IFuture<IService>	fut = (IFuture<IService>)access.getServiceProvider().getService(type, scope, filter);
 				fut.addResultListener(new DelegationResultListener<IService>(ret));
 			}
 			catch(ComponentPersistedException e)
@@ -807,7 +807,7 @@ public class ShadowAccess implements IExternalAccess
 					{
 						try
 						{
-							IFuture<IService>	fut = (IFuture<IService>)access.getServiceProvider().getService(type, scope);
+							IFuture<IService>	fut = (IFuture<IService>)access.getServiceProvider().getService(type, scope, filter);
 							fut.addResultListener(new DelegationResultListener<IService>(ret));
 						}
 						catch(Exception e)

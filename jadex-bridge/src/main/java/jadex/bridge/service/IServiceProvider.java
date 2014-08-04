@@ -3,6 +3,7 @@ package jadex.bridge.service;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IRemotable;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
@@ -25,14 +26,14 @@ public interface IServiceProvider extends IRemotable
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope);
+	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IRemoteFilter<IService> filter);
 	
 	/**
 	 *  Get all services of a type.
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture<IService> getService(ClassInfo type, String scope);
+	public IFuture<IService> getService(ClassInfo type, String scope, IRemoteFilter<IService> filter);
 	
 	/**
 	 *  Get a service per id.

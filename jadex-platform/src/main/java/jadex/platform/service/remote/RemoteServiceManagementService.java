@@ -1,6 +1,5 @@
 package jadex.platform.service.remote;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
@@ -12,6 +11,7 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -44,9 +44,9 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.binaryserializer.IDecodingContext;
+import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.message.MessageService;
@@ -529,7 +529,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
 						// Hack! create remote rms cid with "rms" assumption.
-						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid, filter);
+						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid, (IRemoteFilter<IService>)filter);
 						
 //						System.out.println("send to: "+rrms+" "+callid);
 						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func

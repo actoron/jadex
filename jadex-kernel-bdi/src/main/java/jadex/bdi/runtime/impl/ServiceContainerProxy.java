@@ -76,9 +76,9 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope)
+	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IRemoteFilter<IService> filter)
 	{
-		return ((IServiceProvider)interpreter.getServiceContainer()).getServices(type, scope);
+		return ((IServiceProvider)interpreter.getServiceContainer()).getServices(type, scope, filter);
 	}
 	
 	/**
@@ -86,9 +86,9 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture<IService> getService(ClassInfo type, String scope)
+	public IFuture<IService> getService(ClassInfo type, String scope, IRemoteFilter<IService> filter)
 	{
-		return ((IServiceProvider)interpreter.getServiceContainer()).getService(type, scope);
+		return ((IServiceProvider)interpreter.getServiceContainer()).getService(type, scope, filter);
 	}
 	
 	/**

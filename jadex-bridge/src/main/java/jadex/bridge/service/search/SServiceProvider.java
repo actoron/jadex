@@ -74,11 +74,11 @@ public class SServiceProvider
 	{
 		final Future ret = new Future();
 
-		if(type==null)
-		{
-			ret.setException(new IllegalArgumentException("Type must not null."));
-			return ret;
-		}
+//		if(type==null)
+//		{
+//			ret.setException(new IllegalArgumentException("Type must not null."));
+//			return ret;
+//		}
 		
 //		if(type.toString().indexOf("IAuto")!=-1)
 //			System.out.println("here22");
@@ -98,7 +98,6 @@ public class SServiceProvider
 			IServiceContainer container = (IServiceContainer)provider;
 			if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			{
-				// todo
 				if(filter==null)
 				{
 					T ser = container.getServiceRegistry().searchService(type, provider.getId(), scope);
@@ -125,7 +124,7 @@ public class SServiceProvider
 		{
 			try
 			{
-				provider.getServices(new ClassInfo(type), scope)
+				provider.getServices(new ClassInfo(type), scope, (IRemoteFilter<IService>)filter)
 //				provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
 //					new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter))
 						.addResultListener(new IIntermediateResultListener<IService>()
@@ -342,7 +341,7 @@ public class SServiceProvider
 //					getVisitDecider(false, scope),
 //					new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter));
 				
-				ITerminableIntermediateFuture<IService> fut = provider.getServices(new ClassInfo(type), scope);
+				ITerminableIntermediateFuture<IService> fut = provider.getServices(new ClassInfo(type), scope, (IRemoteFilter<IService>)filter);
 				fut.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(ret, fut));
 			}
 			catch(Exception e)

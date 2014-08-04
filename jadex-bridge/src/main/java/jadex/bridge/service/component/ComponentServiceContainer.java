@@ -28,6 +28,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.SReflect;
 import jadex.commons.collection.ILRUEntryCleaner;
@@ -134,13 +135,13 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope)
+	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IRemoteFilter<IService> filter)
 	{
 		if(type==null)
 			return new TerminableIntermediateFuture<IService>(new IllegalArgumentException("Type must not null."));
 		
 		Class<?> cl = type.getType(instance.getClassLoader());
-		return (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(getServiceProvider(), cl, scope, null);
+		return (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(getServiceProvider(), cl, scope, (IRemoteFilter)filter);
 	}
 	
 	/**
@@ -148,13 +149,13 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture<IService> getService(ClassInfo type, String scope)
+	public IFuture<IService> getService(ClassInfo type, String scope, IRemoteFilter<IService> filter)
 	{
 		if(type==null)
 			return new Future<IService>(new IllegalArgumentException("Type must not null."));
 
 		Class<?> cl = type.getType(instance.getClassLoader());
-		return (IFuture<IService>)SServiceProvider.getService(getServiceProvider(), cl, scope);
+		return (IFuture<IService>)SServiceProvider.getService(getServiceProvider(), cl, scope, (IRemoteFilter)filter);
 	}
 	
 	/**

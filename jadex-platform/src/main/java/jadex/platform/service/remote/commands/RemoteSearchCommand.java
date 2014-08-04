@@ -67,7 +67,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	protected String scope;
 	
 	/** The filter. */
-	protected IRemoteFilter filter;
+	protected IRemoteFilter<IService> filter;
 	
 	//-------- constructors --------
 	
@@ -95,7 +95,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  Create a new remote search command.
 	 */
 	public RemoteSearchCommand(IComponentIdentifier providerid, Class<?> type, 
-		boolean multiple, String scope, String callid, IRemoteFilter<?> filter)
+		boolean multiple, String scope, String callid, IRemoteFilter<IService> filter)
 	{
 		if(type==null)
 			System.out.println("type is null");
@@ -247,7 +247,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 								{
 									Class<?> cl = type.getType(ia.getClassLoader(), ia.getModel().getAllImports());
 									
-									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), cl, scope, filter);
+									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), cl, scope, (IRemoteFilter)filter);
 									res.addResultListener(new IIntermediateResultListener<IService>()
 									{
 										int cnt = 0;	
@@ -325,7 +325,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 						{
 							// start search on target component
 	//						System.out.println("rem search start: "+manager+" "+decider+" "+selector);
-							exta.getServiceProvider().getServices(type, scope)
+							exta.getServiceProvider().getServices(type, scope, filter)
 //							exta.getServiceProvider().getServices(manager, decider, selector)
 								.addResultListener(new IIntermediateResultListener<IService>()
 							{
@@ -545,6 +545,24 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	public void setScope(String scope)
 	{
 		this.scope = scope;
+	}
+	
+	/**
+	 *  Get the filter.
+	 *  @return The filter.
+	 */
+	public IRemoteFilter<IService> getFilter()
+	{
+		return filter;
+	}
+
+	/**
+	 *  Set the filter.
+	 *  @param filter The filter to set.
+	 */
+	public void setFilter(IRemoteFilter<IService> filter)
+	{
+		this.filter = filter;
 	}
 
 	/**
