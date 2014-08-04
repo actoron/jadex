@@ -62,6 +62,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -1121,7 +1122,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //		System.out.println("searchPotentialURLs: "+rid+", "+potentialurls);
 		
 		final Future ret = new Future();
-		IResultListener reslis = ia.createResultListener(new DelegationResultListener(ret)
+		final IResultListener reslis = ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -1148,8 +1149,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 								for (Iterator it = kernelmap.values().iterator(); it.hasNext(); )
 									kernelurls.put(url, it.next());
 							}
-							
 							potentialurls.remove(url);
+//							System.out.println("Remove: " + url + " size " + potentialurls.size());
 							ret.setResult(null);
 						}
 						
@@ -1163,15 +1164,23 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 		});
 		
-		if (activekernelsdirty)
+		ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
-			activekernelsdirty = false;
-			examineKernelModels(new ArrayList(potentialkernellocations), rid).addResultListener(reslis);
-		}
-		else
-		{
-			reslis.resultAvailable(null);
-		}
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if (activekernelsdirty)
+				{
+					activekernelsdirty = false;
+					examineKernelModels(new ArrayList(potentialkernellocations), rid).addResultListener(reslis);
+				}
+				else
+				{
+					reslis.resultAvailable(null);
+				}
+				
+				return IFuture.DONE;
+			}
+		});
 		
 		return ret;
 	}
@@ -1209,6 +1218,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture kernelSearch(final URL url, final IFilter prefilter, IResourceIdentifier rid)
 	{
+//		System.out.println("URLSearhc: " + url);
 		List modellocs = searchUrl(url, new IFilter()
 		{
 			public boolean filter(Object obj)
