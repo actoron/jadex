@@ -895,7 +895,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

@@ -6,6 +6,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.PlanFailureException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.IComponentAction;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
@@ -60,7 +61,7 @@ public abstract class RemoteActionPlan extends Plan
 
 		if(res==null)
 		{
-			IDF df = (IDF)SServiceProvider.getServiceUpwards(getServiceContainer(), IDF.class).get(this);
+			IDF df = (IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getServiceContainer(), IDF.class).get(this);
 			IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
 			IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 				

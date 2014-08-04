@@ -897,72 +897,72 @@ public class ShadowAccess implements IExternalAccess
 			
 		}
 		
-		public IFuture<IServiceProvider> getParent()
-		{
-			final Future<IServiceProvider>	ret	= new Future<IServiceProvider>();
-			try
-			{
-				access.getServiceProvider().getParent().addResultListener(new DelegationResultListener<IServiceProvider>(ret));
-			}
-			catch(ComponentPersistedException e)
-			{
-				resurrect().addResultListener(new ExceptionDelegationResultListener<Void, IServiceProvider>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
-						try
-						{
-							access.getServiceProvider().getParent().addResultListener(new DelegationResultListener<IServiceProvider>(ret));
-						}
-						catch(Exception e)
-						{
-							ret.setException(e);
-						}
-					}
-				});
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
-			return ret;
-		}
+//		public IFuture<IServiceProvider> getParent()
+//		{
+//			final Future<IServiceProvider>	ret	= new Future<IServiceProvider>();
+//			try
+//			{
+//				access.getServiceProvider().getParent().addResultListener(new DelegationResultListener<IServiceProvider>(ret));
+//			}
+//			catch(ComponentPersistedException e)
+//			{
+//				resurrect().addResultListener(new ExceptionDelegationResultListener<Void, IServiceProvider>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
+//						try
+//						{
+//							access.getServiceProvider().getParent().addResultListener(new DelegationResultListener<IServiceProvider>(ret));
+//						}
+//						catch(Exception e)
+//						{
+//							ret.setException(e);
+//						}
+//					}
+//				});
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
+//			return ret;
+//		}
 
 		public IComponentIdentifier getId()
 		{
 			return getComponentIdentifier();
 		}
 
-		public IFuture<Collection<IServiceProvider>> getChildren()
-		{
-			final Future<Collection<IServiceProvider>>	ret	= new Future<Collection<IServiceProvider>>();
-			try
-			{
-				access.getServiceProvider().getChildren().addResultListener(new DelegationResultListener<Collection<IServiceProvider>>(ret));
-			}
-			catch(ComponentPersistedException e)
-			{
-				resurrect().addResultListener(new ExceptionDelegationResultListener<Void, Collection<IServiceProvider>>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
-						try
-						{
-							access.getServiceProvider().getChildren().addResultListener(new DelegationResultListener<Collection<IServiceProvider>>(ret));
-						}
-						catch(Exception e)
-						{
-							ret.setException(e);
-						}
-					}
-				});
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
-			return ret;
-		}
+//		public IFuture<Collection<IServiceProvider>> getChildren()
+//		{
+//			final Future<Collection<IServiceProvider>>	ret	= new Future<Collection<IServiceProvider>>();
+//			try
+//			{
+//				access.getServiceProvider().getChildren().addResultListener(new DelegationResultListener<Collection<IServiceProvider>>(ret));
+//			}
+//			catch(ComponentPersistedException e)
+//			{
+//				resurrect().addResultListener(new ExceptionDelegationResultListener<Void, Collection<IServiceProvider>>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
+//						try
+//						{
+//							access.getServiceProvider().getChildren().addResultListener(new DelegationResultListener<Collection<IServiceProvider>>(ret));
+//						}
+//						catch(Exception e)
+//						{
+//							ret.setException(e);
+//						}
+//					}
+//				});
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
+//			return ret;
+//		}
 
 		//-------- IServiceContainer methods (todo: remove) --------
 		

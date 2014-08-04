@@ -98,6 +98,8 @@ public class RemoteDirNode extends RemoteFileNode
 						rjn.setJarEntries(rjfentries);
 						dir.add(rjn);
 					}
+					
+//					System.out.println("rjfentries size: "+rjfentries.size());
 				}
 				else
 				{

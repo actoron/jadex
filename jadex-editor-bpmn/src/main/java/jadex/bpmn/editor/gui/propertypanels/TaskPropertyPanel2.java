@@ -72,9 +72,9 @@ public class TaskPropertyPanel2 extends InternalSubprocessPropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public TaskPropertyPanel2(final ModelContainer container, final VActivity task, MParameter selectedparameter)
+	public TaskPropertyPanel2(final ModelContainer container, Object selection)
 	{
-		super(container, task, selectedparameter);
+		super(container, selection);
 		
 //		if(cbox.getItemCount()>0)
 //		{

@@ -33,7 +33,7 @@ public class CertificateCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		try
 		{
@@ -71,7 +71,7 @@ public class CertificateCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		try
 		{

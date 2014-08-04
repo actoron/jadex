@@ -50,17 +50,17 @@ public interface IServiceProvider extends IRemotable
 	
 	
 	
-	/**
-	 *  Get the parent service container.
-	 *  @return The parent container.
-	 */
-	public IFuture<IServiceProvider>	getParent();
-	
-	/**
-	 *  Get the children container.
-	 *  @return The children container.
-	 */
-	public IFuture<Collection<IServiceProvider>>	getChildren();
+//	/**
+//	 *  Get the parent service container.
+//	 *  @return The parent container.
+//	 */
+//	public IFuture<IServiceProvider>	getParent();
+//	
+//	/**
+//	 *  Get the children container.
+//	 *  @return The children container.
+//	 */
+//	public IFuture<Collection<IServiceProvider>>	getChildren();
 	
 	/**
 	 *  Get the globally unique id of the provider.

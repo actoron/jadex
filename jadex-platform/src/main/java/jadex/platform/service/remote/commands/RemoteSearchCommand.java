@@ -6,9 +6,11 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -54,10 +56,8 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	/** The security level (set by postprocessing). */
 	protected String securitylevel;
 
-	
 	/** The type. */
 	protected ClassInfo type;
-	protected Class<?> typecl; // not transferred only for preprocessing
 	
 	/** The multiple flag. */
 	protected boolean multiple;
@@ -93,9 +93,11 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	public RemoteSearchCommand(IComponentIdentifier providerid, Class<?> type, 
 		boolean multiple, String scope, String callid)
 	{
+		if(type==null)
+			System.out.println("type is null");
+		
 		this.providerid = providerid;
 		this.type = new ClassInfo(type);
-		this.typecl = type;
 		this.multiple = multiple;
 		this.scope = scope;
 		this.callid = callid;
@@ -117,37 +119,53 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 */
 	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		try
 		{
-			Security	sec	= null;
-			
 			// Try to find security level.
 			// Todo: support other result selectors!?
-			List<Class<?>>	classes	= new ArrayList<Class<?>>();
-			classes.add(typecl);
-			for(int i=0; sec==null && i<classes.size(); i++)
+			if(type!=null)
 			{
-				Class<?>	clazz	= classes.get(i);
-				sec	= clazz.getAnnotation(Security.class);
-				if(sec==null)
+				rrm.getLibraryService().getClassLoader(null).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
-					classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
-					if(clazz.getSuperclass()!=null)
+					public void customResultAvailable(ClassLoader result)
 					{
-						classes.add(clazz.getSuperclass());
+						Security	sec	= null;
+						List<Class<?>>	classes	= new ArrayList<Class<?>>();
+						Class<?> typecl = type.getType(result);
+						classes.add(typecl);
+						for(int i=0; sec==null && i<classes.size(); i++)
+						{
+							Class<?>	clazz	= classes.get(i);
+							sec	= clazz.getAnnotation(Security.class);
+							if(sec==null)
+							{
+								classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
+								if(clazz.getSuperclass()!=null)
+								{
+									classes.add(clazz.getSuperclass());
+								}
+							}
+						}
+						// Default to max security if not found.
+						securitylevel	= sec!=null ? sec.value() : Security.PASSWORD;
+						
+						ret.setResult(null);
 					}
-				}
+				});
 			}
-			
-			// Default to max security if not found.
-			securitylevel	= sec!=null ? sec.value() : Security.PASSWORD;
-			
-			return IFuture.DONE;
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		catch(Exception e)
 		{
-			return new Future<Void>(e);
+			ret.setException(e);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -165,6 +183,12 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 				// Todo: terminate ongoing search.
 			}
 		});
+		
+//		if(type==null)
+//		{
+//			ret.setException(new RuntimeException("Incompatible Jadex version exception."));
+//			return ret;
+//		}
 		
 //		System.out.println("start rem search: "+callid);
 		
@@ -218,7 +242,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 								{
 									Class<?> cl = type.getType(ia.getClassLoader(), ia.getModel().getAllImports());
 									
-									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(ia.getServiceContainer(), cl, scope);
+									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), cl, scope);
 									res.addResultListener(new IIntermediateResultListener<IService>()
 									{
 										int cnt = 0;	

@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.propertypanels.PropertyPanelFactory;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bridge.ClassInfo;
@@ -56,6 +57,9 @@ public class Settings
 	
 	/** The class cache file name. */
 	protected static final String CLASS_CACHE_FILE_NAME = "classes.cache";
+	
+	/** The property panel factory */
+	protected PropertyPanelFactory propertypanelfactory;
 	
 	/** The progress bar for background tasks. */
 	protected BackgroundProgressBar bgprogressbar;
@@ -646,6 +650,26 @@ public class Settings
 	public ClassLoader getLibraryClassLoader()
 	{
 		return libclassloader;
+	}
+	
+	/**
+	 *  Gets the property panel factory.
+	 *  
+	 *  @return The property panel factory.
+	 */
+	public PropertyPanelFactory getPropertyPanelFactory()
+	{
+		return propertypanelfactory;
+	}
+	
+	/**
+	 *  Sets the property panel factory.
+	 * 
+	 * @param propertypanelfactory The property panel factory.
+	 */
+	public void setPropertyPanelFactory(PropertyPanelFactory propertypanelfactory)
+	{
+		this.propertypanelfactory = propertypanelfactory;
 	}
 
 	/**

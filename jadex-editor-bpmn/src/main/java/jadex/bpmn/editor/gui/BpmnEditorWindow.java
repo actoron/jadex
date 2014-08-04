@@ -3,8 +3,7 @@ package jadex.bpmn.editor.gui;
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.DeletionController;
 import jadex.bpmn.editor.gui.controllers.SCreationController;
-import jadex.bpmn.editor.gui.controllers.SelectionController;
-import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
+import jadex.bpmn.editor.gui.propertypanels.PropertyPanelFactory;
 import jadex.bpmn.editor.model.legacy.BpmnXMLReader;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelGenerator;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
@@ -12,6 +11,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.ResourceInfo;
+import jadex.commons.collection.OrderedProperties;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
@@ -28,7 +28,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,7 +37,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -57,7 +55,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.mxgraph.util.mxEvent;
 import com.mxgraph.view.mxStylesheet;
 
 /**
@@ -65,6 +62,8 @@ import com.mxgraph.view.mxStylesheet;
  */
 public class BpmnEditorWindow extends JFrame
 {
+	public static final String JADEX_PANEL_CONFIG = "jadex/bpmn/editor/gui/propertypanels/jadexpanels.properties";
+	
 	/** The tool bar. */
 	protected BpmnToolbar bpmntoolbar;
 	
@@ -90,6 +89,17 @@ public class BpmnEditorWindow extends JFrame
 		BackgroundProgressBar bgprogressbar = new BackgroundProgressBar();
 		
 		settings = Settings.load();
+		
+		OrderedProperties panelprops = new OrderedProperties();
+		try
+		{
+			panelprops.load(getClass().getClassLoader().getResourceAsStream(BpmnEditorWindow.JADEX_PANEL_CONFIG));
+		}
+		catch (IOException e2)
+		{
+			e2.printStackTrace();
+		}
+		settings.setPropertyPanelFactory(new PropertyPanelFactory(panelprops));
 		
 		LookAndFeelInfo lfinfo = BpmnEditor.LOOK_AND_FEELS.get(settings.getLfName());
 		if (lfinfo != null)
@@ -457,7 +467,8 @@ public class BpmnEditorWindow extends JFrame
 		
 		tabpane.setSelectedIndex(index);
 		
-		panel.getModelContainer().setPropertyPanel(SPropertyPanelFactory.createPanel(null, panel.getModelContainer()));
+//		panel.getModelContainer().setPropertyPanel(SPropertyPanelFactory.createPanel(null, panel.getModelContainer()));
+		panel.getModelContainer().setPropertyPanel(settings.getPropertyPanelFactory().createPanel(panel.getModelContainer(), null));
 		panel.setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
 		
 		// More Swing Bugness
@@ -520,7 +531,8 @@ public class BpmnEditorWindow extends JFrame
 	{
 //		modelcontainer.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
 		modelcontainer.getGraphComponent().refresh();
-		modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
+		modelcontainer.setPropertyPanel(settings.getPropertyPanelFactory().createPanel(modelcontainer, null));
+//		modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
 		new DeletionController(modelcontainer);
 	}
 	

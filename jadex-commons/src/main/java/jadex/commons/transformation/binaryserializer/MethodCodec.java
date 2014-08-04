@@ -27,7 +27,7 @@ public class MethodCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, IDecodingContext context)
 	{
 		Method ret = null;
 		try
@@ -69,7 +69,7 @@ public class MethodCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		Method method = (Method) object;
 		ec.writeClass(method.getDeclaringClass());

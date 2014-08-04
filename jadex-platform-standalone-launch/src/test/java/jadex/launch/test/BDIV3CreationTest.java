@@ -33,17 +33,17 @@ public class BDIV3CreationTest //extends TestCase
 	@Test
 	public void	testBDICreation() throws Exception
 	{
-		long timeout	= BasicService.getLocalDefaultTimeout();
+		long timeout	= -1;//BasicService.getLocalDefaultTimeout();
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
-//			"-logging_level", "java.util.logging.Level.INFO",
+			"-logging", "false",
 			"-libpath", "new String[]{\""+new File("../jadex-applications-bdiv3/target/classes").toURI().toURL().toString()+"\"}",
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 //			"-componentfactory", "jadex.component.ComponentComponentFactory",
 //			"-conf", "jadex.standalone.Platform.component.xml",
-//			"-deftimeout", "-1",
+			"-deftimeout", "-1",
 			"-printpass", "false"}).get(sus, timeout);
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
 		
@@ -114,5 +114,14 @@ public class BDIV3CreationTest //extends TestCase
 //		catch(InterruptedException e)
 //		{
 //		}
+	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		BDIV3CreationTest test = new BDIV3CreationTest();
+		test.testBDICreation();
 	}
 }

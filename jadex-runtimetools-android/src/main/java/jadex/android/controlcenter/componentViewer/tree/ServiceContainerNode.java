@@ -7,6 +7,7 @@ import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +124,7 @@ public class ServiceContainerNode	extends AbstractTreeNode implements IAndroidTr
 	{
 		ArrayList<PropertyItem> props = new ArrayList<PropertyItem>();
 		props.add(new PropertyItem("Name", getId()));
-		props.add(new PropertyItem("Type", container.getType()));
+		props.add(new PropertyItem("Type", ((IServiceProvider)container).getType()));
 		
 		return props.toArray(new PropertyItem[props.size()]);
 	}

@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.commons.collection.OrderedProperties;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -9,6 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -371,7 +373,7 @@ public class SettingsPanel extends JPanel
 		
 		extbox = new JCheckBox(changeaction);
 		extbox.setText("Jadex Extensions");
-		extbox.setSelected(settings.isSmoothZoom());
+		extbox.setSelected(settings.isJadexExtensions());
 		g = new GridBagConstraints();
 		g.anchor = GridBagConstraints.WEST;
 		g.gridy = 2;
@@ -478,6 +480,25 @@ public class SettingsPanel extends JPanel
 			debox.setSelected(extbox.isSelected());
 			debox.setEnabled(extbox.isSelected());
 			ntbox.setEnabled(extbox.isSelected());
+			
+			if (!extbox.isSelected())
+			{
+				settings.getPropertyPanelFactory().setConfiguration(Collections.EMPTY_MAP);
+			}
+			else
+			{
+				OrderedProperties panelprops = new OrderedProperties();
+				try
+				{
+					panelprops.load(getClass().getClassLoader().getResourceAsStream(BpmnEditorWindow.JADEX_PANEL_CONFIG));
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+				settings.getPropertyPanelFactory().setConfiguration(panelprops);
+			}
+			
 			ret[1] = true;
 		}
 		

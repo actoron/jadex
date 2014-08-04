@@ -23,9 +23,10 @@ public class TimerEventPropertyPanel extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public TimerEventPropertyPanel(ModelContainer container, VActivity event)
+	public TimerEventPropertyPanel(ModelContainer container, Object selection)
 	{
 		super("Timer Event", container);
+		VActivity event = (VActivity) selection;
 		this.event = event;
 		
 		int y = 0;

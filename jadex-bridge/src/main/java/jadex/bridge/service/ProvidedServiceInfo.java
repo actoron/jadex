@@ -1,6 +1,9 @@
 package jadex.bridge.service;
 
+import java.util.List;
+
 import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
 
 
@@ -25,6 +28,9 @@ public class ProvidedServiceInfo
 	
 	/** Publish information. */
 	protected PublishInfo publish;
+	
+	/** The service properties. */
+	protected List<UnparsedExpression> properties;
 		
 	//-------- constructors --------
 	
@@ -39,18 +45,19 @@ public class ProvidedServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, PublishInfo publish)
+	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, PublishInfo publish, List<UnparsedExpression> properties)
 	{
 		this.name = name;
 		this.implementation = implementation;
 		this.publish = publish;
+		this.properties = properties;
 		setType(new ClassInfo(SReflect.getClassName(type)));
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, PublishInfo publish)
+	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, PublishInfo publish, List<UnparsedExpression> properties)
 	{
 		this.name = name;
 		this.implementation = implementation;
@@ -138,6 +145,22 @@ public class ProvidedServiceInfo
 	public void setPublish(PublishInfo publish)
 	{
 		this.publish = publish;
+	}
+
+	/**
+	 * @return the properties
+	 */
+	public List<UnparsedExpression> getProperties()
+	{
+		return properties;
+	}
+
+	/**
+	 * @param properties the properties to set
+	 */
+	public void setProperties(List<UnparsedExpression> properties)
+	{
+		this.properties = properties;
 	}
 
 	/**

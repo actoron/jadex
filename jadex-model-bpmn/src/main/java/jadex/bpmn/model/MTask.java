@@ -9,8 +9,16 @@ public class MTask extends MActivity
 	/** The activity type for tasks. */
 	public static final String TASK = "Task";
 	
+	/** The default unspecified task. */
+	public static final String TASK_SUBTYPE_NONE = "none";
+	
 	/** The task type. */
 	protected String tasktype;
+	
+	public MTask()
+	{
+		setTasktype(TASK_SUBTYPE_NONE);
+	}
 	
 	/**
 	 *  Hard-code the activity type.

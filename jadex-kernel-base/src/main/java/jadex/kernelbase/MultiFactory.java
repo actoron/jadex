@@ -10,6 +10,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
@@ -104,6 +105,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** Set of kernels that have been active at one point */
 	protected Set activatedkernels;
 	
+	/** Flag if active kernels has changed. */
+	protected boolean activekernelsdirty = true;
+	
 	/** Currently supported types */
 	protected Set componenttypes;
 	
@@ -141,6 +145,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** The library service. */
 	protected ILibraryService libservice;
 
+	public static final String MULTIFACTORY = "multifactory";
+	
+	public static final Map<String, Object> props = SUtil.createHashMap(new String[]{MULTIFACTORY}, new Object[]{Boolean.TRUE});
+	
 	/**
 	 *  Creates a new MultiFactory.
 	 *  @param ia Component internal access.
@@ -205,7 +213,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 		};
 		
-		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -444,6 +452,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
+//		Collection tfactories = SServiceProvider.getServices((IServiceProvider) ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION).get();
+//		if (tfactories.size() <= 1)
+//		{
+//			System.out.println(ServiceCall.getCurrentInvocation().getCaller());
+//			System.out.println("FALSEs");
+//			return new Future<Boolean>(false);
+//		}
 //		if(model.endsWith("BDI.class"))
 //			System.out.println("isLoadable: "+model);
 
@@ -537,6 +552,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture getComponentTypeIcon(String type)
 	{
+//		System.out.println("multi factory icon: "+type+" "+iconcache.containsKey(type));
+		
 		return new Future(iconcache.get(type));
 	}
 
@@ -562,7 +579,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public Map getProperties(String type)
 	{
-		return Collections.EMPTY_MAP;
+//		return Collections.EMPTY_MAP;
+		return props;
 	}
 
 	/**
@@ -755,7 +773,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		//SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(kernelmodel, null, classloader))
 		final Future ret = new Future();
-		SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -764,7 +782,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			
 			public void customResultAvailable(Object result)
 			{
-				final Collection factories = ((Collection)result);
+				final Collection factories = (Collection) result;
+				
 				final IResultListener factorypicker = ia.createResultListener(new CollectionResultListener(factories.size(), true, ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -952,7 +971,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							{
 //								System.out.println("Starting kernel2: " + kernelmodel);
 								final IModelInfo	info	= (IModelInfo)result;
-								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void exceptionOccurred(
 											Exception exception)
@@ -981,6 +1000,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 													public void resultAvailable(Object result)
 													{
 //														System.out.println("Killed kernel4: " + kernelmodel);
+														activekernelsdirty = true;
 														for(int i = 0; i < kexts.length; ++i)
 															factorycache.remove(kexts[i]);
 													}
@@ -1025,7 +1045,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																		{
 																			public void customResultAvailable(Object result)
 																			{
-																				SServiceProvider.getService(ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 																				{
 																					public void customResultAvailable(Object result)
 																					{
@@ -1048,6 +1068,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																			{
 																				public void resultAvailable(byte[] result)
 																				{
+//																					System.out.println("adding icon: "+types[fi]);
 																					iconcache.put(types[fi], result);
 																					typecounter.resultAvailable(null);
 																				}
@@ -1100,7 +1121,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //		System.out.println("searchPotentialURLs: "+rid+", "+potentialurls);
 		
 		final Future ret = new Future();
-		examineKernelModels(new ArrayList(potentialkernellocations), rid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		IResultListener reslis = ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -1140,7 +1161,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					}));
 				}
 			}
-		}));
+		});
+		
+		if (activekernelsdirty)
+		{
+			activekernelsdirty = false;
+			examineKernelModels(new ArrayList(potentialkernellocations), rid).addResultListener(reslis);
+		}
+		else
+		{
+			reslis.resultAvailable(null);
+		}
 		
 		return ret;
 	}
@@ -1301,7 +1332,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				
 				public void exceptionOccurred(Exception exception)
 				{
-//					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. ");
+//					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. " + count.getAndIncrement());
 					resultAvailable(null);
 				}
 			}));
@@ -1309,7 +1340,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		return ret;
 	}
-
+	
 	/**
 	 *  Searches an URL, accepts both directory and .jar-based URLs.
 	 *  @param url The URL.

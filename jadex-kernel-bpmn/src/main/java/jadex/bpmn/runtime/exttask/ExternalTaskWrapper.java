@@ -6,6 +6,7 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DelegationResultListener;
@@ -46,7 +47,7 @@ public class ExternalTaskWrapper implements ITask
 		final Future<Void> ret = new Future<Void>();
 		
 		// todo: scope
-		SServiceProvider.getService(process.getServiceContainer(), ITaskExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)process.getServiceContainer(), ITaskExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ITaskExecutionService, Void>(ret)
 		{
 			public void customResultAvailable(ITaskExecutionService tes)

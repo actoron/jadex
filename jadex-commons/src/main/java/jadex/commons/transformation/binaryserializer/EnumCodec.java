@@ -30,7 +30,7 @@ public class EnumCodec extends AbstractCodec
 	 *  @return The created object.
 	 */
 	@SuppressWarnings("rawtypes")
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		Enum ret = Enum.valueOf((Class<Enum>)clazz, context.readString());
 		return ret;
@@ -53,7 +53,7 @@ public class EnumCodec extends AbstractCodec
 	 */
 	@SuppressWarnings("rawtypes")
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		ec.writeString(((Enum) object).name());
 		

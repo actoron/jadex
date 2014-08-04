@@ -29,9 +29,10 @@ public class ECARuleEventPropertyPanel extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public ECARuleEventPropertyPanel(final ModelContainer container, VActivity event)
+	public ECARuleEventPropertyPanel(final ModelContainer container, Object selection)
 	{
 		super("ECA Rule Event", container);
+		VActivity event = (VActivity) selection;
 		setLayout(new GridBagLayout());
 		this.event = event;
 		

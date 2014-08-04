@@ -58,7 +58,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope)
 	{
-		return interpreter.getServiceContainer().getServices(type, scope);
+		return ((IServiceProvider)interpreter.getServiceContainer()).getServices(type, scope);
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture<IService> getService(ClassInfo type, String scope)
 	{
-		return interpreter.getServiceContainer().getService(type, scope);
+		return ((IServiceProvider)interpreter.getServiceContainer()).getService(type, scope);
 	}
 	
 	/**
@@ -78,7 +78,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture<IService> getService(IServiceIdentifier sid)
 	{
-		return interpreter.getServiceContainer().getService(sid);
+		return ((IServiceProvider)interpreter.getServiceContainer()).getService(sid);
 	}
 	
 	/**
@@ -88,7 +88,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture<Collection<IService>> getDeclaredServices()
 	{
-		return interpreter.getServiceContainer().getDeclaredServices();
+		return ((IServiceProvider)interpreter.getServiceContainer()).getDeclaredServices();
 	}
 	
 	/**
@@ -314,23 +314,23 @@ public class ServiceContainerProxy implements IServiceContainer
 //		return interpreter.getServiceContainer().getServices(manager, decider, selector);
 //	}
 	
-	/**
-	 *  Get the parent service container.
-	 *  @return The parent container.
-	 */
-	public IFuture<IServiceProvider>	getParent()
-	{
-		return interpreter.getServiceContainer().getParent();
-	}
-	
-	/**
-	 *  Get the children container.
-	 *  @return The children container.
-	 */
-	public IFuture<Collection<IServiceProvider>>	getChildren()
-	{
-		return interpreter.getServiceContainer().getChildren();
-	}
+//	/**
+//	 *  Get the parent service container.
+//	 *  @return The parent container.
+//	 */
+//	public IFuture<IServiceProvider>	getParent()
+//	{
+//		return interpreter.getServiceContainer().getParent();
+//	}
+//	
+//	/**
+//	 *  Get the children container.
+//	 *  @return The children container.
+//	 */
+//	public IFuture<Collection<IServiceProvider>>	getChildren()
+//	{
+//		return interpreter.getServiceContainer().getChildren();
+//	}
 	
 	/**
 	 *  Get the globally unique id of the provider.
@@ -338,7 +338,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IComponentIdentifier	getId()
 	{
-		return interpreter.getServiceContainer().getId();
+		return ((IServiceProvider)interpreter.getServiceContainer()).getId();
 	}
 	
 	/**
@@ -347,7 +347,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public String	getType()
 	{
-		return interpreter.getServiceContainer().getType();
+		return ((IServiceProvider)interpreter.getServiceContainer()).getType();
 	}
 
 	/**

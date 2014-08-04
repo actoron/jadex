@@ -13,7 +13,7 @@ import java.util.Map;
  *  Codec for encoding and decoding arrays.
  *
  */
-public class ArrayCodec extends AbstractCodec
+public class LegacyArrayCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -32,7 +32,7 @@ public class ArrayCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		int length = (int) context.readVarInt();
 		
@@ -49,7 +49,7 @@ public class ArrayCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The finished object.
 	 */
-	public Object decodeSubObjects(Object object, Class<?> clazz, DecodingContext context)
+	public Object decodeSubObjects(Object object, Class<?> clazz, IDecodingContext context)
 	{
 		Class compclass = clazz.getComponentType();
 		int length = getArrayLength(object, compclass);
@@ -58,11 +58,8 @@ public class ArrayCodec extends AbstractCodec
 		{
 			if (byte.class.equals(compclass))
 			{
-				byte[] src = context.getContent();
-				int offset = context.getOffset();
 				byte[] array = (byte[]) object;
-				System.arraycopy(src, offset, array, 0, array.length);
-				context.incOffset(array.length);
+				context.read(array);
 			}
 			else if (int.class.equals(compclass))
 			{
@@ -79,7 +76,7 @@ public class ArrayCodec extends AbstractCodec
 			else if (float.class.equals(compclass))
 			{
 				float[] array = (float[]) object;
-				ByteBuffer buf = context.getByteBuffer(array.length << 2);
+				ByteBuffer buf = ((DecodingContext) context).getByteBuffer(array.length << 2);
 				buf.order(ByteOrder.BIG_ENDIAN);
 				for (int i = 0; i < array.length; ++i)
 					array[i] = buf.getFloat();
@@ -87,7 +84,7 @@ public class ArrayCodec extends AbstractCodec
 			else if (double.class.equals(compclass))
 			{
 				double[] array = (double[]) object;
-				ByteBuffer buf = context.getByteBuffer(array.length << 3);
+				ByteBuffer buf = ((DecodingContext) context).getByteBuffer(array.length << 3);
 				buf.order(ByteOrder.BIG_ENDIAN);
 				for (int i = 0; i < array.length; ++i)
 					array[i] = buf.getDouble();
@@ -95,7 +92,7 @@ public class ArrayCodec extends AbstractCodec
 			else if (long.class.equals(compclass))
 			{
 				long[] array = (long[]) object;
-				ByteBuffer buf = context.getByteBuffer(array.length << 3);
+				ByteBuffer buf = ((DecodingContext) context).getByteBuffer(array.length << 3);
 				buf.order(ByteOrder.BIG_ENDIAN);
 				for (int i = 0; i < array.length; ++i)
 					array[i] = buf.getLong();
@@ -103,7 +100,7 @@ public class ArrayCodec extends AbstractCodec
 			else if (short.class.equals(compclass))
 			{
 				short[] array = (short[]) object;
-				ByteBuffer buf = context.getByteBuffer(array.length << 1);
+				ByteBuffer buf = ((DecodingContext) context).getByteBuffer(array.length << 1);
 				buf.order(ByteOrder.BIG_ENDIAN);
 				for (int i = 0; i < array.length; ++i)
 					array[i] = buf.getShort();
@@ -151,7 +148,7 @@ public class ArrayCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		Class compclazz = clazz.getComponentType();
 		
@@ -178,7 +175,7 @@ public class ArrayCodec extends AbstractCodec
 					ec.writeBoolean(ignoreclass);
 					
 					if (ignoreclass)
-						ec.ignoreNextClassWrite();
+						ec.setIgnoreNextClassWrite(true);
 					
 					traverser.doTraverse(val, val.getClass(), traversed, processors, clone, null, ec);
 				}
@@ -188,8 +185,8 @@ public class ArrayCodec extends AbstractCodec
 		return object;
 	}
 	
-	protected void processRawMode(Object obj, Class compclass, EncodingContext ec, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext context)
+	protected void processRawMode(Object obj, Class compclass, IEncodingContext ec, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext context)
 	{
 		if (byte.class.equals(compclass))
 		{
@@ -217,7 +214,7 @@ public class ArrayCodec extends AbstractCodec
 		{
 			float[] array = (float[]) obj;
 			ec.writeVarInt(array.length);
-			ByteBuffer buf = ec.getByteBuffer(array.length << 2);
+			ByteBuffer buf = ((EncodingContext) ec).getByteBuffer(array.length << 2);
 			buf.order(ByteOrder.BIG_ENDIAN);
 			for (int i = 0; i < array.length; ++i)
 			{
@@ -228,7 +225,7 @@ public class ArrayCodec extends AbstractCodec
 		{
 			double[] array = (double[]) obj;
 			ec.writeVarInt(array.length);
-			ByteBuffer buf = ec.getByteBuffer(array.length << 3);
+			ByteBuffer buf = ((EncodingContext) ec).getByteBuffer(array.length << 3);
 			buf.order(ByteOrder.BIG_ENDIAN);
 			for (int i = 0; i < array.length; ++i)
 			{
@@ -239,7 +236,7 @@ public class ArrayCodec extends AbstractCodec
 		{
 			long[] array = (long[]) obj;
 			ec.writeVarInt(array.length);
-			ByteBuffer buf = ec.getByteBuffer(array.length << 3);
+			ByteBuffer buf = ((EncodingContext) ec).getByteBuffer(array.length << 3);
 			buf.order(ByteOrder.BIG_ENDIAN);
 			for (int i = 0; i < array.length; ++i)
 			{
@@ -250,7 +247,7 @@ public class ArrayCodec extends AbstractCodec
 		{
 			short[] array = (short[]) obj;
 			ec.writeVarInt(array.length);
-			ByteBuffer buf = ec.getByteBuffer(array.length << 1);
+			ByteBuffer buf = ((EncodingContext) ec).getByteBuffer(array.length << 1);
 			buf.order(ByteOrder.BIG_ENDIAN);
 			for (int i = 0; i < array.length; ++i)
 			{

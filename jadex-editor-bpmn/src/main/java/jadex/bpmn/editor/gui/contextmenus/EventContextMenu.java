@@ -4,7 +4,6 @@ import jadex.bpmn.editor.gui.BpmnToolbar;
 import jadex.bpmn.editor.gui.BpmnToolbar.IconGenerationTask;
 import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
 import jadex.commons.Tuple3;
@@ -114,7 +113,8 @@ public class EventContextMenu extends JPopupMenu
 				
 				((MActivity) event.getBpmnElement()).setActivityType(type);
 				((MActivity) event.getBpmnElement()).setThrowing(mode.endsWith(ModelContainer.THROWING_EVENT));
-				modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(event, modelcontainer));
+//				modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(event, modelcontainer));
+				modelcontainer.setPropertyPanel(modelcontainer.getSettings().getPropertyPanelFactory().createPanel(modelcontainer, event));
 				modelcontainer.getGraph().refreshCellView(event);
 			}
 		};

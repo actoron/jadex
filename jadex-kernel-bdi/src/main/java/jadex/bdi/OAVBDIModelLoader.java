@@ -487,7 +487,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			
 			ProvidedServiceImplementation psi = new ProvidedServiceImplementation(null, buf.toString(), 
 				BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
-			info.addProvidedService(new ProvidedServiceInfo(null, key, psi, null));
+			info.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null));
 		}
 		
 		// Build user defined plan conditions and add them to the rule base.

@@ -40,101 +40,11 @@ import java.util.Map;
  */
 public class SServiceProvider
 {	
-	//-------- constants --------
-	
-//	public static boolean registrysearch = true;
-	
-//	/** The sequential search manager. */
-//	public static final ISearchManager sequentialmanager = new SequentialSearchManager();
-////	public static ISearchManager sequentialmanagerforced = new SequentialSearchManager(true, true, true);
-//
-//	/** The parallel search manager. */
-//	public static final ISearchManager parallelmanager = new ParallelSearchManager();
-////	public static ISearchManager parallelmanagerforced = new ParallelSearchManager(true, true, true);
-//	
-//	/** The sequential search manager that searches only upwards. */
-//	public static final ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
-//
-//	/** The sequential search manager that searches only locally. */
-//	public static final ISearchManager localmanager = new LocalSearchManager();
-////	public static ISearchManager localmanagerforced = new LocalSearchManager(true);
-//	
-//	/** The visit decider that stops searching after one result has been found. */
-////	public static IVisitDecider abortdecider = new DefaultVisitDecider();
-////	public static IVisitDecider rabortdecider = new DefaultVisitDecider(true, RequiredServiceInfo.GLOBAL_SCOPE);
-//
-//	/** The visit decider that never stops. */
-//	public static final IVisitDecider contdecider = new DefaultVisitDecider(false);
-//	public static final IVisitDecider rcontdecider = new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_GLOBAL);
-//
-//	public static final IResultSelector contanyselector = new AnyResultSelector(false);
-//	public static final IResultSelector abortanyselector = new AnyResultSelector(true);
-//
-//	public static final Map avisitdeciders;
-//	public static final Map visitdeciders;
-	
-//	/** The reference class cache (clazz->boolean (is reference)). */
-//	public static Map references;
-	
 	/** The reference method cache (method -> boolean[] (is reference)). */
-	public static final Map methodreferences;
-	
-	static
-	{
-//		avisitdeciders = new HashMap();
-//		avisitdeciders.put(RequiredServiceInfo.SCOPE_NONE, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_NONE));
-//		avisitdeciders.put(RequiredServiceInfo.SCOPE_LOCAL, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_LOCAL));
-//		avisitdeciders.put(RequiredServiceInfo.SCOPE_COMPONENT, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_COMPONENT));
-//		avisitdeciders.put(RequiredServiceInfo.SCOPE_APPLICATION, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_APPLICATION));
-//		avisitdeciders.put(RequiredServiceInfo.SCOPE_PLATFORM, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM));
-//		avisitdeciders.put(RequiredServiceInfo.SCOPE_GLOBAL, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_GLOBAL));
-//		avisitdeciders.put(RequiredServiceInfo.SCOPE_PARENT, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_PARENT));
-//			
-//		visitdeciders = new HashMap();
-//		visitdeciders.put(RequiredServiceInfo.SCOPE_NONE, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_NONE));
-//		visitdeciders.put(RequiredServiceInfo.SCOPE_LOCAL, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_LOCAL));
-//		visitdeciders.put(RequiredServiceInfo.SCOPE_COMPONENT, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_COMPONENT));
-//		visitdeciders.put(RequiredServiceInfo.SCOPE_APPLICATION, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_APPLICATION));
-//		visitdeciders.put(RequiredServiceInfo.SCOPE_PLATFORM, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_PLATFORM));
-//		visitdeciders.put(RequiredServiceInfo.SCOPE_GLOBAL, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_GLOBAL));
-//		visitdeciders.put(RequiredServiceInfo.SCOPE_PARENT, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_PARENT));
-
-//		references = Collections.synchronizedMap(new LRU(500));
-		methodreferences = Collections.synchronizedMap(new LRU(500));
-	}
+	public static final Map methodreferences = Collections.synchronizedMap(new LRU(500));
 	
 	//-------- methods --------
 
-//	protected static Map	profiling	= new HashMap();
-//	
-//	static
-//	{
-//		new Thread(new Runnable()
-//		{
-//			public void run()
-//			{
-//				try
-//				{
-//					Thread.sleep(5000);
-//					
-//					synchronized(profiling)
-//					{
-//						System.out.println("--------------------");
-//						for(Iterator it=profiling.keySet().iterator(); it.hasNext(); )
-//						{
-//							Object	key	= it.next();
-//							System.out.println(key+":\t"+profiling.get(key));
-//						}
-//					}
-//				}
-//				catch(InterruptedException e)
-//				{
-//					e.printStackTrace();
-//				}
-//			}
-//		}).start();
-//	}
-	
 	/**
 	 *  Get one service of a type.
 	 *  @param type The class.
@@ -144,62 +54,6 @@ public class SServiceProvider
 	{
 		return getService(provider, type, null);
 	}
-	
-//	/**
-//	 *  Get one service of a type.
-//	 *  @param type The class.
-//	 *  @return The corresponding service.
-//	 */
-//	public static IFuture getService(IServiceProvider provider, Class type, boolean remote)
-//	{
-//		return getService(provider, type, false, false);
-//	}
-	
-//	/**
-//	 *  Get one service of a type.
-//	 *  @param type The class.
-//	 *  @return The corresponding service.
-//	 */
-//	public static IFuture getService(final IServiceProvider provider, final Class type, final boolean remote, final boolean forcedsearch)
-//	{
-////		synchronized(profiling)
-////		{
-////			Integer	cnt	= (Integer)profiling.get(type);
-////			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
-////		}
-//		final Future ret = new Future();
-//		
-//		// Hack->remove
-////		IVisitDecider abortdecider = new DefaultVisitDecider();
-////		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
-//		
-//		provider.getServices(forcedsearch? sequentialmanagerforced: sequentialmanager, 
-//			remote? getVisitDecider(true, RequiredServiceInfo.GLOBAL_SCOPE): getVisitDecider(true), 
-//			new TypeResultSelector(type, true, remote))
-//				.addResultListener(new DelegationResultListener(ret)
-//		{
-//			public void customResultAvailable(Object result)
-//			{
-////				System.out.println("Search result: "+result);
-//				Collection res = (Collection)result;
-//				if(res==null || res.size()==0)
-//				{
-//					getService(provider, type, remote, forcedsearch).addResultListener(new DefaultResultListener()
-//					{
-//						public void resultAvailable(Object result)
-//						{
-//							System.out.println("rrr: "+result);
-//						}
-//					});
-//					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
-//				}
-//				else
-//					super.customResultAvailable(res.iterator().next());
-//			}
-//		});
-//		
-//		return ret;
-//	}
 	
 	/**
 	 *  Get one service of a type.
@@ -226,8 +80,8 @@ public class SServiceProvider
 			return ret;
 		}
 		
-//		if(type.toString().indexOf("IComponentM")!=-1 && scope.equals("upwards"))
-//			System.out.println("here22");
+		if(type.toString().indexOf("IAuto")!=-1)
+			System.out.println("here22");
 		
 //		synchronized(profiling)
 //		{
@@ -256,7 +110,7 @@ public class SServiceProvider
 			}
 			else
 			{
-				container.getServiceRegistry().searchGlobalService(type).addResultListener(new DelegationResultListener<T>(ret));
+				container.getServiceRegistry().searchGlobalService(type, provider.getId()).addResultListener(new DelegationResultListener<T>(ret));
 			}
 		}
 		else
@@ -413,48 +267,6 @@ public class SServiceProvider
 		return ret;
 	}
 	
-//	/**
-//	 *  Get one service of a type.
-//	 *  @param clazz The class.
-//	 *  @return The corresponding service.
-//	 */
-//	public static <T> IFuture<T> getService(IServiceProvider provider, final IResultSelector selector)
-//	{
-////		synchronized(profiling)
-////		{
-////			Integer	cnt	= (Integer)profiling.get(selector.getCacheKey());
-////			profiling.put(selector.getCacheKey(), Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
-////		}
-//		final Future ret = new Future();
-//		
-//		// Hack->remove
-////		IVisitDecider abortdecider = new DefaultVisitDecider();
-//
-//		try
-//		{
-//			provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_PLATFORM),
-//				getVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM), selector)
-//				.addResultListener(new DelegationResultListener(ret)
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					Collection res = (Collection)result;
-//					if(res==null || res.size()==0)
-//						exceptionOccurred(new ServiceNotFoundException("No matching service found for: "+selector));
-//					else
-//						super.customResultAvailable(res.iterator().next());
-//				}
-//			});
-//		}
-//		catch(Exception e)
-//		{
-//			ret.setException(e);
-//		}
-//
-//		
-//		return ret;
-//	}
-	
 	/**
 	 *  Get all services of a type.
 	 *  @param type The class.
@@ -464,16 +276,6 @@ public class SServiceProvider
 	{
 		return getServices(provider, type, null);
 	}
-	
-//	/**
-//	 *  Get all services of a type.
-//	 *  @param type The class.
-//	 *  @return The corresponding services.
-//	 */
-//	public static IIntermediateFuture getServices(IServiceProvider provider, Class type, boolean remote)
-//	{
-//		return getServices(provider, type, remote, false);
-//	}
 	
 	/**
 	 *  Get all services of a type.
@@ -514,7 +316,7 @@ public class SServiceProvider
 			}
 			else
 			{
-				container.getServiceRegistry().searchGlobalServices(type).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				container.getServiceRegistry().searchGlobalServices(type, provider.getId()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 			}
 		}
 		else

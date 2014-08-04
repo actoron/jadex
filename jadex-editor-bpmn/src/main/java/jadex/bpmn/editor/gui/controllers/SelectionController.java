@@ -2,7 +2,6 @@ package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.propertypanels.BasePropertyPanel;
-import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
@@ -48,12 +47,14 @@ public class SelectionController implements mxIEventListener
 			modelcontainer.getGraph().getSelectionCount() == 0 ||
 			modelcontainer.getGraph().getSelectionCount() > 1)
 		{
-			modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
+//			modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
+			modelcontainer.setPropertyPanel(modelcontainer.getSettings().getPropertyPanelFactory().createPanel(modelcontainer, null));
 		}
 		
 		if (modelcontainer.getGraph().getSelectionCount() == 1)
 		{
-			modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(modelcontainer.getGraph().getSelectionCell(), modelcontainer));
+//			modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(modelcontainer.getGraph().getSelectionCell(), modelcontainer));
+			modelcontainer.setPropertyPanel(modelcontainer.getSettings().getPropertyPanelFactory().createPanel(modelcontainer, modelcontainer.getGraph().getSelectionCell()));
 		}
 	}
 }

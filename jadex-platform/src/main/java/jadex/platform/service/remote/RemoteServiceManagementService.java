@@ -43,9 +43,9 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.binaryserializer.DecodingContext;
-import jadex.commons.transformation.binaryserializer.EncodingContext;
+import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
+import jadex.commons.transformation.binaryserializer.IDecodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.message.MessageService;
@@ -528,7 +528,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
 						// Hack! create remote rms cid with "rms" assumption.
-						RemoteSearchCommand content = new RemoteSearchCommand(cid, type, true, scope, callid);
+						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid);
 						
 //						System.out.println("send to: "+rrms+" "+callid);
 						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func
@@ -865,7 +865,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							msg.put(SFipa.CONVERSATION_ID, callid);
 							msg.put(SFipa.X_NONFUNCTIONAL, nonfunc);
 							
-							getResourceIdentifier(ia.getServiceContainer(), ((AbstractRemoteCommand)content).getSender())
+							getResourceIdentifier((IServiceProvider)ia.getServiceContainer(), ((AbstractRemoteCommand)content).getSender())
 								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Object>(future)
 							{
 								public void customResultAvailable(IResourceIdentifier rid)
@@ -1441,7 +1441,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ProxyReference.class.equals(clazz);
 			}
 			
-			public Object decode(Class<?> clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, IDecodingContext context)
 			{
 				try
 				{
@@ -1463,7 +1463,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ServiceInputConnectionProxy.class.equals(clazz);
 			}
 			
-			public Object decode(Class<?> clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, IDecodingContext context)
 			{
 				try
 				{
@@ -1487,7 +1487,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ServiceOutputConnectionProxy.class.equals(clazz);
 			}
 			
-			public Object decode(Class<?> clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, IDecodingContext context)
 			{
 				try
 				{
@@ -1582,8 +1582,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					IComponentIdentifier receiver = ((AbstractRemoteCommand)((EncodingContext)context).getRootObject()).getReceiver();
-					return rrm.getProxyReference(object, receiver, ((EncodingContext)context).getClassLoader());
+					IComponentIdentifier receiver = ((AbstractRemoteCommand)((IEncodingContext)context).getRootObject()).getReceiver();
+					return rrm.getProxyReference(object, receiver, ((IEncodingContext)context).getClassLoader());
 				}
 				catch(Exception e)
 				{
@@ -1602,7 +1602,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					AbstractRemoteCommand com = (AbstractRemoteCommand)((EncodingContext)context).getRootObject();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)((IEncodingContext)context).getRootObject();
 					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
 					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(
 						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
@@ -1631,7 +1631,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					AbstractRemoteCommand com = (AbstractRemoteCommand)((EncodingContext)context).getRootObject();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)((IEncodingContext)context).getRootObject();
 					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
 					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(
 						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());

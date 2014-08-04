@@ -29,7 +29,7 @@ public class MultiCollectionCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		MultiCollection ret = null;
 		try
@@ -61,7 +61,7 @@ public class MultiCollectionCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The finished object.
 	 */
-	public Object decodeSubObjects(Object object, Class<?> clazz, DecodingContext context)
+	public Object decodeSubObjects(Object object, Class<?> clazz, IDecodingContext context)
 	{
 		Map map = (Map) BinarySerializer.decodeObject(context);
 		String classname = context.readClassname();
@@ -104,7 +104,7 @@ public class MultiCollectionCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		MultiCollection mc = (MultiCollection) object;
 		try
