@@ -198,7 +198,8 @@ public class LocalServiceRegistry
 			Set<T> sers = (Set<T>)getServices(type);
 			if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 			{
-				Iterator<T> it = sers.iterator();
+				// filter checks in loop are possibly performed outside of synchornized block
+				Iterator<T> it = new HashSet<T>(sers).iterator();
 				searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
 			}
 			else
@@ -282,7 +283,8 @@ public class LocalServiceRegistry
 				Set<T> sers = (Set<T>)services.get(new ClassInfo(type));
 				if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 				{
-					Iterator<T> it = sers.iterator();
+					// filter checks in loop are possibly performed outside of synchornized block
+					Iterator<T> it = new HashSet<T>(sers).iterator();
 					searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 				}
 				else
