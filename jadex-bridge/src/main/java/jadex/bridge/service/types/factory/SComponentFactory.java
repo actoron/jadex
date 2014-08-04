@@ -398,7 +398,7 @@ public class SComponentFactory
 					public void customResultAvailable(Object result)
 					{
 						Collection<IComponentFactory> facs = (Collection<IComponentFactory>)result;
-						System.out.println("facs: "+type+" "+facs);
+//						System.out.println("facs: "+type+" "+facs);
 						
 						IComponentFactory fac = null;
 						if(facs.size()>1)

@@ -954,13 +954,37 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture startLoadableKernel(final String model, final String[] imports, final IResourceIdentifier rid, final String kernelmodel)
 	{
-//		System.out.println("startLoadableKernel: "+model);
+//		System.out.println("startLoadableKernel: "+model+" "+kernelmodel+" "+kernelmodel.length());
+
 		return multiplexer.doCall(kernelmodel, new IResultCommand()
 		{
 			public Object execute(Object args)
 			{
+//				IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model, factorycache);
+//				if (fac != null)
+//				{
+//					return new Future(fac);
+//				}
+//				else
+//				{
+//					System.out.println("no fac found for: "+model);
+//				}
+				
 //				System.out.println("Starting kernel: " + kernelmodel);
 				final Future ret = new Future();
+//				ret.addResultListener(new IResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						System.out.println("call fini: "+model);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println("call fini ex: "+model+" "+exception);
+//					}
+//				});
+				
 				findActiveKernel(kernelmodel, null, rid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -973,10 +997,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							{
 //								System.out.println("Starting kernel2: " + kernelmodel);
 								final IModelInfo	info	= (IModelInfo)result;
-								SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
-									public void exceptionOccurred(
-											Exception exception)
+									public void exceptionOccurred(Exception exception)
 									{
 										super.exceptionOccurred(exception);
 									}
@@ -1017,7 +1041,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 												{
 													public void resultAvailable(Object result)
 													{
-//														System.out.println("Starting kernel6: " + kernelmodel);
+														System.out.println("Starting kernel6: " + kernelmodel);
 														findActiveKernel(model, imports, rid).addResultListener(ia.createResultListener(new DefaultResultListener()
 														{
 															public void resultAvailable(Object result)
@@ -1030,6 +1054,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																}
 																for(int i = 0; i < kexts.length; ++i)
 																{
+																	System.out.println("putting in cache: "+kexts[i]+" "+kernel);
 																	factorycache.put(kexts[i], kernel);
 																}
 																
@@ -1047,7 +1072,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																		{
 																			public void customResultAvailable(Object result)
 																			{
-																				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION)
+																					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 																				{
 																					public void customResultAvailable(Object result)
 																					{

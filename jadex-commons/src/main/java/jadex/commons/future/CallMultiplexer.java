@@ -1,5 +1,6 @@
 package jadex.commons.future;
 
+import jadex.bridge.ClassInfo;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple;
 
@@ -74,32 +75,45 @@ public class CallMultiplexer
 	 */
 	public IFuture doCall(Object keyargs, IResultCommand call, boolean commandaskey)
 	{
+//		if(keyargs instanceof String &&  ((String)keyargs).indexOf("KernelComponentAgent.class")!=-1)
+//			System.out.println("asfsdggf");
+			
 		if(keyargs!=null && keyargs.getClass().isArray())
 			keyargs = new Tuple((Object[]) keyargs);
 		if(commandaskey)
-			keyargs = new Tuple(keyargs, call.getClass());
+			keyargs = new Tuple(keyargs, new ClassInfo(call.getClass()));
 		
-		IFuture ret = (IFuture) futureMap.get(keyargs);
+		Future ret = (Future)futureMap.get(keyargs);
 		if(ret==null)
-		{
+		{			
+//			System.out.println("multiplex create new call for: "+keyargs+" "+futureMap);
+
 			final Object key = keyargs;
-			ret	= (IFuture)call.execute(null);
+			ret = new Future();
 			futureMap.put(key, ret);
-			
+			((IFuture)call.execute(null)).addResultListener(new DelegationResultListener(ret));
+				
 			// Todo: result listener on correct thread?
 			ret.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
+//					System.out.println("eennd: "+result);
 					futureMap.remove(key);
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
+//					System.out.println("eexxx: "+exception);
 					futureMap.remove(key);
 				}
 			});
 		}
+//		else
+//		{
+//			if(keyargs instanceof Tuple && ((Tuple)keyargs).getEntity(0)!=null)
+//				System.out.println("multiplex found call: "+keyargs);
+//		}
 		return ret;
 	}
 }
