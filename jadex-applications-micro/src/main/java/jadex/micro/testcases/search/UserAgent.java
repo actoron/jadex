@@ -40,18 +40,12 @@ public class UserAgent
     public static void main(String[] args)
 	{
     	ThreadSuspendable sus = new ThreadSuspendable();
-		IExternalAccess plat = Starter.createPlatform(new String[]
-		{
-//			"-deftimeout", "-1",
-//			"-awareness", "false",
-//			"-monitoring", "OFF",
-			"-gui", "false"
-		}).get(sus);
+		IExternalAccess plat = Starter.createPlatform(new String[]{"-gui", "false"}).get(sus);
 		IComponentManagementService cms = SServiceProvider.getService(plat.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
 		
 		final Future<Void> fut = new Future<Void>();
 		
-		final int max = 10000;
+		final int max = 2500;
 		final int[] cnt = new int[1];
 		for(int i=0; i<max; i++)
 		{
@@ -79,8 +73,6 @@ public class UserAgent
 		}
 		
 		fut.get(sus);
-		
-		System.out.println("creation finished");
 		
 		cms.createComponent(UserAgent.class.getName()+".class", null).get(sus);
 	}

@@ -207,6 +207,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required multi service.
 	 *  
+	 *  todo: implement filter
+	 *  
 	 *  todo: implement termination!!!!
 	 *  
 	 *  todo: should also create component(s) when no service could be found
@@ -243,6 +245,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							public void customResultAvailable(IExternalAccess ea)
 							{
 								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL, filter);
+//								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL);
 								fut.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, provider, info, binding));
 							}
 						});
@@ -336,6 +339,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								{
 									public void customResultAvailable(IExternalAccess ea)
 									{
+//										SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
 										SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL, filter)
 											.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, provider, info, binding));
 									}

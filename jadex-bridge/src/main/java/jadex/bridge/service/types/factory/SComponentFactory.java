@@ -1,27 +1,22 @@
 package jadex.bridge.service.types.factory;
 
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -94,7 +89,8 @@ public class SComponentFactory
 //					{
 //						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
+						SServiceProvider.getService(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
+//						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
@@ -146,7 +142,8 @@ public class SComponentFactory
 //					{
 //						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
+						SServiceProvider.getService(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
+//						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
@@ -194,7 +191,7 @@ public class SComponentFactory
 		}
 		else
 		{
-			System.out.println("stepped isModelTypes");
+//			System.out.println("stepped isModelTypes");
 			ret = (IFuture<Boolean>)exta.scheduleStep(new IComponentStep<Boolean>()
 			{
 				@Classname("isModelType")
@@ -336,7 +333,8 @@ public class SComponentFactory
 //					{
 //						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
+						SServiceProvider.getService(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
+//						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
@@ -380,7 +378,8 @@ public class SComponentFactory
 			public IFuture<byte[]> execute(final IInternalAccess ia)
 			{
 				final Future<byte[]> ret = new Future<byte[]>();
-				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
+				SServiceProvider.getService(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(type))
+//				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
 					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Object, byte[]>(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -502,7 +501,8 @@ public class SComponentFactory
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
+						SServiceProvider.getService(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
+//						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)

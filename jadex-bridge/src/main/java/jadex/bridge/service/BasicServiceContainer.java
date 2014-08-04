@@ -9,9 +9,6 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.MethodListenerHandler;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.MethodInfo;
@@ -79,44 +76,44 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //	protected static Set<String>	SEARCHES
 //		= Collections.synchronizedSet(new HashSet<String>());
 	
-	/**
-	 *  Get all services of a type.
-	 *  @param clazz The class.
-	 *  @return The corresponding services.
-	 */
-	public ITerminableIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
-	{
-		if(shutdowned)
-		{
-//			if(id.getParent()==null)
-//			{
-//				System.err.println("getS: "+id);
-//				Thread.dumpStack();
-//			}
-			return new TerminableIntermediateFuture<IService>(new ComponentTerminatedException(id));
-		}
-		
-		ITerminableIntermediateFuture<IService>	ret	= manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
-//		final String	search	= "search: "+manager+", "+decider+", "+selector;
-//		if(search.indexOf("IMonitoring")!=-1)
+//	/**
+//	 *  Get all services of a type.
+//	 *  @param clazz The class.
+//	 *  @return The corresponding services.
+//	 */
+//	public ITerminableIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+//	{
+//		if(shutdowned)
 //		{
-//			System.out.println(search);
+////			if(id.getParent()==null)
+////			{
+////				System.err.println("getS: "+id);
+////				Thread.dumpStack();
+////			}
+//			return new TerminableIntermediateFuture<IService>(new ComponentTerminatedException(id));
 //		}
-//		SEARCHES.add(search);
-//		ret.addResultListener(new IResultListener<Collection<IService>>()
-//		{
-//			public void resultAvailable(Collection<IService> result)
-//			{
-//				SEARCHES.remove(search);
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				SEARCHES.remove(search);
-//			}
-//		});
-		return ret;
-	}
+//		
+//		ITerminableIntermediateFuture<IService>	ret	= manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
+////		final String	search	= "search: "+manager+", "+decider+", "+selector;
+////		if(search.indexOf("IMonitoring")!=-1)
+////		{
+////			System.out.println(search);
+////		}
+////		SEARCHES.add(search);
+////		ret.addResultListener(new IResultListener<Collection<IService>>()
+////		{
+////			public void resultAvailable(Collection<IService> result)
+////			{
+////				SEARCHES.remove(search);
+////			}
+////			
+////			public void exceptionOccurred(Exception exception)
+////			{
+////				SEARCHES.remove(search);
+////			}
+////		});
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the parent service container.

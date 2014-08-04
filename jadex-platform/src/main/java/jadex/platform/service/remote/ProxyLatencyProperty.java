@@ -1,5 +1,6 @@
 package jadex.platform.service.remote;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.NFRootProperty;
@@ -21,7 +22,8 @@ public class ProxyLatencyProperty extends NFRootProperty<Long, TimeUnit>
 	 */
 	public ProxyLatencyProperty(final IInternalAccess comp)
 	{
-		super(comp, new NFPropertyMetaInfo("latency "+((ProxyAgent)comp).rcid.getName(), long.class, null, true, 0, true, Target.Root), false);
+		super(comp, new NFPropertyMetaInfo("latency "+((IComponentIdentifier)((ProxyAgent)comp).getArgument("component")).getName(), long.class, null, true, 0, true, Target.Root), false);
+//		super(comp, new NFPropertyMetaInfo("latency "+((ProxyAgent)comp).rcid.getName(), long.class, null, true, 0, true, Target.Root), false);
 	}
 	
 	/**

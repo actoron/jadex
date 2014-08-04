@@ -1,9 +1,7 @@
 package jadex.bridge.service;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -15,12 +13,42 @@ import java.util.Collection;
  */
 public interface IServiceProvider extends IRemotable
 {	
+//	/**
+//	 *  Get all services of a type.
+//	 *  @param type The class.
+//	 *  @return The corresponding services.
+//	 */
+//	public ITerminableIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
+	
 	/**
 	 *  Get all services of a type.
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public ITerminableIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
+	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope);
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<IService> getService(ClassInfo type, String scope);
+	
+	/**
+	 *  Get a service per id.
+	 *  @param sid The service id.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<IService> getService(IServiceIdentifier sid);
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<Collection<IService>> getDeclaredServices();
+	
+	
 	
 	/**
 	 *  Get the parent service container.

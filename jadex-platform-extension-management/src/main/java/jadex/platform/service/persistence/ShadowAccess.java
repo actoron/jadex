@@ -1,5 +1,6 @@
 package jadex.platform.service.persistence;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentPersistedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -21,11 +22,8 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.searchv2.LocalServiceRegistry;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.persistence.ISwapService;
@@ -717,12 +715,50 @@ public class ShadowAccess implements IExternalAccess
 			return type;
 		}
 
-		public ITerminableIntermediateFuture<IService> getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
+//		public ITerminableIntermediateFuture<IService> getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
+//		{
+//			final TerminableIntermediateDelegationFuture<IService>	ret	= new TerminableIntermediateDelegationFuture<IService>();
+//			try
+//			{
+//				ITerminableIntermediateFuture<IService>	fut	= access.getServiceProvider().getServices(manager, decider, selector);
+//				fut.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(ret, fut));
+//			}
+//			catch(ComponentPersistedException e)
+//			{
+//				resurrect().addResultListener(new ExceptionDelegationResultListener<Void, Collection<IService>>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
+//						try
+//						{
+//							ITerminableIntermediateFuture<IService>	fut	= access.getServiceProvider().getServices(manager, decider, selector);
+//							fut.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(ret, fut));
+//						}
+//						catch(Exception e)
+//						{
+//							ret.setException(e);
+//						}
+//					}
+//				});
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
+//			return ret;			
+//		}
+		
+		/**
+		 *  Get all services of a type.
+		 *  @param type The class.
+		 *  @return The corresponding services.
+		 */
+		public ITerminableIntermediateFuture<IService> getServices(final ClassInfo type, final String scope)
 		{
 			final TerminableIntermediateDelegationFuture<IService>	ret	= new TerminableIntermediateDelegationFuture<IService>();
 			try
 			{
-				ITerminableIntermediateFuture<IService>	fut	= access.getServiceProvider().getServices(manager, decider, selector);
+				ITerminableIntermediateFuture<IService>	fut = (ITerminableIntermediateFuture<IService>)access.getServiceProvider().getServices(type, scope);
 				fut.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(ret, fut));
 			}
 			catch(ComponentPersistedException e)
@@ -733,7 +769,7 @@ public class ShadowAccess implements IExternalAccess
 					{
 						try
 						{
-							ITerminableIntermediateFuture<IService>	fut	= access.getServiceProvider().getServices(manager, decider, selector);
+							ITerminableIntermediateFuture<IService>	fut = (ITerminableIntermediateFuture<IService>)access.getServiceProvider().getServices(type, scope);
 							fut.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(ret, fut));
 						}
 						catch(Exception e)
@@ -749,7 +785,118 @@ public class ShadowAccess implements IExternalAccess
 			}
 			return ret;			
 		}
+		
+		/**
+		 *  Get all services of a type.
+		 *  @param type The class.
+		 *  @return The corresponding services.
+		 */
+		public IFuture<IService> getService(final ClassInfo type, final String scope)
+		{
+			final Future<IService>	ret	= new Future<IService>();
+			try
+			{
+				IFuture<IService>	fut = (IFuture<IService>)access.getServiceProvider().getService(type, scope);
+				fut.addResultListener(new DelegationResultListener<IService>(ret));
+			}
+			catch(ComponentPersistedException e)
+			{
+				resurrect().addResultListener(new ExceptionDelegationResultListener<Void, IService>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						try
+						{
+							IFuture<IService>	fut = (IFuture<IService>)access.getServiceProvider().getService(type, scope);
+							fut.addResultListener(new DelegationResultListener<IService>(ret));
+						}
+						catch(Exception e)
+						{
+							ret.setException(e);
+						}
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+			return ret;	
+		}
+			
+		/**
+		 *  Get a service per id.
+		 *  @param sid The service id.
+		 *  @return The corresponding services.
+		 */
+		public IFuture<IService> getService(final IServiceIdentifier sid)
+		{
+			final Future<IService>	ret	= new Future<IService>();
+			try
+			{
+				IFuture<IService>	fut = (IFuture<IService>)access.getServiceProvider().getService(sid);
+				fut.addResultListener(new DelegationResultListener<IService>(ret));
+			}
+			catch(ComponentPersistedException e)
+			{
+				resurrect().addResultListener(new ExceptionDelegationResultListener<Void, IService>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						try
+						{
+							IFuture<IService>	fut = (IFuture<IService>)access.getServiceProvider().getService(sid);
+							fut.addResultListener(new DelegationResultListener<IService>(ret));
+						}
+						catch(Exception e)
+						{
+							ret.setException(e);
+						}
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+			return ret;	
+		}
 
+		public IFuture<Collection<IService>> getDeclaredServices()
+		{
+			final Future<Collection<IService>>	ret	= new Future<Collection<IService>>();
+			
+			try
+			{
+				IFuture<Collection<IService>> fut = (IFuture<Collection<IService>>)access.getServiceProvider().getDeclaredServices();
+				fut.addResultListener(new DelegationResultListener<Collection<IService>>(ret));
+			}
+			catch(ComponentPersistedException e)
+			{
+				resurrect().addResultListener(new ExceptionDelegationResultListener<Void, Collection<IService>>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						try
+						{
+							IFuture<Collection<IService>> fut = (IFuture<Collection<IService>>)access.getServiceProvider().getDeclaredServices();
+							fut.addResultListener(new DelegationResultListener<Collection<IService>>(ret));
+						}
+						catch(Exception e)
+						{
+							ret.setException(e);
+						}
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+			return ret;			
+			
+		}
+		
 		public IFuture<IServiceProvider> getParent()
 		{
 			final Future<IServiceProvider>	ret	= new Future<IServiceProvider>();

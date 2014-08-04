@@ -5,6 +5,7 @@ import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentStep;
@@ -26,7 +27,6 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.clock.IClockService;
@@ -280,7 +280,8 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				public void customResultAvailable(final ILibraryService ls)
 				{
-					IFuture<IComponentFactory> fut = SServiceProvider.getService(agent.getServiceContainer(), new ComponentFactorySelector(filename, null, rid));
+					IFuture<IComponentFactory> fut =SServiceProvider.getService(agent.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(filename, null, rid));
+//					IFuture<IComponentFactory> fut = SServiceProvider.getService(agent.getServiceContainer(), new ComponentFactorySelector(filename, null, rid));
 					fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 					{
 						public void customResultAvailable(IComponentFactory factory)

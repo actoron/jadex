@@ -9,7 +9,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.searchv2.LocalServiceRegistry;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
