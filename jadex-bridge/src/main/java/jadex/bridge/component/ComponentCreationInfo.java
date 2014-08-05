@@ -1,5 +1,6 @@
 package jadex.bridge.component;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 
@@ -25,6 +26,10 @@ public class ComponentCreationInfo
 	// Hack???
 	protected IComponentDescription desc;
 	
+	/** The parent access (hack!!! only required for legacy search). */
+	// Todo: remove!!!
+	public IExternalAccess	parent;
+	
 	/** The real time flag. */
 	protected boolean	realtime;
 	
@@ -42,11 +47,12 @@ public class ComponentCreationInfo
 	 *  @param realtime	The real time flag.
 	 *  @param copy	The copy flag.
 	 */
-	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, IComponentDescription desc, boolean realtime, boolean copy)
+	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, IComponentDescription desc, IExternalAccess parent, boolean realtime, boolean copy)
 	{
 		this.model	= model;
 		this.config = config!=null ? config : model.getConfigurationNames().length>0 ? model.getConfigurationNames()[0] : null;
 		this.arguments	= arguments;
+		this.parent	= parent;
 		this.desc	= desc;
 		this.realtime	= realtime;
 		this.copy	= copy;

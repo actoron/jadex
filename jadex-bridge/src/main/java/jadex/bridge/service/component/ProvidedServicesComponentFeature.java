@@ -419,32 +419,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public IFuture<IServiceProvider>	getParent()
 	{
-		final Future<IServiceProvider> ret = new Future<IServiceProvider>();
-		
-		if(component.getComponentIdentifier().getParent()!=null)
-		{
-			SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IServiceProvider>(ret)
-			{
-				public void customResultAvailable(final IComponentManagementService cms)
-				{
-					cms.getExternalAccess(component.getComponentIdentifier().getParent())
-						.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IServiceProvider>(ret)
-					{
-						public void customResultAvailable(IExternalAccess parent)
-						{
-							ret.setResult(parent.getServiceProvider());
-						}
-					});
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
+		return new Future<IServiceProvider>(cinfo.parent!=null ? cinfo.parent.getServiceProvider() : null);
 	}
 	
 	/**

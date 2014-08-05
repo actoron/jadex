@@ -131,6 +131,18 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
+	 *  Perform the main execution of the component (if any).
+	 *  
+	 *  @return A future to indicate when the body is done.
+	 */
+	public IFuture<Void>	body()
+	{
+		// todo...
+		
+		return IFuture.DONE;
+	}
+	
+	/**
 	 *  Get the user view of this platform component.
 	 *  
 	 *  @return An internal access exposing user operations of the component.
@@ -532,6 +544,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi)
 	{
-		throw new UnsupportedOperationException();
+		// Todo!!!
+		return false;
+//		throw new UnsupportedOperationException();
 	}
 }

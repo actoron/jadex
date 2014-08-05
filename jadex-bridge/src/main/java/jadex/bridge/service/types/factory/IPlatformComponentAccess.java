@@ -16,6 +16,7 @@ public interface IPlatformComponentAccess
 	
 	/**
 	 *  Create the component, i.e. instantiate its features.
+	 *  This is the first method that is called by the platform.
 	 *  
 	 *  @param info The component creation info.
 	 *  @param templates The component feature templates to be instantiated for this component.
@@ -24,11 +25,19 @@ public interface IPlatformComponentAccess
 	
 	/**
 	 *  Perform the initialization of the component.
+	 *  Called after creation.
 	 *  Tries to switch to a separate thread for the component as soon as possible.
 	 *  
 	 *  @return A future to indicate when the initialization is done.
 	 */
 	public IFuture<Void>	init();
+	
+	/**
+	 *  Perform the main execution of the component (if any).
+	 *  
+	 *  @return A future to indicate when the body is done.
+	 */
+	public IFuture<Void>	body();
 	
 	/**
 	 *  Get the user view of this platform component.

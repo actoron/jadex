@@ -409,6 +409,7 @@ public class Starter
 				{
 					Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
 					final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
+					compargs.put("platformaccess", component);
 //					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null).get(null); // No execution yet, can only work if method is synchronous.
 					
 					// Build platform name.
@@ -501,7 +502,7 @@ public class Starter
 					boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
 					boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
 	
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, realtime, copy);
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, null, realtime, copy);
 					Collection<IComponentFeature>	features	= cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 

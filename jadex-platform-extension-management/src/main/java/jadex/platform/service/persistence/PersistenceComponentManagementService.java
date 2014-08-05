@@ -9,6 +9,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.persistence.IIdleHook;
 import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.commons.future.CollectionResultListener;
@@ -44,19 +45,19 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	/**
 	 *  Static method for reflective creation to allow platform start without add-on.
 	 */
-	public static PersistenceComponentManagementService	create(IBootstrapFactory componentfactory,
+	public static PersistenceComponentManagementService	create(IPlatformComponentAccess access,	IBootstrapFactory componentfactory,
 		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
-		return new PersistenceComponentManagementService(componentfactory, copy, realtime, persist, uniqueids);
+		return new PersistenceComponentManagementService(access, componentfactory, copy, realtime, persist, uniqueids);
 	}
 	
 	/**
 	 *  Create a persistence CMS.
 	 */
-	public PersistenceComponentManagementService(IBootstrapFactory componentfactory,
+	public PersistenceComponentManagementService(IPlatformComponentAccess access, IBootstrapFactory componentfactory,
 		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
-		super(componentfactory, copy, realtime, persist, uniqueids);
+		super(access, componentfactory, copy, realtime, persist, uniqueids);
 	}
 	
 	//-------- methods --------
