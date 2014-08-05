@@ -20,11 +20,9 @@ import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
@@ -569,8 +567,6 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname, addresses);
 																	
-																	initinfos.put(cid, new InitInfo(null, null, cinfo, null, resfut));
-																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 																	Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
@@ -591,6 +587,9 @@ public class ComponentManagementService implements IComponentManagementService
 																		persistable!=null ? persistable.booleanValue() : false, moni,
 																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause);
 																	
+																	final IPlatformComponentAccess	component	= new PlatformComponent();
+																	initinfos.put(cid, new InitInfo(ad, component.getInternalAccess(), cinfo, lmodel, resfut));
+																	
 																	logger.info("Starting component: "+cid.getName());
 							//										System.err.println("Pre-Init: "+cid);
 																	
@@ -599,22 +598,17 @@ public class ComponentManagementService implements IComponentManagementService
 																		public void resultAvailable(Void result)
 																		{
 																			logger.info("Started component: "+cid.getName());
-																			
-																			// Create the component instance.
-																			final IPlatformComponentAccess adapter;
-																			
 		//																	System.out.println("created: "+ad);
 																			
 																			// Init successfully finished. Add description and adapter.
 																			InitInfo	info	= initinfos.get(cid);
-																			adapter = info.getAdapter();
 																			
 																			// Init finished. Set to suspended until parent registration is finished.
 																			// not set to suspend to allow other initing sibling components invoking services
 				//															ad.setState(IComponentDescription.STATE_SUSPENDED);
 																			
 					//														System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
-																			components.put(cid, adapter);
+																			components.put(cid, info.getComponent());
 																			// Removed in resumeComponent()
 				//																initinfos.remove(cid);
 																			
@@ -767,7 +761,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		}
 																	}));
 																	
-																	// Create component and wakeup for init.
+																	// Create component and init.
 																	factory.getComponentFeatures(lmodel)
 																		.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeature>, IComponentIdentifier>(inited)
 																	{
@@ -777,58 +771,10 @@ public class ComponentManagementService implements IComponentManagementService
 																			String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 																				: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																			ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, realtime, copy);
-																			IPlatformComponentAccess	component	= new PlatformComponent();
-																			
-																			// Run init on component thread (hack!!! assumes that execution features works before init)
-																			IExecutionFeature exe	= component.getInternalAccess().getComponentFeature(IExecutionFeature.class);
-																			exe.scheduleImmediate(new IComponentStep<Void>()
-																			{
-																				public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia)
-																				{
-																					component.init(cci, features).addResultListener(new ExceptionDelegationResultListener<Void, IComponentIdentifier>(inited));																					
-																				}
-																			});
+																			component.create(cci, features);
+																			component.init().addResultListener(createResultListener(new DelegationResultListener<Void>(resfut)));
 																		}
 																	});
-
-																	IPersistInfo persistinfo = null;
-																	factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, persist, persistinfo, reslis, resfut)
-																		.addResultListener(createResultListener(new IResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>>()
-																	{
-																		public void resultAvailable(Tuple2<IComponentInterpreter, IComponentAdapter> comp)
-																		{
-																			// Store (invalid) desc, adapter and info for children
-																			// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
-				//															System.out.println("infos: "+ad.getName());
-																			InitInfo ii = getInitInfo(cid);
-																			ii.setDescription(ad);
-																			ii.setInfo(cinfo);
-																			ii.setInstance(comp.getFirstEntity());
-																			ii.setAdapter(comp.getSecondEntity());
-																			ii.setModel(lmodel);
-		//																	initinfos.put(cid, new Object[]{ad, comp.getSecondEntity(), cinfo, lmodel, resfut, comp.getFirstEntity()});
-																			
-																			try
-																			{
-																				// Start the init procedure by waking up the adapter.
-																				getComponentAdapterFactory().initialWakeup(comp.getSecondEntity());
-																			}
-																			catch(RuntimeException e)
-																			{
-																				exceptionOccurred(e);
-																			}
-																		}
-																		
-																		public void exceptionOccurred(Exception exception)
-																		{
-																			// Init problem might be notified already in other future.
-																			if(!resfut.isDone())
-																			{
-																				inited.setExceptionIfUndone(exception);
-																			}
-																		}
-																	}));
 //																}
 //															}));
 														}
@@ -870,8 +816,8 @@ public class ComponentManagementService implements IComponentManagementService
 							// Try to find file for local type.
 							String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
 							filename	= null;
-							IPlatformComponentAccess pad = getParentComponent(cinfo);
-							IExternalAccess parent = pad.getInternalAccess().getExternalAccess();
+							IInternalAccess pad = getParentComponent(cinfo);
+							IExternalAccess parent = pad.getExternalAccess();
 							final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
 							for(int i=0; filename==null && i<subcomps.length; i++)
 							{
@@ -1686,9 +1632,9 @@ public class ComponentManagementService implements IComponentManagementService
 	/**
 	 *  Add a new component to its parent.
 	 */
-	protected IFuture<Void>	addSubcomponent(IPlatformComponentAccess pad, IComponentDescription ad, IModelInfo lmodel)
+	protected IFuture<Void>	addSubcomponent(IInternalAccess pad, IComponentDescription ad, IModelInfo lmodel)
 	{
-		CMSComponentDescription padesc	= (CMSComponentDescription)pad.getInternalAccess().getComponentDescription();
+		CMSComponentDescription padesc	= (CMSComponentDescription)pad.getComponentDescription();
 		padesc.addChild(ad.getName());
 		
 //		if(padesc.isAutoShutdown() && !ad.isDaemon())
@@ -1702,7 +1648,7 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		
 		// Register component at parent.
-		return ((IInternalSubcomponentsFeature)pad.getInternalAccess().getComponentFeature(ISubcomponentsFeature.class))
+		return ((IInternalSubcomponentsFeature)pad.getComponentFeature(ISubcomponentsFeature.class))
 			.componentCreated(ad, lmodel);
 	}
 	
@@ -2081,12 +2027,12 @@ public class ComponentManagementService implements IComponentManagementService
 		else
 		{
 //			System.out.println("getExternalAccess: local");
-//			IComponentAdapter adapter = null;
-////				System.out.println("getExternalAccess: adapters");
-//			boolean delayed = false;
-//			adapter = (IComponentAdapter)adapters.get(cid);
+			IInternalAccess component = null;
+//				System.out.println("getExternalAccess: adapters");
+			boolean delayed = false;
+			component = components.get(cid);
 			
-			if(adapter==null)
+			if(component==null)
 			{
 				// Hack? Allows components to getExternalAccess in init phase from parent but also from component itself
 				InitInfo ii = getInitInfo(cid);
@@ -2094,10 +2040,10 @@ public class ComponentManagementService implements IComponentManagementService
 				{
 //					if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread())) // cannot work because of decoupling
 					IComponentIdentifier caller = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getCaller() : null;
-					if(internal || (ii.getAdapter()!=null && caller!=null && (cid.equals(caller.getParent()) || cid.equals(caller))))
+					if(internal || (caller!=null && (cid.equals(caller.getParent()) || cid.equals(caller))))
 					{
 //						System.out.println("getExternalAccess: not delayed");
-						adapter = ii.getAdapter();
+						component = ii.getComponent();
 					}
 					else
 					{
@@ -2110,7 +2056,7 @@ public class ComponentManagementService implements IComponentManagementService
 							{
 								try
 								{
-									ret.setResult(getComponentInstance(internalGetComponentAdapter(cid)).getExternalAccess());
+									ret.setResult(components.get(cid).getExternalAccess());
 								}
 								catch(Exception e)
 								{
@@ -2122,11 +2068,11 @@ public class ComponentManagementService implements IComponentManagementService
 				}
 			}
 			
-			if(adapter!=null)
+			if(component!=null)
 			{
 				try
 				{
-					ret.setResult(getComponentInstance(adapter).getExternalAccess());
+					ret.setResult(component.getExternalAccess());
 				}
 				catch(Exception e)
 				{

@@ -26,7 +26,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public enum State
 	{
-		CREATED, INITED, RUNNING, SHUTDOWN
+		CREATED, RUNNING, SHUTDOWN
 	}
 	
 	//-------- attributes --------
@@ -243,7 +243,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							try
 							{
 								threadpool = result;
-								state	= State.INITED;
+								state	= State.RUNNING;
 								ret.setResult(null);
 							}
 							catch(RuntimeException e)
@@ -264,39 +264,6 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		return ret;
 	}
 
-	/**
-	 * 
-	 */
-	public void start()
-	{
-		if(state!=State.INITED)
-		{
-			throw new RuntimeException("Cannot start service in "+state);
-		}
-		
-		state	= State.RUNNING;
-		
-		if(!executors.isEmpty())
-		{
-			// Resume all suspended tasks.
-			IExecutable[] keys = (IExecutable[])executors.keySet()
-				.toArray(new IExecutable[executors.size()]);
-			for(int i=0; i<keys.length; i++)
-				execute(keys[i]);
-		}
-		else
-		{
-			Future<Void> idf = null;
-			synchronized(AsyncExecutionService.this)
-			{
-				idf = idlefuture;
-				idlefuture = null;
-			}
-			if(idf!=null)
-				idf.setResult(null);
-		}
-	}
-	
 	/**
 	 *  Shutdown the executor service.
 	 *  // todo: make callable more than once
@@ -359,7 +326,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public synchronized boolean customIsValid()
 	{
-		return state==State.INITED || state==State.RUNNING;
+		return state==State.RUNNING;
 	}
 	
 	/**

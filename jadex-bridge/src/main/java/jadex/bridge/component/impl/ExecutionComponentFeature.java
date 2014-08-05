@@ -1,5 +1,6 @@
 package jadex.bridge.component.impl;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -158,6 +159,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 //	 */
 //	public IFuture waitForImmediate(long delay, IComponentStep step);
 	
+	/** Flag to indicate bootstrapping execution of main thread (only for platform, hack???). */
+	protected volatile boolean bootstrap;
+	
+	/** Flag to indicate that the execution service has become available during bootstrapping (only for platform, hack???). */
+	protected volatile boolean available;
+	
 	/**
 	 *  Trigger component execution.
 	 */
@@ -168,13 +175,42 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 		{
 			public void resultAvailable(IExecutionService exe)
 			{
-				exe.execute(ExecutionComponentFeature.this);
+				if(bootstrap)
+				{
+					// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+					available	= true;
+				}
+				else
+				{
+					exe.execute(ExecutionComponentFeature.this);
+				}
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				// Ignore
-				exception.printStackTrace();
+				// Happens during platform bootstrapping -> execute on platform rescue thread.
+				if(!bootstrap)
+				{
+					bootstrap	= true;
+					Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+					{
+						public void run()
+						{
+							boolean	again	= true;
+							while(!available && again)
+							{
+								again	= execute();
+							}
+							bootstrap	= false;
+							
+							if(again)
+							{					
+								// Bootstrapping finished -> do real kickoff
+								wakeup();
+							}
+						}
+					});
+				}
 			}
 		});
 	}

@@ -30,7 +30,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public enum State
 	{
-		CREATED, INITED, RUNNING, SHUTDOWN
+		CREATED, RUNNING, SHUTDOWN
 	}
 		
 	//-------- attributes --------
@@ -162,7 +162,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public boolean customIsValid()
 	{
-		return state==State.INITED || state==State.RUNNING;
+		return state==State.RUNNING;
 	}
 
 	/**
@@ -280,7 +280,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 							}
 						});
 						
-						state	= State.INITED;
+						state	= State.RUNNING;
 						ret.setResult(null);
 					}
 					
@@ -295,15 +295,6 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		return ret;
 	}
 
-	/**
-	 *  Start the execution.
-	 */
-	public void start()
-	{
-		// Wake up the main executor for executing tasks
-		executor.execute();
-	}
-		
 	/**
 	 *  Shutdown the executor service.
 	 */

@@ -11,20 +11,17 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -32,7 +29,6 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
-import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -507,7 +503,11 @@ public class Starter
 	
 					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, realtime, copy);
 					Collection<IComponentFeature>	features	= cfac.getComponentFeatures(model).get();
-					component.init(cci, features).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+					component.create(cci, features);
+
+					initRescueThread(cid);	// Required for bootstrapping init.
+
+					component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
@@ -534,44 +534,6 @@ public class Starter
 							});
 						}						
 					});
-					
-					// Execute init steps of root component on main thread (i.e. platform)
-					// until platform is ready to run by itself.
-					boolean again = true;
-					IExecutable	ie	= (IExecutable)component.getInternalAccess().getComponentFeature(IExecutionFeature.class);
-					while(again && !ret.isDone())
-					{
-						again = ie.execute();
-						
-//						// When adapter not running, process open future notifications as if on platform thread.
-//						if(!again)
-//						{
-//							IPlatformComponentAccess.LOCAL.set(component);
-//							IComponentIdentifier.LOCAL.set(cid);
-//							again	= FutureHelper.notifyStackedListeners();
-//							IComponentIdentifier.LOCAL.set(null);
-//							IPlatformComponentAccess.LOCAL.set(null);
-//						}
-					}
-					
-					// Start execution of platform unless an error occurred during init.
-					boolean	wakeup	= false;
-					try
-					{
-						wakeup	= !ret.isDone() || ret.get(null)!=null;
-					}
-					catch(Exception e)
-					{
-					}
-					
-					if(wakeup)
-					{
-						IProvidedServicesFeature	services	= component.getInternalAccess().getComponentFeature(IProvidedServicesFeature.class);
-						IExecutionService	exe	= services.getProvidedService(IExecutionService.class);
-						exe.start();
-					}
-
-//					initRescueThread(cid);
 					
 					if(cid.equals(IComponentIdentifier.LOCAL.get()))
 					{

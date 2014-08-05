@@ -1,10 +1,12 @@
 package jadex.platform.service.cms;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.IServiceContainer;
@@ -63,15 +65,13 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	//-------- IPlatformComponentAccess interface --------
 	
 	/**
-	 *  Perform the initialization of the component.
+	 *  Create the component, i.e. instantiate its features.
 	 *  
 	 *  @param info The component creation info.
 	 *  @param templates The component feature templates to be instantiated for this component.
-	 *  @return A future to indicate when the initialization is done.
 	 */
-	public IFuture<Void>	init(ComponentCreationInfo info, Collection<IComponentFeature> templates)
+	public void	create(ComponentCreationInfo info, Collection<IComponentFeature> templates)
 	{
-		Future<Void>	ret	= new Future<Void>();
 		this.info	= info;
 		this.features	= new LinkedHashMap<Class<?>, IComponentFeature>();
 		this.lfeatures	= new ArrayList<IComponentFeature>();
@@ -81,8 +81,27 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			features.put((Class<?>)feature.getType(), instance);
 			lfeatures.add(instance);
 		}
-		initFeatures(lfeatures.iterator())
-			.addResultListener(new DelegationResultListener<Void>(ret));
+	}
+	
+	/**
+	 *  Perform the initialization of the component.
+	 *  Tries to switch to a separate thread for the component as soon as possible.
+	 *  
+	 *  @return A future to indicate when the initialization is done.
+	 */
+	public IFuture<Void>	init()
+	{
+		Future<Void>	ret	= new Future<Void>();
+		
+		// Run init on component thread (hack!!! requires that execution feature works before its init)
+		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
+		exe.scheduleImmediate(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return initFeatures(lfeatures.iterator());
+			}
+		}).addResultListener(new DelegationResultListener<Void>(ret));
 		
 		return ret;
 	}
