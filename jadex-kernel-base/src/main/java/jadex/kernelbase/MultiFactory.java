@@ -256,7 +256,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					public IFuture resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
 					{
 						final URI uri = rid.getLocalIdentifier().getUri();
-						String regex = (String) ia.getArguments().get("kernelurlregex");
+						String regex = (String) ia.getArguments().get("kerneluriregex");
 						if (Pattern.matches(regex, uri.toString()))
 						{
 							exta.scheduleStep(new IComponentStep<Void>()
