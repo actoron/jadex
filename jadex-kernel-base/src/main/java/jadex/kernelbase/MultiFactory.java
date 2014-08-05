@@ -209,6 +209,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			return IFuture.DONE;
 		
 		String[] blarray = (String[]) ia.getArguments().get("baseextensionblacklist");
+//		System.out.println(Arrays.toString(blarray));
 		if (blarray != null)
 			baseextensionblacklist.addAll(Arrays.asList(blarray));
 		
@@ -1303,7 +1304,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture kernelSearch(final URI uri, final IFilter prefilter, IResourceIdentifier rid)
 	{
-		System.out.println("URLSearhc: " + uri.toString());
+//		System.out.println("URLSearhc: " + uri.toString());
 		List modellocs = searchUri(uri, new IFilter()
 		{
 			public boolean filter(Object obj)
@@ -1318,6 +1319,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						
 						if (loc.toLowerCase().endsWith(blstr))
 						{
+//							System.out.println(loc + " false for " + blstr);
 							return false;
 						}
 					}

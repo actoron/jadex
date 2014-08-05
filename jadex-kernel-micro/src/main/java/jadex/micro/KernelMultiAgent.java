@@ -26,7 +26,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@Argument(name="kerneluriregex", description="Regular expression identifying kernel URIs.",
 		clazz=String.class, defaultvalue="\".*[Kk]ernel.*\""),
 	@Argument(name="baseextensionblacklist", description="Blacklists files with extensions..",
-		clazz=String[].class, defaultvalue="new String[] {\".png\", \".jpg\", \".dll\", \".gif\", \".exe\", \".doc\", \".docx\", \".txt\", \"\"}")})
+		clazz=String[].class, defaultvalue="new String[] {\".png\", \".jpg\", \".dll\", \".gif\", \".exe\", \".doc\", \".docx\", \".txt\" }")})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
 	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getRawService(jadex.bridge.service.types.factory.IComponentFactory.class)"))
