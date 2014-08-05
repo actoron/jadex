@@ -8,7 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IService;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -20,8 +20,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.annotations.Classname;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -91,15 +93,15 @@ public class SComponentFactory
 //					{
 //						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
+//						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
 //						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
-							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
+						fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IComponentFactory fac)
 							{
-								IComponentFactory fac = (IComponentFactory)result;
 								fac.loadModel(model, null, rid)
-									.addResultListener(new DelegationResultListener(ret));
+									.addResultListener(new DelegationResultListener<IModelInfo>(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -129,14 +131,14 @@ public class SComponentFactory
 	 */
 	public static IFuture<Boolean> isLoadable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
-		Future ret = new Future();
+		Future<Boolean> ret = new Future<Boolean>();
 		
 		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
 			@Classname("isLoadable")
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
+				final Future<Boolean> ret = new Future<Boolean>();
 //				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 //				{
@@ -144,15 +146,15 @@ public class SComponentFactory
 //					{
 //						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
+//						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
 //						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
-							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
+						fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IComponentFactory fac)
 							{
-								IComponentFactory fac = (IComponentFactory)result;
 								fac.isLoadable(model, null, rid)
-									.addResultListener(new DelegationResultListener(ret));
+									.addResultListener(new DelegationResultListener<Boolean>(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -171,7 +173,7 @@ public class SComponentFactory
 //				}));
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
+		}).addResultListener(new DelegationResultListener<Boolean>(ret));
 
 		return ret;
 	}
@@ -233,26 +235,18 @@ public class SComponentFactory
 //				if(model.endsWith("application.xml"))
 //					System.out.println("model2:"+model);
 		
-				final long start = System.currentTimeMillis(); 
+//				final long start = System.currentTimeMillis(); 
 				final Future<Boolean> ret = new Future<Boolean>();
 				SServiceProvider.getServices(ea.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> facs)
 					{
-						long dur = System.currentTimeMillis()-start; 
+//						long dur = System.currentTimeMillis()-start; 
 //						System.out.println("needed search: "+dur);
-						
-//						if(facs.size()>1)
-//						{
-//							for(IComponentFactory fac: facs)
-//							{
-//								if(fac.getProperties("multifactory")!=null)
-//									facs.remove(fac);
-//							}
-//						}
-						
 //						System.out.println("found facs: "+facs.size());
+						
+//						excludeMultiFactory(facs);
 						
 //						if(model.endsWith("application.xml"))
 //							System.out.println("model3:"+model);
@@ -346,15 +340,16 @@ public class SComponentFactory
 //					{
 //						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
+//						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, 
+//							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
 //						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
-							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						getFactory(new FactoryFilter(model, null, rid), ia)
+							.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IComponentFactory fac)
 							{
-								IComponentFactory fac = (IComponentFactory)result;
 								fac.isStartable(model, null, rid)
-									.addResultListener(new DelegationResultListener(ret));
+									.addResultListener(new DelegationResultListener<Boolean>(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -391,33 +386,17 @@ public class SComponentFactory
 			public IFuture<byte[]> execute(final IInternalAccess ia)
 			{
 				final Future<byte[]> ret = new Future<byte[]>();
-				SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(type))
+//				IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), 
+//					IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(type));
 //				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
-					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Object, byte[]>(ret)
+				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(type), ia);
+				fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, byte[]>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IComponentFactory fac)
 					{
-						Collection<IComponentFactory> facs = (Collection<IComponentFactory>)result;
 //						System.out.println("facs: "+type+" "+facs);
-						
-						IComponentFactory fac = null;
-						if(facs.size()>1)
-						{
-							for(IComponentFactory tmp: facs)
-							{
-								Map<String, Object> ps = tmp.getProperties(null);
-//								if(ps!=null && ps.containsKey(MultiFactory.MULTIFACTORY))
-								if(ps==null || !ps.containsKey("multifactory"))
-								{
-									fac = tmp;
-									break;
-								}
-							}
-						}
-						else
-						{
-							fac = facs.iterator().next();
-						}
+//						excludeMultiFactory(facs);
+//						IComponentFactory fac = facs.iterator().next();
 						
 //						System.out.println("selected: "+fac);
 						
@@ -433,8 +412,7 @@ public class SComponentFactory
 //								System.out.println("found icon: "+type+" "+result.length);
 								super.customResultAvailable(result);
 							}
-						}
-						);
+						});
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -480,21 +458,21 @@ public class SComponentFactory
 			@Classname("getProperty")
 			public IFuture<Object> execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
+				final Future<Object> ret = new Future<Object>();
 				SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DelegationResultListener(ret)
+					.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Object>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Collection<IComponentFactory> result)
 					{
 						boolean found = false;
 						if(result!=null)
 						{
-							for(Iterator it=((Collection)result).iterator(); it.hasNext() && !found; )
+							for(Iterator<IComponentFactory> it=result.iterator(); it.hasNext() && !found; )
 							{
 								IComponentFactory fac = (IComponentFactory)it.next();
 								if(SUtil.arrayToSet(fac.getComponentTypes()).contains(type))
 								{
-									Map res = fac.getProperties(type);
+									Map<String, Object> res = fac.getProperties(type);
 									if(res!=null && res.containsKey(key))
 									{
 										ret.setResult(res.get(key));
@@ -525,7 +503,7 @@ public class SComponentFactory
 				});
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
+		}).addResultListener(new DelegationResultListener<Object>(ret));
 		
 		return ret;
 	}
@@ -535,30 +513,29 @@ public class SComponentFactory
 	 */
 	public static IFuture<String> getFileType(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
-		final Future ret = new Future();
+		final Future<String> ret = new Future<String>();
 		
 		exta.scheduleStep(new IComponentStep<String>()
 		{
 			@Classname("getFileType")
 			public IFuture<String> execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
+				final Future<String> ret = new Future<String>();
 				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, String>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(ILibraryService ls)
 					{
-						final ILibraryService ls = (ILibraryService)result;
-						
-						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
+//						IFuture<IComponentFactory> fut = SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, 
+//							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid));
 //						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
-							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
+						fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IComponentFactory fac)
 							{
-								IComponentFactory fac = (IComponentFactory)result;
 								fac.getComponentType(model, null, rid)
-									.addResultListener(new DelegationResultListener(ret));
+									.addResultListener(new DelegationResultListener<String>(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -577,8 +554,62 @@ public class SComponentFactory
 				}));
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
+		}).addResultListener(new DelegationResultListener<String>(ret));
 		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
+	{
+		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
+		
+		IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), 
+			IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+		
+		fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
+		{
+			public void customResultAvailable(Collection<IComponentFactory> facs)
+			{
+				facs = excludeMultiFactory(facs);
+				
+				if(facs!=null && facs.size()>0)
+				{
+					ret.setResult(facs.iterator().next());
+				}
+				else
+				{
+					ret.setException(new ServiceNotFoundException(""+filter));
+				}
+			}
+		}));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Exclude the multifactory from a collection.
+	 *  @param facs The factories.
+	 *  @return cleaned collection.
+	 */
+	protected static Collection<IComponentFactory> excludeMultiFactory(Collection<IComponentFactory> facs)
+	{
+		Collection<IComponentFactory> ret = facs;
+		if(facs!=null && facs.size()>1)
+		{
+			ret = new ArrayList<IComponentFactory>();
+			Iterator<IComponentFactory> it = facs.iterator();
+			for(IComponentFactory tmp: facs)
+			{
+				Map<String, Object> ps = tmp.getProperties(null);
+				if(ps==null || !ps.containsKey("multifactory"))
+				{
+					ret.add(tmp);
+				}
+			}
+		}
 		return ret;
 	}
 }

@@ -1041,7 +1041,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 												{
 													public void resultAvailable(Object result)
 													{
-														System.out.println("Starting kernel6: " + kernelmodel);
+//														System.out.println("Starting kernel6: " + kernelmodel);
 														findActiveKernel(model, imports, rid).addResultListener(ia.createResultListener(new DefaultResultListener()
 														{
 															public void resultAvailable(Object result)
