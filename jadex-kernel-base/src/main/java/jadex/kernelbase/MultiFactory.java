@@ -119,7 +119,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	protected Map<String, byte[]> iconcache;
 	
 	/** Base Blacklist of extension for which there is no factory */
-	protected Set baseextensionblacklist;
+	protected Set<String> baseextensionblacklist;
 
 	/** Blacklist of extension for which there is no factory */
 	protected Set extensionblacklist;
@@ -171,9 +171,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		this.potentialuris = new LinkedHashSet<URI>();
 		this.validuris = new HashSet<URI>();
 		this.multiplexer = new CallMultiplexer();
-		this.baseextensionblacklist = new HashSet();
-		if (extensionblacklist != null)
-			Arrays.asList(extensionblacklist);
+		this.baseextensionblacklist = new HashSet<String>();
+//		if (extensionblacklist != null)
+//			Arrays.asList(extensionblacklist);
 //		this.baseextensionblacklist.add(null);
 		
 		kerneldefaultlocations = new MultiCollection();
@@ -207,6 +207,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		if (started)
 			return IFuture.DONE;
+		
+		String[] blarray = (String[]) ia.getArguments().get("baseextensionblacklist");
+		if (blarray != null)
+			baseextensionblacklist.addAll(Arrays.asList(blarray));
 		
 		final Future ret = new Future()
 		{
@@ -1299,7 +1303,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture kernelSearch(final URI uri, final IFilter prefilter, IResourceIdentifier rid)
 	{
-//		System.out.println("URLSearhc: " + url);
+		System.out.println("URLSearhc: " + uri.toString());
 		List modellocs = searchUri(uri, new IFilter()
 		{
 			public boolean filter(Object obj)
@@ -1312,7 +1316,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					{
 						String blstr = (String) oblstr;
 						
-						if (loc.endsWith(blstr))
+						if (loc.toLowerCase().endsWith(blstr))
 						{
 							return false;
 						}
