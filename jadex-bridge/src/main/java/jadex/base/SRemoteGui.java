@@ -899,18 +899,20 @@ public class SRemoteGui
 				final SubscriptionIntermediateFuture<FileData> ret = new SubscriptionIntermediateFuture<FileData>();
 				try
 				{
-					final JarAsDirectory jad = new JarAsDirectory(file.getPath());
+					final String name = file instanceof RemoteJarFile? ((RemoteJarFile)file).getRelativePath(): null;
+
+					final JarAsDirectory jad = name!=null? new JarAsDirectory(file.getPath(), name): new JarAsDirectory(file.getPath());
 					jad.refresh();
 									
 //					final Map<String, Collection<FileData>> rjfentries = new LinkedHashMap<String, Collection<FileData>>();
 					MultiCollection zipentries = jad.createEntries();
 					
-					final int size = zipentries.size();
+//					final int size = zipentries.size();
 					
 					final List<Tuple2<String, RemoteJarFile>> ires = new ArrayList<Tuple2<String, RemoteJarFile>>(); 
 //					final List<RemoteJarFile> ires = new ArrayList<RemoteJarFile>(); 
 					
-					final CounterResultListener<Tuple2<String, RemoteJarFile>> lis = new CounterResultListener<Tuple2<String, RemoteJarFile>>(zipentries.size(), 
+					final CounterResultListener<Tuple2<String, RemoteJarFile>> lis = new CounterResultListener<Tuple2<String, RemoteJarFile>>(-1, 
 						true, new ExceptionDelegationResultListener<Void, Collection<FileData>>(ret)
 					{
 						public void customResultAvailable(Void result)
@@ -964,60 +966,68 @@ public class SRemoteGui
 //						}
 					};
 	
-					
-					for(Iterator<?> it=zipentries.keySet().iterator(); it.hasNext(); )
-					{
-						final String name = (String)it.next();
-						Collection<?> childs = (Collection<?>)zipentries.get(name);
-	//					System.out.println("childs: "+childs);
+//						for(Iterator<?> it=zipentries.keySet().iterator(); it.hasNext(); )
+//						{
+//						final String name = "/";//(String)it.next();
+						Collection<?> childs = (Collection<?>)zipentries.get(name==null? "/": name);
+						lis.setNumber(childs==null? 0: childs.size());
+						System.out.println("childs: "+childs);
 						
-						for(Iterator<?> it2=childs.iterator(); it2.hasNext(); )
+						if(childs!=null)
 						{
-							ZipEntry entry = (ZipEntry)it2.next();
-							String ename = entry.getName();
-//							System.out.println("eq: "+name+" "+ename);
-							int	slash = ename.lastIndexOf("/", ename.length()-2);
-							ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
-							
-//							System.out.println("ename: "+ename+" "+entry.getName()+" "+(cnt++)+"/"+size);
-							
-//							final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
-//								entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
-							final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
-								entry.isDirectory(), ename, null, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
-							
-							if(filter!=null)
+							for(Iterator<?> it2=childs.iterator(); it2.hasNext(); )
 							{
-								filter.filter(jad.getFile(entry.getName())).addResultListener(new IResultListener<Boolean>()
+								ZipEntry entry = (ZipEntry)it2.next();
+								String ename = entry.getName();
+	//							System.out.println("eq: "+name+" "+ename);
+								int	slash = ename.lastIndexOf("/", ename.length()-2);
+								ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
+								
+	//							System.out.println("ename: "+ename+" "+entry.getName()+" "+(cnt++)+"/"+size);
+								
+	//							final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
+	//								entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
+//								String path = "jar:file:"+jad.getJarPath()+"!/"+entry.getName();
+//								path = jarifyPath(jad.getJarPath(), null);
+//								path=path+entry.getName();
+								
+//								System.out.println("name is: "+path);
+								
+								final RemoteJarFile tmp = new RemoteJarFile(ename, jad.getJarPath(), 
+									entry.isDirectory(), ename, null, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
+								
+								if(filter!=null)
 								{
-									public void resultAvailable(Boolean result)
+									filter.filter(jad.getFile(entry.getName())).addResultListener(new IResultListener<Boolean>()
 									{
-										if(result.booleanValue())
+										public void resultAvailable(Boolean result)
 										{
-											lis.resultAvailable(new Tuple2<String, RemoteJarFile>(name, tmp));
+											if(result.booleanValue())
+											{
+												lis.resultAvailable(new Tuple2<String, RemoteJarFile>(name, tmp));
+											}
+											else
+											{
+												lis.exceptionOccurred(null);
+											}
 										}
-										else
+										
+										public void exceptionOccurred(Exception exception)
 										{
 											lis.exceptionOccurred(null);
 										}
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										lis.exceptionOccurred(null);
-									}
-								});
+									});
+								}
+								else
+								{
+									lis.resultAvailable(new Tuple2<String, RemoteJarFile>(name, tmp));							
+								}
+								
+	//							break;
 							}
-							else
-							{
-								lis.resultAvailable(new Tuple2<String, RemoteJarFile>(name, tmp));							
-							}
-							
-//							break;
 						}
-						
 //						break;
-					}
+//					}
 				}
 				catch(Exception e)
 				{
@@ -1046,6 +1056,8 @@ public class SRemoteGui
 //		
 //		return ret;
 	}
+	
+	
 	
 	/**
 	 *  Check if a component model can be started as test case.

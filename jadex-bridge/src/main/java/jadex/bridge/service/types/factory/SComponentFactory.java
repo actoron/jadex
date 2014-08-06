@@ -246,7 +246,7 @@ public class SComponentFactory
 //						System.out.println("needed search: "+dur);
 //						System.out.println("found facs: "+facs.size());
 						
-//						excludeMultiFactory(facs);
+						facs = reorderMultiFactory(facs);
 						
 //						if(model.endsWith("application.xml"))
 //							System.out.println("model3:"+model);
@@ -395,7 +395,7 @@ public class SComponentFactory
 					public void customResultAvailable(IComponentFactory fac)
 					{
 //						System.out.println("facs: "+type+" "+facs);
-//						excludeMultiFactory(facs);
+//						reorderMultiFactory(facs);
 //						IComponentFactory fac = facs.iterator().next();
 						
 //						System.out.println("selected: "+fac);
@@ -600,7 +600,6 @@ public class SComponentFactory
 		if(facs!=null && facs.size()>1)
 		{
 			ret = new ArrayList<IComponentFactory>();
-			Iterator<IComponentFactory> it = facs.iterator();
 			for(IComponentFactory tmp: facs)
 			{
 				Map<String, Object> ps = tmp.getProperties(null);
@@ -609,6 +608,36 @@ public class SComponentFactory
 					ret.add(tmp);
 				}
 			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Exclude the multifactory from a collection.
+	 *  @param facs The factories.
+	 *  @return cleaned collection.
+	 */
+	protected static Collection<IComponentFactory> reorderMultiFactory(Collection<IComponentFactory> facs)
+	{
+		Collection<IComponentFactory> ret = facs;
+		if(facs!=null && facs.size()>1)
+		{
+			IComponentFactory multi = null;
+			ret = new ArrayList<IComponentFactory>();
+			for(IComponentFactory tmp: facs)
+			{
+				Map<String, Object> ps = tmp.getProperties(null);
+				if(ps==null || !ps.containsKey("multifactory"))
+				{
+					ret.add(tmp);
+				}
+				else
+				{
+					multi = tmp;
+				}
+			}
+			if(multi!=null)
+				ret.add(multi);
 		}
 		return ret;
 	}
