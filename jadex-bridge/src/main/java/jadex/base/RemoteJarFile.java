@@ -121,4 +121,6 @@ public class RemoteJarFile extends FileData
 	{
 		return jarentries!=null;
 	}
+	
+	
 }

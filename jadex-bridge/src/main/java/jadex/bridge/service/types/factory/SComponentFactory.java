@@ -431,16 +431,16 @@ public class SComponentFactory
 			}
 		}).addResultListener(new DelegationResultListener<byte[]>(ret)
 		{
-			public void customResultAvailable(byte[] result)
-			{
-				System.out.println("found icon: "+type+" "+(result==null? "null": result.length));
-				super.customResultAvailable(result);
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("exec: "+exception);
-				super.exceptionOccurred(exception);
-			}
+//			public void customResultAvailable(byte[] result)
+//			{
+//				System.out.println("found icon: "+type+" "+(result==null? "null": result.length));
+//				super.customResultAvailable(result);
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+////				System.out.println("exec: "+exception);
+//				super.exceptionOccurred(exception);
+//			}
 		});
 		
 		return ret;

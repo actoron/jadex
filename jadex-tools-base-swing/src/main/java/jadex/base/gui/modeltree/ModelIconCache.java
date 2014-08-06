@@ -82,15 +82,21 @@ public class ModelIconCache implements IIconCache
 		
 		ret	= (Icon)myicons.get(node);
 		
+//		if(node instanceof IFileNode && ((IFileNode)node).getFileName().indexOf("Admin")!=-1)
+//			System.out.println("file is: ");
+		
 		if(ret==null)
 		{
 			String type = null;
 			
-			if(node instanceof JarNode || node instanceof RemoteJarNode || (node instanceof RIDNode && ((RIDNode)node).isJar()))
+			if(node instanceof JarNode 
+				|| (node instanceof RemoteJarNode && ((RemoteJarNode)node).isRoot())
+				|| (node instanceof RIDNode && ((RIDNode)node).isJar()))
 			{
 				type = "src_jar";
 			}
-			else if(node instanceof DirNode || node instanceof RemoteDirNode || node instanceof RIDNode)
+			else if(node instanceof DirNode || (node instanceof RemoteDirNode && !(node instanceof RemoteJarNode)) || node instanceof RIDNode
+				|| (node instanceof RemoteJarNode && ((RemoteJarNode)node).isDirectory()))
 			{
 				if(node.getParent() instanceof RootNode)
 				{
@@ -110,7 +116,7 @@ public class ModelIconCache implements IIconCache
 			if(node instanceof IFileNode && exta!=null)
 			{
 				// Todo: remember ongoing searches for efficiency?
-	//			System.out.println("getIcon: "+type);
+//				System.out.println("getIcon: "+type);
 				final String file = ((IFileNode)node).getFilePath(); 
 				
 				createResourceIdentifier(node).addResultListener(new SwingResultListener<IResourceIdentifier>(new IResultListener<IResourceIdentifier>()

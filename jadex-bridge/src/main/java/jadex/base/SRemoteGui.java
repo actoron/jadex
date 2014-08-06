@@ -859,12 +859,12 @@ public class SRemoteGui
 		ISubscriptionIntermediateFuture<FileData> ret = null;
 		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
 		{
-			System.out.println("direct listJarFileEntries");
+//			System.out.println("direct listJarFileEntries");
 			ret = listJarFileEntries(file, filter);
 		}
 		else
 		{
-			System.out.println("stepped listJarFileEntries");
+//			System.out.println("stepped listJarFileEntries");
 			ret = (ISubscriptionIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
 			{
 				@Classname("listJarFileEntries")
@@ -900,8 +900,9 @@ public class SRemoteGui
 				try
 				{
 					final String name = file instanceof RemoteJarFile? ((RemoteJarFile)file).getRelativePath(): null;
+					final boolean dir = file instanceof RemoteJarFile? ((RemoteJarFile)file).isDirectory(): false;
 
-					final JarAsDirectory jad = name!=null? new JarAsDirectory(file.getPath(), name): new JarAsDirectory(file.getPath());
+					final JarAsDirectory jad = name!=null? new JarAsDirectory(file.getPath(), name, dir, true): new JarAsDirectory(file.getPath());
 					jad.refresh();
 									
 //					final Map<String, Collection<FileData>> rjfentries = new LinkedHashMap<String, Collection<FileData>>();
@@ -918,7 +919,7 @@ public class SRemoteGui
 						public void customResultAvailable(Void result)
 						{
 							long dur = System.currentTimeMillis()-start;
-							System.out.println("Needed for listJarFileEntries: "+dur/1000);
+//							System.out.println("Needed for listJarFileEntries: "+dur/1000);
 							
 //							for(Tuple2<String, RemoteJarFile> tmp: ires)
 //							{
@@ -971,7 +972,7 @@ public class SRemoteGui
 //						final String name = "/";//(String)it.next();
 						Collection<?> childs = (Collection<?>)zipentries.get(name==null? "/": name);
 						lis.setNumber(childs==null? 0: childs.size());
-						System.out.println("childs: "+childs);
+//						System.out.println("childs: "+childs);
 						
 						if(childs!=null)
 						{
@@ -995,6 +996,8 @@ public class SRemoteGui
 								
 								final RemoteJarFile tmp = new RemoteJarFile(ename, jad.getJarPath(), 
 									entry.isDirectory(), ename, null, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
+								
+//								System.out.println("entry: "+tmp.getFilename()+" "+tmp.isDirectory());
 								
 								if(filter!=null)
 								{

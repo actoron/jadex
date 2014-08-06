@@ -131,7 +131,7 @@ public class RemoteDirNode extends RemoteFileNode
 						files = rjf.listFiles();
 		    		}
 		    		rjfentries = null;
-					System.out.println("size is: "+files.size());
+//					System.out.println("size is: "+files.size());
 		    	}
 		    	else if(entries.size()>0)
 		    	{

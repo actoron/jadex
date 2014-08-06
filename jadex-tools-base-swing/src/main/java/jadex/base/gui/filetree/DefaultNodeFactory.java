@@ -46,7 +46,8 @@ public abstract class DefaultNodeFactory implements INodeFactory
 		else if(value instanceof FileData)
 		{
 			FileData file = (FileData)value;
-			if(file instanceof RemoteJarFile || file.getFilename().endsWith(".jar") || file.getFilename().endsWith(".zip"))
+			if(file instanceof RemoteJarFile //&& ((RemoteJarFile)file).isDirectory()) 
+				|| file.getFilename().endsWith(".jar") || file.getFilename().endsWith(".zip"))
 			{
 				ret = new RemoteJarNode(parent, model, tree, file, iconcache, exta, factory);
 			}
