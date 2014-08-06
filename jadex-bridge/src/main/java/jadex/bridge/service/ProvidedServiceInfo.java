@@ -29,6 +29,9 @@ public class ProvidedServiceInfo
 	/** Publish information. */
 	protected PublishInfo publish;
 	
+	/** The scope. */
+	protected String scope;
+	
 	/** The service properties. */
 	protected List<UnparsedExpression> properties;
 		
@@ -45,23 +48,20 @@ public class ProvidedServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, PublishInfo publish, List<UnparsedExpression> properties)
+	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, String scope, PublishInfo publish, List<UnparsedExpression> properties)
 	{
-		this.name = name;
-		this.implementation = implementation;
-		this.publish = publish;
-		this.properties = properties;
-		setType(new ClassInfo(SReflect.getClassName(type)));
+		this(name, new ClassInfo(SReflect.getClassName(type)), implementation, scope, publish, properties);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, PublishInfo publish, List<UnparsedExpression> properties)
+	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, String scope, PublishInfo publish, List<UnparsedExpression> properties)
 	{
 		this.name = name;
 		this.implementation = implementation;
 		this.publish = publish;
+		this.properties = properties;
 		setType(type);
 	}
 	
@@ -161,6 +161,24 @@ public class ProvidedServiceInfo
 	public void setProperties(List<UnparsedExpression> properties)
 	{
 		this.properties = properties;
+	}
+	
+	/**
+	 *  Get the scope.
+	 *  @return The scope.
+	 */
+	public String getScope()
+	{
+		return scope;
+	}
+
+	/**
+	 *  Set the scope.
+	 *  @param scope The scope to set.
+	 */
+	public void setScope(String scope)
+	{
+		this.scope = scope;
 	}
 
 	/**

@@ -161,7 +161,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	{
 		this.component = component;
 		this.providerid = ((IServiceProvider)component.getServiceContainer()).getId();
-		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
+		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null);
 		return startService();
 	}
 	

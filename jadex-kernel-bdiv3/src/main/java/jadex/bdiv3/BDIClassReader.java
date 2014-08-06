@@ -268,7 +268,7 @@ public class BDIClassReader extends MicroClassReader
 
 			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
 			{
-				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish(), psi.getProperties());
+				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getScope(), psi.getPublish(), psi.getProperties());
 				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
 			}
 			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
@@ -532,7 +532,7 @@ public class BDIClassReader extends MicroClassReader
 							NameValue[] props = provs[j].properties();
 							List<UnparsedExpression> serprops = (props != null && props.length > 0) ? new ArrayList<UnparsedExpression>(Arrays.asList(createUnparsedExpressions(props))) : null;
 							
-							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi, serprops);
+							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, provs[j].scope(), pi, serprops);
 							configinfo.setProvidedServices(psis);
 						}
 						
@@ -612,7 +612,9 @@ public class BDIClassReader extends MicroClassReader
 			
 			ProvidedServiceImplementation psi = new ProvidedServiceImplementation(null, buf.toString(), 
 				BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
-			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null));
+			
+			// todo: allow specifying scope
+			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null));
 		}
 		
 		// Create enhanced classes if not already present.

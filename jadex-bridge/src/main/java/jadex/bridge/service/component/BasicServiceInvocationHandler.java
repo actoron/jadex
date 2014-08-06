@@ -428,7 +428,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
 		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, 
-		boolean realtime, IResourceIdentifier rid, boolean monitoring, IResultCommand<Object, Class<?>> componentfetcher)
+		boolean realtime, IResourceIdentifier rid, boolean monitoring, IResultCommand<Object, Class<?>> componentfetcher, String scope)
 	{
 		IInternalService	ret;
 		
@@ -439,7 +439,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(service instanceof IInternalService)
 		{
-			((IInternalService)service).createServiceIdentifier(name, service.getClass(), rid, type);
+			((IInternalService)service).createServiceIdentifier(name, service.getClass(), rid, type, scope);
 		}
 		
 //		if(type.getName().indexOf("IServiceCallService")!=-1)
@@ -447,7 +447,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
-			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, realtime, componentfetcher);
+			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, realtime, componentfetcher, scope);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, adapter, ia, proxytype, copy, monitoring, ret.getServiceIdentifier());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
@@ -482,7 +482,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 *  Create a basic invocation handler.
 	 */
 	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service,
-		boolean realtime, IResultCommand<Object, Class<?>> componentfetcher)
+		boolean realtime, IResultCommand<Object, Class<?>> componentfetcher, String scope)
 	{
 		BasicServiceInvocationHandler handler;
 		if(service instanceof IService)
@@ -523,7 +523,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			Class<?> serclass = service.getClass();
 
 			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, serclass, null);
-			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type);
+			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope);
 						
 			// Do not try to call isAnnotationPresent for Proxy on Android
 			// see http://code.google.com/p/android/issues/detail?id=24846

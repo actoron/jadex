@@ -296,13 +296,14 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 					}
 				}
 				
+				// todo: provided service scope
 				if(iface!=null && !haspsis.contains(iface))
 				{
 					String exp = "java.lang.reflect.Proxy.newProxyInstance($component.getClassLoader()," 
 						+ "new Class[]{"+iface.getName()+".class"
 						+ "}, new jadex.bpmn.runtime.ProcessServiceInvocationHandler($component, \""+entry.getKey().getId()+"\"))";
 					ProvidedServiceImplementation psim = new ProvidedServiceImplementation(null, exp, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
-					ProvidedServiceInfo psi = new ProvidedServiceInfo("internal_"+iface.getName(), iface, psim, null, null);
+					ProvidedServiceInfo psi = new ProvidedServiceInfo("internal_"+iface.getName(), iface, psim, null, null, null);
 					modelinfo.addProvidedService(psi);
 				}
 			}
