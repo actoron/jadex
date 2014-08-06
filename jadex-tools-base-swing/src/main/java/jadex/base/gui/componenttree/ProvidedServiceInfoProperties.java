@@ -37,6 +37,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 
 		createTextField("Name");
 		createTextField("Type");
+		createTextField("Scope");
 		
 		// todo:
 //		createTextField("Implementation");  
@@ -59,6 +60,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 	{
 		getTextField("Name").setText(service.getName());
 		getTextField("Type").setText(service.getType().getTypeName());
+		getTextField("Scope").setText(sid!=null? sid.getScope(): "");
 //		getTextField("Implementation").setText();
 
 		if(service.getType().getType(null)==null)

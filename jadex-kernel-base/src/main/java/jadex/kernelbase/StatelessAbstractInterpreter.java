@@ -1437,6 +1437,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		final Future<Void> ret = new Future<Void>();
 		assert !getComponentAdapter().isExternalThread();
 		
+//		System.out.println("info: "+info.getType().getTypeName()+" "+info.getScope());
+		
 		try
 		{
 			final ProvidedServiceImplementation	impl = info.getImplementation();

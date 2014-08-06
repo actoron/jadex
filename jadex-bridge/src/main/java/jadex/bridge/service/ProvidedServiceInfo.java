@@ -62,6 +62,7 @@ public class ProvidedServiceInfo
 		this.implementation = implementation;
 		this.publish = publish;
 		this.properties = properties;
+		this.scope = scope;
 		setType(type);
 	}
 	
