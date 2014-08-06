@@ -89,10 +89,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	protected IInternalAccess ia;
 	
 	/** Kernel default locations */
-	protected Map kerneldefaultlocations;
+	protected MultiCollection kerneldefaultlocations;
 	
 	/** Cache of known factories */
-	protected Map factorycache;
+	protected Map<String, IComponentFactory> factorycache;
 	
 	/** Cache of kernel locations */
 	protected MultiCollection kernellocationcache;
@@ -107,13 +107,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	protected Set<URI> validuris;
 	
 	/** Set of kernels that have been active at one point */
-	protected Set activatedkernels;
+	protected Set<String> activatedkernels;
 	
 	/** Flag if active kernels has changed. */
 	protected boolean activekernelsdirty = true;
 	
 	/** Currently supported types */
-	protected Set componenttypes;
+	protected Set<String> componenttypes;
 	
 	/** Cache of component icons */
 	protected Map<String, byte[]> iconcache;
@@ -122,19 +122,19 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	protected Set<String> baseextensionblacklist;
 
 	/** Blacklist of extension for which there is no factory */
-	protected Set extensionblacklist;
+//	protected Set extensionblacklist;
 	
 	/** Kernel blacklist */
-	protected Set kernelblacklist;
+	protected Set<String> kernelblacklist;
 	
 	/** Unloadable kernel locations that may become loadable later. */
-	protected Set potentialkernellocations;
+	protected Set<String> potentialkernellocations;
 	
 	/** Call Multiplexer */
 	protected CallMultiplexer multiplexer;
 	
 	/** The listeners. */
-	protected List listeners;
+	protected List<IMultiKernelListener> listeners;
 	
 	/** The service identifier. */
 	@ServiceIdentifier(IComponentFactory.class)
@@ -165,7 +165,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		//super(ia.getServiceContainer().getId(), IComponentFactory.class, null);
 		//this.ia = ia;
-		this.factorycache = new HashMap();
+		this.factorycache = new HashMap<String, IComponentFactory>();
 		this.kernellocationcache = new MultiCollection();
 		this.kerneluris = new MultiCollection();
 		this.potentialuris = new LinkedHashSet<URI>();
@@ -185,17 +185,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 		}
 		
-		activatedkernels = new HashSet();
-		componenttypes = new HashSet();
+		activatedkernels = new HashSet<String>();
+		componenttypes = new HashSet<String>();
 		iconcache = new HashMap<String, byte[]>();
-		this.kernelblacklist = new HashSet();
+		this.kernelblacklist = new HashSet<String>();
 		if(kernelblacklist != null)
 		{
 			this.kernelblacklist.addAll(Arrays.asList(kernelblacklist));
 		}
-		this.extensionblacklist = new HashSet(baseextensionblacklist);
-		this.potentialkernellocations = new HashSet();
-		this.listeners = new ArrayList();
+//		this.extensionblacklist = new HashSet(baseextensionblacklist);
+		this.potentialkernellocations = new HashSet<String>();
+		this.listeners = new ArrayList<IMultiKernelListener>();
 		started = false;
 	}
 	
@@ -208,7 +208,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		if (started)
 			return IFuture.DONE;
 		
-		String[] blarray = (String[]) ia.getArguments().get("baseextensionblacklist");
+		String[] blarray = (String[]) ia.getArguments().get("ignoreextensions");
 //		System.out.println(Arrays.toString(blarray));
 		if (blarray != null)
 			baseextensionblacklist.addAll(Arrays.asList(blarray));
@@ -268,7 +268,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									extensionblacklist = new HashSet(baseextensionblacklist);
+//									extensionblacklist = new HashSet(baseextensionblacklist);
 									validuris.add(uri);
 									potentialuris.add(uri);
 									return IFuture.DONE;
@@ -765,7 +765,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //		System.out.println("EXT: " + ext);
 //		if(extensionblacklist.contains(ext))
 //			return IFuture.DONE;
-		if (isInExtensionBlacklist(model, extensionblacklist))
+		if (isInExtensionBlacklist(model, baseextensionblacklist))
 			return IFuture.DONE;
 		
 //		if(model.toString().indexOf("agent")!=-1)
@@ -991,7 +991,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	protected boolean hasLoadablePotentialKernels()
 	{
 		boolean	ret	= false;
-		for(Object loc: potentialkernellocations)
+		for(String loc: potentialkernellocations)
 		{
 			ret	= getCacheKeyValueForModel((String)loc, kernellocationcache)!=null;
 			if(ret)
@@ -1305,7 +1305,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	protected IFuture kernelSearch(final URI uri, final IFilter prefilter, IResourceIdentifier rid)
 	{
 //		System.out.println("URLSearhc: " + uri.toString());
-		List modellocs = searchUri(uri, new IFilter()
+		List<String> modellocs = searchUri(uri, new IFilter()
 		{
 			public boolean filter(Object obj)
 			{
@@ -1444,7 +1444,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param filter The search filter.
 	 *  @return List of file locations matching the filter.
 	 */
-	protected List searchUri(URI uri, IFilter filter)
+	protected List<String> searchUri(URI uri, IFilter filter)
 	{
 		try
 		{
@@ -1472,17 +1472,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  				  used when unwinding recursions.
 	 * @return List of files matching the filter.
 	 */
-	protected List searchDirectory(File dir, IFilter filter, boolean prependDir)
+	protected List<String> searchDirectory(File dir, IFilter filter, boolean prependDir)
 	{
 //		System.out.println("Searching dir: " + dir.getAbsolutePath());
-		List ret = new ArrayList();
+		List<String> ret = new ArrayList<String>();
 		File[] content = dir.listFiles();
 		for (int i = 0; i < content.length; ++i)
 		{
 			if (content[i].isDirectory())
 			{
-				List subList = searchDirectory(content[i], filter, true);
-				for (Iterator it = subList.iterator(); it.hasNext();)
+				List<String> subList = searchDirectory(content[i], filter, true);
+				for (Iterator<String> it = subList.iterator(); it.hasNext();)
 				{
 					if (prependDir)
 						ret.add(dir.getName().concat(File.separator).concat(
@@ -1516,10 +1516,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param filter The filter.
 	 * @return List of files matching the filter.
 	 */
-	protected List searchJar(File jar, IFilter filter)
+	protected List<String> searchJar(File jar, IFilter filter)
 	{
 //		System.out.println("Searching jar: " + jar.getAbsolutePath());
-		List ret = new ArrayList();
+		List<String> ret = new ArrayList<String>();
 		JarFile jarFile	= null;
 		try
 		{
@@ -1561,10 +1561,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param filter The filter.
 	 * @return List of files matching the filter.
 	 */
-	protected List searchApk(File apk, IFilter filter)
+	protected List<String> searchApk(File apk, IFilter filter)
 	{
 //		System.out.println("Searching apk: " + apk.getAbsolutePath());
-		List ret = new ArrayList();
+		List<String> ret = new ArrayList<String>();
 		try
 		{
 			// Scan for resource files in .apk
