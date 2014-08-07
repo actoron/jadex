@@ -605,7 +605,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	/**
 	 *  Create a service proxy for registering a provided service.
 	 */
-	public IInternalService	createInternalService(Object service, Class<?> type)
+	public IInternalService	createInternalService(Object service, Class<?> type, ProvidedServiceInfo info)
 	{
 //		boolean moni = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring().booleanValue(): false;
 		PublishEventLevel elm = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring(): null;
@@ -616,7 +616,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			getInternalAccess(), getComponentAdapter(), service, null,
 			type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,
 			null, isCopy(), isRealtime(),
-			getModel().getResourceIdentifier(), moni, null, null);
+			getModel().getResourceIdentifier(), moni, info, null, null);
 		
 		return is;
 	}
@@ -1416,7 +1416,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), 
-			isRealtime(), getModel().getResourceIdentifier(), moni, componentfetcher, info!=null? info.getScope(): null);
+			isRealtime(), getModel().getResourceIdentifier(), moni, info, componentfetcher, info!=null? info.getScope(): null);
 		getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
 		{
 			public void customResultAvailable(Void result)
