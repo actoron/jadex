@@ -166,6 +166,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer, IServ
 		{
 			public void customResultAvailable(final Collection<Class<?>> servicetypes)
 			{
+				// Services are available per default for subcomponents even if not inited
 //				// Hack!!! Must make cms available before init for bootstrapping of service container of platform
 //				if(started && (service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IComponentManagementService")!=-1
 //					|| service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IMessageService")!=-1))
