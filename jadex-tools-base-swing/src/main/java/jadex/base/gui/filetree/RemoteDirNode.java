@@ -113,12 +113,25 @@ public class RemoteDirNode extends RemoteFileNode
 		    	
 		    	if(rjfentries.size()>0)
 		    	{
-//		    		RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
-//						FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
-		    		RemoteJarFile rjf = new RemoteJarFile(file.getFilename(), null, true, 
-						null, rjfentries, "/", 0, File.separatorChar, 0, rjfentries.size());
-					files = rjf.listFiles();
-					System.out.println("size is: "+files.size());
+		    		if(rjfentries.keySet().size()==1)
+		    		{
+		    			files = new ArrayList<FileData>();
+		    			String v = rjfentries.keySet().iterator().next();
+			    		for(FileData jf: rjfentries.get(v))
+			    		{
+			    			files.add(jf);
+			    		}
+		    		}
+		    		else
+		    		{
+//			    		RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
+//							FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
+			    		RemoteJarFile rjf = new RemoteJarFile(file.getFilename(), null, true, 
+							null, rjfentries, "/", 0, File.separatorChar, 0, rjfentries.size());
+						files = rjf.listFiles();
+		    		}
+		    		rjfentries = null;
+//					System.out.println("size is: "+files.size());
 		    	}
 		    	else if(entries.size()>0)
 		    	{

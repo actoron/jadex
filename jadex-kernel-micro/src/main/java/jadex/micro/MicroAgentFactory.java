@@ -116,7 +116,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		this.provider = (IServiceProvider)component.getServiceContainer();
 		this.providerid = provider.getId();
-		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
+		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null);
 		return startService();
 	}
 	
@@ -376,7 +376,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			try
 			{
 				ret.setResult(ICON.getData());
-				System.out.println("icon for micro: "+ICON.getData().length);
+//				System.out.println("icon for micro: "+ICON.getData().length);
 			}
 			catch(IOException e)
 			{
@@ -386,7 +386,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		}
 		else
 		{
-			System.out.println("not found: "+type);
+//			System.out.println("not found: "+type);
 			ret.setResult(null);
 		}
 		

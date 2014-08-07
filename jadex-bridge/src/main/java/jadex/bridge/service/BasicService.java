@@ -318,9 +318,9 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type)
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope)
 	{
-		this.sid = createServiceIdentifier(providerid, name, type, implclazz, rid);
+		this.sid = createServiceIdentifier(providerid, name, type, implclazz, rid, scope);
 	}
 	
 	/**
@@ -492,9 +492,9 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	 *  @return A service identifier.
 	 */
 	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
-		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid)
+		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope)
 	{
-		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid);
+		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid, scope);
 	}
 	
 	/**

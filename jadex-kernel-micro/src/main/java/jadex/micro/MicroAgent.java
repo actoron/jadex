@@ -746,7 +746,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture<Void>	addService(String name, Class<?> type, Object service, PublishInfo pi)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, pi, null): null;
+		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, null, pi, null): null;
 		IFuture<IInternalService> fut = interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi, interpreter.getComponentFetcher());
 		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
 		{

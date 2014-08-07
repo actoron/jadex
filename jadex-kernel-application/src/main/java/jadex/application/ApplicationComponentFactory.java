@@ -139,7 +139,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	{
 		this.provider = (IServiceProvider)component.getServiceContainer();
 		this.providerid = provider.getId();
-		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
+		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null);
 		return startService();
 	}
 	

@@ -112,4 +112,15 @@ public class RemoteJarFile extends FileData
 		return ret;
 //		return relativpath==null? null: relativpath.substring(1);
 	}
+	
+	/**
+	 *  Test if the jar is already resolved, ie.
+	 *  remote call has been performed.
+	 */
+	public boolean isResolved()
+	{
+		return jarentries!=null;
+	}
+	
+	
 }

@@ -37,12 +37,17 @@ public class JarAsDirectory	extends File
 
 	/** The entry. */
 	protected ZipEntry	entry;
+	protected String entrystr;
+	protected Boolean dir;
 	
 	/** The subentries contained in the entry. */
-	protected File[]	entries;
+	protected File[] entries;
 	
 	/** The files for the entry paths (cached for easy access). */
 	protected Map	entryfiles;
+	
+	/** The refresh flag (normally only for root jar file but in remote case also for entries (partial jars). */
+	protected boolean refresh;
 	
 	//-------- constructors -------- 
 	
@@ -53,6 +58,19 @@ public class JarAsDirectory	extends File
 	{
 		super(jarpath);
 		this.jarpath	= jarpath;
+		this.lastmodified	= Long.MIN_VALUE;
+	}
+	
+	/**
+	 *  Create a directory representation of a jar file entry.
+	 */
+	public JarAsDirectory(String jarpath, String entrystr, boolean dir, boolean refresh)
+	{
+		super(jarpath+"!/"+entrystr);
+		this.jarpath	= jarpath;
+		this.entrystr	= entrystr;
+		this.refresh = refresh;
+		this.dir = dir? Boolean.TRUE: Boolean.FALSE;
 		this.lastmodified	= Long.MIN_VALUE;
 	}
 	
@@ -72,7 +90,7 @@ public class JarAsDirectory	extends File
 	public boolean isDirectory()
 	{
 //		System.out.println("is directory: "+entry+", "+(entry==null || entry.isDirectory()));
-		return entry==null || entry.isDirectory();
+		return dir!=null? dir.booleanValue(): entry==null || entry.isDirectory();
 	}
 	
 	public File[] listFiles(FileFilter filter)
@@ -163,10 +181,10 @@ public class JarAsDirectory	extends File
 			jarurl	= "file:"+jarpath.replace('\\', '/');
 		}
 		
-		if(entry!=null)
+		if(getEntryName()!=null)
 		{
 //			if(jarpath.startsWith("/"))
-				ret	= "jar:"+jarurl+"!/"+entry.getName();
+				ret	= "jar:"+jarurl+"!/"+getEntryName();
 //			else
 //				ret	= "jar:file:/"+jarname+"!/"+entry.getName();
 		}
@@ -182,6 +200,9 @@ public class JarAsDirectory	extends File
 		return ret;
 	}
 	
+	/**
+	 * 
+	 */
 	public long lastModified()
 	{
 		return entry==null ? lastmodified : entry.getTime();
@@ -196,7 +217,7 @@ public class JarAsDirectory	extends File
 	{
 		boolean	changed	= false;
 		// Only the root node needs to be refreshed.
-		if(entry==null && new File(jarpath).lastModified()>lastmodified)
+		if(isRefresh() && new File(jarpath).lastModified()>lastmodified)
 		{
 			changed	= true;
 			this.lastmodified	= new File(jarpath).lastModified();
@@ -284,8 +305,9 @@ public class JarAsDirectory	extends File
 //			}
 //			else
 //			{
-//				e.printStackTrace();
+				e.printStackTrace();
 //			}
+			System.out.println("Failed to open jar: "+e);
 		}
 		
 		// Necessary, otherwise file cannot be deleted.
@@ -325,7 +347,7 @@ public class JarAsDirectory	extends File
 			ret[i]	= new JarAsDirectory(jarpath, entry);
 			if(ret[i].isDirectory())
 			{
-				ret[i].entries	= createFiles(ret[i].entry.getName(), entries);
+				ret[i].entries	= createFiles(ret[i].getEntryName(), entries);
 			}
 			entryfiles.put(entry.getName(), ret[i]);
 		}
@@ -358,6 +380,9 @@ public class JarAsDirectory	extends File
 		if(entryfiles==null)
 			refresh();
 		
+		if(entryfiles==null)
+			System.out.println("gdfsdfhjsdfjk");
+		
 		return (File)entryfiles.get(path);
 	}
 
@@ -375,7 +400,7 @@ public class JarAsDirectory	extends File
 	 */
 	public boolean isRoot()
 	{
-		return entry==null;
+		return getEntryName()==null;
 	}
 
 	/**
@@ -386,4 +411,37 @@ public class JarAsDirectory	extends File
 	{
 		return lastmodified;
 	}
+	
+	/**
+	 * 
+	 */
+	public String getEntryName()
+	{
+		return entry!=null? entry.getName(): entrystr;
+	}
+	
+	/**
+	 *  Test if jar should refresh its content.
+	 *  Normally only root jar reads entries and entries already contain their children.
+	 */
+	protected boolean isRefresh()
+	{
+		return refresh? true: getEntryName()==null;
+	}
+	
+//	/**
+//	 * 
+//	 */
+//	protected static String jarifyPath(String path, String file)
+//	{
+//		if(!path.startsWith("jar:file:"))
+//			path = "jar:file:"+path;
+//		if(!path.endsWith("!/") && !path.endsWith("!"))
+//			path = path+"!/";
+//		if(file!=null && !"/".equals(file))
+//		{
+//			path = path+file;
+//		}
+//		return path;
+//	}
 }
