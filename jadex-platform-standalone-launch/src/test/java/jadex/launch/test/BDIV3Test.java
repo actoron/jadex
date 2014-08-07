@@ -22,10 +22,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 	}
 
 	/**
-	 * Constructor
-	 * @param path
-	 * @param root
-	 * @throws Exception
+	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
 	public BDIV3Test(String path, String root)	throws Exception
 	{
@@ -46,6 +43,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 				"CollectorBDI",	// sub agent
 				"3d",	// OpenGL problems on termination?
 				"CreationBDI",	// should only be run as separate benchmark,
+				"WorkpieceBDI",
 				SReflect.isAndroid() ? "GuiBDI" : NOEXCLUDE
 			});
 	}

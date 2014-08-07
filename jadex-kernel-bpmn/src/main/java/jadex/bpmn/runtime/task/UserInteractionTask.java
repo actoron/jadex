@@ -1,6 +1,8 @@
 package jadex.bpmn.runtime.task;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
@@ -100,25 +102,20 @@ public class UserInteractionTask implements ITask
 		final int VALUE	= 2;
 		final int DIRECTION	= 3;
 		final int NEWVALUE	= 4;
-		final List<Object[]>	lparameters = new ArrayList<Object[]>();
 		
-		IndexMap<String, MParameter>	parameters	= task.getParameters();
-		if(parameters!=null)
+		IndexMap<String, MParameter> parameters	= task.getParameters();
+		MIdElement pa = task;
+		MBpmnModel model = context.getBpmnModel();
+		while(pa!=null && (parameters==null || parameters.size()==0))
 		{
-			for(MParameter param: parameters.values())
+			pa = model.getParent(pa);
+			if(pa instanceof MActivity)
 			{
-				Object	value	= context.getParameterValue(param.getName());
-				Class<?>	clazz	= param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports());
-				lparameters.add(new Object[]
-				{
-					param.getName(),
-					clazz,
-					value,
-					param.getDirection(),
-					value
-				});
+				parameters = ((MActivity)pa).getParameters();
 			}
 		}
+		
+		final List<Object[]> lparameters = parameters!=null && parameters.size()>0? extractParams(context, instance, parameters): null;
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -127,7 +124,7 @@ public class UserInteractionTask implements ITask
 				final JOptionPane	pane;
 				JComponent	message;
 				
-				if(!lparameters.isEmpty())
+				if(lparameters!=null && !lparameters.isEmpty())
 				{
 					Insets	insets	= new Insets(2,2,2,2);
 					message	= new JPanel(new GridBagLayout());
@@ -172,9 +169,10 @@ public class UserInteractionTask implements ITask
 							{
 								tf.addKeyListener(new KeyAdapter()
 								{
-									public void keyPressed(KeyEvent e)
+									public void keyReleased(KeyEvent e)
 									{
 										param[NEWVALUE]	= tf.getText();
+//										System.out.println("setting: "+tf.getText());
 									}
 								});
 							}
@@ -238,37 +236,40 @@ public class UserInteractionTask implements ITask
 			                else
 			                {
 			                	// Write changed value, if any.
-			                	for(Object[] param: lparameters)
+			                	if(lparameters!=null)
 			                	{
-			                		if(!SUtil.equals(param[VALUE], param[NEWVALUE]))
-			                		{
-			                			if(param[NEWVALUE] instanceof String)
-			                			{
-											try
-											{
-												// Todo: access thread context for imports etc.!?
-												IParsedExpression	pex	= new JavaCCExpressionParser().parseExpression((String)param[NEWVALUE], null, null, null);
-												context.setParameterValue((String)param[NAME], pex.getValue(null));
-											}
-											catch(Exception ex)
-											{
-												// Hack!!! Fallback: if no expression entered for string, use value directly.
-												if(param[TYPE].equals(String.class))
+				                	for(Object[] param: lparameters)
+				                	{
+				                		if(!SUtil.equals(param[VALUE], param[NEWVALUE]))
+				                		{
+				                			if(param[NEWVALUE] instanceof String)
+				                			{
+												try
 												{
-													context.setParameterValue((String)param[NAME], param[NEWVALUE]);
+													// Todo: access thread context for imports etc.!?
+													IParsedExpression	pex	= new JavaCCExpressionParser().parseExpression((String)param[NEWVALUE], null, null, null);
+	//												System.out.println("setPVal: "+param[NAME]+" "+pex.getValue(null));
+													context.setParameterValue((String)param[NAME], pex.getValue(null));
 												}
-												else
+												catch(Exception ex)
 												{
-													ex.printStackTrace();
+													// Hack!!! Fallback: if no expression entered for string, use value directly.
+													if(param[TYPE].equals(String.class))
+													{
+														context.setParameterValue((String)param[NAME], param[NEWVALUE]);
+													}
+													else
+													{
+														ex.printStackTrace();
+													}
 												}
-											}
-			                			}
-			                			else
-			                			{
-											context.setParameterValue((String)param[NAME], param[NEWVALUE]);
-			                				
-			                			}
-			                		}
+				                			}
+				                			else
+				                			{
+												context.setParameterValue((String)param[NAME], param[NEWVALUE]);
+				                			}
+				                		}
+				                	}
 			                	}
 			                	
 			                	ret.setResultIfUndone(null);
@@ -297,10 +298,37 @@ public class UserInteractionTask implements ITask
 		{
 			public void run()
 			{
-				dialog.dispose();
+				if(dialog!=null)
+				{
+					dialog.dispose();
+				}
 				ret.setResult(null);
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected List<Object[]> extractParams(ITaskContext context, IInternalAccess instance, IndexMap<String, MParameter> parameters)
+	{
+		final List<Object[]> lparameters = new ArrayList<Object[]>();
+		
+		for(MParameter param: parameters.values())
+		{
+			Object	value	= context.getParameterValue(param.getName());
+			Class<?>	clazz	= param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports());
+			lparameters.add(new Object[]
+			{
+				param.getName(),
+				clazz,
+				value,
+				param.getDirection(),
+				value
+			});
+		}
+		
+		return lparameters;
 	}
 }

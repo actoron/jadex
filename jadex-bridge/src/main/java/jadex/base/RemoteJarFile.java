@@ -95,4 +95,32 @@ public class RemoteJarFile extends FileData
 		this.relativepath = relativepath;
 	}
 	
+	/**
+	 *  Get path name.
+	 */
+	public String getPathName()
+	{
+		String ret = null;
+		if(relativepath!=null)
+		{
+			int idx = relativepath.lastIndexOf("/");
+			if(idx!=-1)
+			{
+				ret = relativepath.substring(0, idx);
+			}
+		}
+		return ret;
+//		return relativpath==null? null: relativpath.substring(1);
+	}
+	
+	/**
+	 *  Test if the jar is already resolved, ie.
+	 *  remote call has been performed.
+	 */
+	public boolean isResolved()
+	{
+		return jarentries!=null;
+	}
+	
+	
 }

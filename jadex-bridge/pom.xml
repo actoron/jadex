@@ -17,44 +17,6 @@
 		interfaces and classes for active components and 
 		their management.  
 	</description>
-	
-	<!--
-	<properties>
-	    <timestamp>${maven.build.timestamp}</timestamp>
-	    <maven.build.timestamp.format>yyyyMMdd.HHmmss</maven.build.timestamp.format>
-	</properties>
-	
-	<build>
-	    <!- - Filter the version.properties file but nothing else - ->
-	    <resources>
-	        <resource>
-	            <directory>
-					src/main/java
-				</directory>
-				<filtering>
-					true
-				</filtering>
-				<includes>
-					<include>
-						jadex/bridge/version.properties
-					</include>
-				</includes>
-			</resource>
-	        <resource>
-	            <directory>
-					src/main/java
-				</directory>
-				<filtering>
-					false
-				</filtering>
-				<excludes>
-					<exclude>
-						jadex/bridge/version.properties
-					</exclude>
-				</excludes>
-			</resource>
-		</resources>    
-	</build> -->
 
 	<dependencies>
 		<dependency>
@@ -79,9 +41,11 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>provided</scope>	<!-- Hack!!! don't want to depend on junit. only needed when doing tests, so should be there anyways. -->
+			<!-- <version>3.8.1</version> -->
+			<version>4.11</version>
+			<!-- <scope>test</scope>-->
 		</dependency>
+		<!-- Hack!!! don't want to depend on junit. only needed when doing tests, so should be there anyways. -->
 		
 		<!--
 			<dependency> <groupId>stax</groupId> <artifactId>stax</artifactId>

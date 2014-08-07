@@ -1,8 +1,12 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3.annotation.GoalResult;
+import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bridge.ClassInfo;
 import jadex.commons.MethodInfo;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,7 +38,6 @@ public class MGoal extends MClassBasedElement
 	/** Goal recur condition name. */
 	public static final String CONDITION_RECUR = "recur";
 
-
 	
 	/** Never exclude plan candidates from apl. */
 	public static final String EXCLUDE_NEVER = "never";
@@ -62,13 +65,17 @@ public class MGoal extends MClassBasedElement
 	protected long recurdelay;
 	
 	/** The procedual success flag. */
-	protected boolean succeedonpassed;
+	protected boolean orsuccess;
 	
 	/** The unique. */
 	protected boolean unique;
 	
 	/** The deliberation. */
 	protected MDeliberation deliberation;
+	
+	/** The trigger (other goals) if this goal is used as plan. */
+	protected List<ClassInfo> triggergoals;
+	protected List<MGoal> mtriggergoals;
 	
 	/** The pojo result access (field or method). */
 	protected Object pojoresultreadaccess;
@@ -87,24 +94,25 @@ public class MGoal extends MClassBasedElement
 	protected Map<String, MethodInfo> srmappings;
 	
 	/**
-	 *  Create a new belief.
+	 *  Create a new goal model element.
 	 */
 	public MGoal(String name, String target, boolean posttoall, boolean randomselection, String excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
-		boolean succeedonpassed, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
-		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings)
+		boolean orsuccess, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
+		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings, List<ClassInfo> triggergoals)
 	{
 		super(name, target, posttoall, randomselection, excludemode);
 		this.retry = retry;
 		this.recur = recur;
 		this.retrydelay = retrydelay;
 		this.recurdelay = recurdelay;
-		this.succeedonpassed = succeedonpassed;
+		this.orsuccess = orsuccess;
 		this.unique = unique;
 		this.deliberation = deliberation;
 		this.parameters = parameters;
 		this.spmappings = spmappings;
 		this.srmappings = srmappings;
+		this.triggergoals = triggergoals;
 		
 //		System.out.println("create: "+target);
 	}
@@ -146,21 +154,21 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
-	 *  Get the succeed on passed.
-	 *  @return The succeedonpassed.
+	 *  Get the flag if is or success.
+	 *  @return The or success flag..
 	 */
-	public boolean isSucceedOnPassed()
+	public boolean isOrSuccess()
 	{
-		return succeedonpassed;
+		return orsuccess;
 	}
 
 	/**
-	 *  Set the succeed on passed.
-	 *  @param succeedonpassed The succeedonpassed to set.
+	 *  Set the or success.
+	 *  @param orsuccess The or success flag..
 	 */
-	public void setSucceedOnPassed(boolean succeedonpassed)
+	public void setOrSuccess(boolean orsuccess)
 	{
-		this.succeedonpassed = succeedonpassed;
+		this.orsuccess = orsuccess;
 	}
 
 	/**
@@ -330,6 +338,50 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
+	 *  Create a pojo goal instance.
+	 */
+	public Object createPojoInstance(BDIAgentInterpreter ip, RGoal parent)
+	{
+		Object ret = null;
+		ClassLoader cl = ip.getClassLoader();
+		Class<?> pojocl = getTargetClass(cl);
+		if(pojocl!=null)
+		{
+			try
+			{
+				Constructor<?> c = pojocl.getDeclaredConstructor(new Class[0]);
+				ret = c.newInstance(new Object[0]);
+			}
+			catch(Exception e)
+			{
+				// Find constrcutor with smallest footprint
+				Constructor<?> sc = null;
+				Constructor<?>[] cs = pojocl.getDeclaredConstructors();
+				for(Constructor<?> c: cs)
+				{
+					if(sc==null || c.getParameterTypes().length<sc.getParameterTypes().length)
+					{
+						sc = c;
+					}
+				}
+				if(sc!=null)
+				{
+					try
+					{
+						Object[] pvals = ip.getInjectionValues(sc.getParameterTypes(), null, this, null, null, parent);
+						ret = sc.newInstance(pvals);
+					}
+					catch(Exception ex)
+					{
+						throw new RuntimeException(ex);
+					}
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Add a condition to the goal.
 	 */
 	public void addCondition(String type, MCondition cond)
@@ -436,7 +488,7 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
-	 * 
+	 *  Get the service result mapping.
 	 */
 	public MethodInfo getServiceResultMapping(String name)
 	{
@@ -460,5 +512,46 @@ public class MGoal extends MClassBasedElement
 	{
 		return srmappings;
 	}
+
+	/**
+	 *  Get the triggergoals.
+	 *  @return The triggergoals.
+	 */
+	public List<ClassInfo> getTriggerGoals()
+	{
+		return triggergoals;
+	}
+
+	/**
+	 *  Set the triggergoals.
+	 *  @param triggergoals The triggergoals to set.
+	 */
+	public void setTriggerGoals(List<ClassInfo> triggergoals)
+	{
+		this.triggergoals = triggergoals;
+	}
 	
+	/**
+	 *  Get the triggergoals.
+	 *  @return The triggergoals.
+	 */
+	public List<MGoal> getTriggerMGoals(MCapability mcapa)
+	{
+		if(mtriggergoals==null && triggergoals!=null)
+		{
+			mtriggergoals = new ArrayList<MGoal>();
+			
+			for(ClassInfo cl: triggergoals)
+			{
+				MGoal mgoal = mcapa.getGoal(cl.getTypeName());
+				if(mgoal==null)
+				{
+					throw new RuntimeException("Goal not for for pojo class: "+cl);
+				}
+				mtriggergoals.add(mgoal);
+			}
+		}
+		
+		return mtriggergoals;
+	}
 }

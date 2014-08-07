@@ -65,8 +65,8 @@ public class AndroidLibraryService extends LibraryService
 	{
 		DelegationURLClassLoader result;
 		Logger.d("Creating new delegation ClassLoader for: " + rid);
-		if (rid.getLocalIdentifier().getUrl().getPath().endsWith("apk")) {
-			String path = SUtil.androidUtils().apkPathFromUrl(rid.getLocalIdentifier().getUrl());
+		if (rid.getLocalIdentifier().getUri().getPath().endsWith("apk")) {
+			String path = SUtil.androidUtils().apkPathFromUrl(SUtil.toURL(rid.getLocalIdentifier().getUri()));
 			ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(path);
 			result = new DexDelegationClassLoader(rid, baseloader, cl);
 		} else {

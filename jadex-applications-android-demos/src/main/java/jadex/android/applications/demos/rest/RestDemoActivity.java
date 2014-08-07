@@ -7,6 +7,7 @@ import jadex.android.applications.demos.rest.view.RestImageActivity;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 /**
  * This Activity shows a sample REST Service Call beeing executed using Jadex.
  */
+@Reference
 public class RestDemoActivity extends JadexAndroidActivity
 {
 

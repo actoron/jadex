@@ -14,6 +14,7 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
+import jadex.micro.PojoMicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -339,4 +340,29 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 		
 		return ret;
 	}
+	
+//	/**
+//	 *  Get parameter values for injection into method and constructor calls.
+//	 */
+//	protected Object[] getInjectionValues(Method method, Object[] args)
+//	{
+//		Object[] tmp = new Object[method.getParameterTypes().length];
+//		if(args!=null)
+//		{
+//			System.arraycopy(args, 0, tmp, 0, args.length);
+//		}
+//		for(int j=args==null? 0: args.length; j<method.getParameterTypes().length; j++)
+//		{
+//			Class<?>	clazz	= method.getParameterTypes()[j];
+//			if(SReflect.isSupertype(clazz, PojoMicroAgent.class))
+//			{
+//				tmp[j]= PojoMicroAgent.this;
+//			}
+//			else if(SReflect.isSupertype(clazz, IExternalAccess.class))
+//			{
+//				tmp[j]= PojoMicroAgent.this.getExternalAccess();
+//			}
+//		}
+//		return tmp;
+//	}
 }

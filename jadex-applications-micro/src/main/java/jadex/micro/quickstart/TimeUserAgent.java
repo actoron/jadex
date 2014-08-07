@@ -1,5 +1,6 @@
 package jadex.micro.quickstart;
 
+import jadex.bridge.service.IService;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -9,8 +10,6 @@ import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-
-import java.util.Date;
 
 /**
  *  Simple agent that uses globally available time services.
@@ -24,7 +23,7 @@ public class TimeUserAgent
 	
 	/** The time services are searched and set at agent startup. */
 	@AgentService
-	IIntermediateFuture<ITimeService>	timeservices;
+	private IIntermediateFuture<ITimeService>	timeservices;
 	
 	//-------- methods --------
 	
@@ -39,15 +38,16 @@ public class TimeUserAgent
 		{
 			public void intermediateResultAvailable(final ITimeService timeservice)
 			{
-				ISubscriptionIntermediateFuture<Date> subscription	= timeservice.subscribe();
-				subscription.addResultListener(new IntermediateDefaultResultListener<Date>()
+				ISubscriptionIntermediateFuture<String> subscription	= timeservice.subscribe();
+				subscription.addResultListener(new IntermediateDefaultResultListener<String>()
 				{
 					/**
 					 *  This method gets called for each received time submission.
 					 */
-					public void intermediateResultAvailable(Date time)
+					public void intermediateResultAvailable(String time)
 					{
-						System.out.println("New time received from "+timeservice.getName()+": "+time);
+						String	platform	= ((IService)timeservice).getServiceIdentifier().getProviderId().getPlatformName();
+						System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
 					}
 				});				
 			}

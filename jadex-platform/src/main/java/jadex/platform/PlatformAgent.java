@@ -76,7 +76,7 @@ import java.util.logging.Level;
 	@Argument(name="chat", clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name="awareness", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="awamechanisms", clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay\""),
+	@Argument(name="awamechanisms", clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay, Local\""),
 	@Argument(name="awadelay", clazz=long.class, defaultvalue="20000"),
 	@Argument(name="awaincludes", clazz=String.class, defaultvalue="\"\""),
 	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\""),
@@ -116,6 +116,10 @@ import java.util.logging.Level;
 	@Argument(name="monitoringcomp", clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name="sensors", clazz=boolean.class, defaultvalue="false"),
+	
+	@Argument(name="threadpoolclass", clazz=String.class, defaultvalue="null"),
+
+	@Argument(name="contextserviceclass", clazz=String.class, defaultvalue="null")
 })
 
 @ComponentTypes({
@@ -141,10 +145,10 @@ import java.util.logging.Level;
 })
 
 @ProvidedServices({
-	@ProvidedService(type=IThreadPoolService.class, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService(new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IDaemonThreadPoolService.class, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService(new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IThreadPoolService.class, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IDaemonThreadPoolService.class, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IMarshalService.class, implementation=@Implementation(expression="new jadex.platform.service.marshal.MarshalService($component.getExternalAccess())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IContextService.class, implementation=@Implementation(expression="jadex.commons.SReflect.isAndroid() ? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()}): jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})")),
+	@ProvidedService(type=IContextService.class, implementation=@Implementation(expression="$args.contextserviceclass!=null ? jadex.commons.SReflect.classForName0($args.contextserviceclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : jadex.commons.SReflect.isAndroid() ? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()}): jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})")),
 	@ProvidedService(type=IExecutionService.class, implementation=@Implementation(expression="	($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(SettingsService.class)),
 	@ProvidedService(type=IDependencyService.class, implementation=@Implementation(expression="$args.maven_dependencies ? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.platform.service.library.BasicDependencyService()")),
@@ -190,14 +194,13 @@ import java.util.logging.Level;
 		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-//		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
+		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
 				@NameValue(name="delay", value="$args.awadelay"),
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
-		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
 			arguments={

@@ -29,7 +29,7 @@ public class CreatePlatformTask implements ITask
 	public IFuture<Void> execute(final ITaskContext context, IInternalAccess process)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
+		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUri().toString();
 		
 		Starter.createPlatform(new String[]{"-platformname", process.getComponentIdentifier().getPlatformPrefix()+"_*",
 //			"-logging", "true",

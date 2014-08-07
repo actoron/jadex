@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.search.SServiceProvider;
@@ -38,8 +39,14 @@ public class ComponentStartTest extends	TestCase
 	/** The component management system. */
 	protected IComponentManagementService	cms;
 	
-	/** The component. */
-	protected IModelInfo	comp;
+	/** The component model. */
+	protected String	filename;
+	
+	/** The component resource identifier. */
+	protected IResourceIdentifier	rid;
+	
+	/** The component full name. */
+	protected String	fullname;
 	
 	/** The test suite. */
 	protected ComponentTestSuite	suite;
@@ -52,7 +59,9 @@ public class ComponentStartTest extends	TestCase
 	public ComponentStartTest(IComponentManagementService cms, IModelInfo comp, ComponentTestSuite suite)
 	{
 		this.cms	= cms;
-		this.comp	= comp;
+		this.filename	= comp.getFilename();
+		this.rid	= comp.getResourceIdentifier();
+		this.fullname	= comp.getFullName();
 		this.suite	= suite;
 	}
 	
@@ -76,7 +85,15 @@ public class ComponentStartTest extends	TestCase
 			return;
 		}
 		
-		result.startTest(this);
+		try
+		{
+			result.startTest(this);
+		}
+		catch(IllegalStateException e)
+		{
+			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
+			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
+		}
 		
 		// Start the component.
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
@@ -84,7 +101,7 @@ public class ComponentStartTest extends	TestCase
 		{
 //			System.out.println("starting: "+comp.getFilename());
 			Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
-			final IComponentIdentifier	cid	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), 
+			final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
 				new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
 			try
 			{
@@ -148,7 +165,6 @@ public class ComponentStartTest extends	TestCase
 
 		// Remove references to Jadex resources to aid GC cleanup.
 		cms	= null;
-		comp	= null;
 		suite	= null;
 	}
 	
@@ -201,7 +217,7 @@ public class ComponentStartTest extends	TestCase
 	 */
 	public String toString()
 	{
-		return "start: "+comp.getFullName();
+		return "start: "+fullname;
 	}	
 	
 	/**

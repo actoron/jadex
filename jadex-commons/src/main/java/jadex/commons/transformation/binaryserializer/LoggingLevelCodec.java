@@ -42,13 +42,13 @@ public class LoggingLevelCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
 		Level ret = null;
 		
 		// Check if default level
 		if (context.readBoolean())
-			ret = DEFAULT_LEVELS[context.read(1)[0] & 0xFF];
+			ret = DEFAULT_LEVELS[context.readByte() & 0xFF];
 		else
 		{
 			// Subclassed Level object
@@ -87,7 +87,7 @@ public class LoggingLevelCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		Level level = (Level) object;
 		int id = 0;

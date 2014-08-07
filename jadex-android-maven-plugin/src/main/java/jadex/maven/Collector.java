@@ -7,10 +7,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.sisu.space.asm.Opcodes;
-import org.kohsuke.asm4.ClassReader;
-import org.kohsuke.asm4.ClassVisitor;
-import org.kohsuke.asm4.commons.Remapper;
-import org.kohsuke.asm4.commons.RemappingClassAdapter;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.commons.Remapper;
+import org.objectweb.asm.commons.RemappingClassAdapter;
 
 public class Collector extends Remapper{
 

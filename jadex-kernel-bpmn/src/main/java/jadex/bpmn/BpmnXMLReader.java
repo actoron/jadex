@@ -15,6 +15,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -58,10 +59,14 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
-import jadex.xml.reader.IObjectReaderHandler;
-import jadex.xml.reader.AReader;
+import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.AReadContext;
+import jadex.xml.reader.AReader;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.XMLReaderFactory;
+import jadex.xml.stax.ILocation;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.XMLReporter;
 
 import java.io.File;
 import java.net.URL;
@@ -76,9 +81,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import jadex.xml.stax.QName;
-import jadex.xml.stax.ILocation;
-import jadex.xml.stax.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 
 /**
@@ -401,14 +403,32 @@ public class BpmnXMLReader
 					return type.endsWith("Activity");
 				}
 			}), 
-			new ObjectInfo(MActivity.class, new ActivityPostProcessor()),
+//			new ObjectInfo(MActivity.class, new ActivityPostProcessor()),
+			new ObjectInfo(new IBeanObjectCreator()
+			{
+				public Object createObject(IContext context, Map rawattributes)
+						throws Exception
+				{
+					MActivity ret = null;
+					Object at = rawattributes.get("activityType");
+					if (at == null || MTask.TASK.equals(at))
+					{
+						ret = new MTask();
+					}
+					else
+					{
+						ret = new MActivity();
+					}
+					return ret;
+				}
+			}, new ActivityPostProcessor()),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("name", "description")),
 			new AttributeInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new AttributeInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
 			new AttributeInfo(new AccessInfo("lanes", "laneDescription")),
 			new AttributeInfo(new AccessInfo("associations", "associationsDescription")),
-			new AttributeInfo(new AccessInfo("activityType", "activityType", null, MBpmnModel.TASK)),
+//			new AttributeInfo(new AccessInfo("activityType", "activityType", null, MBpmnModel.TASK)),
 			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			},
 			new SubobjectInfo[]{
@@ -1652,7 +1672,7 @@ public class BpmnXMLReader
 							}
 							
 							// todo: support publish
-							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null);
+							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null, null, null);
 							mi.addProvidedService(psi);
 							
 							if(table.getRowSize()>4)
@@ -1681,7 +1701,7 @@ public class BpmnXMLReader
 											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
 										}
 										// todo: support publish
-										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null));
+										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null, null, null));
 									}
 								}
 							}

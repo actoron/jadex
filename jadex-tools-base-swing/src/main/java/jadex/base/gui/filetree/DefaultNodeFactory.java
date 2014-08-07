@@ -1,5 +1,6 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.RemoteJarFile;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
@@ -45,13 +46,14 @@ public abstract class DefaultNodeFactory implements INodeFactory
 		else if(value instanceof FileData)
 		{
 			FileData file = (FileData)value;
-			if(file.isDirectory())
-			{
-				ret = new RemoteDirNode(parent, model, tree, file, iconcache, exta, factory);
-			}
-			else if(file.getFilename().endsWith(".jar") || file.getFilename().endsWith(".zip"))
+			if(file instanceof RemoteJarFile //&& ((RemoteJarFile)file).isDirectory()) 
+				|| file.getFilename().endsWith(".jar") || file.getFilename().endsWith(".zip"))
 			{
 				ret = new RemoteJarNode(parent, model, tree, file, iconcache, exta, factory);
+			}
+			else if(file.isDirectory())
+			{
+				ret = new RemoteDirNode(parent, model, tree, file, iconcache, exta, factory);
 			}
 			else
 			{

@@ -13,19 +13,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.kohsuke.asm4.Opcodes;
-import org.kohsuke.asm4.Type;
-import org.kohsuke.asm4.tree.AnnotationNode;
-import org.kohsuke.asm4.tree.ClassNode;
-import org.kohsuke.asm4.tree.FieldInsnNode;
-import org.kohsuke.asm4.tree.FieldNode;
-import org.kohsuke.asm4.tree.InnerClassNode;
-import org.kohsuke.asm4.tree.InsnList;
-import org.kohsuke.asm4.tree.InsnNode;
-import org.kohsuke.asm4.tree.MethodInsnNode;
-import org.kohsuke.asm4.tree.MethodNode;
-import org.kohsuke.asm4.tree.TypeInsnNode;
-import org.kohsuke.asm4.tree.VarInsnNode;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InnerClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 
 /**
@@ -53,7 +53,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		boolean	planclass	= isPlanClass(cn);
 		// Check method for array store access of beliefs and replace with
 		// static method call
-		MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
+		MethodNode[] mths = (MethodNode[])cn.methods.toArray(new MethodNode[0]);
 
 		for(MethodNode mn : mths)
 		{

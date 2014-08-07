@@ -59,8 +59,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -337,7 +336,8 @@ public class VisualProcessViewPanel extends JPanel
 							// Double click on element toggles breakpoint
 							if(sels.size()==0 && e.getClickCount()==2 && elem.getBpmnElement() instanceof MActivity)
 							{
-								toggleBreakPoint(((MActivity)elem.getBpmnElement()).getBreakpointId());
+//								toggleBreakPoint(((MActivity)elem.getBpmnElement()).getBreakpointId());
+								toggleBreakPoint(((MActivity)elem.getBpmnElement()).getId());
 							}
 						}
 					}
@@ -489,11 +489,14 @@ public class VisualProcessViewPanel extends JPanel
 					Future<String>	ret	= new Future<String>();
 					try
 					{
-						File f	= new File(ia.getModel().getFilename());
-						String	content	= new Scanner(f, "UTF-8").useDelimiter("\\Z").next();
+						InputStream	is	= SUtil.getResource(ia.getModel().getFilename(), ia.getClassLoader());
+						Scanner	s	= new Scanner(is, "UTF-8");
+						s.useDelimiter("\\Z");
+						String	content	= s.next(); 
+						s.close();
 						ret.setResult(content);
 					}
-					catch(FileNotFoundException fnfe)
+					catch(Exception fnfe)
 					{
 						ret.setException(fnfe);
 					}
@@ -1084,7 +1087,7 @@ public class VisualProcessViewPanel extends JPanel
 		return ret;
 	}
 	
-	 /**
+	/**
      *  Find the velement of the graph that fits to the bpmn id.
      *  @param cell The start cell.
      *  @param brpid The activity id.
@@ -1096,7 +1099,8 @@ public class VisualProcessViewPanel extends JPanel
     	if(cell instanceof VElement)
 		{
 			VElement ve = (VElement)cell;
-			if(ve.getBpmnElement() instanceof MActivity && ((MActivity)ve.getBpmnElement()).getBreakpointId().equals(brpid))
+//			if(ve.getBpmnElement() instanceof MActivity && ((MActivity)ve.getBpmnElement()).getBreakpointId().equals(brpid))
+			if(ve.getBpmnElement() instanceof MActivity && ((MActivity)ve.getBpmnElement()).getId().equals(brpid))
 			{
 				ret = ve;
 			}

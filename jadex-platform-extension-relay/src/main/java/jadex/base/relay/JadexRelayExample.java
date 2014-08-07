@@ -2,6 +2,7 @@ package jadex.base.relay;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -26,9 +27,9 @@ public class JadexRelayExample
 		connect(id);
 		
 		// Send a message to self.
-		send(id, "Hello Relay World!".getBytes(Charset.forName("UTF-8")));
+		send(id, "Hello Relay World!".getBytes("UTF-8"));
 
-		send(id, "some more testing...".getBytes(Charset.forName("UTF-8")));
+		send(id, "some more testing...".getBytes("UTF-8"));
 
 		// Wait while received message is printed on receiver thread.
 		Thread.sleep(1000);
@@ -42,7 +43,14 @@ public class JadexRelayExample
 	 */
 	public static void	deliverMessage(byte[] rawmsg)
 	{
-		System.out.println("Message received: "+new String(rawmsg, Charset.forName("UTF-8")));
+		try
+		{
+			System.out.println("Message received: "+new String(rawmsg, "UTF-8"));
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/** The relay server address. */

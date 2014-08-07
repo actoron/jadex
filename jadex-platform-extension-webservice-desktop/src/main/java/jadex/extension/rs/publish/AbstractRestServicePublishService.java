@@ -26,7 +26,6 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -59,8 +58,14 @@ import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.AnnotationMemberValue;
 import javassist.bytecode.annotation.ArrayMemberValue;
 import javassist.bytecode.annotation.BooleanMemberValue;
+import javassist.bytecode.annotation.CharMemberValue;
 import javassist.bytecode.annotation.ClassMemberValue;
+import javassist.bytecode.annotation.DoubleMemberValue;
+import javassist.bytecode.annotation.FloatMemberValue;
+import javassist.bytecode.annotation.IntegerMemberValue;
+import javassist.bytecode.annotation.LongMemberValue;
 import javassist.bytecode.annotation.MemberValue;
+import javassist.bytecode.annotation.ShortMemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
 import javax.inject.Singleton;
@@ -76,9 +81,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -632,43 +634,144 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 				m.getMethodInfo().addAttribute(attr);
 				proxyclazz.addMethod(m);
 						
+				int pcnt = rmi.getParameterTypes().length;
+				Annotation[][] annos = new Annotation[pcnt][];
+				
+				List<List<Tuple2<String, Map<String, Object>>>> aninfs = rmi.getAnnotationInfo();
+				if(aninfs!=null && !aninfs.isEmpty())
+				{
+					ConstPool cp = m.getMethodInfo().getConstPool();
+					
+					for(int k=0; k<annos.length; k++)
+					{
+						List<Tuple2<String, Map<String, Object>>> paninfs = aninfs.get(k);
+						Annotation[] ans = new Annotation[paninfs.size()];
+						annos[k] = ans;
+						
+						for(int l=0; l<paninfs.size(); l++)
+						{
+							Tuple2<String, Map<String, Object>> tup = paninfs.get(l);
+							ans[l] = new Annotation(cp, SJavassist.getCtClass(tup.getFirstEntity(), pool));
+							Map<String, Object> vals = tup.getSecondEntity();
+							for(Map.Entry<String, Object> entry: vals.entrySet())
+							{
+								MemberValue mv = null;
+								if(entry.getValue() instanceof String)
+								{
+									mv = new StringMemberValue((String)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Integer)
+								{
+									mv = new IntegerMemberValue((Integer)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Double)
+								{
+									mv = new DoubleMemberValue((Double)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Float)
+								{
+									mv = new FloatMemberValue((Float)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Boolean)
+								{
+									mv = new BooleanMemberValue((Boolean)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Short)
+								{
+									mv = new ShortMemberValue((Short)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Long)
+								{
+									mv = new LongMemberValue((Long)entry.getValue(), cp);
+								}
+								else if(entry.getValue() instanceof Character)
+								{
+									mv = new CharMemberValue((Character)entry.getValue(), cp);
+								}
+								
+								// todo: support annotations with arrays and annotation types!?
+								
+								if(mv!=null)
+								{
+									ans[l].addMemberValue(entry.getKey(), mv);
+								}
+								else
+								{
+									System.out.println("Annotation member value currently not supported: "+entry.getValue());
+								}
+							}
+						}
+					}
+				}
+								
 				// add @QueryParam if get
 				// this means that each parameter of the method is automatically
 				// mapped to arg0, arg1 etc of the request
 				if(GET.class.equals(rmi.getRestType()))
 				{
-					int pcnt = rmi.getParameterTypes().length;
 					if(pcnt>0)
 					{
-						Annotation[][] annos = new Annotation[pcnt][];
 						ConstPool cp = m.getMethodInfo().getConstPool();
 						for(int k=0; k<annos.length; k++)
 						{
-							Annotation anno = new Annotation(cp, SJavassist.getCtClass(QueryParam.class, pool));
-							anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
-							annos[k] = new Annotation[]{anno};
+							Annotation[] ans = annos[k];
+							boolean hasq = false;
+							for(Annotation an: ans)
+							{
+								if(an.getTypeName().equals(QueryParam.class.getName()))
+								{
+									hasq = true;
+									break;
+								}
+							}
+							
+							if(!hasq)
+							{
+								Annotation anno = new Annotation(cp, SJavassist.getCtClass(QueryParam.class, pool));
+								anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+								Annotation[] newans = new Annotation[ans.length+1];
+								System.arraycopy(ans, 0, newans, 0, ans.length);
+								newans[newans.length-1] = anno;
+								annos[k] = newans;
+							}
 						}
-						SJavassist.addMethodParameterAnnotation(m, annos, pool);
 					}
 				}
 				// add @FormDataParam if post
 				else if(POST.class.equals(rmi.getRestType()))
 				{
-					int pcnt = rmi.getParameterTypes().length;
 					if(pcnt>0)
 					{
-						Annotation[][] annos = new Annotation[pcnt][];
 						ConstPool cp = m.getMethodInfo().getConstPool();
 						for(int k=0; k<annos.length; k++)
 						{
-							Annotation anno = new Annotation(cp, SJavassist.getCtClass(FormDataParam.class, pool));
-							anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
-							annos[k] = new Annotation[]{anno};
+							Annotation[] ans = annos[k];
+							boolean hasq = false;
+							for(Annotation an: ans)
+							{
+								if(an.getTypeName().equals(FormDataParam.class.getName()))
+								{
+									hasq = true;
+									break;
+								}
+							}
+							
+							if(!hasq)
+							{
+								Annotation anno = new Annotation(cp, SJavassist.getCtClass(FormDataParam.class, pool));
+								anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+								Annotation[] newans = new Annotation[ans.length+1];
+								System.arraycopy(ans, 0, newans, 0, ans.length);
+								newans[newans.length-1] = anno;
+								annos[k] = newans;
+							}
 						}
-						SJavassist.addMethodParameterAnnotation(m, annos, pool);
 					}
 				}
-//						System.out.println("m: "+m.getName()+" "+SUtil.arrayToString(m.getParameterTypes()));
+				
+				SJavassist.addMethodParameterAnnotation(m, annos, pool);
+				
+//				System.out.println("m: "+m.getName()+" "+SUtil.arrayToString(m.getParameterTypes()));
 			}
 			
 			// Add the path annotation 
@@ -828,12 +931,15 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			con.connect();
 			if(HttpServletResponse.SC_OK==con.getResponseCode())
 			{
-				JSONObject jo = (JSONObject)JSONValue.parse(con.getInputStream());
-				ret = (Integer)jo.get("leasetime");
-				if(ret==null)
-				{
-					ret = Integer.valueOf(0);
-				}
+				// todo: fixme
+				
+//				JSONObject jo = (JSONObject)JSONValue.parse(con.getInputStream());
+//				ret = (Integer)jo.get("leasetime");
+//				if(ret==null)
+//				{
+//					ret = Integer.valueOf(0);
+//				}
+				ret = 30;
 			}
 		}
 		catch(Exception e)
@@ -1094,22 +1200,31 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			}
 			
 			ret.append("<html>");
+			ret.append("\n");
 			ret.append("<head>");
+			ret.append("\n");
 			ret.append(stylecss);
+			ret.append("\n");
 			ret.append(functionsjs);
+			ret.append("\n");
 	//		ret.append("<script src=\"functions.js\" type=\"text/javascript\"/>");
-			ret.append("<head>");
 			ret.append("</head>");
+			ret.append("\n");
 			ret.append("<body>");
+			ret.append("\n");
 			
 			ret.append("<div class=\"header\">");
+			ret.append("\n");
 			ret.append("<h1>");//Service Info for: ");
 			String ifacename = ((IService)service).getServiceIdentifier().getServiceType().getTypeName();
 			ret.append(SReflect.getUnqualifiedTypeName(ifacename));
 			ret.append("</h1>");
+			ret.append("\n");
 			ret.append("</div>");
+			ret.append("\n");
 
 			ret.append("<div class=\"middle\">");
+			ret.append("\n");
 			
 			UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
 			
@@ -1144,6 +1259,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 						Class<?>[] ptypes = method.getParameterTypes();
 						
 						ret.append("<div class=\"method\">");
+						ret.append("\n");
 						
 						ret.append("<div class=\"methodname\">");
 //						ret.append("<i><b>");
@@ -1162,6 +1278,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 						}
 						ret.append(")");
 						ret.append("</div>");
+						ret.append("\n");
 //						ret.append("</br>");
 						
 						ret.append("<div class=\"restproperties\">");
@@ -1205,17 +1322,21 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 						}
 //						ret.append("</br>");
 						ret.append("</div>");
+						ret.append("\n");
 
 						UriBuilder ub = ui.getBaseUriBuilder();
 						if(path!=null)
 							ub.path(path.value());
-						String link = ub.build((Object[])null).toString();
+//						System.out.println("path1: "+path);
+						String link = ub.build((Map)Collections.EMPTY_MAP).toString();
+//						System.out.println("path2: "+path);
 						
 						if(ptypes.length>0)
 						{
 							ret.append("<div class=\"servicelink\">");
 							ret.append(link);
 							ret.append("</div>");
+							ret.append("\n");
 							
 							// For post set the media type of the arguments.
 							ret.append("<form class=\"arguments\" action=\"").append(link).append("\" method=\"")
@@ -1224,6 +1345,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 							if(restmethod.equals(POST.class))
 								ret.append("onSubmit=\"return extract(this)\"");
 							ret.append(">");
+							ret.append("\n");
 							
 							for(int j=0; j<ptypes.length; j++)
 							{
@@ -1255,25 +1377,30 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 								ret.append("<option>").append(MediaType.TEXT_PLAIN).append("</option>");
 							}
 							ret.append("</select>");
+							ret.append("\n");
 							
 							ret.append("<input type=\"submit\" value=\"invoke\"/>");
 							ret.append("</form>");
+							ret.append("\n");
 						}
 						else
 						{
 							ret.append("<div class=\"servicelink\">");
 							ret.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
 							ret.append("</div>");
+							ret.append("\n");
 						}
 						
 						ret.append("</div>");
+						ret.append("\n");
 					}
 				}
 			}
 			
 			ret.append("</div>");
+			ret.append("\n");
 			
-			ret.append("<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">Jadex Active Components</span> <a class=\"jadexurl\" href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a> </div>");
+			ret.append("<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">Jadex Active Components</span> <a class=\"jadexurl\" href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a> </div>\n");
 		}
 		catch(Exception e)
 		{
@@ -1281,7 +1408,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			throw new RuntimeException(e);
 		}
 		
-		ret.append("</body></html>");
+		ret.append("</body>\n</html>\n");
 
 		return ret.toString();
 	}

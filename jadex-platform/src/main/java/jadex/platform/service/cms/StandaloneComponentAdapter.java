@@ -4,6 +4,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -96,7 +97,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 			// Add to parent and wake up parent.
 			if(parenta==null)
 			{
-				SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService((IServiceProvider)getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(IComponentManagementService cms)
@@ -132,7 +133,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 //			{
 //				System.out.println("exe1");
 //			}
-			SServiceProvider.getService(getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService((IServiceProvider)getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DefaultResultListener<IExecutionService>()
 			{
 				public void resultAvailable(IExecutionService result)

@@ -496,7 +496,7 @@ public class HttpReceiver
 												}
 												catch(Exception e)
 												{
-													log(Level.WARNING, "Relay transport exception when delivering message: "+e+", "+new String(rawmsg, Charset.forName("UTF-8")));
+													log(Level.WARNING, "Relay transport exception when delivering message: "+e+", "+new String(rawmsg, "UTF-8"));
 												}
 											}
 										}

@@ -7,6 +7,7 @@ import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MTask;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Color;
@@ -28,7 +29,7 @@ public class BpmnStylesheetComplexGrayscale extends BpmnStylesheetColor
 	{
 		styles.get(VPool.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#F0F0F0");
 		styles.get(VLane.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#F3F3F3");
-		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK).put(mxConstants.STYLE_FILLCOLOR, "#AAAAAA");
+		styles.get(VActivity.class.getSimpleName() + "_" + MTask.TASK).put(mxConstants.STYLE_FILLCOLOR, "#AAAAAA");
 		styles.get(VOutParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF");
 		styles.get(VInParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF");
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS).put(mxConstants.STYLE_FILLCOLOR, "#AAAAAA");

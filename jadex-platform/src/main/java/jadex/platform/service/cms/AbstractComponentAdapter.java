@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ComponentSuspendable;
@@ -160,7 +161,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		if(clock==null)
 		{
-			SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService((IServiceProvider)getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DefaultResultListener<IClockService>(logger)
 			{
 				public void resultAvailable(IClockService result)
@@ -218,7 +219,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			// todo: problem: loggers can cause memory leaks
 			// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
 			String name = getLoggerName(getComponentIdentifier());
-			logger = LogManager.getLogManager().getLogger(name);
+			
+			
+//			logger = LogManager.getLogManager().getLogger(name);	// Problems on app engine!?
 			
 			// if logger does not already exist, create it
 			if(logger==null)
@@ -228,7 +231,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					logger = Logger.getLogger(name);
 					initLogger(logger);
-					logger = new LoggerWrapper(logger, clock);
+					logger = createLoggerWrapper(logger, clock);
 					//System.out.println(logger.getParent().getLevel());
 				}
 				catch(SecurityException e)
@@ -236,12 +239,31 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					// Hack!!! For applets / webstart use anonymous logger.
 					logger = Logger.getAnonymousLogger();
 					initLogger(logger);
-					logger = new LoggerWrapper(logger, clock);
+					logger = createLoggerWrapper(logger, clock);
 				}
 			}
 		}
 		
 		return logger;
+	}
+
+	/**
+	 *  Cannot use logger wrapper on appengine :-(.
+	 */
+	protected static Logger createLoggerWrapper(Logger logger, IClockService clock)
+	{
+		Logger	ret	= logger;
+		try
+		{
+			Class<?>	lwclass	= SReflect.classForName("jadex.platform.service.cms.LoggerWrapper", AbstractComponentAdapter.class.getClassLoader());
+			ret	= (Logger)lwclass.getConstructor(Logger.class, IClockService.class).newInstance(logger, clock);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
 	}
 
 	/**
@@ -401,7 +423,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		return SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
 		if(cms==null || cms.getException()!=null)
 		{
-			cms	= SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
+			cms	= SServiceProvider.getServiceUpwards((IServiceProvider)getServiceContainer(), IComponentManagementService.class);
 			cms.addResultListener(new IResultListener<IComponentManagementService>()
 			{
 				public void resultAvailable(IComponentManagementService result)
@@ -997,11 +1019,15 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			System.out.println("fatal error: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 //		}
 //		e.printStackTrace();
-		getLogger().info("fatal error: "+getComponentIdentifier()+e.getMessage());
 		if(getComponentIdentifier().getParent()==null)
 		{
-			System.err.println("fatal platform error: "+getComponentIdentifier());
-			e.printStackTrace();
+//			System.err.println("fatal platform error: "+getComponentIdentifier());
+//			e.printStackTrace();
+			getLogger().log(Level.SEVERE, "fatal platform error: "+getComponentIdentifier(), e);
+		}
+		else
+		{
+			getLogger().info("fatal error: "+getComponentIdentifier()+e.getMessage());
 		}
 		
 		// Fatal error!

@@ -24,12 +24,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *  Test if the platforms can be started and terminate correctly.
  */
-public class PlatformsTest extends TestCase
+public class PlatformsTest //extends TestCase
 {
 	// The platforms to test as pairs of componentfactory and model.
 	String[]	PLATFORMS	= new String[]
@@ -44,7 +45,7 @@ public class PlatformsTest extends TestCase
 //		"-logging", "true",
 //		"-debugfutures", "true",
 //		"-nostackcompaction", "true",
-		"-platformname", "testcases",
+		"-platformname", "testcases_*",
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",
@@ -84,6 +85,7 @@ public class PlatformsTest extends TestCase
 	/**
 	 *  Test the platforms.
 	 */
+	@Test
 	public void	testPlatforms()
 	{
 		long timeout = BasicService.getLocalDefaultTimeout();
@@ -177,11 +179,11 @@ public class PlatformsTest extends TestCase
 		for(IArgument defarg: defargs)
 		{
 			IArgument	arg	= model.getArgument(defarg.getName());
-			assertNotNull("Argument not found: "+defarg.getName()+", "+model.getFilename(), arg);
+			Assert.assertNotNull("Argument not found: "+defarg.getName()+", "+model.getFilename(), arg);
 			if(arg!=null)
 			{
 				Class<?>	defclazz	= defarg.getClazz().getType(getClass().getClassLoader(), defmodel.getAllImports());
-				assertEquals("Argument types differ: "+defarg.getName()+", "+model.getFilename(), defclazz,
+				Assert.assertEquals("Argument types differ: "+defarg.getName()+", "+model.getFilename(), defclazz,
 					arg.getClazz().getType(getClass().getClassLoader(), model.getAllImports()));
 				
 				if(!EXCLUDEARGS.contains(defarg.getName()))
@@ -196,11 +198,11 @@ public class PlatformsTest extends TestCase
 		for(IArgument defres: defress)
 		{
 			IArgument	res	= model.getResult(defres.getName());
-			assertNotNull("Result not found: "+defres.getName()+", "+model.getFilename(), res);
+			Assert.assertNotNull("Result not found: "+defres.getName()+", "+model.getFilename(), res);
 			if(res!=null)
 			{
 				Class<?>	defclazz	= defres.getClazz().getType(getClass().getClassLoader(), defmodel.getAllImports());
-				assertEquals("Result types differ: "+defres.getName()+", "+model.getFilename(), defclazz,
+				Assert.assertEquals("Result types differ: "+defres.getName()+", "+model.getFilename(), defclazz,
 					res.getClazz().getType(getClass().getClassLoader(), model.getAllImports()));
 				
 				if(!EXCLUDEARGS.contains(defres.getName()))
@@ -214,7 +216,7 @@ public class PlatformsTest extends TestCase
 		Map<String, Object>	defprops	= defmodel.getProperties();
 		for(String defprop: defprops.keySet())
 		{
-			assertTrue("Property not found: "+defprop+", "+model.getFilename(), model.getProperties().containsKey(defprop));
+			Assert.assertTrue("Property not found: "+defprop+", "+model.getFilename(), model.getProperties().containsKey(defprop));
 			compareValues(defmodel, model, defmodel.getProperties().get(defprop), model.getProperties().get(defprop), defprop, "Property");
 		}
 		
@@ -240,15 +242,15 @@ public class PlatformsTest extends TestCase
 					break;
 				}
 			}
-			assertNotNull("Service not found: "+defpserv.getType().getTypeName()+", "+model.getFilename(), pserv);
+			Assert.assertNotNull("Service not found: "+defpserv.getType().getTypeName()+", "+model.getFilename(), pserv);
 			if(pserv!=null)
 			{
-				assertEquals("Service name differs: "+defpserv.getType().getTypeName()+", "+model.getFilename(), defpserv.getName(), pserv.getName());
+				Assert.assertEquals("Service name differs: "+defpserv.getType().getTypeName()+", "+model.getFilename(), defpserv.getName(), pserv.getName());
 				
 				ProvidedServiceImplementation	defimpl	= defpserv.getImplementation();
 				ProvidedServiceImplementation	impl	= pserv.getImplementation();
 				compareValues(defmodel, model, defimpl, impl, defpserv.getType().getTypeName(), "Service implementation");
-				assertEquals("Service proxy type differs: "+defpserv.getType().getTypeName()+", "+model.getFilename(), defimpl.getProxytype(), impl.getProxytype());
+				Assert.assertEquals("Service proxy type differs: "+defpserv.getType().getTypeName()+", "+model.getFilename(), defimpl.getProxytype(), impl.getProxytype());
 			}
 			
 //			defimpl.getBinding();
@@ -278,19 +280,19 @@ public class PlatformsTest extends TestCase
 		
 		if(defval!=null)
 		{
-			assertNotNull(type+" '"+name+"' has no default value: "+model.getFilename(), val);
+			Assert.assertNotNull(type+" '"+name+"' has no default value: "+model.getFilename(), val);
 			if(defval instanceof UnparsedExpression)
 			{
-				assertTrue(type+" '"+name+"' should be expression (inconsistent model loaders?): "+model.getFilename(), val instanceof UnparsedExpression);
+				Assert.assertTrue(type+" '"+name+"' should be expression (inconsistent model loaders?): "+model.getFilename(), val instanceof UnparsedExpression);
 				
 				defval	= SJavaParser.parseExpression((UnparsedExpression)defval, defmodel.getAllImports(), getClass().getClassLoader());
 				val	= SJavaParser.parseExpression((UnparsedExpression)val, model.getAllImports(), getClass().getClassLoader());
 			}
-			assertEquals(type+" '"+name+"' default value differs: "+model.getFilename(), defval, val);
+			Assert.assertEquals(type+" '"+name+"' default value differs: "+model.getFilename(), defval, val);
 		}
 		else
 		{
-			assertNull(type+" '"+name+"' should have no default value: "+model.getFilename(), val);
+			Assert.assertNull(type+" '"+name+"' should have no default value: "+model.getFilename(), val);
 		}
 	}
 	

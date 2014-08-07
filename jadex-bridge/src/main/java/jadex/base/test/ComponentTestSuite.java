@@ -15,16 +15,12 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.Future;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
-import java.awt.BorderLayout;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -38,10 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -161,11 +155,6 @@ public class ComponentTestSuite extends TestSuite
 		List<String> scanForTestCases = scanForTestCases(root, path);
 		for (String abspath : scanForTestCases)
 		{	
-			if (SReflect.isAndroid()) {
-				// path-style identifier needed for Factories, but android doesn't use a
-				// classical classpath
-				abspath = abspath.replaceAll("\\.", "/") + ".class";
-			}
 			boolean	exclude	= false;
 						
 			for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
@@ -175,15 +164,17 @@ public class ComponentTestSuite extends TestSuite
 			
 			if(!exclude)
 			{
-				if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get(ts)).booleanValue())
+				try
 				{
-//					if(abspath.indexOf("INeg")!=-1)
-//						System.out.println("test");
-					if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get(ts)).booleanValue())
+//					System.out.println("Check: "+abspath);
+					if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get(ts)).booleanValue())
 					{
-//						System.out.println("Building TestCase: " + abspath);
-						try
+//						System.out.println("Loadable: "+abspath);
+//						if(abspath.indexOf("INeg")!=-1)
+//							System.out.println("test");
+						if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get(ts)).booleanValue())
 						{
+//							System.out.println("Startable: "+abspath);
 							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get(ts);
 							boolean istest = false;
 							if(model!=null && model.getReport()==null)
@@ -201,12 +192,14 @@ public class ComponentTestSuite extends TestSuite
 							
 							if(istest)
 							{
+//								System.out.println("Test: "+abspath);
 								ComponentTest test = new ComponentTest(cms, model, this);
 								test.setName(abspath);
 								addTest(test);
 							}
 							else if(model.getReport()!=null)
 							{
+//								System.out.println("Broken: "+abspath);
 								if(broken)
 								{
 									BrokenComponentTest test = new BrokenComponentTest(abspath, model.getReport());
@@ -216,6 +209,7 @@ public class ComponentTestSuite extends TestSuite
 							}
 							else
 							{
+//								System.out.println("Start: "+abspath);
 								if(start)
 								{
 									ComponentStartTest test = new ComponentStartTest(cms, model, this);
@@ -224,31 +218,32 @@ public class ComponentTestSuite extends TestSuite
 								}
 							}
 						}
-						catch(final RuntimeException e)
-						{
-							BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
-							{
-								public String getErrorText()
-								{
-									StringWriter	sw	= new StringWriter();
-									e.printStackTrace(new PrintWriter(sw));
-									return "Error loading model: "+sw.toString();
-								}
-								
-								public String getErrorHTML()
-								{
-									return getErrorText();
-								}
-								
-								public Map<String, String> getDocuments()
-								{
-									return null;
-								}
-							});
-							test.setName(abspath);
-							addTest(test);							
-						}
 					}
+				}
+				catch(final RuntimeException e)
+				{
+//					System.out.println("Exception: "+abspath);
+					BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
+					{
+						public String getErrorText()
+						{
+							StringWriter	sw	= new StringWriter();
+							e.printStackTrace(new PrintWriter(sw));
+							return "Error loading model: "+sw.toString();
+						}
+						
+						public String getErrorHTML()
+						{
+							return getErrorText();
+						}
+						
+						public Map<String, String> getDocuments()
+						{
+							return null;
+						}
+					});
+					test.setName(abspath);
+					addTest(test);
 				}
 			}
 		}
@@ -295,23 +290,41 @@ public class ComponentTestSuite extends TestSuite
 	{
 		List<String> result = new ArrayList<String>();
 		
-		List<File>	todo	= new LinkedList<File>();
-//		if(path.toString().indexOf("micro")!=-1)
-		todo.add(path);
-		
 		if (SReflect.isAndroid())
 		{
 			try
 			{
+				// Scan for resource files in .apk
+				String	template	= path.toString().replace('.', '/');
+				ZipFile	zip	= new ZipFile(root);
+				Enumeration< ? extends ZipEntry>	entries	= zip.entries();
+				while(entries.hasMoreElements())
+				{
+					ZipEntry	entry	= entries.nextElement();
+					String name	= entry.getName();
+					if(name.startsWith(template))
+					{
+						result.add(name);
+//						System.out.println("Found potential Testcase: "+name);
+					}
+				}
+				zip.close();
+				
+				// Scan for classes in .dex
 				Enumeration<String> dexEntries = SUtil.androidUtils().getDexEntries(root);
 				String nextElement;
-				while (dexEntries.hasMoreElements()) {
+				while(dexEntries.hasMoreElements())
+				{
 					nextElement = dexEntries.nextElement();
-					if (nextElement.toLowerCase().startsWith(path.toString().toLowerCase())) {
-//							&& nextElement.toLowerCase().split("\\.").length  (path.toString().split("\\.").length +1)) {
-						if (!nextElement.matches(".*\\$.*")) {
+					if(nextElement.toLowerCase().startsWith(path.toString().toLowerCase()))
+//						&& nextElement.toLowerCase().split("\\.").length  (path.toString().split("\\.").length +1))
+					{
+						if(!nextElement.matches(".*\\$.*"))
+						{
+							// path-style identifier needed for Factories, but android doesn't use a classical classpath
+							nextElement = nextElement.replaceAll("\\.", "/") + ".class";
 							result.add(nextElement);
-							System.out.println("Found potential Testcase: " + nextElement);
+//							System.out.println("Found potential Testcase: " + nextElement);
 						}
 					}
 				}
@@ -324,6 +337,10 @@ public class ComponentTestSuite extends TestSuite
 		}
 		else
 		{
+			List<File>	todo	= new LinkedList<File>();
+//			if(path.toString().indexOf("micro")!=-1)
+			todo.add(path);
+			
 			while(!todo.isEmpty())
 			{
 				File	file	= (File)todo.remove(0);
@@ -404,69 +421,9 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public static void	clearAWT()
 	{
-		// Java Bug not releasing the last focused window, see:
-		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
-		// http://bugs.sun.com/view_bug.do?bug_id=4726458
-		
-		final Future<Void>	disposed	= new Future<Void>();
-		
-		SwingUtilities.invokeLater(new Runnable()
+		if(!SReflect.isAndroid())
 		{
-			public void run()
-			{
-				javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						final JFrame f	= new JFrame("dummy");
-						f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
-						f.setSize(100, 100);
-						f.setVisible(true);
-						
-						javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
-						{
-							public void actionPerformed(ActionEvent e)
-							{
-								f.dispose();
-								javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
-								{
-									public void actionPerformed(ActionEvent e)
-									{
-//										System.out.println("cleanup dispose");
-										KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
-										disposed.setResult(null);
-									}
-								});
-								t.setRepeats(false);
-								t.start();
-
-							}
-						});
-						t.setRepeats(false);
-						t.start();
-					}
-				});
-				t.setRepeats(false);
-				t.start();
-			}
-		});
-		
-		disposed.get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
-		
-//		// Another bug not releasing the last drawn window.
-//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
-//		
-//		try
-//		{
-//			Class<?> clazz	= Class.forName("sun.java2d.pipe.BufferedContext");
-//			Field	field	= clazz.getDeclaredField("currentContext");
-//			field.setAccessible(true);
-//			field.set(null, null);
-//		}
-//		catch(Throwable e)
-//		{
-//			e.printStackTrace();
-//		}
-
+			SNonAndroid.clearAWT();
+		}
 	}
 }

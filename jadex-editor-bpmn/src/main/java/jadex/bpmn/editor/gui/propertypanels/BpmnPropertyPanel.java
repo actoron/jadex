@@ -101,7 +101,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected String[] PROVIDED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Proxytype", "Implementation Class", "Implementation Expression" };
 	
 	/** The column names for the required services table. */
-	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = {"Name", "Interface", "Multiple", "Scope", "Dynamic", "Create"};
+	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = {"Name", "Interface", "Multiple", "Scope", "Dynamic"};
 	
 	/** The proxy types. */
 	protected String[] PROXY_TYPES = { BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,
@@ -125,6 +125,9 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	
 	/** The configurations table. */
 	protected JTable conftable;
+	
+	/** The required services configurations table. */
+	protected JTable reqservconftable;
 	
 	/** The start elements table. */
 	protected JTable startelementstable;
@@ -156,7 +159,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	/** Start elements list selection listener */
 	protected ListSelectionListener listselectionlistener;
 	
-	public BpmnPropertyPanel(ModelContainer container)
+	public BpmnPropertyPanel(ModelContainer container, Object selection)
 	{
 		super(null, container);
 		this.modelcontainer = container;
@@ -563,7 +566,11 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.fill = GridBagConstraints.NONE;
 		gc.insets = new Insets(0, 0, 5, 5);
 		tablepanel.add(buttonpanel, gc);
-		tabpane.add(tablepanel, "Configurations");
+		
+		//TODO:FINISH
+//		reqservconftable = new JTable();
+		
+//		tabpane.add(tablepanel, "Configurations");
 	}
 	
 	/**
@@ -1602,6 +1609,38 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	/**
 	 *  Table model for start elements.
 	 */
+	protected class RequiredServicesConfigurationTableModel extends AbstractTableModel
+	{
+
+		/**
+		 * 
+		 */
+		public int getRowCount() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+		/**
+		 * 
+		 */
+		public int getColumnCount() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+		/**
+		 * 
+		 */
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+	}
+	
+	/**
+	 *  Table model for start elements.
+	 */
 	protected class StartElementsTableModel extends AbstractTableModel
 	{
 		/** The configuration model. */
@@ -2269,7 +2308,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public Class<?> getColumnClass(int columnIndex)
 		{
-			if(columnIndex == 2 || columnIndex==4 || columnIndex==5)
+			if(columnIndex == 2 || columnIndex==4)
 			{
 				return Boolean.class;
 			}

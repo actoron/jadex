@@ -33,8 +33,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.security.cert.CertificateFactory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -385,7 +385,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						byte[] bytes = Base64.decode(((String)rawattributes.get("content")).getBytes(Charset.forName("UTF-8")));
+						byte[] bytes = Base64.decode(((String)rawattributes.get("content")).getBytes("UTF-8"));
 						return Byte.valueOf(bytes[0]);
 					}
 				}),
@@ -424,6 +424,22 @@ public class JavaReader
 				}
 			));
 			typeinfos.add(ti_url);
+			
+			// java.net.URL
+			TypeInfo ti_uri = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "URI")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new URI((String)rawattributes.get("uri"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]
+				{
+					new AttributeInfo(new AccessInfo("uri", null, AccessInfo.IGNORE_READWRITE)),
+				}
+			));
+			typeinfos.add(ti_uri);
 			
 			// java.logging.Level
 			TypeInfo ti_level = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util.logging", "Level")}),

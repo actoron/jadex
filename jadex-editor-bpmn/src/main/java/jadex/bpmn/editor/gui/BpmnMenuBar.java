@@ -3,7 +3,6 @@ package jadex.bpmn.editor.gui;
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.SCreationController;
 import jadex.bpmn.editor.gui.propertypanels.BasePropertyPanel;
-import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VElement;
@@ -125,12 +124,14 @@ public class BpmnMenuBar extends JMenuBar
 								if (container.getGraph().getSelectionCount() == 0 ||
 									container.getGraph().getSelectionCount() > 1)
 								{
-									container.setPropertyPanel(SPropertyPanelFactory.createPanel(null, container));
+									container.setPropertyPanel(container.getSettings().getPropertyPanelFactory().createPanel(container, null));
+//									container.setPropertyPanel(SPropertyPanelFactory.createPanel(null, container));
 								}
 								
 								if (container.getGraph().getSelectionCount() == 1)
 								{
-									container.setPropertyPanel(SPropertyPanelFactory.createPanel(container.getGraph().getSelectionCell(), container));
+									container.setPropertyPanel(container.getSettings().getPropertyPanelFactory().createPanel(container, container.getGraph().getSelectionCell()));
+//									container.setPropertyPanel(SPropertyPanelFactory.createPanel(container.getGraph().getSelectionCell(), container));
 								}
 								container.getPropertypanelcontainer().setVisible(container.getSettings().isJadexExtensions());
 								if (container.getSettings().isJadexExtensions())
@@ -139,6 +140,7 @@ public class BpmnMenuBar extends JMenuBar
 								}
 							}
 						}
+						
 					}
 				});
 				
@@ -468,6 +470,17 @@ public class BpmnMenuBar extends JMenuBar
 					try
 					{
 						File file = fc.getSelectedFile();
+						
+						for (int i = 0; i < editorwindow.getTabPane().getTabCount(); ++i)
+						{
+							BpmnEditorPanel panel = (BpmnEditorPanel) editorwindow.getTabPane().getComponentAt(i);
+							if (file.equals(panel.getModelContainer().getFile()))
+							{
+								editorwindow.getTabPane().setSelectedIndex(i);
+								return;
+							}
+						}
+						
 						editorwindow.loadModel(file);
 					}
 					catch (Exception e1)

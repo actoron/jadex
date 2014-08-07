@@ -126,7 +126,7 @@ public class InitiatorAgent extends TestAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Test if "+(local? "local": "remote")+" thread decoupling works.");
-				tr.setReason(exception);
+				tr.setFailed(exception);
 				super.resultAvailable(tr);
 			}
 		});

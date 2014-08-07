@@ -3,7 +3,7 @@
  */
 package jadex.bridge;
 
-import java.net.URL;
+import java.net.URI;
 
 /**
  *  Global resources are identified by their unique resource id.
@@ -24,7 +24,7 @@ public interface IGlobalResourceIdentifier
 	 *  Get the url.
 	 *  @return The resource url.
 	 */
-	public URL getRepositoryInfo();
+	public URI getRepositoryInfo();
 	
 	/**
 	 *  Get the version info. Important in case

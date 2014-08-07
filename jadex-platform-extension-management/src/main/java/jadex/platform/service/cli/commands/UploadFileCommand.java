@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.deployment.IDeploymentService;
@@ -227,7 +228,7 @@ public class UploadFileCommand extends ACliCommand
 		}
 		else
 		{
-			SServiceProvider.getService(ia.getServiceContainer(), IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(ia.createResultListener(new DelegationResultListener<IDeploymentService>(ret)));
 		}
 		

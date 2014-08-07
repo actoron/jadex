@@ -4,6 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -32,7 +33,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	public void	doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final long duration)
 	{
 		final Future<ITimer>	wifuture	= new Future<ITimer>(); 
-		SServiceProvider.getService(instance.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(instance.createResultListener(new IResultListener<IClockService>()
 		{
 			public void resultAvailable(final IClockService cs)

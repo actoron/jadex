@@ -1,12 +1,14 @@
 package jadex.commons;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *  Some SUtil methods
  */
-public class SUtilTest extends TestCase
+public class SUtilTest //extends TestCase
 {
+	@Test
 	public void testLongConversion()
 	{
 		long[]	totest	= new long[]
@@ -25,7 +27,7 @@ public class SUtilTest extends TestCase
 		{
 			byte[]	ba	= SUtil.longToBytes(totest[i]);
 			long	val	= SUtil.bytesToLong(ba);
-			assertEquals("Array "+i+": "+SUtil.arrayToString(ba), totest[i], val);
+			Assert.assertEquals("Array "+i+": "+SUtil.arrayToString(ba), totest[i], val);
 		}
 	}
 }

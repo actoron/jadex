@@ -33,4 +33,10 @@ public interface IServiceIdentifier
 	 *  @return The resource identifier.
 	 */
 	public IResourceIdentifier getResourceIdentifier();
+	
+	/**
+	 *  Get the visibility scope.
+	 *  @return The visibility scope.
+	 */
+	public String getScope();
 }

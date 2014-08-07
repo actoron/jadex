@@ -9,22 +9,79 @@
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
-		<version>2.5-SNAPSHOT</version>
+		<version> 2.5-SNAPSHOT </version>
 		<relativePath>../jadex-android-parent/pom.xml</relativePath>
 	</parent>
 
 	<description>
-	
+		App that can contains the Jadex test agents. Does nothing. Started from external JUnit test launcher app.
 	</description>
 
 	<dependencies>
+	
+		<!-- Hack? why doesn't maven include this by default? -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-platformapp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-bpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!--
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-gpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-bdibpmn</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-base-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-bdi</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.toedter</groupId>
+					<artifactId>jcalendar</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-base-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		-->
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applications-micro</artifactId>
@@ -68,33 +125,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>android</artifactId>
-			<version>2.2.1</version>
-			<scope>provided</scope>
-		</dependency>
-
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<excludes>
-					<exclude>**/.svn/*</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.bpmn</include>
-				</includes>
-			</resource>
-		</resources>
-
-		<plugins>
-		
-		<plugin>
+		<plugins>	
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>groovy-maven-plugin</artifactId>
 				<version>1.4</version>
@@ -108,12 +143,12 @@
 							<source>
 								<![CDATA[
 								println "Copying tests ..."
-								def dir = "${project.basedir}"
+								def dir = project.basedir.absolutePath.replace('\\','/');
 								def ln = System.getProperty('line.separator')
 
 								def path = dir + "/../jadex-platform-standalone-launch/src/test/java/"
 								def f = new File(path);
-								print "checking " + path + "... ";
+								println "checking " + path + "... ";
 
 								def target = new File(dir + "/target/generated-sources/tests/");
 								if (!target.exists()) {
@@ -139,7 +174,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-<!-- 				<version>1.8</version> -->
 				<executions>
 					<execution>
 						<id>add-source</id>
@@ -160,7 +194,16 @@
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
 				<extensions>true</extensions>
-				<!-- <configuration> -->
+				<!-- 
+				<configuration>
+					<dex>
+						<jvmArguments>
+							<argument>-Xms256m</argument>
+							<argument>-Xmx2048m</argument>
+						</jvmArguments>
+					</dex>
+				</configuration>
+				-->
 				<!-- <generateApk>true</generateApk> -->
 				<!-- <skip>true</skip> -->
 				<!-- </configuration> -->
@@ -232,26 +275,33 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<execute></execute>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											net.sourceforge.jadex
-										</groupId>
-										<artifactId>
-											jadex-android-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.0-SNAPSHOT,)
-										</versionRange>
+										<groupId>net.sourceforge.jadex</groupId>
+										<artifactId>jadex-android-maven-plugin</artifactId>
+										<versionRange>{$project.version}</versionRange>
 										<goals>
 											<goal>generateBDI</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<execute></execute>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>build-helper-maven-plugin</artifactId>
+										<versionRange>[1.8,)</versionRange>
+										<goals>
+											<goal>add-source</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute></execute>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

@@ -15,9 +15,10 @@ import javax.swing.event.DocumentEvent;
 public class SignalEventHandlerPropertyPanel extends BasePropertyPanel
 {
 
-	public SignalEventHandlerPropertyPanel(ModelContainer container, VActivity vsighandler)
+	public SignalEventHandlerPropertyPanel(ModelContainer container, Object selection)
 	{
 		super("Signal", container);
+		VActivity vsighandler = (VActivity) selection;
 		final MActivity msighandler = vsighandler.getMActivity();
 		
 		int y = 0;

@@ -194,7 +194,7 @@ public class InvokerAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-				tr.setReason(exception);
+				tr.setFailed(exception);
 				super.resultAvailable(tr);
 			}
 		});
@@ -211,7 +211,7 @@ public class InvokerAgent
 					public void customResultAvailable(final IClockService clock)
 					{
 						IResourceIdentifier	rid	= new ResourceIdentifier(
-							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
 						final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
 						CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
@@ -271,7 +271,7 @@ public class InvokerAgent
 											{
 												System.out.println("exceptionOccurred: "+exception);
 												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-												tr.setReason(exception);
+												tr.setFailed(exception);
 												ret.setResult(tr);
 											}
 										}));

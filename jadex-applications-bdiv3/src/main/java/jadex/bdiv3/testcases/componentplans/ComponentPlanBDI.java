@@ -54,7 +54,7 @@ public class ComponentPlanBDI
 		}
 		catch(Exception e)
 		{
-			tr.setReason(e);
+			tr.setFailed(e);
 		}
 		
 		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));

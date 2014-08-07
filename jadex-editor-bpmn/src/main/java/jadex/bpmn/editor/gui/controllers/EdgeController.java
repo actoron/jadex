@@ -79,7 +79,9 @@ public class EdgeController extends mxConnectionHandler
 			if (ret == null)
 			{
 				if (source instanceof VInParameter ||
-					source instanceof VOutParameter)
+					source instanceof VOutParameter ||
+					target instanceof VInParameter ||
+					target instanceof VOutParameter)
 				{
 					ret = SValidation.getDataEdgeValidationError(source, target);
 				}
@@ -87,7 +89,7 @@ public class EdgeController extends mxConnectionHandler
 			
 			if (ret == null)
 			{
-				if (source instanceof VActivity)
+				if (source instanceof VActivity && !(target instanceof VInParameter))
 				{
 					if (target instanceof VActivity &&
 						((MActivity) ((VActivity) source).getBpmnElement()).getActivityType().endsWith("Message") &&

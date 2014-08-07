@@ -2,8 +2,15 @@ package jadex.bpmn.editor.gui.propertypanels;
 
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VOutParameter;
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MParameter;
 import jadex.commons.IFilter;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
 
 import java.awt.Dimension;
@@ -324,6 +331,34 @@ public class BasePropertyPanel extends JPanel
 	public static final String nullifyString(Object value)
 	{
 		return value != null && ((String) value).length() == 0? null : ((String) value);
+	}
+	
+	/**
+	 *  Returns the activity and the selected parameter from Parameter visuals or activity visuals.
+	 *  
+	 *  @param velement The visual element.
+	 *  @return Activity and selected parameter (may be null).
+	 */
+	public static final Tuple2<VActivity, MParameter> getActivityAndSelectedParameter(Object velement)
+	{
+		VActivity act = null;
+		MParameter selectedparameter = null;
+		if (velement instanceof VInParameter)
+		{
+			act = (VActivity) ((VInParameter) velement).getParent();
+			selectedparameter = ((VInParameter) velement).getParameter();
+		}
+		else if (velement instanceof VOutParameter)
+		{
+			act = (VActivity) ((VOutParameter) velement).getParent();
+			selectedparameter = ((VOutParameter) velement).getParameter();
+		}
+		else
+		{
+			act = (VActivity) velement;
+		}
+		
+		return new Tuple2<VActivity, MParameter>(act, selectedparameter);
 	}
 	
 	/**

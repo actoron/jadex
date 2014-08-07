@@ -189,6 +189,20 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	{
 		return num;
 	}
+	
+	/**
+	 *  Set the number.
+	 *  @param num The number.
+	 */
+	public void setNumber(int num)
+	{
+		this.num = num;
+		if(num==0)
+		{
+			this.notified = true;
+			delegate.resultAvailable(null); // todo: undone??
+		}
+	}
 
 	/**
 	 *  Get the cnt.

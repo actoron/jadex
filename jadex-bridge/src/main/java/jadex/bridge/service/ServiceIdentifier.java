@@ -25,6 +25,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
 	
+	/** The scope. */
+	protected String scope;
+	
 	//-------- constructors --------
 	
 	/**
@@ -37,12 +40,13 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IComponentIdentifier providerid, Class<?> type, String servicename, IResourceIdentifier rid)
+	public ServiceIdentifier(IComponentIdentifier providerid, Class<?> type, String servicename, IResourceIdentifier rid, String scope)
 	{
 		this.providerid = providerid;
 		this.type	= new ClassInfo(type);
 		this.servicename = servicename;
 		this.rid = rid;
+		this.scope = scope;
 	}
 	
 	//-------- methods --------
@@ -119,6 +123,25 @@ public class ServiceIdentifier implements IServiceIdentifier
 		this.rid = rid;
 	}
 	
+	/**
+	 *  Get the scope.
+	 *  @return The scope.
+	 */
+	public String getScope()
+	{
+//		return scope==null? RequiredServiceInfo.SCOPE_GLOBAL: scope;
+		return scope;
+	}
+
+	/**
+	 *  Set the scope.
+	 *  @param scope The scope to set.
+	 */
+	public void setScope(String scope)
+	{
+		this.scope = scope;
+	}
+
 	/**
 	 *  Get the hashcode.
 	 *  @return The hashcode.

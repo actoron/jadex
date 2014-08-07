@@ -32,6 +32,8 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.security.MessageDigest;
@@ -97,6 +99,9 @@ public class SUtil
 
 	/** A Null value. */
 	public static final String		NULL					= "NULL";
+	
+	/** The mime types. */
+	protected volatile static Map<String, String> MIMETYPES;
 
 	// Thread local gives best multithread performance for date format access:
 	// http://www.javacodegeeks.com/2010/07/java-best-practices-dateformat-in.html
@@ -2083,6 +2088,9 @@ public class SUtil
 	 */
 	public static URL toURL(Object url)
 	{
+//		System.out.println(url);
+//		long start = System.currentTimeMillis();
+		
 		URL	ret	= null;
 		boolean	jar	= false;
 		if(url instanceof String)
@@ -2092,7 +2100,7 @@ public class SUtil
 			{
 				try
 				{
-					string	= URLDecoder.decode(string, "UTF-8");
+					string = URLDecoder.decode(string, "UTF-8");
 				}
 				catch(UnsupportedEncodingException e)
 				{
@@ -2106,14 +2114,14 @@ public class SUtil
 			
 			if(url==null)
 			{
-				File file	= new File(string);
+				File file = new File(string);
 				if(file.exists())
 				{
 					url	= file;
 				}
 				else
 				{
-					file	= new File(System.getProperty("user.dir"), string);
+					file = new File(System.getProperty("user.dir"), string);
 					if(file.exists())
 					{
 						url	= file;
@@ -2143,8 +2151,62 @@ public class SUtil
 			{
 				String	abs	= ((File)url).getAbsolutePath();
 				String	rel	= SUtil.convertPathToRelative(abs);
-				ret	= abs.equals(rel) ? new File(abs).getCanonicalFile().toURI().toURL()
-					: new File(System.getProperty("user.dir"), rel).getCanonicalFile().toURI().toURL();
+				
+				if(abs.equals(rel))
+				{
+					if(abs.contains(".."))
+					{
+						ret = new File(abs).getCanonicalFile().toURI().toURL();
+					}
+					else
+					{
+						ret = new File(abs).getAbsoluteFile().toURI().toURL();
+					}
+				}
+				else
+				{
+					File basedir = new File(System.getProperty("user.dir"));
+					
+					while(true)
+					{
+						int cut = 0;
+						if(rel.startsWith(".."))
+						{
+							cut = 2;
+						}
+						else if(rel.startsWith("/..") || rel.startsWith("\\.."))
+						{
+							cut = 3;
+						}
+						else if(rel.startsWith("\\\\.."))
+						{
+							cut = 4;
+						}
+						
+						if(cut>0)
+						{
+							basedir = basedir.getParentFile();
+							rel = rel.substring(cut);
+						}
+						else
+						{
+							break;
+						}
+					}
+					
+					if(rel.contains(".."))
+					{
+						ret = new File(basedir, rel).getCanonicalFile().toURI().toURL();
+					}
+					else
+					{
+						ret = new File(basedir, rel).getAbsoluteFile().toURI().toURL();
+					}
+					
+				}
+				
+//				ret	= abs.equals(rel) ? new File(abs).getCanonicalFile().toURI().toURL()
+//					: new File(System.getProperty("user.dir"), rel).getCanonicalFile().toURI().toURL();
 				if(jar)
 				{
 					if(ret.toString().endsWith("!"))
@@ -2158,9 +2220,24 @@ public class SUtil
 				throw new RuntimeException(e);
 			}
 		}
+		else if(url instanceof URI)
+		{
+			try
+			{
+				ret = ((URI)url).toURL();
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+//		long dur = System.currentTimeMillis()-start;
 		
 		return ret;
 	}
+	
+	
 	
 	
 	/**
@@ -2185,6 +2262,9 @@ public class SUtil
 	 */
 	public static URI toURI0(URL url)
 	{
+		if(url==null)
+			return null;
+		
 		URI ret = null;
 		try
 		{
@@ -2196,7 +2276,26 @@ public class SUtil
 		}
 		return ret;
 	}
-
+	
+	/**
+	 *  Convert a URL to a URI but ignore exceptions
+	 */
+	public static URI toURI(URL url)
+	{
+		if(url==null)
+			return null;
+		
+		URI ret = null;
+		try
+		{
+			ret = url.toURI();
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		return ret;
+	}
 
 	/**
 	 * Main method for testing. / public static void main(String[] args) {
@@ -2227,8 +2326,20 @@ public class SUtil
 	
 	public static void main(String[] args)
 	{
-		String res = SUtil.makeConform("uniique-dialogservice.de/ues4/rc?f=https://plus.google.com/+targobank?koop_id=mar_vermoegen18");
-		System.out.println(res);
+//		String res = SUtil.makeConform("uniique-dialogservice.de/ues4/rc?f=https://plus.google.com/+targobank?koop_id=mar_vermoegen18");
+//		System.out.println(res);
+		
+//		String tst = "jar:file:/C:/projects/jadexgit/jadex-platform-standalone-launch/../../inno/vemaproda-eventsystem/target/vemaproda-eventsystem-0.5-SNAPSHOT.jar!/org/codehaus/plexus/context/ContextMapAdapter.class";
+		String tst = "C:\\Users\\Lars\\bpmntutorial2\\bpmntutorial\\target\\classes\\B1_simple.bpmn2";
+		
+		long start = System.currentTimeMillis();
+		
+		for(int i=0; i<30000; i++)
+		{
+			SUtil.toURL(tst);
+		}
+		
+		System.out.println("needed: "+(System.currentTimeMillis()-start)/1000);
 	}
 	
 	/**
@@ -2800,6 +2911,19 @@ public class SUtil
 	}
 	
 	/**
+	 *  Copy an array.
+	 */
+	public static <T> T[] copyArray(T[] original)
+	{
+		// Arrays.copyOf() not present in android 2.2 (version 8).
+		T[] copy = (T[]) Array.newInstance(original.getClass().getComponentType(), original.length);
+        System.arraycopy(original, 0, copy, 0, original.length);
+        
+        return copy;
+	}
+
+	
+	/**
 	 *  Get the source code base using a packagename and a filename.
 	 *  Looks at the filename and subtracts the package name.
 	 *  @param filename The filename.
@@ -2883,7 +3007,15 @@ public class SUtil
 	{
 		if(NIS==null || (System.currentTimeMillis()-NISTIME)>30000)
 		{
-			NIS = Collections.list(NetworkInterface.getNetworkInterfaces());
+			Enumeration<NetworkInterface>	nis	= NetworkInterface.getNetworkInterfaces();
+			if(nis!=null)
+			{
+				NIS = Collections.list(nis);
+			}
+			else
+			{
+				NIS	= Collections.emptyList();
+			}
 			NISTIME	= System.currentTimeMillis();
 		}
 		return NIS;
@@ -3365,6 +3497,46 @@ public class SUtil
 	}
 	
 	/**
+	 *  Encodes a set of data as a Base16 String (hex).
+	 *  
+	 * 	@param data The data.
+	 * 	@return Base16-encoded String.
+	 */
+	public static String base16Encode(byte[] data)
+	{
+		StringBuilder ret = new StringBuilder();
+		for (byte b : data)
+		{
+			int ib = b & 0xFF;
+			if (ib < 16)
+			{
+				ret.append("0");
+			}
+			ret.append(Integer.toHexString(ib));
+		}
+		return ret.toString();
+	}
+	
+	/**
+	 *  Decodes a Base16-encoded String and returns the data.
+	 *  
+	 * 	@param data The encoded data.
+	 *  @return The decoded data.
+	 */
+	public static byte[] base16Decode(String data)
+	{
+		byte[] ret = new byte[data.length() >> 1];
+		for (int i = 0; i < ret.length; ++i)
+		{
+			int val = i * 2;
+			String sub = data.substring(val, val + 2);
+			val = Integer.valueOf(sub, 16);
+			ret[i] = (byte) val;
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Taken from ant.
 	 *  Split a command line.
 	 * 
@@ -3517,7 +3689,7 @@ public class SUtil
 	 */
 	public static void	moveFile(File source, File target)	throws IOException
 	{
-		Class filesclazz = null;
+		Class<?> filesclazz = null;
 		try
 		{
 			filesclazz = Class.forName("java.nio.file.Files");
@@ -3531,15 +3703,15 @@ public class SUtil
 			// Java 7+ mode
 			try
 			{
-				Class pathclazz = Class.forName("java.nio.file.Path");
-				Class copyoptionclazz = Class.forName("java.nio.file.CopyOption");
-				Class standardcopyoptionclazz = Class.forName("java.nio.file.StandardCopyOption");
+				Class<?> pathclazz = Class.forName("java.nio.file.Path");
+				Class<?> copyoptionclazz = Class.forName("java.nio.file.CopyOption");
+				Class<?> standardcopyoptionclazz = Class.forName("java.nio.file.StandardCopyOption");
 				Object atomicflag = standardcopyoptionclazz.getField("ATOMIC_MOVE").get(null);
 				Object replaceflag = standardcopyoptionclazz.getField("REPLACE_EXISTING").get(null);
 				Object moveoptions = Array.newInstance(copyoptionclazz, 2);
 				Array.set(moveoptions, 0, replaceflag);
 				Array.set(moveoptions, 1, atomicflag);
-				Class copyoptionarrayclazz = moveoptions.getClass();
+				Class<?> copyoptionarrayclazz = moveoptions.getClass();
 				Method movemethod = filesclazz.getMethod("move", pathclazz, pathclazz, copyoptionarrayclazz);
 				
 				Method topathmethod = File.class.getMethod("toPath", (Class<?>[]) null);
@@ -3577,6 +3749,53 @@ public class SUtil
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Reads a file into memory (byte array).
+	 *  Note: This only works for files smaller than 2GiB.
+	 *  
+	 * 	@param file The file.
+	 * 	@return Contents of the file.
+	 * 	@throws IOException Exception on IO errors.
+	 */
+	public static byte[] readFile(File file) throws IOException
+	{
+		FileInputStream fis = new FileInputStream(file);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try
+		{
+			FileChannel channel = fis.getChannel( );
+			MappedByteBuffer mbb = channel.map(FileChannel.MapMode.READ_ONLY, 0L, channel.size());
+			byte[] buf = new byte[4096];
+			while(mbb.hasRemaining())
+			{
+				int readbytes = Math.min(mbb.remaining(), 4096);
+			    mbb.get(buf, 0, readbytes);
+			    baos.write(buf, 0, readbytes);
+			}
+		}
+		catch (IOException e)
+		{
+			try
+			{
+				fis.close();
+			}
+			catch (Exception e1)
+			{
+			}
+			throw e;
+		}
+		
+		try
+		{
+			fis.close();
+		}
+		catch (Exception e)
+		{
+		}
+		
+		return baos.toByteArray();
 	}
 	
 	/**
@@ -4075,4 +4294,78 @@ public class SUtil
 			(bytes[1] & 0xFF) == 0xBB && 
 			(bytes[2] & 0xFF) == 0xBF;
     }
+	
+	/**
+	 *  Get the exception stacktrace.
+	 *  @param e The exception.
+	 *  @return The exception stacktrace.
+	 */
+	public static String getExceptionStacktrace(Exception e)
+	{
+		StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		return sw.toString();
+	}
+	
+
+	/**
+	 *  Guess the mime type by the file name.
+	 *  @param name The filename
+	 *  @return The mime type.
+	 */
+	public static String guessContentTypeByFilename(String name)
+	{
+		if(name == null)
+			return null;
+
+		int li = name.lastIndexOf('.');
+		if(li!=-1)
+		{
+			String ext = name.substring(li+1).toLowerCase();
+			if(MIMETYPES==null)
+			{
+				synchronized(SUtil.class)
+				{
+					if(MIMETYPES==null)
+					{
+						MIMETYPES = new HashMap<String, String>();
+						InputStream is = SUtil.class.getResourceAsStream("mimetypes.properties");
+						try
+						{
+							Properties props = new Properties();
+							props.load(is);
+							for(Object key: props.keySet())
+							{
+								String val = props.getProperty((String)key);
+								StringTokenizer st = new StringTokenizer(val, " ");
+								while(st.hasMoreTokens())
+								{
+									MIMETYPES.put(st.nextToken(), (String)key);
+								}
+							}
+						}
+						catch(IOException e)
+						{
+							throw new RuntimeException(e);
+						}
+						finally
+						{
+							try
+							{
+								is.close();
+							}
+							catch(IOException e)
+							{
+								throw new RuntimeException(e);
+							}
+						}
+					}
+				}
+			}
+			return MIMETYPES.get(ext);
+		}
+		return null;
+	}
+	
+	
 }

@@ -10,9 +10,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.search.BasicResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
@@ -228,12 +225,14 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 	private void addViewableServices(IExternalAccess extAcc)
 	{
 		IServiceProvider sp = extAcc.getServiceProvider();
-		ISearchManager manager = SServiceProvider.getSearchManager(true, Binding.SCOPE_PLATFORM);
-		IVisitDecider decider = SServiceProvider.getVisitDecider(false, Binding.SCOPE_PLATFORM);
+		
+//		ISearchManager manager = SServiceProvider.getSearchManager(true, Binding.SCOPE_PLATFORM);
+//		IVisitDecider decider = SServiceProvider.getVisitDecider(false, Binding.SCOPE_PLATFORM);
+//		BasicResultSelector<IService> selector = new BasicResultSelector<IService>(ViewableFilter.VIEWABLE_FILTER, false);
+//		IIntermediateFuture<IService> services = sp.getServices(manager, decider, selector);
 
-		BasicResultSelector<IService> selector = new BasicResultSelector<IService>(ViewableFilter.VIEWABLE_FILTER, false);
-		IIntermediateFuture<IService> services = sp.getServices(manager, decider, selector);
-
+		IIntermediateFuture<IService> services = SServiceProvider.getServices(sp, null, Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
+		
 		services.addResultListener(new IntermediateDefaultResultListener<IService>()
 		{
 

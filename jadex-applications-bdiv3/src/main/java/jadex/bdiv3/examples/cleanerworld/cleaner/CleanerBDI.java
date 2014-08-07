@@ -337,7 +337,7 @@ public class CleanerBDI
 	/**
 	 *  Goal that lets the cleaner look for waste.
 	 */
-	@Goal(excludemode=ExcludeMode.Never, succeedonpassed=false)
+	@Goal(excludemode=ExcludeMode.Never, orsuccess=false)
 	public class PerformLookForWaste
 	{
 		/**
@@ -353,7 +353,7 @@ public class CleanerBDI
 	/**
 	 *  Goal that lets the agent perform patrol rounds.
 	 */
-	@Goal(excludemode=ExcludeMode.Never, succeedonpassed=false)
+	@Goal(excludemode=ExcludeMode.Never, orsuccess=false)
 	public class PerformPatrol
 	{
 		/**
@@ -637,7 +637,7 @@ public class CleanerBDI
 		}
 	}
 	
-	@Goal(excludemode=ExcludeMode.Never, succeedonpassed=false, retrydelay=300)
+	@Goal(excludemode=ExcludeMode.Never, orsuccess=false, retrydelay=300)
 	public class PerformMemorizePositions
 	{
 	}

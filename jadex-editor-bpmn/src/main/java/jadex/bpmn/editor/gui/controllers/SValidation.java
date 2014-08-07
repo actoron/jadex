@@ -11,6 +11,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 
 import java.util.HashSet;
 import java.util.List;
@@ -114,6 +115,12 @@ public class SValidation
 						hasoutedge)
 					{
 						return "Activities transferred into sub-processes cannot have sequence edges.";
+					}
+					
+					if (MSubProcess.SUBPROCESSTYPE_EVENT.equals(msubproc.getSubprocessType()) &&
+						MBpmnModel.EVENT_START_EMPTY.equals(mactivity.getActivityType()))
+					{
+						return "Empty start events not allowed in event subprocesses.";
 					}
 				}
 				else
@@ -229,15 +236,24 @@ public class SValidation
 		{
 			MActivity sact = (MActivity) ((VActivity) source).getBpmnElement();
 			MActivity tact = (MActivity) ((VActivity) target).getBpmnElement();
+//			if (((sact.getActivityType().startsWith("Event") &&
+//				sact.getActivityType().endsWith("Message") &&
+//				sact.isThrowing() &&
+//				tact.getActivityType().startsWith("Event") &&
+//				tact.getActivityType().endsWith("Message") &&
+//				!tact.isThrowing()) ||
+//				MBpmnModel.TASK.equals(sact.getActivityType()) &&
+//				MBpmnModel.TASK.equals(tact.getActivityType())) ||
+//				SValidation.areMessageEventsConnectable(source, target))
 			if (((sact.getActivityType().startsWith("Event") &&
-				sact.getActivityType().endsWith("Message") &&
-				sact.isThrowing() &&
-				tact.getActivityType().startsWith("Event") &&
-				tact.getActivityType().endsWith("Message") &&
-				!tact.isThrowing()) ||
-				MBpmnModel.TASK.equals(sact.getActivityType()) &&
-				MBpmnModel.TASK.equals(tact.getActivityType())) ||
-				SValidation.areMessageEventsConnectable(source, target))
+					sact.getActivityType().endsWith("Message") &&
+					sact.isThrowing() &&
+					tact.getActivityType().startsWith("Event") &&
+					tact.getActivityType().endsWith("Message") &&
+					!tact.isThrowing()) ||
+					sact instanceof MTask &&
+					tact instanceof MTask) ||
+					SValidation.areMessageEventsConnectable(source, target))
 			{
 				return null;
 			}
@@ -255,7 +271,11 @@ public class SValidation
 	public static String getDataEdgeValidationError(Object source, Object target)
 	{
 		String error = null;
-		if (!(source instanceof VOutParameter) || !(target instanceof VInParameter))
+//		if (!(source instanceof VOutParameter) || !(target instanceof VInParameter))
+		if (!((source instanceof VOutParameter && target instanceof VInParameter) ||
+			 ((source instanceof VOutParameter || target instanceof VInParameter) &&
+			  (SHelper.isVisualEvent(source) || SHelper.isVisualEvent(target)) ||
+			 (SHelper.isVisualEvent(source) || SHelper.isVisualEvent(target)))))
 		{
 			error = "Data edges can only connect an output parameter with an input parameter.";
 		}
@@ -285,13 +305,13 @@ public class SValidation
 			}
 		}
 		
-		if (error == null)
-		{
-			if (((VInParameter) target).getEdgeCount() > 0)
-			{
-				error = "Only one incoming data edge allowed.";
-			}
-		}
+//		if (error == null)
+//		{
+//			if (((mxICell) target).getEdgeCount() > 0)
+//			{
+//				error = "Only one incoming data edge allowed.";
+//			}
+//		}
 		
 		return error;
 	}

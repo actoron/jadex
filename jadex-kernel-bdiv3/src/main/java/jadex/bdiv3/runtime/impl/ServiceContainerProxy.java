@@ -1,5 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.model.MElement;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.sensor.service.IMethodInvocationListener;
@@ -13,12 +15,8 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
-import jadex.commons.IFilter;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.commons.IRemoteFilter;
-import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -52,6 +50,46 @@ public class ServiceContainerProxy implements IServiceContainer
 	}
 	
 	//-------- internal admin methods --------
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IRemoteFilter<IService> filter)
+	{
+		return ((IServiceProvider)interpreter.getServiceContainer()).getServices(type, scope, filter);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<IService> getService(ClassInfo type, String scope, IRemoteFilter<IService> filter)
+	{
+		return ((IServiceProvider)interpreter.getServiceContainer()).getService(type, scope, filter);
+	}
+	
+	/**
+	 *  Get a service per id.
+	 *  @param sid The service id.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<IService> getService(IServiceIdentifier sid)
+	{
+		return ((IServiceProvider)interpreter.getServiceContainer()).getService(sid);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture<Collection<IService>> getDeclaredServices()
+	{
+		return ((IServiceProvider)interpreter.getServiceContainer()).getDeclaredServices();
+	}
 	
 	/**
 	 *  Start the service.
@@ -131,7 +169,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IService getProvidedService(String name)
 	{
-		return interpreter.getServiceContainer().getProvidedService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
+		return interpreter.getServiceContainer().getProvidedService(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name);
 	}
 	
 	/**
@@ -167,7 +205,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name)
 	{
-		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
+		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name);
 	}
 
 	/**
@@ -177,7 +215,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public ITerminableIntermediateFuture getRequiredServices(String name)
 	{
-		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
+		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name);
 	}
 	
 	/**
@@ -186,7 +224,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
-		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
+		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name);
 	}
 	
 	/**
@@ -195,7 +233,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
-		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind);
+		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, rebind);
 	}
 	
 	/**
@@ -204,7 +242,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name, boolean rebind, IRemoteFilter filter)
 	{
-		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind, filter);
+		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, rebind, filter);
 	}
 	
 	/**
@@ -213,7 +251,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IRemoteFilter filter)
 	{
-		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind, filter);
+		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, rebind, filter);
 	}
 	
 	/**
@@ -266,33 +304,33 @@ public class ServiceContainerProxy implements IServiceContainer
 		return interpreter.getServiceContainer().getInterceptors(service);
 	}
 
-	/**
-	 *  Get all services of a type.
-	 *  @param type The class.
-	 *  @return The corresponding services.
-	 */
-	public ITerminableIntermediateFuture<IService>	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
-	{
-		return interpreter.getServiceContainer().getServices(manager, decider, selector);
-	}
+//	/**
+//	 *  Get all services of a type.
+//	 *  @param type The class.
+//	 *  @return The corresponding services.
+//	 */
+//	public ITerminableIntermediateFuture<IService>	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+//	{
+//		return interpreter.getServiceContainer().getServices(manager, decider, selector);
+//	}
 	
-	/**
-	 *  Get the parent service container.
-	 *  @return The parent container.
-	 */
-	public IFuture<IServiceProvider>	getParent()
-	{
-		return interpreter.getServiceContainer().getParent();
-	}
-	
-	/**
-	 *  Get the children container.
-	 *  @return The children container.
-	 */
-	public IFuture<Collection<IServiceProvider>>	getChildren()
-	{
-		return interpreter.getServiceContainer().getChildren();
-	}
+//	/**
+//	 *  Get the parent service container.
+//	 *  @return The parent container.
+//	 */
+//	public IFuture<IServiceProvider>	getParent()
+//	{
+//		return interpreter.getServiceContainer().getParent();
+//	}
+//	
+//	/**
+//	 *  Get the children container.
+//	 *  @return The children container.
+//	 */
+//	public IFuture<Collection<IServiceProvider>>	getChildren()
+//	{
+//		return interpreter.getServiceContainer().getChildren();
+//	}
 	
 	/**
 	 *  Get the globally unique id of the provider.
@@ -300,7 +338,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IComponentIdentifier	getId()
 	{
-		return interpreter.getServiceContainer().getId();
+		return ((IServiceProvider)interpreter.getServiceContainer()).getId();
 	}
 	
 	/**
@@ -309,7 +347,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public String	getType()
 	{
-		return interpreter.getServiceContainer().getType();
+		return ((IServiceProvider)interpreter.getServiceContainer()).getType();
 	}
 
 	/**
@@ -444,5 +482,14 @@ public class ServiceContainerProxy implements IServiceContainer
 	public boolean hasMethodListeners(IServiceIdentifier sid, MethodInfo mi)
 	{
 		return interpreter.getServiceContainer().hasMethodListeners(sid, mi);
+	}
+	
+	/**
+	 *  Get the service registry.
+	 *  @return The service registry.
+	 */
+	public LocalServiceRegistry getServiceRegistry() 
+	{
+		return interpreter.getServiceContainer().getServiceRegistry();
 	}
 }

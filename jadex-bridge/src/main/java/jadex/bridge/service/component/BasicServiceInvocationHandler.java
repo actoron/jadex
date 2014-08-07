@@ -112,6 +112,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public BasicServiceInvocationHandler(IInternalAccess comp, IServiceIdentifier sid, Logger logger, boolean realtime, Cause cause, boolean required)
 	{
+		assert cause!=null;
 		this.comp = comp;
 		this.sid = sid;
 		this.logger	= logger;
@@ -127,6 +128,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public BasicServiceInvocationHandler(IInternalAccess comp, IService service, Logger logger, boolean realtime, Cause cause, boolean required)
 	{
+		assert cause!=null;
 		this.comp = comp;
 		this.service = service;
 //		this.sid = service.getServiceIdentifier();
@@ -143,6 +145,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public BasicServiceInvocationHandler(IInternalAccess comp, ServiceInfo service, Logger logger, boolean realtime, Cause cause)
 	{
+		assert cause!=null;
 		this.comp = comp;
 		this.service = service;
 //		this.sid = service.getManagementService().getServiceIdentifier();
@@ -161,9 +164,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
 	{
 		Object ret = null;
-		
-//		if(method.getName().indexOf("create")!=-1)
-//			System.out.println("goto");
 		
 //		final long callid = this.callid.getAndIncrement();
 //		comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), true, proxy, method, args, callid, null);
@@ -214,14 +214,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //						System.out.println("fret ex: "+exception);
 //					}
 //				});
-				if(method.getName().indexOf("addEntry")!=-1)
-					System.out.println("connect: ");
+//				if(method.getName().indexOf("addEntry")!=-1)
+//					System.out.println("connect: ");
 				sic.invoke(service, method, myargs).addResultListener(new ExceptionDelegationResultListener<Void, Object>(fret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						if(sic.getMethod().getName().indexOf("addEntry")!=-1)
-							System.out.println("connect: "+sic.getMethod().getName());
+//						if(sic.getMethod().getName().indexOf("test")!=-1)
+//							System.out.println("connect: "+sic.getMethod().getName());
 						FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
 					}
 				});
@@ -425,7 +425,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, Object service, 
 		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, 
-		boolean realtime, boolean monitoring)
+		boolean realtime, boolean monitoring, String scope)
 	{
 		IInternalService	ret;
 		
@@ -436,7 +436,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(service instanceof IInternalService)
 		{
-			((IInternalService)service).createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type);
+			((IInternalService)service).createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope);
 		}
 		
 //		if(type.getName().indexOf("IServiceCallService")!=-1)
@@ -444,7 +444,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
-			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, realtime);
+			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, realtime, scope);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, copy, monitoring, ret.getServiceIdentifier());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
@@ -478,7 +478,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a basic invocation handler.
 	 */
-	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, boolean realtime)
+	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, boolean realtime, String scope)
 	{
 		BasicServiceInvocationHandler handler;
 		if(service instanceof IService)
@@ -520,7 +520,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			Class<?> serclass = service.getClass();
 
 			BasicService mgmntservice = new BasicService(ia.getComponentIdentifier(), type, serclass, null);
-			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type);
+			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope);
 						
 			// Do not try to call isAnnotationPresent for Proxy on Android
 			// see http://code.google.com/p/android/issues/detail?id=24846

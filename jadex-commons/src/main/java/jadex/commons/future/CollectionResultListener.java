@@ -79,7 +79,6 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 			if(!notified)
 			{
 				results.add(result);
-//				System.out.println("resultAvailable: "+this+", "+this.sresults.size());
 				notify	= num==this.results.size();
 				notified	= notify;
 			}

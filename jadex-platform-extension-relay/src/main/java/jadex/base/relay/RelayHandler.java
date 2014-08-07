@@ -362,7 +362,7 @@ public class RelayHandler
 						{
 							baos.write(buffer, 0, length);
 						}
-						System.out.println("message: "+new String(baos.toByteArray(), Charset.forName("UTF-8")));
+						System.out.println("message: "+new String(baos.toByteArray(), "UTF-8"));
 						//					e.printStackTrace();
 					}
 					catch(Exception e2)

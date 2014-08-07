@@ -152,6 +152,15 @@ public class ClassPlanBody extends AbstractPlanBody
 	}
 
 	/**
+	 *  Get the plan.
+	 *  @return The plan.
+	 */
+	public Object getPojoPlan()
+	{
+		return plan;
+	}
+
+	/**
 	 *  Inject plan elements.
 	 */
 	// Todo: plan in subcapabilities!

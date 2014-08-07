@@ -1,9 +1,11 @@
 package jadex.launch.test;
 import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SReflect;
 
 import java.io.File;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 
 
 /**
@@ -11,19 +13,18 @@ import junit.framework.Test;
  */
 public class BDITest	extends	ComponentTestSuite
 {
+	private static final String NOEXCLUDE = "__noexclude__";
+	
 	/**
 	 *  Constructor called by Maven JUnit runner.
 	 */
 	public BDITest() throws Exception 
 	{
-		this("../jadex-applications-bdi/target/classes/","../jadex-applications-bdi/target/classes");
+		this("../jadex-applications-bdi/target/classes", "../jadex-applications-bdi/target/classes");
 	}
 
 	/**
-	 * Constructor
-	 * @param path
-	 * @param root
-	 * @throws Exception
+	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
 	public BDITest(String path, String root)	throws Exception
 	{
@@ -60,7 +61,9 @@ public class BDITest	extends	ComponentTestSuite
 				"ShutdownPlatform",
 //				"ServiceCallReasoning",
 				"3d",	// OpenGL problems on termination?
-				"ErrorMessages"
+				"ErrorMessages",
+				
+				SReflect.isAndroid() ? "GUICloser" : NOEXCLUDE
 			});
 	}
 	
@@ -72,11 +75,8 @@ public class BDITest	extends	ComponentTestSuite
 		return new BDITest();
 	}
 
-//	public void run(TestResult result)
+//	public void cleanup(TestResult result)
 //	{
-//		// TODO Auto-generated method stub
-//		super.run(result);
-//		
 //		try
 //		{
 //			Thread.sleep(3000000);
@@ -84,5 +84,7 @@ public class BDITest	extends	ComponentTestSuite
 //		catch(InterruptedException e)
 //		{
 //		}
+//		
+//		super.cleanup(result);
 //	}
 }

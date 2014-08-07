@@ -6,6 +6,7 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -27,7 +28,7 @@ import java.util.StringTokenizer;
 /**
  *  Handler for message events.
  */
-public class EventIntermediateMessageActivityHandler	extends DefaultActivityHandler
+public class EventIntermediateMessageActivityHandler extends DefaultActivityHandler
 {
 	//-------- constants --------
 	
@@ -76,12 +77,12 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 */
 	protected void sendMessage(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		SServiceProvider.getService(instance.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(instance.createResultListener(new DefaultResultListener<IMessageService>()
 		{
 			public void resultAvailable(final IMessageService ms)
 			{
-				SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(instance.createResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(IComponentManagementService cms)

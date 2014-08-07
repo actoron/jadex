@@ -204,7 +204,7 @@ public class UserAgent
 											public void exceptionOccurred(Exception exception)
 											{
 												TestReport rep5 = new TestReport("#5", "Test non-func props");
-												rep5.setReason(exception);
+												rep5.setFailed(exception);
 												agent.setResultValue("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}

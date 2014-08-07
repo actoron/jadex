@@ -2,6 +2,7 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -48,6 +49,8 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 		String methodname, boolean finished, Map<String, Object> nonfunc, IFuture<?> orig, int cnt)
 	{
 		super(realreceiver, result, null, callid, isref, methodname, nonfunc);
+//		if(result!=null && result.getClass().getName().indexOf("Bunch")!=-1)
+//			System.out.println("ires com: "+result);
 		this.finished = finished;
 		this.orig	= orig;
 		this.cnt = cnt;
@@ -69,7 +72,7 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	 */
 	public IIntermediateFuture execute(IExternalAccess component, RemoteServiceManagementService rsms)
 	{
-//		System.out.println("intermediate result command: "+result+" "+exceptioninfo+" "+callid);
+//		System.out.println("intermediate result command: "+result+" "+exception+" "+callid);
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
 		

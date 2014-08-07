@@ -7,6 +7,7 @@ import jadex.bdiv3.examples.puzzle.IBoard;
 import jadex.bdiv3.examples.puzzle.SokratesBDI;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.beans.PropertyChangeEvent;
@@ -22,6 +23,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 
+@Reference	// Hack??? Is transferred in creation info.
 public class SokratesService extends JadexPlatformService
 {
 	private PlatformListener listener;
@@ -37,6 +39,7 @@ public class SokratesService extends JadexPlatformService
 		public void platformStarting();
 	}
 
+	@Reference	// Hack??? Is transferred in creation info.
 	public interface SokratesListener
 	{
 		public void handleEvent(PropertyChangeEvent event);

@@ -101,8 +101,10 @@ public abstract class MasterSlaveDiscoveryAgent extends DiscoveryAgent
 		{
 			public void customResultAvailable(Void result)
 			{
-				locals.dispose();
-				remotes.dispose();
+				if(locals!=null)
+					locals.dispose();
+				if(remotes!=null)
+					remotes.dispose();
 				super.customResultAvailable(result);
 			}
 		});

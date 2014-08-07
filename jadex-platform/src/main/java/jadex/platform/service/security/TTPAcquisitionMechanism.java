@@ -3,6 +3,7 @@ package jadex.platform.service.security;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -137,7 +138,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 			// real cid with addresses?
 			if(ttpcid.getAddresses()!=null && ttpcid.getAddresses().length>0)
 			{
-				SServiceProvider.getService(getSecurityService().getComponent().getServiceContainer(), ttpcid, ISecurityService.class)
+				SServiceProvider.getService((IServiceProvider)getSecurityService().getComponent().getServiceContainer(), ttpcid, ISecurityService.class)
 					.addResultListener(new DelegationResultListener<ISecurityService>(ret)
 				{
 					public void customResultAvailable(final ISecurityService ss)
@@ -156,7 +157,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 			// or just a name? Then find the ttp security service by searching (and comparing names)
 			else
 			{
-				SServiceProvider.getServices(secser.getComponent().getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				SServiceProvider.getServices((IServiceProvider)secser.getComponent().getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 					.addResultListener(new IIntermediateResultListener<ISecurityService>()
 				{
 					// Flag that indicates if ttpservice was found and is checked now

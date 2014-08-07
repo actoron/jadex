@@ -37,10 +37,11 @@ public class ErrorEventPropertyPanel extends BasePropertyPanel
 	/**
 	 *  Creates the panel.
 	 */
-	public ErrorEventPropertyPanel(ModelContainer container, VActivity exceptionevent)
+	public ErrorEventPropertyPanel(ModelContainer container, Object selection)
 	{
 		super("Exception", container);
 		
+		VActivity exceptionevent = (VActivity) selection;
 		vevent = exceptionevent;
 		
 		int y = 0;

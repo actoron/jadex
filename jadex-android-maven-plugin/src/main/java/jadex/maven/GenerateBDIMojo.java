@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -136,6 +137,8 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	@SuppressWarnings("resource")
 	public void execute() throws MojoExecutionException, MojoFailureException
 	{
+		getLog().info("Generating BDI V3 Agents...");
+		
 		modelLoader = new MavenBDIModelLoader();
 		gen = new ByteKeepingASMBDIClassGenerator();
 		modelLoader.setGenerator(gen);
@@ -212,7 +215,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			throw new MojoExecutionException(e.getMessage());
+			throw new MojoExecutionException(e.toString());
 		}
 
 	}
@@ -223,7 +226,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		JarOutputStream jos = null;
 		try
 		{
-			jos = new JarOutputStream(new FileOutputStream(outputFile));
+			jos = new JarOutputStream(new FileOutputStream(outputFile), new Manifest());	// Empty manifest to avoid empty zip file.
 			
 			// System.out.println(outputDir.list());
 			for (File depDir : depDirs)
@@ -233,6 +236,11 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 					for (File file : allFiles)
 					{
 						String relativePath = ResourceUtils.getRelativePath(file.getPath(), depDir.getPath(), File.separator);
+						if(!File.separator.equals("/"))
+						{
+							// Zip entries must use '/' as file separator.
+							relativePath	= relativePath.replace(File.separator, "/");
+						}
 						FileInputStream is = new FileInputStream(file);
 						ZipEntry zipEntry = new ZipEntry(relativePath);
 						jos.putNextEntry(zipEntry);
@@ -255,10 +263,11 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			}
 			catch (IOException e)
 			{
+				e.printStackTrace();
 			}
 		}
 
-		getLog().debug("written enhanced: " + outputFile.getName());
+		getLog().info("written enhanced: " + outputFile.getName());
 	}
 
 	private File enhanceJar(File in, File outputDir) throws IOException
@@ -289,6 +298,11 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			for (File file : allFiles)
 			{
 				String relativePath = ResourceUtils.getRelativePath(file.getPath(), outputDir.getPath(), File.separator);
+				if(!File.separator.equals("/"))
+				{
+					// Zip entries must use '/' as file separator.
+					relativePath	= relativePath.replace(File.separator, "/");
+				}
 				FileInputStream is = new FileInputStream(file);
 				ZipEntry zipEntry = new ZipEntry(relativePath);
 				jos.putNextEntry(zipEntry);
@@ -360,7 +374,10 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			{
 				inZip.close();
 			}
-			fos.close();
+			if(fos!=null)
+			{
+				fos.close();
+			}
 			fos = null;
 		}
 		catch (IOException e)
@@ -401,7 +418,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			
 			if (bdiFileFilter.accept(bdiFile))
 			{
-				String agentClassName = relativePath.replaceAll(File.separator, ".").replace(".class", "");
+				String agentClassName = relativePath.replace(File.separator, ".").replace(".class", "");
 
 				getLog().debug("Loading Model: " + relativePath);
 
@@ -456,12 +473,13 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 					catch (IOException e)
 					{
 						e.printStackTrace();
-						if (inputCl != null) {
-							inputCl.close();
-						}
-						if (outputCl != null) {
-							outputCl.close();
-						}
+						// URLClassLoader.close() not in JDK 1.6
+//						if (inputCl != null) {
+//							inputCl.close();
+//						}
+//						if (outputCl != null) {
+//							outputCl.close();
+//						}
 						throw new MojoExecutionException(e.getMessage());
 					}
 				}
@@ -480,8 +498,8 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 				}
 			}
 		}
-		inputCl.close();
-		outputCl.close();
+//		inputCl.close();
+//		outputCl.close();
 	}
 	
 	private void removeAndroidIncompatible(File path) throws IOException {
@@ -552,7 +570,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		for (File bdiFile : allBDIFiles)
 		{
 			String relativePath = ResourceUtils.getRelativePath(bdiFile.getAbsolutePath(), absoluteOutput, File.separator);
-			String importPath = relativePath.replaceAll(File.separator, ".").replace(".class", "");
+			String importPath = relativePath.replace(File.separator, ".").replace(".class", "");
 			result.add(importPath);
 		}
 

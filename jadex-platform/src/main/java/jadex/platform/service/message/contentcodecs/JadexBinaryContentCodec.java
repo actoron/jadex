@@ -9,6 +9,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.platform.service.message.transport.codecs.JadexBinaryCodec;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,16 @@ public class JadexBinaryContentCodec implements IContentCodec, Serializable
 		List<ITraverseProcessor> preprocessors = (List<ITraverseProcessor>)(infos!=null? infos[1]: null);
 		byte[] ret = BinarySerializer.objectToByteArray(val, preprocessors, JadexBinaryCodec.getEncoderChain(context), null, classloader);
 		if(DEBUG)
-			System.out.println("encode content: "+new String(ret, Charset.forName("UTF-8")));
+		{
+			try
+			{
+				System.out.println("encode content: "+new String(ret, "UTF-8"));
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 		return ret;
 	}
 

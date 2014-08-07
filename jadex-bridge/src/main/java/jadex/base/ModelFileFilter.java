@@ -166,8 +166,20 @@ public class ModelFileFilter implements IRemoteFilter
 					System.out.println("no rid for url: "+furl+", "+rids);
 				}
 				
+//				ret.setResult(Boolean.TRUE);
+				
+				final long start = System.currentTimeMillis();
 				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
-					.addResultListener(new DelegationResultListener<Boolean>(ret));
+					.addResultListener(new DelegationResultListener<Boolean>(ret)
+				{
+					public void customResultAvailable(Boolean val)
+					{
+						long dur = System.currentTimeMillis()-start;
+						if(dur>1000)
+							System.out.println("Needed isModelType: "+dur);
+						super.customResultAvailable(val);
+					}
+				});
 			}
 		}
 		else

@@ -18,6 +18,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -29,6 +30,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -276,7 +278,39 @@ public class Starter
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final String[] args)
+	public static IFuture<IExternalAccess> createPlatform(Map<String, String> args)
+	{
+		final Map<String, Object> cmdargs = new HashMap<String, Object>();	// Starter arguments (required for instantiation of root component)
+		final Map<String, Object> compargs = new HashMap<String, Object>();	// Arguments of root component (platform)
+		final List<String> components = new ArrayList<String>();	// Additional components to start
+
+		processArgs(args, cmdargs, compargs, components);
+		
+		return createPlatform(args, cmdargs, compargs, components);
+	}
+	
+	/**
+	 *  Create the platform.
+	 *  @param args The command line arguments.
+	 *  @return The external access of the root component.
+	 */
+	public static IFuture<IExternalAccess> createPlatform(String[] args)
+	{
+		final Map<String, Object> cmdargs = new HashMap<String, Object>();	// Starter arguments (required for instantiation of root component)
+		final Map<String, Object> compargs = new HashMap<String, Object>();	// Arguments of root component (platform)
+		final List<String> components = new ArrayList<String>();	// Additional components to start
+
+		processArgs(args, cmdargs, compargs, components);
+
+		return createPlatform(args, cmdargs, compargs, components);
+	}
+	
+	/**
+	 *  Create the platform.
+	 *  @param args The command line arguments.
+	 *  @return The external access of the root component.
+	 */
+	public static IFuture<IExternalAccess> createPlatform(final Object args, final Map<String, Object> cmdargs, final Map<String, Object> compargs, final List<String> components)
 	{
 		// Fix below doesn't work. WLAN address is missing :-(
 //		// ANDROID: Selector.open() causes an exception in a 2.2
@@ -312,64 +346,6 @@ public class Starter
 			// Absolute start time (for testing and benchmarking).
 			final long starttime = System.currentTimeMillis();
 		
-			final Map<String, Object> cmdargs = new HashMap<String, Object>();	// Starter arguments (required for instantiation of root component)
-			final Map<String, Object> compargs = new HashMap<String, Object>();	// Arguments of root component (platform)
-			final List<String> components = new ArrayList<String>();	// Additional components to start
-			for(int i=0; args!=null && i<args.length; i+=2)
-			{
-				String key = args[i].substring(1);
-				Object val = args[i+1];
-				if(!RESERVED.contains(key))
-				{
-					try
-					{
-						val = SJavaParser.evaluateExpression(args[i+1], null);
-					}
-					catch(Exception e)
-					{
-						System.out.println("Argument parse exception using as string: "+args[i]+" \""+args[i+1]+"\"");
-					}
-					compargs.put(key, val);
-				}
-				else if(COMPONENT.equals(key))
-				{
-					components.add((String)val);
-				}
-				else if(DEBUGFUTURES.equals(key) && "true".equals(val))
-				{
-					Future.DEBUG	= true;
-				}
-				else if(DEBUGSERVICES.equals(key) && "true".equals(val))
-				{
-					MethodInvocationInterceptor.DEBUG = true;
-				}
-				else if(DEFTIMEOUT.equals(key))
-				{
-					val = SJavaParser.evaluateExpression(args[i+1], null);
-//					BasicService.DEFTIMEOUT	= ((Number)val).longValue();
-					long to	= ((Number)val).longValue();
-					BasicService.setRemoteDefaultTimeout(to);
-					BasicService.setLocalDefaultTimeout(to);
-//					System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
-				}
-				else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
-				{
-					Future.NO_STACK_COMPACTION	= true;
-				}
-				else if(OPENGL.equals(key) && "false".equals(val))
-				{
-					Class<?>	p2d	= SReflect.classForName0("jadex.extension.envsupport.observer.perspective.Perspective2D", Starter.class.getClassLoader());
-					if(p2d!=null)
-					{
-						p2d.getField("OPENGL").set(null, Boolean.FALSE);
-					}
-				}
-				else
-				{
-					cmdargs.put(key, val);
-				}
-			}
-			
 			// Load the platform (component) model.
 			final ClassLoader cl = Starter.class.getClassLoader();
 			final String configfile = (String)cmdargs.get(CONFIGURATION_FILE)!=null? 
@@ -473,11 +449,12 @@ public class Starter
 					// Hack: change rid afterwards?!
 					ResourceIdentifier rid = (ResourceIdentifier)model.getResourceIdentifier();
 					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
-					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUrl()));
+					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUri()));
 					
 					String ctype	= cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get(null);
-					IComponentIdentifier caller = sc.getCaller();
-					Cause cause = sc.getCause();
+					IComponentIdentifier caller = sc==null? null: sc.getCaller();
+					Cause cause = sc==null? null: sc.getCause();
+					assert cause!=null;
 					Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
 					Object tmpmoni = getArgumentValue(MONITORING, model, cmdargs, compargs);
 					PublishEventLevel moni = PublishEventLevel.OFF;
@@ -506,7 +483,7 @@ public class Starter
 					Collection<IComponentFeature>	features	= cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 
-					initRescueThread(cid);	// Required for bootstrapping init.
+					initRescueThread(cid, compargs);	// Required for bootstrapping init.
 
 					component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
@@ -533,7 +510,7 @@ public class Starter
 									super.exceptionOccurred(exception);
 								}
 							});
-						}						
+						}
 					});
 					
 					if(cid.equals(IComponentIdentifier.LOCAL.get()))
@@ -554,6 +531,103 @@ public class Starter
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Create the platform.
+	 *  @param args The command line arguments.
+	 *  @return The external access of the root component.
+	 */
+	protected static void processArgs(Map<String, String> args, Map<String, Object> cmdargs, Map<String, Object> compargs, List<String> components)
+	{
+		if(args!=null)
+		{
+			for(Map.Entry<String, String> entry: args.entrySet())
+			{
+				processArg(entry.getKey(), entry.getValue(), cmdargs, compargs, components);
+			}
+		}
+	}
+	
+	/**
+	 *  Create the platform.
+	 *  @param args The command line arguments.
+	 *  @return The external access of the root component.
+	 */
+	protected static void processArgs(String[] args, Map<String, Object> cmdargs, Map<String, Object> compargs, List<String> components)
+	{
+		if(args!=null)
+		{
+			for(int i=0; args!=null && i<args.length; i+=2)
+			{
+				processArg(args[i], args[i+1], cmdargs, compargs, components);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected static void processArg(String okey, String val, Map<String, Object> cmdargs, Map<String, Object> compargs, List<String> components)
+	{
+		String key = okey.startsWith("-")? okey.substring(1): okey;
+		Object value = val;
+		if(!RESERVED.contains(key))
+		{
+			try
+			{
+				value = SJavaParser.evaluateExpression(val, null);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Argument parse exception using as string: "+key+" \""+val+"\"");
+			}
+			compargs.put(key, value);
+		}
+		else if(COMPONENT.equals(key))
+		{
+			components.add((String)val);
+		}
+		else if(DEBUGFUTURES.equals(key) && "true".equals(val))
+		{
+			Future.DEBUG	= true;
+		}
+		else if(DEBUGSERVICES.equals(key) && "true".equals(val))
+		{
+			MethodInvocationInterceptor.DEBUG = true;
+		}
+		else if(DEFTIMEOUT.equals(key))
+		{
+			value = SJavaParser.evaluateExpression(val, null);
+//				BasicService.DEFTIMEOUT	= ((Number)val).longValue();
+			long to	= ((Number)value).longValue();
+			BasicService.setRemoteDefaultTimeout(to);
+			BasicService.setLocalDefaultTimeout(to);
+//				System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
+		}
+		else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
+		{
+			Future.NO_STACK_COMPACTION	= true;
+		}
+		else if(OPENGL.equals(key) && "false".equals(val))
+		{
+			Class<?> p2d = SReflect.classForName0("jadex.extension.envsupport.observer.perspective.Perspective2D", Starter.class.getClassLoader());
+			if(p2d!=null)
+			{
+				try
+				{
+					p2d.getField("OPENGL").set(null, Boolean.FALSE);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		else
+		{
+			cmdargs.put(key, val);
+		}
 	}
 	
 	/**
@@ -741,8 +815,22 @@ public class Starter
 	/**
 	 *  Init the rescue thread for a platform..
 	 */
-	public synchronized static void initRescueThread(IComponentIdentifier cid)
+	public synchronized static void initRescueThread(IComponentIdentifier cid, Map<String, Object> compargs)
 	{
+		IThreadPool	tp	= null;
+		if(compargs.get("threadpoolclass")!=null)
+		{
+			try
+			{
+				tp	= (IThreadPool)SReflect.classForName(
+					(String)compargs.get("threadpoolclass"), Starter.class.getClassLoader()).newInstance();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
 		assert cid.getParent()==null;
 		if(rescuethreads==null)
 		{
@@ -751,7 +839,7 @@ public class Starter
 		
 		final BlockingQueue bq = new BlockingQueue();
 		final IComponentIdentifier fcid = cid;
-		Thread rescuethread = new Thread(new Runnable()
+		Runnable	run	= new Runnable()
 		{
 			public void run()
 			{
@@ -774,12 +862,20 @@ public class Starter
 				{
 				}
 			}
-		}, "rescue_thread_"+cid.getName());
-		Tuple2<BlockingQueue, Thread> tup = new Tuple2<BlockingQueue, Thread>(bq, rescuethread);
-		rescuethreads.put(cid, tup);
-		// rescue thread must not be daemon, otherwise shutdown code like writing platform settings might be interrupted by vm exit. 
-//		rescuethread.setDaemon(true);
-		rescuethread.start();
+		};
+		if(tp!=null)
+		{
+			tp.execute(run);
+		}
+		else
+		{
+			Thread rescuethread =new Thread(run, "rescue_thread_"+cid.getName());
+			Tuple2<BlockingQueue, Thread> tup = new Tuple2<BlockingQueue, Thread>(bq, rescuethread);
+			rescuethreads.put(cid, tup);
+			// rescue thread must not be daemon, otherwise shutdown code like writing platform settings might be interrupted by vm exit. 
+	//		rescuethread.setDaemon(true);
+			rescuethread.start();
+		}
 	}
 	
 	/**

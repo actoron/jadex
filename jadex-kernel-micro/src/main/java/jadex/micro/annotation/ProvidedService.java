@@ -1,5 +1,6 @@
 package jadex.micro.annotation;
 
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.publish.IPublishService;
 
 import java.lang.annotation.ElementType;
@@ -24,6 +25,11 @@ public @interface ProvidedService
 	 */
 	public Class<?> type();
 	
+	/** 
+	 *  The visibility scope.
+	 */
+	public String scope() default RequiredServiceInfo.SCOPE_GLOBAL;
+	
 	/**
 	 *  The service implementation.
 	 */
@@ -33,4 +39,9 @@ public @interface ProvidedService
 	 *  Publish details.
 	 */
 	public Publish publish() default @Publish(publishid="", publishtype=IPublishService.PUBLISH_WS, mapping=Object.class);
+	
+	/**
+	 *  Properties for the provided service.
+	 */
+	public NameValue[] properties() default {};
 }

@@ -11,6 +11,7 @@ import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.writer.IObjectWriterHandler;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
@@ -49,7 +50,16 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 		IObjectWriterHandler handler = (IObjectWriterHandler)(infos!=null? infos[1]: null);
 		byte[] ret = JavaWriter.objectToByteArray(val, classloader, handler);
 		if(DEBUG)
-			System.out.println("encode content: "+new String(ret, Charset.forName("UTF-8")));
+		{
+			try
+			{
+				System.out.println("encode content: "+new String(ret, "UTF-8"));
+			}
+			catch(UnsupportedEncodingException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 		return ret;
 	}
 

@@ -4,11 +4,12 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -25,26 +26,28 @@ import jadex.rules.eca.IRule;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ *  Goal instance implementation.
  */
-public class RGoal extends RProcessableElement implements IGoal
+public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 {
+	//-------- attributes --------
+	
 	/** The lifecycle state. */
 	protected GoalLifecycleState lifecyclestate;
 
 	/** The processing state. */
 	protected GoalProcessingState processingstate;
 
-//	/** The observing rules. */
-//	protected List<String> rulenames;
-	
 	/** The parent plan. */
 	protected RPlan parentplan;
+	protected RGoal parentgoal;
 	
 	/** The child plan. */
 	protected RPlan childplan;
@@ -54,6 +57,8 @@ public class RGoal extends RProcessableElement implements IGoal
 
 	/** The internal access. */
 	protected IInternalAccess ia;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new rgoal. 
@@ -66,9 +71,23 @@ public class RGoal extends RProcessableElement implements IGoal
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;
 	}
-
+	
 	/**
-	 * 
+	 *  Create a new rgoal. 
+	 */
+	public RGoal(IInternalAccess ia, MGoal mgoal, Object goal, RGoal parentgoal)
+	{
+		super(mgoal, goal);
+		this.ia = ia;
+		this.parentgoal = parentgoal;
+		this.lifecyclestate = GoalLifecycleState.NEW;
+		this.processingstate = GoalProcessingState.IDLE;
+	}
+
+	//-------- methods --------
+	
+	/**
+	 *  Adopt a goal so that the agent tries pursuing it.
 	 */
 	public static void adoptGoal(RGoal rgoal, IInternalAccess ia)
 	{
@@ -83,6 +102,23 @@ public class RGoal extends RProcessableElement implements IGoal
 	public RPlan getParentPlan()
 	{
 		return parentplan;
+	}
+	
+	/**
+	 *  Get the parentgoal.
+	 *  @return The parentgoal.
+	 */
+	public RGoal getParentGoal()
+	{
+		return parentgoal;
+	}
+	
+	/**
+	 *  Get parent (goal or plan).
+	 */
+	public RElement getParent()
+	{
+		return parentplan!=null? parentplan: parentgoal;
 	}
 
 	/**
@@ -544,17 +580,18 @@ public class RGoal extends RProcessableElement implements IGoal
 	}
 	
 	/**
-	 * 
+	 *  Called when a plan is finished.
 	 */
-	public void planFinished(IInternalAccess ia, RPlan rplan)
+	public void planFinished(IInternalAccess ia, IInternalPlan rplan)
 	{
 		super.planFinished(ia, rplan);
 		childplan = null;
 		
 		if(rplan!=null)
 		{
-			PlanLifecycleState state = rplan.getLifecycleState();
-			if(state.equals(RPlan.PlanLifecycleState.FAILED))
+//			PlanLifecycleState state = rplan.getLifecycleState();
+//			if(state.equals(RPlan.PlanLifecycleState.FAILED))
+			if(rplan.isFailed())
 			{
 				this.setException(rplan.getException());
 			}
@@ -690,18 +727,51 @@ public class RGoal extends RProcessableElement implements IGoal
 	}
 	
 	/**
-	 * 
+	 *  Test if a goal has succeeded with respect to its plan execution.
 	 */
 	public boolean isProceduralSucceeded()
 	{
 		boolean ret = false;
 		
 		// todo: perform goals
-		if(isProceduralGoal() && getMGoal().isSucceedOnPassed() 
-			&& getTriedPlans()!=null && !getTriedPlans().isEmpty())
+		if(isProceduralGoal() && getTriedPlans()!=null && !getTriedPlans().isEmpty())
 		{
-			RPlan rplan = getTriedPlans().get(getTriedPlans().size()-1);
-			ret = rplan.isPassed();
+			// OR case
+			if(getMGoal().isOrSuccess())
+			{
+				IInternalPlan rplan = getTriedPlans().get(getTriedPlans().size()-1);
+				ret = rplan.isPassed();
+			}
+			// AND case
+			else
+			{
+				MCapability mcapa = getInterpreter().getBDIModel().getCapability();
+				
+				String capaname = getMGoal().getCapabilityName();
+				if(capaname!=null)
+				{
+					mcapa = getInterpreter().getBDIModel().getCapability(capaname);
+				}
+				
+				// No further candidate? Then is considered as succeeded
+				// todo: is it sufficient that one plan has succeeded or all?
+				// todo: what to do when rebuild?
+				if(getApplicablePlanList().isEmpty())
+				{
+					List<IInternalPlan> tps = getTriedPlans();
+					if(tps!=null && !tps.isEmpty())
+					{
+						for(IInternalPlan plan: tps)
+						{
+							if(plan.isPassed())
+							{
+								ret = true;
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
 		
 		return ret;
@@ -792,10 +862,12 @@ public class RGoal extends RProcessableElement implements IGoal
 	}
 	
 	/**
-	 * 
+	 *  Set the goal result from a plan.
 	 */
 	public void setGoalResult(Object result, ClassLoader cl, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
 	{
+//		System.out.println("set goal result: "+result);
+		
 		MGoal mgoal = (MGoal)getModelElement();
 		Object wa = mgoal.getPojoResultWriteAccess(cl);
 		if(wa instanceof Field)
@@ -816,8 +888,12 @@ public class RGoal extends RProcessableElement implements IGoal
 			try
 			{
 				Method m = (Method)wa;
+				m.setAccessible(true);
+				List<Object> res = new ArrayList<Object>();
+				res.add(result);
 				BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-				Object[] params = bai.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), rplan.getModelElement(), event, rplan, rpe);
+				Object[] params = bai.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), 
+					rplan!=null? rplan.getModelElement(): rpe.getModelElement(), event, rplan, rpe, res);
 				if(params==null)
 					System.out.println("Invalid parameter assignment");
 				m.invoke(getPojoElement(), params);
@@ -1055,4 +1131,32 @@ public class RGoal extends RProcessableElement implements IGoal
 //         }
 //         out.close();
 //	}
+	
+//	/**
+//	 *  Get the parent plan.
+//	 *  @return The parent plan.
+//	 */
+//	public IPlan getParent()
+//	{
+//		return parentplan;
+//	}
+
+	// IInternalPlan extra methods
+	
+	/**
+	 *  Get the candidate.
+	 *  @return The candidate.
+	 */
+	public Object getCandidate()
+	{
+		return getModelElement();
+	}
+	
+	/**
+	 *  Test if plan has passed.
+	 */
+	public boolean isPassed()
+	{
+		return isSucceeded();
+	}
 }

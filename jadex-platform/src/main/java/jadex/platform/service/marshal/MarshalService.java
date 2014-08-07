@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -38,8 +39,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Marshal service implementation.
@@ -348,7 +351,7 @@ public class MarshalService extends BasicService implements IMarshalService
 			boolean localret = ret;
 			boolean remoteret = ret;
 		
-			Class cl = object.getClass();
+			Class<?> cl = object.getClass();
 			// Avoid creating list for frequent case that class is already contained
 			boolean[] isref = (boolean[])references.get(cl);
 			if(isref!=null)
@@ -359,12 +362,12 @@ public class MarshalService extends BasicService implements IMarshalService
 			}
 			else
 			{
-				List todo = new ArrayList();
+				List<Class<?>> todo = new ArrayList<Class<?>>();
 				todo.add(cl);
 				isref = null;
 				while(todo.size()>0 && isref==null)
 				{
-					Class clazz = (Class)todo.remove(0);
+					Class<?> clazz = (Class<?>)todo.remove(0);
 					isref = (boolean[])references.get(clazz);
 					if(isref!=null)
 					{
@@ -393,10 +396,10 @@ public class MarshalService extends BasicService implements IMarshalService
 							}
 							else
 							{
-								Class superclazz = clazz.getSuperclass();
+								Class<?> superclazz = clazz.getSuperclass();
 								if(superclazz!=null && !superclazz.equals(Object.class))
 									todo.add(superclazz);
-								Class[] interfaces = clazz.getInterfaces();
+								Class<?>[] interfaces = clazz.getInterfaces();
 								for(int i=0; i<interfaces.length; i++)
 								{
 									todo.add(interfaces[i]);
@@ -431,16 +434,19 @@ public class MarshalService extends BasicService implements IMarshalService
 	 */
 	public Class<?>[] getRemoteInterfaces(Object object, ClassLoader cl)
 	{
-		List ret = new ArrayList();
+		List<Class<?>> ret = new ArrayList<Class<?>>();
 		
 		if(object!=null)
 		{
-			List todo = new ArrayList();
+			List<Class<?>> todo = new ArrayList<Class<?>>();
+			Set<Class<?>> done = new HashSet<Class<?>>();
 			todo.add(object.getClass());
 			
 			while(todo.size()>0)
 			{
-				Class clazz = (Class)todo.remove(0);
+				Class<?> clazz = (Class<?>)todo.remove(0);
+				done.add(clazz);
+				
 				if(clazz.isInterface())
 				{
 					boolean isref = SReflect.isSupertype(IRemotable.class, clazz)
@@ -450,25 +456,35 @@ public class MarshalService extends BasicService implements IMarshalService
 						Reference ref = (Reference)clazz.getAnnotation(Reference.class);
 						isref = ref!=null && ref.remote();
 					}
+					if(!isref)
+					{
+						Service ser = clazz.getAnnotation(Service.class);
+						isref = ser!=null;
+					}
 					if(isref)
 					{
 						if(!ret.contains(clazz))
 							ret.add(clazz);
 					}
 				}
-				Class superclazz = clazz.getSuperclass();
-				if(superclazz!=null && !superclazz.equals(Object.class))
+				Class<?> superclazz = clazz.getSuperclass();
+				if(superclazz!=null && !superclazz.equals(Object.class) && !done.contains(superclazz))
+				{
 					todo.add(superclazz);
-				Class[] interfaces = clazz.getInterfaces();
+				}
+				Class<?>[] interfaces = clazz.getInterfaces();
 				for(int i=0; i<interfaces.length; i++)
 				{
-					todo.add(interfaces[i]);
+					if(!done.contains(superclazz))
+					{
+						todo.add(interfaces[i]);
+					}
 				}
 			}
 			
 			if(object instanceof IService)
 			{
-				Class serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType(cl);
+				Class<?> serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType(cl);
 				if(!ret.contains(serviceinterface))
 					ret.add(serviceinterface);
 			}

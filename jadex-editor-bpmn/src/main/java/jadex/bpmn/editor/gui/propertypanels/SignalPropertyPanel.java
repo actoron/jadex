@@ -45,11 +45,12 @@ public class SignalPropertyPanel extends BasePropertyPanel
 	/**
 	 *  Creates the panel.
 	 */
-	public SignalPropertyPanel(ModelContainer container, VActivity event)
+	public SignalPropertyPanel(ModelContainer container, Object selection)
 	{
 		super("Signal", container);
 		setLayout(new BorderLayout());
 		
+		VActivity event = (VActivity) selection;
 		vevent = event;
 		
 		JPanel tablepanel = new JPanel(new GridBagLayout());

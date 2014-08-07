@@ -36,6 +36,43 @@ public class BDIModel extends MicroModel
 	}
 
 	/**
+	 *  Get a capability by name.
+	 *  @return The mcapa.
+	 */
+	public MCapability getCapability(String name)
+	{
+		MCapability ret = null;
+		int idx = name.indexOf(MElement.CAPABILITY_SEPARATOR);
+		if(idx!=-1)
+		{
+			String capaname = name.substring(0, idx-1);
+			String rest = name.substring(idx+1);
+			if(subcapabilities!=null)
+			{
+				BDIModel subcap = null;
+				for(Tuple2<FieldInfo, BDIModel> tup: subcapabilities)
+				{
+					subcap = tup.getSecondEntity();
+					if(subcap.getCapability().getName().equals(capaname))
+					{
+						break;
+					}
+				}
+				if(subcap==null)
+				{
+					throw new RuntimeException("Capability not found: "+capaname);
+				}
+				ret = subcap.getCapability(rest);
+			}
+		}
+		else
+		{
+			ret = mcapa;
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get the mcapa.
 	 *  @return The mcapa.
 	 */

@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.propertypanels.PropertyPanelFactory;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bridge.ClassInfo;
@@ -38,10 +39,10 @@ import java.util.jar.JarEntry;
 
 import javax.swing.SwingUtilities;
 
-import org.kohsuke.asm4.AnnotationVisitor;
-import org.kohsuke.asm4.ClassReader;
-import org.kohsuke.asm4.ClassVisitor;
-import org.kohsuke.asm4.Opcodes;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
 
 import com.mxgraph.view.mxStylesheet;
 
@@ -56,6 +57,9 @@ public class Settings
 	
 	/** The class cache file name. */
 	protected static final String CLASS_CACHE_FILE_NAME = "classes.cache";
+	
+	/** The property panel factory */
+	protected PropertyPanelFactory propertypanelfactory;
 	
 	/** The progress bar for background tasks. */
 	protected BackgroundProgressBar bgprogressbar;
@@ -646,6 +650,26 @@ public class Settings
 	public ClassLoader getLibraryClassLoader()
 	{
 		return libclassloader;
+	}
+	
+	/**
+	 *  Gets the property panel factory.
+	 *  
+	 *  @return The property panel factory.
+	 */
+	public PropertyPanelFactory getPropertyPanelFactory()
+	{
+		return propertypanelfactory;
+	}
+	
+	/**
+	 *  Sets the property panel factory.
+	 * 
+	 * @param propertypanelfactory The property panel factory.
+	 */
+	public void setPropertyPanelFactory(PropertyPanelFactory propertypanelfactory)
+	{
+		this.propertypanelfactory = propertypanelfactory;
 	}
 
 	/**

@@ -9,6 +9,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -236,7 +237,14 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 					{
 						for(Iterator<IComponentFactory> it=facts.iterator(); it.hasNext(); )
 						{
-							IComponentFactory fac = it.next();
+							Object o = it.next();
+							if(!(o instanceof IComponentFactory))
+							{
+								System.out.println("debug: "+o);
+								SUtil.arrayToString("interfaces:"+o.getClass().getInterfaces());
+							}
+							
+							IComponentFactory fac = (IComponentFactory)o;//it.next();
 							
 							String[] fts = fac.getComponentTypes();
 							
@@ -251,6 +259,8 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 									{
 										public void resultAvailable(byte[] img)
 										{
+											if(ff==null)
+												System.out.println("hhh");
 											ff.setIcon(new ImageIcon(img));
 										}
 										

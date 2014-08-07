@@ -3,7 +3,6 @@ package jadex.micro.quickstart;
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
-import java.util.Date;
 
 /**
  *  Simple service to publish the local system time.
@@ -15,16 +14,16 @@ import java.util.Date;
 public interface ITimeService
 {
 	/**
-	 *  Get the name of the platform, where the time service runs.
-	 *  Name is a constant value for each service, therefore it can be cached
+	 *  Get the location of the platform, where the time service runs.
+	 *  The location is a constant value for each service, therefore it can be cached
 	 *  and no future is needed.
 	 */
-	public String	getName();
+	public String	getLocation();
 	
 	/**
 	 *  Subscribe to the time service.
-	 *  Every couple of seconds, the current time will be
+	 *  Every couple of seconds, a string with the current time will be
 	 *  sent to the subscriber.
 	 */
-	public ISubscriptionIntermediateFuture<Date>	subscribe();
+	public ISubscriptionIntermediateFuture<String>	subscribe();
 }

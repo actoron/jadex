@@ -17,8 +17,15 @@ public class BDIAppLibTest	extends	ComponentTestSuite
 	public BDIAppLibTest()	throws Exception
 	{
 		// Use BDI classes directory as classpath root,
-		super(new File("../jadex-applib-bdi/target/classes/"),
-			new File("../jadex-applib-bdi/target/classes"),
+		this("../jadex-applib-bdi/target/classes/", "../jadex-applib-bdi/target/classes");
+	}
+	
+	/**
+	 *  Constructor called by JadexInstrumentor for Android tests.
+	 */
+	public BDIAppLibTest(String root, String path) throws Exception
+	{
+		super(new File(root), new File(path),
 			// Exclude failing tests to allow maven build.
 			new String[]{});
 	}

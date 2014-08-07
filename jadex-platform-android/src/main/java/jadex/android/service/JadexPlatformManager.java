@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -208,7 +209,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			{
 				Future<S> ret = new Future<S>();
 				SServiceProvider
-						.getService(ia.getServiceContainer(), serviceClazz, scope)
+						.getService((IServiceProvider)ia.getServiceContainer(), serviceClazz, scope)
 						.addResultListener(ia.createResultListener(new DelegationResultListener<S>(ret)));
 
 				return ret;

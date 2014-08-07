@@ -37,6 +37,12 @@ public interface IServiceContainer
 //	public ServiceContainerPersistInfo	getPersistInfo();
 //	
 //	/**
+//	 *  Get the service registry.
+//	 *  @return The service registry.
+//	 */
+//	public LocalServiceRegistry getServiceRegistry();
+//	
+//	/**
 //	 *  Restore a container from a persited state,
 //	 */
 //	public void	restore(ServiceContainerPersistInfo info);
@@ -69,19 +75,19 @@ public interface IServiceContainer
 //	 *  @param clazz The interface.
 //	 *  @return The service.
 //	 */
-//	public <T> T getProvidedService(Class<T> clazz);
+//	public IService getProvidedService(Class<?> clazz);
 //
 //	/**
 //	 *  Get provided (declared) service.
 //	 *  @param clazz The interface.
 //	 *  @return The service.
 //	 */
-//	public <T> T[] getProvidedServices(Class<T> clazz);
+//	public IService[] getProvidedServices(Class<?> clazz);
 //	
 //	/**
 //	 *  Get the provided service
 //	 */
-//	public <T> T getProvidedServiceRawImpl(Class<T> clazz);
+//	public Object getProvidedServiceRawImpl(Class<?> clazz);
 //	
 //	/**
 //	 *  Get the required service infos.

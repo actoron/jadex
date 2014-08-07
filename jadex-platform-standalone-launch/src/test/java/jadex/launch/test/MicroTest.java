@@ -24,10 +24,7 @@ public class MicroTest	extends ComponentTestSuite
 	}
 	
 	/**
-	 * Constructor
-	 * @param path
-	 * @param root
-	 * @throws Exception
+	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
 	public MicroTest(String path, String root)	throws Exception
 	{
@@ -57,6 +54,8 @@ public class MicroTest	extends ComponentTestSuite
 			"messagequeue\\User",
 			"messagequeue/replicated/User",
 			"messagequeue\\replicated\\User",
+			"search/User",
+			"search\\User",
 			"ServicePrey",
 			"ChatE3Agent",
 			"TimeUserAgent",
@@ -76,11 +75,13 @@ public class MicroTest	extends ComponentTestSuite
 			"AgentCreationAgent",	
 			"PojoAgentCreationAgent",
 			"MegaParallelStarter",
+			
 			// android excludes
 			SReflect.isAndroid() ? "authenticate/InitiatorAgent" : NOEXCLUDE,
 			SReflect.isAndroid() ? "nfpropvis/ProviderAndUserAgent" : NOEXCLUDE,
+			SReflect.isAndroid() ? "nfpropvis/ProviderAgent" : NOEXCLUDE,
 			SReflect.isAndroid() ? "nfpropvis/UserAgent" : NOEXCLUDE,
-			SReflect.isAndroid() ? "nfpropvis/Application" : NOEXCLUDE
+			SReflect.isAndroid() ? "nfpropvis/Application" : NOEXCLUDE,
 		});
 //		}, 600000, true, false);
 	}

@@ -1,6 +1,7 @@
 package jadex.micro.testcases;
 
 import jadex.base.Starter;
+import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -127,9 +128,68 @@ public abstract class TestAgent
 	}
 	
 	/**
-	 * 
+	 *  The agent body.
 	 */
-	protected abstract IFuture<Void> performTests(Testcase tc);
+	protected IFuture<Void> performTests(final Testcase tc)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		IFuture<IComponentManagementService>	fut	= agent.getServiceContainer().getRequiredService("cms");
+		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		{
+			public void customResultAvailable(final IComponentManagementService cms)
+			{
+				test(cms, true).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				{
+					public void customResultAvailable(TestReport result)
+					{
+						tc.addReport(result);
+						createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+						{
+							public void customResultAvailable(final IExternalAccess exta)
+							{
+								createProxy(cms, exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+								{
+									public void customResultAvailable(IComponentIdentifier result)
+									{
+										SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
+											.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+										{
+											public void customResultAvailable(IComponentManagementService cms2)
+											{
+												test(cms2, false).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+												{
+													public void customResultAvailable(TestReport result)
+													{
+														tc.addReport(result);
+														ret.setResult(null);
+													}
+												});
+											}
+										}));
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a proxy for the remote platform.
+	 */
+	protected IFuture<IComponentIdentifier>	createProxy(IComponentManagementService local, IExternalAccess remote)
+	{
+		Map<String, Object>	args = new HashMap<String, Object>();
+		args.put("component", remote.getComponentIdentifier());
+		CreationInfo ci = new CreationInfo(args);
+		return local.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null);
+
+	}
 	
 	/**
 	 * 
@@ -213,7 +273,7 @@ public abstract class TestAgent
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
 				ci.setArguments(args);
@@ -356,5 +416,16 @@ public abstract class TestAgent
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  Perform  the test.
+	 *  @param cms	The cms of the platform to test (local or remote).
+	 * 	@param local	True when tests runs on local platform. 
+	 *  @return	The test result.
+	 */
+	protected IFuture<TestReport>	test(IComponentManagementService cms, boolean local)
+	{
+		throw new UnsupportedOperationException("Implement test() or performTests()");
 	}
 }

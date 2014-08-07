@@ -11,6 +11,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IPlatformComponentFactory;
@@ -22,6 +23,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -30,7 +32,6 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -108,14 +109,23 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 
 	/** The flag if persistence is enabled. */
 	protected boolean	persist;
+	
+	/** The service registry .*/
+	protected LocalServiceRegistry registry;
 
 	// -------- constructors --------
 
 	/**
 	 * Create a new context.
 	 */
+<<<<<<< HEAD
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, final IPlatformComponentFactory factory, final IExternalAccess parent,
 		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist, IPersistInfo persistinfo, IIntermediateResultListener<Tuple2<String, Object>> resultlistener)
+=======
+	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, final IComponentAdapterFactory factory, final IExternalAccess parent,
+		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist, IPersistInfo persistinfo, IIntermediateResultListener<Tuple2<String, Object>> resultlistener,
+		LocalServiceRegistry registry)
+>>>>>>> master
 	{
 		this.config = config != null ? config : model.getConfigurationNames().length > 0 ? model.getConfigurationNames()[0] : null;
 		this.model = model;
@@ -126,6 +136,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.persist = persist;
 		this.emitlevelsub = PublishEventLevel.OFF;
 		// this.emitlevelmon = desc.getMonitoring();
+		this.registry = registry;
 		if(factory != null)
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.container = createServiceContainer();
@@ -450,7 +461,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public RequiredServiceBinding[] getBindings()
 	{
-		return bindings != null ? Arrays.copyOf(bindings, bindings.length) : null;
+		return bindings != null ? SUtil.copyArray(bindings) : null;
 	}
 
 	/**
@@ -461,7 +472,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	public IServiceContainer createServiceContainer()
 	{
 		assert container == null;
-		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess(), isRealtime());
+		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess(), isRealtime(), getServiceRegistry());
 	}
 
 	/**
@@ -824,5 +835,14 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		{
 			((ExternalAccess)access).invalidate(terminate);
 		}
+	}
+
+	/**
+	 *  Get the service registry.
+	 *  @return The service registry.
+	 */
+	public LocalServiceRegistry getServiceRegistry() 
+	{
+		return registry;
 	}
 }

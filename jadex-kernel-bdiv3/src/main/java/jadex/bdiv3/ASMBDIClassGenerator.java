@@ -22,27 +22,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.kohsuke.asm4.AnnotationVisitor;
-import org.kohsuke.asm4.ClassReader;
-import org.kohsuke.asm4.ClassVisitor;
-import org.kohsuke.asm4.ClassWriter;
-import org.kohsuke.asm4.Label;
-import org.kohsuke.asm4.MethodVisitor;
-import org.kohsuke.asm4.Opcodes;
-import org.kohsuke.asm4.Type;
-import org.kohsuke.asm4.tree.AbstractInsnNode;
-import org.kohsuke.asm4.tree.ClassNode;
-import org.kohsuke.asm4.tree.FieldInsnNode;
-import org.kohsuke.asm4.tree.InsnList;
-import org.kohsuke.asm4.tree.InsnNode;
-import org.kohsuke.asm4.tree.LabelNode;
-import org.kohsuke.asm4.tree.LdcInsnNode;
-import org.kohsuke.asm4.tree.MethodInsnNode;
-import org.kohsuke.asm4.tree.MethodNode;
-import org.kohsuke.asm4.tree.TypeInsnNode;
-import org.kohsuke.asm4.tree.VarInsnNode;
-import org.kohsuke.asm4.util.ASMifier;
-import org.kohsuke.asm4.util.TraceClassVisitor;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.util.ASMifier;
+import org.objectweb.asm.util.TraceClassVisitor;
 
 
 /**

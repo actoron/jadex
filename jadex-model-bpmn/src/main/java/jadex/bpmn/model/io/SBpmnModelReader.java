@@ -13,6 +13,7 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -24,15 +25,19 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.commons.staxwrapper.IStaxReaderWrapper;
+import jadex.commons.staxwrapper.XmlTag;
+import jadex.commons.staxwrapper.XmlUtil;
 import jadex.javaparser.SJavaParser;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,11 +46,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamReader;
 
 public class SBpmnModelReader
 {
@@ -82,7 +82,7 @@ public class SBpmnModelReader
 			}
 		}
 		
-		ACT_TYPE_MAPPING.put("userTask", MBpmnModel.TASK);
+		ACT_TYPE_MAPPING.put("userTask", MTask.TASK);
 		
 	}
 	
@@ -120,11 +120,24 @@ public class SBpmnModelReader
 	 */
 	public static final MBpmnModel readModel(InputStream in, String filename, IBpmnVisualModelReader vreader, ClassLoader cl) throws Exception
 	{
-		BufferedInputStream fis = new BufferedInputStream(in);
-		XMLInputFactory fac = XMLInputFactory.newInstance(); 
-		XMLStreamReader reader = fac.createXMLStreamReader(fis);
+//		BufferedInputStream fis = new BufferedInputStream(in);
+//		XMLInputFactory fac = XMLInputFactory.newInstance(); 
+//		XMLStreamReader reader = fac.createXMLStreamReader(fis);
+		IStaxReaderWrapper reader = null;
+		if (!SReflect.isAndroid())
+		{
+			Class<?> clazz = SReflect.classForName("jadex.commons.staxwrapper.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
+			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
+			reader = (IStaxReaderWrapper) con.newInstance(new Object[] { in });
+		}
+		else
+		{
+			Class<?> clazz = SReflect.classForName("jadex.xml.reader.StaxReaderWrapper", SBpmnModelReader.class.getClassLoader());
+			Constructor<?> con = clazz.getConstructor(new Class<?>[] { InputStream.class });
+			reader = (IStaxReaderWrapper) con.newInstance(new Object[] { in });
+		}
 		
-		LinkedList<QName> tagstack = new LinkedList<QName>();
+//		LinkedList<XmlTag> tagstack = new LinkedList<XmlTag>();
 		LinkedList<Map<String, String>> attrstack = new LinkedList<Map<String,String>>();
 		LinkedList<String> contentstack = new LinkedList<String>();
 		
@@ -143,57 +156,69 @@ public class SBpmnModelReader
 		buffer.put("unresolvedsequencesources", new HashMap<String, MSequenceEdge>());
 		buffer.put("unresolvedsequencetargets", new HashMap<String, MSequenceEdge>());
 		
-		String sempre = null;
+		String semuri = null;
 		
 		String text = null;
 		while (reader.hasNext())
 		{
 		    reader.next();
-		    if (reader.getEventType() == XMLStreamConstants.START_ELEMENT &&
-		    	"definitions".equals(reader.getLocalName()) &&
-		    	reader.getPrefix() != null &&
-		    	reader.getPrefix().equals(reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/BPMN/20100524/MODEL")))
+//		    if (reader.getEventType() == XMLStreamConstants.START_ELEMENT &&
+//			    	"definitions".equals(reader.getLocalName()) &&
+//			    	reader.getPrefix() != null &&
+//			    	reader.getPrefix().equals(reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/BPMN/20100524/MODEL")))
+		    if (reader.getEventType() == XmlUtil.START_ELEMENT &&
+		    	"definitions".equals(reader.getXmlTag().getLocalPart()) &&
+		    	reader.getXmlTag().getNamespace() != null &&
+		    	reader.getXmlTag().getNamespace().equals("http://www.omg.org/spec/BPMN/20100524/MODEL"))
 		    {
-				sempre = reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/BPMN/20100524/MODEL");
-				buffer.put("di", reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/DD/20100524/DI"));
-				buffer.put("dc", reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/DD/20100524/DC"));
-				buffer.put("bpmndi", reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/BPMN/20100524/DI"));
-				buffer.put("semantic", sempre);
-				buffer.put("jadex", reader.getNamespaceContext().getPrefix("http://www.activecomponents.org/bpmnextensions"));
-				buffer.put("jadexvisual", reader.getNamespaceContext().getPrefix("http://www.activecomponents.org/bpmnvisualextensions"));
+//				sempre = reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/BPMN/20100524/MODEL");
+//				buffer.put("di", reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/DD/20100524/DI"));
+//				buffer.put("dc", reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/DD/20100524/DC"));
+//				buffer.put("bpmndi", reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/BPMN/20100524/DI"));
+//				buffer.put("semantic", sempre);
+//				buffer.put("jadex", reader.getNamespaceContext().getPrefix("http://www.activecomponents.org/bpmnextensions"));
+//				buffer.put("jadexvisual", reader.getNamespaceContext().getPrefix("http://www.activecomponents.org/bpmnvisualextensions"));
+		    	semuri = "http://www.omg.org/spec/BPMN/20100524/MODEL";
+				buffer.put("di", "http://www.omg.org/spec/DD/20100524/DI");
+				buffer.put("dc", "http://www.omg.org/spec/DD/20100524/DC");
+				buffer.put("bpmndi", "http://www.omg.org/spec/BPMN/20100524/DI");
+				buffer.put("semantic", semuri);
+				buffer.put("jadex", "http://www.activecomponents.org/bpmnextensions");
+				buffer.put("jadexvisual", "http://www.activecomponents.org/bpmnvisualextensions");
 		    }
-		    if (reader.getEventType() == XMLStreamConstants.START_ELEMENT)
+		    if (reader.getEventType() == XmlUtil.START_ELEMENT)
 		    {
 		    	text = null;
 		    	
-		    	tagstack.push(reader.getName());
+//		    	tagstack.push(reader.getXmlTag());
 		    	
-		    	Map<String, String> attrs = null;
-		    	if (reader.getAttributeCount() > 0)
-		    	{
-		    		attrs = new HashMap<String, String>(reader.getAttributeCount());
-			    	for (int i = 0; i < reader.getAttributeCount(); ++i)
-			    	{
-			    		attrs.put(reader.getAttributeLocalName(i), unescapeString(reader.getAttributeValue(i)));
-			    	}
-		    	}
-		    	attrstack.push(attrs);
+//		    	Map<String, String> attrs = null;
+//		    	if (reader.getAttributeCount() > 0)
+//		    	{
+//		    		attrs = new HashMap<String, String>(reader.getAttributeCount());
+//			    	for (int i = 0; i < reader.getAttributeCount(); ++i)
+//			    	{
+//			    		attrs.put(reader.getAttributeLocalName(i), unescapeString(reader.getAttributeValue(i)));
+//			    	}
+//		    	}
+		    	Map<String, String> attrs = reader.getAttributes();
+		    	attrstack.addFirst(attrs);
 		    	
-		    	if ("extension".equals(reader.getName().getLocalPart()) && sempre.equals(reader.getName().getPrefix()))
+		    	if ("extension".equals(reader.getXmlTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
 	    		{
 	    			buffer.put("extension", null);
 	    		}
-		    	else if ("process".equals(reader.getName().getLocalPart()) && sempre.equals(reader.getName().getPrefix()))
+		    	else if ("process".equals(reader.getXmlTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
 	    		{
 	    			handlePool(ret, attrs, bpmnelementmap, buffer);
 	    		}
-		    	else if ("subProcess".equals(reader.getName().getLocalPart()) && sempre.equals(reader.getName().getPrefix()))
+		    	else if ("subProcess".equals(reader.getXmlTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
 		    	{
 		    		LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
-		    		sps.push(new MSubProcess());
+		    		sps.addFirst(new MSubProcess());
 		    	}
 		    }
-		    else if (reader.getEventType() == XMLStreamConstants.CHARACTERS)
+		    else if (reader.getEventType() == XmlUtil.CHARACTERS)
 		    {
 		    	String moretext = reader.getText();
 		    	if (moretext != null)
@@ -201,19 +226,19 @@ public class SBpmnModelReader
 		    		text = text != null? text + moretext : moretext;
 		    	}
 		    }
-		    else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT)
+		    else if (reader.getEventType() == XmlUtil.END_ELEMENT)
 		    {
 		    	text = text!=null && text.trim().length()>0? text.trim(): null;
-		    	text = text != null? unescapeString(text) : null;
-		    	contentstack.push(text);
+		    	text = text != null? XmlUtil.unescapeString(text) : null;
+		    	contentstack.addFirst(text);
 		    	text = null;
-		    	
-		    	if ("extension".equals(reader.getName().getLocalPart()) && sempre.equals(reader.getName().getPrefix()))
+		    	if (reader.getXmlTag() != null && "extension".equals(reader.getClosedTag().getLocalPart()) && semuri.equals(reader.getXmlTag().getNamespace()))
 	    		{
 	    			buffer.remove("extension");
 	    		}
 		    	
-		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, tagstack.pop(), tagstack, attrstack.pop(), contentstack.pop(), buffer, vreader);
+//		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, tagstack.pop(), tagstack, attrstack.pop(), contentstack.pop(), buffer, vreader);
+		    	handleElement(ret, bpmnelementmap, lanemap, laneparents, reader.getClosedTag(), reader.getXmlTagStack(), attrstack.removeFirst(), contentstack.removeFirst(), buffer, vreader);
 		    }
 		}
 		
@@ -262,22 +287,22 @@ public class SBpmnModelReader
 											  Map<String, MIdElement> emap,
 											  Map<String, MLane> lanemap,
 											  Map<String, String> laneparents,
-											  QName tag,
-											  LinkedList<QName> tagstack,
+											  XmlTag tag,
+											  LinkedList<XmlTag> tagstack,
 											  Map<String, String> attrs,
 											  String content,
 											  Map<String, Object> buffer,
 											  IBpmnVisualModelReader vreader)
 	{
-		if(buffer.get("semantic").equals(tag.getPrefix()))
+		if(buffer.get("semantic").equals(tag.getNamespace()))
 		{
 			handleSemanticElement(model, emap, lanemap, laneparents, tag, tagstack, attrs, content, buffer);
 		}
-		else if(buffer.get("jadex").equals(tag.getPrefix()))
+		else if(buffer.get("jadex").equals(tag.getNamespace()))
 		{
 			handleJadexElement(model, tag, tagstack, attrs, content, buffer, emap);
 		}
-		else if (vreader != null && (buffer.get("bpmndi").equals(tag.getPrefix()) || buffer.get("dc").equals(tag.getPrefix()) || buffer.get("di").equals(tag.getPrefix()) || buffer.get("jadexvisual").equals(tag.getPrefix())))
+		else if (vreader != null && (buffer.get("bpmndi").equals(tag.getNamespace()) || buffer.get("dc").equals(tag.getNamespace()) || buffer.get("di").equals(tag.getNamespace()) || buffer.get("jadexvisual").equals(tag.getNamespace())))
 		{
 			handleVisualElement(vreader, tag, attrs, content, laneparents, emap, buffer);
 		}
@@ -298,8 +323,8 @@ public class SBpmnModelReader
 													  Map<String, MIdElement> emap,
 													  Map<String, MLane> lanemap,
 													  Map<String, String> laneparents,
-													  QName tag,
-													  LinkedList<QName> tagstack,
+													  XmlTag tag,
+													  LinkedList<XmlTag> tagstack,
 													  Map<String, String> attrs,
 													  String content,
 													  Map<String, Object> buffer)
@@ -357,13 +382,17 @@ public class SBpmnModelReader
 			if (MBpmnModel.SUBPROCESS.equals(ACT_TYPE_MAPPING.get(tag.getLocalPart())))
 			{
 				LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
-				act = sps.pop();
+				act = sps.removeFirst();
 				
 				String eventsp = attrs.get("triggeredByEvent");
 				if ((eventsp != null) && eventsp.equalsIgnoreCase("true"))
 				{
 					((MSubProcess) act).setSubprocessType(MSubProcess.SUBPROCESSTYPE_EVENT);
 				}
+			}
+			else if (MTask.TASK.equals(ACT_TYPE_MAPPING.get(tag.getLocalPart())))
+			{
+				act = new MTask();
 			}
 			else
 			{
@@ -502,6 +531,15 @@ public class SBpmnModelReader
 				}
 			}
 			
+			if(buffer.containsKey("parameters"))
+			{
+				List<MParameter> params = (List<MParameter>) buffer.remove("parameters");
+				for(MParameter param : params)
+				{
+					evt.addParameter(param);
+				}
+			}
+			
 			evt.setActivityType(acttype);
 			
 			connectActivityEdges(evt, buffer, emap);
@@ -559,7 +597,7 @@ public class SBpmnModelReader
 			MSequenceEdge edge = new MSequenceEdge();
 			edge.setId(attrs.get("id"));
 			String edgename = attrs.get("name");
-			edgename = edgename != null? unescapeString(edgename) : null;
+			edgename = edgename != null? XmlUtil.unescapeString(edgename) : null;
 			edge.setName(edgename);
 			MActivity src = (MActivity) emap.get(attrs.get("sourceRef"));
 			MActivity tgt = (MActivity) emap.get(attrs.get("targetRef"));
@@ -627,7 +665,7 @@ public class SBpmnModelReader
 			MMessagingEdge edge = new MMessagingEdge();
 			edge.setId(attrs.get("id"));
 			String edgename = attrs.get("name");
-			edgename = edgename != null? unescapeString(edgename) : null;
+			edgename = edgename != null? XmlUtil.unescapeString(edgename) : null;
 			edge.setName(edgename);
 			MActivity src = (MActivity) emap.get(attrs.get("sourceRef"));
 			MActivity tgt = (MActivity) emap.get(attrs.get("targetRef"));
@@ -681,15 +719,14 @@ public class SBpmnModelReader
 	 *  @param buffer Buffered information.
 	 */
 	protected static final void handleJadexElement(MBpmnModel model,
-												   QName tag,
-												   LinkedList<QName> tagstack,
+												   XmlTag tag,
+												   LinkedList<XmlTag> tagstack,
 												   Map<String, String> attrs,
 												   String content,
 												   Map<String, Object> buffer,  
 												   Map<String, MIdElement> emap)
 	{
 		ClassLoader cl = model.getClassLoader();
-		
 //		if(tag.getLocalPart().equals("class"))
 //		{
 //			System.out.println("tagstack: "+tagstack);
@@ -1132,14 +1169,14 @@ public class SBpmnModelReader
 			MDataEdge edge = new MDataEdge();
 			edge.setId(attrs.get("id"));
 			String edgename = attrs.get("name");
-			edgename = edgename != null? unescapeString(edgename) : null;
+			edgename = edgename != null? XmlUtil.unescapeString(edgename) : null;
 			edge.setName(edgename);
 			MActivity src = (MActivity)emap.get(attrs.get("sourceRef"));
 			MActivity tgt = (MActivity)emap.get(attrs.get("targetRef"));
 			edge.setSource(src);
 			edge.setTarget(tgt);
-			edge.setSourceParameter(attrs.get("sourceParam"));
-			edge.setTargetParameter(attrs.get("targetParam"));
+			edge.setSourceParameter(SBpmnModelWriter.handleNullStr(attrs.get("sourceParam")));
+			edge.setTargetParameter(SBpmnModelWriter.handleNullStr(attrs.get("targetParam")));
 			
 			String expstr = (String) buffer.remove("dataFlowValueMapping");
 			if(expstr!=null && expstr.length()>0)
@@ -1151,9 +1188,9 @@ public class SBpmnModelReader
 			}
 			
 			if (src != null &&
-				tgt != null &&
-				src.getParameters().get(edge.getSourceParameter()) != null &&
-				tgt.getParameters().get(edge.getTargetParameter()) != null)
+				tgt != null)// &&
+//				src.getParameters().get(edge.getSourceParameter()) != null &&
+//				tgt.getParameters().get(edge.getTargetParameter()) != null)
 			{
 			
 				if(src != null)
@@ -1187,7 +1224,7 @@ public class SBpmnModelReader
 	 *  @param emap The element map.
 	 *  @param buffer The buffer.
 	 */
-	protected static final void handleVisualElement(IBpmnVisualModelReader vreader, QName tag, Map<String, String> attrs, String content, Map<String, String> laneparents, Map<String, MIdElement> emap, Map<String, Object> buffer)
+	protected static final void handleVisualElement(IBpmnVisualModelReader vreader, XmlTag tag, Map<String, String> attrs, String content, Map<String, String> laneparents, Map<String, MIdElement> emap, Map<String, Object> buffer)
 	{
 		if (vreader != null)
 		{
@@ -1199,7 +1236,7 @@ public class SBpmnModelReader
 				buffer.put("vbuffer", vbuffer);
 			}
 			
-			vreader.readElement(tag, attrs, laneparents, emap, buffer);
+//			vreader.readElement(tag, attrs, laneparents, emap, buffer);
 			
 			if ("Bounds".equals(tag.getLocalPart()))
 			{
@@ -1402,7 +1439,7 @@ public class SBpmnModelReader
 	 *  Matches local part of the tag.
 	 *  TODO: Do this for all tags.
 	 */
-	protected static final boolean matchLTag(String tagname, QName tag)
+	protected static final boolean matchLTag(String tagname, XmlTag tag)
 	{
 		String oltag = tag.getLocalPart();
 		String ltag = TAG_ALIASES.get(oltag);
@@ -1411,42 +1448,5 @@ public class SBpmnModelReader
 			ltag = oltag;
 		}
 		return tagname.equals(ltag);
-	}
-	
-	/**
-	 *  Unescapes strings for xml.
-	 */
-	private static final String unescapeString(String string)
-	{
-		StringBuilder ret = new StringBuilder();
-		boolean escapemode = false;
-		for (int i = 0; i < string.length(); ++i)
-		{
-			String c = string.substring(i, i + 1);
-			if (escapemode)
-			{
-				if (c.equals("n"))
-				{
-					ret.append("\n");
-				}
-				else
-				{
-					ret.append(c);
-				}
-				escapemode = false;
-			}
-			else
-			{
-				if (c.equals("\\"))
-				{
-					escapemode = true;
-				}
-				else
-				{
-					ret.append(c);
-				}
-			}
-		}
-		return ret.toString();
 	}
 }

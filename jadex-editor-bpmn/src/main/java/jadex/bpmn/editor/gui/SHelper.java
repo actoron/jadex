@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.kohsuke.asm4.ClassReader;
-import org.kohsuke.asm4.Type;
-import org.kohsuke.asm4.tree.ClassNode;
-import org.kohsuke.asm4.tree.LocalVariableNode;
-import org.kohsuke.asm4.tree.MethodNode;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.LocalVariableNode;
+import org.objectweb.asm.tree.MethodNode;
 
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
@@ -352,6 +352,19 @@ public class SHelper
 			}
 		}
 		
+		return ret;
+	}
+	
+	/** Checks if an object is a visual event. */
+	public static final boolean isVisualEvent(Object obj)
+	{
+		boolean ret = false;
+		if (obj instanceof VActivity)
+		{
+			VActivity vactivity = (VActivity) obj;
+			MActivity mactivity = vactivity.getMActivity();
+			ret = mactivity != null && mactivity.getActivityType() != null && mactivity.getActivityType().startsWith("Event");
+		}
 		return ret;
 	}
 }

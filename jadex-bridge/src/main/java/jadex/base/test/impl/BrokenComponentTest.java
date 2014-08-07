@@ -13,11 +13,11 @@ public class BrokenComponentTest extends	TestCase
 {
 	//-------- attributes --------
 	
-	/** The component. */
-	protected IModelInfo	comp;
-	
-	/** The filename (if model could not be loaded). */
+	/** The component model. */
 	protected String	filename;
+	
+	/** The component full name. */
+	protected String	fullname;
 	
 	/** The error. */
 	protected IErrorReport	error;
@@ -29,7 +29,8 @@ public class BrokenComponentTest extends	TestCase
 	 */
 	public BrokenComponentTest(IModelInfo comp, IErrorReport error)
 	{
-		this.comp	= comp;
+		this.filename	= comp.getFilename();
+		this.fullname	= comp.getFullName();
 		this.error	= error;
 	}
 	
@@ -57,14 +58,21 @@ public class BrokenComponentTest extends	TestCase
 	 */
 	public void run(TestResult result)
 	{
-		result.startTest(this);
+		try
+		{
+			result.startTest(this);
+		}
+		catch(IllegalStateException e)
+		{
+			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
+			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
+		}
 		
 		result.addError(this, new RuntimeException(error.getErrorText()));			
 
 		result.endTest(this);
 		
 		// Remove references to Jadex resources to aid GC cleanup.
-		comp	= null;
 		error	= null;
 	}
 	
@@ -78,6 +86,6 @@ public class BrokenComponentTest extends	TestCase
 	 */
 	public String toString()
 	{
-		return comp!=null ? comp.getFullName() : filename;
+		return "broken: "+(fullname!=null ? fullname : filename);
 	}
 }

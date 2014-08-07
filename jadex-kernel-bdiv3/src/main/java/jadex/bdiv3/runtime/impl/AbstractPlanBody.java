@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -52,8 +53,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 		final Future<Void> ret = new Future<Void>();
 		
 		String	pname	= rplan.getModelElement().getName();
-		String	capaname	= pname.indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
-			? null : pname.substring(0, pname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
+		String	capaname	= pname.indexOf(MElement.CAPABILITY_SEPARATOR)==-1
+			? null : pname.substring(0, pname.lastIndexOf(MElement.CAPABILITY_SEPARATOR));
 		final Object agent	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).getCapabilityObject(capaname);
 
 		internalInvokePart(agent, 0).addResultListener(new IResultListener<Object>()

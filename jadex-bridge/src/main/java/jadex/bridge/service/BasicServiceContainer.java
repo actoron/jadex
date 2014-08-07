@@ -1,5 +1,6 @@
 package jadex.bridge.service;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -9,9 +10,6 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.MethodListenerHandler;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.MethodInfo;
@@ -43,7 +41,7 @@ import java.util.logging.Logger;
  *  services. It allows for starting/shutdowning the container and fetching
  *  service by their type/name.
  */
-public abstract class BasicServiceContainer implements  IServiceContainer
+public abstract class BasicServiceContainer implements  IServiceContainer, IServiceProvider
 {	
 	//-------- attributes --------
 	
@@ -80,40 +78,44 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //	protected static Set<String>	SEARCHES
 //		= Collections.synchronizedSet(new HashSet<String>());
 	
-	/**
-	 *  Get all services of a type.
-	 *  @param clazz The class.
-	 *  @return The corresponding services.
-	 */
-	public ITerminableIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
-	{
-		if(shutdowned)
-		{
-//			if(id.getParent()==null)
-//			{
-//				System.err.println("getS: "+id);
-//				Thread.dumpStack();
-//			}
-			return new TerminableIntermediateFuture<IService>(new ComponentTerminatedException(id));
-		}
-		
-		ITerminableIntermediateFuture<IService>	ret	= manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
-//		final String	search	= "search: "+manager+", "+decider+", "+selector+"\n";
-//		SEARCHES.add(search);
-//		ret.addResultListener(new IResultListener<Collection<IService>>()
+//	/**
+//	 *  Get all services of a type.
+//	 *  @param clazz The class.
+//	 *  @return The corresponding services.
+//	 */
+//	public ITerminableIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+//	{
+//		if(shutdowned)
 //		{
-//			public void resultAvailable(Collection<IService> result)
-//			{
-//				SEARCHES.remove(search);
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				SEARCHES.remove(search);
-//			}
-//		});
-		return ret;
-	}
+////			if(id.getParent()==null)
+////			{
+////				System.err.println("getS: "+id);
+////				Thread.dumpStack();
+////			}
+//			return new TerminableIntermediateFuture<IService>(new ComponentTerminatedException(id));
+//		}
+//		
+//		ITerminableIntermediateFuture<IService>	ret	= manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
+////		final String	search	= "search: "+manager+", "+decider+", "+selector;
+////		if(search.indexOf("IMonitoring")!=-1)
+////		{
+////			System.out.println(search);
+////		}
+////		SEARCHES.add(search);
+////		ret.addResultListener(new IResultListener<Collection<IService>>()
+////		{
+////			public void resultAvailable(Collection<IService> result)
+////			{
+////				SEARCHES.remove(search);
+////			}
+////			
+////			public void exceptionOccurred(Exception exception)
+////			{
+////				SEARCHES.remove(search);
+////			}
+////		});
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the parent service container.
@@ -163,8 +165,18 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		
 		getServiceTypes(service.getServiceIdentifier()).addResultListener(new ExceptionDelegationResultListener<Collection<Class<?>>, Void>(ret)
 		{
-			public void customResultAvailable(Collection<Class<?>> servicetypes)
+			public void customResultAvailable(final Collection<Class<?>> servicetypes)
 			{
+//				// Hack!!! Must make cms available before init for bootstrapping of service container of platform
+//				if(started && (service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IComponentManagementService")!=-1
+//					|| service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IMessageService")!=-1))
+//				{
+//					for(Class<?> key: servicetypes)
+//					{
+//						getServiceRegistry().addService(new ClassInfo(key), service);
+//					}
+//				}
+				
 				synchronized(this)
 				{
 					if(services==null)
@@ -188,27 +200,36 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						serviceinfos = Collections.synchronizedMap(new HashMap<IServiceIdentifier, ProvidedServiceInfo>());
 					}
 					serviceinfos.put(service.getServiceIdentifier(), info);
+				}
 					
-					if(started)
+				if(started)
+				{
+					service.setComponentAccess(getComponent()).addResultListener(new DelegationResultListener<Void>(ret)
 					{
-						service.setComponentAccess(getComponent()).addResultListener(new DelegationResultListener<Void>(ret)
+						public void customResultAvailable(Void result)
 						{
-							public void customResultAvailable(Void result)
+							service.startService().addResultListener(new DelegationResultListener<Void>(ret)
 							{
-								service.startService().addResultListener(new DelegationResultListener<Void>(ret)
+								public void customResultAvailable(Void result)
 								{
-									public void customResultAvailable(Void result)
+									for(Class<?> key: servicetypes)
 									{
-										serviceStarted(service).addResultListener(new DelegationResultListener<Void>(ret));
+										getServiceRegistry().addService(new ClassInfo(key), service);
 									}
-								});
-							};
-						});
-					}
-					else
+									serviceStarted(service).addResultListener(new DelegationResultListener<Void>(ret));
+								}
+							});
+						};
+					});
+				}
+				else
+				{
+					// Make services available for init of subcomponents, but not visible to outside until component is running.
+					for(Class<?> key: servicetypes)
 					{
-						ret.setResult(null);
+						getServiceRegistry().addService(new ClassInfo(key), service);
 					}
+					ret.setResult(null);
 				}
 			}
 		});
@@ -300,6 +321,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //											if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
 //												System.out.println("Terminated service: "+sid);
 											getLogger().info("Terminated service: "+sid);
+											
+											for(Class<?> key: servicetypes)
+											{
+												getServiceRegistry().removeService(new ClassInfo(key), fservice);
+											}
+											
 											serviceShutdowned(fservice).addResultListener(new DelegationResultListener<Void>(ret));
 										}
 										
@@ -391,6 +418,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						public void resultAvailable(Void result)
 						{
 							getLogger().info("Started service: "+is.getServiceIdentifier());
+							
 							serviceStarted(is).addResultListener(new DelegationResultListener<Void>(ret)
 							{
 								public void customResultAvailable(Void result)
@@ -1136,7 +1164,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public boolean equals(Object obj)
 	{
-		return obj instanceof IServiceContainer && ((IServiceContainer)obj).getId().equals(getId());
+		return obj instanceof IServiceContainer && ((IServiceProvider)obj).getId().equals(getId());
 	}
 	
 	/**
@@ -1175,8 +1203,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		{
 			ret = deftimeout;
 		}
-		
-		return ret==Timeout.UNSET? remote? BasicService.getRemoteDefaultTimeout(): BasicService.getLocalDefaultTimeout(): ret;
+				
+//		return ret==Timeout.UNSET? remote? BasicService.getRemoteDefaultTimeout(): BasicService.getLocalDefaultTimeout(): ret;
+		return ret;
 	}
 	
 }

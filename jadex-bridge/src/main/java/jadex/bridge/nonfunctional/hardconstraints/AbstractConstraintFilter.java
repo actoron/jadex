@@ -7,6 +7,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+/**
+ * 
+ */
 public abstract class AbstractConstraintFilter<T> implements IRemoteFilter<T>
 {
 	/** Name of the property being kept constant. */

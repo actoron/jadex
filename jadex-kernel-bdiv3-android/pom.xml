@@ -62,12 +62,13 @@
 <!-- 			<version>${project.version}</version> -->
 <!-- 		</dependency> -->
 
+<!-- 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>asm-dex</artifactId>
 			<version>1.0-1</version>
 		</dependency>
-
+ -->
 		<dependency>
 			<groupId>com.google.android.tools</groupId>
 			<artifactId>dx</artifactId>

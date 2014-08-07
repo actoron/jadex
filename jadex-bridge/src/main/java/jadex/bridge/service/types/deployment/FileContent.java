@@ -5,6 +5,7 @@ import jadex.commons.Base64;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 /**
@@ -201,7 +202,14 @@ public class FileContent
 		String	ret	= null;
 		if(data!=null)
 		{
-			ret	= new String(Base64.encode(data), Charset.forName("UTF-8"));
+			try
+			{
+				ret	= new String(Base64.encode(data), "UTF-8");
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 		return ret;
 	}
@@ -221,7 +229,14 @@ public class FileContent
 	 */
 	public void setDataString(String sdata)
 	{
-		this.data = Base64.decode(sdata.getBytes(Charset.forName("UTF-8")));
+		try
+		{
+			this.data = Base64.decode(sdata.getBytes("UTF-8"));
+		}
+		catch(UnsupportedEncodingException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

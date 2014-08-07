@@ -1,15 +1,26 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MDataEdge;
+import jadex.bpmn.model.MParameter;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 
+/**
+ *  Panel for data edges.
+ */
 public class DataEdgePropertyPanel extends BasePropertyPanel
 {
 	/** The column names for the mapping table */
@@ -22,9 +33,10 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public DataEdgePropertyPanel(ModelContainer container, VDataEdge edge)
+	public DataEdgePropertyPanel(ModelContainer container, Object selection)
 	{
 		super("Data Edge", container);
+		VDataEdge edge = (VDataEdge) selection;
 		this.dataedge = edge;
 		
 		int y = 0;
@@ -50,6 +62,123 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 			}
 		});
 		configureAndAddInputLine(column, label, textarea, y++);
+		
+		// Source parameter name.
+		if(edge.getSource() instanceof VActivity)
+		{
+			MActivity src = (MActivity)((VActivity)edge.getSource()).getMActivity();
+			
+			label = new JLabel("Source Parameter");
+			final JComboBox pbox = new JComboBox();
+			pbox.addItem(null);
+			//textarea = new JTextArea();
+			
+			List<MParameter> params = src.getParameters(new String[]{MParameter.DIRECTION_INOUT, MParameter.DIRECTION_OUT});
+			if(params!=null)
+			{
+				for(MParameter param: params)
+				{
+					pbox.addItem(param.getName());
+				}
+			}
+			
+			if(getBpmnDataEdge().getSourceParameter() != null)
+			{
+				pbox.setSelectedItem(getBpmnDataEdge().getSourceParameter());
+			}
+			
+			pbox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					String name = (String)pbox.getSelectedItem();
+					name = name.length() == 0 ? null : name;
+					getBpmnDataEdge().setSourceParameter(name);
+					modelcontainer.setDirty(true);
+				}
+			});
+			
+//			textarea.getDocument().addDocumentListener(new DocumentAdapter()
+//			{
+//				public void update(DocumentEvent e)
+//				{
+//					String name = getText(e.getDocument());
+//					name = name.length() == 0 ? null : name;
+//					getBpmnDataEdge().setSourceParameter(name);
+//					modelcontainer.setDirty(true);
+//				}
+//			});
+			configureAndAddInputLine(column, label, pbox, y++);
+		}
+		
+		// Target parameter name.
+		if(edge.getTarget() instanceof VActivity)
+		{
+			label = new JLabel("Target Parameter");
+//			textarea = new JTextArea();
+//			
+//			if (getBpmnDataEdge().getParameterMapping() != null)
+//			{
+//				textarea.setText(getBpmnDataEdge().getTargetParameter() != null? getBpmnDataEdge().getTargetParameter() : "");
+//			}
+//			
+//			textarea.getDocument().addDocumentListener(new DocumentAdapter()
+//			{
+//				public void update(DocumentEvent e)
+//				{
+//					String name = getText(e.getDocument());
+//					name = name.length() == 0 ? null : name;
+//					getBpmnDataEdge().setTargetParameter(name);
+//					modelcontainer.setDirty(true);
+//				}
+//			});
+//			configureAndAddInputLine(column, label, textarea, y++);
+			
+//			MActivity src = (MActivity)((VActivity)edge.getSource()).getMActivity();
+			MActivity target = (MActivity)((VActivity)edge.getTarget()).getMActivity();
+			
+			label = new JLabel("Target Parameter");
+			final JComboBox pbox = new JComboBox();
+			pbox.addItem(null);
+			//textarea = new JTextArea();
+			
+			List<MParameter> params = target.getParameters(new String[]{MParameter.DIRECTION_INOUT, MParameter.DIRECTION_OUT});
+			if(params!=null)
+			{
+				for(MParameter param: params)
+				{
+					pbox.addItem(param.getName());
+				}
+			}
+			
+			if(getBpmnDataEdge().getTargetParameter() != null)
+			{
+				pbox.setSelectedItem(getBpmnDataEdge().getTargetParameter());
+			}
+			
+			pbox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					String name = (String)pbox.getSelectedItem();
+					name = name.length() == 0 ? null : name;
+					getBpmnDataEdge().setTargetParameter(name);
+					modelcontainer.setDirty(true);
+				}
+			});
+			
+//			textarea.getDocument().addDocumentListener(new DocumentAdapter()
+//			{
+//				public void update(DocumentEvent e)
+//				{
+//					String name = getText(e.getDocument());
+//					name = name.length() == 0 ? null : name;
+//					getBpmnDataEdge().setSourceParameter(name);
+//					modelcontainer.setDirty(true);
+//				}
+//			});
+			configureAndAddInputLine(column, label, pbox, y++);
+		}
 		
 //		label = new JLabel("Index Mapping");
 //		textarea = new JTextArea();

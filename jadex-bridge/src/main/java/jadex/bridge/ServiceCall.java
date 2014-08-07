@@ -62,29 +62,6 @@ public class ServiceCall
 	{
 		this.caller	= caller;
 		this.properties = props!=null? props: new HashMap<String, Object>();
-		if(!properties.containsKey(TIMEOUT))
-			properties.put(DEFTIMEOUT, BasicService.getLocalDefaultTimeout()); // todo: refactor that
-	
-//		if(properties.containsKey("buibui"))
-//			System.out.println("driss");
-//		properties.put("buibui", "buibui");
-//		System.out.println("sc: "+hashCode()+" "+System.identityHashCode(properties));
-//		if(sprops.contains(System.identityHashCode(properties)))
-//		{
-//			System.out.println("driss "+System.identityHashCode(properties));
-//		}
-//		sprops.add(System.identityHashCode(properties));
-		
-		
-//		if(props!=null)
-//			properties.putAll(props);
-//		if(props!=null && props.get(CAUSE) instanceof String)
-//		{
-//			System.out.println("sdgouh287418");
-//		}
-		
-//		System.err.println("call: "+this);
-//		Thread.dumpStack();
 	}
 	
 	/**
@@ -231,6 +208,8 @@ public class ServiceCall
 	 */
 	public void setTimeout(long to)
 	{
+//		if(((String)properties.get("method")).indexOf("service")!=-1)
+//			System.out.println("sdfjbsdfjk");
 		properties.put(TIMEOUT, Long.valueOf(to));
 	}
 	
@@ -301,9 +280,13 @@ public class ServiceCall
 	 */
 	public void setProperty(String name, Object val)
 	{
-//		if(name.indexOf("__dur")!=-1)
-//			return;
-//		System.out.println("setting: "+name+" "+val+" "+this);
+//		if(TIMEOUT.equals(name))
+//		{
+//			if(properties.get("method")!=null && ((String)properties.get("method")).indexOf("service")!=-1)
+//				System.out.println("setting tout: "+val);
+//			else if(properties.get("method")==null)
+//				System.out.println("setting unknown tout: "+val);
+//		}
 		this.properties.put(name, val);
 	}
 	

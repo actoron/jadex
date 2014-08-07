@@ -43,9 +43,10 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public SequenceEdgePropertyPanel(ModelContainer container, VSequenceEdge edge)
+	public SequenceEdgePropertyPanel(ModelContainer container, Object selection)
 	{
 		super("Sequence Edge", container);
+		VSequenceEdge edge = (VSequenceEdge) selection;
 		this.seqedge = edge;
 		
 		int y = 0;

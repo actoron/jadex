@@ -16,4 +16,5 @@ jadex-platform-standalone-launch/highscore.dmp
 /microcreationtime.properties
 /microkillingtime.properties
 /micromem.properties
-/jadex-platform-standalone-launch/src/main/config/Jadex Standalone (persist).launch
+/jadex-platform-android/tmp/cached-robolectric-classes.jar
+/jadex-platform-standalone-launch/.repoindices/Maven Central

@@ -200,7 +200,6 @@
 				<module>jadex-rules-eca</module>
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-micro</module>
-				<module>jadex-kernel-micro-android</module>
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bdiv3</module>
@@ -217,7 +216,29 @@
 				<module>jadex-android-platformapp</module>
 			</modules>
 		</profile>
+
+		<!-- ======== Profile for install (android modules only) ======== -->
+		<profile>
+			<id>install</id>
+			<modules>
+				<!-- runtime -->
+			    <module>jadex-android-parent</module>
+				<module>jadex-android-commons</module>
+				<module>jadex-android-antlr</module>	
+				<module>jadex-android-xmlpull</module>
+				<module>jadex-android-platformclient</module>
+				<module>jadex-platform-android</module>
+				<module>jadex-runtimetools-android</module>
+				<module>jadex-platform-extension-webservice-android</module>
+				<module>jadex-kernel-bdiv3-android</module>
+				<!-- separated platform -->
+				<module>jadex-android-platformapp</module>
+				<!-- build tools -->
+				<module>jadex-android-maven-plugin</module>
+			</modules>
+		</profile>
 		
+		<!-- 
 		<profile>
 			<id>development</id>
 			<activation>
@@ -242,7 +263,8 @@
 				<module>jadex-applications-android-chat</module>
 				<module>jadex-applications-android-puzzle</module>
 			</modules>
-		</profile>		
+		</profile>
+		 -->
 		
 		<!-- ======== integration test ======== -->
 		

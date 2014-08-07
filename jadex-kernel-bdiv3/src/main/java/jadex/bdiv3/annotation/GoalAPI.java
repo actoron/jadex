@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ *  The goal API (IGoal) injection for a pojo goal.
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

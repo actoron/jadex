@@ -358,6 +358,33 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 		return ret;
 	}
 	
+//	/**
+//	 *  Get the application name. Equals the local component name in case it is a child of the platform.
+//	 *  broadcast@awa.plat1 -> awa
+//	 *  @return The application name.
+//	 */
+//	public String getApplicationName()
+//	{
+//		String ret = getName();
+//		int idx;
+//		// If it is a direct subcomponent
+//		if((idx = ret.lastIndexOf('.')) != -1)
+//		{
+//			// cut off platform name
+//			ret = ret.substring(0, idx);
+//			// cut off local name 
+//			if((idx = ret.indexOf('@'))!=-1)
+//				ret = ret.substring(idx + 1);
+//			if((idx = ret.indexOf('.'))!=-1)
+//				ret = ret.substring(idx + 1);
+//		}
+//		else
+//		{
+//			ret = getLocalName();
+//		}
+//		return ret;
+//	}
+	
 	/**
 	 *  Get the platform name without the suffix for name uniqueness.
 	 *  @return The platform name without suffix.
@@ -412,4 +439,17 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 		}
 		return name;
 	}
+	
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		ComponentIdentifier cid = new ComponentIdentifier("broadcast@awa.plat1");
+//		System.out.println(cid.getApplicationName());
+//		cid = new ComponentIdentifier("broadcast@plat1");
+//		System.out.println(cid.getApplicationName());
+//		cid = new ComponentIdentifier("broadcast@a.b.plat1");
+//		System.out.println(cid.getApplicationName());
+//	}
 }

@@ -82,7 +82,8 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	{
 		if (universalService.isClientServiceConnection(conn))
 		{
-			boolean unbindClientService = universalService.unbindClientService(conn);
+//			boolean unbindClientService =
+			universalService.unbindClientService(conn);
 		}
 		else
 		{

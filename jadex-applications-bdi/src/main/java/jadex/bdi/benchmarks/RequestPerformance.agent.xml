@@ -37,7 +37,7 @@
 
 		<!-- The number of conversations to perform. -->
 		<belief name="max" class="int" exported="true">
-			<fact>1000</fact>
+			<fact>500</fact>
 		</belief>
 	</beliefs>
 	

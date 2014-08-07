@@ -10,6 +10,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -117,7 +118,16 @@ public class JadexBinaryCodec implements ICodec
 	{
 		byte[] ret = BinarySerializer.objectToByteArray(val, null, getEncoderChain(context), null, classloader);
 		if(DEBUG)
-			System.out.println("encode message: "+(new String(ret, Charset.forName("UTF-8"))));
+		{
+			try
+			{
+				System.out.println("encode message: "+(new String(ret, "UTF-8")));
+			}
+			catch(UnsupportedEncodingException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 		return ret;
 	}
 
@@ -132,7 +142,16 @@ public class JadexBinaryCodec implements ICodec
 			? BinarySerializer.objectFromByteArray((byte[])bytes, null, null, classloader, rep)
 			: BinarySerializer.objectFromByteArrayInputStream((ByteArrayInputStream)bytes, null, null, classloader, rep);
 		if(DEBUG)
-			System.out.println("decode message: "+(new String((byte[])bytes, Charset.forName("UTF-8"))));
+		{
+			try
+			{
+				System.out.println("decode message: "+(new String((byte[])bytes, "UTF-8")));
+			}
+			catch(UnsupportedEncodingException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 		return ret;
 	}
 	

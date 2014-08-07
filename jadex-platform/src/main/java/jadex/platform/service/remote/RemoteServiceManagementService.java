@@ -16,13 +16,8 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.search.AnyResultSelector;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.search.TypeResultSelector;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -32,6 +27,7 @@ import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -42,14 +38,15 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.binaryserializer.DecodingContext;
-import jadex.commons.transformation.binaryserializer.EncodingContext;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
+import jadex.commons.transformation.binaryserializer.IDecodingContext;
+import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.message.MessageService;
@@ -208,22 +205,243 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		return infos;
 	}
 	
+//	/**
+//	 *  Get service proxies from a remote platform.
+//	 *  (called from arbitrary components)
+//	 *  @param cid Component id that is used to start the search.
+//	 *  @param manager The search manager.
+//	 *  @param decider The visit decider.
+//	 *  @param selector The result selector.
+//	 *  @return Collection or single result (i.e. service proxies). 
+//	 */
+//	public ITerminableIntermediateFuture<IService> getServiceProxies(final IComponentIdentifier cid, 
+//		final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
+//	{
+//		final IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+//		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".0.getServiceProxies");
+//		
+//		final TerminableIntermediateDelegationFuture<IService> future = new TerminableIntermediateDelegationFuture<IService>()
+//		{
+//			public void terminate(final Exception e) 
+//			{
+//				component.scheduleStep(new IComponentStep<Void>()
+//				{
+//					// Sends termination command if aborted
+//					@Classname("getServiceProxiesTerminate")
+//					public IFuture<Void> execute(IInternalAccess ia)
+//					{
+//						// Set exception for local state (as rms removes waiting call, cannot receive remote result any more)
+//						boolean	set	= setExceptionIfUndone(e);
+//						
+//						// Send message to announce termination to remote
+//						if(set)
+//						{
+//							Future res = new Future();
+//		//					res.addResultListener(new IResultListener()
+//		//					{
+//		//						public void resultAvailable(Object result)
+//		//						{
+//		//							System.out.println("received result: "+result);
+//		//						}
+//		//						public void exceptionOccurred(Exception exception)
+//		//						{
+//		//							System.out.println("received exception: "+exception);
+//		//						}
+//		//					});
+//							final String mycallid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".ret.getServiceProxies");
+//							RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, e);
+//							// Can be invoked directly, because internally redirects to agent thread.
+//		//					System.out.println("sending terminate");
+//							sendMessage(rrms, null, content, mycallid,  BasicService.getRemoteDefaultTimeout(), res, null, null);
+//						}
+//						return IFuture.DONE;
+//					}
+//				});
+//			}
+//			
+//			public void sendBackwardCommand(Object info)
+//			{
+//				Future<Object> res = new Future<Object>();
+//				final String mycallid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".ret.getServiceProxies");
+//				RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+////				System.out.println("sending backward cmd");
+//				sendMessage(rrms, null, content, mycallid, BasicService.getRemoteDefaultTimeout(), res, null, null);
+//			}
+//			
+//			// Called from delegation listeners in RMS -> ignore if already terminated
+//			public void setException(Exception exception)
+//			{
+//				super.setExceptionIfUndone(exception);
+//			}
+//		};
+//		
+////		future.addResultListener(new IIntermediateResultListener<IService>()
+////		{
+////			public void intermediateResultAvailable(IService result)
+////			{
+////				System.out.println("inm res: "+result+" "+callid);
+////			}
+////			public void finished()
+////			{
+////				System.out.println("fini"+" "+callid);
+////			}
+////			public void resultAvailable(Collection<IService> result)
+////			{
+////				System.out.println("res: "+result+" "+callid);
+////			}
+////			public void exceptionOccurred(Exception exception)
+////			{
+////				System.out.println("ex: "+exception+" "+callid);
+////			}
+////		});
+//		
+////		System.out.println("gsp: "+cid);
+//		component.scheduleStep(new IComponentStep<Object>()
+//		{
+//			@Classname("getServiceProxies")
+//			public IFuture<Object> execute(IInternalAccess ia)
+//			{
+//				final Future fut = future;
+////				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+////					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(fut)
+////				{
+////					public void customResultAvailable(IComponentManagementService cms)
+////					{
+//						// Hack! create remote rms cid with "rms" assumption.
+//						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
+//							decider, selector, callid);
+//						
+////						System.out.println("send to: "+rrms+" "+callid);
+//						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func
+////					}
+////				});
+//				
+////				return fut;
+//				return new Future<Object>(null);
+//			}
+//		});
+//		
+//		return future;
+//	}
+	
+	
+	
+//	/**
+//	 *  Get a service proxy from a remote component.
+//	 *  (called from arbitrary components)
+//	 *  @param cid	The remote provider id.
+//	 *  @param service	The service type.
+//	 *  @param scope	The search scope. 
+//	 *  @return The service proxy.
+//	 */
+//	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope)
+//	{
+////		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
+//		final Future<T>	ret	= new Future<T>();
+//		getServiceProxies(cid, SServiceProvider.getSearchManager(false, scope), SServiceProvider.getVisitDecider(true, scope), 
+//			new TypeResultSelector(service, true)).addResultListener(new ExceptionDelegationResultListener<Collection<IService>, T>(ret)
+//		{
+//			public void customResultAvailable(Collection<IService> result)
+//			{
+////				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
+//				if(result!=null && !((Collection<?>)result).isEmpty())
+//				{
+//					Object	o	= ((Collection<?>)result).iterator().next();
+//					ret.setResult((T)o);
+//				}
+//				else
+//				{
+//					super.exceptionOccurred(new ServiceNotFoundException("No proxy for service found: "+cid+", "+service.getName()));
+//				}
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+////				System.out.println("getServiceProxy end ex: "+cid+" "+service.getName());
+//				super.exceptionOccurred(exception);
+//			}
+//		});
+//		return ret;
+//	}
+	
 	/**
-	 *  Get service proxies from a remote platform.
+	 *  Get a service proxy from a remote component.
 	 *  (called from arbitrary components)
-	 *  @param cid Component id that is used to start the search.
-	 *  @param manager The search manager.
-	 *  @param decider The visit decider.
-	 *  @param selector The result selector.
-	 *  @return Collection or single result (i.e. service proxies). 
+	 *  @param cid	The remote provider id.
+	 *  @param service	The service type.
+	 *  @param scope	The search scope. 
+	 *  @return The service proxy.
 	 */
-	public ITerminableIntermediateFuture<IService> getServiceProxies(final IComponentIdentifier cid, 
-		final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
+	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope, IRemoteFilter<T> filter)
 	{
+//		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
+		final Future<T>	ret	= new Future<T>();
+		getServiceProxies(cid, service, scope, false, filter).addResultListener(new ExceptionDelegationResultListener<Collection<T>, T>(ret)
+		{
+			public void customResultAvailable(Collection<T> result)
+			{
+//				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
+				if(result!=null && !result.isEmpty())
+				{
+					T o = result.iterator().next();
+					ret.setResult(o);
+				}
+				else
+				{
+					super.exceptionOccurred(new ServiceNotFoundException("No proxy for service found: "+cid+", "+service.getName()));
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+//				System.out.println("getServiceProxy end ex: "+cid+" "+service.getName());
+				super.exceptionOccurred(exception);
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Get all service proxies from a remote component.
+	 *  (called from arbitrary components)
+	 *  @param cid	The remote provider id.
+	 *  @param service	The service type.
+	 *  @param scope	The search scope. 
+	 *  @return The service proxy.
+	 */
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier cid, final Class<T> service, final String scope, IRemoteFilter<T> filter)
+	{
+		return getServiceProxies(cid, service, scope, true, filter);
+	}
+	
+	/**
+	 *  Get all service proxies from a remote component.
+	 *  (called from arbitrary components)
+	 *  @param cid	The remote provider id.
+	 *  @param service	The service type.
+	 *  @param scope	The search scope. 
+	 *  @return The service proxy.
+	 */
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IRemoteFilter<T> filter)
+	{
+//		final Future<T>	ret	= new Future<T>();
+//		
+//		getServiceProxies(cid, SServiceProvider.getSearchManager(true, scope),
+//			SServiceProvider.getVisitDecider(false, scope), new TypeResultSelector(service, true))
+//			.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, T>(ret)
+//		{
+//			public void customResultAvailable(Collection<IService> result)
+//			{
+//				ret.setResult((T)result);
+//			}
+//		});
+//		
+//		return ret;
+		
 		final IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".0.getServiceProxies");
 		
-		final TerminableIntermediateDelegationFuture<IService> future = new TerminableIntermediateDelegationFuture<IService>()
+		final TerminableIntermediateDelegationFuture<T> future = new TerminableIntermediateDelegationFuture<T>()
 		{
 			public void terminate(final Exception e) 
 			{
@@ -311,8 +529,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
 						// Hack! create remote rms cid with "rms" assumption.
-						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
-							decider, selector, callid);
+						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid, (IRemoteFilter<IService>)filter);
 						
 //						System.out.println("send to: "+rrms+" "+callid);
 						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func
@@ -327,83 +544,18 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		return future;
 	}
 	
-	
-	
-	/**
-	 *  Get a service proxy from a remote component.
-	 *  (called from arbitrary components)
-	 *  @param cid	The remote provider id.
-	 *  @param service	The service type.
-	 *  @param scope	The search scope. 
-	 *  @return The service proxy.
-	 */
-	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope)
-	{
-//		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
-		final Future<T>	ret	= new Future<T>();
-		getServiceProxies(cid, SServiceProvider.getSearchManager(false, scope), SServiceProvider.getVisitDecider(true, scope), 
-			new TypeResultSelector(service, true)).addResultListener(new ExceptionDelegationResultListener<Collection<IService>, T>(ret)
-		{
-			public void customResultAvailable(Collection<IService> result)
-			{
-//				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
-				if(result!=null && !((Collection<?>)result).isEmpty())
-				{
-					Object	o	= ((Collection<?>)result).iterator().next();
-					ret.setResult((T)o);
-				}
-				else
-				{
-					super.exceptionOccurred(new ServiceNotFoundException("No proxy for service found: "+cid+", "+service.getName()));
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-//				System.out.println("getServiceProxy end ex: "+cid+" "+service.getName());
-				super.exceptionOccurred(exception);
-			}
-		});
-		return ret;
-	}
-	
-	/**
-	 *  Get all service proxies from a remote component.
-	 *  (called from arbitrary components)
-	 *  @param cid	The remote provider id.
-	 *  @param service	The service type.
-	 *  @param scope	The search scope. 
-	 *  @return The service proxy.
-	 */
-	public <T> IFuture<T> getServiceProxies(IComponentIdentifier cid, Class<T> service, String scope)
-	{
-		final Future<T>	ret	= new Future<T>();
-		
-		getServiceProxies(cid, SServiceProvider.getSearchManager(true, scope),
-			SServiceProvider.getVisitDecider(false, scope), new TypeResultSelector(service, true))
-			.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, T>(ret)
-		{
-			public void customResultAvailable(Collection<IService> result)
-			{
-				ret.setResult((T)result);
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get all declared service proxies from a remote component.
-	 *  (called from arbitrary components)
-	 *  @param cid The remote provider id.
-	 *  @param service The service type.
-	 *  @return The service proxy.
-	 */
-	public IFuture<Collection<IService>> getDeclaredServiceProxies(IComponentIdentifier cid)
-	{
-		return getServiceProxies(cid, SServiceProvider.localmanager, SServiceProvider.contdecider, 
-			new AnyResultSelector(false, false));
-	}
+//	/**
+//	 *  Get all declared service proxies from a remote component.
+//	 *  (called from arbitrary components)
+//	 *  @param cid The remote provider id.
+//	 *  @param service The service type.
+//	 *  @return The service proxy.
+//	 */
+//	public IFuture<Collection<IService>> getDeclaredServiceProxies(IComponentIdentifier cid)
+//	{
+//		return getServiceProxies(cid, SServiceProvider.localmanager, SServiceProvider.contdecider, 
+//			new AnyResultSelector(false, false));
+//	}
 	
 	/**
 	 *  Get an external access proxy from a remote component.
@@ -659,22 +811,52 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							putWaitingCall(callid, future, tt, context);
 							
 							// Remove waiting call when future is done
-							future.addResultListener(ia.createResultListener(new IFutureCommandResultListener<Object>()
+							if(future instanceof ISubscriptionIntermediateFuture)
 							{
-								public void resultAvailable(Object result)
+								// IResultListener not allowed for subscription future.
+								((ISubscriptionIntermediateFuture)future).addResultListener(ia.createResultListener(new IIntermediateFutureCommandResultListener<Object>()
 								{
-									removeWaitingCall(callid);
-								}
-								public void exceptionOccurred(Exception exception)
+									public void intermediateResultAvailable(Object result)
+									{
+									}
+									public void finished()
+									{
+										removeWaitingCall(callid);
+									}
+									public void resultAvailable(Collection<Object> result)
+									{
+										removeWaitingCall(callid);
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										removeWaitingCall(callid);								
+										ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
+									}
+									public void commandAvailable(Object command)
+									{
+										// do nothing here, cannot forward
+									}
+								}));								
+							}
+							else
+							{
+								future.addResultListener(ia.createResultListener(new IFutureCommandResultListener<Object>()
 								{
-									removeWaitingCall(callid);								
-									ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
-								}
-								public void commandAvailable(Object command)
-								{
-									// do nothing here, cannot forward
-								}
-							}));
+									public void resultAvailable(Object result)
+									{
+										removeWaitingCall(callid);
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										removeWaitingCall(callid);								
+										ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
+									}
+									public void commandAvailable(Object command)
+									{
+										// do nothing here, cannot forward
+									}
+								}));
+							}
 							
 	//						System.out.println("Waitingcalls: "+waitingcalls.size());
 							
@@ -684,7 +866,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							msg.put(SFipa.CONVERSATION_ID, callid);
 							msg.put(SFipa.X_NONFUNCTIONAL, nonfunc);
 							
-							getResourceIdentifier(ia.getServiceContainer(), ((AbstractRemoteCommand)content).getSender())
+							getResourceIdentifier((IServiceProvider)ia.getServiceContainer(), ((AbstractRemoteCommand)content).getSender())
 								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Object>(future)
 							{
 								public void customResultAvailable(IResourceIdentifier rid)
@@ -1260,7 +1442,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ProxyReference.class.equals(clazz);
 			}
 			
-			public Object decode(Class<?> clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, IDecodingContext context)
 			{
 				try
 				{
@@ -1282,7 +1464,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ServiceInputConnectionProxy.class.equals(clazz);
 			}
 			
-			public Object decode(Class<?> clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, IDecodingContext context)
 			{
 				try
 				{
@@ -1306,7 +1488,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ServiceOutputConnectionProxy.class.equals(clazz);
 			}
 			
-			public Object decode(Class<?> clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, IDecodingContext context)
 			{
 				try
 				{
@@ -1401,8 +1583,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					IComponentIdentifier receiver = ((AbstractRemoteCommand)((EncodingContext)context).getRootObject()).getReceiver();
-					return rrm.getProxyReference(object, receiver, ((EncodingContext)context).getClassLoader());
+					IComponentIdentifier receiver = ((AbstractRemoteCommand)((IEncodingContext)context).getRootObject()).getReceiver();
+					return rrm.getProxyReference(object, receiver, ((IEncodingContext)context).getClassLoader());
 				}
 				catch(Exception e)
 				{
@@ -1421,7 +1603,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					AbstractRemoteCommand com = (AbstractRemoteCommand)((EncodingContext)context).getRootObject();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)((IEncodingContext)context).getRootObject();
 					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
 					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(
 						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
@@ -1450,7 +1632,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					AbstractRemoteCommand com = (AbstractRemoteCommand)((EncodingContext)context).getRootObject();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)((IEncodingContext)context).getRootObject();
 					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
 					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(
 						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());

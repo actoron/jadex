@@ -18,5 +18,5 @@ public interface IDecoderHandler
 	 *  @param context The decoding context.
 	 *  @return The decoded object.
 	 */
-	public Object decode(Class<?> clazz, DecodingContext context);
+	public Object decode(Class<?> clazz, IDecodingContext context);
 }

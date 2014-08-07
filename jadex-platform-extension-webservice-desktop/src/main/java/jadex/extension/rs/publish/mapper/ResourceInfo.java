@@ -8,6 +8,9 @@ public class ResourceInfo
 	/** The resource file path. */
 	protected String path;
 
+	/** The direct data as alternative to the path. */
+	protected byte[] data;
+	
 	/** The media type. */
 	protected String mediatype;
 
@@ -18,6 +21,15 @@ public class ResourceInfo
 	{
 		this.mediatype = mediatype;
 		this.path = path;
+	}
+	
+	/**
+	 *  Create a new ResourceInfo.
+	 */
+	public ResourceInfo(byte[] data, String mediatype)
+	{
+		this.mediatype = mediatype;
+		this.data = data;
 	}
 
 	/**
@@ -54,5 +66,23 @@ public class ResourceInfo
 	public void setPath(String path)
 	{
 		this.path = path;
+	}
+
+	/**
+	 *  Get the data.
+	 *  return The data.
+	 */
+	public byte[] getData()
+	{
+		return data;
+	}
+
+	/**
+	 *  Set the data. 
+	 *  @param data The data to set.
+	 */
+	public void setData(byte[] data)
+	{
+		this.data = data;
 	}
 }

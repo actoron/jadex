@@ -16,9 +16,16 @@ public class BPMNTest	extends ComponentTestSuite
 	 */
 	public BPMNTest()	throws Exception
 	{
-		// Use BPMN classes directory as classpath root,
-		super(new File("../jadex-applications-bpmn/target/classes/"),
-			new File("../jadex-applications-bpmn/target/classes"),
+		// Use classes directory as classpath root,
+		this("../jadex-applications-bpmn/target/classes/", "../jadex-applications-bpmn/target/classes");
+	}
+	
+	/**
+	 *  Constructor called by JadexInstrumentor for Android tests.
+	 */
+	public BPMNTest(String root, String path) throws Exception
+	{
+		super(new File(root), new File(path),
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
@@ -35,7 +42,9 @@ public class BPMNTest	extends ComponentTestSuite
 				"StreamTest",	// ???
 				"CustomTask",	// Uses modal dialog that blocks execution.
 				"LoopingSubtask",	// Not yet implemented.
-				"ServiceCallTask"	// task properties implementation not yet finished
+				"ServiceCallTask",	// task properties implementation not yet finished
+				"S2_RequiredServices",	// req service not available
+				"S2_RequiredServices2",	// req service not available
 			});
 //			}, 600000, true, false);	// Uncomment for no starting of non-test agents.
 	}

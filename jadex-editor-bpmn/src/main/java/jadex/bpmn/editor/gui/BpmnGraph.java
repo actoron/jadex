@@ -10,19 +10,28 @@ import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VMessagingEdge;
+import jadex.bpmn.editor.model.visual.VNode;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MTask;
 import jadex.commons.collection.LRU;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.layout.mxStackLayout;
+import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxLayoutManager;
 import com.mxgraph.view.mxStylesheet;
@@ -97,6 +106,172 @@ public class BpmnGraph extends mxGraph
 //				orderCells(true, cells);
 //			}
 //		});
+		
+		addListener(mxEvent.CELLS_RESIZED, new mxIEventListener()
+		{
+			public void invoke(Object sender, mxEventObject evt)
+			{
+				final Object[] cells = (Object[]) evt.getProperty("cells");
+				for (int i = 0; i < cells.length; ++i)
+				{
+					if (cells[i] instanceof VPool)
+					{
+						VPool vpool = (VPool) cells[i];
+//						System.out.println(vpool.getGeometry() + " " + vpool.getPreviousGeometry());
+						if (vpool.getGeometry().getX() == vpool.getPreviousGeometry().getX() + vpool.getPreviousGeometry().getWidth() ||
+							vpool.getGeometry().getX() + vpool.getGeometry().getWidth() == vpool.getPreviousGeometry().getX())
+						{
+							vpool.getGeometry().setWidth(vpool.getGeometry().getWidth() + vpool.getPreviousGeometry().getWidth());
+							vpool.getGeometry().setX(Math.min(vpool.getPreviousGeometry().getX(), vpool.getGeometry().getX()));
+						}
+						if (vpool.getGeometry().getY() == vpool.getPreviousGeometry().getY() + vpool.getPreviousGeometry().getHeight() ||
+							vpool.getGeometry().getY() + vpool.getGeometry().getHeight() == vpool.getPreviousGeometry().getY())
+						{
+							vpool.getGeometry().setHeight(vpool.getGeometry().getHeight() + vpool.getPreviousGeometry().getHeight());
+							vpool.getGeometry().setY(Math.min(vpool.getPreviousGeometry().getY(), vpool.getGeometry().getY()));
+						}
+						Integer startsize = (Integer) getStylesheet().getCellStyle(vpool.getStyle(), null).get(mxConstants.STYLE_STARTSIZE);
+						startsize = startsize != null? startsize : mxConstants.DEFAULT_STARTSIZE;
+						double minx = Double.MAX_VALUE;
+						double miny = Double.MAX_VALUE;
+						double maxx = 0.0;
+						double maxy = 0.0;
+						boolean leftresize = vpool.getPreviousGeometry().getX() != vpool.getGeometry().getX();
+						boolean topresize = vpool.getPreviousGeometry().getY() != vpool.getGeometry().getY();
+						double xdiff = vpool.getPreviousGeometry().getX() - vpool.getGeometry().getX();
+						double ydiff = vpool.getPreviousGeometry().getY() - vpool.getGeometry().getY();
+						List<VNode> innercells = new ArrayList<VNode>();
+						for (int j = 0; j < vpool.getChildCount(); ++j)
+						{
+							Object obj = vpool.getChildAt(j);
+							if (obj instanceof VLane)
+							{
+								VLane lane = (VLane) obj;
+								for (int k = 0; k < lane.getChildCount(); ++k)
+								{
+									Object lobj = lane.getChildAt(k);
+									if (lobj instanceof VNode)
+									{
+										VNode node = (VNode) lobj;
+										mxGeometry geo = node.getGeometry();
+										if (minx > geo.getX())
+										{
+											minx = geo.getX();
+										}
+										if (miny > geo.getY())
+										{
+											miny = geo.getY();
+										}
+										if (maxx < geo.getWidth() + geo.getX())
+										{
+											maxx = geo.getWidth() + geo.getX();
+										}
+										if (maxy < (mxConstants.SHADOW_OFFSETY + geo.getHeight() + geo.getY()))
+										{
+											maxy = mxConstants.SHADOW_OFFSETY + geo.getHeight() + geo.getY();
+										}
+										
+										innercells.add(node);
+									}
+								}
+							}
+							else if (obj instanceof VNode)
+							{
+								VNode node = (VNode) obj;
+								mxGeometry geo = node.getGeometry();
+								if (minx > geo.getX())
+								{
+									minx = geo.getX();
+								}
+								if (miny > geo.getY())
+								{
+									miny = geo.getY();
+								}
+								if (maxx < geo.getWidth() + geo.getX())
+								{
+									maxx = geo.getWidth() + geo.getX();
+								}
+								if (maxy < (mxConstants.SHADOW_OFFSETY + geo.getHeight() + geo.getY()))
+								{
+									maxy = mxConstants.SHADOW_OFFSETY + geo.getHeight() + geo.getY();
+								}
+								
+								innercells.add(node);
+							}
+						}
+						
+						if (!leftresize)
+						{
+							if (maxx > vpool.getGeometry().getWidth())
+							{
+								double diff = maxx - vpool.getGeometry().getWidth();
+								xdiff = -diff;
+								if ((minx + xdiff) < startsize)
+								{
+									xdiff += (startsize - (minx + xdiff));
+									diff += xdiff;
+									vpool.getGeometry().setWidth(vpool.getGeometry().getWidth() + diff);
+								}
+							}
+						}
+						else
+						{
+							if ((minx + xdiff) < startsize)
+							{
+								xdiff -= (minx + (xdiff - startsize));
+							}
+							if (vpool.getGeometry().getWidth() < (startsize + maxx - minx))
+							{
+								double diff = (startsize + maxx - minx) - vpool.getGeometry().getWidth();
+								vpool.getGeometry().setWidth(startsize + maxx - minx);
+								vpool.getGeometry().setX(vpool.getGeometry().getX() - diff);
+							}
+						}
+						if (!topresize)
+						{
+							if (maxy > vpool.getGeometry().getHeight())
+							{
+								double diff = maxy - vpool.getGeometry().getHeight();
+								ydiff = -diff;
+								if ((miny + ydiff) < 0)
+								{
+									ydiff += -(miny + ydiff);
+									diff += ydiff;
+									vpool.getGeometry().setHeight(vpool.getGeometry().getHeight() + diff);
+								}
+							}
+						}
+						else
+						{
+							if ((miny + ydiff) < 0)
+							{
+								ydiff -= (miny + ydiff);
+							}
+							if (vpool.getGeometry().getHeight() < (maxy - miny))
+							{
+								double diff = (maxy - miny) - vpool.getGeometry().getHeight();
+								vpool.getGeometry().setHeight(maxy - miny);
+								vpool.getGeometry().setY(vpool.getGeometry().getY() - diff);
+							}
+						}
+						
+//								System.out.println(minx + " " + miny + " " + maxx + " " + maxy + " " + xdiff + " " + ydiff);
+						
+						for (VNode node : innercells)
+						{
+							mxGeometry geo = node.getGeometry();
+							geo.setX(geo.getX() + xdiff);
+							geo.setY(geo.getY() + ydiff);
+						}
+						Object[] selcells = getSelectionCells();
+						clearSelection();
+						refreshCellView(vpool);
+						setSelectionCells(selcells);
+					}
+				}
+			}
+		});
+		
 		setStylesheet(sheet);
 		activate();
 	}
@@ -198,6 +373,7 @@ public class BpmnGraph extends mxGraph
 			}
 		}
 		
+//		System.out.println("IsVisible: " + cell + " " + ret);
 		return ret;
 	}
 
@@ -237,10 +413,14 @@ public class BpmnGraph extends mxGraph
 						(!model.isEdge(cell) && !isCellCollapsed(cell));
 			}
 		}
+//		else if (cell instanceof VActivity &&
+//				 ((VActivity) cell).getBpmnElement() != null &&
+//				 (cell instanceof VExternalSubProcess ||
+//				 MBpmnModel.TASK.equals(((MActivity) ((VActivity) cell).getBpmnElement()).getActivityType())))
 		else if (cell instanceof VActivity &&
 				 ((VActivity) cell).getBpmnElement() != null &&
 				 (cell instanceof VExternalSubProcess ||
-				 MBpmnModel.TASK.equals(((MActivity) ((VActivity) cell).getBpmnElement()).getActivityType())))
+				 ((VActivity) cell).getBpmnElement() instanceof MTask))
 		{
 			/* Tasks are never drop targets, even if they contain children, they will be all event handlers. */
 			ret = false;
@@ -422,7 +602,9 @@ public class BpmnGraph extends mxGraph
 				((VElement) parent).getBpmnElement() instanceof MActivity)
 			{
 				MActivity mparent = (MActivity) ((VElement) parent).getBpmnElement();
-				if (MBpmnModel.TASK.equals(mparent.getActivityType()) ||
+//				if (MBpmnModel.TASK.equals(mparent.getActivityType()) ||
+//					MBpmnModel.SUBPROCESS.equals(mparent.getActivityType()))
+				if (mparent instanceof MTask ||
 					MBpmnModel.SUBPROCESS.equals(mparent.getActivityType()))
 				{
 					return evtlayout;

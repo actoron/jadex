@@ -33,17 +33,21 @@ public class VDataEdge extends VEdge
 		{
 			if (getSource() != null)
 			{
-				VActivity vsrc = (VActivity) getSource().getParent();
+				VActivity vsrc = getSourceActivity();
 				((MActivity) vsrc.getBpmnElement()).removeOutgoingDataEdge(dedge);
 			}
 			super.setSource(source);
 			if (source != null)
 			{
-				VActivity vsrc = (VActivity) getSource().getParent();
+				VActivity vsrc = getSourceActivity();
 				((MActivity) vsrc.getBpmnElement()).addOutgoingDataEdge(dedge);
-				dedge.setSource((MActivity) vsrc.getBpmnElement());
-				String paramname = ((VOutParameter) getSource()).getParameter().getName();
-				dedge.setSourceParameter(paramname);
+				dedge.setSource(vsrc.getMActivity());
+				
+				if (getSource() instanceof VOutParameter)
+				{
+					String paramname = ((VOutParameter) getSource()).getParameter().getName();
+					dedge.setSourceParameter(paramname);
+				}
 			}
 		}
 		else
@@ -62,19 +66,26 @@ public class VDataEdge extends VEdge
 		{
 			if (getTarget() != null)
 			{
-				VActivity vtgt = (VActivity) getTarget().getParent();
+				VActivity vtgt = getTargetActivity();
+//				VActivity vtgt = (VActivity) getTarget().getParent();
 				((BpmnGraph) getGraph()).delayedRefreshCellView(vtgt);
 				((MActivity) vtgt.getBpmnElement()).removeIncomingDataEdge(dedge);
 			}
 			super.setTarget(target);
 			if (target != null)
 			{
-				VActivity vtgt = (VActivity) getTarget().getParent();
+				
+				VActivity vtgt = getTargetActivity();
+//				VActivity vtgt = (VActivity) getTarget().getParent();
 				((BpmnGraph) getGraph()).delayedRefreshCellView(vtgt);
 				((MActivity) vtgt.getBpmnElement()).addIncomingDataEdge(dedge);
 				dedge.setTarget((MActivity) vtgt.getBpmnElement());
-				String paramname = ((VInParameter) getTarget()).getParameter().getName();
-				dedge.setTargetParameter(paramname);
+				
+				if (getTarget() instanceof VInParameter)
+				{
+					String paramname = ((VInParameter) getTarget()).getParameter().getName();
+					dedge.setTargetParameter(paramname);
+				}
 			}
 		}
 		else
@@ -93,11 +104,48 @@ public class VDataEdge extends VEdge
 		mxICell ret = null;
 		if (getSource() != null)
 		{
-			if (getSource().getParent() != null)
+			if (getSource() instanceof VOutParameter)
 			{
-				ret = getSource().getParent().getParent();
+				if (getSource().getParent() != null)
+				{
+					ret = getSource().getParent().getParent();
+				}
+			}
+			else
+			{
+				ret = getSource().getParent();
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Returns the source activity.
+	 *  
+	 *  @return The activity.
+	 */
+	protected VActivity getSourceActivity()
+	{
+		mxICell tmpvsrc = getSource();
+		if (tmpvsrc instanceof VOutParameter)
+		{
+			tmpvsrc = tmpvsrc.getParent();
+		}
+		return (VActivity) tmpvsrc;
+	}
+	
+	/**
+	 *  Returns the target activity.
+	 *  
+	 *  @return The activity.
+	 */
+	protected VActivity getTargetActivity()
+	{
+		mxICell tmpvtgt = getTarget();
+		if (tmpvtgt instanceof VInParameter)
+		{
+			tmpvtgt = tmpvtgt.getParent();
+		}
+		return (VActivity) tmpvtgt;
 	}
 }

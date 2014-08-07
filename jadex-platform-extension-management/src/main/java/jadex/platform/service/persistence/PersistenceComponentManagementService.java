@@ -211,7 +211,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 				public void customResultAvailable(final IExternalAccess parent)
 				{
 					// cinfo only needed for imports -> can be empty as model name is fully qualified.
-					getComponentFactory(pi.getModelFileName(), new CreationInfo(), pi.getComponentDescription().getResourceIdentifier())
+					getComponentFactory(pi.getModelFileName(), new CreationInfo(), pi.getComponentDescription().getResourceIdentifier(), false, false)
 						.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Void>(fut)
 					{
 						public void customResultAvailable(final IComponentFactory factory)
@@ -233,51 +233,51 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 										resultlisteners.put(pi.getComponentDescription().getName(), reslis);
 									}
 		
-//									// Todo: allow adapting component identifier (e.g. to changed platform suffix).
-//									Future<Void>	init	= new Future<Void>();
-//									final IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>>	tupfut	=
-//										factory.createComponentInstance(pi.getComponentDescription(), getComponentAdapterFactory(), model, 
-//										null, null, parent, null, copy, realtime, persist, pi, reslis, init);
-//									
-//									init.addResultListener(new ExceptionDelegationResultListener<Void, Void>(fut)
-//									{
-//										public void customResultAvailable(Void result)
-//										{
-//											tupfut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInterpreter, IComponentAdapter>, Void>(fut)
-//											{
-//												public void customResultAvailable(final Tuple2<IComponentInterpreter, IComponentAdapter> tup)
-//												{
-//													IComponentAdapter	pad	= internalGetComponentAdapter(parent.getComponentIdentifier());
-//													if(Arrays.asList(((CMSComponentDescription)pad.getDescription()).getChildren()).contains(pi.getComponentDescription().getName()))
-//													{
-//														done(tup);											
-//													}
-//													
-//													// If component hull no longer present, readd component at parent.
-//													else
-//													{
-//														addSubcomponent(pad, pi.getComponentDescription(), model)
-//															.addResultListener(new ExceptionDelegationResultListener<Void, Void>(fut)
-//														{
-//															public void customResultAvailable(Void result)
-//															{
-//																notifyListenersAdded(pi.getComponentDescription().getName(), pi.getComponentDescription());
-//																done(tup);
-//															}
-//														});
-//													}
-//												}
-//												
-//												public void done(Tuple2<IComponentInterpreter, IComponentAdapter> tup)
-//												{
-//													adapters.put(pi.getComponentDescription().getName(), tup.getSecondEntity());
-//													getComponentAdapterFactory().initialWakeup(tup.getSecondEntity());
-//													
-//													fut.setResult(null);
-//												}
-//											}));
-//										}
-//									});
+									// Todo: allow adapting component identifier (e.g. to changed platform suffix).
+									Future<Void>	init	= new Future<Void>();
+									final IFuture<Tuple2<IComponentInstance, IComponentAdapter>>	tupfut	=
+										factory.createComponentInstance(pi.getComponentDescription(), getComponentAdapterFactory(), model, 
+										null, null, parent, null, copy, realtime, persist, pi, reslis, init, agent.getServiceContainer().getServiceRegistry());
+									
+									init.addResultListener(new ExceptionDelegationResultListener<Void, Void>(fut)
+									{
+										public void customResultAvailable(Void result)
+										{
+											tupfut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, Void>(fut)
+											{
+												public void customResultAvailable(final Tuple2<IComponentInstance, IComponentAdapter> tup)
+												{
+													IComponentAdapter	pad	= internalGetComponentAdapter(parent.getComponentIdentifier());
+													if(Arrays.asList(((CMSComponentDescription)pad.getDescription()).getChildren()).contains(pi.getComponentDescription().getName()))
+													{
+														done(tup);											
+													}
+													
+													// If component hull no longer present, readd component at parent.
+													else
+													{
+														addSubcomponent(pad, pi.getComponentDescription(), model)
+															.addResultListener(new ExceptionDelegationResultListener<Void, Void>(fut)
+														{
+															public void customResultAvailable(Void result)
+															{
+																notifyListenersAdded(pi.getComponentDescription().getName(), pi.getComponentDescription());
+																done(tup);
+															}
+														});
+													}
+												}
+												
+												public void done(Tuple2<IComponentInstance, IComponentAdapter> tup)
+												{
+													adapters.put(pi.getComponentDescription().getName(), tup.getSecondEntity());
+													getComponentAdapterFactory().initialWakeup(tup.getSecondEntity());
+													
+													fut.setResult(null);
+												}
+											}));
+										}
+									});
 								}
 							}));
 						}

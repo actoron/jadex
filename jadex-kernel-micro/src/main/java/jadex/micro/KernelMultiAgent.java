@@ -23,7 +23,9 @@ import jadex.micro.annotation.ProvidedServices;
 	@Argument(name="ignorekernels", description="Kernels that are ignored.",
 		clazz=String[].class, defaultvalue="new String[] {\"KernelBDI.component.xml\"}"),
 	@Argument(name="ignoreextensions", description="File extensions that are ignored.",
-		clazz=String[].class, defaultvalue="null")})
+		clazz=String[].class, defaultvalue="new String[] {\".png\", \".jpg\", \".dll\", \".gif\", \".exe\", \".doc\", \".docx\", \".txt\" }"),
+	@Argument(name="kerneluriregex", description="Regular expression identifying kernel URIs.",
+		clazz=String.class, defaultvalue="\".*[Kk]ernel.*\"")})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
 	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getRawService(jadex.bridge.service.types.factory.IComponentFactory.class)"))

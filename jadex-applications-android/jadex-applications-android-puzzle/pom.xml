@@ -9,14 +9,14 @@
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
-		<version>2.5-SNAPSHOT</version>
+		<version> 2.5-SNAPSHOT </version>
 		<relativePath>../../jadex-android-parent/pom.xml</relativePath>
 	</parent>
 
 	<description>
 	This project contains the BDI based sokrates puzzle game for android.
 	The Jadex platform app must be installed prior to running this application!
-	Must be build with maven.
+	Must be built with maven.
 	</description>
 
 	<dependencies>
@@ -78,21 +78,8 @@
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<excludes>
-					<exclude>**/.svn/*</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.bpmn</include>
-				</includes>
-			</resource>
-		</resources>
 
-		<plugins>
-		
+		<plugins>		
 			<plugin>
 				<groupId>net.sourceforge.jadex</groupId>
 				<artifactId>jadex-android-maven-plugin</artifactId>
@@ -158,15 +145,9 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											net.sourceforge.jadex
-										</groupId>
-										<artifactId>
-											jadex-android-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.0-SNAPSHOT,)
-										</versionRange>
+										<groupId>net.sourceforge.jadex</groupId>
+										<artifactId>jadex-android-maven-plugin</artifactId>
+										<versionRange>{$project.version}</versionRange>
 										<goals>
 											<goal>generateBDI</goal>
 										</goals>

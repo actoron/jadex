@@ -78,7 +78,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	/**
 	 *  Goal for running around on the grid and searching for garbage.
 	 */
-	@Goal(excludemode=ExcludeMode.Never, succeedonpassed=false)
+	@Goal(excludemode=ExcludeMode.Never, orsuccess=false)
 	public class Check
 	{
 	}

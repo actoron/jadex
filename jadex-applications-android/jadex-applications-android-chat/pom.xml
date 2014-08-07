@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
-		<version>2.5-SNAPSHOT</version>
+		<version> 2.5-SNAPSHOT </version>
 		<relativePath>../../jadex-android-parent/pom.xml</relativePath>
 	</parent>
 	
@@ -63,7 +63,6 @@
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>support-v4</artifactId>
-			<version>r7</version>
 		</dependency>
 
 		<dependency>
@@ -75,21 +74,8 @@
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<excludes>
-					<exclude>**/.svn/*</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.bpmn</include>
-				</includes>
-			</resource>
-		</resources>
-
 		<plugins>
-			<plugin>
+   			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
 				<extensions>true</extensions>

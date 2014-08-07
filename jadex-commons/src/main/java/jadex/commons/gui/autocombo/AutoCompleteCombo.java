@@ -10,6 +10,8 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -91,6 +93,12 @@ public class AutoCompleteCombo<T> extends JComboBox
 			}
 		});
 	}
+	
+//	public void setSelectedItem(Object anObject) 
+//	{
+//		System.out.println("sel: "+anObject);
+//		super.setSelectedItem(anObject);
+//	}
 	
 	/**
 	 * 
@@ -219,9 +227,12 @@ public class AutoCompleteCombo<T> extends JComboBox
 	 */
 	private void clearSelection()
 	{
+		// Save caret position since selections moves the caret.
+		int pos = getEditorComponent().getCaretPosition();
 		int i = getText().length();
 		getEditorComponent().setSelectionStart(i);
 		getEditorComponent().setSelectionEnd(i);
+		getEditorComponent().setCaretPosition(pos);
 	}
 
 	/**
@@ -249,8 +260,8 @@ public class AutoCompleteCombo<T> extends JComboBox
 	{
 		try
 		{
-			setPopupVisible(false);
-			setPopupVisible(true);
+			hidePopup();
+			showPopup();
 			clearSelection();
 		}
 		catch(Exception e)
@@ -296,12 +307,12 @@ public class AutoCompleteCombo<T> extends JComboBox
 				
 				public void keyTyped(KeyEvent e)
 				{
-//					int key = e.getKeyCode();
+					int key = e.getKeyCode();
 //					System.out.println("typed: "+key);
 				
 //					getAutoModel().setSelectedItemQuiet(null);
 					
-					if(!t.isRunning())
+					if(!t.isRunning() && key == KeyEvent.VK_ENTER)
 					{
 						t.start();
 					}
@@ -331,6 +342,11 @@ public class AutoCompleteCombo<T> extends JComboBox
 							T obj = getAutoModel().getModelValue(text);
 							if(obj!=null)
 								getAutoModel().setSelectedItem(obj);
+						}
+						
+						if(t.isRunning())
+						{
+							t.stop();
 						}
 						
 //						System.out.println(getSelectedItem());

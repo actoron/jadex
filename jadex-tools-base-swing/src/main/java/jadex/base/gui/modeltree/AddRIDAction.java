@@ -17,7 +17,7 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
-import java.net.URL;
+import java.net.URI;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
@@ -102,7 +102,7 @@ public class AddRIDAction extends ToolTipAction
 							String url = (String)o.getClass().getField("remoteUrl").get(o);
 							Long lmod = (Long)o.getClass().getField("lastModified").get(o);
 							String id = grid+":"+arid+":"+ver;
-							IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, new URL(url), lmod!=null? lmod.toString(): null);
+							IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, new URI(url), lmod!=null? lmod.toString(): null);
 //							System.out.println("adding: "+gid);
 			
 			//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1";

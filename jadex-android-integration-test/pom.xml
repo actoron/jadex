@@ -8,7 +8,7 @@
 
 	<description>
 	Provides an entry point for unit tests on android.
-	Example project MUST be installed for this to work. 
+	Testlauncher project MUST be installed for this to work. 
 	(see http://code.google.com/p/maven-android-plugin/issues/detail?id=142)
 	</description>
 
@@ -20,7 +20,7 @@
 	</parent>
 
 	<properties>
-		<emulator.timeout>100000</emulator.timeout>
+		<emulator.timeout>1000000</emulator.timeout>
 	</properties>
 
 	<dependencies>
@@ -64,6 +64,33 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		    <resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+					<exclude>**/.svn/*</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/java</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+					<exclude>**/.svn/*</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
 
 		<plugins>
 
@@ -83,7 +110,7 @@
 				<configuration>
 					<emulator>
 						<!-- name of the avd to deploy to and run the instrumentation on -->
-						<avd>23</avd>
+						<avd>22</avd>
 						<!-- wait time for the emulator to start -->
 						<wait>${emulator.timeout}</wait>
 						<!-- additional options to run the emulator with -->
@@ -92,7 +119,7 @@
 					<undeployBeforeDeploy>true</undeployBeforeDeploy>
 					<sdk>
 						<path>${env.ANDROID_HOME}</path>
-						<platform>10</platform>
+						<platform>8</platform>
 					</sdk>
 					<extensions>true</extensions>
 					<test>
@@ -184,15 +211,9 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											net.sourceforge.jadex
-										</groupId>
-										<artifactId>
-											jadex-android-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.0-SNAPSHOT,)
-										</versionRange>
+										<groupId>net.sourceforge.jadex</groupId>
+										<artifactId>jadex-android-maven-plugin</artifactId>
+										<versionRange>{$project.version}</versionRange>
 										<goals>
 											<goal>generateBDI</goal>
 										</goals>

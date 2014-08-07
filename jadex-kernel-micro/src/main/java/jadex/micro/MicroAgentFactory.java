@@ -109,7 +109,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		this.provider = component.getServiceProvider();
 		this.providerid = provider.getId();
-		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
+		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null);
 		return startService();
 	}
 	
@@ -290,7 +290,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							Logger.getLogger(MicroAgentFactory.class.toString()).warning(exception.getMessage());
+//							exception.printStackTrace();
+							Logger.getLogger(MicroAgentFactory.class.toString()).warning(exception.toString());
 							ret.setResult(Boolean.FALSE);
 //							super.exceptionOccurred(exception);
 						}
@@ -314,23 +315,28 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  Get a default icon for a file type.
 	 */
 	public IFuture<byte[]> getComponentTypeIcon(String type)
-	{
+	{		
 		Future<byte[]>	ret	= new Future<byte[]>();
 		if(type.equals(FILETYPE_MICROAGENT))
 		{
 			try
 			{
 				ret.setResult(ICON.getData());
+//				System.out.println("icon for micro: "+ICON.getData().length);
 			}
 			catch(IOException e)
 			{
+				e.printStackTrace();
 				ret.setException(e);
 			}
 		}
 		else
 		{
+//			System.out.println("not found: "+type);
 			ret.setResult(null);
 		}
+		
+		
 		return ret;
 	}	
 

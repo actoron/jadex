@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
-		<version>2.5-SNAPSHOT</version>
+		<version> 2.5-SNAPSHOT </version>
 		<relativePath>../jadex-android-parent/pom.xml</relativePath>
 	</parent>
 	
@@ -46,6 +46,12 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdiv3-android</artifactId>
 			<version>${project.version}</version>
 		</dependency>		
 
@@ -89,20 +95,18 @@
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<excludes>
-					<exclude>**/.svn/*</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.bpmn</include>
-				</includes>
-			</resource>
-		</resources>
-
 		<plugins>
+			<plugin>
+				<groupId>net.sourceforge.jadex</groupId>
+				<artifactId>jadex-android-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generateBDI</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
@@ -119,5 +123,34 @@
 			</plugin>
 
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>net.sourceforge.jadex</groupId>
+										<artifactId>jadex-android-maven-plugin</artifactId>
+										<versionRange>{$project.version}</versionRange>
+										<goals>
+											<goal>generateBDI</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>

@@ -1,18 +1,12 @@
 package jadex.android.test;
 
 import jadex.android.AndroidContextManager;
-import jadex.android.commons.JadexDexClassLoader;
 import jadex.android.service.JadexPlatformManager;
 import jadex.base.test.impl.BrokenComponentTest;
 import jadex.bridge.ErrorReport;
-import jadex.commons.SUtil;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Collection;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,7 +16,6 @@ import android.test.AndroidTestRunner;
 import android.test.InstrumentationTestRunner;
 import android.test.suitebuilder.TestSuiteBuilder;
 import android.util.Log;
-import dalvik.system.PathClassLoader;
 
 public class JadexInstrumentor extends InstrumentationTestRunner
 {
@@ -56,16 +49,26 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		
 		try
 		{
+			Thread.sleep(10000);
+			
 			// To execute a single test:
 //			Test singleTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases.stream.InitiatorAgent", sourceDir);
 //			suite.addTest(singleTest);
 			
-			
-			Test bdiTest = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", sourceDir);
+			// Make sure that also the dependencies are placed in pom.
 			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
+			Test bdiTest = createTest("jadex.launch.test.BDITest", "jadex.bdi.testcases", sourceDir);
+			Test bpmnTest = createTest("jadex.launch.test.BPMNTest", "jadex.bpmn.testcases", sourceDir);
+			Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", "jadex.bdibpmn.testcases", sourceDir);
+			Test gpmnTest = createTest("jadex.launch.test.GPMNTest", "jadex.gpmn.testcases", sourceDir);
+			Test bdiv3Test = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", sourceDir);
 
-			suite.addTest(bdiTest);
 			suite.addTest(microTest);
+			suite.addTest(bdiTest);
+			suite.addTest(bpmnTest);
+			suite.addTest(bdibpmnTest);
+			suite.addTest(gpmnTest);
+			suite.addTest(bdiv3Test);
 			
 		}
 		catch (Exception e)
@@ -77,12 +80,12 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			suite.addTest(error);
 		}
 		
-		if (suite.countTestCases() < 10) {
-			ErrorReport errorReport = new ErrorReport();
-			errorReport.setErrorText("Less than 10 Testcases found - Problem with loading them?");
-			BrokenComponentTest error = new BrokenComponentTest("creation", errorReport);
-			suite.addTest(error);
-		}
+//		if (suite.countTestCases() < 10) {
+//			ErrorReport errorReport = new ErrorReport();
+//			errorReport.setErrorText("Less than 10 Testcases found - Problem with loading them?");
+//			BrokenComponentTest error = new BrokenComponentTest("creation", errorReport);
+//			suite.addTest(error);
+//		}
 		
 		return suite;
 	}

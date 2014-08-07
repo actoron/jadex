@@ -13,7 +13,7 @@
 	</parent>
 
 	<properties>
-		<jadex-android-maven-plugin-version>1.0</jadex-android-maven-plugin-version>
+		<!-- <jadex-android-maven-plugin-version>1.1-SNAPSHOT</jadex-android-maven-plugin-version> -->
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
 		<android-maven-plugin-version>3.8.1</android-maven-plugin-version>
 		<android-api-version>2.2.1</android-api-version>
@@ -23,6 +23,7 @@
 		<munge-generated-sources-dir>src/gen/java</munge-generated-sources-dir>
 	</properties>
 	
+	<!-- 
 	<repositories>
 		<repository>
 			<id>jadex-android</id>
@@ -42,7 +43,8 @@
 			<url>http://jadex.julakali.org/nexus/content/repositories/jadex-public-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
-
+	-->
+	
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
 		<!-- and remove the JRE from eclipse build path. -->
@@ -134,13 +136,13 @@
 				<plugin>
 					<groupId>net.sourceforge.jadex</groupId>
 					<artifactId>jadex-android-maven-plugin</artifactId>
-					<version>${jadex-android-maven-plugin-version}</version>
+					<version>${project.version}</version>
 				</plugin>
 				
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>1.7</version>
+					<version>1.8</version>
 				</plugin>
 				
 				<plugin>
@@ -161,7 +163,7 @@
 						<dex>
 							<jvmArguments>
 								<jvmArgument>-Xms256m</jvmArgument>
-								<jvmArgument>-Xmx1200m</jvmArgument>
+								<jvmArgument>-Xmx2048m</jvmArgument>
 							</jvmArguments>
 							<coreLibrary>false</coreLibrary>
 							<noLocals>false</noLocals>
@@ -232,6 +234,26 @@
 									</pluginExecutionFilter>
 									<action>
 										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											com.jayway.maven.plugins.android.generation2
+										</groupId>
+										<artifactId>
+											android-maven-plugin
+										</artifactId>
+										<versionRange>
+											[3.8.1,)
+										</versionRange>
+										<goals>
+											<goal>generate-sources</goal>
+											<goal>proguard</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute></execute>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

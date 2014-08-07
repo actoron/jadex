@@ -37,7 +37,8 @@
 			same_long=prefer long moves of same color, alter_long=prefer
 			long move of alternate color. -->
 		<belief name="ml" class="String" exported="true">
-			<fact>"alter_long"</fact>
+			<!-- <fact>"alter_long"</fact>-->
+			<fact>"same_long"</fact>
 		</belief>
 		
 		<!-- The memory used when the solution is found. -->
@@ -103,16 +104,6 @@
 	</properties>
 
 	<configurations>
-		<configuration name="alter-long">
-			<beliefs>
-				<initialbelief ref="ml">
- 					<fact>"alter_long"</fact>
-				</initialbelief>
-			</beliefs>
-			<plans>
-				<initialplan ref="play_game_plan"/>
-			</plans>
-		</configuration>
 		<configuration name="none">
 			<beliefs>
 				<initialbelief ref="ml">
@@ -137,6 +128,16 @@
 			<beliefs>
 				<initialbelief ref="ml">
  					<fact>"same_long"</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="play_game_plan"/>
+			</plans>
+		</configuration>
+		<configuration name="alter-long">
+			<beliefs>
+				<initialbelief ref="ml">
+ 					<fact>"alter_long"</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

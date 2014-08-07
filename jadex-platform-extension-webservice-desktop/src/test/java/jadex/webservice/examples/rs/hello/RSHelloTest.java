@@ -7,14 +7,18 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.rs.publish.GrizzlyRestServicePublishService;
-import junit.framework.TestCase;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  *  Test the consuming part of the Jadex Rest Webservice Extension.
  *  Creates a Simple Rest Service and tries to access it via 
  *  a Jadex Service.
  */
-public class RSHelloTest extends TestCase
+public class RSHelloTest //extends TestCase
 {
 
 	private static final String BASE_URI = "http://localhost";
@@ -25,11 +29,11 @@ public class RSHelloTest extends TestCase
 	private GrizzlyRestServicePublishService pservice;
 	private IServiceIdentifier sid;
 	
-	
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		hello = new Hello();
-		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class);
+		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class, null);
 		sid	= hello.getServiceIdentifier();
 		
 		pservice = new GrizzlyRestServicePublishService();
@@ -85,11 +89,13 @@ public class RSHelloTest extends TestCase
 //		extAcc = fut.get(sus);
 //	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		pservice.unpublishService(sid);
 	}
 
+	@Test
 	public void testAccessRestService()
 	{
 		try
@@ -102,7 +108,7 @@ public class RSHelloTest extends TestCase
 
 		String xmlHello = hs.sayXMLHello().get(sus);
 
-		assertEquals(hello.sayXMLHello(), xmlHello);
+		Assert.assertEquals(hello.sayXMLHello(), xmlHello);
 		System.out.println("Response: " + xmlHello);
 		}
 		catch(Exception e)

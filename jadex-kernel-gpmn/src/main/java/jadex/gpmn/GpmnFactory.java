@@ -1,29 +1,39 @@
 package jadex.gpmn;
 
 import jadex.bdi.BDIAgentFactory;
+import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
 import jadex.bdibpmn.BpmnPlanExecutor;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.LazyResource;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.gpmn.model.MGpmnModel;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,7 +94,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public GpmnFactory(IInternalAccess access, Map properties)
 	{
-		super(access.getServiceContainer().getId(), IComponentFactory.class, properties);
+		super(((IServiceProvider)access.getServiceContainer()).getId(), IComponentFactory.class, properties);
 		
 		this.fproperties	= properties;
 		this.ia = access;
@@ -100,7 +110,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 //		final IFuture<Void> sfuture = super.startService();
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -108,7 +118,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 				libservice = (ILibraryService)result;
 //				libservice.addLibraryServiceListener(libservicelistener);
 				
-				SServiceProvider.getService(ia.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
+				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -262,95 +272,85 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	}
 	
 	/**
-	 *  Get the component features for a model.
-	 *  @param model The component model.
-	 *  @return The component features.
+	 * Create a component instance.
+	 * @param adapter The component adapter.
+	 * @param model The component model.
+	 * @param config The name of the configuration (or null for default configuration) 
+	 * @param arguments The arguments for the agent as name/value pairs.
+	 * @param parent The parent component (if any).
+	 * @return An instance of a component.
 	 */
-	public IFuture<Collection<IComponentFeature>> getComponentFeatures(IModelInfo model)
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
+		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, 
+		final boolean copy, final boolean realtime, final boolean persist, final IPersistInfo persistinfo, 
+		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited, final LocalServiceRegistry registry)
 	{
-		// Todo: kernel-specific features.
-		return new Future<Collection<IComponentFeature>>(SComponentFactory.DEFAULT_FEATURES);
-	}
-	
-//	/**
-//	 * Create a component instance.
-//	 * @param adapter The component adapter.
-//	 * @param model The component model.
-//	 * @param config The name of the configuration (or null for default configuration) 
-//	 * @param arguments The arguments for the agent as name/value pairs.
-//	 * @param parent The parent component (if any).
-//	 * @return An instance of a component.
-//	 */
-//	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IPlatformComponentFactory factory, 
-//		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, 
-//		final boolean copy, final boolean realtime, final boolean persist, final IPersistInfo persistinfo, final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
-//	{
-//		final Future<Tuple2<IComponentInterpreter, IComponentAdapter>> ret = new Future<Tuple2<IComponentInterpreter, IComponentAdapter>>();
+		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+
+//		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
+//		System.out.println(factory.getClass().toString());
+		
+		if(libservice!=null)
+		{
+			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
+				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
+			{
+				public void customResultAvailable(ClassLoader cl)
+				{
+					try
+					{
+						MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, 
+							cl, modelinfo.getResourceIdentifier());
+						OAVAgentModel agmodel = converter.convertGpmnModelToBDIAgents(amodel, amodel.getClassLoader());
+						ret.setResult(GpmnFactory.this.factory.createComponentInstance(desc, factory, agmodel, config, arguments, parent, bindings, copy, realtime, resultlistener, inited, registry));
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			});
+		}
+		else
+		{
+			try
+			{
+				ClassLoader cl = getClass().getClassLoader();
+				MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, 
+					cl, modelinfo.getResourceIdentifier());
+				OAVAgentModel agmodel = converter.convertGpmnModelToBDIAgents(amodel, amodel.getClassLoader());
+				ret.setResult(GpmnFactory.this.factory.createComponentInstance(desc, factory, agmodel, config, arguments, parent, bindings, copy, realtime, resultlistener, inited, registry));
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		
+		return ret;
+		
+//		try
+//		{
+//			MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, 
+//				libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
 //
-////		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
-////		System.out.println(factory.getClass().toString());
-//		
-//		if(libservice!=null)
-//		{
-//			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
-//				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInterpreter, IComponentAdapter>>(ret)
-//			{
-//				public void customResultAvailable(ClassLoader cl)
-//				{
-//					try
-//					{
-//						MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, 
-//							cl, modelinfo.getResourceIdentifier());
-//						OAVAgentModel agmodel = converter.convertGpmnModelToBDIAgents(amodel, amodel.getClassLoader());
-//						ret.setResult(GpmnFactory.this.factory.createComponentInstance(desc, factory, agmodel, config, arguments, parent, bindings, copy, realtime, resultlistener, inited));
-//					}
-//					catch(Exception e)
-//					{
-//						ret.setException(e);
-//					}
-//				}
-//			});
+//			Object ret = null;
+////			ResourceInfo rinfo = SUtil.getResourceInfo0(modelinfo.getFilename(), modelinfo.getClassLoader());
+////			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
+////			br.readLine();
+////			ret = GpmnXMLReader.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
+//			
+////			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
+//			ret = converter.convertGpmnModelToBDIAgents(amodel, amodel.getClassLoader());
+//	
+//			//factory.createComponentAdapter(desc, model, instance, parent);
+//			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, copy, inited));
 //		}
-//		else
+//		catch(Exception e)
 //		{
-//			try
-//			{
-//				ClassLoader cl = getClass().getClassLoader();
-//				MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, 
-//					cl, modelinfo.getResourceIdentifier());
-//				OAVAgentModel agmodel = converter.convertGpmnModelToBDIAgents(amodel, amodel.getClassLoader());
-//				ret.setResult(GpmnFactory.this.factory.createComponentInstance(desc, factory, agmodel, config, arguments, parent, bindings, copy, realtime, resultlistener, inited));
-//			}
-//			catch(Exception e)
-//			{
-//				ret.setException(e);
-//			}
+//			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
 //		}
-//		
-//		return ret;
-//		
-////		try
-////		{
-////			MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, 
-////				libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
-////
-////			Object ret = null;
-//////			ResourceInfo rinfo = SUtil.getResourceInfo0(modelinfo.getFilename(), modelinfo.getClassLoader());
-//////			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
-//////			br.readLine();
-//////			ret = GpmnXMLReader.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
-////			
-//////			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
-////			ret = converter.convertGpmnModelToBDIAgents(amodel, amodel.getClassLoader());
-////	
-////			//factory.createComponentAdapter(desc, model, instance, parent);
-////			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, copy, inited));
-////		}
-////		catch(Exception e)
-////		{
-////			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
-////		}
-//	}
+	}
 	
 	/**
 	 *  Get the properties.

@@ -12,6 +12,7 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -41,7 +42,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 39;
+	public static final int BUILD = 44;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -59,7 +60,7 @@ public class SBpmnModelWriter
 	public static final Map<String, String> ACT_TYPE_MAPPING = new HashMap<String, String>();
 	static
 	{
-		ACT_TYPE_MAPPING.put(MBpmnModel.TASK, "task");
+		ACT_TYPE_MAPPING.put(MTask.TASK, "task");
 		ACT_TYPE_MAPPING.put(MBpmnModel.SUBPROCESS, "subProcess");
 		ACT_TYPE_MAPPING.put(MBpmnModel.GATEWAY_PARALLEL, "parallelGateway");
 		ACT_TYPE_MAPPING.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, "exclusiveGateway");
@@ -950,11 +951,11 @@ public class SBpmnModelWriter
 			out.print("\" sourceRef=\"");
 			out.print(escapeString(dedge.getSource().getId()));
 			out.print("\" sourceParam=\"");
-			out.print(escapeString(dedge.getSourceParameter()));
+			out.print(escapeString(handleNullStr(dedge.getSourceParameter())));
 			out.print("\" targetRef=\"");
 			out.print(escapeString(dedge.getTarget().getId()));
 			out.print("\" targetParam=\"");
-			out.print(escapeString(dedge.getTargetParameter()));
+			out.print(escapeString(handleNullStr(dedge.getTargetParameter())));
 			
 			if (dedge.getParameterMapping() != null &&
 				dedge.getParameterMapping().getValue() != null &&
@@ -1241,9 +1242,10 @@ public class SBpmnModelWriter
 				}
 			}
 			
-			boolean istask = MBpmnModel.TASK.equals(activity.getActivityType()) || issubproc;
+//			boolean istask = MBpmnModel.TASK.equals(activity.getActivityType()) || issubproc;
 			boolean hasclass = activity.getClazz()!=null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
-			boolean hastaskparams = istask && activity.getParameters()!=null && activity.getParameters().size()>0;
+//			boolean hastaskparams = istask && activity.getParameters()!=null && activity.getParameters().size()>0;
+			boolean hastaskparams = activity.getParameters()!=null && activity.getParameters().size()>0;
 			boolean hasprops = activity.getProperties()!=null && activity.getProperties().size()>0;
 			
 			if(hasclass || hastaskparams || hasprops || procref != null)
@@ -1473,6 +1475,20 @@ public class SBpmnModelWriter
 			sb.append(INDENT_STRING);
 		}
 		return sb.toString();
+	}
+	
+	/** Returns an empty string for null and null for an empty string. */
+	public static final String handleNullStr(String input)
+	{
+		if (input == null)
+		{
+			input = "";
+		}
+		else if (input.length() == 0)
+		{
+			input = null;
+		}
+		return input;
 	}
 	
 	/** Carriage return. */

@@ -228,7 +228,7 @@ public class RHardConstraints
 	
 	public static <T> ITerminableIntermediateFuture<T> getServices(final IServiceProvider provider, final Class<T> type, final String scope, final MethodInfo method, final RHardConstraints hardconstraints)
 	{
-		if (hardconstraints == null)
+		if(hardconstraints == null)
 		{
 			return SServiceProvider.getServices(provider, type, scope);
 		}

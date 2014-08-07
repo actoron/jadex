@@ -185,7 +185,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	 */
 	public IServiceContainer createServiceContainer(Map<String, Object> args)
 	{
-		return new ComponentServiceContainer(getAgentAdapter(), getModel().getType(), this, getInterpreter().isRealtime())
+		return new ComponentServiceContainer(getAgentAdapter(), getModel().getType(), this, getInterpreter().isRealtime(), getInterpreter().getServiceRegistry())
 		{
 			/**
 			 *  Get the children container.

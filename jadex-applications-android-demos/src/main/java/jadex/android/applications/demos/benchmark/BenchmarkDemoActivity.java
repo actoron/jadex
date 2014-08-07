@@ -9,6 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ChangeEvent;
@@ -41,6 +42,7 @@ import android.widget.TextView;
  *  Activity (screen) for the jadex android benchmark app.
  *  Starts the platform and allows launching the different benchmarks.
  */
+@Reference
 public class BenchmarkDemoActivity extends JadexAndroidActivity
 {
 	//-------- attributes --------

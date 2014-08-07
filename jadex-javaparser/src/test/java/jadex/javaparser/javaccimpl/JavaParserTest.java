@@ -17,12 +17,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * 
  */
-public class JavaParserTest extends TestCase
+public class JavaParserTest //extends TestCase
 {
 	// Expressions known to be broken (excluded from test -> todo: fix!)
 	protected Set<String>	broken	= new HashSet<String>(Arrays.asList(new String[]
@@ -32,6 +33,7 @@ public class JavaParserTest extends TestCase
 		"\"term\"==\"term\"?false:true"
 	}));
 	
+	@Test
 	public void	testExpressions() throws IOException
 	{
 		// Load tests from properties.
@@ -119,11 +121,11 @@ public class JavaParserTest extends TestCase
 				{
 					//node = parser.parseExpression(exp, paramtypes, null);
 					node = parser.parseExpression(exp, imports, params, getClass().getClassLoader());
-					assertFalse("Expected parse exception", parsex);
+					Assert.assertFalse("Expected parse exception", parsex);
 				}
 				catch(Throwable e)
 				{
-					assertTrue("Unexpected parse exception: "+e, parsex);
+					Assert.assertTrue("Unexpected parse exception: "+e, parsex);
 	//				if(parsex)
 	//				{
 	//					assertTrue("Unexpected parse exception type: "+e, e.toString().startsWith(type));
@@ -139,17 +141,17 @@ public class JavaParserTest extends TestCase
 					{
 						retval	= node.getValue(fetcher);
 						evaluated	= true;
-						assertFalse("Expected evaluation exception", evalex);
+						Assert.assertFalse("Expected evaluation exception", evalex);
 					}
 					catch(HeadlessException e) {
 						// ignore
 					}
 					catch(Exception e)
 					{
-						assertTrue("Unexpected evaluation exception: "+e, evalex);
+						Assert.assertTrue("Unexpected evaluation exception: "+e, evalex);
 						if(evalex)
 						{
-							assertTrue("Unexpected evaluation exception type: "+e, e.toString().startsWith(type));
+							Assert.assertTrue("Unexpected evaluation exception type: "+e, e.toString().startsWith(type));
 						}
 					}
 				}
@@ -158,7 +160,7 @@ public class JavaParserTest extends TestCase
 				if(evaluated && !evalex)
 				{
 					String	rets	= ""+retval;
-					assertTrue("Unexpected value "+rets+", should be "+value+")", rets.startsWith(value));
+					Assert.assertTrue("Unexpected value "+rets+", should be "+value+")", rets.startsWith(value));
 				}
 			}
 		}

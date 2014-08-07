@@ -2,6 +2,9 @@ package jadex.extension.rs.publish.mapper;
 
 import jadex.commons.SUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 
 import javax.ws.rs.core.Response;
@@ -30,19 +33,53 @@ public class NativeResponseMapper implements IValueMapper
 		if(o instanceof ResourceInfo)
 		{
 			ResourceInfo ri = (ResourceInfo)o;
-			o = SUtil.getResource0(ri.getPath(), null);
+			if(ri.getPath()!=null)
+			{
+				o = SUtil.getResource0(ri.getPath(), null);
+			}
+			else if(ri.getData()!=null)
+			{
+				o = new ByteArrayInputStream(ri.getData());
+			}
 			ResponseBuilder rb = Response.ok(o);
 			if(ri.getMediatype()!=null)
+			{
 				rb = rb.type(ri.getMediatype());
+			}
+			else if(ri.getPath()!=null)
+			{
+				String cttype = SUtil.guessContentTypeByFilename(ri.getPath());
+				if(cttype!=null)
+				{
+					rb = rb.type(cttype);
+				}
+			}
 			ret = rb.build();
 		}
 		else if(o instanceof String)
 		{
 			ret = Response.ok(o).build();
 		}
+		else if(o instanceof Exception)
+		{
+			if(!isProduction())
+			{
+				ret = Response.ok(SUtil.getExceptionStacktrace((Exception)o)).build();
+			}
+			else
+			{
+				ret = Response.status(Status.INTERNAL_SERVER_ERROR).entity("<html><head></head>" +
+					"<body><h1>500 Internal server error</h1></body></html>").build();
+			}
+		}
 		else if(o instanceof URI)
 		{
-			ret = Response.status(Status.SEE_OTHER).location((URI)o).build();
+			URI uri = (URI)o;
+			if(uri.toString().indexOf(":")==-1)
+			{
+				uri = new URI("http://"+uri.toString());
+			}
+			ret = Response.status(Status.SEE_OTHER).location(uri).build();
 		}
 		
 		return ret;
@@ -54,5 +91,25 @@ public class NativeResponseMapper implements IValueMapper
 	public Object extractContent(Object value)
 	{
 		return value;
+	}
+	
+	/**
+	 *  Test if is in debug mode.
+	 */
+	protected boolean isProduction()
+	{
+		boolean ret = false;
+		String pro = System.getProperty("production", System.getenv("production"));
+		if(pro!=null)
+		{
+			try
+			{
+				ret = Boolean.parseBoolean(pro);
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		return ret;
 	}
 }

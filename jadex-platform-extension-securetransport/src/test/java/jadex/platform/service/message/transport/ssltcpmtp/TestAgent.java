@@ -12,7 +12,6 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -218,7 +217,7 @@ public abstract class TestAgent
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
 				ci.setArguments(args);
@@ -316,23 +315,23 @@ public abstract class TestAgent
 	}
 
 	
-	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
-	{
-		final Future<T>	ret	= new Future<T>();
-		IFuture<IClockService>	clockfut	= agent.getServiceContainer().getRequiredService("clock");
-		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
-		{
-			public void customResultAvailable(IClockService clock)
-			{
-				clock.createRealtimeTimer(delay, new ITimedObject()
-				{
-					public void timeEventOccurred(long currenttime)
-					{
-						agent.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
-					}
-				});
-			}
-		});
-		return ret;
-	}
+//	private <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
+//	{
+//		final Future<T>	ret	= new Future<T>();
+//		IFuture<IClockService>	clockfut	= agent.getServiceContainer().getRequiredService("clock");
+//		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+//		{
+//			public void customResultAvailable(IClockService clock)
+//			{
+//				clock.createRealtimeTimer(delay, new ITimedObject()
+//				{
+//					public void timeEventOccurred(long currenttime)
+//					{
+//						agent.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+//					}
+//				});
+//			}
+//		});
+//		return ret;
+//	}
 }

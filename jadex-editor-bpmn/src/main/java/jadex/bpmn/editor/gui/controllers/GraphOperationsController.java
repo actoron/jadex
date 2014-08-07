@@ -45,7 +45,7 @@ public class GraphOperationsController extends mxGraphHandler
 				&& !graphComponent.isForceMarqueeEvent(e))
 		{
 			cell = graphComponent.getCellAt(e.getX(), e.getY(), false);
-			
+//			System.out.println("Sel CELL: "+cell);
 			// Enable to make the whole pool draggable.
 //			if (cell == null)
 //			{

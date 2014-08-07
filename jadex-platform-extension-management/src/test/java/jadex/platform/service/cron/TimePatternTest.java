@@ -6,12 +6,13 @@ import jadex.commons.Tuple2;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *  Test time patterns via simple simulation.
  */
-public class TimePatternTest extends TestCase
+public class TimePatternTest //extends TestCase
 {
 	/**
 	 *  Main for testing.
@@ -59,6 +60,7 @@ public class TimePatternTest extends TestCase
 	/**
 	 *  Test pattern "*\/5 * * * *".
 	 */
+	@Test
 	public void testEveryMinute()
 	{
 		long[] actual = simulate("* * * * *");
@@ -74,12 +76,13 @@ public class TimePatternTest extends TestCase
 			1328051280000L, 
 			1328051340000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern "* * * * *".
 	 */
+	@Test
 	public void testEvery5Mins()
 	{
 		long[] actual = simulate("*/5 * * * *");
@@ -95,12 +98,13 @@ public class TimePatternTest extends TestCase
 			1328053200000L, 
 			1328053500000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern "*\/5 * * * *|*\/3 * * * *", every 5 3 mins 
 	 */
+	@Test
 	public void testMultiPattern()
 	{
 		long[] actual = simulate("*/5 * * * *|*/3 * * * *");
@@ -116,12 +120,13 @@ public class TimePatternTest extends TestCase
 			1328051880000L, 
 			1328052000000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern "3-18\/5 * * * *", every 5 mins from 3, 8, 13,18 - ok
 	 */
+	@Test
 	public void testRangeStepsPattern()
 	{
 		long[] actual = simulate("3-18/5 * * * *");
@@ -137,12 +142,13 @@ public class TimePatternTest extends TestCase
 			1328058180000L, 
 			1328058480000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern "*\/5 *\/2 * * *", // every 5 mins every 2 hours - ok
 	 */
+	@Test
 	public void testEvery20MinsEvery2Hours()
 	{
 		long[] actual = simulate("*/20 */2 * * *");
@@ -158,12 +164,13 @@ public class TimePatternTest extends TestCase
 			1328067600000L, 
 			1328072400000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern "*\/45 9-13 * * *", // at 0/45 mins from 9-12
 	 */
+	@Test
 	public void testAt45MinsFrom9to12()
 	{
 		long[] actual = simulate("*/45 9-12 * * *");
@@ -179,13 +186,14 @@ public class TimePatternTest extends TestCase
 			1328169600000L, 
 			1328172300000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Needs 3 patterns to create a job every 45 mins
 	 *  Test pattern 0,45 0,3,6,9,12,15,18,21  * * *|30 1,4,7,10,13,16,19,22 * * *|15 2,5,8,11,14,17,20,23 * * *			
 	 */
+	@Test
 	public void testEvery45Mins()
 	{
 		long[] actual = simulate("0,45 0,3,6,9,12,15,18,21 * * *|30 1,4,7,10,13,16,19,22  * * *|15 2,5,8,11,14,17,20,23 * * *");
@@ -201,12 +209,13 @@ public class TimePatternTest extends TestCase
 			1328072400000L, 
 			1328075100000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern *\/30 12 1-3,15,20-22 * *
 	 */
+	@Test
 	public void testEvery30MinsAt12AtDates()
 	{
 		long[] actual = simulate("*/30 12 1-3,15,20-22 * *");
@@ -222,12 +231,13 @@ public class TimePatternTest extends TestCase
 			1329735600000L, 
 			1329737400000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern 55 7 * * 1,2,3,4,5 7:55 Mo-Fr
 	 */
+	@Test
 	public void test755MoToFr()
 	{
 		long[] actual = simulate("55 7 * * 1,2,3,4,5");
@@ -243,12 +253,13 @@ public class TimePatternTest extends TestCase
 			1329116100000L, 
 			1329202500000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern 55 7 * * 1-5 7:55 Mo-Fr
 	 */
+	@Test
 	public void test755MoToFr2()
 	{
 		long[] actual = simulate("55 7 * * 1-5");
@@ -264,12 +275,13 @@ public class TimePatternTest extends TestCase
 			1329116100000L, 
 			1329202500000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern 0 * * * * hourly
 	 */
+	@Test
 	public void testHourly()
 	{
 		long[] actual = simulate("0 * * * *");
@@ -285,12 +297,13 @@ public class TimePatternTest extends TestCase
 			1328079600000L, 
 			1328083200000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern 0 0 * * * daily
 	 */
+	@Test
 	public void testDaily()
 	{
 		long[] actual = simulate("0 0 * * *");
@@ -306,12 +319,13 @@ public class TimePatternTest extends TestCase
 			1328742000000L, 
 			1328828400000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern "0 0 * * 0" weekly
 	 */
+	@Test
 	public void testWeekly()
 	{
 		long[] actual = simulate("0 0 * * 0");
@@ -327,12 +341,13 @@ public class TimePatternTest extends TestCase
 			1333231200000L, 
 			1333836000000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern "0 0 1 * *" weekly
 	 */
+	@Test
 	public void testMonthly()
 	{
 		long[] actual = simulate("0 0 1 * *");
@@ -348,12 +363,13 @@ public class TimePatternTest extends TestCase
 			1349042400000L, 
 			1351724400000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**
 	 *  Test pattern 0 0 1 1 * yearly
 	 */
+	@Test
 	public void testYearly()
 	{
 		long[] actual = simulate("0 0 1 1 *");
@@ -369,7 +385,7 @@ public class TimePatternTest extends TestCase
 			1609455600000L, 
 			1640991600000L
 		};
-		assertTrue(Arrays.equals(expected, actual));
+		Assert.assertTrue(Arrays.equals(expected, actual));
 	}
 	
 	/**

@@ -32,13 +32,13 @@ public class UUIDCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class<?> clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
-		ByteBuffer buf = context.getByteBuffer(8);
+		byte[] abuf = new byte[16];
+		context.read(abuf);
+		ByteBuffer buf = ByteBuffer.wrap(abuf);
 		buf.order(ByteOrder.BIG_ENDIAN);
 		long msb = buf.getLong();
-		buf = context.getByteBuffer(8);
-		buf.order(ByteOrder.BIG_ENDIAN);
 		long lsb = buf.getLong();
 		return new UUID(msb, lsb);
 	}
@@ -59,15 +59,17 @@ public class UUIDCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
 		UUID uuid = (UUID)object;
-		ByteBuffer buf = ec.getByteBuffer(16);
+		byte[] abuf = new byte[16];
+		ByteBuffer buf = ByteBuffer.wrap(abuf);
 		buf.order(ByteOrder.BIG_ENDIAN);
 		buf.putLong(uuid.getMostSignificantBits());
 //		buf = ec.getByteBuffer(8);
 //		buf.order(ByteOrder.BIG_ENDIAN);
 		buf.putLong(uuid.getLeastSignificantBits());
+		ec.write(abuf);
 		
 		return object;
 	}

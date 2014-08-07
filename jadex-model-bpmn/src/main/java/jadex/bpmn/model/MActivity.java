@@ -33,6 +33,25 @@ public class MActivity extends MAssociationTarget
 {
 	protected static final MethodInfo MI_NOTFOUND = new MethodInfo();
 
+	/** Constant for the return parameter name. */
+	public static final String RETURNPARAM = "returnparam";
+	
+	/** The interface name. */
+	public static final String IFACE = "iface";
+	
+	/** The method name. */
+	public static final String METHOD = "method";
+	
+	/** Is service constant. */
+	public static final String ISSERVICE = "isService";
+	
+	/** Constant for the sequential result execution mode . */
+	public static final String ISSEQUENTIAL = "isSequential";
+
+	/** Constant for the result param name. */
+	public static final String RESULTNAME = "resultName";
+
+	
 	//-------- attributes --------
 	
 	/** The lane description. */
@@ -593,6 +612,14 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Get a parameter by name.
+	 */
+	public MParameter getParameter(String name)
+	{
+		return parameters!=null? parameters.get(name): null;
+	}
+	
+	/**
 	 *  Get the parameters.
 	 *  @return The parameters.
 	 */
@@ -697,7 +724,6 @@ public class MActivity extends MAssociationTarget
 	
 	/**
 	 *  Sets the parameters.
-	 *  
 	 *  @param parameters The parameters.
 	 */
 	public void setParameters(IndexMap<String, MParameter> parameters)
@@ -732,6 +758,26 @@ public class MActivity extends MAssociationTarget
 	{
 		if(parameters!=null)
 			parameters.removeValue(param.getName());
+	}
+	
+	/**
+	 *  Remove a parameter.
+	 *  @param param The parameter.
+	 */
+	public void removeParameter(String name)
+	{
+		if(parameters!=null)
+			parameters.removeValue(name);
+	}
+	
+	/**
+	 *  Remove a parameter.
+	 *  @param param The parameter.
+	 */
+	public void removeParameters()
+	{
+		if(parameters!=null)
+			parameters.clear();
 	}
 	
 	/**
@@ -898,9 +944,19 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void addProperty(String name, String value)
 	{
+		addProperty(name, value, true);
+	}
+	
+	/**
+	 *  Add a simple string-based property.
+	 *  @param name Property name.
+	 *  @param value The string value.
+	 */
+	public void addProperty(String name, String value, boolean string)
+	{
 		MProperty mprop = new MProperty();
 		mprop.setName(name);
-		UnparsedExpression uexp = new UnparsedExpression(name, String.class, "\"" + value + "\"", null);
+		UnparsedExpression uexp = new UnparsedExpression(name, String.class, string? "\"" + value + "\"": value, null);
 		SJavaParser.parseExpression(uexp, null, MActivity.class.getClassLoader());
 		mprop.setInitialValue(uexp); 
 		addProperty(mprop);
@@ -924,6 +980,66 @@ public class MActivity extends MAssociationTarget
 	{
 		if(properties!=null)
 			removeProperty(prop.getName());
+	}
+	
+	/**
+	 *  Set a property value:
+	 *  a) val==null -> remove property
+	 *  b) val!=null && !hasProp(name) -> addProp(name, val)
+	 *  c) val!=null && hasProp(name) -> setInitialVal(val)
+	 */
+	public void setProperty(String name, String value, boolean string)
+	{
+//		System.out.println("setProp: "+name+" "+value+" "+string);
+		
+		if(value==null)
+		{
+			removeProperty(name);
+		}
+		else
+		{
+			MProperty mprop = getProperties()!=null? getProperties().get(name): null;
+			if(mprop==null)
+			{
+				addProperty(name, value, string);
+			}
+			else
+			{
+				UnparsedExpression uexp = new UnparsedExpression(null, 
+					String.class, string? "\""+value+"\"": value, null);
+				mprop.setInitialValue(uexp);
+			}
+		}
+	}
+	
+	/**
+	 *  Set a parameter value:
+	 *  a) val==null -> remove property
+	 *  b) val!=null && !hasProp(name) -> addProp(name, val)
+	 *  c) val!=null && hasProp(name) -> setInitialVal(val)
+	 */
+	public void setParameter(String name, String value, Class<?> type, boolean string, String direction)
+	{
+//		System.out.println("setProp: "+name+" "+value+" "+string);
+		
+		if(value==null)
+		{
+			removeParameter(name);
+		}
+		else
+		{
+			MParameter mpara = getParameters()!=null? getParameters().get(name): null;
+			UnparsedExpression uexp = new UnparsedExpression(null, 
+				String.class, string? "\""+value+"\"": value, null);
+			if(mpara==null)
+			{
+				addParameter(new MParameter(direction, new ClassInfo(type), name, uexp));
+			}
+			else
+			{
+				mpara.setInitialValue(uexp);
+			}
+		}
 	}
 	
 	/**
@@ -983,17 +1099,17 @@ public class MActivity extends MAssociationTarget
 		this.lane	= lane;
 	}
 
-	/**
-	 *  Get a string to identify this activity in a tool such as the debugger.
-	 *  @return A unique but nicely readable name.
-	 */
-	public String getBreakpointId()
-	{
-		String	name	= getName();
-		if(name==null)
-			name	= getActivityType()+"("+getId()+")";
-		return name;
-	}
+//	/**
+//	 *  Get a string to identify this activity in a tool such as the debugger.
+//	 *  @return A unique but nicely readable name.
+//	 */
+//	public String getBreakpointId()
+//	{
+//		String	name	= getName();
+//		if(name==null)
+//			name	= getActivityType()+"("+getId()+")";
+//		return name;
+//	}
 
 	/**
 	 *  Get the eventhandler.
@@ -1039,6 +1155,51 @@ public class MActivity extends MAssociationTarget
 	public boolean isEvent()
 	{
 		return getActivityType().startsWith("Event");
+	}
+	
+	/**
+	 *  Test if activity is a start event.
+	 *  @return True, if is event.
+	 */
+	public boolean isStartEvent()
+	{
+		return isEvent() && getActivityType().indexOf("Start")!=-1;
+	}
+	
+	/**
+	 *  Test if activity is a end event.
+	 *  @return True, if is event.
+	 */
+	public boolean isEndEvent()
+	{
+		return isEvent() && getActivityType().indexOf("End")!=-1;
+	}
+	
+	/**
+	 *  Test if activity is an intermediate event.
+	 *  @return True, if is event.
+	 */
+	public boolean isIntermediateEvent()
+	{
+		return isEvent() && getActivityType().indexOf("Intermediate")!=-1;
+	}
+	
+	/**
+	 *  Test if activity is event.
+	 *  @return True, if is event.
+	 */
+	public boolean isMessageEvent()
+	{
+		return isEvent() && getActivityType().indexOf("Message")!=-1;
+	}
+	
+	/**
+	 *  Test if activity is event.
+	 *  @return True, if is event.
+	 */
+	public boolean isSignalEvent()
+	{
+		return isEvent() && getActivityType().indexOf("Signal")!=-1;
 	}
 	
 	/**

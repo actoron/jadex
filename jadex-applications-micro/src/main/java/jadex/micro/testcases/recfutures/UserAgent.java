@@ -245,7 +245,7 @@ public class UserAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if rec results work");
-				tr.setReason(exception);
+				tr.setFailed(exception);
 				super.resultAvailable(tr);
 			}
 		});
@@ -257,7 +257,7 @@ public class UserAgent
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
 				final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
 				jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getComponentIdentifier() : root, rid);

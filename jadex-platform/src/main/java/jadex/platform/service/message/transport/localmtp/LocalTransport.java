@@ -93,9 +93,11 @@ public class LocalTransport implements ITransport
 	
 	/**
 	 *  Test if a transport satisfies the non-functional requirements.
+	 *  @param nonfunc	The non-functional requirements (name, value).
+	 *  @param address	The transport address.
 	 *  @return True, if the transport satisfies the non-functional requirements.
 	 */
-	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc)
+	public boolean	isNonFunctionalSatisfied(Map<String, Object> nonfunc, String address)
 	{
 		// Local satisfies all?!
 		return true;

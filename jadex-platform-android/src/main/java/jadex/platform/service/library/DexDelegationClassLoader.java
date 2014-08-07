@@ -4,6 +4,7 @@ import jadex.bridge.IResourceIdentifier;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 
@@ -17,7 +18,7 @@ public class DexDelegationClassLoader extends DelegationURLClassLoader
 	public DexDelegationClassLoader(IResourceIdentifier rid, ClassLoader basecl, DelegationURLClassLoader[] delegates, File dexOutputPath)
 	{
 		super(rid, basecl, delegates);
-		URL url = rid.getLocalIdentifier().getUrl();
+		URI url = rid.getLocalIdentifier().getUri();
 		dexCl = new DexClassLoader(url.getPath(),dexOutputPath.getAbsolutePath(), null, basecl);
 	}
 	

@@ -3,6 +3,7 @@ package jadex.bdiv3;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
@@ -715,10 +716,10 @@ public class BDIAgent extends MicroAgent
 	{
 //		System.out.println("getAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name+", "+type);
 		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
-		String	belname	= bdimodel.getBeliefMappings().get(capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
-			throw new RuntimeException("No mapping for abstract belief: "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+			throw new RuntimeException("No mapping for abstract belief: "+capa+MElement.CAPABILITY_SEPARATOR+name);
 		}
 		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
 		Object	ret	= bel.getValue((BDIAgentInterpreter)getInterpreter());
@@ -749,10 +750,10 @@ public class BDIAgent extends MicroAgent
 	{
 //		System.out.println("setAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
 		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
-		String	belname	= bdimodel.getBeliefMappings().get(capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
-			throw new RuntimeException("No mapping for abstract belief: "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+			throw new RuntimeException("No mapping for abstract belief: "+capa+MElement.CAPABILITY_SEPARATOR+name);
 		}
 		MBelief	mbel = bdimodel.getCapability().getBelief(belname);
 
@@ -839,7 +840,7 @@ public class BDIAgent extends MicroAgent
 			e.printStackTrace();
 		}
 		
-		String belname	= gn!=null ? gn + BDIAgentInterpreter.CAPABILITY_SEPARATOR + fieldname : fieldname;
+		String belname	= gn!=null ? gn + MElement.CAPABILITY_SEPARATOR + fieldname : fieldname;
 		return belname;
 	}
 	

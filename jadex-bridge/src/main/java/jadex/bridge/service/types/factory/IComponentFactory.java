@@ -5,6 +5,7 @@ import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 import java.util.Collection;
@@ -16,6 +17,7 @@ import java.util.Map;
  *  and is capable of loading component models from files
  *  as well as providing component features.
  */
+@Service
 public interface IComponentFactory
 {
 	/**

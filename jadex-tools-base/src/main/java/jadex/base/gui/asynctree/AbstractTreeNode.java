@@ -167,8 +167,7 @@ public abstract class AbstractTreeNode implements ITreeNode
 	public IFuture<List<ITreeNode>> getChildren()
 	{
 														// Starter.isShutdown();
-
-		if (childrenfuture == null)
+		if(childrenfuture == null)
 		{
 			childrenfuture = new Future<List<ITreeNode>>();
 		}
@@ -299,8 +298,8 @@ public abstract class AbstractTreeNode implements ITreeNode
 		}
 	}
 	
-	protected void expandChildren(boolean dorecurse, List<ITreeNode> children) {
-		
+	protected void expandChildren(boolean dorecurse, List<ITreeNode> children) 
+	{
 	};
 
 	/**
@@ -323,7 +322,6 @@ public abstract class AbstractTreeNode implements ITreeNode
 				}
 			}
 		}
-
 
 		return true;
 	}

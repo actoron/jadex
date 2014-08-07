@@ -201,7 +201,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<IClockService> fut = SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService clock)
@@ -616,7 +616,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			getInternalAccess(), getComponentAdapter(), service, null,
 			type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,
 			null, isCopy(), isRealtime(),
-			getModel().getResourceIdentifier(), moni, null);
+			getModel().getResourceIdentifier(), moni, null, null);
 		
 		return is;
 	}
@@ -1000,7 +1000,10 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType().getType(getClassLoader(), getModel().getAllImports());
 					ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
 					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(getClassLoader(), getModel().getAllImports()), 
-						new ProvidedServiceImplementation(cs[i].getImplementation()), psi.getPublish());
+						new ProvidedServiceImplementation(cs[i].getImplementation()), 
+						cs[i].getScope()!=null? cs[i].getScope(): psi.getScope(),
+						cs[i].getPublish()!=null? cs[i].getPublish(): psi.getPublish(), 
+						cs[i].getProperties()!=null? cs[i].getProperties() : psi.getProperties());
 					sermap.put(key, newpsi);
 				}
 			}
@@ -1222,7 +1225,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
 			ConfigurationInfo conf = model.getConfiguration(config);
 			final ComponentInstanceInfo[] components = conf.getComponentInstances();
-			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
+			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -1413,7 +1416,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), 
-			isRealtime(), getModel().getResourceIdentifier(), moni, componentfetcher);
+			isRealtime(), getModel().getResourceIdentifier(), moni, componentfetcher, info!=null? info.getScope(): null);
 		getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -1434,6 +1437,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		final Future<Void> ret = new Future<Void>();
 		assert !getComponentAdapter().isExternalThread();
 		
+//		System.out.println("info: "+info.getType().getTypeName()+" "+info.getScope());
+		
 		try
 		{
 			final ProvidedServiceImplementation	impl = info.getImplementation();
@@ -1443,7 +1448,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 				RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType().getType( 
 					getClassLoader(), getModel().getAllImports()))+":virtual", info.getType().getType(getClassLoader(), getModel().getAllImports()));
 				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
-					rsi.getName(), rsi.getType().getType(getClassLoader(), getModel().getAllImports()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier());
+					rsi.getName(), rsi.getType().getType(getClassLoader(), getModel().getAllImports()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier(), info.getScope());
 				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 					getInternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), getClassLoader(), isRealtime());
 				getServiceContainer().addService(service, info).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
@@ -1650,7 +1655,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		IFuture<IComponentManagementService> fut = SServiceProvider.getService(getServiceContainer(), 
+		IFuture<IComponentManagementService> fut = SServiceProvider.getService(getServiceProvider(), 
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
@@ -1788,7 +1793,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -1894,7 +1899,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return getServiceContainer();
+		return (IServiceProvider)getServiceContainer();
 	}
 	
 	/**
@@ -2111,7 +2116,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		
 		final Future<T> ret = new Future<T>();
 		
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 		{
 			public void customResultAvailable(IClockService cs)
@@ -2157,7 +2162,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(IClockService cs)

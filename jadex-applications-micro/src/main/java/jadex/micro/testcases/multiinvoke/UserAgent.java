@@ -177,7 +177,7 @@ public class UserAgent
 		
 		public void exceptionOccurred(Exception exception)
 		{
-			tr.setReason(exception);
+			tr.setFailed(exception);
 			endlis.resultAvailable(null);
 		}
 	}
@@ -217,7 +217,7 @@ public class UserAgent
 		
 		public void exceptionOccurred(Exception exception)
 		{
-			tr.setReason(exception);
+			tr.setFailed(exception);
 			endlis.resultAvailable(null);
 		}
 	}
