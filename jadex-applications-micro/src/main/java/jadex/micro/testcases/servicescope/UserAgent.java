@@ -82,7 +82,7 @@ public class UserAgent
 			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getModel().getResourceIdentifier()));
 			cid = fut.getFirstResult();
 			IExampleService ser = (IExampleService)agent.getRequiredService("exaser").get();
-//			System.out.println("Problem: could find hidden service: "+ser.getInfo().get());
+			System.out.println("Problem: could find hidden service: "+ser.getInfo().get());
 			tr.setFailed("Problem: could find hidden service");
 		}
 		catch(Exception e)
