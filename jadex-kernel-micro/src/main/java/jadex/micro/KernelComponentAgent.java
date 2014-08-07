@@ -15,7 +15,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@NameValue(name="kernel.types", value="new String[] { \"component.xml\"}")
 })
 @ProvidedServices({
-	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.component.ComponentComponentFactory($component.getServiceProvider())"))
+	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.component.ComponentComponentFactory($component)"))
 })
 @Agent
 public class KernelComponentAgent

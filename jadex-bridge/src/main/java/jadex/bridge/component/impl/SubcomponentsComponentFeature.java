@@ -80,7 +80,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 			final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
 			ConfigurationInfo conf = component.getModel().getConfiguration(component.getConfiguration());
 			final ComponentInstanceInfo[] components = conf.getComponentInstances();
-			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+			SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
 				.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)

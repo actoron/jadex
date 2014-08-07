@@ -77,7 +77,7 @@ public class SettingsService implements ISettingsService
 		this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 		
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), IContextService.class)
+		SServiceProvider.getService(access, IContextService.class)
 			.addResultListener(new DefaultResultListener<IContextService>()
 		{
 			public void resultAvailable(IContextService result)

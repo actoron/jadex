@@ -3,7 +3,7 @@ package jadex.bridge.service.component;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
@@ -79,13 +79,13 @@ public interface IRequiredServicesFeature
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IRemoteFilter<T> filter);
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IAsyncFilter<T> filter);
 	
 	/**
 	 *  Get a required services.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IRemoteFilter<T> filter);
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter);
 	
 	/**
 	 *  Get the result of the last search.

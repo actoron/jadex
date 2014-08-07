@@ -23,7 +23,7 @@ import java.util.Set;
  *  able to execute Jadex components without any 3rd party
  *  execution platform.
  */
-public class StandaloneComponentAdapter	extends AbstractComponentAdapter	implements IComponentAdapter, IExecutable
+//public class StandaloneComponentAdapter	extends AbstractComponentAdapter	implements IComponentAdapter, IExecutable
 {
 	//-------- attributes --------
 	

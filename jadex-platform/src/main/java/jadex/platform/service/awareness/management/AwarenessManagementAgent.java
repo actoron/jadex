@@ -34,7 +34,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -115,9 +115,14 @@ import java.util.TimerTask;
 //	@GuiClassName("jadex.android.controlcenter.settings.AwarenessSettingsScreen"),
 //	@GuiClassName("jadex.tools.awareness.AwarenessAgentPanel") 
 //})
-public class AwarenessManagementAgent extends MicroAgent implements IPropertiesProvider, IAwarenessManagementService
+@Agent
+public class AwarenessManagementAgent	implements IPropertiesProvider, IAwarenessManagementService
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess	agent;
 	
 	/** The send delay. */
 	protected long delay;
@@ -171,12 +176,12 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IFuture<ISettingsService>	setfut	= getServiceContainer().getRequiredService("settings");
+		IFuture<ISettingsService>	setfut	= agent.getServiceContainer().getRequiredService("settings");
 		setfut.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
 			{
-				settings.registerPropertiesProvider(getAgentName(), AwarenessManagementAgent.this)
+				settings.registerPropertiesProvider(agent.getComponentIdentifier().getName(), AwarenessManagementAgent.this)
 					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
@@ -430,7 +435,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				{
 					public void resultAvailable(IComponentIdentifier cid)
 					{
-						SServiceProvider.getService(getServiceProvider(), cid, IProxyAgentService.class)
+						SServiceProvider.getService(agent, cid, IProxyAgentService.class)
 							.addResultListener(new IResultListener<IProxyAgentService>()
 						{
 							public void resultAvailable(IProxyAgentService pas)

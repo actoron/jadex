@@ -16,7 +16,7 @@ import jadex.micro.annotation.ProvidedServices;
 @Properties(@NameValue(name="kernel.types", value="new String[]{\"bpmn\", \"bpmn2\"}"))
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(
-	expression="new jadex.bpmn.BpmnFactory($component.getServiceProvider(), jadex.commons.SUtil.createHashMap("
+	expression="new jadex.bpmn.BpmnFactory($component, jadex.commons.SUtil.createHashMap("
 	+		"new String[]"
 	+		"{"
 	+		"	\"debugger.panels\""

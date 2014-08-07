@@ -931,11 +931,11 @@ public class XMLTests extends TestCase
 	
 	public void testAmpersands() {
 		Object o = doWrite("<implementation proxytype=\"raw\">" +
-				"//new jadex.platform.service.execution.AsyncExecutionService($component.getServiceProvider())" +
+				"//new jadex.platform.service.execution.AsyncExecutionService($component)" +
 				"($args.asyncexecution!=null &amp;&amp; !$args.asyncexecution.booleanValue()) ||" +
 				"($args.asyncexecution==null &amp;&amp; $args.simulation!=null &amp;&amp; $args.simulation.booleanValue())" +
-				"? new jadex.platform.service.execution.SyncExecutionService($component.getServiceProvider())" +
-				": new jadex.platform.service.execution.AsyncExecutionService($component.getServiceProvider())" +
+				"? new jadex.platform.service.execution.SyncExecutionService($component)" +
+				": new jadex.platform.service.execution.AsyncExecutionService($component)" +
 				"</implementation>");
 		Object read = doRead(o);
 		assertEquals("\\&", read);

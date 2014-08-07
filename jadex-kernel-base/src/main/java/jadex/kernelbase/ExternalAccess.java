@@ -66,9 +66,6 @@ public class ExternalAccess implements IExternalAccess
 	// Todo: should not be kept in memory?
 	protected String	localtype;
 	
-	/** The provider. */
-	protected IServiceProvider provider;
-	
 	/** The results (cached after termination). */
 	protected Map<String, Object>	results;
 	
@@ -82,7 +79,6 @@ public class ExternalAccess implements IExternalAccess
 		this.valid	= true;
 		this.ia = ia;
 		this.cid	= ia.getComponentIdentifier();
-		this.provider = ia.getServiceProvider();
 		this.tostring = cid.getLocalName();
 	}
 

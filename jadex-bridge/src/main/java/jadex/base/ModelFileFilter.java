@@ -3,7 +3,7 @@ package jadex.base;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.factory.SComponentFactory;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -20,7 +20,7 @@ import java.util.Map;
  *  
  *  Is so complicated because it has to work locally and must be transferable.
  */
-public class ModelFileFilter implements IRemoteFilter
+public class ModelFileFilter implements IAsyncFilter
 {
 	//-------- attributes --------
 	

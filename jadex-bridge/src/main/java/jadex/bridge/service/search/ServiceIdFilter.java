@@ -1,14 +1,14 @@
 package jadex.bridge.service.search;
 
 import jadex.bridge.service.IService;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
  *  Filter for service ids.
  */
-public class ServiceIdFilter implements IRemoteFilter
+public class ServiceIdFilter implements IAsyncFilter
 {
 	//-------- attributes --------
 	

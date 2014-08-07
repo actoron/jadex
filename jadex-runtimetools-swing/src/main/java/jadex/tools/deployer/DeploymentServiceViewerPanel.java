@@ -19,7 +19,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -85,7 +85,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		ftp.setMenuItemConstructor(mic);
 		ftp.setNodeFactory(new DefaultNodeFactory()
 		{
-			public IRemoteFilter getFileFilter()
+			public IAsyncFilter getFileFilter()
 			{
 				return new DefaultFileFilter(mic.isAll(), mic.getSelectedComponentTypes());
 			}

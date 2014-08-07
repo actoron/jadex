@@ -52,7 +52,7 @@ import java.util.logging.SimpleFormatter;
 /**
  *  Base component adapter with reusable functionality for all platforms.
  */
-public abstract class AbstractComponentAdapter implements IComponentAdapter, IExecutable
+//public abstract class AbstractComponentAdapter implements IComponentAdapter, IExecutable
 {
 	//-------- attributes --------
 

@@ -235,7 +235,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				}
 				else
 				{
-					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IThreadPoolService.class)
+					SServiceProvider.getServiceUpwards(component, IThreadPoolService.class)
 						.addResultListener(new IResultListener<IThreadPoolService>()
 					{
 						public void resultAvailable(IThreadPoolService result)

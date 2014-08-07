@@ -1,7 +1,7 @@
 package jadex.bridge.component;
 
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 
 import java.util.Map;
@@ -23,12 +23,11 @@ public class ComponentCreationInfo
 	protected Map<String, Object> arguments;
 	
 	/** The component description. */
-	// Hack???
+	// Hack??? Should be only available in CMS (single thread access)
 	protected IComponentDescription desc;
 	
-	/** The parent access (hack!!! only required for legacy search). */
-	// Todo: remove!!!
-	public IExternalAccess	parent;
+	/** The service registry of the local platform. */
+	protected LocalServiceRegistry	registry;
 	
 	/** The real time flag. */
 	protected boolean	realtime;
@@ -44,15 +43,16 @@ public class ComponentCreationInfo
 	 *  @param config	The configuration name or null for default (if any).
 	 *  @param arguments	The arguments (if any).
 	 *  @param desc	The component description (required).
+	 *  @param registry	The service registry of the local platform.
 	 *  @param realtime	The real time flag.
 	 *  @param copy	The copy flag.
 	 */
-	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, IComponentDescription desc, IExternalAccess parent, boolean realtime, boolean copy)
+	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, IComponentDescription desc, LocalServiceRegistry registry, boolean realtime, boolean copy)
 	{
 		this.model	= model;
 		this.config = config!=null ? config : model.getConfigurationNames().length>0 ? model.getConfigurationNames()[0] : null;
 		this.arguments	= arguments;
-		this.parent	= parent;
+		this.registry	= registry;
 		this.desc	= desc;
 		this.realtime	= realtime;
 		this.copy	= copy;
@@ -92,6 +92,16 @@ public class ComponentCreationInfo
 		return this.desc;
 	}
 	
+	/**
+	 *  Get the local platform service registry.
+	 *  
+	 *  @return The local platform service registry.
+	 */
+	public LocalServiceRegistry	getServiceRegistry()
+	{
+		return registry;
+	}
+
 	/**
 	 *  Get the real time flag.
 	 */

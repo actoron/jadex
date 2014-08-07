@@ -1,7 +1,7 @@
 package jadex.bridge.nonfunctional.hardconstraints;
 
 import jadex.bridge.service.IService;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -10,7 +10,7 @@ import jadex.commons.future.IResultListener;
 /**
  * 
  */
-public abstract class AbstractConstraintFilter<T> implements IRemoteFilter<T>
+public abstract class AbstractConstraintFilter<T> implements IAsyncFilter<T>
 {
 	/** Name of the property being kept constant. */
 	protected String propname;

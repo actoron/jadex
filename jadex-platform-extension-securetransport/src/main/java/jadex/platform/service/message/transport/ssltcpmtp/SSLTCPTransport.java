@@ -1,6 +1,6 @@
 package jadex.platform.service.message.transport.ssltcpmtp;
 
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -62,7 +62,7 @@ public class SSLTCPTransport extends TCPTransport
 	/**
 	 *  Static method for reflective creation to allow platform start without add-on.
 	 */
-	public static SSLTCPTransport	create(IServiceProvider container, int port)
+	public static SSLTCPTransport	create(IInternalAccess container, int port)
 	{
 		return new SSLTCPTransport(container, port);
 	}
@@ -72,7 +72,7 @@ public class SSLTCPTransport extends TCPTransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public SSLTCPTransport(IServiceProvider container, int port)
+	public SSLTCPTransport(IInternalAccess container, int port)
 	{
 		this(container, port, true);
 	}
@@ -82,7 +82,7 @@ public class SSLTCPTransport extends TCPTransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public SSLTCPTransport(final IServiceProvider container, int port, final boolean async)
+	public SSLTCPTransport(final IInternalAccess container, int port, final boolean async)
 	{
 		super(container, port, async);
 	}
@@ -94,7 +94,7 @@ public class SSLTCPTransport extends TCPTransport
 	{
 		final Future<Void> ret = new Future<Void>();
 	
-		SServiceProvider.getService(container, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(component, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService ss)
@@ -128,7 +128,7 @@ public class SSLTCPTransport extends TCPTransport
 				// possibly create a new keystore on disk
 //				System.out.println("Using keystore: "+storepath+" "+storepass+" "+keypass);
 //				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, "jadex");
-				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, container.getId().getPlatformPrefix());
+				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, component.getComponentIdentifier().getPlatformPrefix());
 				
 				kmf.init(ks, keypass.toCharArray());
 				

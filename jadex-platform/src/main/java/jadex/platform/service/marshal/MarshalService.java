@@ -2,10 +2,9 @@ package jadex.platform.service.marshal;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -85,9 +84,6 @@ public class MarshalService extends BasicService implements IMarshalService
 	
 	//-------- attributes --------
 	
-	/** The component. */
-	protected IExternalAccess	access;
-	
 	/** The clone processors. */
 	protected List<ITraverseProcessor> processors;
 	
@@ -99,10 +95,9 @@ public class MarshalService extends BasicService implements IMarshalService
 	/**
 	 *  Create marshal service.
 	 */
-	public MarshalService(IExternalAccess access)
+	public MarshalService(IInternalAccess access)
 	{
 		super(access.getComponentIdentifier(), IMarshalService.class, null);
-		this.access = access;
 	}
 	
 	//-------- methods --------

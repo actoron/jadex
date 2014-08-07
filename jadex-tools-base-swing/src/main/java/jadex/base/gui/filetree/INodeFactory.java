@@ -3,7 +3,7 @@ package jadex.base.gui.filetree;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 
 import javax.swing.JTree;
 
@@ -21,5 +21,5 @@ public interface INodeFactory
 	/**
 	 *  Get the current file filter.
 	 */
-	public IRemoteFilter	getFileFilter();
+	public IAsyncFilter	getFileFilter();
 }

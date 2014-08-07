@@ -255,7 +255,7 @@
 	
 	<properties>
 		<property name="clock" class="IFuture">
-			SServiceProvider.getService($component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 		</property>
 	</properties>
 

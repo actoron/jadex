@@ -1,7 +1,7 @@
 package jadex.bridge;
 
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -14,7 +14,7 @@ import java.util.Arrays;
  *  a) per model type (bdi, mirco, etc.)
  *  b) per model filename
  */
-public class FactoryFilter implements IRemoteFilter
+public class FactoryFilter implements IAsyncFilter
 {
 	//-------- attributes --------
 

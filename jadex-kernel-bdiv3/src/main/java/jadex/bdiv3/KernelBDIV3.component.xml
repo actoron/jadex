@@ -22,7 +22,7 @@
 	<services>
 		<providedservice class="IComponentFactory">
 			<implementation>
-			    BDIClassGeneratorFactory.getInstance().createBDIAgentFactory($component.getServiceProvider(), jadex.commons.SUtil.createHashMap(new String[]{"debugger.panels"},new Object[]{"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel"}))
+			    BDIClassGeneratorFactory.getInstance().createBDIAgentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{"debugger.panels"},new Object[]{"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel"}))
 			</implementation>
 		</providedservice>
 	</services>

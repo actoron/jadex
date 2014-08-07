@@ -253,12 +253,12 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		else
 		{
-			SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<ILibraryService, IModelInfo>(ret)
 			{
 				public void customResultAvailable(final ILibraryService ls)
 				{
-					IFuture<IComponentFactory> fut = SServiceProvider.getService(agent.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(filename, null, rid));
+					IFuture<IComponentFactory> fut = SServiceProvider.getService(agent, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(filename, null, rid));
 					fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 					{
 						public void customResultAvailable(IComponentFactory factory)
@@ -577,7 +577,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname, addresses);
 																	
 																	// Defer component services being found from registry
-																	agent.getServiceContainer().getServiceRegistry().addExcludedComponent(cid);
+																	access.getServiceRegistry().addExcludedComponent(cid);
 																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
@@ -603,7 +603,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																	final IPlatformComponentAccess	component	= new PlatformComponent();
-																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, pad.getExternalAccess(), realtime, copy);
+																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, access.getServiceRegistry(), realtime, copy);
 																	component.create(cci, features);																	
 																	initinfos.put(cid, new InitInfo(component, cinfo, resfut));
 																	
@@ -616,7 +616,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Started component: "+cid.getName());
 
-																			agent.getServiceContainer().getServiceRegistry().removeExcludedComponent(cid);
+																			access.getServiceRegistry().removeExcludedComponent(cid);
 																			
 		//																	System.out.println("created: "+ad);
 																			
@@ -808,7 +808,7 @@ public class ComponentManagementService implements IComponentManagementService
 	protected IFuture<String>	resolveFilename(final String modelname, final CreationInfo cinfo, final IResourceIdentifier rid)
 	{
 		final Future<String>	ret	= new Future<String>();
-		SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<ILibraryService, String>(ret)
 		{
 			public void customResultAvailable(ILibraryService libservice)
@@ -902,7 +902,7 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 //			System.out.println("searching factories");
 			
-			IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(agent.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(agent, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
 			fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
 			{
 				public void customResultAvailable(Collection<IComponentFactory> facts)
@@ -2548,7 +2548,7 @@ public class ComponentManagementService implements IComponentManagementService
 //		open.add(fut);
 		if(remote)
 		{
-			IFuture<Collection<IComponentManagementService>> futi = SServiceProvider.getServices(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+			IFuture<Collection<IComponentManagementService>> futi = SServiceProvider.getServices(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 			futi.addResultListener(createResultListener(new IResultListener<Collection<IComponentManagementService>>()
 			{
 				public void resultAvailable(Collection<IComponentManagementService> result)
@@ -2689,7 +2689,7 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				public void customResultAvailable(Void result)
 				{
-									SServiceProvider.getService(agent.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									SServiceProvider.getService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 										.addResultListener(createResultListener(new IResultListener<IMessageService>()
 									{
 										public void resultAvailable(IMessageService result)
@@ -2705,7 +2705,7 @@ public class ComponentManagementService implements IComponentManagementService
 										
 										protected void cont()
 										{
-											SServiceProvider.getService(agent.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											SServiceProvider.getService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 											{
 												public void customResultAvailable(IClockService result)
@@ -3061,7 +3061,7 @@ public class ComponentManagementService implements IComponentManagementService
 	protected IFuture<IComponentManagementService>	getRemoteCMS(final IComponentIdentifier cid)
 	{
 		final Future<IComponentManagementService>	ret	= new Future<IComponentManagementService>();
-		SServiceProvider.getService(agent.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(agent, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IComponentManagementService>(ret)
 		{
 			public void customResultAvailable(IRemoteServiceManagementService rms)

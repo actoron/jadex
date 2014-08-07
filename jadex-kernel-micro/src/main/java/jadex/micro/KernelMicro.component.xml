@@ -22,7 +22,7 @@
 	<services>
 		<providedservice class="IComponentFactory">
 			<implementation>
-				new MicroAgentFactory($component.getServiceProvider(), SUtil.createHashMap(
+				new MicroAgentFactory($component, SUtil.createHashMap(
 					new String[]
 					{
 						"debugger.panels"

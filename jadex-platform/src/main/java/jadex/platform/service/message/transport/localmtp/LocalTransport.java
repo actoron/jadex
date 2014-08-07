@@ -53,7 +53,7 @@ public class LocalTransport implements ITransport
 	public IFuture<Void> start()
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
 			public void customResultAvailable(IMessageService result)

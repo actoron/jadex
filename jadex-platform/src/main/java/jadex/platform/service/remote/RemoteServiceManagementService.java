@@ -27,7 +27,7 @@ import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IFilter;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -372,7 +372,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope, IRemoteFilter<T> filter)
+	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope, IAsyncFilter<T> filter)
 	{
 //		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
 		final Future<T>	ret	= new Future<T>();
@@ -409,7 +409,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier cid, final Class<T> service, final String scope, IRemoteFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier cid, final Class<T> service, final String scope, IAsyncFilter<T> filter)
 	{
 		return getServiceProxies(cid, service, scope, true, filter);
 	}
@@ -422,7 +422,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IRemoteFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
 	{
 //		final Future<T>	ret	= new Future<T>();
 //		
@@ -529,7 +529,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
 						// Hack! create remote rms cid with "rms" assumption.
-						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid, (IRemoteFilter<IService>)filter);
+						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid, (IAsyncFilter<IService>)filter);
 						
 //						System.out.println("send to: "+rrms+" "+callid);
 						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func

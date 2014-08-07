@@ -11,7 +11,7 @@ import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.IPropertiesProvider;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
@@ -110,9 +110,9 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		this.iconcache = new DelegationIconCache();
 		setNodeFactory(new DefaultNodeFactory()
 		{
-			public IRemoteFilter getFileFilter()
+			public IAsyncFilter getFileFilter()
 			{
-				return IRemoteFilter.ALWAYS;
+				return IAsyncFilter.ALWAYS;
 			}
 		});
 		
@@ -610,7 +610,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		ftp.setPopupBuilder(new PopupBuilder(new Object[]{mic}));
 		ftp.setNodeFactory(new DefaultNodeFactory()
 		{
-			public IRemoteFilter getFileFilter()
+			public IAsyncFilter getFileFilter()
 			{
 				return new DefaultFileFilter(mic.isAll(), mic.getSelectedComponentTypes());
 			}
@@ -626,12 +626,12 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Delegation filter class.
 	 */
-	public static class DelegationFilter implements IRemoteFilter
+	public static class DelegationFilter implements IAsyncFilter
 	{
 		//-------- attributes --------
 		
 		/** The delegation filter. */
-		protected IRemoteFilter filter;
+		protected IAsyncFilter filter;
 
 		//-------- methods --------
 
@@ -648,7 +648,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		 *  Get the filter.
 		 *  @return the filter.
 		 */
-		public IRemoteFilter getFilter()
+		public IAsyncFilter getFilter()
 		{
 			return filter;
 		}
@@ -657,7 +657,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		 *  Set the filter.
 		 *  @param filter The filter to set.
 		 */
-		public void setFilter(IRemoteFilter filter)
+		public void setFilter(IAsyncFilter filter)
 		{
 			this.filter = filter;
 		}

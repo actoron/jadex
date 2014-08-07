@@ -289,7 +289,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IThreadPoolService.class)
+		SServiceProvider.getServiceUpwards(component, IThreadPoolService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -301,7 +301,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 				{
 					public void customResultAvailable(Object result)
 					{
-						SServiceProvider.getService(component.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
@@ -346,7 +346,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 		{
 			public void customResultAvailable(Void result)
 			{
-				SServiceProvider.getService(component.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new IResultListener<ISettingsService>()
 				{
 					public void resultAvailable(ISettingsService settings)

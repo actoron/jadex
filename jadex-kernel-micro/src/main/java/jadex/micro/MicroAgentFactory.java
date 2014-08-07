@@ -51,7 +51,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	protected MicroModelLoader loader;
 	
 	/** The platform. */
-	protected IServiceProvider provider;
+	protected IInternalAccess provider;
 	
 	/** The properties. */
 	protected Map<String, Object> fproperties;
@@ -67,9 +67,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Create a new agent factory.
 	 */
-	public MicroAgentFactory(IServiceProvider provider, Map<String, Object> properties)
+	public MicroAgentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getId(), IComponentFactory.class, null);
+		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
 
 		this.provider = provider;
 		this.fproperties = properties;
@@ -107,8 +107,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
-		this.provider = component.getServiceProvider();
-		this.providerid = provider.getId();
+		this.provider = component;
+		this.providerid = provider.getComponentIdentifier();
 		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null);
 		return startService();
 	}

@@ -1,16 +1,16 @@
 package jadex.android.controlcenter;
 
 import jadex.bridge.service.IService;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-public class ViewableFilter implements IRemoteFilter {
+public class ViewableFilter implements IAsyncFilter {
 
 	public static final String COMPONENTVIEWER_VIEWERCLASS = "componentviewer.viewerclass";
 
 	/** Static proxy filter instance. */
-	public static IRemoteFilter VIEWABLE_FILTER = new ViewableFilter();
+	public static IAsyncFilter VIEWABLE_FILTER = new ViewableFilter();
 
 	public IFuture<Boolean> filter(Object obj) {
 		Future<Boolean> ret = new Future<Boolean>();

@@ -30,7 +30,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -222,7 +222,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IRemoteFilter<T> filter)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter)
 	{
 //		if(shutdowned)
 //			return new TerminableIntermediateFuture<T>(new ComponentTerminatedException(id));
@@ -258,7 +258,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-		return getRequiredService(info, binding, false, (IRemoteFilter)null);
+		return getRequiredService(info, binding, false, (IAsyncFilter)null);
 	}
 	
 	/**
@@ -274,7 +274,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
 	{
 //		if(shutdowned)
 //		{
@@ -308,7 +308,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-		return getRequiredServices(info, binding, false, (IRemoteFilter)null);
+		return getRequiredServices(info, binding, false, (IAsyncFilter)null);
 	}
 	
 	/**
@@ -324,7 +324,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
 	{
 //		if(shutdowned)
 //		{
@@ -348,7 +348,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, IRemoteFilter<T> filter)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, IAsyncFilter<T> filter)
 	{
 		IFuture<T> ret = getRequiredService(info, binding, false, filter);
 		return ret;
@@ -359,7 +359,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, IRemoteFilter<T> filter)
+	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, IAsyncFilter<T> filter)
 	{
 		return getRequiredServices(info, binding, false, filter);
 	}
@@ -368,7 +368,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IRemoteFilter<T> filter)
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IAsyncFilter<T> filter)
 	{
 //		if(shutdowned)
 //			return new Future<T>(new ComponentTerminatedException(id));

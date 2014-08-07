@@ -129,12 +129,12 @@ public class NIOTCPTransport implements ITransport
 			}
 			
 			// Start receiver thread.
-			SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 			{
 				public void customResultAvailable(final IMessageService ms)
 				{
-					SServiceProvider.getService(component.getServiceProvider(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(component, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Void>(ret)
 					{
 						public void customResultAvailable(IDaemonThreadPoolService tp)

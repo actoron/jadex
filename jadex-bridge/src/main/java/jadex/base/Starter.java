@@ -479,7 +479,7 @@ public class Starter
 					boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
 					boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
 	
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, null, realtime, copy);
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, new LocalServiceRegistry(), realtime, copy);
 					Collection<IComponentFeature>	features	= cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 
@@ -721,7 +721,7 @@ public class Starter
 		
 		if(i<components.size())
 		{
-			SServiceProvider.getServiceUpwards(instance.getServiceProvider(), IComponentManagementService.class)
+			SServiceProvider.getServiceUpwards(instance, IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)

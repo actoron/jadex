@@ -21,7 +21,7 @@ import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
@@ -112,7 +112,7 @@ public class ModelTreePanel extends FileTreePanel
 		final ModelFileFilterMenuItemConstructor mic = new ModelFileFilterMenuItemConstructor(getModel(), exta);
 		setNodeFactory(new DefaultNodeFactory()
 		{
-			public IRemoteFilter getFileFilter()
+			public IAsyncFilter getFileFilter()
 			{
 				// Hack!!! Have to use URL for communication backwards compatibility as model file filter is transferred remotely.
 				Map<URL, IResourceIdentifier>	rids	= new HashMap();

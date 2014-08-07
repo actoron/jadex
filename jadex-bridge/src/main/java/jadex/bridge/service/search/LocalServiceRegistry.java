@@ -6,7 +6,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -185,7 +185,7 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for service.
 	 */
-	public synchronized <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IRemoteFilter<T> filter)
+	public synchronized <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -216,7 +216,7 @@ public class LocalServiceRegistry
 	 * @param it
 	 * @return
 	 */
-	protected <T> IFuture<T> searchLoopService(final IRemoteFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
+	protected <T> IFuture<T> searchLoopService(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -268,7 +268,7 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IRemoteFilter<T> filter)
+	public synchronized <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
@@ -306,7 +306,7 @@ public class LocalServiceRegistry
 	 * @param it
 	 * @return
 	 */
-	protected <T> ISubscriptionIntermediateFuture<T> searchLoopServices(final IRemoteFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
+	protected <T> ISubscriptionIntermediateFuture<T> searchLoopServices(final IAsyncFilter<T> filter, final Iterator<T> it, final IComponentIdentifier cid, final String scope)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
@@ -356,7 +356,7 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IRemoteFilter<T> filter)
+	public synchronized <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -406,7 +406,7 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IRemoteFilter<T> filter)
+	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
 	{
 //		System.out.println("Search global services: "+type);
 		
@@ -557,7 +557,7 @@ public class LocalServiceRegistry
 	 *  @param type The type.
 	 *  @param scope The scope.
 	 */
-	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final Class<T> type, final IRemoteFilter<T> filter)
+	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final Class<T> type, final IAsyncFilter<T> filter)
 	{
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		
@@ -640,7 +640,7 @@ public class LocalServiceRegistry
 	 *  @param type The type.
 	 *  @param scope The scope.
 	 */
-	protected <T> IFuture<T> searchRemoteService(final Class<T> type, final IRemoteFilter<T> filter)
+	protected <T> IFuture<T> searchRemoteService(final Class<T> type, final IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		

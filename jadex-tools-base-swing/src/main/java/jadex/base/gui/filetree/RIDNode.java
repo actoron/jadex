@@ -5,7 +5,7 @@ import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IResourceIdentifier;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.collection.SortedList;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -215,7 +215,7 @@ public class RIDNode extends AbstractSwingTreeNode implements IFileNode
 //			System.out.println("name: "+toString()+" files length: "+files.length);
 			for(int i=0; i<files.length; i++)
 			{
-				IRemoteFilter	filter	= factory.getFileFilter();
+				IAsyncFilter	filter	= factory.getFileFilter();
 				if(filter==null)
 				{
 					lis.resultAvailable(files[i]);

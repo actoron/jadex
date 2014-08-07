@@ -226,7 +226,7 @@ public class HttpReceiver
 		if(shutdown)
 			return;
 		
-		SServiceProvider.getService(access.getServiceProvider(), IAwarenessManagementService.class, Binding.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, IAwarenessManagementService.class, Binding.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IAwarenessManagementService>()
 		{
 			public void resultAvailable(IAwarenessManagementService awa)
@@ -427,7 +427,7 @@ public class HttpReceiver
 	{
 //		System.err.println("handleConnection: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
 			public void customResultAvailable(final IMessageService ms)

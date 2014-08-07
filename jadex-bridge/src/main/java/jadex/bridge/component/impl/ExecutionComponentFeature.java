@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -170,19 +171,27 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 	 */
 	protected void	wakeup()
 	{
-		SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IExecutionService>()
 		{
 			public void resultAvailable(IExecutionService exe)
 			{
-				if(bootstrap)
+				// Hack!!! service is foudn before it is started, grrr.
+				if(((IService)exe).isValid().get(null).booleanValue())	// Hack!!! service is raw
 				{
-					// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-					available	= true;
+					if(bootstrap)
+					{
+						// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+						available	= true;
+					}
+					else
+					{
+						exe.execute(ExecutionComponentFeature.this);
+					}
 				}
 				else
 				{
-					exe.execute(ExecutionComponentFeature.this);
+					exceptionOccurred(null);
 				}
 			}
 			

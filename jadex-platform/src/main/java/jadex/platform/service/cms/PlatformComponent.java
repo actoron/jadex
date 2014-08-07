@@ -10,8 +10,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
@@ -152,6 +151,16 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		return this;
 	}
 	
+	/**
+	 *  Get the local platform service registry.
+	 *  
+	 *  @return The local platform service registry.
+	 */
+	public LocalServiceRegistry	getServiceRegistry()
+	{
+		return info.getServiceRegistry();
+	}
+	
 	//-------- IInternalAccess interface --------
 	
 	/**
@@ -220,46 +229,35 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
 			{
-				return SServiceProvider.getServices(getServiceProvider(), type, scope);
+				return SServiceProvider.getServices(PlatformComponent.this, type, scope);
 			}
 			
 			public <T> IIntermediateFuture<T> searchServices(Class<T> type)
 			{
-				return SServiceProvider.getServices(getServiceProvider(), type);
+				return SServiceProvider.getServices(PlatformComponent.this, type);
 			}
 			
 			public <T> IFuture<T> searchServiceUpwards(Class<T> type)
 			{
-				return SServiceProvider.getServiceUpwards(getServiceProvider(), type);
+				return SServiceProvider.getServiceUpwards(PlatformComponent.this, type);
 			}
 			
 			public <T> IFuture<T> searchService(Class<T> type, String scope)
 			{
-				return SServiceProvider.getService(getServiceProvider(), type, scope);
+				return SServiceProvider.getService(PlatformComponent.this, type, scope);
 			}
 			
 			public <T> IFuture<T> searchService(Class<T> type)
 			{
-				return SServiceProvider.getService(getServiceProvider(), type);
+				return SServiceProvider.getService(PlatformComponent.this, type);
 			}
 			
 			public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
 			{
-				return SServiceProvider.getService(getServiceProvider(), cid, type);
+				return SServiceProvider.getService(PlatformComponent.this, cid, type);
 			}
 		};
 	}
-	
-	/**
-	 *  Get the service provider.
-	 */
-	// Todo: internal object? -> fix search!?
-	public IServiceProvider	getServiceProvider()
-	{
-		// Hack!?
-		return (IServiceProvider)getComponentFeature(IProvidedServicesFeature.class);
-	}
-
 	
 	/**
 	 *  Kill the component.
@@ -269,12 +267,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		// Todo:
 		return new Future<Map<String, Object>>();
 	}
-	
-//	/**
-//	 *  Test if component has been killed.
-//	 *  @return True, if has been killed.
-//	 */
-//	public boolean isKilled();
 	
 	/**
 	 *  Get the external access.
@@ -470,7 +462,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				
 				if(!found)
 				{
-					throw new UnsupportedOperationException();
+					throw new UnsupportedOperationException("Value not found: "+name);
 				}
 				
 				return ret;
@@ -495,7 +487,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				
 				if(!found)
 				{
-					throw new UnsupportedOperationException();
+					throw new UnsupportedOperationException("Value not found: "+name+", "+object);
 				}
 				
 				return ret;
@@ -511,19 +503,11 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		return ((ModelInfo)getModel()).getClassLoader();
 	}
 	
-//	/**
-//	 *  Get the model name of a component type.
-//	 *  @param ctype The component type.
-//	 *  @return The model name of this component type.
-//	 */
-//	public IFuture getFileName(String ctype);
-	
 	/**
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
 	 *  @param initial True, for receiving the current state.
 	 */
-//	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm)
 	{
 		throw new UnsupportedOperationException();

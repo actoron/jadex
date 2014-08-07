@@ -92,7 +92,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	deregistered	= new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -141,7 +141,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		SServiceProvider.getService(access.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -171,7 +171,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			{
 				final boolean[]	services	= new boolean[2];
 
-				SServiceProvider.getService(access.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(access, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -194,7 +194,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					}
 				}));
 						
-				SServiceProvider.getService(access.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(access, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -382,7 +382,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				SServiceProvider.getServiceUpwards(access.getServiceProvider(), IThreadPoolService.class)
+				SServiceProvider.getServiceUpwards(access, IThreadPoolService.class)
 					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)

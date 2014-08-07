@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -60,12 +59,6 @@ public interface IInternalAccess
 	 */
 	// Todo: convenience object? -> fix search!?
 	public IServiceContainer getServiceContainer();
-	
-	/**
-	 *  Get the service provider.
-	 */
-	// Todo: internal object? -> fix search!?
-	public IServiceProvider	getServiceProvider();
 	
 	/**
 	 *  Kill the component.

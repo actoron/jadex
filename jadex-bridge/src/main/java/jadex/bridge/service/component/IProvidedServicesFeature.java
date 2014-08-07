@@ -25,6 +25,7 @@ public interface IProvidedServicesFeature
 		
 	/**
 	 *  Get provided (declared) service.
+	 *  
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
@@ -32,6 +33,7 @@ public interface IProvidedServicesFeature
 	
 	/**
 	 *  Get provided (declared) service.
+	 *  
 	 *  @param clazz The interface.
 	 *  @return The service.
 	 */
@@ -39,13 +41,25 @@ public interface IProvidedServicesFeature
 
 	/**
 	 *  Get provided (declared) service.
-	 *  @param clazz The interface.
+	 *  
+	 *  @param clazz The interface (null for all services).
 	 *  @return The service.
 	 */
 	public <T> T[] getProvidedServices(Class<T> clazz);
 	
 	/**
-	 *  Get the provided service
+	 *  Get the provided service implementation object by class.
+	 *  
+	 *  @param clazz The service clazz.
+	 *  @return The service.
 	 */
 	public <T> T getProvidedServiceRawImpl(Class<T> clazz);
+	
+	/**
+	 *  Get the provided service implementation object by name.
+	 *  
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public Object getProvidedServiceRawImpl(String name);
 }

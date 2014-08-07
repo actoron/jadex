@@ -1,6 +1,6 @@
 package jadex.bridge.service.search;
 
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -9,12 +9,12 @@ import java.lang.reflect.Proxy;
 /**
  *  Test if a class is a proxy.
  */
-public class ProxyFilter implements IRemoteFilter
+public class ProxyFilter implements IAsyncFilter
 {
 	//-------- attributes --------
 	
 	/** Static proxy filter instance. */
-	public static final IRemoteFilter PROXYFILTER = new ProxyFilter();
+	public static final IAsyncFilter PROXYFILTER = new ProxyFilter();
 
 	//-------- methods --------
 	

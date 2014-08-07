@@ -23,7 +23,7 @@
 	<services>
 		<providedservice class="IComponentFactory">
 			<implementation>
-				new BpmnFactory($component.getServiceProvider(), SUtil.createHashMap(
+				new BpmnFactory($component, SUtil.createHashMap(
 					new String[]
 					{
 						"debugger.panels"

@@ -16,7 +16,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.platform.service.cms.AbstractComponentAdapter;
+import jadex.platform.service.cms.PlatformComponent;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
 
@@ -122,7 +122,7 @@ public class TCPTransport implements ITransport
 	 */
 	public TCPTransport(final IInternalAccess component, int port, final boolean async)
 	{
-		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(component.getComponentIdentifier())+".TCPTransport");
+		this.logger = Logger.getLogger(PlatformComponent.getLoggerName(component.getComponentIdentifier())+".TCPTransport");
 		
 		this.component = component;
 		this.async = async;
@@ -168,7 +168,7 @@ public class TCPTransport implements ITransport
 			}
 			
 			// Start the receiver thread.
-			SServiceProvider.getService(component.getServiceProvider(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(component, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Void>(ret)
 			{
 				public void customResultAvailable(final IDaemonThreadPoolService tp)
@@ -704,7 +704,7 @@ public class TCPTransport implements ITransport
 		
 		if(msgservice==null)
 		{
-			SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DelegationResultListener<IMessageService>(ret)
 			{
 				public void customResultAvailable(IMessageService result)

@@ -1,6 +1,6 @@
 package jadex.base;
 
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -11,7 +11,7 @@ import java.util.List;
  *  The default file filter allows using different file extensions.
  *  This class needs to handle remote transfer.
  */
-public class DefaultFileFilter implements IRemoteFilter
+public class DefaultFileFilter implements IAsyncFilter
 {
 	//-------- attributes --------
 	

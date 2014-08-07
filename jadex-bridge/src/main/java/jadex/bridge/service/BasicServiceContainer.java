@@ -11,7 +11,7 @@ import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.MethodListenerHandler;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -846,7 +846,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer, IServ
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, IRemoteFilter<T> filter)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, IAsyncFilter<T> filter)
 	{
 		IFuture<T> ret = getRequiredService(info, binding, false, filter);
 		return ret;
@@ -857,7 +857,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer, IServ
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, IRemoteFilter<T> filter)
+	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, IAsyncFilter<T> filter)
 	{
 		return getRequiredServices(info, binding, false, filter);
 	}
@@ -875,7 +875,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer, IServ
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IRemoteFilter<T> filter)
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IAsyncFilter<T> filter)
 	{
 		if(shutdowned)
 			return new Future<T>(new ComponentTerminatedException(id));
@@ -907,7 +907,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer, IServ
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IRemoteFilter<T> filter)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter)
 	{
 		if(shutdowned)
 			return new TerminableIntermediateFuture<T>(new ComponentTerminatedException(id));
@@ -930,7 +930,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer, IServ
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
 	{
 		if(info==null)
 		{
@@ -947,7 +947,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer, IServ
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
 	{
 		if(info==null)
 		{

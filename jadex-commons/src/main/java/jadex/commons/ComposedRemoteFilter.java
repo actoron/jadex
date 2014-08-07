@@ -11,7 +11,7 @@ import java.util.Arrays;
  *  A filter checks if an object matches
  *  the given subfilters.
  */
-public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
+public class  ComposedRemoteFilter implements IAsyncFilter, Serializable
 {
 	//-------- constants --------
 
@@ -28,7 +28,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	//-------- attributes ---------
 
 	/** The filters */
-	protected IRemoteFilter[] filters;
+	protected IAsyncFilter[] filters;
 
 	/** The operator. */
 	protected int operator;
@@ -40,7 +40,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	 *  @param filters The filters.
 	 *  @param operator The operator.
 	 */
-	public ComposedRemoteFilter(IRemoteFilter[] filters)
+	public ComposedRemoteFilter(IAsyncFilter[] filters)
 	{
 		this(filters, AND);
 	}
@@ -50,7 +50,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	 *  @param filters The filters.
 	 *  @param operator The operator.
 	 */
-	public ComposedRemoteFilter(IRemoteFilter[] filters, int operator)
+	public ComposedRemoteFilter(IAsyncFilter[] filters, int operator)
 	{
 		this.filters	= filters.clone();
 		this.operator	= operator;
@@ -94,7 +94,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	/**
 	 *  Check and filter.
 	 */
-	protected IFuture<Boolean> checkAndFilter(final Object object, final IRemoteFilter[] filter, final int i)
+	protected IFuture<Boolean> checkAndFilter(final Object object, final IAsyncFilter[] filter, final int i)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
 		filters[i].filter(object).addResultListener(new DelegationResultListener<Boolean>(ret)
@@ -125,7 +125,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	/**
 	 *  Check or filter.
 	 */
-	protected IFuture<Boolean> checkOrFilter(final Object object, final IRemoteFilter[] filter, final int i)
+	protected IFuture<Boolean> checkOrFilter(final Object object, final IAsyncFilter[] filter, final int i)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
 		filters[i].filter(object).addResultListener(new DelegationResultListener<Boolean>(ret)
@@ -157,7 +157,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	 *  Get the filters.
 	 *  @return the filters.
 	 */
-	public IRemoteFilter[] getFilters()
+	public IAsyncFilter[] getFilters()
 	{
 		return filters;
 	}
@@ -166,7 +166,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	 *  Set the filters.
 	 *  @param filters The filters to set.
 	 */
-	public void setFilters(IRemoteFilter[] filters)
+	public void setFilters(IAsyncFilter[] filters)
 	{
 		this.filters = filters.clone();
 	}
@@ -175,9 +175,9 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	 *  Add a filter.
 	 *  @param filter The filter.
 	 */
-	public void addFilter(IRemoteFilter filter)
+	public void addFilter(IAsyncFilter filter)
 	{
-		IRemoteFilter[] copy = new IRemoteFilter[filters==null? 1: filters.length+1];
+		IAsyncFilter[] copy = new IAsyncFilter[filters==null? 1: filters.length+1];
 		if(filters!=null)
 			System.arraycopy(filter, 0, copy, 0, filters.length);
 		copy[copy.length-1] = filter;

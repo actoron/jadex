@@ -28,7 +28,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.persistence.ISwapService;
 import jadex.commons.IFilter;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -753,7 +753,7 @@ public class ShadowAccess implements IExternalAccess
 		 *  @param type The class.
 		 *  @return The corresponding services.
 		 */
-		public ITerminableIntermediateFuture<IService> getServices(final ClassInfo type, final String scope, final IRemoteFilter<IService> filter)
+		public ITerminableIntermediateFuture<IService> getServices(final ClassInfo type, final String scope, final IAsyncFilter<IService> filter)
 		{
 			final TerminableIntermediateDelegationFuture<IService>	ret	= new TerminableIntermediateDelegationFuture<IService>();
 			try
@@ -791,7 +791,7 @@ public class ShadowAccess implements IExternalAccess
 		 *  @param type The class.
 		 *  @return The corresponding services.
 		 */
-		public IFuture<IService> getService(final ClassInfo type, final String scope, final IRemoteFilter<IService> filter)
+		public IFuture<IService> getService(final ClassInfo type, final String scope, final IAsyncFilter<IService> filter)
 		{
 			final Future<IService>	ret	= new Future<IService>();
 			try
@@ -1066,12 +1066,12 @@ public class ShadowAccess implements IExternalAccess
 			throw new UnsupportedOperationException();
 		}
 		
-		public <T> IFuture<T> getRequiredService(String name, boolean rebind, IRemoteFilter<T> filter)
+		public <T> IFuture<T> getRequiredService(String name, boolean rebind, IAsyncFilter<T> filter)
 		{
 			throw new UnsupportedOperationException();
 		}
 		
-		public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IRemoteFilter<T> filter)
+		public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter)
 		{
 			throw new UnsupportedOperationException();
 		}

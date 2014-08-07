@@ -10,7 +10,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -67,7 +67,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	protected String scope;
 	
 	/** The filter. */
-	protected IRemoteFilter<IService> filter;
+	protected IAsyncFilter<IService> filter;
 	
 	//-------- constructors --------
 	
@@ -95,7 +95,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  Create a new remote search command.
 	 */
 	public RemoteSearchCommand(IComponentIdentifier providerid, Class<?> type, 
-		boolean multiple, String scope, String callid, IRemoteFilter<IService> filter)
+		boolean multiple, String scope, String callid, IAsyncFilter<IService> filter)
 	{
 		if(type==null)
 			System.out.println("type is null");
@@ -247,7 +247,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 								{
 									Class<?> cl = type.getType(ia.getClassLoader(), ia.getModel().getAllImports());
 									
-									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), cl, scope, (IRemoteFilter)filter);
+									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), cl, scope, (IAsyncFilter)filter);
 									res.addResultListener(new IIntermediateResultListener<IService>()
 									{
 										int cnt = 0;	
@@ -551,7 +551,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  Get the filter.
 	 *  @return The filter.
 	 */
-	public IRemoteFilter<IService> getFilter()
+	public IAsyncFilter<IService> getFilter()
 	{
 		return filter;
 	}
@@ -560,7 +560,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  Set the filter.
 	 *  @param filter The filter to set.
 	 */
-	public void setFilter(IRemoteFilter<IService> filter)
+	public void setFilter(IAsyncFilter<IService> filter)
 	{
 		this.filter = filter;
 	}

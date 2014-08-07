@@ -4,7 +4,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.ComposedRemoteFilter;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -30,7 +30,7 @@ public class RHardConstraints
 	protected Collection<MHardConstraint> constraintmodel;
 	
 	/** The basic hard constraints filter */
-	protected List<IRemoteFilter<?>> filters = new ArrayList<IRemoteFilter<?>>();
+	protected List<IAsyncFilter<?>> filters = new ArrayList<IAsyncFilter<?>>();
 	
 	/** Unbound constant value filters */
 	protected List<ConstantValueFilter> unboundconstantfilters = new ArrayList<ConstantValueFilter>();
@@ -77,7 +77,7 @@ public class RHardConstraints
 	 *  
 	 *  @param filter The filter.
 	 */
-	protected void addFilter(IRemoteFilter<IService> filter)
+	protected void addFilter(IAsyncFilter<IService> filter)
 	{
 		if (filter instanceof ConstantValueFilter &&
 				((ConstantValueFilter) filter).getValue() == null)
@@ -95,20 +95,20 @@ public class RHardConstraints
 	 * 
 	 *  @return Remotable filter.
 	 */
-	public IRemoteFilter<?> getRemotableFilter()
+	public IAsyncFilter<?> getRemotableFilter()
 	{
-		IRemoteFilter<?> ret = null;
+		IAsyncFilter<?> ret = null;
 		
 		if (filters.isEmpty())
 		{
-			ret = IRemoteFilter.ALWAYS;
+			ret = IAsyncFilter.ALWAYS;
 		} 
 		else
 		{
-			ret = new ComposedRemoteFilter(filters.toArray(new IRemoteFilter[filters.size()]));
+			ret = new ComposedRemoteFilter(filters.toArray(new IAsyncFilter[filters.size()]));
 		}
 		
-		return (IRemoteFilter<?>) ret;
+		return (IAsyncFilter<?>) ret;
 	}
 	
 	/**
@@ -116,7 +116,7 @@ public class RHardConstraints
 	 *  
 	 *  @return Filter for local filtering.
 	 */
-	public IRemoteFilter<?> getLocalFilter()
+	public IAsyncFilter<?> getLocalFilter()
 	{
 		return getLocalFilter(null);
 	}
@@ -126,17 +126,17 @@ public class RHardConstraints
 	 *  
 	 *  @return Filter for local filtering.
 	 */
-	public IRemoteFilter<IService> getLocalFilter(final MethodInfo method)
+	public IAsyncFilter<IService> getLocalFilter(final MethodInfo method)
 	{
-		IRemoteFilter<IService> ret = null;
+		IAsyncFilter<IService> ret = null;
 		
 		if (unboundconstantfilters.isEmpty())
 		{
-			ret = IRemoteFilter.ALWAYS;
+			ret = IAsyncFilter.ALWAYS;
 		}
 		else
 		{
-			ret = new IRemoteFilter<IService>()
+			ret = new IAsyncFilter<IService>()
 			{
 				public IFuture<Boolean> filter(final IService service)
 				{
@@ -235,12 +235,12 @@ public class RHardConstraints
 		else
 		{
 			final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
-			SServiceProvider.getServices(provider, type, scope, (IRemoteFilter<T>) hardconstraints.getRemotableFilter()).addResultListener(new IResultListener<Collection<T>>()
+			SServiceProvider.getServices(provider, type, scope, (IAsyncFilter<T>) hardconstraints.getRemotableFilter()).addResultListener(new IResultListener<Collection<T>>()
 			{
 				public void resultAvailable(Collection<T> results)
 				{
 //					List<T> filteredresults = new ArrayList<T>();
-					IRemoteFilter<T> filter = (IRemoteFilter<T>) hardconstraints.getLocalFilter();
+					IAsyncFilter<T> filter = (IAsyncFilter<T>) hardconstraints.getLocalFilter();
 					
 //					CollectionResultListener<T> crl = new CollectionResultListener<T>(results.size(), true, new DelegationResultListener<T>(new IResultListener<T>()
 //					{

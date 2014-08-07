@@ -25,7 +25,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjApaMEeCj2rAtY6yqkw" key="0:0" value="name"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjA5aMEeCj2rAtY6yqkw" key="0:1" value="IComponentFactory"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjBZaMEeCj2rAtY6yqkw" key="0:2" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjBJaMEeCj2rAtY6yqkw" key="0:3" value="new BpmnFactory($component.getServiceProvider(), SUtil.createHashMap(new String[]{&quot;debugger.panels&quot;},new Object[]{&quot;jadex.tools.debugger.bpmn.BpmnDebuggerPanel&quot;}))"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gGYjBJaMEeCj2rAtY6yqkw" key="0:3" value="new BpmnFactory($component, SUtil.createHashMap(new String[]{&quot;debugger.panels&quot;},new Object[]{&quot;jadex.tools.debugger.bpmn.BpmnDebuggerPanel&quot;}))"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_EpnE0ZaMEeCj2rAtY6yqkw" iD="_EpnE0JaMEeCj2rAtY6yqkw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_Epnr4ZaMEeCj2rAtY6yqkw" iD="_Epnr4JaMEeCj2rAtY6yqkw" name="Task" activityType="Task"/>

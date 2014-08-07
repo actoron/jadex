@@ -28,7 +28,7 @@ import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -672,7 +672,7 @@ public class SRemoteGui
 	 *  @param dir	The directory.
 	 *  @param filter	The filter or null for all files.
 	 */
-	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IRemoteFilter filter, IExternalAccess exta)
+	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IAsyncFilter filter, IExternalAccess exta)
 	{
 		IIntermediateFuture<FileData> ret = null;
 		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
@@ -706,7 +706,7 @@ public class SRemoteGui
 	 *  @param dir	The directory.
 	 *  @param filter	The filter or null for all files.
 	 */
-	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IRemoteFilter filter)
+	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IAsyncFilter filter)
 	{
 //		return (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
 //		{
@@ -854,7 +854,7 @@ public class SRemoteGui
 	 *  @param dir	The directory.
 	 *  @param filter	The filter or null for all files.
 	 */
-	public static ISubscriptionIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IRemoteFilter filter, IExternalAccess exta)
+	public static ISubscriptionIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IAsyncFilter filter, IExternalAccess exta)
 	{
 		ISubscriptionIntermediateFuture<FileData> ret = null;
 		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
@@ -886,7 +886,7 @@ public class SRemoteGui
 	/**
 	 *	List files of a remote jar file
 	 */
-	public static ISubscriptionIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IRemoteFilter filter)
+	public static ISubscriptionIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IAsyncFilter filter)
 	{
 		final long start = System.currentTimeMillis();
 		

@@ -136,7 +136,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		// Fetch marshal service first time.		
 		if(marshal==null)
 		{
-			SServiceProvider.getService(ea.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(ea, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
 			{
 				public void customResultAvailable(IMarshalService result)

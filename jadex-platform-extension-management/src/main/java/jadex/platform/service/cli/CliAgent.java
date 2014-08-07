@@ -61,7 +61,7 @@ import javax.swing.SwingUtilities;
 @ProvidedServices(
 {
 	@ProvidedService(name="cliser", type=ICliService.class, implementation=@Implementation(expression="$pojoagent")),
-	@ProvidedService(type=IInternalCliService.class, implementation=@Implementation(expression="$component.getRawService(\"cliser\")"))
+	@ProvidedService(type=IInternalCliService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"cliser\")"))
 })
 @RequiredServices(
 	@RequiredService(name="dtp", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))

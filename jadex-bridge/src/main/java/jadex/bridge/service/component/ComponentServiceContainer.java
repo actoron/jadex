@@ -29,7 +29,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.SReflect;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
@@ -135,13 +135,13 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IRemoteFilter<IService> filter)
+	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IAsyncFilter<IService> filter)
 	{
 		if(type==null)
 			return new TerminableIntermediateFuture<IService>(new IllegalArgumentException("Type must not null."));
 		
 		Class<?> cl = type.getType(instance.getClassLoader());
-		return (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(getServiceProvider(), cl, scope, (IRemoteFilter)filter);
+		return (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(getServiceProvider(), cl, scope, (IAsyncFilter)filter);
 	}
 	
 	/**
@@ -149,13 +149,13 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture<IService> getService(ClassInfo type, String scope, IRemoteFilter<IService> filter)
+	public IFuture<IService> getService(ClassInfo type, String scope, IAsyncFilter<IService> filter)
 	{
 		if(type==null)
 			return new Future<IService>(new IllegalArgumentException("Type must not null."));
 
 		Class<?> cl = type.getType(instance.getClassLoader());
-		return (IFuture<IService>)SServiceProvider.getService(getServiceProvider(), cl, scope, (IRemoteFilter)filter);
+		return (IFuture<IService>)SServiceProvider.getService(getServiceProvider(), cl, scope, (IAsyncFilter)filter);
 	}
 	
 	/**
@@ -235,7 +235,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-		return getRequiredService(info, binding, false, (IRemoteFilter)null);
+		return getRequiredService(info, binding, false, (IAsyncFilter)null);
 	}
 	
 	/**
@@ -251,7 +251,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
 	{
 		if(shutdowned)
 		{
@@ -275,7 +275,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-		return getRequiredServices(info, binding, false, (IRemoteFilter)null);
+		return getRequiredServices(info, binding, false, (IAsyncFilter)null);
 	}
 	
 	/**
@@ -291,7 +291,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
 	{
 		if(shutdowned)
 		{

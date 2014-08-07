@@ -16,7 +16,7 @@ import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.LocalServiceRegistry;
-import jadex.commons.IRemoteFilter;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -76,7 +76,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IRemoteFilter<IService> filter)
+	public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IAsyncFilter<IService> filter)
 	{
 		return ((IServiceProvider)interpreter.getServiceContainer()).getServices(type, scope, filter);
 	}
@@ -86,7 +86,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture<IService> getService(ClassInfo type, String scope, IRemoteFilter<IService> filter)
+	public IFuture<IService> getService(ClassInfo type, String scope, IAsyncFilter<IService> filter)
 	{
 		return ((IServiceProvider)interpreter.getServiceContainer()).getService(type, scope, filter);
 	}
@@ -246,7 +246,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(String name, boolean rebind, IRemoteFilter filter)
+	public IFuture getRequiredService(String name, boolean rebind, IAsyncFilter filter)
 	{
 		String prefix = interpreter.findServicePrefix(scope);
 		return interpreter.getServiceContainer().getRequiredService(prefix+name, rebind, filter);
@@ -256,7 +256,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IRemoteFilter filter)
+	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IAsyncFilter filter)
 	{
 		String prefix = interpreter.findServicePrefix(scope);
 		return interpreter.getServiceContainer().getRequiredServices(prefix+name, rebind, filter);

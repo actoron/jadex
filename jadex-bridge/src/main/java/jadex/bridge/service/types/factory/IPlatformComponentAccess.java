@@ -3,6 +3,7 @@ package jadex.bridge.service.types.factory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.commons.future.IFuture;
 
 import java.util.Collection;
@@ -45,4 +46,11 @@ public interface IPlatformComponentAccess
 	 *  @return An internal access exposing user operations of the component.
 	 */
 	public IInternalAccess	getInternalAccess();
+	
+	/**
+	 *  Get the local platform service registry.
+	 *  
+	 *  @return The local platform service registry.
+	 */
+	public LocalServiceRegistry	getServiceRegistry();
 }

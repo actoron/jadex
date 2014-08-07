@@ -2,7 +2,7 @@ package jadex.platform.service.chat;
 
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -19,13 +19,14 @@ import jadex.micro.annotation.RequiredServices;
 @Description("This agent offers a chat service.")
 @ProvidedServices({
 	@ProvidedService(name="chat", type=IChatService.class, implementation=@Implementation(ChatService.class)),
-	@ProvidedService(type=IChatGuiService.class, implementation=@Implementation(expression="$component.getRawService(\"chat\")"))
+	@ProvidedService(type=IChatGuiService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"chat\")"))
 })
 @RequiredServices(
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
 		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL))
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
-public class ChatAgent extends MicroAgent
+@Agent
+public class ChatAgent
 {
 }

@@ -1,8 +1,6 @@
 package jadex.bridge.service.component;
 
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
@@ -13,25 +11,17 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
-import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.Array;
@@ -39,6 +29,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -49,8 +40,7 @@ import java.util.Set;
 /**
  *  Feature for provided services.
  */
-// Todo: synchronous or asynchronous (for search)?
-public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	implements IProvidedServicesFeature, IServiceProvider
+public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	implements IProvidedServicesFeature
 {
 	//-------- attributes --------
 	
@@ -127,7 +117,10 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType().getType(component.getClassLoader(), component.getModel().getAllImports());
 					ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
 					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()), 
-						new ProvidedServiceImplementation(cs[i].getImplementation()), psi.getPublish());
+						new ProvidedServiceImplementation(cs[i].getImplementation()), 
+						cs[i].getScope()!=null? cs[i].getScope(): psi.getScope(),
+						cs[i].getPublish()!=null? cs[i].getPublish(): psi.getPublish(), 
+						cs[i].getProperties()!=null? cs[i].getProperties() : psi.getProperties());
 					sermap.put(key, newpsi);
 				}
 			}
@@ -142,7 +135,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 					RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType().getType( 
 						component.getClassLoader(), component.getModel().getAllImports()))+":virtual", info.getType().getType(component.getClassLoader(), component.getModel().getAllImports()));
 					IServiceIdentifier sid = BasicService.createServiceIdentifier(component.getComponentIdentifier(), 
-						rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()), BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier());
+						rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()),
+						BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info.getScope());
 					final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 						component, sid, rsi, impl.getBinding(), component.getClassLoader(), cinfo.isRealtime());
 					
@@ -179,7 +173,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 						final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 							component, ser, info.getName(), type, info.getImplementation().getProxytype(), ics, cinfo.isCopy(), 
-							cinfo.isRealtime(), moni);
+							cinfo.isRealtime(), moni, info.getScope());
 						
 						addService(proxy, info);
 					}
@@ -251,6 +245,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				services.put(servicetype, tmp);
 			}
 			tmp.add(service);
+			
+			// Make all services available immediately, even before start (hack???).
+			((IPlatformComponentAccess)component).getServiceRegistry().addService(new ClassInfo(servicetype), service);
 		}
 	}
 	
@@ -306,13 +303,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						public void resultAvailable(Void result)
 						{
 							component.getLogger().info("Started service: "+is.getServiceIdentifier());
-//							serviceStarted(is).addResultListener(new DelegationResultListener<Void>(ret)
-//							{
-//								public void customResultAvailable(Void result)
-//								{
-									initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
-//								}
-//							});
+							
+							initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -377,6 +369,25 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		return ret;
 	}
 
+	/**
+	 *  Get the provided service implementation object by name.
+	 *  
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public Object getProvidedServiceRawImpl(String name)
+	{
+		Object ret = null;
+		
+		Object service = getProvidedService(name);
+		if(service!=null)
+		{
+			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+			ret = handler.getDomainService();
+		}
+		
+		return ret;	
+	}
 	
 	/**
 	 *  Get provided (declared) service.
@@ -385,7 +396,24 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public <T> T[] getProvidedServices(Class<T> clazz)
 	{
-		Collection<IInternalService> coll = services!=null? services.get(clazz): null;
+		Collection<IInternalService> coll	= null;
+		if(services!=null)
+		{
+			if(clazz!=null)
+			{
+				coll = services.get(clazz);
+			}
+			else
+			{
+				coll = new HashSet<IInternalService>();
+				for(Class<?> cl: services.keySet())
+				{
+					Collection<IInternalService> sers = services.get(cl);
+					coll.addAll(sers);
+				}
+			}			
+		}
+		
 		T[] ret	= (T[])Array.newInstance(clazz, coll!=null ? coll.size(): 0);
 		return coll==null ? ret : coll.toArray(ret);
 	}
@@ -399,93 +427,5 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	{
 		T[] ret = getProvidedServices(clazz);
 		return ret.length>0? ret[0]: null;
-	}
-	
-	//-------- IServiceProvider interface --------
-	
-	/**
-	 *  Get all services of a type.
-	 *  @param type The class.
-	 *  @return The corresponding services.
-	 */
-	public ITerminableIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
-	{
-		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
-	}
-	
-	/**
-	 *  Get the parent service container.
-	 *  @return The parent container.
-	 */
-	public IFuture<IServiceProvider>	getParent()
-	{
-		return new Future<IServiceProvider>(cinfo.parent!=null ? cinfo.parent.getServiceProvider() : null);
-	}
-	
-	/**
-	 *  Get the children container.
-	 *  @return The children container.
-	 */
-	public IFuture<Collection<IServiceProvider>>	getChildren()
-	{
-		final Future<Collection<IServiceProvider>> ret = new Future<Collection<IServiceProvider>>();
-
-		SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IServiceProvider>>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
-			{
-				cms.getChildren(component.getComponentIdentifier())
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IServiceProvider>>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier[] children)
-					{
-						if(children!=null)
-						{
-							final IResultListener<IServiceProvider> lis = new CollectionResultListener<IServiceProvider>(
-								children.length, true, new DelegationResultListener<Collection<IServiceProvider>>(ret));
-							for(int i=0; i<children.length; i++)
-							{
-								cms.getExternalAccess(children[i]).addResultListener(new IResultListener<IExternalAccess>()
-								{
-									public void resultAvailable(IExternalAccess exta)
-									{
-										try
-										{
-											lis.resultAvailable(exta.getServiceProvider());
-										}
-										catch(ComponentTerminatedException cte)
-										{
-											lis.exceptionOccurred(cte);
-										}
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										lis.exceptionOccurred(exception);
-									}
-								});
-							}
-						}
-						else
-						{
-							List<IServiceProvider>	res	= Collections.emptyList();
-							ret.setResult(res);
-						}
-					}
-				});
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get the globally unique id of the provider.
-	 *  @return The id of this provider.
-	 */
-	public IComponentIdentifier	getId()
-	{
-		return component.getComponentIdentifier();
 	}
 }

@@ -1,7 +1,7 @@
 package jadex.platform.service.execution;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -57,14 +57,14 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	protected List<Future<Void>> removedfut;
 	
 	/** The provider. */
-	protected IServiceProvider provider;
+	protected IInternalAccess provider;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new synchronous executor service. 
 	 */
-	public SyncExecutionService(IServiceProvider provider)
+	public SyncExecutionService(IInternalAccess provider)
 	{
 		this(provider, null);
 	}
@@ -72,9 +72,9 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	/**
 	 *  Create a new synchronous executor service. 
 	 */
-	public SyncExecutionService(IServiceProvider provider, Map<String, Object> properties)
+	public SyncExecutionService(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getId(), IExecutionService.class, properties);
+		super(provider.getComponentIdentifier(), IExecutionService.class, properties);
 
 		this.provider = provider;
 		this.state	= State.CREATED;

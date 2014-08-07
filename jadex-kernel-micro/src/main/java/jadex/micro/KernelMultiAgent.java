@@ -28,7 +28,7 @@ import jadex.micro.annotation.ProvidedServices;
 		clazz=String.class, defaultvalue="\".*[Kk]ernel.*\"")})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
-	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getRawService(jadex.bridge.service.types.factory.IComponentFactory.class)"))
+	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.factory.IComponentFactory.class)"))
 })
 @ComponentTypes({
 	@ComponentType(name="KernelMicro", filename="jadex/micro/KernelMicroAgent.class")

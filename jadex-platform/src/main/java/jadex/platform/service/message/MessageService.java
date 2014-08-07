@@ -1080,14 +1080,14 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else
 				{
-					SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
 					{
 						public void customResultAvailable(IExecutionService result)
 						{
 							exeservice	= result;
 							
-							SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 								.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 							{
 								public void customResultAvailable(IComponentManagementService cmsser)
@@ -1106,13 +1106,13 @@ public class MessageService extends BasicService implements IMessageService
 											}
 											else
 											{
-												SServiceProvider.getService(component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+												SServiceProvider.getService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 													.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 												{
 													public void customResultAvailable(IClockService result)
 													{
 														clockservice = result;
-														SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+														SServiceProvider.getService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 															.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 														{
 															public void customResultAvailable(ILibraryService result)
@@ -1500,7 +1500,7 @@ public class MessageService extends BasicService implements IMessageService
 		// means for inlcuding them a) as new resource with custom rid b) in the startup path with platform rid
 		if(rid!=null && rid.getGlobalIdentifier()!=null)
 		{
-			SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class)
+			SServiceProvider.getServiceUpwards(component, ILibraryService.class)
 				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 			{
 				public void customResultAvailable(final ILibraryService ls)
@@ -1543,7 +1543,7 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		else if(realrec!=null)
 		{
-			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+			SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, ClassLoader>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -1552,7 +1552,7 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						public void customResultAvailable(final IComponentDescription desc)
 						{
-							SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class)
+							SServiceProvider.getServiceUpwards(component, ILibraryService.class)
 								.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 							{
 								public void customResultAvailable(ILibraryService ls)
@@ -1577,7 +1577,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			// Hack? Use global loader if no rid declared? Use x_receiver?
 			
-			SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class)
+			SServiceProvider.getServiceUpwards(component, ILibraryService.class)
 				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 			{
 				public void customResultAvailable(final ILibraryService ls)
@@ -2160,7 +2160,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				public void customResultAvailable(final ClassLoader classloader)
 				{
-					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+					SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
 						public void customResultAvailable(IComponentManagementService cms)
@@ -2388,7 +2388,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			final InputConnection	fcon	= con;
 			final Future<Void> ret = new Future<Void>();
-			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+			SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -2463,7 +2463,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			final OutputConnection	fcon	= con;
 			final Future<Void> ret = new Future<Void>();
-			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+			SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -2614,7 +2614,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					SServiceProvider.getService(ia.getServiceProvider(), IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(ia, IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IMessageAwarenessService>()
 					{
 						public void resultAvailable(IMessageAwarenessService result)
@@ -2696,7 +2696,7 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else if(!releasedatecache.containsKey(rec.getRoot()))
 				{
-					SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener<IAwarenessManagementService>()
+					SServiceProvider.getService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener<IAwarenessManagementService>()
 					{
 						public void resultAvailable(IAwarenessManagementService ams)
 						{

@@ -4,7 +4,9 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -27,7 +29,10 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.STransformation;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
@@ -57,9 +62,14 @@ import java.util.Map;
 {
 	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default.")
 })
-public class RemoteServiceManagementAgent extends MicroAgent
+@Agent
+public class RemoteServiceManagementAgent
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess	agent;
 	
 	/** The remote management service. */
 	protected RemoteServiceManagementService rms;
@@ -69,6 +79,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
+	@AgentCreated
 	public IFuture<Void>	agentCreated()
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -88,24 +99,27 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		STransformation.registerClass(DefaultEqualsMethodReplacement.class);
 		STransformation.registerClass(DefaultHashcodeMethodReplacement.class);
 		
-		SServiceProvider.getService((IServiceProvider)getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+		SServiceProvider.getService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{
 			public void customResultAvailable(final ILibraryService libservice)
 			{
-				SServiceProvider.getService((IServiceProvider)getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
+				SServiceProvider.getService(agent, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
 				{
 					public void customResultAvailable(final IMarshalService marshalservice)
 					{
-						SServiceProvider.getService((IServiceProvider)getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+						SServiceProvider.getService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 						{
 							public void customResultAvailable(final IMessageService msgservice)
 							{
 //								boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
-								rms = new RemoteServiceManagementService((IExternalAccess)getExternalAccess(), libservice, marshalservice, msgservice);//, binarymode);
-								addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+								rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice);//, binarymode);
+								
+								// Todo:
+//								addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+								
 								ret.setResult(null);
 							}
 						}));
@@ -137,6 +151,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
 	 */
+	@AgentKilled
 	public IFuture<Void>	agentKilled()
 	{
 		// Send notifications to other processes that remote references are not needed any longer.
@@ -148,6 +163,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 *  @param msg The message.
 	 *  @param mt The message type.
 	 */
+	@AgentMessageArrived
 	public void messageArrived(final Map<String, Object> msg, final MessageType mt)
 	{
 //		String	tmp	= (""+msg.get(SFipa.CONTENT)).replace("\n", " ").replace("\r", " ");
@@ -180,7 +196,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //			ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
 //			next.setProperty("debugsource", "RemoteServiceManagementAgent.messageArrived("+msg+")");
 			
-			getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			agent.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener<ILibraryService>()
 			{
 				public void resultAvailable(final ILibraryService ls)
@@ -211,7 +227,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						
 						// Post-process.
 						final IFuture<Void>	post	= com instanceof AbstractRemoteCommand? 
-							((AbstractRemoteCommand)com).postprocessCommand(RemoteServiceManagementAgent.this, rms.getRemoteReferenceModule(), getComponentIdentifier()) : IFuture.DONE;
+							((AbstractRemoteCommand)com).postprocessCommand(agent, rms.getRemoteReferenceModule(), agent.getComponentIdentifier()) : IFuture.DONE;
 						final Map<String, Object> nonfunc = com instanceof AbstractRemoteCommand? ((AbstractRemoteCommand)com).getNonFunctionalProperties(): null;
 							
 						// Validate command.
@@ -220,7 +236,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{
 							public void customResultAvailable(Void result)
 							{
-								getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								agent.getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(new IResultListener<ISecurityService>()
 								{
 									public void resultAvailable(ISecurityService sec)
@@ -249,7 +265,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							public void resultAvailable(Void result)
 							{
 								RemoteServiceManagementService.getResourceIdentifier(getServiceProvider(), ((AbstractRemoteCommand)com).getRealReceiver())
-									.addResultListener(createResultListener(new IResultListener<IResourceIdentifier>()
+									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IResourceIdentifier>()
 								{
 									public void resultAvailable(final IResourceIdentifier srid) 
 									{
@@ -266,8 +282,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //											System.out.println("No caller: "+msg.get(SFipa.SENDER)+", "+((RemoteMethodInvocationCommand)com).getMethodName());
 //										}
 										
-										com.execute((IExternalAccess)getExternalAccess(), rms)
-											.addResultListener(createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
+										com.execute((IExternalAccess)agent.getExternalAccess(), rms)
+											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
 									}
 									
 									
@@ -287,7 +303,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								// RMS might be terminated in mean time.
 								if(!(exception instanceof ComponentTerminatedException))
 								{
-									getLogger().info("RMS rejected unauthorized command: "+msg.get(SFipa.SENDER)+", "+com);
+									agent.getLogger().info("RMS rejected unauthorized command: "+msg.get(SFipa.SENDER)+", "+com);
 									reply.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false, null, nonfunc));
 									reply.setFinished();
 								}
@@ -296,7 +312,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					}
 					else if(content instanceof ContentException)
 					{
-						getLogger().info("RMS received broken message content: "+msg.get(SFipa.SENDER)+", "+content);							
+						agent.getLogger().info("RMS received broken message content: "+msg.get(SFipa.SENDER)+", "+content);							
 						WaitingCallInfo	wci	= rms.getWaitingCall(callid);
 						if(wci!=null)
 						{
@@ -311,13 +327,13 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					}
 					else
 					{
-						getLogger().info("RMS received unexpected message content: "+msg.get(SFipa.SENDER)+", "+content);
+						agent.getLogger().info("RMS received unexpected message content: "+msg.get(SFipa.SENDER)+", "+content);
 						reply.addIntermediateResult(new RemoteResultCommand(null, null, new RuntimeException("RMS received unexpected message content: "+content), callid, false, null, null));
 						reply.setFinished();
 					}
 
 					// Send reply.
-					reply.addResultListener(createResultListener(new IIntermediateResultListener<IRemoteCommand>()
+					reply.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IRemoteCommand>()
 					{
 						public void intermediateResultAvailable(IRemoteCommand result)
 						{
@@ -340,7 +356,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								Future<Void>	pre	= new Future<Void>(); 
 								if(result instanceof AbstractRemoteCommand)
 								{
-									((AbstractRemoteCommand)result).preprocessCommand(RemoteServiceManagementAgent.this,
+									((AbstractRemoteCommand)result).preprocessCommand(agent,
 										rms.getRemoteReferenceModule(), (IComponentIdentifier)msg.get(SFipa.SENDER))
 										.addResultListener(new DelegationResultListener<Void>(pre));
 								}
@@ -392,7 +408,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										// Terminated, when rms killed in mean time
 										if(!(exception instanceof ComponentTerminatedException))
 										{
-											getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
+											agent.getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
 										}
 									}
 								});
@@ -408,7 +424,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							// Terminated, when rms killed in mean time
 							if(!(exception instanceof ComponentTerminatedException))
 							{
-								getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
+								agent.getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
 							}
 						}
 					}));
@@ -419,7 +435,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					// Terminated, when rms killed in mean time
 					if(!(exception instanceof ComponentTerminatedException))
 					{
-						getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
+						agent.getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
 					}
 				}
 			});
