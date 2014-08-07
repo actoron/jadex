@@ -8,10 +8,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.Tuple;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -39,7 +37,7 @@ public class BlockingAgentCreationAgent
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent	agent;
+	protected IInternalAccess	agent;
 	
 	/** Maximum number of agents to create. */
 	@AgentArgument
@@ -155,9 +153,11 @@ public class BlockingAgentCreationAgent
 					System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 					System.out.println("Still used memory: "+stillused+"kB.");
 					
-					ia.setResultValue("microcreationtime", new Tuple(""+pera, "s"));
-					ia.setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
-					ia.setResultValue("micromem", new Tuple(""+upera, "kb"));
+					// Todo
+//					ia.setResultValue("microcreationtime", new Tuple(""+pera, "s"));
+//					ia.setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
+//					ia.setResultValue("micromem", new Tuple(""+upera, "kb"));
+
 					ia.killComponent();
 
 					return IFuture.DONE;

@@ -16,7 +16,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 import jadex.micro.IntervalBehavior;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -72,7 +71,7 @@ public class CliAgent implements ICliService, IInternalCliService
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The gui flag. */
 	@AgentArgument

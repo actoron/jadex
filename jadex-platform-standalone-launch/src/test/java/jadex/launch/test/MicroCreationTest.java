@@ -45,12 +45,18 @@ public class MicroCreationTest //extends TestCase
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
 			"-awareness", "false",	// otherwise influences performance measure
-			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
+			"-gui", "false",
+			"-saveonexit", "false",
+			"-welcome", "false",
+			"-extensions", "null",
+			"-chat", "false",
+			"-cli", "false",
+//			"-autoshutdown", "true",
 //			"-componentfactory", "jadex.component.ComponentComponentFactory",
 //			"-conf", "jadex.standalone.Platform.component.xml",
 //			"-deftimeout", "-1",
 			"-printpass", "false"}).get(sus, timeout);
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get(sus, timeout);
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
