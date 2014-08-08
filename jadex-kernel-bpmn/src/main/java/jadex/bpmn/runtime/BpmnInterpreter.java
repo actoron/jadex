@@ -593,7 +593,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					.addResultListener(createResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(IComponentManagementService cms)
-					{
+					{						
+//						System.out.println("terminating bpmn: "+getComponentIdentifier());
 						cms.destroyComponent(adapter.getComponentIdentifier());
 					}
 					public void exceptionOccurred(Exception exception)

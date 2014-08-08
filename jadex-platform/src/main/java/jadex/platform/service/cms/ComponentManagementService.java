@@ -1232,8 +1232,8 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		contains = cfs.containsKey(cid);
 		tmp = contains? (Future<Map<String, Object>>)cfs.get(cid): new Future<Map<String, Object>>();
-//			System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid));
-//			Thread.currentThread().dumpStack();
+//		System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid)+" "+tmp.isDone());
+//		Thread.currentThread().dumpStack();
 		
 		// If destroyComponent has not been called before
 		if(!contains)
@@ -1256,7 +1256,7 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			destroyComponent(cid, ret);
 		}
-//		else if("Application".equals(getDescription(cid).getType()))
+//		else //if("Application".equals(getDescription(cid).getType()))
 //			System.out.println("no destroy: "+contains+", "+locked);
 		
 		return ret;
@@ -1388,6 +1388,7 @@ public class ComponentManagementService implements IComponentManagementService
 			}			
 			else
 			{
+				cfs.remove(cid);
 				ret.setException(new ComponentTerminatedException(cid, "Cannot kill, no such component."));
 			}
 		}
@@ -1407,7 +1408,7 @@ public class ComponentManagementService implements IComponentManagementService
 		ccs.remove(cid);
 		ret	= (Future<Map<String, Object>>)cfs.remove(cid);
 		
-//		System.out.println("Terminated component: "+cid.getName());
+//		System.out.println("Terminated component (exitDestroy): "+cid.getName());
 		
 		if(ret!=null)
 		{

@@ -253,7 +253,6 @@ public class DefaultStepHandler implements IStepHandler
 			{
 				thread.getParent().removeThread(thread);
 			}
-			
 		} 
 		else
 		{
