@@ -35,6 +35,7 @@ import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
@@ -156,6 +157,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 
 	/** The external service bindings. */
 	protected RequiredServiceBinding[] bindings;
+	
+	/** The external service infos. */
+	protected ProvidedServiceInfo[] pinfos;
 	
 	//-------- recreate on init (no state) --------
 	
@@ -282,7 +286,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
-		final String config, final Map<String, Object> arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, 
+		final String config, final Map<String, Object> arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, ProvidedServiceInfo[] pinfos,
 		final Map kernelprops, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited, LocalServiceRegistry registry)
 	{	
 		this.initthread = Thread.currentThread();
@@ -366,6 +370,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		if(arguments!=null && !arguments.isEmpty())
 			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, arguments);
 		this.bindings	= bindings;
+		this.pinfos	= pinfos;
 
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0);
 		
@@ -2105,6 +2110,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public RequiredServiceBinding[]	getBindings()
 	{
 		return bindings;
+	}
+
+	/**
+	 *  Get the service infos.
+	 *  @return The service infos.
+	 */
+	public ProvidedServiceInfo[]	getProvidedServiceInfos()
+	{
+		return pinfos;
 	}
 
 	/**

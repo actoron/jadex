@@ -834,7 +834,7 @@ public class ComponentManagementService implements IComponentManagementService
 																						
 																	IPersistInfo persistinfo = null;
 																	factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, persist, persistinfo, reslis, resfut, agent.getServiceContainer().getServiceRegistry())
+																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), cinfo.getProvidedServiceInfos(), copy, realtime, persist, persistinfo, reslis, resfut, agent.getServiceContainer().getServiceRegistry())
 																		.addResultListener(createResultListener(new IResultListener<Tuple2<IComponentInstance, IComponentAdapter>>()
 																	{
 																		public void resultAvailable(Tuple2<IComponentInstance, IComponentAdapter> comp)

@@ -69,7 +69,7 @@ public class InterpreterTest
 				{
 				}
 			});
-			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, null, config, true, true, null, ret, null);
+			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, null, null, config, true, true, null, ret, null);
 			interpreter.getAgentAdapter().wakeup();
 			
 	//		System.out.println("Agent execution finished.");

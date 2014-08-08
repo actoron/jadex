@@ -7,6 +7,7 @@ import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
@@ -80,6 +81,9 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The required service binding information. */
 	protected RequiredServiceBinding[]	bindings;
 
+	/** The provided service information. */
+	protected ProvidedServiceInfo[]	pinfos;
+
 	/** The extension instances. */
 	protected Map<String, IExtensionInstance>	extensions;
 
@@ -119,13 +123,14 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 * Create a new context.
 	 */
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, final IComponentAdapterFactory factory, final IExternalAccess parent,
-		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist, IPersistInfo persistinfo, IIntermediateResultListener<Tuple2<String, Object>> resultlistener,
+		final RequiredServiceBinding[] bindings, ProvidedServiceInfo[] pinfos, boolean copy, boolean realtime, boolean persist, IPersistInfo persistinfo, IIntermediateResultListener<Tuple2<String, Object>> resultlistener,
 		LocalServiceRegistry registry)
 	{
 		this.config = config != null ? config : model.getConfigurationNames().length > 0 ? model.getConfigurationNames()[0] : null;
 		this.model = model;
 		this.parent = parent;
 		this.bindings = bindings;
+		this.pinfos = pinfos;
 		this.copy = copy;
 		this.realtime = realtime;
 		this.persist = persist;
@@ -457,6 +462,16 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	public RequiredServiceBinding[] getBindings()
 	{
 		return bindings != null ? SUtil.copyArray(bindings) : null;
+	}
+
+	/**
+	 * Get the service infos.
+	 * 
+	 * @return The info.
+	 */
+	public ProvidedServiceInfo[] getProvidedServiceInfos()
+	{
+		return pinfos != null ? SUtil.copyArray(pinfos) : null;
 	}
 
 	/**

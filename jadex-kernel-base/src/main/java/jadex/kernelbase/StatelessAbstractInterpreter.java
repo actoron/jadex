@@ -1000,13 +1000,28 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType().getType(getClassLoader(), getModel().getAllImports());
 					ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
 					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(getClassLoader(), getModel().getAllImports()), 
-						new ProvidedServiceImplementation(cs[i].getImplementation()), 
+						cs[i].getImplementation()!=null? new ProvidedServiceImplementation(cs[i].getImplementation()): psi.getImplementation(), 
 						cs[i].getScope()!=null? cs[i].getScope(): psi.getScope(),
 						cs[i].getPublish()!=null? cs[i].getPublish(): psi.getPublish(), 
 						cs[i].getProperties()!=null? cs[i].getProperties() : psi.getProperties());
 					sermap.put(key, newpsi);
 				}
 			}
+
+			// Add custom service infos from outside.
+			ProvidedServiceInfo[] pinfos = getProvidedServiceInfos();
+			for(int i=0; pinfos!=null && i<pinfos.length; i++)
+			{
+				Object key = pinfos[i].getName()!=null? pinfos[i].getName(): pinfos[i].getType().getType(getClassLoader(), getModel().getAllImports());
+				ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
+				ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(getClassLoader(), getModel().getAllImports()), 
+					pinfos[i].getImplementation()!=null? new ProvidedServiceImplementation(pinfos[i].getImplementation()): psi.getImplementation(), 
+					pinfos[i].getScope()!=null? pinfos[i].getScope(): psi.getScope(),
+					pinfos[i].getPublish()!=null? pinfos[i].getPublish(): psi.getPublish(), 
+					pinfos[i].getProperties()!=null? pinfos[i].getProperties() : psi.getProperties());
+				sermap.put(key, newpsi);
+			}
+
 			ProvidedServiceInfo[] services = (ProvidedServiceInfo[])sermap.values().toArray(new ProvidedServiceInfo[sermap.size()]);
 			initProvidedServices(0, services, model).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 			{
@@ -1093,8 +1108,13 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 *  @return The bindings.
 	 */
 	public abstract RequiredServiceBinding[] getBindings();
-
 	
+	/**
+	 *  Get the service infos.
+	 *  @return The service infos.
+	 */
+	public abstract ProvidedServiceInfo[] getProvidedServiceInfos();
+
 	/**
 	 *  Start the services.
 	 */

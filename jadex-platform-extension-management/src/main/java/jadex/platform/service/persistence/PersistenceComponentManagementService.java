@@ -245,7 +245,7 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 									Future<Void>	init	= new Future<Void>();
 									final IFuture<Tuple2<IComponentInstance, IComponentAdapter>>	tupfut	=
 										factory.createComponentInstance(pi.getComponentDescription(), getComponentAdapterFactory(), model, 
-										null, null, parent, null, copy, realtime, persist, pi, reslis, init, agent.getServiceContainer().getServiceRegistry());
+										null, null, parent, null, null, copy, realtime, persist, pi, reslis, init, agent.getServiceContainer().getServiceRegistry());
 									
 									init.addResultListener(new ExceptionDelegationResultListener<Void, Void>(fut)
 									{

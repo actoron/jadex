@@ -230,7 +230,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container, LocalServiceRegistry registry)
 	{
-		super(null, model.getModelInfo(), config, null, parent, null, true, true, false, null, null, registry);
+		super(null, model.getModelInfo(), config, null, parent, null, null, true, true, false, null, null, registry);
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? new BpmnInstanceFetcher(this, fetcher) :null;
 		this.adapter = adapter;
@@ -258,11 +258,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	// Constructor for self-contained bpmn components
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, final Map<String, Object> arguments, 
 		String config, final IExternalAccess parent, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers, 
-		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
+		IValueFetcher fetcher, RequiredServiceBinding[] bindings, ProvidedServiceInfo[] pinfos, boolean copy, boolean realtime, boolean persist,
 		IPersistInfo persistinfo,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited, LocalServiceRegistry registry)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, registry);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, registry);
 		this.inited = inited;
 		
 		if(persistinfo==null)

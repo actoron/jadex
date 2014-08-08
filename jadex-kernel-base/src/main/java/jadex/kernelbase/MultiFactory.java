@@ -11,9 +11,11 @@ import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
@@ -645,42 +647,43 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 
 	/**
 	 * Create a component instance.
-	 * 
-	 * @param factory
-	 *            The component adapter factory.
-	 * @param model
-	 *            The component model.
-	 * @param config
-	 *            The name of the configuration (or null for default
-	 *            configuration)
-	 * @param arguments
-	 *            The arguments for the component as name/value pairs.
-	 * @param parent
-	 *            The parent component (if any).
+	 * @param desc	The component description.
+	 * @param factory The component adapter factory.
+	 * @param model The component model.
+	 * @param config The name of the configuration (or null for default configuration) 
+	 * @param arguments The arguments for the component as name/value pairs.
+	 * @param parent The parent component (if any).
+	 * @param bindings	Optional bindings to override bindings from model.
+	 * @param pinfos	Optional provided service infos to override settings from model.
+	 * @param copy	Global flag for parameter copying.
+	 * @param realtime	Global flag for real time timeouts.
+	 * @param persist	Global flag for persistence support.
+	 * @param resultlistener	Optional listener to be notified when the component finishes.
+	 * @param init	Future to be notified when init of the component is completed.
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
-			final IComponentAdapterFactory factory, final IModelInfo model, final String config,
-			final Map<String, Object> arguments, final IExternalAccess parent,
-			final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
-			final IPersistInfo persistinfo,
-			final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret, final LocalServiceRegistry registry)
+	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference final IComponentDescription desc, 
+		final IComponentAdapterFactory factory, final IModelInfo model, final String config, final Map<String, Object> arguments, 
+		final IExternalAccess parent, @Reference final RequiredServiceBinding[] bindings, @Reference final ProvidedServiceInfo[] pinfos, final boolean copy, final boolean realtime, final boolean persist,
+		final IPersistInfo persistinfo, 
+		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret, @Reference final LocalServiceRegistry registry)
 	{
 //		System.out.println("createComponentInstance: "+model.getName());
 		
 //		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
 		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model.getFilename(), factorycache);
 		if(fac != null)
-			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, ret, registry);
+			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, ret, registry);
 		
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
-		findKernel(model.getFilename(), null, model.getResourceIdentifier()).addResultListener(ia.createResultListener(new DelegationResultListener(res)
+		findKernel(model.getFilename(), null, model.getResourceIdentifier()).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Tuple2<IComponentInstance, IComponentAdapter>>(res)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentFactory result)
 			{
-				((IComponentFactory)result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, ret, registry).addResultListener(new DelegationResultListener(res));
+				DelegationResultListener delegationResultListener = new DelegationResultListener(res);
+				result.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, ret, registry).addResultListener(delegationResultListener);
 			}
 		}));
 		return res;
@@ -746,7 +749,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param classloader Model classloader.
 	 *  @return Factory instance of the kernel or null if no matching kernel was found.
 	 */
-	protected IFuture findKernel(final String model, final String[] imports, final IResourceIdentifier rid)
+	protected IFuture<IComponentFactory> findKernel(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
 		return findKernel(model, imports, rid, false);
 	}

@@ -7,13 +7,15 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -22,7 +24,6 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
-import jadex.kernelbase.IBootstrapFactory;
 import jadex.commons.LazyResource;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -30,6 +31,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.kernelbase.IBootstrapFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -280,17 +282,27 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	
 	/**
 	 * Create a component instance.
-	 * @param adapter The component adapter.
-	 * @param bpmnmodel The component model.
+	 * @param desc	The component description.
+	 * @param factory The component adapter factory.
+	 * @param modelinfo The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the agent as name/value pairs.
+	 * @param arguments The arguments for the component as name/value pairs.
 	 * @param parent The parent component (if any).
-	 * @return An instance of a component.
+	 * @param bindings	Optional bindings to override bindings from model.
+	 * @param pinfos	Optional provided service infos to override settings from model.
+	 * @param copy	Global flag for parameter copying.
+	 * @param realtime	Global flag for real time timeouts.
+	 * @param persist	Global flag for persistence support.
+	 * @param resultlistener	Optional listener to be notified when the component finishes.
+	 * @param init	Future to be notified when init of the component is completed.
+	 * @return An instance of a component and the corresponding adapter.
 	 */
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
-		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, 
-		final boolean copy, final boolean realtime, final boolean persist, final IPersistInfo persistinfo, 
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited, final LocalServiceRegistry registry)
+	@Excluded
+	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference final IComponentDescription desc, 
+		final IComponentAdapterFactory factory, final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, 
+		final IExternalAccess parent, @Reference final RequiredServiceBinding[] bindings, @Reference final ProvidedServiceInfo[] pinfos, final boolean copy, final boolean realtime, final boolean persist,
+		final IPersistInfo persistinfo, 
+		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, @Reference final LocalServiceRegistry registry)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
@@ -304,7 +316,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 					try
 					{
 						MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-						BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, realtime, persist, persistinfo, resultlistener, inited, registry);
+						BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, init, registry);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
 					catch(Exception e)
@@ -320,7 +332,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 			{
 				ClassLoader cl = getClass().getClassLoader();
 				MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-				BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, realtime, persist, persistinfo, resultlistener, inited, registry);
+				BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, init, registry);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}
 			catch(Exception e)

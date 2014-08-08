@@ -2,6 +2,7 @@ package jadex.bridge.service.types.cms;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 
@@ -59,6 +60,9 @@ public class CreationInfo
 	
 	/** The bindings. */
 	protected RequiredServiceBinding[] bindings;
+	
+	/** The provided service infos. */
+	protected ProvidedServiceInfo[] pinfos;
 	
 	/** The local component type name. */
 	protected String localtype;
@@ -458,6 +462,24 @@ public class CreationInfo
 	public void setRequiredServiceBindings(RequiredServiceBinding[] bindings)
 	{
 		this.bindings = bindings;
+	}
+
+	/**
+	 *  Get the service infos.
+	 *  @return The infos.
+	 */
+	public ProvidedServiceInfo[] getProvidedServiceInfos()
+	{
+		return pinfos;
+	}
+
+	/**
+	 *  Set the bindings.
+	 *  @param bindings The bindings to set.
+	 */
+	public void setProvidedServiceInfos(ProvidedServiceInfo[] pinfos)
+	{
+		this.pinfos = pinfos;
 	}
 
 	/**
