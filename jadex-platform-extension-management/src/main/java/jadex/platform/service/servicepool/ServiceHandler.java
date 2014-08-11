@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -173,6 +174,7 @@ public class ServiceHandler implements InvocationHandler
 				CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
 				ci.setParent(component.getComponentIdentifier());
 				ci.setImports(component.getModel().getAllImports());
+				ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
 				cms.createComponent(null, componentname, ci, null)
 					.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IService>(ret)
 				{

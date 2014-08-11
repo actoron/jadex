@@ -95,6 +95,7 @@ public class CreationInfo
 			this.synchronous = info.getSynchronous();
 			this.imports	= info.getImports();
 			this.bindings = info.getRequiredServiceBindings();
+			this.pinfos	= info.getProvidedServiceInfos();
 			this.rid = info.getResourceIdentifier();
 			this.localtype = info.getLocalType();
 		}

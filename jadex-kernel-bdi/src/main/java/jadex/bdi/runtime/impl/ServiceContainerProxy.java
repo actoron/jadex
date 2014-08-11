@@ -28,7 +28,7 @@ import java.util.Collection;
 /**
  *  For prefixed access of required services in capability.
  */
-public class ServiceContainerProxy implements IServiceContainer
+public class ServiceContainerProxy implements IServiceContainer, IServiceProvider
 {
 	//-------- attributes --------
 	

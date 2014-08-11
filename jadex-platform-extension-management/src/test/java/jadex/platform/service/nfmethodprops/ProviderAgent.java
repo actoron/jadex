@@ -29,6 +29,7 @@ public class ProviderAgent implements ITestService
 //	@NFProperties(@NFProperty(value=WaitingTimeProperty.class))
 	public IFuture<Void> methodA(long wait)
 	{
+		System.out.println("a");
 		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -44,6 +45,7 @@ public class ProviderAgent implements ITestService
 //	@NFProperties(@NFProperty(value=WaitingTimeProperty.class))
 	public IFuture<Void> methodB(long wait)
 	{
+		System.out.println("b");
 		return methodA(wait);
 	}
 }
