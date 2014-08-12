@@ -288,7 +288,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					public void customResultAvailable(Object result)
 					{
 						String regexstr = (String) ia.getArguments().get("kerneluriregex");
-						Pattern regex = Pattern.compile(regexstr);
+						Pattern regex = Pattern.compile(regexstr!=null ? regexstr : "");
 						
 //						potentialurls.addAll();
 //						validurls.addAll((Collection) result);

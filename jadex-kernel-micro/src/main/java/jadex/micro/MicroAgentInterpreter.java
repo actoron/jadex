@@ -1299,6 +1299,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					{
 						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
 					}
+					
+					public String toString()
+					{
+						return getComponentIdentifier()+"(step="+step+")";
+					}
 				});
 			}
 		}));
