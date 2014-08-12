@@ -445,7 +445,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, IResourceIdentifier rid)
 	{
-//		System.out.println("loadModel: "+model);
+		if(model.indexOf("Rich")!=-1)
+			System.out.println("loadModel: "+model);
 		
 		return loadModel(model, imports, rid, false);
 	}
@@ -459,7 +460,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid, boolean isrecur)
 	{
-//		System.out.println("loadModel2: "+model);
+		if(model.indexOf("Rich")!=-1)
+			System.out.println("loadModel2: "+model);
 		
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
@@ -669,7 +671,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		final IPersistInfo persistinfo, 
 		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret, @Reference final LocalServiceRegistry registry)
 	{
-//		System.out.println("createComponentInstance: "+model.getName());
+		if(model.getName().indexOf("Rich")!=-1)
+			System.out.println("createComponentInstance: "+model.getName());
 		
 //		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
 		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model.getFilename(), factorycache);
@@ -771,8 +774,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		if (isInExtensionBlacklist(model, baseextensionblacklist))
 			return IFuture.DONE;
 		
-//		if(model.toString().indexOf("agent")!=-1)
-//			System.out.println("findKernel: "+model);
+		if(model.toString().indexOf("Rich")!=-1)
+			System.out.println("findKernel: "+model);
 		
 //		IComponentFactory fac = (IComponentFactory)factorycache.get(ext);
 		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model, factorycache);
@@ -846,7 +849,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			public void customResultAvailable(Object result)
 			{
 				final Collection factories = (Collection) result;
-//				System.out.println("found factories: "+result);
+				if(model.indexOf("Rich")!=-1)
+					System.out.println("found factories: "+result);
 				
 				final IResultListener factorypicker = ia.createResultListener(new CollectionResultListener(factories.size(), true, ia.createResultListener(new DefaultResultListener()
 				{
@@ -867,12 +871,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					final IComponentFactory factory = (IComponentFactory)it.next();
 					if(((IService)factory).getServiceIdentifier().equals(sid))
 					{
-//						System.out.println("removed: "+factory);
+						if(model.indexOf("Rich")!=-1)
+							System.out.println("removed: "+factory);
 						factorypicker.exceptionOccurred(new RuntimeException());
 						continue;
 					}
 					
-//					System.out.println("Trying isloadable :" + factory + " for " + model);
+					if(model.indexOf("Rich")!=-1)
+						System.out.println("Trying isloadable :" + factory + " for " + model);
 					factory.isLoadable(model, imports, rid).addResultListener(ia.createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
@@ -906,8 +912,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findLoadableKernel(final String model, final String[] imports, final IResourceIdentifier rid, boolean isrecur)
 	{
-//		if(model.toString().indexOf("HelloWorld")!=-1)
-//			System.out.println("findLoadableKernel: "+model);
+		if(model.toString().indexOf("Rich")!=-1)
+			System.out.println("findLoadableKernel: "+model);
 		
 		IFuture	ret;
 //		String dl = (String) kerneldefaultlocations.get(getModelExtension(model));
@@ -931,8 +937,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findKernelInCache(final String model, final String[] imports, final IResourceIdentifier rid, final boolean isrecur)
 	{
-//		if(model.toString().indexOf("BDI")!=-1)
-//			System.out.println("findKernelInCache0: "+model);
+		if(model.toString().indexOf("Rich")!=-1)
+			System.out.println("findKernelInCache0: "+model);
 		final Future ret = new Future();
 		
 //		Collection kernels = kernellocationcache.getCollection(getModelExtension(model));
@@ -945,8 +951,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		if(cachedresult != null)
 		{
-//			if(model.toString().indexOf("RemoteServiceManagementAgent")!=-1)
-//				System.out.println("findKernelInCache1: "+model);
+			if(model.toString().indexOf("Rich")!=-1)
+				System.out.println("findKernelInCache1: "+model);
 			final String	kernelmodel	= cachedresult;	
 			startLoadableKernel(model, imports, rid, kernelmodel)
 				.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
@@ -1016,7 +1022,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture startLoadableKernel(final String model, final String[] imports, final IResourceIdentifier rid, final String kernelmodel)
 	{
-//		System.out.println("startLoadableKernel: "+model+" "+kernelmodel+" "+kernelmodel.length());
+		if(model.indexOf("Rich")!=-1)
+			System.out.println("startLoadableKernel: "+model+" "+kernelmodel+" "+kernelmodel.length());
 
 		return multiplexer.doCall(kernelmodel, new IResultCommand()
 		{
