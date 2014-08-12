@@ -237,6 +237,10 @@ public class SCreationController
 			mactivity = new MSubProcess();
 			mactivity.setClazz(new ClassInfo(""));
 		}
+		else if (ModelContainer.EDIT_MODE_TASK.equals(mode))
+		{
+			mactivity = new MTask();
+		}
 		else
 		{
 			mactivity = new MActivity();
