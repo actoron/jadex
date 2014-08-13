@@ -1282,11 +1282,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				if (activekernelsdirty)
 				{
+					System.out.println("searchPotentialURLs4: ");
 					activekernelsdirty = false;
 					examineKernelModels(new ArrayList(potentialkernellocations), rid).addResultListener(reslis);
 				}
 				else
 				{
+					System.out.println("searchPotentialURLs5: ");
 					reslis.resultAvailable(null);
 				}
 				
