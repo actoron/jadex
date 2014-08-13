@@ -264,7 +264,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					{
 						final URI uri = rid.getLocalIdentifier().getUri();
 						String regex = (String) ia.getArguments().get("kerneluriregex");
-						if (Pattern.matches(regex, uri.toString()))
+						if (Pattern.matches(regex!=null ? regex : "", uri.toString()))
 						{
 							exta.scheduleStep(new IComponentStep<Void>()
 							{
@@ -1022,7 +1022,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture startLoadableKernel(final String model, final String[] imports, final IResourceIdentifier rid, final String kernelmodel)
 	{
-		if(model.indexOf("Rich")!=-1)
+		if(kernelmodel.toLowerCase().indexOf("bdi")!=-1)
 			System.out.println("startLoadableKernel: "+model+" "+kernelmodel+" "+kernelmodel.length());
 
 		return multiplexer.doCall(kernelmodel, new IResultCommand()
@@ -1058,13 +1058,15 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				{
 					public void customResultAvailable(Object result)
 					{
-//						System.out.println("Starting kernel1: " + kernelmodel);
+						if(kernelmodel.toLowerCase().indexOf("bdi")!=-1)
+							System.out.println("Starting kernel1: " + kernelmodel);
 						IComponentFactory	fac	= (IComponentFactory)result;
 						fac.loadModel(kernelmodel, null, rid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
-//								System.out.println("Starting kernel2: " + kernelmodel);
+								if(kernelmodel.toLowerCase().indexOf("bdi")!=-1)
+									System.out.println("Starting kernel2: " + kernelmodel);
 								final IModelInfo	info	= (IModelInfo)result;
 								SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
@@ -1076,7 +1078,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 									
 									public void customResultAvailable(Object result)
 									{
-//										System.out.println("Starting kernel3: " + kernelmodel);
+										if(kernelmodel.toLowerCase().indexOf("bdi")!=-1)
+											System.out.println("Starting kernel3: " + kernelmodel);
 										final IComponentManagementService cms = (IComponentManagementService) result;										
 										final CreationInfo ci = new CreationInfo(ia.getComponentIdentifier());
 										String	name	= info.getName().toLowerCase();
@@ -1094,7 +1097,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 												{
 													public void resultAvailable(Object result)
 													{
-//														System.out.println("Killed kernel4: " + kernelmodel);
+														if(kernelmodel.toLowerCase().indexOf("bdi")!=-1)
+															System.out.println("Killed kernel4: " + kernelmodel);
 														activekernelsdirty = true;
 														for(int i = 0; i < kexts.length; ++i)
 															factorycache.remove(kexts[i]);
@@ -1102,7 +1106,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 													
 													public void exceptionOccurred(Exception exception)
 													{
-//														System.out.println("Killed kernel5: " + kernelmodel);
+														if(kernelmodel.toLowerCase().indexOf("bdi")!=-1)
+															System.out.println("Killed kernel5: " + kernelmodel+", "+exception);
 														exception.printStackTrace();
 														resultAvailable(null);
 													}
@@ -1110,7 +1115,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 												{
 													public void resultAvailable(Object result)
 													{
-//														System.out.println("Starting kernel6: " + kernelmodel);
+														if(kernelmodel.toLowerCase().indexOf("bdi")!=-1)
+															System.out.println("Starting kernel6: " + kernelmodel);
 														findActiveKernel(model, imports, rid).addResultListener(ia.createResultListener(new DefaultResultListener()
 														{
 															public void resultAvailable(Object result)
@@ -1191,7 +1197,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 													
 													public void exceptionOccurred(Exception exception)
 													{
-//														System.out.println("Starting kernel7: " + kernelmodel);
+														if(kernelmodel.toLowerCase().indexOf("bdi")!=-1)
+															System.out.println("Starting kernel7: " + kernelmodel+", "+exception);
 //														exception.printStackTrace();
 														ret.setException(exception);
 													}
