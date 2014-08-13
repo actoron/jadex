@@ -1241,15 +1241,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				Map kernellocs = (Map) result;
 				if (kernellocs != null && !kernellocs.isEmpty())
 				{
-//					System.out.println("searchPotentialURLs1: "+kernellocs);
+					System.out.println("searchPotentialURLs1: "+kernellocs);
 					kernellocationcache.putAll(kernellocs);
 					ret.setResult(null);
 				}
 				else
 				{
 					final URI uri = potentialuris.iterator().next();
-					if(uri.toString().indexOf("bdi")!=-1)
-						System.out.println("searchPotentialURLs2: "+uri);
+					System.out.println("searchPotentialURLs2: "+uri);
 					quickKernelSearch(uri, rid).addResultListener(ia.createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
@@ -1420,7 +1419,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				public void resultAvailable(final IModelInfo modelinfo)
 				{
-					if(modellocs.toString().indexOf("bdi")!=-1)
+//					if(modellocs.toString().indexOf("bdi")!=-1)
 						System.out.println("Tried to load model for kernel: " + kernelloc + " model " + modelinfo);
 					if(modelinfo!=null)
 					{
@@ -1431,7 +1430,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							public void resultAvailable(ClassLoader result)
 							{
 								String[] exts = (String[])modelinfo.getProperty(KERNEL_EXTENSIONS, result);
-								if(modellocs.toString().indexOf("bdi")!=-1)
+//								if(modellocs.toString().indexOf("bdi")!=-1)
 									System.out.println("Kernel extensions for kernel " + kernelloc + " " + SUtil.arrayToString(exts));
 								if(exts!=null)
 								{
@@ -1462,10 +1461,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					if(modellocs.toString().indexOf("bdi")!=-1)
-					{
-						System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. "+exception);
-					}
+					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. "+exception);
 					resultAvailable(null);
 				}
 			}));
