@@ -1243,14 +1243,16 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				else
 				{
 					final URI uri = potentialuris.iterator().next();
-//					if(url.toString().indexOf("bdi")!=-1)
-//						System.out.println("searchPotentialURLs2: "+url);
+					if(uri.toString().indexOf("bdi")!=-1)
+						System.out.println("searchPotentialURLs2: "+uri);
 					quickKernelSearch(uri, rid).addResultListener(ia.createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
 							if (result != null && validuris.contains(uri))
 							{
+								if(uri.toString().indexOf("bdi")!=-1)
+									System.out.println("searchPotentialURLs3: "+uri+", "+result);
 								Map kernelmap = (Map) result;
 								kernellocationcache.putAll(kernelmap);
 								for (Iterator it = kernelmap.values().iterator(); it.hasNext(); )
@@ -1352,6 +1354,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						
 						if (loc.endsWith(blstr))
 						{
+							System.out.println(loc + " false2 for " + blstr);
 							return false;
 						}
 					}
@@ -1360,7 +1363,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						!kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1)) &&
 						prefilter.filter(obj)) 
 					{
-//							System.out.println("Found kernel: " + loc);
+							System.out.println("Found kernel: " + loc);
 							return true;
 					}
 				}
