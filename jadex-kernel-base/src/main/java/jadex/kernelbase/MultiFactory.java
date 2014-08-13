@@ -912,7 +912,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findLoadableKernel(final String model, final String[] imports, final IResourceIdentifier rid, boolean isrecur)
 	{
-		if(model.toString().indexOf("Rich")!=-1)
+		if(model.toString().indexOf("agent.xml")!=-1)
 			System.out.println("findLoadableKernel: "+model);
 		
 		IFuture	ret;
@@ -937,7 +937,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findKernelInCache(final String model, final String[] imports, final IResourceIdentifier rid, final boolean isrecur)
 	{
-		if(model.toString().indexOf("Rich")!=-1)
+		if(model.toString().indexOf("agent.xml")!=-1)
 			System.out.println("findKernelInCache0: "+model);
 		final Future ret = new Future();
 		
@@ -951,8 +951,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		if(cachedresult != null)
 		{
-			if(model.toString().indexOf("Rich")!=-1)
-				System.out.println("findKernelInCache1: "+model);
+			if(model.toString().indexOf("agent.xml")!=-1)
+				System.out.println("findKernelInCache1: "+model+", "+cachedresult);
 			final String	kernelmodel	= cachedresult;	
 			startLoadableKernel(model, imports, rid, kernelmodel)
 				.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
@@ -970,6 +970,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			if(potentialuris.isEmpty() && !hasLoadablePotentialKernels() || isrecur)
 //			if(!hasLoadablePotentialKernels() || isrecur)
 			{
+				if(model.toString().indexOf("agent.xml")!=-1)
+					System.out.println("findKernelInCache2: "+model+", "+potentialuris+", "+hasLoadablePotentialKernels()+", "+isrecur);
 				ret.setResult(null);
 			}
 			else
@@ -978,6 +980,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				{
 					public Object execute(Object args)
 					{
+						if(model.toString().indexOf("agent.xml")!=-1)
+							System.out.println("findKernelInCache3: "+model+", "+potentialuris+", "+hasLoadablePotentialKernels()+", "+isrecur);
 						return searchPotentialUrls(rid);
 					}
 				}).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
