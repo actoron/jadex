@@ -1385,8 +1385,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture examineKernelModels(final List modellocs, IResourceIdentifier rid)
 	{
-//		if(modellocs.toString().indexOf("KernelApplication.component.xml")!=-1)
-//			System.out.println("examineKernelModels0: "+modellocs);
+		if(modellocs.toString().indexOf("bdi")!=-1)
+			System.out.println("examineKernelModels0: "+modellocs);
 		final Map kernellocs = new HashMap();
 		if (modellocs.isEmpty())
 			return new Future(kernellocs);
@@ -1415,7 +1415,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				public void resultAvailable(final IModelInfo modelinfo)
 				{
-//					System.out.println("Tried to load model for kernel: " + kernelloc + " model " + modelinfo);
+					if(modellocs.toString().indexOf("bdi")!=-1)
+						System.out.println("Tried to load model for kernel: " + kernelloc + " model " + modelinfo);
 					if(modelinfo!=null)
 					{
 						potentialkernellocations.remove(kernelloc);
@@ -1424,10 +1425,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						{
 							public void resultAvailable(ClassLoader result)
 							{
-//								if(modellocs.toString().indexOf("KernelApplication.component.xml")!=-1)
-//									System.out.println("examineKernelModels2: "+modellocs);
 								String[] exts = (String[])modelinfo.getProperty(KERNEL_EXTENSIONS, result);
-//								System.out.println("Kernel extensions for kernel " + kernelloc + " " + SUtil.arrayToString(exts));
+								if(modellocs.toString().indexOf("bdi")!=-1)
+									System.out.println("Kernel extensions for kernel " + kernelloc + " " + SUtil.arrayToString(exts));
 								if(exts!=null)
 								{
 									for (int i = 0; i < exts.length; ++i)
@@ -1453,7 +1453,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				
 				public void exceptionOccurred(Exception exception)
 				{
-//					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. " + count.getAndIncrement());
+					if(modellocs.toString().indexOf("bdi")!=-1)
+						System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. ");
 					resultAvailable(null);
 				}
 			}));
