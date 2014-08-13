@@ -1255,8 +1255,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						{
 							if (result != null && validuris.contains(uri))
 							{
-								if(uri.toString().indexOf("bdi")!=-1)
-									System.out.println("searchPotentialURLs3: "+uri+", "+result);
+								System.out.println("searchPotentialURLs3: "+uri+", "+result);
 								Map kernelmap = (Map) result;
 								kernellocationcache.putAll(kernelmap);
 								for (Iterator it = kernelmap.values().iterator(); it.hasNext(); )
