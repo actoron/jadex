@@ -967,11 +967,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		}
 		else
 		{
+			if(model.toString().indexOf("agent.xml")!=-1)
+				System.out.println("findKernelInCache2a: "+model+", "+potentialuris+", "+isrecur);
 			if(potentialuris.isEmpty() && !hasLoadablePotentialKernels() || isrecur)
 //			if(!hasLoadablePotentialKernels() || isrecur)
 			{
-				if(model.toString().indexOf("agent.xml")!=-1)
-					System.out.println("findKernelInCache2: "+model+", "+potentialuris+", "+hasLoadablePotentialKernels()+", "+isrecur);
+//				if(model.toString().indexOf("agent.xml")!=-1)
+					System.out.println("findKernelInCache2: "+model+", "+potentialuris+", "+isrecur);
 				ret.setResult(null);
 			}
 			else
@@ -981,7 +983,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					public Object execute(Object args)
 					{
 						if(model.toString().indexOf("agent.xml")!=-1)
-							System.out.println("findKernelInCache3: "+model+", "+potentialuris+", "+hasLoadablePotentialKernels()+", "+isrecur);
+							System.out.println("findKernelInCache3: "+model+", "+potentialuris+", "+isrecur);
 						return searchPotentialUrls(rid);
 					}
 				}).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
@@ -1006,6 +1008,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		boolean	ret	= false;
 		for(String loc: potentialkernellocations)
 		{
+			if(loc.toLowerCase().indexOf("bdi")!=-1)
+				System.out.println("loc: "+loc+", "+getCacheKeyValueForModel((String)loc, kernellocationcache));
+
 			ret	= getCacheKeyValueForModel((String)loc, kernellocationcache)!=null;
 			if(ret)
 			{
@@ -1454,7 +1459,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				public void exceptionOccurred(Exception exception)
 				{
 					if(modellocs.toString().indexOf("bdi")!=-1)
-						System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. ");
+					{
+						System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. "+exception);
+						exception.printStackTrace();
+					}
 					resultAvailable(null);
 				}
 			}));
