@@ -1452,6 +1452,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					else
 					{
 						potentialkernellocations.add(kernelloc);
+						if(modellocs.toString().indexOf("bdi")!=-1)
+						{
+							System.out.println("potential: "+hasLoadablePotentialKernels());
+						}
 						kernelCounter.exceptionOccurred(new RuntimeException());
 					}
 				}
@@ -1461,7 +1465,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					if(modellocs.toString().indexOf("bdi")!=-1)
 					{
 						System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. "+exception);
-						exception.printStackTrace();
 					}
 					resultAvailable(null);
 				}
