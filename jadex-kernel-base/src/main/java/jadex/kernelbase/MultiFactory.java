@@ -1008,8 +1008,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		boolean	ret	= false;
 		for(String loc: potentialkernellocations)
 		{
-			if(loc.toLowerCase().indexOf("ComponentAgent")!=-1)
-				System.out.println("loc: "+loc+", "+getCacheKeyValueForModel((String)loc, kernellocationcache));
+//			if(loc.toLowerCase().indexOf("ComponentAgent")!=-1)
+			System.out.println("loc: "+loc+", "+getCacheKeyValueForModel((String)loc, kernellocationcache));
 
 			ret	= getCacheKeyValueForModel((String)loc, kernellocationcache)!=null;
 			if(ret)
