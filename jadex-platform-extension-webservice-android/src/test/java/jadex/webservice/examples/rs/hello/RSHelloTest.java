@@ -2,6 +2,7 @@ package jadex.webservice.examples.rs.hello;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
@@ -98,7 +99,7 @@ public class RSHelloTest extends TestCase
 	{
 		ThreadSuspendable sus = new ThreadSuspendable();
 
-		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IHelloService.class);
+		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 
 		IHelloService hs = fut.get(sus);
 		

@@ -1,18 +1,14 @@
 package jadex.webservice.examples.rs.chart;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-
-import android.graphics.Color;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
-
 import junit.framework.TestCase;
+import android.graphics.Color;
 
 public class RSChartTest extends TestCase
 {
@@ -23,10 +19,15 @@ public class RSChartTest extends TestCase
 		new SReflectSub().setIsAndroid(false);
 		ThreadSuspendable sus = new ThreadSuspendable();
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
+		{
+				"-gui", "false",
+				"-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
 //				"-componentfactory", "jadex.component.ComponentComponentFactory",
 //				"-conf", "jadex/platform/Platform.component.xml",
-				"-component", "jadex/webservice/examples/rs/chart/ChartProvider.component.xml"});
+//				"-logging", "true",
+//				"-deftimeout", "-1",
+				"-component", "jadex/webservice/examples/rs/chart/ChartProvider.component.xml"
+		});
 
 		extAcc = fut.get(sus);
 	}
@@ -34,7 +35,7 @@ public class RSChartTest extends TestCase
 	public void testAccessRestService() throws InterruptedException
 	{
 		ThreadSuspendable sus = new ThreadSuspendable();
-		IFuture<IChartService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IChartService.class);
+		IFuture<IChartService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		IChartService hs = fut.get(sus);
 		double[][] data = new double[][] {{30, 50, 20, 90}, {55, 88, 11, 14}};
 		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get(sus);
