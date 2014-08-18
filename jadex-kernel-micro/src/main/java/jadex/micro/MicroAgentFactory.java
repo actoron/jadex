@@ -6,7 +6,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;

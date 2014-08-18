@@ -7,11 +7,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.IPlatformComponentFactory;
+import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -59,13 +60,13 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 *  Create a new interpreter.
 	 */
 	public ComponentInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
-		final IPlatformComponentFactory factory, final IExternalAccess parent, final Map<String, Object> arguments, 
-		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
+		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map<String, Object> arguments, 
+		final RequiredServiceBinding[] bindings, ProvidedServiceInfo[] pinfos, boolean copy, boolean realtime, boolean persist,
 		IPersistInfo persistinfo,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited,
 		ClassLoader classloader, LocalServiceRegistry registry)
 	{
-		super(desc, model, config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, registry);
+		super(desc, model, config, factory, parent, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, registry);
 		this.steps = new ArrayList();
 		this.classloader = classloader;
 	

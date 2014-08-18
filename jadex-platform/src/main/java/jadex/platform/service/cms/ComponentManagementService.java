@@ -603,7 +603,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																	final IPlatformComponentAccess	component	= new PlatformComponent();
-																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, access.getServiceRegistry(), realtime, copy);
+																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, access.getServiceRegistry(), cinfo.getProvidedServiceInfos(), realtime, copy);
 																	component.create(cci, features);																	
 																	initinfos.put(cid, new InitInfo(component, cinfo, resfut));
 																	
@@ -1144,8 +1144,8 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		contains = cfs.containsKey(cid);
 		tmp = contains? (Future<Map<String, Object>>)cfs.get(cid): new Future<Map<String, Object>>();
-//			System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid));
-//			Thread.currentThread().dumpStack();
+//		System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid)+" "+tmp.isDone());
+//		Thread.currentThread().dumpStack();
 		
 		// If destroyComponent has not been called before
 		if(!contains)
@@ -1168,7 +1168,7 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			destroyComponent(cid, ret);
 		}
-//		else if("Application".equals(getDescription(cid).getType()))
+//		else //if("Application".equals(getDescription(cid).getType()))
 //			System.out.println("no destroy: "+contains+", "+locked);
 		
 		return ret;
@@ -1300,6 +1300,7 @@ public class ComponentManagementService implements IComponentManagementService
 			}			
 			else
 			{
+				cfs.remove(cid);
 				ret.setException(new ComponentTerminatedException(cid, "Cannot kill, no such component."));
 			}
 		}
@@ -1319,7 +1320,7 @@ public class ComponentManagementService implements IComponentManagementService
 		ccs.remove(cid);
 		ret	= (Future<Map<String, Object>>)cfs.remove(cid);
 		
-//		System.out.println("Terminated component: "+cid.getName());
+//		System.out.println("Terminated component (exitDestroy): "+cid.getName());
 		
 		if(ret!=null)
 		{

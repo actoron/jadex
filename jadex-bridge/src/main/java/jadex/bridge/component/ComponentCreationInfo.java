@@ -1,6 +1,7 @@
 package jadex.bridge.component;
 
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 
@@ -35,6 +36,9 @@ public class ComponentCreationInfo
 	/** The copy flag. */
 	protected boolean	copy;
 	
+	/** The provided service infos. */
+	protected ProvidedServiceInfo[]	infos;
+	
 	//-------- constructors --------
 	
 	/**
@@ -47,13 +51,14 @@ public class ComponentCreationInfo
 	 *  @param realtime	The real time flag.
 	 *  @param copy	The copy flag.
 	 */
-	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, IComponentDescription desc, LocalServiceRegistry registry, boolean realtime, boolean copy)
+	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, IComponentDescription desc, LocalServiceRegistry registry, ProvidedServiceInfo[] infos, boolean realtime, boolean copy)
 	{
 		this.model	= model;
 		this.config = config!=null ? config : model.getConfigurationNames().length>0 ? model.getConfigurationNames()[0] : null;
 		this.arguments	= arguments;
 		this.registry	= registry;
 		this.desc	= desc;
+		this.infos	= infos;
 		this.realtime	= realtime;
 		this.copy	= copy;
 	}
@@ -100,6 +105,16 @@ public class ComponentCreationInfo
 	public LocalServiceRegistry	getServiceRegistry()
 	{
 		return registry;
+	}
+
+	/**
+	 *  Get the provided service infos.
+	 *  
+	 *  @return The provided service infos..
+	 */
+	public ProvidedServiceInfo[]	getProvidedServiceInfos()
+	{
+		return infos;
 	}
 
 	/**

@@ -9,8 +9,11 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -279,18 +282,27 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	
 	/**
 	 * Create a component instance.
-	 * @param adapter The component adapter.
-	 * @param model The component model.
+	 * @param desc	The component description.
+	 * @param factory The component adapter factory.
+	 * @param modelinfo The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
 	 * @param arguments The arguments for the component as name/value pairs.
 	 * @param parent The parent component (if any).
-	 * @return An instance of a component.
+	 * @param bindings	Optional bindings to override bindings from model.
+	 * @param pinfos	Optional provided service infos to override settings from model.
+	 * @param copy	Global flag for parameter copying.
+	 * @param realtime	Global flag for real time timeouts.
+	 * @param persist	Global flag for persistence support.
+	 * @param resultlistener	Optional listener to be notified when the component finishes.
+	 * @param init	Future to be notified when init of the component is completed.
+	 * @return An instance of a component and the corresponding adapter.
 	 */
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
-		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
-		final IPersistInfo persistinfo,
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, final LocalServiceRegistry registry)
+	@Excluded
+	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference final IComponentDescription desc, 
+		final IComponentAdapterFactory factory, final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, 
+		final IExternalAccess parent, @Reference final RequiredServiceBinding[] bindings, @Reference final ProvidedServiceInfo[] pinfos, final boolean copy, final boolean realtime, final boolean persist,
+		final IPersistInfo persistinfo, 
+		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, @Reference final LocalServiceRegistry registry)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
@@ -305,7 +317,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 					{
 						CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, 
 							new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-						ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, realtime, persist,
+						ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, pinfos, copy, realtime, persist,
 								persistinfo, resultlistener, init, cl, registry);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
@@ -325,7 +337,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				ClassLoader cl = getClass().getClassLoader();
 				CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, 
 					new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-				ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, realtime, persist,
+				ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, pinfos, copy, realtime, persist,
 					persistinfo, resultlistener, init, cl, registry);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}

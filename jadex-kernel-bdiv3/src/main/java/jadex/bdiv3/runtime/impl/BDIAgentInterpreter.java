@@ -128,11 +128,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public BDIAgentInterpreter(IComponentDescription desc, IPlatformComponentFactory factory, 
 		final BDIModel model, Class<?> agentclass, final Map<String, Object> args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, ProvidedServiceInfo[] pinfos, boolean copy, boolean realtime, boolean persist,
 		IPersistInfo persistinfo,
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited, LocalServiceRegistry registry)
 	{
-		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, persist, persistinfo, listener, inited, registry);
+		super(desc, factory, model, agentclass, args, config, parent, bindings, pinfos, copy, realtime, persist, persistinfo, listener, inited, registry);
 		this.bdimodel = model;
 		this.capa = new RCapability(bdimodel.getCapability());
 	}

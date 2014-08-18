@@ -146,7 +146,7 @@ public class LocalServiceRegistry
 		{
 			for(IService ser: sers)
 			{
-				if(checkService(cid, ser, scope))
+				if(checkSearchScope(cid, ser, scope) && checkPublicationScope(cid, ser))
 				{
 					ret = (T)ser;
 					break;
@@ -172,7 +172,7 @@ public class LocalServiceRegistry
 			ret = new HashSet<T>();
 			for(IService ser: sers)
 			{
-				if(checkService(cid, ser, scope))
+				if(checkSearchScope(cid, ser, scope) && checkPublicationScope(cid, ser))
 				{
 					ret.add((T)ser);
 				}
@@ -198,7 +198,7 @@ public class LocalServiceRegistry
 			Set<T> sers = (Set<T>)getServices(type);
 			if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
 			{
-				// filter checks in loop are possibly performed outside of synchornized block
+				// filter checks in loop are possibly performed outside of synchronized block
 				Iterator<T> it = new HashSet<T>(sers).iterator();
 				searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
 			}
@@ -223,7 +223,7 @@ public class LocalServiceRegistry
 		if(it.hasNext())
 		{
 			final T ser = it.next();
-			if(!checkService(cid, (IService)ser, scope))
+			if(!checkSearchScope(cid, (IService)ser, scope) || !checkPublicationScope(cid, (IService)ser))
 			{
 				searchLoopService(filter, it, cid, scope).addResultListener(new DelegationResultListener<T>(ret));
 			}
@@ -313,7 +313,7 @@ public class LocalServiceRegistry
 		if(it.hasNext())
 		{
 			final T ser = it.next();
-			if(!checkService(cid, (IService)ser, scope))
+			if(!checkSearchScope(cid, (IService)ser, scope) || !checkPublicationScope(cid, (IService)ser))
 			{
 				searchLoopServices(filter, it, cid, scope).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 			}
@@ -360,8 +360,6 @@ public class LocalServiceRegistry
 	{
 		final Future<T> ret = new Future<T>();
 		
-		T res = null;
-		
 		searchService(type, cid, RequiredServiceInfo.SCOPE_PLATFORM, filter).addResultListener(new IResultListener<T>()
 		{
 			public void resultAvailable(T result)
@@ -374,31 +372,6 @@ public class LocalServiceRegistry
 				searchRemoteService(type, filter).addResultListener(new DelegationResultListener<T>(ret));
 			}
 		});
-		
-//		if(services!=null)
-//		{
-//			Set<IService> sers = services.get(new ClassInfo(type));
-//			if(sers!=null && sers.size()>0)
-//			{
-//				for(IService ser: sers)
-//				{
-//					if(isIncluded(cid, ser))
-//					{
-//						res = (T)ser;
-//						break;
-//					}
-//				}
-//			}
-//		}
-		
-//		if(res==null)
-//		{
-//			searchRemoteService(type).addResultListener(new DelegationResultListener<T>(ret));
-//		}
-//		else
-//		{
-//			ret.setResult(res);
-//		}
 		
 		return ret;
 	}
@@ -438,21 +411,6 @@ public class LocalServiceRegistry
 			}
 		});
 		
-//		if(services!=null)
-//		{
-//			Set<IService> sers = services.get(new ClassInfo(type));
-//			if(sers!=null && sers.size()>0)
-//			{
-//				for(IService ser: sers)
-//				{
-//					if(isIncluded(cid, ser))
-//					{
-//						ret.addIntermediateResult((T)ser);
-//					}
-//				}
-//			}
-//		}
-		
 		searchRemoteServices(type, filter).addResultListener(new IntermediateDefaultResultListener<T>()
 		{
 			public void intermediateResultAvailable(T result)
@@ -475,9 +433,9 @@ public class LocalServiceRegistry
 	}
 	
 	/**
-	 *  Check if service is ok with respect to scope.
+	 *  Check if service is ok with respect to search scope of caller.
 	 */
-	protected boolean checkService(IComponentIdentifier cid, IService ser, String scope)
+	protected boolean checkSearchScope(IComponentIdentifier cid, IService ser, String scope)
 	{
 		boolean ret = false;
 		
@@ -497,14 +455,14 @@ public class LocalServiceRegistry
 		}
 		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 		{
-			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-			ret = target.getPlatformName().equals(cid.getPlatformName())
-				&& getApplicationName(target).equals(getApplicationName(cid));
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = sercid.getPlatformName().equals(cid.getPlatformName())
+				&& getApplicationName(sercid).equals(getApplicationName(cid));
 		}
 		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
 		{
-			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-			ret = getDotName(target).endsWith(getDotName(cid));
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = getDotName(sercid).endsWith(getDotName(cid));
 		}
 		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
 		{
@@ -513,40 +471,85 @@ public class LocalServiceRegistry
 		}
 		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
 		{
-			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
+			// check if parent of searcher reaches the service
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			String subname = getSubcomponentName(cid);
+			ret = sercid.getName().endsWith(subname);
+		}
+		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
+		{
+			// Test if service id is part of searcher id, service is upwards from searcher
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = getDotName(cid).endsWith(getDotName(sercid));
 			
-			String subname = getSubcomponentName(target);
-			ret = target.getName().endsWith(subname);
-			
-//			while(target!=null)
+//			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+//			String subname = getSubcomponentName(cid);
+//			ret = sercid.getName().endsWith(subname);
+//			
+//			while(cid!=null)
 //			{
-//				if(target.equals(parent))
+//				if(sercid.equals(cid))
 //				{
-//					ret.add((T)ser);
+//					ret = true;
 //					break;
 //				}
 //				else
 //				{
-//					target = target.getParent();
+//					cid = cid.getParent();
 //				}
 //			}
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Check if service is ok with respect to publication scope.
+	 */
+	protected boolean checkPublicationScope(IComponentIdentifier cid, IService ser)
+	{
+		boolean ret = false;
+		
+		String scope = ser.getServiceIdentifier().getScope()!=null? ser.getServiceIdentifier().getScope(): RequiredServiceInfo.SCOPE_GLOBAL;
+		
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		{
+			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		{
+			// Test if searcher and service are on same platform
+			ret = cid.getPlatformName().equals(ser.getServiceIdentifier().getProviderId().getPlatformName());
+		}
+		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		{
+			// todo: special case platform service with app scope
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = sercid.getPlatformName().equals(cid.getPlatformName())
+				&& getApplicationName(sercid).equals(getApplicationName(cid));
+		}
+		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		{
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = getDotName(cid).endsWith(getDotName(sercid));
+		}
+		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		{
+			// only the component itself
+			ret = ser.getServiceIdentifier().getProviderId().equals(cid);
+		}
+		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		{
+			// check if parent of service reaches the searcher
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			String subname = getSubcomponentName(sercid);
+			ret = cid.getName().endsWith(subname);
+		}
 		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
 		{
-			IComponentIdentifier target = ser.getServiceIdentifier().getProviderId();
-			
-			while(cid!=null)
-			{
-				if(target.equals(cid))
-				{
-					ret = true;
-					break;
-				}
-				else
-				{
-					cid = cid.getParent();
-				}
-			}
+			// check if searcher is upwards from service (part of name)
+			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			ret = getDotName(sercid).endsWith(getDotName(cid));
 		}
 		
 		return ret;

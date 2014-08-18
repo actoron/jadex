@@ -125,6 +125,20 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				}
 			}
 			
+			// Add custom service infos from outside.
+			ProvidedServiceInfo[] pinfos = cinfo.getProvidedServiceInfos();
+			for(int i=0; pinfos!=null && i<pinfos.length; i++)
+			{
+				Object key = pinfos[i].getName()!=null? pinfos[i].getName(): pinfos[i].getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+				ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
+				ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()), 
+					pinfos[i].getImplementation()!=null? new ProvidedServiceImplementation(pinfos[i].getImplementation()): psi.getImplementation(), 
+					pinfos[i].getScope()!=null? pinfos[i].getScope(): psi.getScope(),
+					pinfos[i].getPublish()!=null? pinfos[i].getPublish(): psi.getPublish(), 
+					pinfos[i].getProperties()!=null? pinfos[i].getProperties() : psi.getProperties());
+				sermap.put(key, newpsi);
+			}
+			
 			// Instantiate service objects
 			for(ProvidedServiceInfo info: sermap.values())
 			{
@@ -173,7 +187,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 						final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 							component, ser, info.getName(), type, info.getImplementation().getProxytype(), ics, cinfo.isCopy(), 
-							cinfo.isRealtime(), moni, info.getScope());
+							cinfo.isRealtime(), moni, info, info.getScope());
 						
 						addService(proxy, info);
 					}

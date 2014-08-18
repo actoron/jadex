@@ -11,6 +11,7 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -45,6 +46,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -425,7 +427,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, Object service, 
 		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, 
-		boolean realtime, boolean monitoring, String scope)
+		boolean realtime, boolean monitoring, ProvidedServiceInfo info, String scope)
 	{
 		IInternalService	ret;
 		
@@ -444,7 +446,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
-			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, realtime, scope);
+			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, realtime, info, scope);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, copy, monitoring, ret.getServiceIdentifier());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
@@ -478,12 +480,28 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a basic invocation handler.
 	 */
-	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, boolean realtime, String scope)
+	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, boolean realtime, ProvidedServiceInfo info, String scope)
 	{
+		Map<String, Object> serprops = new HashMap<String, Object>();
+		if (info != null && info.getProperties() != null)
+		{
+			for (UnparsedExpression exp : info.getProperties())
+			{
+				Object val = SJavaParser.parseExpression(exp, ia.getModel().getAllImports(), ia.getClassLoader()).getValue(null);
+				serprops.put(exp.getName(), val);
+			}
+		}
+		
 		BasicServiceInvocationHandler handler;
 		if(service instanceof IService)
 		{
 			IService ser = (IService)service;
+			
+			if (service instanceof BasicService)
+			{
+				((BasicService) service).setPropertyMap(serprops);
+			}
+			
 			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), realtime, ia.getComponentDescription().getCause(), false);
 			
 //			if(type==null)
@@ -521,7 +539,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 
 			BasicService mgmntservice = new BasicService(ia.getComponentIdentifier(), type, serclass, null);
 			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope);
-						
+			mgmntservice.setPropertyMap(serprops);
+			
 			// Do not try to call isAnnotationPresent for Proxy on Android
 			// see http://code.google.com/p/android/issues/detail?id=24846
 			if(!(SReflect.isAndroid() && (service instanceof Proxy))) 

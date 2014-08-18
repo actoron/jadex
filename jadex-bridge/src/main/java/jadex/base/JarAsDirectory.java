@@ -380,9 +380,6 @@ public class JarAsDirectory	extends File
 		if(entryfiles==null)
 			refresh();
 		
-		if(entryfiles==null)
-			System.out.println("gdfsdfhjsdfjk");
-		
 		return (File)entryfiles.get(path);
 	}
 
