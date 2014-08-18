@@ -13,10 +13,12 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bpmn.runtime.handler.SplitInfo;
+import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
@@ -101,6 +103,9 @@ public class ProcessThread	implements ITaskContext
 	
 	/** The loop command. */
 	protected IResultCommand<Boolean, Void> loopcmd;
+	
+	/** The subprocess intermediate result received command. */
+	protected ICommand<Object[]> iresultcmd;
 	
 	//-------- constructors --------
 
@@ -510,6 +515,16 @@ public class ProcessThread	implements ITaskContext
 //			{
 //				throw new RuntimeException("Unsupported collection type: "+coll);
 //			}
+		}
+		
+		if(getActivity() instanceof MSubProcess)
+		{
+			if(getActivity().hasParameter(name) && getActivity().getParameter(name).isOut())
+			{
+//				System.out.println("setting subprocess out parameter: "+name+" "+value);
+				// Hack?! should this be called directly?
+				SubProcessActivityHandler.handleProcessResult(instance, this, activity, name, key, value);
+			}
 		}
 	}
 	
