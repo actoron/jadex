@@ -274,7 +274,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 
 	/**
 	 * Get the properties.
-	 * 
 	 * @return the properties.
 	 */
 	public Map<String, Object> getProperties()

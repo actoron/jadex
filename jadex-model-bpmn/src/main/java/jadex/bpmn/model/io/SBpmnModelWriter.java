@@ -42,7 +42,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 44;
+	public static final int BUILD = 45;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -359,7 +359,7 @@ public class SBpmnModelWriter
 					out.print(" name=\"");
 					out.print(escapeString(arg.getName()));
 					out.print("\" type=\"");
-					String type = arg.getClazz() != null? arg.getClazz().getTypeName() != null? arg.getClazz().getTypeName() : "" : "";
+					String type = arg.getClazz() != null? arg.getClazz().getGenericTypeName() != null? arg.getClazz().getGenericTypeName() : "" : "";
 					out.print(escapeString(type));
 					
 					if (hasdesc || hasval)
@@ -423,7 +423,7 @@ public class SBpmnModelWriter
 			for (MContextVariable ctv : ctvs)
 			{
 				ClassInfo ci = ctv.getClazz();
-				String cn = ci != null? ci.getTypeName() : "";
+				String cn = ci != null? ci.getGenericTypeName() : "";
 				
 				out.print(getIndent(ind));
 				out.print("<jadex:contextvariable name=\"");
@@ -480,20 +480,20 @@ public class SBpmnModelWriter
 				out.print("<jadex:providedservice name=\"");
 				out.print(escapeString(ps.getName()));
 				
-				String iface = ps.getType() != null? ps.getType().getTypeName() : null;
+				String iface = ps.getType() != null? ps.getType().getGenericTypeName() : null;
 				if (iface != null)
 				{
 					out.print("\" interface=\"");
-					out.print(escapeString(ps.getType().getTypeName()));
+					out.print(escapeString(ps.getType().getGenericTypeName()));
 				}
 				
 				if (ps.getImplementation() != null)
 				{
 					ClassInfo implclass = ps.getImplementation().getClazz();
-					if (implclass != null && implclass.getTypeName() != null && implclass.getTypeName().length() > 0)
+					if (implclass != null && implclass.getGenericTypeName() != null && implclass.getGenericTypeName().length() > 0)
 					{
 						out.print("\" class=\"");
-						out.print(escapeString(implclass.getTypeName()));
+						out.print(escapeString(implclass.getGenericTypeName()));
 					}
 					
 					String proxytype = ps.getImplementation().getProxytype();
@@ -541,7 +541,7 @@ public class SBpmnModelWriter
 				out.print("<jadex:requiredservice name=\"");
 				out.print(escapeString(rs.getName()));
 				
-				String iface = rs.getType() != null? rs.getType().getTypeName() : null;
+				String iface = rs.getType() != null? rs.getType().getGenericTypeName() : null;
 				if (iface != null)
 				{
 					out.print("\" interface=\"");
@@ -793,10 +793,10 @@ public class SBpmnModelWriter
 							out.print("<jadex:providedserviceconfiguration name=\"");
 							out.print(escapeString(ps.getName()));
 							
-							if (ps.getImplementation().getClazz() != null && ps.getImplementation().getClazz().getTypeName() != null && ps.getImplementation().getClazz().getTypeName().length() > 0)
+							if (ps.getImplementation().getClazz() != null && ps.getImplementation().getClazz().getGenericTypeName() != null && ps.getImplementation().getClazz().getGenericTypeName().length() > 0)
 							{
 								out.print("\" class=\"");
-								out.print(escapeString(ps.getImplementation().getClazz().getTypeName()));
+								out.print(escapeString(ps.getImplementation().getClazz().getGenericTypeName()));
 							}
 							
 							if (ps.getImplementation().getProxytype() != null && ps.getImplementation().getProxytype().length() > 0)
@@ -1243,7 +1243,7 @@ public class SBpmnModelWriter
 			}
 			
 //			boolean istask = MBpmnModel.TASK.equals(activity.getActivityType()) || issubproc;
-			boolean hasclass = activity.getClazz()!=null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
+			boolean hasclass = activity.getClazz()!=null && activity.getClazz().getGenericTypeName() != null && activity.getClazz().getGenericTypeName().length() > 0;
 //			boolean hastaskparams = istask && activity.getParameters()!=null && activity.getParameters().size()>0;
 			boolean hastaskparams = activity.getParameters()!=null && activity.getParameters().size()>0;
 			boolean hasprops = activity.getProperties()!=null && activity.getProperties().size()>0;
@@ -1255,7 +1255,7 @@ public class SBpmnModelWriter
 				if(hasclass)
 				{
 					out.print(getIndent(baseind + 2) + "<jadex:class>");
-					out.print(escapeString(activity.getClazz().getTypeName()));
+					out.print(escapeString(activity.getClazz().getGenericTypeName()));
 					out.println("</jadex:class>");
 				}
 				
@@ -1270,7 +1270,7 @@ public class SBpmnModelWriter
 						out.print("\" name=\"");
 						out.print(escapeString(param.getName()));
 						out.print("\" type=\"");
-						out.print(escapeString(param.getClazz().getTypeName()));
+						out.print(escapeString(param.getClazz().getGenericTypeName()));
 						out.print("\"");
 						
 						String inival = param.getInitialValue() != null? param.getInitialValue().getValue() : null;
@@ -1298,7 +1298,7 @@ public class SBpmnModelWriter
 						if (prop.getClazz() != null)
 						{
 							out.print("\" type=\"");
-							out.print(escapeString(prop.getClazz().getTypeName()));
+							out.print(escapeString(prop.getClazz().getGenericTypeName()));
 						}
 						out.print("\"");
 						

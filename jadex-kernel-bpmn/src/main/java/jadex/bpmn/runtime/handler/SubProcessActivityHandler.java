@@ -16,9 +16,6 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -84,6 +81,12 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						for(int i=0; i<start.size(); i++)
 						{
 							ProcessThread subthread = new ProcessThread((MActivity)start.get(i), thread, instance);
+//							{
+//								public void setSubprocessResultValue(String name, Object key, Object result) 
+//								{
+//									handleIntermediateProcessResult(instance, this, activity, name, result);
+//								}
+//							};
 							subthread.setOrCreateParameterValue(itername, value);	// Hack!!! parameter not declared?
 							thread.addThread(subthread);
 //							System.out.println("val in t: "+subthread+" "+itername+"="+value);
@@ -110,6 +113,12 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							for(MActivity st: start)
 							{
 								ProcessThread subthread = new ProcessThread(st, thread, instance);
+//								{
+//									public void setSubprocessResultValue(String name, Object key, Object result) 
+//									{
+//										handleIntermediateProcessResult(instance, this, activity, name, result);
+//									}
+//								};
 								thread.addThread(subthread);
 								subthread.setOrCreateParameterValue(itername, elem); // Hack!!! parameter not declared?
 							}
@@ -126,69 +135,19 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				{
 					thread.setLoopCommand(cmd);
 				}
-				
-//				List<Object> elems = new LinkedList<Object>();
-//				while(it.hasNext())
-//				{
-//					elems.add(0, it.next());
-//				}
-//				
-//				ProcessThread tmp = thread;
-//				if(elems.isEmpty())
-//				{
-//					wait = false;
-//				}
-//				else
-//				{
-//					for(Object elem: elems)
-//					{
-//						ProcessThread cothread = new ProcessThread(null, tmp, instance);
-//						cothread.setWaiting(true);
-//						tmp.addThread(cothread);
-//						tmp = cothread;
-//						for(MActivity st: start)
-//						{
-//							ProcessThread subthread = new ProcessThread(st, cothread, instance);
-//							subthread.setWaiting(true);
-//							cothread.addThread(subthread);
-//							subthread.setParameterValue("item", elem);	// Hack!!! parameter not declared?
-//						}
-//					}
-//					for(ProcessThread t: tmp.getSubthreads())
-//					{
-//						t.setWaiting(false);
-//					}
-//				}
-				
-//				if(!it.hasNext())
-//				{
-//					wait = false;
-//				}
-//				else
-//				{
-//					boolean	first = true;
-//					while(it.hasNext())
-//					{
-//						Object elem = it.next();
-//						for(MActivity st: start)
-//						{
-//							ProcessThread subthread = new ProcessThread(st, thread, instance);
-//							thread.addThread(subthread);
-//							subthread.setParameterValue("item", elem);	// Hack!!! parameter not declared?
-//							if(!first)
-//							{
-//								subthread.setWaiting(true);
-//							}
-//						}
-//						first = false;
-//					}
-//				}
 			}
+			// just simple process without multi property
 			else
 			{
 				for(int i=0; i<start.size(); i++)
 				{
 					ProcessThread subthread = new ProcessThread((MActivity)start.get(i), thread, instance);
+//					{
+//						public void setSubprocessResultValue(String name, Object key, Object result) 
+//						{
+//							handleProcessResult(instance, this, activity, name, result);
+//						}
+//					};
 					thread.addThread(subthread);
 				}
 			}	
@@ -290,118 +249,15 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 									}
 								}
 								
-								// Todo: event handlers should also react to internal subprocesses???
-								List<MActivity> handlers = activity.getEventHandlers();
-								
-								MActivity handler = null;
-								if(handlers!=null)
-								{
-									for(int i=0; i<handlers.size() && handler==null; i++)
-									{
-										MActivity act = handlers.get(i);
-										
-										if(act.isMessageEvent())
-										{
-											String trig = null;
-											if(act.hasProperty(MActivity.RESULTNAME))
-											{
-												trig = (String)act.getPropertyValueString(MActivity.RESULTNAME);
-											}
-											if(trig == null || param.equals(trig))
-											{
-												handler = act;
-											}
-										}
-										else
-										{
-											String trig = null;
-											if(act.hasProperty(MBpmnModel.SIGNAL_EVENT_TRIGGER))
-											{
-												trig = (String)thread.getPropertyValue(MBpmnModel.SIGNAL_EVENT_TRIGGER, act);
-											}
-											
-											if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL) &&
-											   (trig == null || param.equals(trig)))
-											{
-												handler = act;
-											}
-										}
-									}
-								}		
-
-								if(handler!=null)
-								{
-									ProcessThread newthread	= thread.createCopy();
-									updateParameters(newthread);
-									
-									// todo: allow this, does not work because handler is used for waiting for service calls!
-									if(handler.isMessageEvent())
-									{
-										newthread.setActivity(handler);
-										if(handler.hasParameter(MActivity.RETURNPARAM))
-										{
-											newthread.setParameterValue(MActivity.RETURNPARAM, value);
-										}
-									}
-									else
-									{
-										newthread.setLastEdge((MSequenceEdge)handler.getOutgoingSequenceEdges().get(0));
-									}
-									
-									thread.getParent().addThread(newthread);
-								}
-								
-//								// Only set result value in thread when out parameter exists.
-//								if(activity.getParameters()!=null && activity.getParameters().get(param)!=null)
-//								{
-//									String	dir	= activity.getParameters().get(param).getDirection();
-//									if(MParameter.DIRECTION_INOUT.equals(dir) || MParameter.DIRECTION_OUT.equals(dir))
-//									{
-//										thread.setParameterValue(param, value);
-//
-//										// Todo: event handlers should also react to internal subprocesses???
-//										List<MActivity> handlers = activity.getEventHandlers();
-//										if(handlers!=null)
-//										{
-//											for(int i=0; i<handlers.size(); i++)
-//											{
-//												MActivity act = handlers.get(i);
-//												String trig = null;
-//												if(act.hasProperty(MBpmnModel.SIGNAL_EVENT_TRIGGER))
-//												{
-//													trig = (String) thread.getPropertyValue(MBpmnModel.SIGNAL_EVENT_TRIGGER, act);
-//												}
-//												
-//												if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL) &&
-//												   (trig == null || param.equals(trig)))
-//												{
-//													ProcessThread newthread	= thread.createCopy();
-//													updateParameters(newthread);
-//													// todo: allow this, does not work because handler is used for waiting for service calls!
-////													newthread.setActivity(act);
-//													newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
-//													thread.getParent().addThread(newthread);
-//													
-////													ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-////														thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
-////													instance.notifyListeners(cce);
-//													
-//													if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-//													{
-//														instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
-//													}
-//												}
-//											}
-//										}									
-//									}
-//								}								
+								// todo: need to distinguish between collection and normal parameters
+								handleProcessResult(instance, thread, activity, param, null, value);
 							}
 						}
 						
 						public void finished()
 						{
 //							System.out.println("end0: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
-							updateParameters(thread);
+							updateParameters(instance, thread, activity);
 							
 							thread.setNonWaiting();
 							instance.step(activity, instance, thread, null);
@@ -427,41 +283,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								thread.setNonWaiting();
 								thread.setException(exception);
 								instance.step(activity, instance, thread, null);
-							}
-						}
-						
-						protected void updateParameters(ProcessThread thread)
-						{
-							List<MParameter>	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
-							if(params!=null && !params.isEmpty())
-							{
-								IValueFetcher fetcher	=null;
-
-								for(int i=0; i<params.size(); i++)
-								{
-									MParameter	param	= params.get(i);
-									if(param.getInitialValue()!=null)
-									{
-										if(fetcher==null)
-											fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
-										try
-										{
-											thread.setParameterValue(param.getName(), ((IParsedExpression) param.getInitialValue().getParsed()).getValue(fetcher));
-										}
-										catch(RuntimeException e)
-										{
-											throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
-										}
-									}
-								}
-								
-								if(activity.getOutgoingDataEdges() != null)	
-								{
-									for (MDataEdge de : activity.getOutgoingDataEdges())
-									{
-										thread.setDataEdgeValue(de.getId(), thread.getParameterValue(de.getSourceParameter()));
-									}
-								}
 							}
 						}
 						
@@ -499,6 +320,114 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		else
 		{
 			throw new RuntimeException("External subprocess may not have inner activities: "+activity+", "+instance);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static void handleProcessResult(BpmnInterpreter instance, ProcessThread thread, MActivity activity, String param, Object key, Object value)
+	{
+		// Todo: event handlers should also react to internal subprocesses???
+		List<MActivity> handlers = activity.getEventHandlers();
+		
+		MActivity handler = null;
+		if(handlers!=null)
+		{
+			for(int i=0; i<handlers.size() && handler==null; i++)
+			{
+				MActivity act = handlers.get(i);
+				
+				if(act.isMessageEvent())
+				{
+					String trig = null;
+					if(act.hasProperty(MActivity.RESULTNAME))
+					{
+						trig = (String)act.getPropertyValueString(MActivity.RESULTNAME);
+					}
+					if(trig == null || param.equals(trig))
+					{
+						handler = act;
+					}
+				}
+				else
+				{
+					String trig = null;
+					if(act.hasProperty(MBpmnModel.SIGNAL_EVENT_TRIGGER))
+					{
+						trig = (String)thread.getPropertyValue(MBpmnModel.SIGNAL_EVENT_TRIGGER, act);
+					}
+					
+					if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL) &&
+					   (trig == null || param.equals(trig)))
+					{
+						handler = act;
+					}
+				}
+			}
+		}		
+
+		if(handler!=null)
+		{
+			ProcessThread newthread	= thread.createCopy();
+			updateParameters(instance, newthread, activity);
+			
+			// todo: allow this, does not work because handler is used for waiting for service calls!
+			if(handler.isMessageEvent())
+			{
+				newthread.setActivity(handler);
+				if(handler.hasParameter(MActivity.RETURNPARAM))
+				{
+					newthread.setParameterValue(MActivity.RETURNPARAM, value);
+				}
+			}
+			else
+			{
+				newthread.setLastEdge((MSequenceEdge)handler.getOutgoingSequenceEdges().get(0));
+			}
+			
+			thread.getParent().addThread(newthread);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param activity
+	 * @param thread
+	 * @param instance
+	 */
+	protected static void updateParameters(BpmnInterpreter instance, ProcessThread thread, MActivity activity)
+	{
+		List<MParameter>	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
+		if(params!=null && !params.isEmpty())
+		{
+			IValueFetcher fetcher	=null;
+
+			for(int i=0; i<params.size(); i++)
+			{
+				MParameter	param	= params.get(i);
+				if(param.getInitialValue()!=null)
+				{
+					if(fetcher==null)
+						fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
+					try
+					{
+						thread.setParameterValue(param.getName(), ((IParsedExpression) param.getInitialValue().getParsed()).getValue(fetcher));
+					}
+					catch(RuntimeException e)
+					{
+						throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
+					}
+				}
+			}
+			
+			if(activity.getOutgoingDataEdges() != null)	
+			{
+				for (MDataEdge de : activity.getOutgoingDataEdges())
+				{
+					thread.setDataEdgeValue(de.getId(), thread.getParameterValue(de.getSourceParameter()));
+				}
+			}
 		}
 	}
 }
