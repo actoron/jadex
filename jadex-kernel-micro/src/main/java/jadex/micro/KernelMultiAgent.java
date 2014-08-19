@@ -23,8 +23,8 @@ import jadex.micro.annotation.ProvidedServices;
 		clazz=String[].class, defaultvalue="new String[] {\"KernelBDI.component.xml\"}"),
 	@Argument(name="ignoreextensions", description="File extensions that are ignored.",
 		clazz=String[].class, defaultvalue="new String[] {\".png\", \".jpg\", \".dll\", \".gif\", \".exe\", \".doc\", \".docx\", \".txt\" }"),
-	@Argument(name="kerneluriregex", description="Regular expression identifying kernel URIs.",
-		clazz=String.class, defaultvalue="\".*[Kk]ernel.*\"")})
+	@Argument(name="kerneluriregex", description="Regular expression identifying kernel URIs  (ignored on android as there is only the DEX file).",
+		clazz=String.class, defaultvalue="jadex.commons.SReflect.isAndroid() ? \"\" : \".*[Kk]ernel.*\"")})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
 	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getRawService(jadex.bridge.service.types.factory.IComponentFactory.class)"))
