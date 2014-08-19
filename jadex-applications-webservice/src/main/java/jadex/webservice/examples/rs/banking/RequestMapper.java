@@ -19,7 +19,7 @@ public class RequestMapper implements IParameterMapper
 	 *  @param parameters The parameters.
 	 *  @return The converted parameters.
 	 */
-	public Object[] convertParameters(Object[] parameters) throws Exception
+	public Object[] convertParameters(Object[] parameters, Object request) throws Exception
 	{
 		return new Object[]{new Request(parseDate(parameters[0]), parseDate(parameters[1]))};		
 	}

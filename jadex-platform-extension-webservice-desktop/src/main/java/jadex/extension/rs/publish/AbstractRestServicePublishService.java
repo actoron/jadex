@@ -69,6 +69,7 @@ import javassist.bytecode.annotation.ShortMemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -82,6 +83,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -508,6 +510,21 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			attr.addAnnotation(annot);
 			ui.getFieldInfo().addAttribute(attr);
 			proxyclazz.addField(ui);
+			
+			// Buaaahhhhhh grizzly does not allow injection of httpservlet request
+			CtField req = new CtField(SJavassist.getCtClass(org.glassfish.grizzly.http.server.Request.class, pool), "__greq", proxyclazz);
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
+			attr.addAnnotation(annot);
+			req.getFieldInfo().addAttribute(attr);
+			proxyclazz.addField(req);
+			
+			req = new CtField(SJavassist.getCtClass(HttpServletRequest.class, pool), "__req", proxyclazz);
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
+			attr.addAnnotation(annot);
+			req.getFieldInfo().addAttribute(attr);
+			proxyclazz.addField(req);
 			
 			// if webproxy refresh is need add an init method that initializes refresh
 			// problem: init annotation (Singleton/PostCreate) does not work
@@ -1017,6 +1034,13 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //			}
 //			System.out.println("call: "+this+" "+method+" "+SUtil.arrayToString(params)+" "+name);
 			
+//			Request req = (Request)getClass().getDeclaredField("__greq").get(this);
+////			System.out.println("call: "+this+" "+method+" "+req);
+//			for(String name: req.getHeaderNames())
+//			{
+//				System.out.println("header: "+name+": "+req.getHeader(name));
+//			}
+			
 			// check if mappers are there
 			ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
 			
@@ -1024,6 +1048,9 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			Object service = rc.getProperty("jadexservice");
 //			System.out.println("jadex service is: "+service);
 
+			HttpServletRequest req = (HttpServletRequest)getClass().getDeclaredField("__req").get(this);
+			Request greq = (Request)getClass().getDeclaredField("__greq").get(this);
+			
 			Method targetmethod = null;
 			if(method.isAnnotationPresent(MethodMapper.class))
 			{
@@ -1062,7 +1089,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 					if(mapper instanceof IValueMapper)
 						mapper = new DefaultParameterMapper((IValueMapper)mapper);
 					
-					targetparams = ((IParameterMapper)mapper).convertParameters(params);
+					targetparams = ((IParameterMapper)mapper).convertParameters(params, req!=null? req: greq);
 				}
 				else
 				{
