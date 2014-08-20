@@ -392,7 +392,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			{
 				final boolean isseq = handler.hasProperty(MActivity.ISSEQUENTIAL);
 				
-				ProcessThread newthread = new ProcessThread(handler, thread.getParent(), thread.getInstance())
+				// parent in seq mode is subproc thread to let it wait until all handler processing is done (hack?)
+				ProcessThread newthread = new ProcessThread(handler, isseq? thread: thread.getParent(), thread.getInstance())
 				{
 					public void notifyFinished() 
 					{
@@ -436,8 +437,17 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					newthread.setParameterValue(MActivity.RETURNPARAM, value);
 				}
 				
-				thread.getParent().addThread(newthread);
-//				thread.addThread(newthread);
+				// add newthread on suprocess thread in case of sequential execution.
+				// this will let the subprocess wait until all child processes have
+				// been finished - is kind of a hack
+				if(isseq)
+				{
+					thread.addThread(newthread);
+				}
+				else
+				{
+					thread.getParent().addThread(newthread);
+				}
 			}
 		}
 		
