@@ -3,8 +3,6 @@ package jadex.extension.rs.publish.mapper;
 import jadex.commons.SUtil;
 
 import java.io.ByteArrayInputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URI;
 
 import javax.ws.rs.core.Response;
@@ -28,7 +26,7 @@ public class NativeResponseMapper implements IValueMapper
 	{
 		Object o = extractContent(value);
 		
-		Response ret = null;
+		ResponseBuilder ret = null;
 		
 		if(o instanceof ResourceInfo)
 		{
@@ -41,35 +39,35 @@ public class NativeResponseMapper implements IValueMapper
 			{
 				o = new ByteArrayInputStream(ri.getData());
 			}
-			ResponseBuilder rb = Response.ok(o);
+			ret = Response.ok(o);
 			if(ri.getMediatype()!=null)
 			{
-				rb = rb.type(ri.getMediatype());
+				ret = ret.type(ri.getMediatype());
 			}
 			else if(ri.getPath()!=null)
 			{
 				String cttype = SUtil.guessContentTypeByFilename(ri.getPath());
 				if(cttype!=null)
 				{
-					rb = rb.type(cttype);
+					ret = ret.type(cttype);
 				}
 			}
-			ret = rb.build();
 		}
 		else if(o instanceof String)
 		{
-			ret = Response.ok(o).build();
+			ret = Response.ok(o);
 		}
 		else if(o instanceof Exception)
 		{
 			if(!isProduction())
 			{
-				ret = Response.ok(SUtil.getExceptionStacktrace((Exception)o)).build();
+				ret = Response.status(Status.INTERNAL_SERVER_ERROR).entity("<html><head></head>" +
+						"<body><pre>\n"+SUtil.getExceptionStacktrace((Exception)o)+"\n</pre></body></html>");
 			}
 			else
 			{
 				ret = Response.status(Status.INTERNAL_SERVER_ERROR).entity("<html><head></head>" +
-					"<body><h1>500 Internal server error</h1></body></html>").build();
+					"<body><h1>500 Internal server error</h1></body></html>");
 			}
 		}
 		else if(o instanceof URI)
@@ -79,18 +77,28 @@ public class NativeResponseMapper implements IValueMapper
 			{
 				uri = new URI("http://"+uri.toString());
 			}
-			ret = Response.status(Status.SEE_OTHER).location(uri).build();
+			ret = Response.status(Status.SEE_OTHER).location(uri);
 		}
 		
-		return ret;
+		ret	= buildResponse(ret, value);
+		
+		return ret.build();
 	}
 	
 	/**
 	 *  Prestep for extracting the content of a value.
 	 */
-	public Object extractContent(Object value)
+	protected Object extractContent(Object value)
 	{
 		return value;
+	}
+	
+	/**
+	 *  Post step to change or augment the response.
+	 */
+	protected ResponseBuilder	buildResponse(ResponseBuilder rb, Object value)
+	{
+		return rb;
 	}
 	
 	/**
