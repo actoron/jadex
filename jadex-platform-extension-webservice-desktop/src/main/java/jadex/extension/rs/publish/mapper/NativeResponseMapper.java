@@ -3,8 +3,6 @@ package jadex.extension.rs.publish.mapper;
 import jadex.commons.SUtil;
 
 import java.io.ByteArrayInputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URI;
 
 import javax.ws.rs.core.Response;

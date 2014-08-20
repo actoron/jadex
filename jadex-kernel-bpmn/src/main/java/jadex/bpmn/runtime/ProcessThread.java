@@ -14,6 +14,7 @@ import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
+import jadex.bpmn.runtime.handler.SubProcessActivityHandler.SubprocessResultHandler;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -105,7 +106,7 @@ public class ProcessThread	implements ITaskContext
 	protected IResultCommand<Boolean, Void> loopcmd;
 	
 	/** The subprocess intermediate result received command. */
-	protected ICommand<Object[]> iresultcmd;
+	protected SubprocessResultHandler resulthandler;
 	
 	//-------- constructors --------
 
@@ -165,8 +166,11 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setActivity(MActivity activity)
 	{
-		this.edge	= null;
 		this.activity	= activity;
+		
+		// Clear edge and resulthandler on each transition
+		this.edge	= null;
+		this.resulthandler = null;
 	}
 	
 	/**
@@ -354,6 +358,17 @@ public class ProcessThread	implements ITaskContext
 	}
 	
 	/**
+	 *  Create a copy of this thread (e.g. for a parallel split).
+	 */
+	public void copy(ProcessThread ret)
+	{
+		ret.edge	= edge;
+		ret.data	= data!=null? new HashMap<String, Object>(data): null;
+		ret.dataedges	= dataedges!=null? new HashMap<String, Object>(dataedges): null;
+		ret.splitinfos	= splitinfos!=null ? new LinkedHashMap<String, SplitInfo>(splitinfos) : null;
+	}
+	
+	/**
 	 *  Test if a parameter has been set on activity.
 	 *  @param name	The parameter name. 
 	 *  @return	True if parameter is known.
@@ -523,7 +538,10 @@ public class ProcessThread	implements ITaskContext
 			{
 //				System.out.println("setting subprocess out parameter: "+name+" "+value);
 				// Hack?! should this be called directly?
-				SubProcessActivityHandler.handleProcessResult(instance, this, activity, name, key, value);
+				if(resulthandler==null)
+					resulthandler = new SubprocessResultHandler(this, activity);
+				resulthandler.handleProcessResult(name, key, value);
+//				SubProcessActivityHandler.handleProcessResult(instance, this, activity, name, key, value);
 			}
 		}
 	}

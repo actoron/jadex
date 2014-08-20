@@ -6,7 +6,6 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
-import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.gui.PropertiesPanel;
@@ -22,6 +21,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
@@ -241,6 +242,30 @@ public class ProvidedServicePropertyPanel extends BasePropertyPanel
 						vact.getMActivity().setProperty(MActivity.RESULTNAME, txt.length()==0? null: txt, false);
 					}
 				});
+				
+				final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
+				final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getAllClasses());
+				acc.setModel(accm);
+				acc.setEditor(new ComboBoxEditor(accm));
+				acc.setRenderer(new ClassInfoComboBoxRenderer());
+				
+				pp.addComponent("Result paramter type: ", acc);
+				
+				acc.addItemListener(new ItemListener() 
+				{
+					public void itemStateChanged(ItemEvent e) 
+					{
+//						System.out.println("sel: "+acc.getSelectedItem().toString());
+						vact.getMActivity().setProperty(MActivity.RESULTTYPE, acc.getSelectedItem()!=null? acc.getSelectedItem().toString(): null, true);
+					}
+				});
+				
+				if(vact.getMActivity().hasProperty(MActivity.RESULTTYPE))
+				{
+					String typename = (String)SJavaParser.parseExpression(vact.getMActivity().getPropertyValue(MActivity.RESULTTYPE), null, null).getValue(null);
+					if(typename!=null && typename.length()>0)
+						acc.setSelectedItem(new ClassInfo(typename));
+				}
 			}
 		}
 		
