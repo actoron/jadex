@@ -281,7 +281,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //			rc.register(new MoxyJsonFeature());
 			rc.register(MultiPartFeature.class);
 			
-			internalPublishService(uri, rc, service.getServiceIdentifier());
+			internalPublishService(uri, rc, service.getServiceIdentifier(), pi);
 //			System.out.println("handler: "+handler+" "+server.getServerConfiguration().getHttpHandlers());
 
 //			String wpurl = (String)mapprops.get(PublishInfo.WP_URL);
@@ -323,7 +323,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	/**
 	 * 
 	 */
-	public abstract void internalPublishService(URI uri, ResourceConfig rc, IServiceIdentifier sid);
+	public abstract void internalPublishService(URI uri, ResourceConfig rc, IServiceIdentifier sid, PublishInfo info);
 	
 //	/**
 //	 *  Get or start an api to the http server.

@@ -1,10 +1,13 @@
 package jadex.extension.rs.publish;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.javaparser.SJavaParser;
 
 import java.io.Writer;
 import java.net.URI;
@@ -20,6 +23,9 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpContainer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -61,11 +67,11 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	/**
 	 * 
 	 */
-	public void internalPublishService(URI uri, ResourceConfig rc, IServiceIdentifier sid)
+	public void internalPublishService(URI uri, ResourceConfig rc, IServiceIdentifier sid, PublishInfo info)
 	{
 		try
 		{
-			HttpServer server = getHttpServer(uri);
+			HttpServer server = getHttpServer(uri, info);
 			System.out.println("Adding http handler to server: "+uri.getPath());
 			HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, rc);
 			ServerConfiguration sc = server.getServerConfiguration();
@@ -98,7 +104,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	/**
 	 *  Get or start an api to the http server.
 	 */
-	public HttpServer getHttpServer(URI uri)
+	public HttpServer getHttpServer(URI uri, PublishInfo info)
 	{
 		HttpServer server = null;
 		
@@ -111,7 +117,42 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			{
 				System.out.println("Starting new server: "+uri.getPort());
 				
-				server = GrizzlyHttpServerFactory.createHttpServer(uri);
+				String	keystore	= null;
+				String	keystorepass	= null;
+				if(info!=null)
+				{
+					for(UnparsedExpression upex: info.getProperties())
+					{
+						if("sslkeystore".equals(upex.getName()))
+						{
+							keystore	= (String) SJavaParser.getParsedValue(upex, null,
+								component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
+						}
+						else if("sslkeystorepass".equals(upex.getName()))
+						{
+							keystorepass	= (String) SJavaParser.getParsedValue(upex, null,
+								component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
+						}
+					}
+				}
+				
+				if(keystore!=null)
+				{
+					SSLContextConfigurator sslContext = new SSLContextConfigurator();
+					sslContext.setKeyStoreFile(keystore); // contains server keypair
+					sslContext.setKeyStorePass(keystorepass);
+//					sslContext.setTrustStoreFile("./truststore_server"); // contains client certificate
+//					sslContext.setTrustStorePass("asdfgh");
+					SSLEngineConfigurator sslConf = new SSLEngineConfigurator(sslContext).setClientMode(false);
+					
+					server = GrizzlyHttpServerFactory.createHttpServer(uri, (GrizzlyHttpContainer)null, true, sslConf, false);
+				}
+				else
+				{
+					server	= GrizzlyHttpServerFactory.createHttpServer(uri);
+				}
+				
+				
 				server.start();
 				
 				if(portservers==null)
@@ -156,7 +197,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	 */
 	public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html)
 	{
-		HttpServer server = getHttpServer(uri);
+		HttpServer server = getHttpServer(uri, null);
 		
         ServerConfiguration sc = server.getServerConfiguration();
         Map<HttpHandler, String[]>	handlers	= sc.getHttpHandlers();
@@ -240,7 +281,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	 */
 	public IFuture<Void> publishResources(URI uri, String path)
 	{
-		HttpServer server = getHttpServer(uri);
+		HttpServer server = getHttpServer(uri, null);
         ServerConfiguration sc = server.getServerConfiguration();
         path = path.endsWith("/")? path: path+"/";
 		sc.addHttpHandler(new CLStaticHttpHandler(component.getClassLoader(), path)
