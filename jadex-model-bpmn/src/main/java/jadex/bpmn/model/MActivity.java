@@ -51,6 +51,9 @@ public class MActivity extends MAssociationTarget
 	/** Constant for the result param name. */
 	public static final String RESULTNAME = "resultName";
 
+	/** Constant for the result param type (needed for distinguishing collection results from single values). */
+	public static final String RESULTTYPE = "resultType";
+
 	
 	//-------- attributes --------
 	

@@ -4,6 +4,7 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VSubProcess;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;

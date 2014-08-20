@@ -149,7 +149,7 @@ public class DefaultStepHandler implements IStepHandler
 						}
 						
 						// When last thread or exception, mark current context for removal.
-						if(parent.getSubthreads().size()==1 || ex!=null)
+						if((parent.getSubthreads()!=null && parent.getSubthreads().size()==1) || ex!=null)
 						{
 							activity = (MActivity)parent.getModelElement();
 							remove = parent;
@@ -169,7 +169,7 @@ public class DefaultStepHandler implements IStepHandler
 						}
 						
 						// If more threads are available in current context just exit loop.
-						else if(parent.getSubthreads().size()>1)
+						else if(parent.getSubthreads()!=null && parent.getSubthreads().size()>1)
 						{
 							outside	= true;
 						}
