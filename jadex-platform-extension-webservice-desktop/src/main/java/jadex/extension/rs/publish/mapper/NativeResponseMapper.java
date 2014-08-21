@@ -4,6 +4,7 @@ import jadex.commons.SUtil;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -40,9 +41,24 @@ public class NativeResponseMapper implements IValueMapper
 				o = new ByteArrayInputStream(ri.getData());
 			}
 			ret = Response.ok(o);
+			if(ri.getStatus()!=null)
+			{
+				ret.status(ri.getStatus());
+			}
 			if(ri.getMediatype()!=null)
 			{
 				ret = ret.type(ri.getMediatype());
+			}
+			if(ri.getHeaders()!=null)
+			{
+				Map<String, String>	headers	= ri.getHeaders();
+				if(headers!=null)
+				{
+					for(Map.Entry<String, String> entry: headers.entrySet())
+					{
+						ret = ret.header(entry.getKey(), entry.getValue());
+					}
+				}
 			}
 			else if(ri.getPath()!=null)
 			{
@@ -62,7 +78,7 @@ public class NativeResponseMapper implements IValueMapper
 			if(!isProduction())
 			{
 				ret = Response.status(Status.INTERNAL_SERVER_ERROR).entity("<html><head></head>" +
-						"<body><pre>\n"+SUtil.getExceptionStacktrace((Exception)o)+"\n</pre></body></html>");
+					"<body><pre>\n"+SUtil.getExceptionStacktrace((Exception)o)+"\n</pre></body></html>");
 			}
 			else
 			{
@@ -80,7 +96,7 @@ public class NativeResponseMapper implements IValueMapper
 			ret = Response.status(Status.SEE_OTHER).location(uri);
 		}
 		
-		ret	= buildResponse(ret, value);
+//		ret	= buildResponse(ret, value);
 		
 		return ret.build();
 	}
@@ -93,13 +109,13 @@ public class NativeResponseMapper implements IValueMapper
 		return value;
 	}
 	
-	/**
-	 *  Post step to change or augment the response.
-	 */
-	protected ResponseBuilder	buildResponse(ResponseBuilder rb, Object value)
-	{
-		return rb;
-	}
+//	/**
+//	 *  Post step to change or augment the response.
+//	 */
+//	protected ResponseBuilder	buildResponse(ResponseBuilder rb, Object value)
+//	{
+//		return rb;
+//	}
 	
 	/**
 	 *  Test if is in debug mode.
