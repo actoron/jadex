@@ -123,8 +123,6 @@ public class SServiceProvider
 		{
 			IServiceContainer container = (IServiceContainer)provider;
 			ret = container.getServiceRegistry().searchServices(type, provider.getId(), scope, filter);
-			if(ret==null)
-				throw new ServiceNotFoundException(type.getName());
 		}
 		else
 		{
