@@ -37,7 +37,7 @@ public class RSHelloTest //extends TestCase
 		sid	= hello.getServiceIdentifier();
 		
 		pservice = new GrizzlyRestServicePublishService();
-		PublishInfo pi = new PublishInfo("http://localhost:9123", "", IRSHelloService.class, null);
+		PublishInfo pi = new PublishInfo("http://localhost:9123", "", IRSHelloService.class);
 		pi.addProperty("generate", "false");
 //		
 		IFuture<Void> publishService = pservice.publishService(getClass().getClassLoader(), hello, pi);
