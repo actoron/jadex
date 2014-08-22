@@ -14,6 +14,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
@@ -43,7 +44,97 @@ public class SServiceProvider
 	/** The reference method cache (method -> boolean[] (is reference)). */
 	public static final Map methodreferences = Collections.synchronizedMap(new LRU(500));
 	
-	//-------- methods --------
+	//-------- sync method (only local search) --------
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IServiceProvider provider, final Class<T> type)
+	{
+		return getLocalService(provider, type, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IServiceProvider provider, final Class<T> type, final String scope)
+	{
+		return getLocalService(provider, type, scope, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IServiceProvider provider, final Class<T> type, final String scope, final IFilter<T> filter)
+	{
+		T ret = null;
+		
+		if(provider instanceof IServiceContainer)
+		{
+			IServiceContainer container = (IServiceContainer)provider;
+			ret = container.getServiceRegistry().searchService(type, provider.getId(), scope, filter);
+			if(ret==null)
+				throw new ServiceNotFoundException(type.getName());
+		}
+		else
+		{
+			throw new IllegalArgumentException("Must be used with local service provider.");
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IServiceProvider provider, final Class<T> type)
+	{
+		return getLocalServices(provider, type, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IServiceProvider provider, final Class<T> type, final String scope)
+	{
+		return getLocalServices(provider, type, scope, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IServiceProvider provider, final Class<T> type, final String scope, final IFilter<T> filter)
+	{
+		Collection<T> ret = null;
+		
+		if(provider instanceof IServiceContainer)
+		{
+			IServiceContainer container = (IServiceContainer)provider;
+			ret = container.getServiceRegistry().searchServices(type, provider.getId(), scope, filter);
+			if(ret==null)
+				throw new ServiceNotFoundException(type.getName());
+		}
+		else
+		{
+			throw new IllegalArgumentException("Must be used with local service provider.");
+		}
+		
+		return ret;
+	}
+	
+	//-------- async methods --------
 
 	/**
 	 *  Get one service of a type.
@@ -74,24 +165,11 @@ public class SServiceProvider
 	{
 		final Future ret = new Future();
 
-//		if(type==null)
-//		{
-//			ret.setException(new IllegalArgumentException("Type must not null."));
-//			return ret;
-//		}
-		
-//		if(type.toString().indexOf("IAuto")!=-1)
-//			System.out.println("here22");
-		
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		
-		// Hack->remove
-//		IVisitDecider abortdecider = new DefaultVisitDecider();
-//		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
 		
 		if(provider instanceof IServiceContainer)
 		{
@@ -125,21 +203,15 @@ public class SServiceProvider
 			try
 			{
 				provider.getServices(new ClassInfo(type), scope, (IRemoteFilter<IService>)filter)
-//				provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
-//					new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter))
-						.addResultListener(new IIntermediateResultListener<IService>()
+					.addResultListener(new IIntermediateResultListener<IService>()
 				{
 					public void intermediateResultAvailable(IService result)
 					{
-	//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
-	//						System.out.println("ir: "+result);
 						ret.setResult(result);
 					}
 					
 					public void finished()
 					{
-	//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
-	//						System.out.println("fin");
 						if(!ret.isDone())
 						{
 							ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()+" in "+provider.getId())
@@ -155,20 +227,9 @@ public class SServiceProvider
 					
 					public void resultAvailable(Collection<IService> result)
 					{
-	//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
-	//						System.out.println("ra: "+result);
 						Collection<IService> res = (Collection<IService>)result;
 						if(res==null || res.size()==0)
 						{
-		//					provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
-		//						new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
-		//						.addResultListener(new DefaultResultListener()
-		//					{
-		//						public void resultAvailable(Object result)
-		//						{
-		//							System.out.println("rrr: "+result);
-		//						}
-		//					});
 							exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()+" scope: "+scope));
 						}
 						else
@@ -179,8 +240,6 @@ public class SServiceProvider
 					
 					public void exceptionOccurred(Exception exception)
 					{
-	//					if(type.toString().indexOf("IFile")!=-1)
-	//						System.out.println("Ex result: "+exception);
 						if(!ret.isDone())
 						{
 							ret.setException(exception);
@@ -195,6 +254,8 @@ public class SServiceProvider
 		}
 		return ret;
 	}
+	
+
 	
 	/**
 	 *  Get one service with id.

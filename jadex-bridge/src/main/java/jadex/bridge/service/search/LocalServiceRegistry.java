@@ -6,6 +6,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -20,11 +21,13 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -185,13 +188,84 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for service.
 	 */
+	public synchronized <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+		
+		T ret = null;
+		
+		Set<T> sers = (Set<T>)getServices(type);
+		if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
+		{
+			for(T ser: sers)
+			{
+				if(checkSearchScope(cid, (IService)ser, scope) && checkPublicationScope(cid, (IService)ser))
+				{
+					try
+					{
+						if(filter==null || filter.filter(ser))
+						{
+							ret = ser;
+							break;
+						}
+					}
+					catch(Exception e)
+					{
+						System.out.println("Warning: filter threw exception during search: "+filter);
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Search for service.
+	 */
+	public synchronized <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter)
+	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			throw new IllegalArgumentException("For global searches async method searchGlobalService has to be used.");
+		
+		List<T> ret = new ArrayList<T>();
+		
+		Set<T> sers = (Set<T>)getServices(type);
+		if(sers!=null && sers.size()>0 && !RequiredServiceInfo.SCOPE_NONE.equals(scope))
+		{
+			for(T ser: sers)
+			{
+				if(checkSearchScope(cid, (IService)ser, scope) && checkPublicationScope(cid, (IService)ser))
+				{
+					try
+					{
+						if(filter==null || filter.filter(ser))
+						{
+							ret.add(ser);
+						}
+					}
+					catch(Exception e)
+					{
+						System.out.println("Warning: filter threw exception during search: "+filter);
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Search for service.
+	 */
 	public synchronized <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IRemoteFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
-			ret.setException(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
+			ret.setException(new IllegalArgumentException("For global searches searchGlobalService has to be used."));
 		}
 		else
 		{
@@ -274,7 +348,7 @@ public class LocalServiceRegistry
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
-			ret.setException(new IllegalArgumentException("For global searches async method searchGlobalService has to be used."));
+			ret.setException(new IllegalArgumentException("For global searches searchGlobalServices has to be used."));
 		}
 		else
 		{
