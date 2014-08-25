@@ -125,6 +125,7 @@ public class JavaParserTest //extends TestCase
 				}
 				catch(Throwable e)
 				{
+//					e.printStackTrace();
 					Assert.assertTrue("Unexpected parse exception: "+e, parsex);
 	//				if(parsex)
 	//				{

@@ -429,7 +429,6 @@ TOKEN : /* OPERATORS * /
 }
 */
 
-
 //-------- Grammer rules --------
 
 /**
@@ -992,18 +991,19 @@ void RelationalExpression()       :
  *  If present, creates MathNode(s) with two subnodes.
  */
 void ShiftExpression()       :
-{	Token	t; }	// Declare local variable.
+{	String	exp; }	// Declare local variable.
 {
 	AdditiveExpression()
-	(/*@bgen(jjtree) #MathNode( 2) */
+	(
+		LOOKAHEAD(2)/*@bgen(jjtree) #MathNode( 2) */
                 {
                   MathNode jjtn001 = new MathNode(this, JJTMATHNODE);
                   boolean jjtc001 = true;
                   jjtree.openNodeScope(jjtn001);
                 }
                 try {
-/*@egen*/
-		( ( t="<<" | t=">>" | t=">>>" ) AdditiveExpression()
+/*@egen*/ 
+		( ( "<<" {exp="<<";} | LOOKAHEAD(3) RUNSIGNEDSHIFT() {exp=">>>";} | RSIGNEDSHIFT() {exp=">>";} ) AdditiveExpression()
 		)/*@bgen(jjtree)*/
                 } catch (Throwable jjte001) {
                   if (jjtc001) {
@@ -1027,9 +1027,23 @@ void ShiftExpression()       :
 /*@egen*/
 		{
 			// Set node text to specify math operation.
-			((ExpressionNode)jjtree.peekNode()).setText(t.image);
+			((ExpressionNode)jjtree.peekNode()).setText(exp);
 		}
 	)*
+}
+
+/* We use productions to match >>>, >> and > so that we can keep the
+* type declaration syntax with generics clean
+*/
+void RUNSIGNEDSHIFT()      :
+{}
+{
+	( ">" ">" ">" )
+}
+void RSIGNEDSHIFT()      :
+{}
+{
+	( ">" ">" )
 }
 
 /**
@@ -1330,7 +1344,7 @@ void PrimaryPrefix()       :
 //		((ReflectNode)jjtree.peekNode()).setType(ReflectNode.CONTEXT_FIELD);
 //	}
 	// Constructor.
-|	LOOKAHEAD("new" Name() "(")/*@bgen(jjtree) #ReflectNode( 2) */
+|	LOOKAHEAD("new" Name() [ TypeArguments() ] "(")/*@bgen(jjtree) #ReflectNode( 2) */
         {
           ReflectNode jjtn001 = new ReflectNode(this, JJTREFLECTNODE);
           boolean jjtc001 = true;
@@ -1338,7 +1352,7 @@ void PrimaryPrefix()       :
         }
         try {
 /*@egen*/
-	( "new" Name() Arguments()
+	( "new" Name() [ TypeArguments() ] Arguments()
 	)/*@bgen(jjtree)*/
         } catch (Throwable jjte001) {
           if (jjtc001) {
@@ -1401,9 +1415,7 @@ void PrimaryPrefix()       :
 	}
 
 	// Static field (allow primitive or array for .class "field")
-	//|	LOOKAHEAD( Name() | PrimitiveType() )
-	//	( ( Name() | PrimitiveType() ) "." t=Identifier()
-|	LOOKAHEAD( Type() )/*@bgen(jjtree) #ReflectNode( 1) */
+|	LOOKAHEAD( Name() | PrimitiveType() )/*@bgen(jjtree) #ReflectNode( 1) */
         {
           ReflectNode jjtn003 = new ReflectNode(this, JJTREFLECTNODE);
           boolean jjtc003 = true;
@@ -1411,7 +1423,9 @@ void PrimaryPrefix()       :
         }
         try {
 /*@egen*/
-	( ( Type() ) "." t=Identifier()
+	( ( Name() | PrimitiveType() ) "." t=Identifier()
+//|	LOOKAHEAD( Type() )
+//	( ( Type() ) "." t=Identifier()
 	)/*@bgen(jjtree)*/
         } catch (Throwable jjte003) {
           if (jjtc003) {
@@ -1890,7 +1904,7 @@ void ArrayExpression()            :
         try {
 /*@egen*/
 	// Array with content (new MyClass[]{val1, val2,...})
-	LOOKAHEAD("new" ( Name() | PrimitiveType() ) "[" "]")
+	LOOKAHEAD("new" ( Name() | PrimitiveType() ) [ TypeArguments() ] "[" "]")
 	( "new" Type() ArrayContent()
 	)/*@bgen(jjtree)*/
         {
@@ -1901,8 +1915,8 @@ void ArrayExpression()            :
 	{ jjtn000.setType(ArrayNode.ARRAY); }
 
 |	// Array with dimensions (new MyClass[5][2])
-	LOOKAHEAD("new" ( Name() | PrimitiveType() ) "[")
-	( "new" ( Name() | PrimitiveType() )  ArrayDimensions()
+	LOOKAHEAD("new" ( Name() | PrimitiveType() ) [ TypeArguments() ] "[")
+	( "new" ( Name() | PrimitiveType() )  [ TypeArguments() ] ArrayDimensions()
 	)/*@bgen(jjtree)*/
         {
           jjtree.closeNodeScope(jjtn000, true);
@@ -2138,7 +2152,7 @@ void CollectionContent()                :
 void Type()       :
 {}
 {	
-	( PrimitiveType() | Name() )
+	( PrimitiveType() | Name() ) [ TypeArguments() ]
 	(
 		( "[" "]" )
 		{
@@ -2343,3 +2357,24 @@ String Identifier()       :
 	{ return t.image; }
 }
 
+/**
+ * Generic type arguments.
+ * https://github.com/pmd/pmd/blob/master/pmd/etc/grammar/Java.jjt
+ */
+void TypeArguments()      :
+{}
+{
+	LOOKAHEAD(2) "<" /*{checkForBadGenericsUsage();}*/ TypeArgument() ( "," TypeArgument() )* ">"
+	| "<" /*{checkForBadDiamondUsage();}*/ ">"
+}
+
+/**
+ * A generic type argument.
+ */
+void TypeArgument()      :
+{}
+{
+	/* (Annotation() {checkForBadTypeAnnotations();})* */ Type()
+	{ jjtree.popNode(); /* hack!!! */}
+	/* | "?" [ WildcardBounds() ] */
+}

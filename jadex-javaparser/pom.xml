@@ -24,12 +24,12 @@
 			<artifactId>jadex-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 
+		<!-- Javacc only needed when regenerating the grammars. - ->
 		<dependency>
 		    <groupId>net.java.dev.javacc</groupId>
 		    <artifactId>javacc</artifactId>
 		    <version>4.0</version>
 		</dependency>
-		 -->
+		-->
 	</dependencies>
 </project>
