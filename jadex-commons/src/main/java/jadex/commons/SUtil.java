@@ -1,6 +1,9 @@
 package jadex.commons;
 
 import jadex.commons.collection.SCollection;
+import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.IBeanIntrospector;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -4020,6 +4023,42 @@ public class SUtil
 	{
 		 return Pattern.compile("^\\Q" 
 			+glob.replace("*", "\\E.*\\Q").replace("?", "\\E.\\Q")+"\\E$");
+	}
+	
+	/**
+	 *  Converts a bean to a string.
+	 *  
+	 *  @param bean The bean.
+	 *  @param cl The classloader.
+	 */
+	public static String beanToString(Object bean, ClassLoader cl)
+	{
+		if (cl == null)
+		{
+			cl = SUtil.class.getClassLoader();
+		}
+		StringBuilder beanstr = new StringBuilder("[");
+		IBeanIntrospector is = BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+		Map<String, BeanProperty> props = is.getBeanProperties(bean.getClass(), true, false);
+		boolean notfirst = false;
+		for (Map.Entry<String, BeanProperty> entry : props.entrySet())
+		{
+			if (notfirst)
+			{
+				beanstr.append(",");
+			}
+			else
+			{
+				notfirst = true;
+			}
+			String name = entry.getKey();
+			Object val = entry.getValue().getPropertyValue(bean);
+			beanstr.append(name);
+			beanstr.append("=");
+			beanstr.append(String.valueOf(val));
+		}
+		beanstr.append("]");
+		return beanstr.toString();
 	}
 	
 	/**
