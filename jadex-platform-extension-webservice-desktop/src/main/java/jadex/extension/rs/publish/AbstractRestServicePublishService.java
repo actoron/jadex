@@ -89,6 +89,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
 
 
@@ -514,6 +515,13 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			
 			// Buaaahhhhhh grizzly does not allow injection of httpservlet request
 			CtField req = new CtField(SJavassist.getCtClass(org.glassfish.grizzly.http.server.Request.class, pool), "__greq", proxyclazz);
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
+			attr.addAnnotation(annot);
+			req.getFieldInfo().addAttribute(attr);
+			proxyclazz.addField(req);
+			
+			req = new CtField(SJavassist.getCtClass(ContainerRequest.class, pool), "__creq", proxyclazz);
 			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
 			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
 			attr.addAnnotation(annot);
@@ -1051,6 +1059,8 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 
 			HttpServletRequest req = (HttpServletRequest)getClass().getDeclaredField("__req").get(this);
 			Request greq = (Request)getClass().getDeclaredField("__greq").get(this);
+			ContainerRequest creq = (ContainerRequest)getClass().getDeclaredField("__creq").get(this);
+
 			
 			Method targetmethod = null;
 			if(method.isAnnotationPresent(MethodMapper.class))

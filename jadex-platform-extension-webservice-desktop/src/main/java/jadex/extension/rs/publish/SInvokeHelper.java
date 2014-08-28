@@ -1,11 +1,14 @@
 package jadex.extension.rs.publish;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
+
+import org.glassfish.grizzly.http.server.Request;
 
 /**
  * 
@@ -120,6 +123,22 @@ public class SInvokeHelper
 	 */
 	public static void debug(Object req)
 	{
+		if(req instanceof Request)
+		{
+			try
+			{
+				Request r = (Request)req;
+				Field f = r.getClass().getDeclaredField("usingInputStream");
+				f.setAccessible(true);
+				f.set(r, Boolean.FALSE);
+				System.out.println("params: "+r.getParameterNames());
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
 		System.out.println(req);
 	}
 }
