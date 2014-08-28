@@ -1129,26 +1129,37 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 					{
 						Class<?>[] ts = targetmethod.getParameterTypes();
 						targetparams = new Object[ts.length];
-						System.out.println("automapping detected: "+SUtil.arrayToString(ts));
+//						System.out.println("automapping detected: "+SUtil.arrayToString(ts));
 						if(ts.length==1)
 						{
 							if(SReflect.isSupertype(ts[0], Map.class))
 							{
 								if(greq!=null)
 								{
-									System.out.println("1");
-									SInvokeHelper.debug(greq);
+//									SInvokeHelper.debug(greq);
+									// Hack to make grizzly allow parameter parsing
+									// Jersey calls getInputStream() hindering grizzly parsing params
+									try
+									{
+										Request r = (Request)greq;
+										Field f = r.getClass().getDeclaredField("usingInputStream");
+										f.setAccessible(true);
+										f.set(r, Boolean.FALSE);
+										System.out.println("params: "+r.getParameterNames());
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
 									targetparams[0] = SInvokeHelper.convertMultiMap(greq.getParameterMap());
 								}
 								else if(req!=null)
 								{
-									System.out.println("2");
 									targetparams[0] = SInvokeHelper.convertMultiMap(req.getParameterMap());
 								}
 							}
 							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
 							{
-								System.out.println("3");
 								targetparams[0] = SInvokeHelper.convertToMultiMap(req.getParameterMap());
 							}
 						}
