@@ -1145,7 +1145,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 										Field f = r.getClass().getDeclaredField("usingInputStream");
 										f.setAccessible(true);
 										f.set(r, Boolean.FALSE);
-										System.out.println("params: "+r.getParameterNames());
+//										System.out.println("params: "+r.getParameterNames());
 									}
 									catch(Exception e)
 									{
