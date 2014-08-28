@@ -79,6 +79,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -1093,20 +1094,54 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 				}
 				else
 				{
-//					System.out.println("automapping detected");
-					Class<?>[] ts = targetmethod.getParameterTypes();
-					targetparams = new Object[ts.length];
-					if(ts.length==1 && SReflect.isSupertype(ts[0], Map.class))
+					// In case of GET autmap the query parameters
+					if(method.isAnnotationPresent(GET.class))
 					{
-						UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
-						MultivaluedMap<String, String> vals = ui.getQueryParameters();
-						Map<String, String> ps = new HashMap<String, String>();
-						for(Map.Entry<String, List<String>> e: vals.entrySet())
+	//					System.out.println("automapping detected");
+						Class<?>[] ts = targetmethod.getParameterTypes();
+						targetparams = new Object[ts.length];
+						if(ts.length==1)
 						{
-							List<String> val = e.getValue();
-							ps.put(e.getKey(), val!=null && !val.isEmpty()? val.get(0): null);
+							if(SReflect.isSupertype(ts[0], Map.class))
+							{
+								UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+								MultivaluedMap<String, String> vals = ui.getQueryParameters();
+								targetparams[0] = SInvokeHelper.convertMultiMap(vals);
+							}
+							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
+							{
+								UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+								targetparams[0] = SInvokeHelper.convertMultiMap(ui.getQueryParameters());
+							}
 						}
-						targetparams[0] = ps;
+					}
+					else //if(method.isAnnotationPresent(POST.class))
+					{
+						Class<?>[] ts = targetmethod.getParameterTypes();
+						targetparams = new Object[ts.length];
+						System.out.println("automapping detected: "+SUtil.arrayToString(ts));
+						if(ts.length==1)
+						{
+							if(SReflect.isSupertype(ts[0], Map.class))
+							{
+								if(greq!=null)
+								{
+									System.out.println("1");
+									SInvokeHelper.debug(greq);
+									targetparams[0] = SInvokeHelper.convertMultiMap(greq.getParameterMap());
+								}
+								else if(req!=null)
+								{
+									System.out.println("2");
+									targetparams[0] = SInvokeHelper.convertMultiMap(req.getParameterMap());
+								}
+							}
+							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
+							{
+								System.out.println("3");
+								targetparams[0] = SInvokeHelper.convertToMultiMap(req.getParameterMap());
+							}
+						}
 					}
 				}
 			}
@@ -1511,5 +1546,4 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //		URI newuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
 //		System.out.println(newuri);
 //	}
-
 }
