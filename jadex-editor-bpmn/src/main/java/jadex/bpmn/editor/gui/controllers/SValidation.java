@@ -146,8 +146,6 @@ public class SValidation
 				}
 				else
 				{
-//					if(target!=null)
-//						System.out.println("jjjuuu");
 					return "Activities must belong to pools, lanes or sub-processes.";
 				}
 			}

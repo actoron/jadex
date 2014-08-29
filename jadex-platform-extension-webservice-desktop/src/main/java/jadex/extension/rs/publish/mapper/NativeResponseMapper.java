@@ -4,11 +4,15 @@ import jadex.commons.SUtil;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+
+import org.glassfish.grizzly.http.server.Request;
 
 /**
  *  The native response mapper allows for sending back native response objects.

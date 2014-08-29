@@ -1047,7 +1047,7 @@ public class SReflect
 	 *  @param clazz2	The assumed subtype.
 	 *  @return True, if clazz1 is a supertype of, or the same as clazz2.
 	 */
-	public static boolean	isSupertype(Class clazz1, Class clazz2)
+	public static boolean	isSupertype(Class<?> clazz1, Class<?> clazz2)
 	{
 		if(clazz1==null || clazz2==null)
 			return false;

@@ -101,6 +101,7 @@
 		
 		http.setRequestHeader("content-type",
 			"multipart/form-data; charset=utf-8; boundary=" + boundary);
+			//application/x-www-form-urlencoded
 			
 		for(i=0; i<names.length; i++)
 		{
