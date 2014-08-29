@@ -3,12 +3,18 @@ package jadex.bpmn.editor.gui.controllers;
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
+import jadex.bpmn.model.MBpmnModel;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.MouseEvent;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -124,6 +130,11 @@ public class GraphOperationsController extends mxGraphHandler
 				}
 				sp.setPseudoFolded(false);
 				mxRectangle alt = sp.getGeometry().getAlternateBounds();
+				if (alt == null)
+				{
+					Dimension dim = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS);
+					alt = new mxGeometry(sp.getGeometry().getX(), sp.getGeometry().getY(), dim.getWidth(), dim.getHeight());
+				}
 				mxGeometry altgeo = new mxGeometry(sp.getGeometry().getX(), sp.getGeometry().getY(), alt.getWidth(), alt.getHeight());
 				altgeo.setAlternateBounds(sp.getGeometry());
 				sp.setGeometry(altgeo);
@@ -136,6 +147,11 @@ public class GraphOperationsController extends mxGraphHandler
 				pseudoCollapse(sp);
 				sp.setPseudoFolded(true);
 				mxRectangle alt = sp.getGeometry().getAlternateBounds();
+				if (alt == null)
+				{
+					Dimension dim = BpmnStylesheetColor.COLLAPSED_SIZES.get(ModelContainer.EDIT_MODE_SUBPROCESS);
+					alt = new mxGeometry(sp.getGeometry().getX(), sp.getGeometry().getY(), dim.getWidth(), dim.getHeight());
+				}
 				mxGeometry altgeo = new mxGeometry(sp.getGeometry().getX(), sp.getGeometry().getY(), alt.getWidth(), alt.getHeight());
 				altgeo.setAlternateBounds(sp.getGeometry());
 				sp.setGeometry(altgeo);
@@ -225,12 +241,30 @@ public class GraphOperationsController extends mxGraphHandler
 	
 	public static final void pseudoCollapse(VSubProcess sp)
 	{
+		Set<VActivity> handlers = new HashSet<VActivity>();
 		for (int i = 0; i < sp.getChildCount(); ++i)
 		{
 			mxICell child = sp.getChildAt(i);
-			if (!(child instanceof VActivity) || !((VActivity) child).getMActivity().isEventHandler())
+			if (child instanceof VActivity && ((VActivity) child).getMActivity().isEventHandler())
+			{
+				handlers.add((VActivity) child);
+			}
+		}
+		
+		for (int i = 0; i < sp.getChildCount(); ++i)
+		{
+			mxICell child = sp.getChildAt(i);
+			if (!handlers.contains(child))
 			{
 				child.setVisible(false);
+			}
+		}
+		
+		for (VActivity handler : handlers)
+		{
+			for (int i = 0; i < handler.getEdgeCount(); ++i)
+			{
+				handler.getEdgeAt(i).setVisible(true);
 			}
 		}
 		

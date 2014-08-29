@@ -113,6 +113,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 	{
 //		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.TASK, new Dimension(160, 100));
 		DEFAULT_ACTIVITY_SIZES.put(MTask.TASK, new Dimension(160, 100));
+		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, new Dimension(480, 200));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Unfolded", new Dimension(480, 200));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Event", new Dimension(480, 200));
 		DEFAULT_ACTIVITY_SIZES.put(VExternalSubProcess.class.getSimpleName(), new Dimension(160, 100));
