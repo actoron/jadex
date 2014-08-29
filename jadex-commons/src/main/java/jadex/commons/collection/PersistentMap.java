@@ -764,7 +764,7 @@ public class PersistentMap<K, V> implements Map<K, V>
      *  Marker for deleted entries.
      *
      */
-    protected class DeletedKey
+    protected static class DeletedKey
     {
     	/** The key. */
     	protected Object key;

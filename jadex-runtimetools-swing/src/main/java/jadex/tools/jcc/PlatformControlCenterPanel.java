@@ -371,6 +371,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 //		}
 //        if(cnt>0)
         
+//        System.out.println("Logobutton: "+System.getProperty("jadex_logobutton"));
         String	buttonclass	= System.getProperty("jadex_logobutton", JadexLogoButton.class.getName());
         JButton jlb	= null;
         try
