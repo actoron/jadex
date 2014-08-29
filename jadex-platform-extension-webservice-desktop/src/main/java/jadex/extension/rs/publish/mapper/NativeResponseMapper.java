@@ -4,11 +4,15 @@ import jadex.commons.SUtil;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+
+import org.glassfish.grizzly.http.server.Request;
 
 /**
  *  The native response mapper allows for sending back native response objects.
@@ -134,6 +138,36 @@ public class NativeResponseMapper implements IValueMapper
 			{
 			}
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Extract caller values like ip and browser.
+	 *  @param request The requrest.
+	 *  @param vals The values.
+	 */
+	public static Map<String, String> extractCallerValues(Object request)
+	{
+		Map<String, String> ret = new HashMap<String, String>();
+		
+		// add request to map as internal parameter
+		// cannot put request into map because map is cloned via service call
+		if(request!=null)
+		{
+			if(request instanceof Request)
+			{
+				Request greq = (Request)request;
+				ret.put("ip", greq.getRemoteAddr());
+				ret.put("browser", greq.getHeader("User-Agent"));
+			}
+			else if(request instanceof HttpServletRequest)
+			{
+				HttpServletRequest sreq = (HttpServletRequest)request;
+				ret.put("ip", sreq.getRemoteAddr());
+				ret.put("browser", sreq.getHeader("User-Agent"));
+			}
+		}
+		
 		return ret;
 	}
 }

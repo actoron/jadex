@@ -23,6 +23,7 @@ import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
+import jadex.extension.rs.publish.mapper.NativeResponseMapper;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
@@ -1106,6 +1107,10 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 							List<String> val = e.getValue();
 							ps.put(e.getKey(), val!=null && !val.isEmpty()? val.get(0): null);
 						}
+
+						Map<String, String> cvs = NativeResponseMapper.extractCallerValues(req!=null? req: greq);
+						ps.putAll(cvs);
+
 						targetparams[0] = ps;
 					}
 				}
@@ -1500,6 +1505,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		}
 		return values;
 	}
+	
 	
 //	/**
 //	 *  Main for testing.
