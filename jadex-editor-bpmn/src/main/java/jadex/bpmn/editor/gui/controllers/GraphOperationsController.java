@@ -5,10 +5,12 @@ import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VEdge;
+import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VLane;
-import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MNamedIdElement;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -144,8 +146,8 @@ public class GraphOperationsController extends mxGraphHandler
 			}
 			else
 			{
-				pseudoCollapse(sp);
 				sp.setPseudoFolded(true);
+				pseudoCollapse(sp);
 				mxRectangle alt = sp.getGeometry().getAlternateBounds();
 				if (alt == null)
 				{

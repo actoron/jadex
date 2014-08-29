@@ -352,22 +352,14 @@ public class BpmnGraph extends mxGraph
 			cell instanceof VOutParameter ||
 			cell instanceof VDataEdge)
 		{
-			if(modelcontainer.getSettings()==null)
-			{
-				ret = true;
-			}
-			else
+			if(modelcontainer.getSettings()!=null)
 			{
 				ret &= modelcontainer.getSettings().isDataEdges();
 			}
 		}
 		else if (cell instanceof VSequenceEdge)
 		{
-			if(modelcontainer.getSettings()==null)
-			{
-				ret = true;
-			}
-			else
+			if(modelcontainer.getSettings()!=null)
 			{
 				ret &= modelcontainer.getSettings().isSequenceEdges();
 			}
