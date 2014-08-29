@@ -312,6 +312,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			{
 				HttpServer server = tup.getFirstEntity();
 			    ServerConfiguration config = server.getServerConfiguration();
+			    System.out.println("unpub: "+tup.getSecondEntity());
 			    config.removeHttpHandler(tup.getSecondEntity());
 			    if(config.getHttpHandlers().size()==0)
 			    {
