@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="RkPxF811Yix4GLUZ">
+    <semantic:subProcess name="Beschwerde" id="b9n5ucbEsnnF2OeR">
+      <semantic:incoming>ILR4YsqPUI0reS9e</semantic:incoming>
+      <semantic:outgoing>LPslqxpoSE7Yzi1a</semantic:outgoing>
+      <semantic:startEvent id="/OejlmCMfLyiZCdm">
+        <semantic:outgoing>3ddGLIOKrh6sQtv/</semantic:outgoing>
+      </semantic:startEvent>
+      <semantic:task name="Verfügbarkeits-\nprüfung" id="aimOCe1MWW4ucGY5">
+        <semantic:incoming>3ddGLIOKrh6sQtv/</semantic:incoming>
+        <semantic:outgoing>uYJn9xVGiQlnWYc5</semantic:outgoing>
+      </semantic:task>
+      <semantic:exclusiveGateway id="pE4bxIV1SqSt/NWx">
+        <semantic:incoming>uYJn9xVGiQlnWYc5</semantic:incoming>
+        <semantic:outgoing>iPgHau8boCSxjPLX</semantic:outgoing>
+        <semantic:outgoing>UiMRTF0jHZ94l6E4</semantic:outgoing>
+      </semantic:exclusiveGateway>
+      <semantic:task name="Bearbeitung\ndurch Mitarbeiter" id="8JYdH5n3+24lA3r/">
+        <semantic:incoming>iPgHau8boCSxjPLX</semantic:incoming>
+        <semantic:outgoing>XLY7p+Pd5lUHF+Tz</semantic:outgoing>
+      </semantic:task>
+      <semantic:endEvent id="B8O9k43h2ECDMUaB">
+        <semantic:incoming>XLY7p+Pd5lUHF+Tz</semantic:incoming>
+      </semantic:endEvent>
+      <semantic:endEvent id="mLD65ApOJkOd8Ql6">
+        <semantic:incoming>UiMRTF0jHZ94l6E4</semantic:incoming>
+        <semantic:errorEventDefinition/>
+      </semantic:endEvent>
+    </semantic:subProcess>
+    <semantic:boundaryEvent id="zVOqce0d/XxK3+Ih" attachedToRef="b9n5ucbEsnnF2OeR">
+      <semantic:outgoing>UHu99p/WtXljXwJ3</semantic:outgoing>
+      <semantic:timerEventDefinition/>
+    </semantic:boundaryEvent>
+    <semantic:boundaryEvent id="z4bxoBgV1TilCVgv" attachedToRef="b9n5ucbEsnnF2OeR">
+      <semantic:outgoing>poGrmfom9w5iugCa</semantic:outgoing>
+      <semantic:errorEventDefinition/>
+    </semantic:boundaryEvent>
+    <semantic:startEvent name="Eingehende Email" id="8paeVA7sVEpr5Vor">
+      <semantic:outgoing>E97Tun2qN/Nz6aGQ</semantic:outgoing>
+      <semantic:messageEventDefinition/>
+    </semantic:startEvent>
+    <semantic:task name="Themenanayse &amp;\nKlassifikation" id="GMigE/LydeybBLrk">
+      <semantic:incoming>E97Tun2qN/Nz6aGQ</semantic:incoming>
+      <semantic:outgoing>5v/YR2Cp4SbuW+KC</semantic:outgoing>
+    </semantic:task>
+    <semantic:exclusiveGateway id="zOIoCNN14VM17Ojj" default="ILR4YsqPUI0reS9e">
+      <semantic:incoming>5v/YR2Cp4SbuW+KC</semantic:incoming>
+      <semantic:outgoing>ILR4YsqPUI0reS9e</semantic:outgoing>
+      <semantic:outgoing>Z4GHvOKNMApf02qd</semantic:outgoing>
+      <semantic:outgoing>ffSiTq7oBc0s5fED</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:subProcess name="Neuantrag-\neskalation" id="Na4ewBL2cVWrw5d8">
+      <semantic:incoming>868EVcfqTREJ254l</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:property name="filename" type="java.lang.String">&quot;&quot;</jadex:property>
+        <jadex:subprocessref></jadex:subprocessref>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:subProcess name="Adressänderung" id="NoFpeuPBcJWksLLk">
+      <semantic:incoming>ffSiTq7oBc0s5fED</semantic:incoming>
+      <semantic:outgoing>2jCECLTTJSuTKb4H</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:property name="filename" type="java.lang.String">&quot;&quot;</jadex:property>
+        <jadex:subprocessref></jadex:subprocessref>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:boundaryEvent id="PDkUsSTz2EDf7zRv" attachedToRef="NoFpeuPBcJWksLLk">
+      <semantic:outgoing>mScbEE/iBg6kNSBQ</semantic:outgoing>
+      <semantic:timerEventDefinition/>
+    </semantic:boundaryEvent>
+    <semantic:subProcess name="Adressänderung-\neskalation" id="2pr86sT33w+/fucD">
+      <semantic:incoming>mScbEE/iBg6kNSBQ</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:property name="filename" type="java.lang.String">&quot;&quot;</jadex:property>
+        <jadex:subprocessref></jadex:subprocessref>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:subProcess name="Beschwerde-\neskalation" id="ueVGMYJDnh5RHBas">
+      <semantic:incoming>UHu99p/WtXljXwJ3</semantic:incoming>
+      <semantic:incoming>poGrmfom9w5iugCa</semantic:incoming>
+      <semantic:outgoing>mK0O9Fkw0t4pdG9j</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:property name="filename" type="java.lang.String">&quot;&quot;</jadex:property>
+        <jadex:subprocessref></jadex:subprocessref>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:exclusiveGateway id="hV9iWcnhqqHFjpt+">
+      <semantic:incoming>LPslqxpoSE7Yzi1a</semantic:incoming>
+      <semantic:incoming>mK0O9Fkw0t4pdG9j</semantic:incoming>
+      <semantic:incoming>wGTvIJTWtQiataDI</semantic:incoming>
+      <semantic:incoming>2jCECLTTJSuTKb4H</semantic:incoming>
+      <semantic:outgoing>+Sc/RX7gNU0hLOWQ</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:endEvent id="kiFh4Q3qihUP01j4">
+      <semantic:incoming>+Sc/RX7gNU0hLOWQ</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:subProcess name="Neuantrag" id="iUpgfjLWlW8sHK4X">
+      <semantic:incoming>Z4GHvOKNMApf02qd</semantic:incoming>
+      <semantic:outgoing>wGTvIJTWtQiataDI</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:property name="filename" type="java.lang.String">&quot;&quot;</jadex:property>
+        <jadex:subprocessref></jadex:subprocessref>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:boundaryEvent id="z2mdKtpmMjPBSbgV" attachedToRef="iUpgfjLWlW8sHK4X">
+      <semantic:outgoing>868EVcfqTREJ254l</semantic:outgoing>
+      <semantic:timerEventDefinition/>
+    </semantic:boundaryEvent>
+    <semantic:sequenceFlow sourceRef="b9n5ucbEsnnF2OeR" targetRef="hV9iWcnhqqHFjpt+" id="LPslqxpoSE7Yzi1a">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="/OejlmCMfLyiZCdm" targetRef="aimOCe1MWW4ucGY5" id="3ddGLIOKrh6sQtv/">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="aimOCe1MWW4ucGY5" targetRef="pE4bxIV1SqSt/NWx" id="uYJn9xVGiQlnWYc5">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="pE4bxIV1SqSt/NWx" targetRef="8JYdH5n3+24lA3r/" id="iPgHau8boCSxjPLX">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow name="Keine Zuweisung\nmöglich" sourceRef="pE4bxIV1SqSt/NWx" targetRef="mLD65ApOJkOd8Ql6" id="UiMRTF0jHZ94l6E4">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="8JYdH5n3+24lA3r/" targetRef="B8O9k43h2ECDMUaB" id="XLY7p+Pd5lUHF+Tz">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="zVOqce0d/XxK3+Ih" targetRef="ueVGMYJDnh5RHBas" id="UHu99p/WtXljXwJ3">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="z4bxoBgV1TilCVgv" targetRef="ueVGMYJDnh5RHBas" id="poGrmfom9w5iugCa">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="8paeVA7sVEpr5Vor" targetRef="GMigE/LydeybBLrk" id="E97Tun2qN/Nz6aGQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="GMigE/LydeybBLrk" targetRef="zOIoCNN14VM17Ojj" id="5v/YR2Cp4SbuW+KC">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="zOIoCNN14VM17Ojj" targetRef="b9n5ucbEsnnF2OeR" id="ILR4YsqPUI0reS9e">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="zOIoCNN14VM17Ojj" targetRef="iUpgfjLWlW8sHK4X" id="Z4GHvOKNMApf02qd">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="zOIoCNN14VM17Ojj" targetRef="NoFpeuPBcJWksLLk" id="ffSiTq7oBc0s5fED">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="NoFpeuPBcJWksLLk" targetRef="hV9iWcnhqqHFjpt+" id="2jCECLTTJSuTKb4H">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="PDkUsSTz2EDf7zRv" targetRef="2pr86sT33w+/fucD" id="mScbEE/iBg6kNSBQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="ueVGMYJDnh5RHBas" targetRef="hV9iWcnhqqHFjpt+" id="mK0O9Fkw0t4pdG9j">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="hV9iWcnhqqHFjpt+" targetRef="kiFh4Q3qihUP01j4" id="+Sc/RX7gNU0hLOWQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="iUpgfjLWlW8sHK4X" targetRef="hV9iWcnhqqHFjpt+" id="wGTvIJTWtQiataDI">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="z2mdKtpmMjPBSbgV" targetRef="Na4ewBL2cVWrw5d8" id="868EVcfqTREJ254l">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="RkPxF811Yix4GLUZ">
+        <dc:Bounds height="840.0" width="3000.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="b9n5ucbEsnnF2OeR" isExpanded="true">
+        <dc:Bounds height="250.0" width="760.0" x="660.0" y="20.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="660.0" y="20.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="zVOqce0d/XxK3+Ih">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="/OejlmCMfLyiZCdm">
+        <dc:Bounds height="40.0" width="40.0" x="30.0" y="100.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="aimOCe1MWW4ucGY5">
+        <dc:Bounds height="100.0" width="160.0" x="130.0" y="70.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="z4bxoBgV1TilCVgv">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="pE4bxIV1SqSt/NWx">
+        <dc:Bounds height="60.0" width="60.0" x="340.0" y="90.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="8JYdH5n3+24lA3r/">
+        <dc:Bounds height="100.0" width="160.0" x="450.0" y="20.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="B8O9k43h2ECDMUaB">
+        <dc:Bounds height="40.0" width="40.0" x="680.0" y="100.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mLD65ApOJkOd8Ql6">
+        <dc:Bounds height="40.0" width="40.0" x="500.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="8paeVA7sVEpr5Vor">
+        <dc:Bounds height="40.0" width="40.0" x="120.0" y="241.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="GMigE/LydeybBLrk">
+        <dc:Bounds height="100.0" width="160.0" x="270.0" y="211.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="zOIoCNN14VM17Ojj">
+        <dc:Bounds height="60.0" width="60.0" x="500.0" y="231.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Na4ewBL2cVWrw5d8">
+        <dc:Bounds height="100.0" width="160.0" x="830.0" y="524.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="810.0" y="580.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="NoFpeuPBcJWksLLk">
+        <dc:Bounds height="100.0" width="160.0" x="660.0" y="654.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="670.0" y="550.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="PDkUsSTz2EDf7zRv">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="2pr86sT33w+/fucD">
+        <dc:Bounds height="100.0" width="160.0" x="830.0" y="727.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="700.0" y="700.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ueVGMYJDnh5RHBas">
+        <dc:Bounds height="100.0" width="160.0" x="780.0" y="320.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="800.0" y="290.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="hV9iWcnhqqHFjpt+">
+        <dc:Bounds height="60.0" width="60.0" x="1490.0" y="470.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="kiFh4Q3qihUP01j4">
+        <dc:Bounds height="40.0" width="40.0" x="1610.0" y="480.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="iUpgfjLWlW8sHK4X">
+        <dc:Bounds height="100.0" width="160.0" x="660.0" y="450.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="910.0" y="680.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="z2mdKtpmMjPBSbgV">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="E97Tun2qN/Nz6aGQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="5v/YR2Cp4SbuW+KC">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="ILR4YsqPUI0reS9e">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="3ddGLIOKrh6sQtv/">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="UHu99p/WtXljXwJ3">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="uYJn9xVGiQlnWYc5">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="poGrmfom9w5iugCa">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="iPgHau8boCSxjPLX">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="UiMRTF0jHZ94l6E4">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="XLY7p+Pd5lUHF+Tz">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="LPslqxpoSE7Yzi1a">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="o5mqEv/N7G1N3tD/">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="FMro4E72Py7aElp2">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="+Sc/RX7gNU0hLOWQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="mK0O9Fkw0t4pdG9j">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Z4GHvOKNMApf02qd">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="ffSiTq7oBc0s5fED">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="wGTvIJTWtQiataDI">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="2jCECLTTJSuTKb4H">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="mScbEE/iBg6kNSBQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="868EVcfqTREJ254l">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+
