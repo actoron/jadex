@@ -3,6 +3,7 @@ package jadex.bpmn.editor.gui.controllers;
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 
@@ -13,11 +14,14 @@ import java.util.logging.Logger;
 
 import javax.swing.TransferHandler;
 
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxCellMarker;
 import com.mxgraph.swing.handler.mxGraphHandler;
 import com.mxgraph.swing.handler.mxGraphTransferHandler;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
@@ -108,8 +112,43 @@ public class GraphOperationsController extends mxGraphHandler
 	 */
 	protected void fold(Object cell)
 	{
-		graphComponent.doLayout();
-		super.fold(cell);
+		if (cell instanceof VSubProcess)
+		{
+			VSubProcess sp = (VSubProcess) cell;
+			if (sp.isPseudoFolded())
+			{
+				for (int i = 0; i < sp.getChildCount(); ++i)
+				{
+					mxICell child = sp.getChildAt(i);
+					child.setVisible(true);
+				}
+				sp.setPseudoFolded(false);
+				mxRectangle alt = sp.getGeometry().getAlternateBounds();
+				mxGeometry altgeo = new mxGeometry(sp.getGeometry().getX(), sp.getGeometry().getY(), alt.getWidth(), alt.getHeight());
+				altgeo.setAlternateBounds(sp.getGeometry());
+				sp.setGeometry(altgeo);
+				((BpmnGraph) graphComponent.getGraph()).refreshCellView((mxICell) cell);
+				Object[] selcels = graphComponent.getGraph().getSelectionCells();
+				graphComponent.getGraph().setSelectionCells(selcels);
+			}
+			else
+			{
+				pseudoCollapse(sp);
+				sp.setPseudoFolded(true);
+				mxRectangle alt = sp.getGeometry().getAlternateBounds();
+				mxGeometry altgeo = new mxGeometry(sp.getGeometry().getX(), sp.getGeometry().getY(), alt.getWidth(), alt.getHeight());
+				altgeo.setAlternateBounds(sp.getGeometry());
+				sp.setGeometry(altgeo);
+				((BpmnGraph) graphComponent.getGraph()).refreshCellView((mxICell) cell);
+				Object[] selcels = graphComponent.getGraph().getSelectionCells();
+				graphComponent.getGraph().setSelectionCells(selcels);
+			}
+		}
+		else
+		{
+			graphComponent.doLayout();
+			super.fold(cell);
+		}
 	}
 	
 	/**
@@ -182,5 +221,18 @@ public class GraphOperationsController extends mxGraphHandler
 		marker.setSwimlaneContentEnabled(true);
 
 		return marker;
+	}
+	
+	public static final void pseudoCollapse(VSubProcess sp)
+	{
+		for (int i = 0; i < sp.getChildCount(); ++i)
+		{
+			mxICell child = sp.getChildAt(i);
+			if (!(child instanceof VActivity) || !((VActivity) child).getMActivity().isEventHandler())
+			{
+				child.setVisible(false);
+			}
+		}
+		
 	}
 }

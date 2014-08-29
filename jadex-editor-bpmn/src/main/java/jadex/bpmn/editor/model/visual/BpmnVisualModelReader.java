@@ -3,6 +3,7 @@ package jadex.bpmn.editor.model.visual;
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.SHelper;
+import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
@@ -11,7 +12,7 @@ import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.model.io.IBpmnVisualModelReader;
+import jadex.bpmn.model.io.IPostProcessingVisualModelReader;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -27,12 +28,13 @@ import javax.xml.namespace.QName;
 
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
 
 /**
  *  Reader for the visual BPMN model.
  *
  */
-public class BpmnVisualModelReader implements IBpmnVisualModelReader
+public class BpmnVisualModelReader implements IPostProcessingVisualModelReader
 {
 	/** The visual BPMN graph. */
 	protected BpmnGraph graph;
@@ -132,18 +134,29 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 		{
 			if (expanded != null)
 			{
-				vnode.setCollapsed(!expanded);
+				if (vnode instanceof VSubProcess)
+				{
+					((VSubProcess) vnode).setPseudoFolded(!expanded);
+				}
+				else
+				{
+					vnode.setCollapsed(!expanded);
+				}
 			}
 			
 			mxGeometry geo = null;
 			if(bounds != null)
 			{
-				geo = new mxGeometry(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());;
+				geo = new mxGeometry(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
 			}
 			
 			mxGeometry oldgeo = vnode.getGeometry();
 			if(geo != null)
 			{
+				if (altbounds != null)
+				{
+					geo.setAlternateBounds(new mxRectangle(altbounds.getX(), altbounds.getY(), altbounds.getWidth(), altbounds.getHeight()));
+				}
 				vnode.setGeometry(geo);
 			}
 			
@@ -369,6 +382,21 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown data edge ID " + id);
 			}
 			
+		}
+	}
+	
+	/**
+	 *  Performs the post-process.
+	 */
+	public void postProcess()
+	{
+		for (Map.Entry<String, VElement> entry : vmap.entrySet())
+		{
+			if (entry.getValue() instanceof VSubProcess &&
+				((VSubProcess) entry.getValue()).isPseudoFolded())
+			{
+				GraphOperationsController.pseudoCollapse((VSubProcess) entry.getValue());
+			}
 		}
 	}
 	

@@ -254,6 +254,11 @@ public class SBpmnModelReader
 			}
 		}
 		
+		if (vreader instanceof IPostProcessingVisualModelReader)
+		{
+			((IPostProcessingVisualModelReader) vreader).postProcess();
+		}
+		
 		return ret;
 	}
 	

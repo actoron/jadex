@@ -149,7 +149,15 @@ public class BpmnGraphComponent extends mxGraphComponent
 	{
 		if (state.getCell() instanceof VSubProcess)
 		{
-			if (graph.isCellCollapsed(state.getCell()))
+//			if (graph.isCellCollapsed(state.getCell()))
+//			{
+//				return uncollapseimageicon;
+//			}
+//			else
+//			{
+//				return collapseimageicon;
+//			}
+			if (((VSubProcess) state.getCell()).isPseudoFolded())
 			{
 				return uncollapseimageicon;
 			}
