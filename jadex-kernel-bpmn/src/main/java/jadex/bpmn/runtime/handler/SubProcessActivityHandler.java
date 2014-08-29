@@ -296,7 +296,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		}
 		
 		// Empty subprocess.
-		else if((start==null || start.isEmpty()) && file==null)
+		else if((start==null || start.isEmpty()) && (file==null || file.length()==0))
 		{
 			// If no activity in sub process, step immediately. 
 			instance.step(activity, instance, thread, null);
