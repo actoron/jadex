@@ -140,34 +140,4 @@ public class NativeResponseMapper implements IValueMapper
 		}
 		return ret;
 	}
-	
-	/**
-	 *  Extract caller values like ip and browser.
-	 *  @param request The requrest.
-	 *  @param vals The values.
-	 */
-	public static Map<String, String> extractCallerValues(Object request)
-	{
-		Map<String, String> ret = new HashMap<String, String>();
-		
-		// add request to map as internal parameter
-		// cannot put request into map because map is cloned via service call
-		if(request!=null)
-		{
-			if(request instanceof Request)
-			{
-				Request greq = (Request)request;
-				ret.put("ip", greq.getRemoteAddr());
-				ret.put("browser", greq.getHeader("User-Agent"));
-			}
-			else if(request instanceof HttpServletRequest)
-			{
-				HttpServletRequest sreq = (HttpServletRequest)request;
-				ret.put("ip", sreq.getRemoteAddr());
-				ret.put("browser", sreq.getHeader("User-Agent"));
-			}
-		}
-		
-		return ret;
-	}
 }

@@ -11,6 +11,7 @@ import jadex.bpmn.model.MTask;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Color;
+import java.util.HashMap;
 
 import com.mxgraph.util.mxConstants;
 
@@ -32,6 +33,8 @@ public class BpmnStylesheetComplexGrayscale extends BpmnStylesheetColor
 		styles.get(VActivity.class.getSimpleName() + "_" + MTask.TASK).put(mxConstants.STYLE_FILLCOLOR, "#AAAAAA");
 		styles.get(VOutParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF");
 		styles.get(VInParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF");
+		styles.get(VInParameter.class.getSimpleName()+ "_Connected").put(mxConstants.STYLE_FILLCOLOR, "#CCCCCC");
+		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Event").put(mxConstants.STYLE_FILLCOLOR, "#BBBBBB");
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS).put(mxConstants.STYLE_FILLCOLOR, "#AAAAAA");
 		styles.get(VExternalSubProcess.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, SGUI.colorToHTML(Color.LIGHT_GRAY));
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE).put(mxConstants.STYLE_FILLCOLOR, SGUI.colorToHTML(Color.WHITE));

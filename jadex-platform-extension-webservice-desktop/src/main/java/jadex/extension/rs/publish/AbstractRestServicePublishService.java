@@ -80,6 +80,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -89,6 +90,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
 
 
@@ -514,6 +516,13 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			
 			// Buaaahhhhhh grizzly does not allow injection of httpservlet request
 			CtField req = new CtField(SJavassist.getCtClass(org.glassfish.grizzly.http.server.Request.class, pool), "__greq", proxyclazz);
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
+			attr.addAnnotation(annot);
+			req.getFieldInfo().addAttribute(attr);
+			proxyclazz.addField(req);
+			
+			req = new CtField(SJavassist.getCtClass(ContainerRequest.class, pool), "__creq", proxyclazz);
 			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
 			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
 			attr.addAnnotation(annot);
@@ -1051,6 +1060,8 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 
 			HttpServletRequest req = (HttpServletRequest)getClass().getDeclaredField("__req").get(this);
 			Request greq = (Request)getClass().getDeclaredField("__greq").get(this);
+			ContainerRequest creq = (ContainerRequest)getClass().getDeclaredField("__creq").get(this);
+
 			
 			Method targetmethod = null;
 			if(method.isAnnotationPresent(MethodMapper.class))
@@ -1094,24 +1105,65 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 				}
 				else
 				{
-//					System.out.println("automapping detected");
-					Class<?>[] ts = targetmethod.getParameterTypes();
-					targetparams = new Object[ts.length];
-					if(ts.length==1 && SReflect.isSupertype(ts[0], Map.class))
+					// In case of GET autmap the query parameters
+					if(method.isAnnotationPresent(GET.class))
 					{
-						UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
-						MultivaluedMap<String, String> vals = ui.getQueryParameters();
-						Map<String, String> ps = new HashMap<String, String>();
-						for(Map.Entry<String, List<String>> e: vals.entrySet())
+	//					System.out.println("automapping detected");
+						Class<?>[] ts = targetmethod.getParameterTypes();
+						targetparams = new Object[ts.length];
+						if(ts.length==1)
 						{
-							List<String> val = e.getValue();
-							ps.put(e.getKey(), val!=null && !val.isEmpty()? val.get(0): null);
+							if(SReflect.isSupertype(ts[0], Map.class))
+							{
+								UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+								MultivaluedMap<String, String> vals = ui.getQueryParameters();
+								targetparams[0] = SInvokeHelper.convertMultiMap(vals);
+							}
+							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
+							{
+								UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+								targetparams[0] = SInvokeHelper.convertMultiMap(ui.getQueryParameters());
+							}
 						}
-
-						Map<String, String> cvs = NativeResponseMapper.extractCallerValues(req!=null? req: greq);
-						ps.putAll(cvs);
-
-						targetparams[0] = ps;
+					}
+					else //if(method.isAnnotationPresent(POST.class))
+					{
+						Class<?>[] ts = targetmethod.getParameterTypes();
+						targetparams = new Object[ts.length];
+//						System.out.println("automapping detected: "+SUtil.arrayToString(ts));
+						if(ts.length==1)
+						{
+							if(SReflect.isSupertype(ts[0], Map.class))
+							{
+								if(greq!=null)
+								{
+//									SInvokeHelper.debug(greq);
+									// Hack to make grizzly allow parameter parsing
+									// Jersey calls getInputStream() hindering grizzly parsing params
+									try
+									{
+										Request r = (Request)greq;
+										Field f = r.getClass().getDeclaredField("usingInputStream");
+										f.setAccessible(true);
+										f.set(r, Boolean.FALSE);
+//										System.out.println("params: "+r.getParameterNames());
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
+									targetparams[0] = SInvokeHelper.convertMultiMap(greq.getParameterMap());
+								}
+								else if(req!=null)
+								{
+									targetparams[0] = SInvokeHelper.convertMultiMap(req.getParameterMap());
+								}
+							}
+							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
+							{
+								targetparams[0] = SInvokeHelper.convertToMultiMap(req.getParameterMap());
+							}
+						}
 					}
 				}
 			}
@@ -1517,5 +1569,4 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //		URI newuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
 //		System.out.println(newuri);
 //	}
-
 }

@@ -29,6 +29,8 @@ public class BpmnStylesheetSimpleGrayscale extends BpmnStylesheetColor
 		styles.get(VActivity.class.getSimpleName() + "_" + MTask.TASK).put(mxConstants.STYLE_FILLCOLOR, white);
 		styles.get(VOutParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, white);
 		styles.get(VInParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, white);
+		styles.get(VInParameter.class.getSimpleName()+ "_Connected").put(mxConstants.STYLE_FILLCOLOR, white);
+		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Event").put(mxConstants.STYLE_FILLCOLOR, white);
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS).put(mxConstants.STYLE_FILLCOLOR, white);
 		styles.get(VExternalSubProcess.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, white);
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE).put(mxConstants.STYLE_FILLCOLOR, white);
