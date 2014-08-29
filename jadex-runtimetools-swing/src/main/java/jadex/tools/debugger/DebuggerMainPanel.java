@@ -112,7 +112,7 @@ public class DebuggerMainPanel extends JSplitPane
 						{
 							leftpanel[0] = new BreakpointPanel(bps, desc, jcc.getPlatformAccess(), jcc.getCMSHandler());
 							DebuggerMainPanel.this.setLeftComponent(leftpanel[0]);
-							DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
+							DebuggerMainPanel.this.setDividerLocation(0);	// 150? Hack???
 						}
 						else
 						{
@@ -135,7 +135,7 @@ public class DebuggerMainPanel extends JSplitPane
 									{
 										public void customResultAvailable(ClassLoader cl)
 										{
-//													final ClassLoader	cl	= (ClassLoader)result;
+//											final ClassLoader	cl	= (ClassLoader)result;
 											StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
 											while(stok.hasMoreTokens())
 											{

@@ -89,7 +89,7 @@ import com.mxgraph.swing.handler.mxConnectionHandler;
 import com.mxgraph.view.mxCellState;
 
 /**
- * 
+ *  Panel that shows a bpmn process visually.
  */
 public class VisualProcessViewPanel extends JPanel
 {
@@ -470,7 +470,9 @@ public class VisualProcessViewPanel extends JPanel
 			JSplitPanel tmp2 = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 			tmp2.add(bpmnpan);
 			tmp2.add(procp);
-			tmp2.setDividerLocation(0.7);
+			tmp2.setDividerLocation(0.8);
+			tmp2.setOneTouchExpandable(true);
+			tmp2.setResizeWeight(1);
 			
 //			JSplitPane tmp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 //			tmp.add(procp);

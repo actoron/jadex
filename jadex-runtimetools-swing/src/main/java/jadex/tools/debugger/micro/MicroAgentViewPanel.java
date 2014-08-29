@@ -425,6 +425,7 @@ public class MicroAgentViewPanel extends JPanel
 		tmp.add(up);
 		tmp.add(down);
 		tmp.setDividerLocation(200); // Hack?!
+		tmp.setOneTouchExpandable(true);
 		
 		setLayout(new BorderLayout());
 		add(tmp, BorderLayout.CENTER);
