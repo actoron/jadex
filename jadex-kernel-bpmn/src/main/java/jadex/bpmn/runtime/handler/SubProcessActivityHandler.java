@@ -167,7 +167,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		}
 		
 		// External subprocess
-		else if((start==null || start.isEmpty()) && file!=null)
+		else if((start==null || start.isEmpty()) && file!=null && file.length()>0)
 		{
 			// Extract arguments from in/inout parameters.
 			final Map<String, Object>	args	= new HashMap<String, Object>();
