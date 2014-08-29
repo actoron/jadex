@@ -44,6 +44,7 @@ public class BpmnStylesheetSelections extends BpmnStylesheetColorGradient
 		
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MTask.TASK);
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS);
+		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Unfolded");
 		addWaitingEntry(VExternalSubProcess.class.getSimpleName());
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE);
 		addWaitingEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_PARALLEL);
@@ -55,6 +56,7 @@ public class BpmnStylesheetSelections extends BpmnStylesheetColorGradient
 		
 		addReadyEntry(VActivity.class.getSimpleName() + "_" + MTask.TASK);
 		addReadyEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS);
+		addReadyEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Unfolded");
 		addReadyEntry(VExternalSubProcess.class.getSimpleName());
 		addReadyEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE);
 		addReadyEntry(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_PARALLEL);
