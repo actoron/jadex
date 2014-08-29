@@ -57,7 +57,7 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 			Boolean expanded = null;
 			if (node instanceof VSubProcess)// || node instanceof VExternalSubProcess)
 			{
-				expanded = !node.isCollapsed();
+				expanded = !((VSubProcess) node).isPseudoFolded();
 			}
 			
 			Rectangle2D bounds = null;

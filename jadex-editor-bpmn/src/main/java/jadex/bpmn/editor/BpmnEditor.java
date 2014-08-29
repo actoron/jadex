@@ -31,7 +31,7 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 85;
+	public static final int BUILD = 86;
 	
 	/** Console logging flag. */
 	public static final boolean CONSOLE_LOGGING = false;
