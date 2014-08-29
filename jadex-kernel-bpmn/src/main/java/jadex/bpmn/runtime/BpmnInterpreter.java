@@ -24,6 +24,7 @@ import jadex.bpmn.runtime.handler.EventIntermediateServiceActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.handler.EventMultipleStepHandler;
 import jadex.bpmn.runtime.handler.EventStartRuleHandler;
+import jadex.bpmn.runtime.handler.EventStartServiceActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayORActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
@@ -155,7 +156,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		activityhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_TIMER, new EventIntermediateTimerActivityHandler());
 //		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventIntermediateMessageActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventIntermediateServiceActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventStartServiceActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_MULTIPLE, new EventIntermediateMultipleActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_RULE, new EventStartRuleHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_SIGNAL, new EventIntermediateNotificationHandler());
