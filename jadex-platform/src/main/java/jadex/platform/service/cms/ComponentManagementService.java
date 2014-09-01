@@ -597,10 +597,34 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 																	final ComponentIdentifier cid;
 																	
+																	// check if system component is located in system tree
+																	Map<String, Object> props = lmodel.getProperties();
+																	if(props.containsKey("system") && !"system".equals(name))
+																	{
+																		if(props.get("system").toString().indexOf("true")!=-1)
+																		{
+																			// is system component, now check whether parent is ok
+																			boolean insystem = false;
+																			IComponentIdentifier pacid = getParentIdentifier(cinfo);
+																			while(pacid.getParent()!=null && !insystem)
+																			{
+																				insystem = pacid.getLocalName().equals("system");
+																			}
+																			
+																			if(!insystem)
+																			{
+																				System.out.println("Relocating system component: "+name+" - "+modelname);
+																				ComponentIdentifier npa = new ComponentIdentifier("system", root.getComponentIdentifier());
+																				cinfo.setParent(npa);
+																			}
+																		}
+																	}
+																	
 																	final IComponentAdapter pad = getParentAdapter(cinfo);
 																	IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
 					
 																	IComponentIdentifier pacid = parent.getComponentIdentifier();
+																	
 																	String paname = pacid.getName().replace('@', '.');
 																	
 																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname, addresses);
@@ -831,7 +855,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	// Use first configuration if no config specified.
 																	String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
-																						
+																		
 																	IPersistInfo persistinfo = null;
 																	factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
 																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), cinfo.getProvidedServiceInfos(), copy, realtime, persist, persistinfo, reslis, resfut, agent.getServiceContainer().getServiceRegistry())

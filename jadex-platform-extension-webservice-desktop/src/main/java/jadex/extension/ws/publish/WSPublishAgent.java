@@ -3,6 +3,8 @@ package jadex.extension.ws.publish;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -15,6 +17,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@ProvidedService(name="publish_ws", type=IPublishService.class, 
 		implementation=@Implementation(DefaultWebServicePublishService.class))
 })
+@Properties(@NameValue(name="system", value="true"))
 public class WSPublishAgent
 {
 }

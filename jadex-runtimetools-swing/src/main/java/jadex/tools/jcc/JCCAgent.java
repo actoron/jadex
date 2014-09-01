@@ -24,6 +24,8 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.tools.awareness.AwarenessComponentPlugin;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
@@ -42,6 +44,7 @@ import jadex.tools.testcenter.TestCenterPlugin;
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
 @Agent
+@Properties(@NameValue(name="system", value="true"))
 public class JCCAgent	implements IComponentStep<Void>
 {
 	//-------- constants --------

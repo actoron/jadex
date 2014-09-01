@@ -25,6 +25,8 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -66,6 +68,7 @@ import javax.swing.SwingUtilities;
 @RequiredServices(
 	@RequiredService(name="dtp", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 )
+@Properties(@NameValue(name="system", value="true"))
 public class CliAgent implements ICliService, IInternalCliService
 {
 	//-------- attributes --------
