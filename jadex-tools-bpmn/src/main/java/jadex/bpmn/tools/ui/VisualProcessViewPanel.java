@@ -87,12 +87,16 @@ import com.mxgraph.model.mxICell;
 import com.mxgraph.shape.mxBasicShape;
 import com.mxgraph.swing.handler.mxConnectionHandler;
 import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxStylesheet;
 
 /**
  *  Panel that shows a bpmn process visually.
  */
 public class VisualProcessViewPanel extends JPanel
 {
+	/** Style class */
+	public static Class<?> styleclass = BpmnStylesheetSelections.class;
+	
 	//------- attributes --------
 	
 	/** The process. */
@@ -135,7 +139,8 @@ public class VisualProcessViewPanel extends JPanel
 			this.hmodel	= new HistoryModel();
 			this.modelcontainer = new ModelContainer(null);
 			
-			BpmnStylesheetSelections sheet = new BpmnStylesheetSelections();
+//			BpmnStylesheetSelections sheet = new BpmnStylesheetSelections();
+			mxStylesheet sheet = (mxStylesheet) styleclass.newInstance();
 			final BpmnGraph graph = new BpmnGraph(modelcontainer, sheet);
 			graph.setCellsMovable(false);
 			graph.setCellsResizable(false);
