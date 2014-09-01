@@ -9,6 +9,8 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.platform.service.awareness.discovery.ConnectionException;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.MasterSlaveDiscoveryAgent;
@@ -27,6 +29,7 @@ import java.net.ServerSocket;
 {
 	@Argument(name="port", clazz=int.class, defaultvalue="55670", description="The port used for finding other agents.")
 })
+@Properties(@NameValue(name="system", value="true"))
 @Agent
 public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 {

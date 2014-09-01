@@ -78,6 +78,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** The step info for debugging. To determine the next step. */
 	protected String stepinfo;
 	
+	/** Boolean flag if it is a system component. */
+	protected boolean systemcomponent;
+	
 	//-------- constructors --------
 
 	/**
@@ -94,7 +97,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	public CMSComponentDescription(IComponentIdentifier cid, String type, boolean master, 
 		boolean daemon, boolean autoshutdown, boolean synchronous, boolean persistable,
 		PublishEventLevel monitoring, String modelname, String localtype, IResourceIdentifier rid,
-		long creationtime, IComponentIdentifier creator, Cause cause)
+		long creationtime, IComponentIdentifier creator, Cause cause, boolean systemcomponent)
 	{
 //		if(cid.getName().indexOf("Dyn")!=-1)
 //			System.out.println("created desc: "+cid+" "+hashCode());
@@ -115,6 +118,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setCreationTime(creationtime);
 		setCreator(creator);
 		setCause(cause);
+		setSystemComponent(systemcomponent);
 	}
 
 	//-------- accessor methods --------
@@ -501,6 +505,24 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	public void setStepInfo(String stepinfo)
 	{
 		this.stepinfo = stepinfo;
+	}
+	
+	/**
+	 *  Test if it is a system component.
+	 *  @return True, if it is a system component.
+	 */
+	public boolean isSystemComponent()
+	{
+		return this.systemcomponent;
+	}
+	
+	/**
+	 *  Set the system component flag.
+	 *  @param systemcomponent The flag.
+	 */
+	public void setSystemComponent(boolean systemcomponent)
+	{
+		this.systemcomponent = systemcomponent;
 	}
 
 	/**

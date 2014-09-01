@@ -23,6 +23,8 @@ import jadex.micro.AbstractMessageHandler;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -49,6 +51,7 @@ import java.util.Map;
 	implementation=@Implementation(expression="$component.getPojoAgent()")))
 @RequiredServices(@RequiredService(name="awa", type=IAwarenessManagementService.class))
 @Service
+@Properties(@NameValue(name="system", value="true"))
 public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwarenessService
 {
 	//-------- attributes --------

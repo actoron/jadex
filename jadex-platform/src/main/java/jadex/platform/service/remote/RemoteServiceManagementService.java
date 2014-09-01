@@ -438,7 +438,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //		
 //		return ret;
 		
-		final IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+		final IComponentIdentifier rrms = new ComponentIdentifier("rms@system."+cid.getPlatformName(), cid.getAddresses());
 		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".0.getServiceProxies");
 		
 		final TerminableIntermediateDelegationFuture<T> future = new TerminableIntermediateDelegationFuture<T>()
@@ -580,7 +580,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					{
 						// Hack! create remote rms cid with "rms" assumption.
 //						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
-						IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+						IComponentIdentifier rrms = new ComponentIdentifier("rms@system."+cid.getPlatformName(), cid.getAddresses());
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						

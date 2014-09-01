@@ -52,7 +52,8 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	{
 		"overlay_check", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_check.png"),
 //		"overlay_busy", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_busy.png")
-		"overlay_busy", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_clock.png")
+		"overlay_busy", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_clock.png"),
+		"overlay_system", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_system.png")
 	});
 	
 	//-------- attributes --------
@@ -143,6 +144,11 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		else if(broken)
 		{
 			icon	= icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_check")}) : icons.getIcon("overlay_check");
+		}
+		
+		if(desc.isSystemComponent())
+		{
+			icon	= icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_system")}) : icons.getIcon("overlay_system");
 		}
 		return icon;
 	}

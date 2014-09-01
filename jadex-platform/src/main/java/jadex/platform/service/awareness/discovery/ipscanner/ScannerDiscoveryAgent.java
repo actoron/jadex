@@ -9,6 +9,8 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.platform.service.awareness.discovery.ConnectionException;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.MasterSlaveDiscoveryAgent;
@@ -31,6 +33,7 @@ import java.nio.channels.Selector;
 	@Argument(name="scanfactor", clazz=long.class, defaultvalue="1", description="The delay between scanning as factor of delay time, e.g. 1=10000, 2=20000."),
 	@Argument(name="buffersize", clazz=int.class, defaultvalue="1024*1024", description="The size of the send buffer (determines the number of messages that can be sent at once).")
 })
+@Properties(@NameValue(name="system", value="true"))
 @Agent
 public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 {

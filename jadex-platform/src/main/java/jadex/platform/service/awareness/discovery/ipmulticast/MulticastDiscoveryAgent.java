@@ -6,6 +6,8 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.platform.service.awareness.discovery.ConnectionException;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
@@ -23,6 +25,7 @@ import java.net.MulticastSocket;
 	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
 	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents.")
 })
+@Properties(@NameValue(name="system", value="true"))
 @Agent
 public class MulticastDiscoveryAgent extends DiscoveryAgent
 {

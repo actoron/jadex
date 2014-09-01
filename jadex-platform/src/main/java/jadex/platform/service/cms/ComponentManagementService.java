@@ -599,21 +599,27 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 																	// check if system component is located in system tree
 																	Map<String, Object> props = lmodel.getProperties();
+																	
+																	IComponentIdentifier pacid = getParentIdentifier(cinfo);
+																	boolean systemcomponent = "system".equals(name) && pacid.getParent()==null;
 																	if(props.containsKey("system") && !"system".equals(name))
 																	{
 																		if(props.get("system").toString().indexOf("true")!=-1)
 																		{
+																			systemcomponent = true;
 																			// is system component, now check whether parent is ok
 																			boolean insystem = false;
-																			IComponentIdentifier pacid = getParentIdentifier(cinfo);
+																			
 																			while(pacid.getParent()!=null && !insystem)
 																			{
 																				insystem = pacid.getLocalName().equals("system");
+																				pacid = pacid.getParent();
 																			}
 																			
 																			if(!insystem)
 																			{
-																				System.out.println("Relocating system component: "+name+" - "+modelname);
+//																				System.out.println("Relocating system component: "+name+" - "+modelname);
+																				logger.info("Relocating system component: "+name+" - "+modelname);
 																				ComponentIdentifier npa = new ComponentIdentifier("system", root.getComponentIdentifier());
 																				cinfo.setParent(npa);
 																			}
@@ -623,7 +629,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	final IComponentAdapter pad = getParentAdapter(cinfo);
 																	IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
 					
-																	IComponentIdentifier pacid = parent.getComponentIdentifier();
+																	pacid = parent.getComponentIdentifier();
 																	
 																	String paname = pacid.getName().replace('@', '.');
 																	
@@ -672,7 +678,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
 																		daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,
 																		persistable!=null ? persistable.booleanValue() : false, moni,
-																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause);
+																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause, systemcomponent);
 																	
 																	logger.info("Starting component: "+cid.getName());
 							//										System.err.println("Pre-Init: "+cid);

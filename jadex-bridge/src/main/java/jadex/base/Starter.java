@@ -457,7 +457,7 @@ public class Starter
 								}
 
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
-									autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
+									autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
 								
 								Object	af = getArgumentValue(ADAPTER_FACTORY, model, cmdargs, compargs);
 								if(af==null)
