@@ -6,6 +6,8 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
@@ -28,7 +30,8 @@ import jadex.micro.annotation.RequiredServices;
 		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL))
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
-@Properties(@NameValue(name="system", value="true"))
+@Properties(@NameValue(name="system", value="\"system\".equals($component.getConfiguration())"))
+@Configurations({@Configuration(name="system"), @Configuration(name="user")})
 public class ChatAgent extends MicroAgent
 {
 }
