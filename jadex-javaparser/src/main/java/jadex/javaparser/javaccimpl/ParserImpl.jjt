@@ -884,10 +884,8 @@ void PrimaryPrefix() #void :
 	}
 
 	// Static field (allow primitive or array for .class "field")
-|	LOOKAHEAD( Name() | PrimitiveType() )
-	( ( Name() | PrimitiveType() ) "." t=Identifier()
-//|	LOOKAHEAD( Type() )
-//	( ( Type() ) "." t=Identifier()
+|	LOOKAHEAD( Type() )
+	( ( Type() ) "." t=Identifier()
 	) #ReflectNode(1)
 	{
 		((ReflectNode)jjtree.peekNode()).setText(t);
@@ -1330,8 +1328,8 @@ String Identifier() #void :
 void TypeArguments() #void:
 {}
 {
-	LOOKAHEAD(2) "<" /*{checkForBadGenericsUsage();}*/ TypeArgument() ( "," TypeArgument() )* ">"
-	| "<" /*{checkForBadDiamondUsage();}*/ ">"
+	LOOKAHEAD(2) "<" TypeArgument() ( "," TypeArgument() )* ">"
+	| "<" ">"
 }
 
 /**
@@ -1340,7 +1338,6 @@ void TypeArguments() #void:
 void TypeArgument() #void:
 {}
 {
-	/* (Annotation() {checkForBadTypeAnnotations();})* */ Type()
+	Type()
 	{ jjtree.popNode(); /* hack!!! */}
-	/* | "?" [ WildcardBounds() ] */
 }

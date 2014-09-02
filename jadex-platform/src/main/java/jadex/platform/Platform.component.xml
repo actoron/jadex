@@ -160,7 +160,7 @@
 	</arguments>
 	
 	<componenttypes>
-		<componenttype filename="jadex/platform/SystemAgent.class" name="system"/>
+		<componenttype filename="jadex/platform/System.component.xml" name="system"/>
 		<componenttype filename="jadex/platform/service/extensions/Extensions.component.xml" name="extensions"/>
 		
 		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>

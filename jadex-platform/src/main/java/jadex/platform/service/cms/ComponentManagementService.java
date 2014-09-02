@@ -487,43 +487,6 @@ public class ComponentManagementService implements IComponentManagementService
 			// Check if parent is killing itself -> no new child component, exception
 			if(cfs.containsKey(cinfo.getParent()))
 				return new Future<IComponentIdentifier>(new ComponentTerminatedException(cinfo.getParent() ,"Parent is killing itself. Child component creation no allowed."));
-			
-			// Lock the parent while creating
-			final String lockkey = SUtil.createUniqueId("lock");
-			LockEntry kt = lockentries.get(cinfo.getParent());
-			if(kt==null)
-			{
-				kt= new LockEntry(cinfo.getParent());
-				lockentries.put(cinfo.getParent(), kt);
-			}
-			kt.addLocker(lockkey);
-			inited.addResultListener(createResultListener(new IResultListener<IComponentIdentifier>()
-			{
-				public void resultAvailable(IComponentIdentifier result)
-				{
-					LockEntry kt = lockentries.get(cinfo.getParent());
-					if(kt!=null)
-					{
-						kt.removeLocker(lockkey);
-						if(kt.getLockerCount()==0)
-						{
-							lockentries.remove(cinfo.getParent());
-						}
-					}
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					LockEntry kt = lockentries.get(cinfo.getParent());
-					if(kt!=null)
-					{
-						kt.removeLocker(lockkey);
-						if(kt.getLockerCount()==0)
-						{
-							lockentries.remove(cinfo.getParent());
-						}
-					}
-				}
-			}));
 		}
 		
 		if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
@@ -626,6 +589,43 @@ public class ComponentManagementService implements IComponentManagementService
 																		}
 																	}
 																	
+																	// Lock the parent while creating
+																	final String lockkey = SUtil.createUniqueId("lock");
+																	LockEntry kt = lockentries.get(cinfo.getParent());
+																	if(kt==null)
+																	{
+																		kt= new LockEntry(cinfo.getParent());
+																		lockentries.put(cinfo.getParent(), kt);
+																	}
+																	kt.addLocker(lockkey);
+																	inited.addResultListener(createResultListener(new IResultListener<IComponentIdentifier>()
+																	{
+																		public void resultAvailable(IComponentIdentifier result)
+																		{
+																			LockEntry kt = lockentries.get(cinfo.getParent());
+																			if(kt!=null)
+																			{
+																				kt.removeLocker(lockkey);
+																				if(kt.getLockerCount()==0)
+																				{
+																					lockentries.remove(cinfo.getParent());
+																				}
+																			}
+																		}
+																		public void exceptionOccurred(Exception exception)
+																		{
+																			LockEntry kt = lockentries.get(cinfo.getParent());
+																			if(kt!=null)
+																			{
+																				kt.removeLocker(lockkey);
+																				if(kt.getLockerCount()==0)
+																				{
+																					lockentries.remove(cinfo.getParent());
+																				}
+																			}
+																		}
+																	}));
+
 																	final IComponentAdapter pad = getParentAdapter(cinfo);
 																	IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
 					

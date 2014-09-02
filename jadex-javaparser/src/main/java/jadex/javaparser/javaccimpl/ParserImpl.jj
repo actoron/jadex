@@ -1415,7 +1415,7 @@ void PrimaryPrefix()       :
 	}
 
 	// Static field (allow primitive or array for .class "field")
-|	LOOKAHEAD( Name() | PrimitiveType() )/*@bgen(jjtree) #ReflectNode( 1) */
+|	LOOKAHEAD( Type() )/*@bgen(jjtree) #ReflectNode( 1) */
         {
           ReflectNode jjtn003 = new ReflectNode(this, JJTREFLECTNODE);
           boolean jjtc003 = true;
@@ -1423,9 +1423,7 @@ void PrimaryPrefix()       :
         }
         try {
 /*@egen*/
-	( ( Name() | PrimitiveType() ) "." t=Identifier()
-//|	LOOKAHEAD( Type() )
-//	( ( Type() ) "." t=Identifier()
+	( ( Type() ) "." t=Identifier()
 	)/*@bgen(jjtree)*/
         } catch (Throwable jjte003) {
           if (jjtc003) {
@@ -2364,8 +2362,8 @@ String Identifier()       :
 void TypeArguments()      :
 {}
 {
-	LOOKAHEAD(2) "<" /*{checkForBadGenericsUsage();}*/ TypeArgument() ( "," TypeArgument() )* ">"
-	| "<" /*{checkForBadDiamondUsage();}*/ ">"
+	LOOKAHEAD(2) "<" TypeArgument() ( "," TypeArgument() )* ">"
+	| "<" ">"
 }
 
 /**
@@ -2374,7 +2372,6 @@ void TypeArguments()      :
 void TypeArgument()      :
 {}
 {
-	/* (Annotation() {checkForBadTypeAnnotations();})* */ Type()
+	Type()
 	{ jjtree.popNode(); /* hack!!! */}
-	/* | "?" [ WildcardBounds() ] */
 }
