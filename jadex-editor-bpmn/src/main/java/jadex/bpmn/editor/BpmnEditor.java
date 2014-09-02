@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,9 @@ public class BpmnEditor
 	
 	/** The style sheets. */
 	@SuppressWarnings("unchecked")
-	public static List<Tuple2<String, mxStylesheet>> STYLE_SHEETS = new ArrayList<Tuple2<String, mxStylesheet>>((Collection<? extends Tuple2<String, mxStylesheet>>) Arrays.asList(new Tuple2[] 
+	// Hack!!! generics expression doesn't compile on build servers (JDK 1.6/1.7/1.8 ???)
+//	public static List<Tuple2<String, mxStylesheet>> STYLE_SHEETS = new ArrayList<Tuple2<String, mxStylesheet>>((Collection<? extends Tuple2<String, mxStylesheet>>) Arrays.asList(new Tuple2[] 
+	public static List<Tuple2<String, mxStylesheet>> STYLE_SHEETS = new ArrayList(Arrays.asList(new Tuple2[] 
 		{
 			new Tuple2<String, mxStylesheet>("Color Gradient", new BpmnStylesheetColorGradient()),
 			new Tuple2<String, mxStylesheet>("Color", new BpmnStylesheetColor()),
