@@ -160,6 +160,7 @@
 	</arguments>
 	
 	<componenttypes>
+		<componenttype filename="jadex/platform/SystemAgent.class" name="system"/>
 		<componenttype filename="jadex/platform/service/extensions/Extensions.component.xml" name="extensions"/>
 		
 		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>
@@ -340,6 +341,7 @@
 			</arguments>
 			
 			<components>
+			    <component name="system" type="system" daemon="true"/>
 			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
@@ -386,6 +388,7 @@
 		<!-- Fixed name and port.  Dynamically loads kernels as required.-->
 		<configuration name="fixed">
 			<components>
+			  	<component name="system" type="system" daemon="true"/>
 			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
