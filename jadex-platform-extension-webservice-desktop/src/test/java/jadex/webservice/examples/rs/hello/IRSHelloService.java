@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
  * call information is used to generate the rest service call.
  */
 // @BaseURI("https://chart.googleapis.com/chart")
-@Path("http://localhost:9123")
+@Path("http://localhost:9123/murks")
 public interface IRSHelloService
 {
 	/**

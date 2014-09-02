@@ -22,7 +22,7 @@ import org.junit.Test;
 public class RSHelloTest //extends TestCase
 {
 
-	private static final String BASE_URI = "http://localhost";
+//	private static final String BASE_URI = "http://localhost";
 //	private int basePort = 9123;
 	private Hello hello;
 //	private HttpServer httpServer;
@@ -38,7 +38,8 @@ public class RSHelloTest //extends TestCase
 		sid	= hello.getServiceIdentifier();
 		
 		pservice = new GrizzlyRestServicePublishService();
-		PublishInfo pi = new PublishInfo("http://localhost:9123", "", IRSHelloService.class);
+		// Grizzly breaks without trailing '/murks' !?
+		PublishInfo pi = new PublishInfo("http://localhost:9123/murks", "", IRSHelloService.class);
 		pi.addProperty("generate", "false");
 //		
 		IFuture<Void> publishService = pservice.publishService(getClass().getClassLoader(), hello, pi);
