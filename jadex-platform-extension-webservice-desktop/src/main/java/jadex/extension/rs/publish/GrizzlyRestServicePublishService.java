@@ -23,6 +23,7 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
+import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpContainer;
@@ -296,6 +297,27 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		
 		return IFuture.DONE;
 	}
+	
+	/**
+	 *  Publish file resources from the file system.
+	 */
+	public IFuture<Void> publishExternal(URI uri, String rootpath)
+	{		
+		HttpServer server = getHttpServer(uri, null);
+        ServerConfiguration sc = server.getServerConfiguration();
+		sc.addHttpHandler(new StaticHttpHandler(rootpath)
+		{
+			public void service(Request request, Response resp) throws Exception
+			{
+				super.service(request, resp);
+			}
+		}, uri.getPath());
+		
+//		System.out.println("published at: "+uri.getPath());
+		
+		return IFuture.DONE;
+	}
+
 	
 	/**
 	 *  Unpublish a service.

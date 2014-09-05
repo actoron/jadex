@@ -22,7 +22,12 @@ public interface IWebPublishService extends IPublishService
 	public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
 	
 	/**
-	 *  Publish file resources.
+	 *  Publish file resources from the classpath.
 	 */
 	public IFuture<Void> publishResources(URI uri, String rootpath);
+	
+	/**
+	 *  Publish file resources from the file system.
+	 */
+	public IFuture<Void> publishExternal(URI uri, String rootpath);
 }

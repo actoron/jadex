@@ -445,6 +445,12 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	public abstract IFuture<Void> publishResources(URI uri, String path);
 	
 	/**
+	 *  Publish file resources from the file system.
+	 */
+	public abstract IFuture<Void> publishExternal(URI uri, String rootpath);
+
+	
+	/**
 	 *  Create a service proxy class.
 	 *  @param service The Jadex service.
 	 *  @param classloader The classloader.

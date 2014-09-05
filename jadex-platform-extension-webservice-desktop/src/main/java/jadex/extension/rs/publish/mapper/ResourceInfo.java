@@ -28,6 +28,22 @@ public class ResourceInfo
 	/**
 	 *  Create a new ResourceInfo.
 	 */
+	public ResourceInfo(String path, String mediatype)
+	{
+		this(path, mediatype, null);
+	}
+	
+	/**
+	 *  Create a new ResourceInfo.
+	 */
+	public ResourceInfo(byte[] data, String mediatype)
+	{
+		this(data, mediatype, null);
+	}
+	
+	/**
+	 *  Create a new ResourceInfo.
+	 */
 	public ResourceInfo(String path, String mediatype, Integer status)
 	{
 		this.mediatype = mediatype;
