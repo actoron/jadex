@@ -99,6 +99,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+
 /**
  *  The bdi agent interpreter.
  *  Its steps consist of two parts
@@ -142,6 +145,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	protected MicroAgent createAgent(Class<?> agentclass, MicroModel model, IPersistInfo pinfo) throws Exception
 	{
+		// check if agentclass is bytecode enhanced
+		try
+		{
+			agentclass.getField("__agent");
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException("BDI agent class was not bytecode enhanced. This may happen if the class is accessed directly in application code before loadModel() was called.");
+		}
+		
 		MicroAgent ret;
 		final Object agent = agentclass.newInstance();
 		if(agent instanceof MicroAgent)
@@ -1206,6 +1219,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 												if(!goal.isFinished())
 												{
 													goal.setException(new GoalFailureException("drop condition: "+m.getName()));
+//													{
+//														public void printStackTrace() 
+//														{
+//															super.printStackTrace();
+//														}
+//													});
 													goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.FAILED);
 												}
 											}

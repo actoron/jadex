@@ -869,8 +869,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	}
 	
 	/**
-	 * Transform byte Array into Class and define it in classloader.
-	 * @return the loaded Class or <code>null</code>, if the class is not valid, such as Map.entry "inner Classes".
+	 *  Transform byte Array into Class and define it in classloader.
+	 *  @return the loaded class or <code>null</code>, if the class is not valid, such as Map.entry "inner Classes".
 	 */
 	public Class<?> toClass(String name, byte[] data, ClassLoader loader, ProtectionDomain domain)
 	{

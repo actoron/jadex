@@ -1,8 +1,10 @@
 package jadex.platform.service.chat;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -20,6 +22,7 @@ import jadex.micro.annotation.RequiredServices;
 /**
  *  Chat micro agent. 
  */
+@Agent
 @Description("This agent offers a chat service.")
 @ProvidedServices({
 	@ProvidedService(name="chat", type=IChatService.class, implementation=@Implementation(ChatService.class)),
@@ -30,8 +33,17 @@ import jadex.micro.annotation.RequiredServices;
 		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL))
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
-@Properties(@NameValue(name="system", value="\"system\".equals($component.getConfiguration())"))
+@Properties(@NameValue(name="system", value="\"system\".equals($config)"))
 @Configurations({@Configuration(name="system"), @Configuration(name="user")})
-public class ChatAgent extends MicroAgent
+public class ChatAgent //extends MicroAgent
 {
+//	@Agent
+//	protected IInternalAccess agent;
+//	
+//	@AgentCreated
+//	public void body()
+//	{
+//		System.out.println("config: "+agent.getConfiguration());
+//	}
+	
 }

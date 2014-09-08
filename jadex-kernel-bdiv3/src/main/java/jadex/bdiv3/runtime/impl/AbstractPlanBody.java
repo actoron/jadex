@@ -243,7 +243,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			ret.setException(e);
 		}
 		catch(BodyAborted ba)

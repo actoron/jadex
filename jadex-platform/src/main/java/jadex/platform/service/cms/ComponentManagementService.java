@@ -19,6 +19,7 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -65,6 +66,9 @@ import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.IBootstrapFactory;
 
 import java.util.ArrayList;
@@ -567,7 +571,36 @@ public class ComponentManagementService implements IComponentManagementService
 																	boolean systemcomponent = "system".equals(name) && pacid.getParent()==null;
 																	if(props.containsKey("system") && !"system".equals(name))
 																	{
-																		if(props.get("system").toString().indexOf("true")!=-1)
+																		UnparsedExpression uexp = (UnparsedExpression)props.get("system");
+																		IParsedExpression exp = SJavaParser.parseExpression(uexp, lmodel.getAllImports(), null); // todo: classloader
+																		Boolean bool = (Boolean)exp.getValue(new SimpleValueFetcher()
+																		{
+																			public Object fetchValue(String name) 
+																			{
+																				Object ret = null;
+																				if("$config".equals(name) || "$configuration".equals(name))
+																				{
+																					if(cinfo.getConfiguration()!=null)
+																					{
+																						ret = cinfo.getConfiguration();
+																					}
+																					else
+																					{
+																						String[] cs = lmodel.getConfigurationNames();
+																						if(cs!=null && cs.length>0)
+																						{
+																							ret = cs[0];
+																						}
+																					}
+																				}
+																				else if("$model".equals(name))
+																				{
+																					ret = lmodel;
+																				}
+																				return ret;
+																			}
+																		});
+																		if(bool!=null && bool.booleanValue())// || (props.get("system").toString().indexOf("true")!=-1))
 																		{
 																			systemcomponent = true;
 																			// is system component, now check whether parent is ok
