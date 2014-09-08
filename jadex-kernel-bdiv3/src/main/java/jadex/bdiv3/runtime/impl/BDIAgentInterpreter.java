@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.ASMBDIClassGenerator;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.PojoBDIAgent;
@@ -145,15 +146,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	protected MicroAgent createAgent(Class<?> agentclass, MicroModel model, IPersistInfo pinfo) throws Exception
 	{
-		// check if agentclass is bytecode enhanced
-		try
-		{
-			agentclass.getField("__agent");
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException("BDI agent class was not bytecode enhanced. This may happen if the class is accessed directly in application code before loadModel() was called.");
-		}
+		ASMBDIClassGenerator.checkEnhanced(agentclass);
 		
 		MicroAgent ret;
 		final Object agent = agentclass.newInstance();
