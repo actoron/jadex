@@ -305,13 +305,13 @@ public class SInvokeHelper
 						{
 							if(SReflect.isSupertype(ts[0], Map.class))
 							{
-								UriInfo ui = (UriInfo)clazz.getDeclaredField("__ui").get(object);
+								UriInfo ui = (UriInfo)getFieldValue("__ui", object);
 								MultivaluedMap<String, String> vals = ui.getQueryParameters();
 								targetparams[0] = SInvokeHelper.convertMultiMap(vals);
 							}
 							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
 							{
-								UriInfo ui = (UriInfo)clazz.getDeclaredField("__ui").get(object);
+								UriInfo ui = (UriInfo)getFieldValue("__ui", object);
 								targetparams[0] = SInvokeHelper.convertMultiMap(ui.getQueryParameters());
 							}
 						}
