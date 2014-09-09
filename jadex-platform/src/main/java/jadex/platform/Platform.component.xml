@@ -21,7 +21,7 @@
 		<!-- The configuration to use. -->	
 		<argument name="configname" class="String">"auto"</argument>
 		<!-- Automatically shut down the platform when no user agents are running anymore. -->	
-		<argument name="autoshutdown" class="boolean">true</argument>
+		<argument name="autoshutdown" class="boolean">false</argument>
 		<!-- Tell the starter to use the standalone adapter factory (usually no need to change). -->	
 		<argument name="adapterfactory" class="Class">jadex.platform.service.cms.ComponentAdapterFactory.class</argument>
 		<!-- Tell starter to print welcome message. -->

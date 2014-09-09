@@ -180,8 +180,6 @@ public class BDIClassReader extends MicroClassReader
 		Class<?> genclass = SReflect.findClass0(cma.getName(), null, classloader);
 		modelinfo.setStartable(!Modifier.isAbstract(genclass.getModifiers()));
 		
-		ASMBDIClassGenerator.checkEnhanced(genclass);
-		
 		return ret;
 	}
 	

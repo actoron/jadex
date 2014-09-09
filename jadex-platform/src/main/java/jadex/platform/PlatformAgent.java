@@ -57,7 +57,7 @@ import java.util.logging.Level;
 {
 	@Argument(name="platformname", clazz=String.class, defaultvalue="\"jadex\""),
 	@Argument(name="configname", clazz=String.class, defaultvalue="\"auto\""),
-	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="false"), // todo: does not cound children hierarchically
 	@Argument(name="adapterfactory", clazz=Class.class, defaultvalue="jadex.platform.service.cms.ComponentAdapterFactory.class"),
 	@Argument(name="welcome", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="programarguments", clazz=String[].class),

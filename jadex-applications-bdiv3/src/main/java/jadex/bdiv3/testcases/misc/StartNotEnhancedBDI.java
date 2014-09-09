@@ -35,17 +35,26 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 		IComponentManagementService cms = SServiceProvider.getLocalService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		try
 		{
-			IResourceIdentifier rid = agent.getModel().getResourceIdentifier();
-			IComponentIdentifier cid = cms.createComponent(NotEnhancedBDI.class.getName()+".class", new CreationInfo(rid)).getFirstResult();
-			System.out.println("cid: "+cid);
-			tr.setFailed("BDI agent was created although class was not enhanced.");
-		}
-		catch(Exception e)
-		{
+			Class<?> cl = NotEnhancedBDI.class;
+			cl.getField("__agent");
+			// if field is found test cannot be performed because class was already loaded
 			tr.setSucceeded(true);
-//			e.printStackTrace();
 		}
-		
+		catch(Exception ex)
+		{
+			try
+			{
+				IResourceIdentifier rid = agent.getModel().getResourceIdentifier();
+				IComponentIdentifier cid = cms.createComponent(NotEnhancedBDI.class.getName()+".class", new CreationInfo(rid)).getFirstResult();
+				System.out.println("cid: "+cid);
+				tr.setFailed("BDI agent was created although class was not enhanced.");
+			}
+			catch(Exception e)
+			{
+				tr.setSucceeded(true);
+	//			e.printStackTrace();
+			}
+		}
 		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }
