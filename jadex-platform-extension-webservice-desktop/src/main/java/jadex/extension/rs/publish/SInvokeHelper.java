@@ -177,7 +177,7 @@ public class SInvokeHelper
 	{
 		Object ret = null;
 		
-		System.out.println("called invoke: "+sig+" "+Arrays.toString(params));
+//		System.out.println("called invoke: "+sig+" "+Arrays.toString(params));
 		
 		Class<?> clazz = object.getClass();
 		
