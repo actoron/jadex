@@ -106,10 +106,6 @@
 			// else use default browser accept header
 //			http.setRequestHeader("Accept", "text/html,application/json;q=0.9,*/*;q=0.8");
 		}
-		
-		http.setRequestHeader("content-type",
-			"multipart/form-data; charset=utf-8; boundary=" + boundary);
-			//application/x-www-form-urlencoded
 			
 		http.onreadystatechange = function() 
 		{
@@ -159,10 +155,14 @@
 		if(textpost)
 		{
 			var fd = new FormData(form);
+//			http.setRequestHeader("content-type", "application/x-www-form-urlencoded");
 			http.send(fd);
 		}
 		else
 		{
+			http.setRequestHeader("content-type",
+				"multipart/form-data; charset=utf-8; boundary=" + boundary);
+			
 			for(i=0; i<names.length; i++)
 			{
 				multipart += "--" + boundary
