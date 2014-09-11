@@ -154,12 +154,14 @@ public class SInvokeHelper
 				Request greq = (Request)request;
 				ret.put("ip", greq.getRemoteAddr());
 				ret.put("browser", greq.getHeader("User-Agent"));
+				ret.put("querystring", greq.getQueryString());
 			}
 			else if(request instanceof HttpServletRequest)
 			{
 				HttpServletRequest sreq = (HttpServletRequest)request;
 				ret.put("ip", sreq.getRemoteAddr());
 				ret.put("browser", sreq.getHeader("User-Agent"));
+				ret.put("querystring", sreq.getQueryString());
 			}
 		}
 		
