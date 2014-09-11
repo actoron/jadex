@@ -1,5 +1,6 @@
 package jadex.extension.rs.publish;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IServiceIdentifier;
@@ -292,7 +293,8 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		IComponentManagementService	cms	= SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		cms.getComponentDescription(ServiceCall.getLastInvocation().getCaller())
+		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getComponentIdentifier();
+		cms.getComponentDescription(cid)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
 		{
 			public void customResultAvailable(IComponentDescription desc)
