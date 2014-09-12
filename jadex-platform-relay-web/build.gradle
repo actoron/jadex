@@ -1,0 +1,21 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.6
+version = '2.5-SNAPSHOT'
+group = 'net.sourceforge.jadex'
+
+repositories 
+{
+	mavenCentral()
+	maven {url 'file://C:/Users/Lars/.m2/repository'}
+}
+ 
+dependencies 
+{
+	compile 'net.sourceforge.jadex:jadex-platform-extension-relay:2.5-SNAPSHOT'
+	
+	compile 'javax.servlet:servlet-api:2.4' // <scope>provided</scope>
+	
+	testCompile 'junit:junit:4.11'
+}
+

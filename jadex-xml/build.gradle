@@ -1,0 +1,28 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.6
+version = '2.5-SNAPSHOT'
+group = 'net.sourceforge.jadex'
+
+repositories 
+{
+	mavenCentral()
+	maven {url 'file://C:/Users/Lars/.m2/repository'}
+	//maven 
+	//{
+	//	url 'http://www0.activecomponents.org/nexus/content/repositories/snapshots/'
+	// 	credentials 
+	// 	{
+    //        username 'Lars'
+    //        password 'larsop37'
+    //    }
+    //}
+}
+ 
+dependencies 
+{
+	compile 'net.sourceforge.jadex:jadex-commons:2.5-SNAPSHOT'
+	testCompile 'net.sourceforge.jadex:jadex-commons:2.5-SNAPSHOT:tests'
+	testCompile 'junit:junit:4.11'
+}
+

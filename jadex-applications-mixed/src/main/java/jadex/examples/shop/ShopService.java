@@ -8,7 +8,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.IMicroExternalAccess;
 
 
 /**
@@ -19,7 +18,7 @@ public class ShopService extends BasicService implements IShopService
 	//-------- attributes --------
 	
 	/** The component. */
-	protected IMicroExternalAccess comp;
+	protected IExternalAccess comp;
 	
 	/** The shop name. */
 	protected String name;
@@ -35,7 +34,7 @@ public class ShopService extends BasicService implements IShopService
 		super(comp.getServiceProvider().getId(), IShopService.class, null);
 
 //		System.out.println("created: "+name);
-		this.comp = (IMicroExternalAccess)comp;
+		this.comp = comp;
 		this.name = name;
 	}
 

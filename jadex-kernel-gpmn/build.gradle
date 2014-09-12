@@ -1,0 +1,24 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.6
+version = '2.5-SNAPSHOT'
+group = 'net.sourceforge.jadex'
+
+repositories 
+{
+	mavenCentral()
+	maven {url 'file://C:/Users/Lars/.m2/repository'}
+}
+ 
+dependencies 
+{
+	compile 'net.sourceforge.jadex:jadex-commons:2.5-SNAPSHOT'
+	compile 'net.sourceforge.jadex:jadex-xml:2.5-SNAPSHOT'
+	compile 'net.sourceforge.jadex:jadex-rules:2.5-SNAPSHOT'
+	compile 'net.sourceforge.jadex:jadex-bridge:2.5-SNAPSHOT'
+	compile 'net.sourceforge.jadex:jadex-kernel-bdi:2.5-SNAPSHOT'
+	compile 'net.sourceforge.jadex:jadex-kernel-bdibpmn:2.5-SNAPSHOT'
+	
+	compile 'org.ow2.asm:asm-all:5.0.3'
+	testCompile 'junit:junit:4.11'
+}
