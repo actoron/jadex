@@ -1,10 +1,19 @@
 package jadex.extension.rs.publish;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Tuple2;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
@@ -280,22 +289,40 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	 *  The resources are searched with respect to the
 	 *  component classloader (todo: allow for specifiying RID).
 	 */
-	public IFuture<Void> publishResources(URI uri, String path)
+	public IFuture<Void> publishResources(final URI uri, final String path)
 	{
-		HttpServer server = getHttpServer(uri, null);
-        ServerConfiguration sc = server.getServerConfiguration();
-        path = path.endsWith("/")? path: path+"/";
-		sc.addHttpHandler(new CLStaticHttpHandler(component.getClassLoader(), path)
+		final Future<Void>	ret	= new Future<Void>();
+		IComponentManagementService	cms	= SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getComponentIdentifier();
+		cms.getComponentDescription(cid)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
 		{
-			public void service(Request request, Response resp) throws Exception
+			public void customResultAvailable(IComponentDescription desc)
 			{
-				super.service(request, resp);
+				ILibraryService	ls	= SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				ls.getClassLoader(desc.getResourceIdentifier())
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+				{
+					public void customResultAvailable(ClassLoader cl)
+					{
+						HttpServer server = getHttpServer(uri, null);
+				        ServerConfiguration sc = server.getServerConfiguration();
+						sc.addHttpHandler(new CLStaticHttpHandler(cl, path.endsWith("/")? path: path+"/")
+						{
+							public void service(Request request, Response resp) throws Exception
+							{
+								super.service(request, resp);
+							}
+						}, uri.getPath());
+						
+						System.out.println("Resource published at: "+uri.getPath());
+						ret.setResult(null);
+					}
+				});
 			}
-		}, uri.getPath());
+		});
 		
-//		System.out.println("published at: "+uri.getPath());
-		
-		return IFuture.DONE;
+		return ret;
 	}
 	
 	/**

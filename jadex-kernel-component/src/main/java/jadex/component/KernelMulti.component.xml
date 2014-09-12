@@ -18,7 +18,7 @@
 		<argument name="ignorekernels" class="String[]">null</argument>
 		<argument name="ignoreextensions" class="String[]">null</argument>
 		<!-- Regular expression identifying kernel URIs (ignored on android as there is only the DEX file). -->
-		<argument name="kerneluriregex" class="String">jadex.commons.SReflect.isAndroid() ? "" : ".*[Kk]ernel.*"</argument>
+		<argument name="kerneluriregex" class="String">jadex.commons.SReflect.isAndroid() ? ".*" : ".*[Kk]ernel.*"</argument>
 	</arguments>
 	
 	<componenttypes>
