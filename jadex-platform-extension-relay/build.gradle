@@ -1,25 +1,11 @@
-apply plugin: 'java'
-
-sourceCompatibility = 1.6
-version = '2.5-SNAPSHOT'
-group = 'net.sourceforge.jadex'
-
-repositories 
-{
-	mavenCentral()
-	maven {url 'file://C:/Users/Lars/.m2/repository'}
-}
- 
 dependencies 
 {
-	compile 'net.sourceforge.jadex:jadex-commons:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-xml:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-bridge:2.5-SNAPSHOT' 	// Bridge required for cid and awareness objects.
-	compile 'net.sourceforge.jadex:jadex-platform:2.5-SNAPSHOT' 	// Platform base required for codecs.
+	compile project(':jadex-commons')
+	compile project(':jadex-xml')
+	compile project(':jadex-bridge') 	// Bridge required for cid and awareness objects.
+	compile project(':jadex-platform') 	// Platform base required for codecs.
 	
 	compile 'org.apache.derby:derby:10.8.2.2' 
 	compile 'org.ow2.util:util-geolocation-ejb:1.0.31' 
-	
-	testCompile 'junit:junit:4.11'
 }
 

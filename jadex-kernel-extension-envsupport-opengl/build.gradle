@@ -1,0 +1,9 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-javaparser')
+	compile project(':jadex-kernel-extension-envsupport')
+
+	// Hack!!! Not available in maven central :-(
+	compile files('lib/gluegen-rt.jar', 'lib/jogl.jar')
+}

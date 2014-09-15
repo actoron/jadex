@@ -1,19 +1,7 @@
 apply plugin: 'war'
 apply plugin: 'eclipse-wtp'
 
-sourceCompatibility = 1.6
-version = '2.5-SNAPSHOT'
-group = 'net.sourceforge.jadex'
-
-repositories 
-{
-	mavenCentral()
-	maven {url 'file://C:/Users/Lars/.m2/repository'}
-}
- 
 dependencies 
 {
-	compile 'net.sourceforge.jadex:jadex-servletfilter:2.5-SNAPSHOT'
-	
-	testCompile 'junit:junit:4.11'
+	compile project(':jadex-servletfilter')
 }

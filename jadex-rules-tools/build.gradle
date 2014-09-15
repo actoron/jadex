@@ -1,20 +1,11 @@
-apply plugin: 'java'
-
-sourceCompatibility = 1.6
-version = '2.5-SNAPSHOT'
-group = 'net.sourceforge.jadex'
-
-repositories 
-{
-	mavenCentral()
-	maven {url 'file://C:/Users/Lars/.m2/repository'}
-}
- 
 dependencies 
 {
-	compile 'net.sourceforge.jadex:jadex-tools-base-swing:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-platform:2.5-SNAPSHOT'
+	compile project(':jadex-commons')
+	compile project(':jadex-rules')
 	
-	testCompile 'junit:junit:4.11'
+	compile 'net.sourceforge.collections:collections-generic:4.01'
+	compile 'net.sf.jung:jung-api:2.0.1'
+	compile 'net.sf.jung:jung-graph-impl:2.0.1'
+	compile 'net.sf.jung:jung-visualization:2.0.1'
+	compile 'net.sf.jung:jung-algorithms:2.0.1'
 }
-

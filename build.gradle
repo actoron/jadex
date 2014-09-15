@@ -1,25 +1,38 @@
-apply plugin: 'java'
-
-sourceCompatibility = 1.6
-version = '2.5-SNAPSHOT'
-group = 'net.sourceforge.jadex'
-
-//subprojects 
-//{
-//    apply plugin: 'java'
- 
+allprojects
+{
+	version = '2.5-SNAPSHOT'
+	group = 'net.sourceforge.jadex'
+	
     //configurations 
     //{
     //    all*.exclude group: "commons-logging", module: "commons-logging"
     //}
  
-//    repositories 
-//    {
-//        mavenCentral()
-//    }
- 
-//    dependencies 
-//    {
-//        testCompile 'junit:junit:4.11'
-//    }
-//}
+    repositories 
+    {
+        mavenCentral()
+		//maven 
+		//{
+		//	url 'http://www0.activecomponents.org/nexus/content/repositories/snapshots/'
+		// 	credentials 
+		// 	{
+	    //        username 'Lars'
+	    //        password 'larsop37'
+	    //    }
+	    //}
+    }
+}
+
+subprojects 
+{
+	apply plugin: 'java'
+	
+	sourceCompatibility = 1.6
+	sourceSets.main.resources.srcDirs	'src/main/java'
+	sourceSets.test.resources.srcDirs	'src/test/java'
+	
+    dependencies 
+    {
+        testCompile 'junit:junit:4.11'
+    }
+}

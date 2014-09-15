@@ -1,28 +1,14 @@
-apply plugin: 'java'
-
-sourceCompatibility = 1.6
-version = '2.5-SNAPSHOT'
-group = 'net.sourceforge.jadex'
-
-repositories 
-{
-	mavenCentral()
-	maven {url 'file://C:/Users/Lars/.m2/repository'}
-}
- 
 dependencies 
 {
-	compile 'net.sourceforge.jadex:jadex-commons:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-xml:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-bridge:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-tools-base-swing:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-kernel-micro:2.5-SNAPSHOT'
-	runtime 'net.sourceforge.jadex:jadex-kernel-component:2.5-SNAPSHOT' // Todo: move component tests in own project. -<scope>runtime</scope>
-	runtime 'net.sourceforge.jadex:jadex-kernel-application:2.5-SNAPSHOT' // <scope>runtime</scope>
-	compile 'net.sourceforge.jadex:jadex-kernel-extension-envsupport:2.5-SNAPSHOT'
+	compile project(':jadex-commons')
+	compile project(':jadex-xml')
+	compile project(':jadex-bridge')
+	compile project(':jadex-tools-base-swing')
+	compile project(':jadex-kernel-micro')
+	runtime project(':jadex-kernel-component') // Todo: move component tests in own project. -<scope>runtime</scope>
+	runtime project(':jadex-kernel-application') // <scope>runtime</scope>
+	compile project(':jadex-kernel-extension-envsupport')
 	
 	compile 'com.github.sarxos:webcam-capture:0.3.9'
 	compile 'org.jcodec:jcodec:0.1.5'
-	
-	testCompile 'junit:junit:4.11'
 }

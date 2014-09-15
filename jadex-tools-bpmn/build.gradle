@@ -1,30 +1,8 @@
-apply plugin: 'java'
-
-sourceCompatibility = 1.6
-version = '2.5-SNAPSHOT'
-group = 'net.sourceforge.jadex'
-
-repositories 
-{
-	mavenCentral()
-	maven {url 'file://C:/Users/Lars/.m2/repository'}
-}
- 
 dependencies 
 {
-	compile 'net.sourceforge.jadex:jadex-commons:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-bridge:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-xml:2.5-SNAPSHOT'
-	compile 'net.sourceforge.jadex:jadex-tools-base-swing:2.5-SNAPSHOT'
-	
-	compile 'jfree:jfreechart:1.0.12'
-	compile 'jfree:jcommon:1.0.15'
-	compile 'net.sf.jung:jung-visualization:2.0.1'
-	compile 'net.sf.jung:jung-graph-impl:2.0.1'
-	compile 'net.sf.jung:jung-algorithms:2.0.1'
-	compile 'net.sf.jung:jung-api:2.0.1'
-	compile 'colt:colt:1.2.0'
-	compile 'net.sourceforge.collections:collections-generic:4.01'
-	
-	testCompile 'junit:junit:4.11'
+	compile project(':jadex-commons')
+	compile project(':jadex-bridge')
+	compile project(':jadex-kernel-bpmn')
+	compile project(':jadex-runtimetools-swing')
+	compile project(':jadex-editor-bpmn')
 }

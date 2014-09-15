@@ -19,14 +19,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import junit.framework.TestCase;
 
 /**
  *  Test if different activations with the same variable bindings are
  *  handled correctly.
  */
-// Class doesn't end with 'Test', because test fails and would interrupt maven builds.
-public class DuplicateActivationsTestFail extends TestCase
+public class DuplicateActivationsTestFail
 {
 	//-------- attributes --------
 	
@@ -50,7 +53,8 @@ public class DuplicateActivationsTestFail extends TestCase
 	/**
 	 *  Test setup.
 	 */
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		state	= OAVStateFactory.createOAVState(Blocks.blocksworld_type_model);
 		colors	= new ArrayList();
@@ -95,23 +99,25 @@ public class DuplicateActivationsTestFail extends TestCase
 	/**
 	 *  Test that rule triggers twice. 
 	 */
+//	@Test	// Test currently does not work due to missing functionality
 	public void testTriggerTwice()
 	{
 		system.fireAllRules();
 		List	test	= Arrays.asList(new String[]{"red", "red"});
-		assertEquals("Rule should trigger twice for color 'red'", test, colors);
+		Assert.assertEquals("Rule should trigger twice for color 'red'", test, colors);
 	}
 		
 	/**
 	 *  Test that rule triggers once after a block is removed.
 	 */
+//	@Test	// Test currently does not work due to missing functionality
 	public void testRemoveTrigger()
 	{
 		state.notifyEventListeners();
 		state.dropObject(block1);
 		system.fireAllRules();
 		List	test	= Collections.singletonList("red");
-		assertEquals("Should trigger for second block", test, colors);
+		Assert.assertEquals("Should trigger for second block", test, colors);
 	}
 	
 	//-------- main for testing --------
@@ -124,9 +130,9 @@ public class DuplicateActivationsTestFail extends TestCase
 		DuplicateActivationsTestFail	datf	= new DuplicateActivationsTestFail();
 		datf.setUp();
 		datf.testTriggerTwice();
-		datf.tearDown();
+//		datf.tearDown();
 		datf.setUp();
 		datf.testRemoveTrigger();
-		datf.tearDown();
+//		datf.tearDown();
 	}
 }
