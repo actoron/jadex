@@ -134,6 +134,22 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		return IFuture.DONE;
 	}
 	
+	/**
+	 *  Execute the main activity of the feature.
+	 */
+	public IFuture<Void>	body()
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Shutdown the feature.
+	 */
+	public IFuture<Void>	shutdown()
+	{
+		return IFuture.DONE;
+	}
+	
 	//-------- IValueFetcher interface --------
 	
 	/**
