@@ -3,6 +3,7 @@ package jadex.bridge.component.impl;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.commons.future.IFuture;
 
 import java.util.Collections;
@@ -11,7 +12,7 @@ import java.util.Set;
 /**
  *  Feature for provided services.
  */
-public abstract class AbstractComponentFeature	implements IComponentFeature
+public abstract class AbstractComponentFeature	implements IComponentFeature, IComponentFeatureFactory
 {
 	//-------- attributes --------
 	

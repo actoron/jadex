@@ -3,6 +3,7 @@ package jadex.bridge.service.types.factory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.commons.future.IFuture;
 
@@ -22,7 +23,7 @@ public interface IPlatformComponentAccess
 	 *  @param info The component creation info.
 	 *  @param templates The component feature templates to be instantiated for this component.
 	 */
-	public void	create(ComponentCreationInfo info, Collection<IComponentFeature> templates);
+	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> templates);
 	
 	/**
 	 *  Perform the initialization of the component.
@@ -39,6 +40,13 @@ public interface IPlatformComponentAccess
 	 *  @return A future to indicate when the body is done.
 	 */
 	public IFuture<Void>	body();
+	
+	/**
+	 *  Perform the shutdown of the component (if any).
+	 *  
+	 *  @return A future to indicate when the shutdown is done.
+	 */
+	public IFuture<Void>	shutdown();
 	
 	/**
 	 *  Get the user view of this platform component.

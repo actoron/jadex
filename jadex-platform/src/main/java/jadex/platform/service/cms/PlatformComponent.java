@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
@@ -69,12 +70,12 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 *  @param info The component creation info.
 	 *  @param templates The component feature templates to be instantiated for this component.
 	 */
-	public void	create(ComponentCreationInfo info, Collection<IComponentFeature> templates)
+	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> templates)
 	{
 		this.info	= info;
 		this.features	= new LinkedHashMap<Class<?>, IComponentFeature>();
 		this.lfeatures	= new ArrayList<IComponentFeature>();
-		for(IComponentFeature feature: templates)
+		for(IComponentFeatureFactory feature: templates)
 		{
 			IComponentFeature	instance	= feature.createInstance(getInternalAccess(), info);
 			features.put((Class<?>)feature.getType(), instance);
@@ -106,6 +107,26 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
+	 *  Perform the main execution of the component (if any).
+	 *  
+	 *  @return A future to indicate when the body is done.
+	 */
+	public IFuture<Void>	body()
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Perform the shutdown of the component (if any).
+	 *  
+	 *  @return A future to indicate when the shutdown is done.
+	 */
+	public IFuture<Void>	shutdown()
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
 	 *  Recursively init the features.
 	 */
 	protected IFuture<Void>	initFeatures(final Iterator<IComponentFeature> features)
@@ -127,18 +148,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			return IFuture.DONE;
 		}
-	}
-	
-	/**
-	 *  Perform the main execution of the component (if any).
-	 *  
-	 *  @return A future to indicate when the body is done.
-	 */
-	public IFuture<Void>	body()
-	{
-		// todo...
-		
-		return IFuture.DONE;
 	}
 	
 	/**

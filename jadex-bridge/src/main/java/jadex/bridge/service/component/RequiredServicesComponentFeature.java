@@ -122,6 +122,22 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	}
 	
 	/**
+	 *  Execute the main activity of the feature.
+	 */
+	public IFuture<Void>	body()
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Shutdown the feature.
+	 */
+	public IFuture<Void>	shutdown()
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
 	 *  Add required services for a given prefix.
 	 *  @param prefix The name prefix to use.
 	 *  @param required services The required services to set.

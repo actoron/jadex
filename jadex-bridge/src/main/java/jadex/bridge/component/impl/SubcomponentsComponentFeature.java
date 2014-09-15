@@ -111,6 +111,22 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		
 		return ret;
 	}	
+	
+	/**
+	 *  Execute the main activity of the feature.
+	 */
+	public IFuture<Void>	body()
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Shutdown the feature.
+	 */
+	public IFuture<Void>	shutdown()
+	{
+		return IFuture.DONE;
+	}
 
 	/**
 	 *  Create subcomponents.

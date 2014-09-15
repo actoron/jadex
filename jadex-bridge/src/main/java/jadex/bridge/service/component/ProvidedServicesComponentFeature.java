@@ -227,6 +227,22 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	}
 	
 	/**
+	 *  Execute the main activity of the feature.
+	 */
+	public IFuture<Void>	body()
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Shutdown the feature.
+	 */
+	public IFuture<Void>	shutdown()
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
 	 *  Add a service.
 	 *  @param service	The service object.
 	 *  @param info	 The service info.
