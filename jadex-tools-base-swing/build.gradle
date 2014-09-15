@@ -1,0 +1,7 @@
+dependencies 
+{
+	compile project(':jadex-bridge')
+	compile project(':jadex-tools-base')
+	compile project(':jadex-xml')
+}
+

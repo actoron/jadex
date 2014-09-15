@@ -56,8 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javassist.expr.Instanceof;
-
 /**
  *  Base class for application agents.
  */
@@ -1033,4 +1031,6 @@ public class BDIAgent extends MicroAgent
 	{
 		return this;
 	}
+	
+	
 }

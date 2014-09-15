@@ -11,6 +11,8 @@ import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -24,8 +26,8 @@ import jadex.micro.annotation.ProvidedServices;
 		clazz=String[].class, defaultvalue="new String[] {\"KernelBDI.component.xml\"}"),
 	@Argument(name="ignoreextensions", description="File extensions that are ignored.",
 		clazz=String[].class, defaultvalue="new String[] {\".png\", \".jpg\", \".dll\", \".gif\", \".exe\", \".doc\", \".docx\", \".txt\" }"),
-	@Argument(name="kerneluriregex", description="Regular expression identifying kernel URIs.",
-		clazz=String.class, defaultvalue="\".*[Kk]ernel.*\"")})
+	@Argument(name="kerneluriregex", description="Regular expression identifying kernel URIs  (ignored on android as there is only the DEX file).",
+		clazz=String.class, defaultvalue="jadex.commons.SReflect.isAndroid() ? \".*\" : \".*[Kk]ernel.*\"")})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
 	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.factory.IComponentFactory.class)"))
@@ -39,6 +41,7 @@ import jadex.micro.annotation.ProvidedServices;
 	})
 })
 @Agent
+@Properties(@NameValue(name="system", value="true"))
 public class KernelMultiAgent
 {
 }

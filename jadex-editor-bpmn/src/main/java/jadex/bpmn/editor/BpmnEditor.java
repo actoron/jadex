@@ -14,7 +14,10 @@ import java.awt.EventQueue;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -31,7 +34,7 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 85;
+	public static final int BUILD = 86;
 	
 	/** Console logging flag. */
 	public static final boolean CONSOLE_LOGGING = false;
@@ -56,13 +59,15 @@ public class BpmnEditor
 	
 	/** The style sheets. */
 	@SuppressWarnings("unchecked")
-	public static final Tuple2<String, mxStylesheet>[] STYLE_SHEETS = new Tuple2[] 
+	// Hack!!! generics expression doesn't compile on build servers (JDK 1.6/1.7/1.8 ???)
+//	public static List<Tuple2<String, mxStylesheet>> STYLE_SHEETS = new ArrayList<Tuple2<String, mxStylesheet>>((Collection<? extends Tuple2<String, mxStylesheet>>) Arrays.asList(new Tuple2[] 
+	public static List<Tuple2<String, mxStylesheet>> STYLE_SHEETS = new ArrayList(Arrays.asList(new Tuple2[] 
 		{
 			new Tuple2<String, mxStylesheet>("Color Gradient", new BpmnStylesheetColorGradient()),
 			new Tuple2<String, mxStylesheet>("Color", new BpmnStylesheetColor()),
 			new Tuple2<String, mxStylesheet>("Simple Grayscale", new BpmnStylesheetSimpleGrayscale()),
 			new Tuple2<String, mxStylesheet>("Complex Grayscale", new BpmnStylesheetComplexGrayscale())
-		};
+		}));
 	
 	/** Standard task classes. */
 	protected static final String[] FALLBACK_TASK_NAMES = { "jadex.bpmn.runtime.task.PrintTask",

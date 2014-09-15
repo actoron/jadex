@@ -316,17 +316,17 @@ public class BpmnMenuBar extends JMenuBar
 			}
 		};
 		
-		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
+		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.size(); ++i)
 		{
 			JRadioButtonMenuItem view = new JRadioButtonMenuItem(styleaction);
-			view.putClientProperty("sheet", BpmnEditor.STYLE_SHEETS[i].getSecondEntity());
+			view.putClientProperty("sheet", BpmnEditor.STYLE_SHEETS.get(i).getSecondEntity());
 			
-			if (BpmnEditor.STYLE_SHEETS[i].getFirstEntity().equals(editwindow.getSettings().getSelectedSheet()))
+			if (BpmnEditor.STYLE_SHEETS.get(i).getFirstEntity().equals(editwindow.getSettings().getSelectedSheet()))
 			{
 				view.setSelected(true);
 			}
 			
-			view.setText(BpmnEditor.STYLE_SHEETS[i].getFirstEntity());
+			view.setText(BpmnEditor.STYLE_SHEETS.get(i).getFirstEntity());
 			stylegroup.add(view);
 			stylemenu.add(view);
 			

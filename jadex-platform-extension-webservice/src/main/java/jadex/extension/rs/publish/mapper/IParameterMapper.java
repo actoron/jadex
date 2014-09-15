@@ -10,7 +10,8 @@ public interface IParameterMapper
 	/**
 	 *  Convert parameters.
 	 *  @param parameters The values to convert.
+	 *  @param context The context (could be the http servlet request or a custom container request).
 	 *  @return The converted parameters.
 	 */
-	public Object[] convertParameters(Object[] parameters) throws Exception;
+	public Object[] convertParameters(Object[] parameters, Object request) throws Exception;
 }

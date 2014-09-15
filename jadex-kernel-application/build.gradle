@@ -1,0 +1,10 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-javaparser')
+	compile project(':jadex-bridge')
+	compile project(':jadex-xml')
+	compile project(':jadex-kernel-base')
+	compile project(':jadex-kernel-component')
+}
+

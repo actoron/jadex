@@ -351,10 +351,10 @@ public class BpmnEditorWindow extends JFrame
 		if (modelcontainer.getGraph() == null)
 		{
 			mxStylesheet sheet = null;
-			for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
+			for (int i = 0; i < BpmnEditor.STYLE_SHEETS.size(); ++i)
 			{
-				sheet = BpmnEditor.STYLE_SHEETS[i].getSecondEntity();
-				if (BpmnEditor.STYLE_SHEETS[i].getFirstEntity().equals(settings.getSelectedSheet()))
+				sheet = BpmnEditor.STYLE_SHEETS.get(i).getSecondEntity();
+				if (BpmnEditor.STYLE_SHEETS.get(i).getFirstEntity().equals(settings.getSelectedSheet()))
 				{
 					break;
 				}
@@ -554,10 +554,10 @@ public class BpmnEditorWindow extends JFrame
 		
 		ModelContainer modelcontainer = new ModelContainer(settings);
 		mxStylesheet sheet = null;
-		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
+		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.size(); ++i)
 		{
-			sheet = BpmnEditor.STYLE_SHEETS[i].getSecondEntity();
-			if (BpmnEditor.STYLE_SHEETS[i].getFirstEntity().equals(settings.getSelectedSheet()))
+			sheet = BpmnEditor.STYLE_SHEETS.get(i).getSecondEntity();
+			if (BpmnEditor.STYLE_SHEETS.get(i).getFirstEntity().equals(settings.getSelectedSheet()))
 			{
 				break;
 			}

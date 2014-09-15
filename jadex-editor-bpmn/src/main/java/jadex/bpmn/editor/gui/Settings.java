@@ -101,7 +101,7 @@ public class Settings
 	protected boolean smoothzoom = true;
 	
 	/** The selected style sheet */
-	protected String selectedsheet = BpmnEditor.STYLE_SHEETS[0].getFirstEntity();
+	protected String selectedsheet = BpmnEditor.STYLE_SHEETS.get(0).getFirstEntity();
 	
 	/** The library home. */
 	//protected File libraryhome;

@@ -100,7 +100,7 @@ import java.util.TimerTask;
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000")),
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
 })*/
-@Properties(@NameValue(name="componentviewer.viewerclass", value="new String[]{\"jadex.tools.awareness.AwarenessAgentPanel\", \"jadex.android.controlcenter.settings.AwarenessSettings\"}"))
+@Properties({@NameValue(name="system", value="true"), @NameValue(name="componentviewer.viewerclass", value="new String[]{\"jadex.tools.awareness.AwarenessAgentPanel\", \"jadex.android.controlcenter.settings.AwarenessSettings\"}")})
 @ProvidedServices(
 	@ProvidedService(type=IAwarenessManagementService.class, implementation=@Implementation(expression="$component"))
 )

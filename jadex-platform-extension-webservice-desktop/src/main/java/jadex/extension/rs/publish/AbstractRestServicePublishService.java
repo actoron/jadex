@@ -23,6 +23,7 @@ import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
+import jadex.extension.rs.publish.mapper.NativeResponseMapper;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
@@ -69,6 +70,7 @@ import javassist.bytecode.annotation.ShortMemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -78,14 +80,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
 
 
@@ -279,7 +284,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //			rc.register(new MoxyJsonFeature());
 			rc.register(MultiPartFeature.class);
 			
-			internalPublishService(uri, rc, service.getServiceIdentifier());
+			internalPublishService(uri, rc, service.getServiceIdentifier(), pi);
 //			System.out.println("handler: "+handler+" "+server.getServerConfiguration().getHttpHandlers());
 
 //			String wpurl = (String)mapprops.get(PublishInfo.WP_URL);
@@ -321,7 +326,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	/**
 	 * 
 	 */
-	public abstract void internalPublishService(URI uri, ResourceConfig rc, IServiceIdentifier sid);
+	public abstract void internalPublishService(URI uri, ResourceConfig rc, IServiceIdentifier sid, PublishInfo info);
 	
 //	/**
 //	 *  Get or start an api to the http server.
@@ -440,6 +445,12 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	public abstract IFuture<Void> publishResources(URI uri, String path);
 	
 	/**
+	 *  Publish file resources from the file system.
+	 */
+	public abstract IFuture<Void> publishExternal(URI uri, String rootpath);
+
+	
+	/**
 	 *  Create a service proxy class.
 	 *  @param service The Jadex service.
 	 *  @param classloader The classloader.
@@ -508,6 +519,28 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			attr.addAnnotation(annot);
 			ui.getFieldInfo().addAttribute(attr);
 			proxyclazz.addField(ui);
+			
+			// Buaaahhhhhh grizzly does not allow injection of httpservlet request
+			CtField req = new CtField(SJavassist.getCtClass(org.glassfish.grizzly.http.server.Request.class, pool), "__greq", proxyclazz);
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
+			attr.addAnnotation(annot);
+			req.getFieldInfo().addAttribute(attr);
+			proxyclazz.addField(req);
+			
+			req = new CtField(SJavassist.getCtClass(ContainerRequest.class, pool), "__creq", proxyclazz);
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
+			attr.addAnnotation(annot);
+			req.getFieldInfo().addAttribute(attr);
+			proxyclazz.addField(req);
+			
+			req = new CtField(SJavassist.getCtClass(HttpServletRequest.class, pool), "__req", proxyclazz);
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
+			attr.addAnnotation(annot);
+			req.getFieldInfo().addAttribute(attr);
+			proxyclazz.addField(req);
 			
 			// if webproxy refresh is need add an init method that initializes refresh
 			// problem: init annotation (Singleton/PostCreate) does not work
@@ -959,165 +992,224 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	 */
 	public Object invoke(Object[] params, String sig)
 	{
-		Object ret = null;
+		return SInvokeHelper.invoke(params, sig, this);
 		
-//		System.out.println("called invoke: "+sig+" "+Arrays.toString(params));
-		
-		try
-		{
-			// find own method
-			
-			Method[] ms = getClass().getDeclaredMethods();
-			Method method = null;
-			for(Method m: ms)
-			{
-				if(RestMethodInfo.buildSignature(m.getName(), m.getParameterTypes()).equals(sig))
-				{
-					method = m;
-					break;
-				}
-			}
-			if(method==null)
-			{
-				System.out.println("methods: "+Arrays.toString(ms));
-				throw new RuntimeException("No method '"+sig+"' on class: "+getClass());
-			}
-			
-//			StackTraceElement[] s = Thread.currentThread().getStackTrace();
-//			String name = s[2].getMethodName();
-			
-//			System.out.println("name is: "+name);
-
-//			for(int i=0;i<s.length; i++)
+//		Object ret = null;
+//		
+////		System.out.println("called invoke: "+sig+" "+Arrays.toString(params));
+//		
+//		try
+//		{
+//			// find own method
+//			
+//			Method[] ms = getClass().getDeclaredMethods();
+//			Method method = null;
+//			for(Method m: ms)
 //			{
-//				System.out.println(s[i].getMethodName());
+//				if(RestMethodInfo.buildSignature(m.getName(), m.getParameterTypes()).equals(sig))
+//				{
+//					method = m;
+//					break;
+//				}
 //			}
-//			String name = SReflect.getMethodName();
-//			Method[] methods = SReflect.getMethods(getClass(), name);
-//		    Method method = null;
-//			if(methods.length>1)
+//			if(method==null)
 //			{
-//			    for(int i=0; i<methods.length && method==null; i++)
-//			    {
-//			    	Class<?>[] types = methods[i].getParameterTypes();
-//			    	if(types.length==params.length)
-//			    	{
-//			    		// check param types
-//			    		method = methods[i];
-//			    	}
-//			    }
+//				System.out.println("methods: "+Arrays.toString(ms));
+//				throw new RuntimeException("No method '"+sig+"' on class: "+getClass());
 //			}
-//			else if(methods.length==1)
+//			
+////			StackTraceElement[] s = Thread.currentThread().getStackTrace();
+////			String name = s[2].getMethodName();
+//			
+////			System.out.println("name is: "+name);
+//
+////			for(int i=0;i<s.length; i++)
+////			{
+////				System.out.println(s[i].getMethodName());
+////			}
+////			String name = SReflect.getMethodName();
+////			Method[] methods = SReflect.getMethods(getClass(), name);
+////		    Method method = null;
+////			if(methods.length>1)
+////			{
+////			    for(int i=0; i<methods.length && method==null; i++)
+////			    {
+////			    	Class<?>[] types = methods[i].getParameterTypes();
+////			    	if(types.length==params.length)
+////			    	{
+////			    		// check param types
+////			    		method = methods[i];
+////			    	}
+////			    }
+////			}
+////			else if(methods.length==1)
+////			{
+////				method = methods[0];
+////			}
+////			else
+////			{
+////				throw new RuntimeException("No method '"+name+"' on class: "+getClass());
+////			}
+////			System.out.println("call: "+this+" "+method+" "+SUtil.arrayToString(params)+" "+name);
+//			
+////			Request req = (Request)getClass().getDeclaredField("__greq").get(this);
+//////			System.out.println("call: "+this+" "+method+" "+req);
+////			for(String name: req.getHeaderNames())
+////			{
+////				System.out.println("header: "+name+": "+req.getHeader(name));
+////			}
+//			
+//			// check if mappers are there
+//			ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
+//			
+////			Object service = rc.getProperty(JADEXSERVICE);
+//			Object service = rc.getProperty("jadexservice");
+////			System.out.println("jadex service is: "+service);
+//
+//			HttpServletRequest req = (HttpServletRequest)getClass().getDeclaredField("__req").get(this);
+//			Request greq = (Request)getClass().getDeclaredField("__greq").get(this);
+//			ContainerRequest creq = (ContainerRequest)getClass().getDeclaredField("__creq").get(this);
+//
+//			
+//			Method targetmethod = null;
+//			if(method.isAnnotationPresent(MethodMapper.class))
 //			{
-//				method = methods[0];
+//				MethodMapper mm = method.getAnnotation(MethodMapper.class);
+//				targetmethod = SReflect.getMethod(service.getClass(), mm.value(), mm.parameters());
 //			}
 //			else
 //			{
-//				throw new RuntimeException("No method '"+name+"' on class: "+getClass());
+//				String mname = method.getName();
+//				if(mname.endsWith("XML"))
+//					mname = mname.substring(0, mname.length()-3);
+//				if(mname.endsWith("JSON"))
+//					mname = mname.substring(0, mname.length()-4);
+//				targetmethod = service.getClass().getMethod(mname, method.getParameterTypes());
 //			}
-//			System.out.println("call: "+this+" "+method+" "+SUtil.arrayToString(params)+" "+name);
-			
-			// check if mappers are there
-			ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
-			
-//			Object service = rc.getProperty(JADEXSERVICE);
-			Object service = rc.getProperty("jadexservice");
-//			System.out.println("jadex service is: "+service);
-
-			Method targetmethod = null;
-			if(method.isAnnotationPresent(MethodMapper.class))
-			{
-				MethodMapper mm = method.getAnnotation(MethodMapper.class);
-				targetmethod = SReflect.getMethod(service.getClass(), mm.value(), mm.parameters());
-			}
-			else
-			{
-				String mname = method.getName();
-				if(mname.endsWith("XML"))
-					mname = mname.substring(0, mname.length()-3);
-				if(mname.endsWith("JSON"))
-					mname = mname.substring(0, mname.length()-4);
-				targetmethod = service.getClass().getMethod(mname, method.getParameterTypes());
-			}
-			
-//			System.out.println("target: "+targetmethod);
-			
-			Object[] targetparams = params;
-			if(method.isAnnotationPresent(ParametersMapper.class))
-			{
-//				System.out.println("foundmapper");
-				ParametersMapper mm = method.getAnnotation(ParametersMapper.class);
-				if(!mm.automapping())
-				{
-					Class<?> clazz = mm.value().clazz();
-					Object mapper;
-					if(!Object.class.equals(clazz))
-					{
-						mapper = clazz.newInstance();
-					}
-					else
-					{
-						mapper = SJavaParser.evaluateExpression(mm.value().value(), null);
-					}
-					if(mapper instanceof IValueMapper)
-						mapper = new DefaultParameterMapper((IValueMapper)mapper);
-					
-					targetparams = ((IParameterMapper)mapper).convertParameters(params);
-				}
-				else
-				{
-//					System.out.println("automapping detected");
-					Class<?>[] ts = targetmethod.getParameterTypes();
-					targetparams = new Object[ts.length];
-					if(ts.length==1 && SReflect.isSupertype(ts[0], Map.class))
-					{
-						UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
-						MultivaluedMap<String, String> vals = ui.getQueryParameters();
-						Map<String, String> ps = new HashMap<String, String>();
-						for(Map.Entry<String, List<String>> e: vals.entrySet())
-						{
-							List<String> val = e.getValue();
-							ps.put(e.getKey(), val!=null && !val.isEmpty()? val.get(0): null);
-						}
-						targetparams[0] = ps;
-					}
-				}
-			}
-	
-//			System.out.println("method: "+method.getName()+" "+method.getDeclaringClass().getName());
-//			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
-//			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
 //			
-			ret = targetmethod.invoke(service, targetparams);
-			if(ret instanceof IFuture)
-			{
-				ret = ((IFuture<?>)ret).get(new ThreadSuspendable());
-			}
-			
-			if(method.isAnnotationPresent(ResultMapper.class))
-			{
-				ResultMapper mm = method.getAnnotation(ResultMapper.class);
-				Class<?> clazz = mm.value().clazz();
-				IValueMapper mapper;
-//				System.out.println("res mapper: "+clazz);
-				if(!Object.class.equals(clazz))
-				{
-					mapper = (IValueMapper)clazz.newInstance();
-				}
-				else
-				{
-					mapper = (IValueMapper)SJavaParser.evaluateExpression(mm.value().value(), null);
-				}
-				
-				ret = mapper.convertValue(ret);
-			}
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
-		
-		return ret;
+////			System.out.println("target: "+targetmethod);
+//			
+//			Object[] targetparams = params;
+//			if(method.isAnnotationPresent(ParametersMapper.class))
+//			{
+////				System.out.println("foundmapper");
+//				ParametersMapper mm = method.getAnnotation(ParametersMapper.class);
+//				if(!mm.automapping())
+//				{
+//					Class<?> clazz = mm.value().clazz();
+//					Object mapper;
+//					if(!Object.class.equals(clazz))
+//					{
+//						mapper = clazz.newInstance();
+//					}
+//					else
+//					{
+//						mapper = SJavaParser.evaluateExpression(mm.value().value(), null);
+//					}
+//					if(mapper instanceof IValueMapper)
+//						mapper = new DefaultParameterMapper((IValueMapper)mapper);
+//					
+//					targetparams = ((IParameterMapper)mapper).convertParameters(params, req!=null? req: greq);
+//				}
+//				else
+//				{
+//					// In case of GET autmap the query parameters
+//					if(method.isAnnotationPresent(GET.class))
+//					{
+//	//					System.out.println("automapping detected");
+//						Class<?>[] ts = targetmethod.getParameterTypes();
+//						targetparams = new Object[ts.length];
+//						if(ts.length==1)
+//						{
+//							if(SReflect.isSupertype(ts[0], Map.class))
+//							{
+//								UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+//								MultivaluedMap<String, String> vals = ui.getQueryParameters();
+//								targetparams[0] = SInvokeHelper.convertMultiMap(vals);
+//							}
+//							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
+//							{
+//								UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+//								targetparams[0] = SInvokeHelper.convertMultiMap(ui.getQueryParameters());
+//							}
+//						}
+//					}
+//					else //if(method.isAnnotationPresent(POST.class))
+//					{
+//						Class<?>[] ts = targetmethod.getParameterTypes();
+//						targetparams = new Object[ts.length];
+////						System.out.println("automapping detected: "+SUtil.arrayToString(ts));
+//						if(ts.length==1)
+//						{
+//							if(SReflect.isSupertype(ts[0], Map.class))
+//							{
+//								if(greq!=null)
+//								{
+////									SInvokeHelper.debug(greq);
+//									// Hack to make grizzly allow parameter parsing
+//									// Jersey calls getInputStream() hindering grizzly parsing params
+//									try
+//									{
+//										Request r = (Request)greq;
+//										Field f = r.getClass().getDeclaredField("usingInputStream");
+//										f.setAccessible(true);
+//										f.set(r, Boolean.FALSE);
+////										System.out.println("params: "+r.getParameterNames());
+//									}
+//									catch(Exception e)
+//									{
+//										e.printStackTrace();
+//									}
+//									targetparams[0] = SInvokeHelper.convertMultiMap(greq.getParameterMap());
+//								}
+//								else if(req!=null)
+//								{
+//									targetparams[0] = SInvokeHelper.convertMultiMap(req.getParameterMap());
+//								}
+//							}
+//							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
+//							{
+//								targetparams[0] = SInvokeHelper.convertToMultiMap(req.getParameterMap());
+//							}
+//						}
+//					}
+//				}
+//			}
+//	
+////			System.out.println("method: "+method.getName()+" "+method.getDeclaringClass().getName());
+////			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
+////			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
+////			
+//			ret = targetmethod.invoke(service, targetparams);
+//			if(ret instanceof IFuture)
+//			{
+//				ret = ((IFuture<?>)ret).get(new ThreadSuspendable());
+//			}
+//			
+//			if(method.isAnnotationPresent(ResultMapper.class))
+//			{
+//				ResultMapper mm = method.getAnnotation(ResultMapper.class);
+//				Class<?> clazz = mm.value().clazz();
+//				IValueMapper mapper;
+////				System.out.println("res mapper: "+clazz);
+//				if(!Object.class.equals(clazz))
+//				{
+//					mapper = (IValueMapper)clazz.newInstance();
+//				}
+//				else
+//				{
+//					mapper = (IValueMapper)SJavaParser.evaluateExpression(mm.value().value(), null);
+//				}
+//				
+//				ret = mapper.convertValue(ret);
+//			}
+//		}
+//		catch(Throwable t)
+//		{
+//			throw new RuntimeException(t);
+//		}
+//		
+//		return ret;
 	}
 	
 	/**
@@ -1474,6 +1566,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		return values;
 	}
 	
+	
 //	/**
 //	 *  Main for testing.
 //	 */
@@ -1484,5 +1577,4 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //		URI newuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
 //		System.out.println(newuri);
 //	}
-
 }

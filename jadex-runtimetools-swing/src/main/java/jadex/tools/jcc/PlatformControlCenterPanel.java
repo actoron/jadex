@@ -31,7 +31,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -372,9 +371,22 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 //		}
 //        if(cnt>0)
         
-		JButton jlb = new JadexLogoButton(toolbar);
-		toolbar.addSeparator();
-		toolbar.add(jlb);
+//        System.out.println("Logobutton: "+System.getProperty("jadex_logobutton"));
+        String	buttonclass	= System.getProperty("jadex_logobutton", JadexLogoButton.class.getName());
+        JButton jlb	= null;
+        try
+        {
+        	jlb	= (JButton)Class.forName(buttonclass).newInstance();
+        }
+        catch(Exception e)
+        {
+        }
+        
+        if(jlb!=null)
+        {
+			toolbar.addSeparator();
+			toolbar.add(jlb);
+        }
 		
         toolbar.validate();
         toolbar.repaint();

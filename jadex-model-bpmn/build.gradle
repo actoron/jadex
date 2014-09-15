@@ -1,0 +1,6 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-bridge') // todo: remove, big problem IModelInfo 
+	compile project(':jadex-xml')
+}

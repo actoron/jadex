@@ -18,6 +18,9 @@ import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.Boolean3;
+import jadex.micro.KernelComponentAgent;
+import jadex.micro.KernelMicroAgent;
+import jadex.micro.KernelMultiAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -34,8 +37,13 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.platform.sensor.SensorHolderAgent;
+import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.deployment.DeploymentService;
 import jadex.platform.service.df.DirectoryFacilitatorService;
+import jadex.platform.service.extensions.ExtensionsAgent;
+import jadex.platform.service.monitoring.MonitoringAgent;
+import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.settings.SettingsService;
 import jadex.platform.service.simulation.SimulationService;
 
@@ -49,7 +57,7 @@ import java.util.logging.Level;
 {
 	@Argument(name="platformname", clazz=String.class, defaultvalue="\"jadex\""),
 	@Argument(name="configname", clazz=String.class, defaultvalue="\"auto\""),
-	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
 	@Argument(name="platformcomponent", clazz=Class.class, defaultvalue="jadex.platform.service.cms.PlatformComponent.class"),
 	@Argument(name="welcome", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="programarguments", clazz=String[].class),
@@ -123,25 +131,27 @@ import java.util.logging.Level;
 })
 
 @ComponentTypes({
-	@ComponentType(name="monitor", filename="jadex/platform/service/monitoring/MonitoringAgent.class"),
-	@ComponentType(name="extensions", filename="jadex/platform/service/extensions/ExtensionsAgent.class"),
-	@ComponentType(name="kernel_component", filename="jadex/micro/KernelComponentAgent.class"),
+	@ComponentType(name="system", clazz=SystemAgent.class),
+	@ComponentType(name="monitor", clazz=MonitoringAgent.class), //filename="jadex/platform/service/monitoring/MonitoringAgent.class"),
+	@ComponentType(name="extensions", clazz=ExtensionsAgent.class), //filename="jadex/platform/service/extensions/ExtensionsAgent.class"),
+	@ComponentType(name="kernel_component", clazz=KernelComponentAgent.class), //filename="jadex/micro/KernelComponentAgent.class"),
 	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
-	@ComponentType(name="kernel_micro", filename="jadex/micro/KernelMicroAgent.class"),
+	@ComponentType(name="kernel_micro", clazz=KernelMicroAgent.class), // filename="jadex/micro/KernelMicroAgent.class"),
 	@ComponentType(name="kernel_bdiv3", filename="jadex/bdiv3/KernelBDIV3Agent.class"),
 	@ComponentType(name="kernel_bdi", filename="jadex/bdi/KernelBDI.component.xml"),
 	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
-	@ComponentType(name="kernel_bpmn", filename="jadex/bpmn/KernelBPMN.component.xml"),
+//	@ComponentType(name="kernel_bpmn", filename="jadex/bpmn/KernelBPMN.component.xml"),
+	@ComponentType(name="kernel_bpmn", filename="jadex/micro/KernelBpmnAgent.class"),
 	@ComponentType(name="kernel_gpmn", filename="jadex/gpmn/KernelGPMN.component.xml"),
-	@ComponentType(name="kernel_multi", filename="jadex/micro/KernelMultiAgent.class"),
-	@ComponentType(name="rms", filename="jadex/platform/service/remote/RemoteServiceManagementAgent.class"),
+	@ComponentType(name="kernel_multi", clazz=KernelMultiAgent.class), //filename="jadex/micro/KernelMultiAgent.class"),
+	@ComponentType(name="rms", clazz=RemoteServiceManagementAgent.class), //filename="jadex/platform/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"),
-	@ComponentType(name="awa", filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
+	@ComponentType(name="awa", clazz=AwarenessManagementAgent.class), //filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
 	@ComponentType(name="rspublish", filename="jadex/extension/rs/publish/RSPublishAgent.class"),
 	@ComponentType(name="wspublish", filename="jadex/extension/ws/publish/WSPublishAgent.class"),
 	@ComponentType(name="cli", filename="jadex/platform/service/cli/CliAgent.class"),
-	@ComponentType(name="sensor", filename="jadex/platform/sensor/SensorHolderAgent.class")
+	@ComponentType(name="sensor", clazz=SensorHolderAgent.class) //filename="jadex/platform/sensor/SensorHolderAgent.class")
 })
 
 @ProvidedServices({
@@ -182,6 +192,7 @@ import java.util.logging.Level;
 		@NameValue(name="ssltcpport", value="0"),
 		@NameValue(name="platformname", value="null")
 	}, components={
+		@Component(name="system", type="system", daemon=Boolean3.TRUE),
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="extensions", type="extensions", daemon=Boolean3.TRUE, number="($args.extensions!=null && !jadex.commons.SReflect.isAndroid()) ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),
@@ -218,6 +229,7 @@ import java.util.logging.Level;
 		//@NameValue(name="platformname", value="null"),
 		//@NameValue(name="kernels", value="\"component,micro,application,bdi,bdiv3,bpmn,gpmn\"")
 	}, components={
+		@Component(name="system", type="system", daemon=Boolean3.TRUE),
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="extensions", type="extensions", daemon=Boolean3.TRUE, number="$args.extensions!=null ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),

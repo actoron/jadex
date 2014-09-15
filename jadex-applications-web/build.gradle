@@ -1,0 +1,17 @@
+apply plugin: 'war'
+apply plugin: 'eclipse-wtp'
+
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-xml')
+	compile project(':jadex-bridge')
+	compile project(':jadex-tools-base-swing')
+	compile project(':jadex-kernel-bdi')
+	compile project(':jadex-kernel-bdiv3')
+	compile project(':jadex-kernel-micro')
+	compile project(':jadex-kernel-component')
+	compile project(':jadex-platform')
+	
+	compile 'javax.servlet:servlet-api:2.5'
+}

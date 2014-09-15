@@ -60,10 +60,10 @@ public class PropertyPanelFactory
 	public static final String TIMER_EVENT = "TimerEvent";
 	
 	/** Filter keyword for message events. */
-	public static final String MESSAGE_EVENT = "TimerEvent";
+	public static final String MESSAGE_EVENT = "MessageEvent";
 	
 	/** Filter keyword for rule events. */
-	public static final String RULE_EVENT = "TimerEvent";
+	public static final String RULE_EVENT = "RuleEvent";
 	
 	/** Filter keyword for signal events. */
 	public static final String SIGNAL_EVENT = "SignalEvent";

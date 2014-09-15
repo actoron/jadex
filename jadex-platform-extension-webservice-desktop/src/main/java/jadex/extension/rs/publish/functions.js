@@ -69,12 +69,15 @@
 		
 //		var http = xmlHttpReq;
 		var http = new XMLHttpRequest();
-		var multipart = "";
-	
+		
 		http.open(method, url, true);
+		
+		var multipart = "";
 	
 		var boundary = Math.random().toString().substr(2);
 
+		var textpost = "post"==method.toLowerCase();
+		
 		if(types.length>0)
 		{
 			var accept = "";
@@ -82,6 +85,11 @@
 			var num = 0;
 			for(i=0; i<types.length; i++)
 			{
+				if("text/plain"!=types[i])
+				{
+					textpost = false;
+				}
+				
 				if(!contains(had, types[i]) && "multipart/form-data"!=types[i])
 				{
 					if(accept!="")
@@ -98,23 +106,7 @@
 			// else use default browser accept header
 //			http.setRequestHeader("Accept", "text/html,application/json;q=0.9,*/*;q=0.8");
 		}
-		
-		http.setRequestHeader("content-type",
-			"multipart/form-data; charset=utf-8; boundary=" + boundary);
 			
-		for(i=0; i<names.length; i++)
-		{
-			multipart += "--" + boundary
-				+ "\r\nContent-Disposition: form-data; name=\u0022" + names[i] + "\u0022" 
-				+ "\r\nContent-Type: "+ types[i]
-				+ "\r\n\r\n"
-				+ vals[i] 
-				+ "\r\n";
-		}
-		multipart += "--" + boundary + "--\r\n";
-		
-//		alert(multipart);
-		
 		http.onreadystatechange = function() 
 		{
 			if(http.readyState == 4 && http.status == 200) 
@@ -159,8 +151,33 @@
 //				}
 			}
 		}
-	
-		http.send(multipart);
+		
+		if(textpost)
+		{
+			var fd = new FormData(form);
+//			http.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+			http.send(fd);
+		}
+		else
+		{
+			http.setRequestHeader("content-type",
+				"multipart/form-data; charset=utf-8; boundary=" + boundary);
+			
+			for(i=0; i<names.length; i++)
+			{
+				multipart += "--" + boundary
+					+ "\r\nContent-Disposition: form-data; name=\u0022" + names[i] + "\u0022" 
+					+ "\r\nContent-Type: "+ types[i]
+					+ "\r\n\r\n"
+					+ vals[i] 
+					+ "\r\n";
+			}
+			multipart += "--" + boundary + "--\r\n";
+//			alert(multipart);
+			http.send(multipart);
+		}
+		
+
 	}
 	
 	function contains(a, obj) 

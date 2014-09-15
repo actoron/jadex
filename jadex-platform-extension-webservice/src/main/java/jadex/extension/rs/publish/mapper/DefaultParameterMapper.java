@@ -29,7 +29,7 @@ public class DefaultParameterMapper implements IParameterMapper
 	 *  @param parameters The values to convert.
 	 *  @return The converted parameters.
 	 */
-	public Object[] convertParameters(Object[] parameters) throws Exception
+	public Object[] convertParameters(Object[] parameters, Object context) throws Exception
 	{
 		Object[] ret = new Object[parameters.length];
 		for(int i=0; i<parameters.length; i++)
@@ -38,4 +38,5 @@ public class DefaultParameterMapper implements IParameterMapper
 		}
 		return ret;
 	}
+
 }

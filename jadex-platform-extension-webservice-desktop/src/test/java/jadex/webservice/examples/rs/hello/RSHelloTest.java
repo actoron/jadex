@@ -3,6 +3,7 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
@@ -21,7 +22,7 @@ import org.junit.Test;
 public class RSHelloTest //extends TestCase
 {
 
-	private static final String BASE_URI = "http://localhost";
+//	private static final String BASE_URI = "http://localhost";
 //	private int basePort = 9123;
 	private Hello hello;
 //	private HttpServer httpServer;
@@ -37,7 +38,8 @@ public class RSHelloTest //extends TestCase
 		sid	= hello.getServiceIdentifier();
 		
 		pservice = new GrizzlyRestServicePublishService();
-		PublishInfo pi = new PublishInfo("http://localhost:9123", "", IRSHelloService.class, null);
+		// Grizzly breaks without trailing '/murks' !?
+		PublishInfo pi = new PublishInfo("http://localhost:9123/murks", "", IRSHelloService.class);
 		pi.addProperty("generate", "false");
 //		
 		IFuture<Void> publishService = pservice.publishService(getClass().getClassLoader(), hello, pi);
@@ -102,7 +104,7 @@ public class RSHelloTest //extends TestCase
 		{
 		ThreadSuspendable sus = new ThreadSuspendable();
 
-		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IHelloService.class);
+		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 
 		IHelloService hs = fut.get(sus);
 

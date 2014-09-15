@@ -114,6 +114,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 //		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.TASK, new Dimension(160, 100));
 		DEFAULT_ACTIVITY_SIZES.put(MTask.TASK, new Dimension(160, 100));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, new Dimension(480, 200));
+		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Unfolded", new Dimension(480, 200));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Event", new Dimension(480, 200));
 		DEFAULT_ACTIVITY_SIZES.put(VExternalSubProcess.class.getSimpleName(), new Dimension(160, 100));
 		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new Dimension(60, 60));
@@ -129,6 +130,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 	public static final Map<String, Dimension> COLLAPSED_SIZES = new HashMap<String, Dimension>();
 	static
 	{
+		// Hack! Unfolded only because that's the initialization style
+		COLLAPSED_SIZES.put(ModelContainer.EDIT_MODE_SUBPROCESS + "_Unfolded", new Dimension(160, 100));
 		COLLAPSED_SIZES.put(ModelContainer.EDIT_MODE_SUBPROCESS, new Dimension(160, 100));
 //		COLLAPSED_SIZES.put(ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, COLLAPSED_SIZES.get(ModelContainer.EDIT_MODE_SUBPROCESS));
 	}
@@ -500,10 +503,13 @@ public class BpmnStylesheetColor extends mxStylesheet
 		
 		style = new HashMap<String, Object>(style);
 		style.put(mxConstants.STYLE_FILLCOLOR, SUBPROCESS_COLOR);
-		style.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);
-		style.put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_LEFT);
 		style.put(mxConstants.STYLE_SPACING, 10);
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, style);
+		
+		style = new HashMap<String, Object>(style);
+		style.put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_LEFT);
+		style.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);
+		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Unfolded", style);
 		
 		style = new HashMap<String, Object>(style);
 		style.put(mxConstants.STYLE_FILLCOLOR, EVENT_SUBPROCESS_COLOR);

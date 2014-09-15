@@ -6,6 +6,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.IValueFetcher;
 
 import java.util.List;
 import java.util.Map;
@@ -141,7 +142,7 @@ public interface IModelInfo
 	 *  @return The property value.
 	 */
 	public Object	getProperty(String name, ClassLoader cl);
-
+	
 	/**
 	 *  Get the nf properties.
 	 *  @return The nf properties.

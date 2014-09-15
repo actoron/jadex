@@ -43,10 +43,19 @@ public class SValidation
 			List<MSequenceEdge> edges = mactivity.getOutgoingSequenceEdges();
 			if (edges != null)
 			{
+				edgeloop:
 				for (MSequenceEdge edge : edges)
 				{
 					if (!acts.contains(edge.getTarget()))
 					{
+						for (MActivity pact : acts)
+						{
+							// check if the source is a handler that is contained in a parent in the selected group.
+							if (pact.getEventHandlers() != null && pact.getEventHandlers().contains(edge.getSource()))
+							{
+								continue edgeloop;
+							}
+						}
 						hasoutedge = true;
 						break edgesearch;
 					}
@@ -56,10 +65,22 @@ public class SValidation
 			edges = mactivity.getIncomingSequenceEdges();
 			if (edges != null)
 			{
+				edgeloop:
 				for (MSequenceEdge edge : edges)
 				{
 					if (!acts.contains(edge.getSource()))
 					{
+						if (edge.getSource().isEventHandler())
+						{
+							for (MActivity pact : acts)
+							{
+								// check if the source is a handler that is contained in a parent in the selected group.
+								if (pact.getEventHandlers() != null && pact.getEventHandlers().contains(edge.getSource()))
+								{
+									continue edgeloop;
+								}
+							}
+						}
 						hasoutedge = true;
 						break edgesearch;
 					}

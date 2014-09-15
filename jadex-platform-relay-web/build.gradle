@@ -1,0 +1,10 @@
+apply plugin: 'war'
+apply plugin: 'eclipse-wtp'
+
+dependencies 
+{
+	compile project(':jadex-platform-extension-relay')
+	
+	compile 'javax.servlet:servlet-api:2.4' // <scope>provided</scope>
+}
+

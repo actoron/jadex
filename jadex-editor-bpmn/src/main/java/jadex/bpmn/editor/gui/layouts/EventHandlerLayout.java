@@ -72,7 +72,7 @@ public class EventHandlerLayout extends mxGraphLayout
 			Dimension evtsize = new Dimension(BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_BOUNDARY"));
 //			double vpos = graph.getBoundingBox(vparent).getHeight() - 0.5 * evtsize.height;
 			double vpos = vparent.getGeometry().getHeight() - 0.5 * evtsize.height - 1;
-			double dist = evtsize.width * 1.5;
+			double dist = evtsize.width * 1.15;// 1.5;
 //			System.out.println(dist);
 			if (pw > 0.0)
 			{
@@ -94,7 +94,7 @@ public class EventHandlerLayout extends mxGraphLayout
 				mxGeometry geo = vactivity.getGeometry();
 				geo.setWidth(evtsize.width);
 				geo.setHeight(evtsize.height);
-				geo.setX(dist * 0.5 + dist * count++);
+				geo.setX(dist * 0.2 + dist * count++);
 				geo.setY(vpos);
 				graph.getView().invalidate(vactivity);
 			}

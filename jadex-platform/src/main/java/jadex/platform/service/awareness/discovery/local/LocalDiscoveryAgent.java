@@ -22,6 +22,8 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -46,6 +48,7 @@ import java.lang.reflect.Method;
 {
 	@Argument(name="leasetime", clazz=Long.class, defaultvalue="30000L")
 })
+@Properties(@NameValue(name="system", value="true"))
 public class LocalDiscoveryAgent implements IDiscoveryService
 {
 	/** The discovery directory. */

@@ -5,6 +5,8 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.platform.service.awareness.discovery.ConnectionException;
 import jadex.platform.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
@@ -28,6 +30,7 @@ import java.net.InetAddress;
 	@Argument(name="address", clazz=String.class, defaultvalue="\"134.100.11.233\"", description="The ip address of registry."),
 	@Argument(name="port", clazz=int.class, defaultvalue="55699", description="The port used for finding other agents.")
 })
+@Properties(@NameValue(name="system", value="true"))
 public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 {
 	//-------- attributes --------

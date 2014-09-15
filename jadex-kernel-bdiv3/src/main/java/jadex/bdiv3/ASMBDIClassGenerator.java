@@ -869,8 +869,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	}
 	
 	/**
-	 * Transform byte Array into Class and define it in classloader.
-	 * @return the loaded Class or <code>null</code>, if the class is not valid, such as Map.entry "inner Classes".
+	 *  Transform byte Array into Class and define it in classloader.
+	 *  @return the loaded class or <code>null</code>, if the class is not valid, such as Map.entry "inner Classes".
 	 */
 	public Class<?> toClass(String name, byte[] data, ClassLoader loader, ProtectionDomain domain)
 	{
@@ -1091,6 +1091,21 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		m.invoke(null, new Object[]{new String[0]});
 	}
 	
-	
+	/**
+	 *  Check if a bdi agent class was enhanced.
+	 *  @throws RuntimeException if was not enhanced.
+	 */
+	public static void checkEnhanced(Class<?> clazz)
+	{
+		// check if agentclass is bytecode enhanced
+		try
+		{
+			clazz.getField("__agent");
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException("BDI agent class was not bytecode enhanced. This may happen if the class is accessed directly in application code before loadModel() was called.");
+		}
+	}
 
 }

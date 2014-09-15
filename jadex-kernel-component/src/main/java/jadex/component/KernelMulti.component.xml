@@ -17,8 +17,8 @@
 		<!-- <argument name="ignorekernels">new String[] {"KernelBDI.component.xml"}</argument> -->
 		<argument name="ignorekernels" class="String[]">null</argument>
 		<argument name="ignoreextensions" class="String[]">null</argument>
-		<!-- Regular expression identifying kernel URIs. -->
-		<argument name="kerneluriregex" class="String">".*[Kk]ernel.*"</argument>
+		<!-- Regular expression identifying kernel URIs (ignored on android as there is only the DEX file). -->
+		<argument name="kerneluriregex" class="String">jadex.commons.SReflect.isAndroid() ? ".*" : ".*[Kk]ernel.*"</argument>
 	</arguments>
 	
 	<componenttypes>

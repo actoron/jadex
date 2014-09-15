@@ -21,7 +21,7 @@
 		<!-- The configuration to use. -->	
 		<argument name="configname" class="String">"auto"</argument>
 		<!-- Automatically shut down the platform when no user agents are running anymore. -->	
-		<argument name="autoshutdown" class="boolean">true</argument>
+		<argument name="autoshutdown" class="boolean">false</argument>
 		<!-- Tell the starter to use the standalone adapter factory (usually no need to change). -->	
 		<argument name="adapterfactory" class="Class">jadex.platform.service.cms.ComponentAdapterFactory.class</argument>
 		<!-- Tell starter to print welcome message. -->
@@ -160,6 +160,7 @@
 	</arguments>
 	
 	<componenttypes>
+		<componenttype filename="jadex/platform/System.component.xml" name="system"/>
 		<componenttype filename="jadex/platform/service/extensions/Extensions.component.xml" name="extensions"/>
 		
 		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>
@@ -340,6 +341,7 @@
 			</arguments>
 			
 			<components>
+			    <component name="system" type="system" daemon="true"/>
 			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
@@ -386,6 +388,7 @@
 		<!-- Fixed name and port.  Dynamically loads kernels as required.-->
 		<configuration name="fixed">
 			<components>
+			  	<component name="system" type="system" daemon="true"/>
 			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>

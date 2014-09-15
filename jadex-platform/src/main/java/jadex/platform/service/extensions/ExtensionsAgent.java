@@ -8,6 +8,8 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -21,6 +23,7 @@ import jadex.micro.annotation.RequiredServices;
 @Arguments(@Argument(name="extensions", clazz=String.class))
 @ProvidedServices(@ProvidedService(type=IExtensionLoaderService.class, implementation=@Implementation(ExtensionLoaderService.class)))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
+@Properties(@NameValue(name="system", value="true"))
 @Agent
 public class ExtensionsAgent
 {

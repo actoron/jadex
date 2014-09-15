@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.ASMBDIClassGenerator;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.PojoBDIAgent;
@@ -99,6 +100,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+
 /**
  *  The bdi agent interpreter.
  *  Its steps consist of two parts
@@ -142,6 +146,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	protected MicroAgent createAgent(Class<?> agentclass, MicroModel model, IPersistInfo pinfo) throws Exception
 	{
+		ASMBDIClassGenerator.checkEnhanced(agentclass);
+		
 		MicroAgent ret;
 		final Object agent = agentclass.newInstance();
 		if(agent instanceof MicroAgent)
@@ -1206,6 +1212,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 												if(!goal.isFinished())
 												{
 													goal.setException(new GoalFailureException("drop condition: "+m.getName()));
+//													{
+//														public void printStackTrace() 
+//														{
+//															super.printStackTrace();
+//														}
+//													});
 													goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.FAILED);
 												}
 											}

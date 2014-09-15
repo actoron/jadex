@@ -54,7 +54,7 @@ public class Email
 	{
 		this.sender = sender;
 		this.content = content;
-		this.contenttype = contenttype;
+		this.contenttype = contenttype==null? "text/plain": contenttype;
 		this.subject = subject;
 		this.receivers = receivers;
 		this.ccs = ccs;

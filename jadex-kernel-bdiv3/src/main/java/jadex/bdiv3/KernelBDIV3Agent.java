@@ -11,7 +11,8 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Component kernel.
  */
-@Properties(@NameValue(name="kernel.types", value="new String[]{\"BDI.class\"}"))
+//@Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\"BDI.class\"}")})
+@Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\"BDI.class\"}")})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(
 //	expression="new jadex.bdiv3.BDIAgentFactory($component)"))

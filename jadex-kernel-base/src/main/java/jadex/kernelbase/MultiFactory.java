@@ -308,10 +308,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							}
 						}
 						
-						List	tmp	= new ArrayList(potentialuris);
-						Collections.sort(tmp);
-						potentialuris.clear();
-						potentialuris.addAll(tmp);
+						// Sort uris (for repeatability during debugging)
+//						List	tmp	= new ArrayList(potentialuris);
+//						Collections.sort(tmp);
+//						potentialuris.clear();
+//						potentialuris.addAll(tmp);
 						
 						if(kerneldefaultlocations.isEmpty())
 							ret.setResult(null);

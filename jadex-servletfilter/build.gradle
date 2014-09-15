@@ -1,0 +1,6 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	
+	compile 'javax.servlet:javax.servlet-api:3.0.1'
+}

@@ -45,6 +45,7 @@
 					false
 				</filtering>
 				<excludes>
+					<exclude>**/*.java</exclude>
 					<exclude>
 						jadex/bridge/version.properties
 					</exclude>

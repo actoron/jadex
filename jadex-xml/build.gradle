@@ -1,0 +1,6 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	testCompile project(':jadex-commons').sourceSets.test.output
+}
+

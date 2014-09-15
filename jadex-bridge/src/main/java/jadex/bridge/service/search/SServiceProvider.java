@@ -16,6 +16,7 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.IAsyncFilter;
+import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
@@ -42,7 +43,77 @@ public class SServiceProvider
 	/** The reference method cache (method -> boolean[] (is reference)). */
 	public static final Map methodreferences = Collections.synchronizedMap(new LRU(500));
 	
-	//-------- search methods --------
+	//-------- sync method (only local search) --------
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type)
+	{
+		return getLocalService(provider, type, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type, final String scope)
+	{
+		return getLocalService(provider, type, scope, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type, final String scope, final IFilter<T> filter)
+	{
+		T ret = ((IPlatformComponentAccess)provider).getServiceRegistry().searchService(type, provider.getComponentIdentifier(), scope, filter);
+		if(ret==null)
+		{
+			throw new ServiceNotFoundException(type.getName());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IInternalAccess provider, final Class<T> type)
+	{
+		return getLocalServices(provider, type, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IInternalAccess provider, final Class<T> type, final String scope)
+	{
+		return getLocalServices(provider, type, scope, null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> Collection<T> getLocalServices(final IInternalAccess provider, final Class<T> type, final String scope, final IFilter<T> filter)
+	{
+		Collection<T> ret = ((IPlatformComponentAccess)provider).getServiceRegistry().searchServices(type, provider.getComponentIdentifier(), scope, filter);
+		
+		return ret;
+	}
+	
+	//-------- async methods --------
 
 	/**
 	 *  Get one service of a type.
@@ -99,6 +170,8 @@ public class SServiceProvider
 		
 		return ret;
 	}
+	
+
 	
 	/**
 	 *  Get one service with id.

@@ -473,7 +473,7 @@ public class Starter
 	
 					final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
 						autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(),
-						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
+						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
 					
 					boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
 					boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));

@@ -1,0 +1,16 @@
+dependencies 
+{
+	compile project(':jadex-bridge')
+	compile project(':jadex-xml')
+	compile project(':jadex-commons')
+	compile project(':jadex-kernel-bpmn')
+	compile project(':jadex-kernel-application')
+	compile project(':jadex-kernel-bdi')
+	compile project(':jadex-kernel-bdibpmn')
+	compile project(':jadex-applib-bdi')
+	compile project(':jadex-kernel-extension-envsupport')
+	compile project(':jadex-kernel-extension-agr')
+	compile project(':jadex-tools-base-swing')
+	compile project(':jadex-rules')
+	compile project(':jadex-applib-bdi')
+}

@@ -10,6 +10,9 @@ import com.mxgraph.view.mxGraph;
  */
 public class VSubProcess extends VActivity
 {
+	/** Pseudo folding flag. */
+	protected boolean pseudofolded = false;
+	
 	public VSubProcess(mxGraph graph)
 	{
 		super(graph);
@@ -25,9 +28,34 @@ public class VSubProcess extends VActivity
 		{
 			ret += "_Event";
 		}
+		else
+		{
+			if (!isPseudoFolded())
+			{
+				ret += "_Unfolded";
+			}
+		}
 		
 		return ret;
 	}
+
+	/**
+	 * @return the pseudofolded
+	 */
+	public boolean isPseudoFolded()
+	{
+		return pseudofolded;
+	}
+
+	/**
+	 * @param pseudofolded the pseudofolded to set
+	 */
+	public void setPseudoFolded(boolean pseudofolded)
+	{
+		this.pseudofolded = pseudofolded;
+	}
+	
+	
 	
 	/**
 	 *  Checks if connectable.

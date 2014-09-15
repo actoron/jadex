@@ -11,6 +11,8 @@ import jadex.bridge.sensor.memory.MaxPermGenMemoryProperty;
 import jadex.bridge.sensor.memory.UsedMemoryProperty;
 import jadex.bridge.sensor.memory.UsedPermGenMemoryProperty;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 
 /**
  *  Agent that installs some top-level non-functional properties
@@ -28,6 +30,7 @@ import jadex.micro.annotation.Agent;
 	@NFProperty(UsedPermGenMemoryProperty.class),
 	@NFProperty(LoadedClassesProperty.class)
 })
+@Properties(@NameValue(name="system", value="true"))
 public class SystemSensorAgent
 {
 }

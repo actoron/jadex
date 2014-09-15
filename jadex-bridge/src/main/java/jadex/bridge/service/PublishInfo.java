@@ -48,7 +48,7 @@ public class PublishInfo
 	 */
 	public PublishInfo(String pid, String publishtype, Class<?> mapping)
 	{
-		this(pid, publishtype, mapping, null);
+		this(pid, publishtype, mapping, (UnparsedExpression[])null);
 	}
 		
 	/**
@@ -62,7 +62,33 @@ public class PublishInfo
 		this.pid = pid;
 		this.publishtype = publishtype;
 		this.mapping = mapping==null? null: new ClassInfo(mapping);
-		this.properties = SUtil.arrayToList(properties);
+		if(properties!=null)
+		{
+			this.properties = SUtil.arrayToList(properties);
+		}
+	}
+	
+	/**
+	 *  Create a new publish info.
+	 *  Convenience constructor that creates unparsed expressions from a string array containing consecutive name/value pairs.
+	 *  @param pid The publish id, e.g. url.
+	 *  @param publishtype The publish type.
+	 */
+	public PublishInfo(String pid, String publishtype, 
+		Class<?> mapping, Object[] props)
+	{
+		this.pid = pid;
+		this.publishtype = publishtype;
+		this.mapping = mapping==null? null: new ClassInfo(mapping);
+		if(props!=null)
+		{
+			this.properties = new ArrayList<UnparsedExpression>();
+			for(int i=0; i<props.length; i+=2)
+			{
+				properties.add(new UnparsedExpression((String)props[i],
+					props[i+1] instanceof String ? "\""+props[i+1]+"\"" : ""+props[i+1]));
+			}
+		}
 	}
 	
 	//-------- methods --------

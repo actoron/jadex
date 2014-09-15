@@ -1,0 +1,7 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-xml')
+	
+	compile 'org.antlr:antlr-runtime:3.1.3'
+}

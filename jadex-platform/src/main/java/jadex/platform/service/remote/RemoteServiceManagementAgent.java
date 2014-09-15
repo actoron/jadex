@@ -35,6 +35,8 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
 import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
@@ -63,6 +65,7 @@ import java.util.Map;
 	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default.")
 })
 @Agent
+@Properties(@NameValue(name="system", value="true"))
 public class RemoteServiceManagementAgent
 {
 	//-------- attributes --------

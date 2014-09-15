@@ -1,0 +1,11 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-xml')
+	compile project(':jadex-bridge') 	// Bridge required for cid and awareness objects.
+	compile project(':jadex-platform') 	// Platform base required for codecs.
+	
+	compile 'org.apache.derby:derby:10.8.2.2' 
+	compile 'org.ow2.util:util-geolocation-ejb:1.0.31' 
+}
+

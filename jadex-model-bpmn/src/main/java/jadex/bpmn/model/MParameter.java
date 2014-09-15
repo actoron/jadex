@@ -68,6 +68,24 @@ public class MParameter extends MProperty
 		}
 		this.direction = direction;
 	}
+	
+	/**
+	 *  Test if parameter is out (i.e. out or inout).
+	 *  @return True, if is a out parameter.
+	 */
+	public boolean isOut()
+	{
+		return direction.equals(DIRECTION_OUT) || direction.equals(DIRECTION_INOUT);
+	}
+	
+	/**
+	 *  Test if parameter is in (i.e. in or inout).
+	 *  @return True, if is a in parameter.
+	 */
+	public boolean isIn()
+	{
+		return direction.equals(DIRECTION_IN) || direction.equals(DIRECTION_INOUT);
+	}
 
 	/**
 	 *  Get the clazz.

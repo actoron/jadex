@@ -34,8 +34,8 @@ public class GatewayXORActivityHandler implements IActivityHandler
 			instance.publishEvent(instance.createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
 		}
 		
-		List	incoming	= activity.getIncomingSequenceEdges();
-		List	outgoing	= activity.getOutgoingSequenceEdges();
+		List<MSequenceEdge>	incoming	= activity.getIncomingSequenceEdges();
+		List<MSequenceEdge>	outgoing	= activity.getOutgoingSequenceEdges();
 		
 		// Split
 		if(incoming!=null /* && incoming.size()==1 */ && outgoing!=null && outgoing.size()>1)

@@ -1,0 +1,35 @@
+dependencies 
+{
+	// Core api
+	compile project(':jadex-commons')
+	compile project(':jadex-bridge')
+	compile project(':jadex-javaparser')
+	compile project(':jadex-xml')
+	
+	// Kernels
+	compile project(':jadex-kernel-base')
+	compile project(':jadex-kernel-micro')
+	compile project(':jadex-kernel-bpmn')
+	compile project(':jadex-kernel-application')
+	compile project(':jadex-kernel-gpmn')
+	compile project(':jadex-kernel-component')
+	compile project(':jadex-kernel-bdibpmn')
+	compile project(':jadex-applib-bdi')
+	compile project(':jadex-kernel-bdi')
+	compile project(':jadex-kernel-bdiv3')
+	
+	// Platform
+	compile project(':jadex-platform')
+	
+	// Tools
+	compile project(':jadex-runtimetools-swing')
+	compile project(':jadex-tools-bdi')
+	compile project(':jadex-tools-bpmn')
+	compile project(':jadex-tools-comanalyzer')
+	compile project(':jadex-rules-tools')
+	
+	// Extensions
+	compile project(':jadex-kernel-extension-agr')
+	compile project(':jadex-kernel-extension-envsupport')
+	compile project(':jadex-kernel-extension-envsupport-opengl')
+}

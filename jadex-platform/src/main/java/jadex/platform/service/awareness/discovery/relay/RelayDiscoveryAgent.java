@@ -18,6 +18,8 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
@@ -38,6 +40,7 @@ import java.util.Map;
 @ProvidedServices(@ProvidedService(type=IRelayAwarenessService.class,
 	implementation=@Implementation(expression="$component.getPojoAgent()")))
 @Service
+@Properties(@NameValue(name="system", value="true"))
 public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarenessService
 {
 	//-------- attributes --------

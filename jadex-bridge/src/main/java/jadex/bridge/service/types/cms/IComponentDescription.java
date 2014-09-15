@@ -152,4 +152,10 @@ public interface IComponentDescription
 	 *  @return The local type.
 	 */
 	public String getLocalType();
+	
+	/**
+	 *  Test if it is a system component.
+	 *  @return True, if it is a system component.
+	 */
+	public boolean isSystemComponent();
 }

@@ -22,6 +22,7 @@ import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -66,6 +67,9 @@ import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.IBootstrapFactory;
 
 import java.util.ArrayList;
@@ -463,43 +467,6 @@ public class ComponentManagementService implements IComponentManagementService
 			// Check if parent is killing itself -> no new child component, exception
 			if(cfs.containsKey(cinfo.getParent()))
 				return new Future<IComponentIdentifier>(new ComponentTerminatedException(cinfo.getParent() ,"Parent is killing itself. Child component creation no allowed."));
-			
-			// Lock the parent while creating
-			final String lockkey = SUtil.createUniqueId("lock");
-			LockEntry kt = lockentries.get(cinfo.getParent());
-			if(kt==null)
-			{
-				kt= new LockEntry(cinfo.getParent());
-				lockentries.put(cinfo.getParent(), kt);
-			}
-			kt.addLocker(lockkey);
-			inited.addResultListener(createResultListener(new IResultListener<IComponentIdentifier>()
-			{
-				public void resultAvailable(IComponentIdentifier result)
-				{
-					LockEntry kt = lockentries.get(cinfo.getParent());
-					if(kt!=null)
-					{
-						kt.removeLocker(lockkey);
-						if(kt.getLockerCount()==0)
-						{
-							lockentries.remove(cinfo.getParent());
-						}
-					}
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					LockEntry kt = lockentries.get(cinfo.getParent());
-					if(kt!=null)
-					{
-						kt.removeLocker(lockkey);
-						if(kt.getLockerCount()==0)
-						{
-							lockentries.remove(cinfo.getParent());
-						}
-					}
-				}
-			}));
 		}
 		
 		if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
@@ -570,8 +537,104 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 																	final IInternalAccess pad = getParentComponent(cinfo);
 																	IExternalAccess parent = pad.getExternalAccess();
-					
-																	IComponentIdentifier pacid = parent.getComponentIdentifier();
+																	
+																	// check if system component is located in system tree
+																	Map<String, Object> props = lmodel.getProperties();
+																	
+																	IComponentIdentifier pacid = getParentIdentifier(cinfo);
+																	boolean systemcomponent = "system".equals(name) && pacid.getParent()==null;
+																	if(props.containsKey("system") && !"system".equals(name))
+																	{
+																		UnparsedExpression uexp = (UnparsedExpression)props.get("system");
+																		IParsedExpression exp = SJavaParser.parseExpression(uexp, lmodel.getAllImports(), null); // todo: classloader
+																		Boolean bool = (Boolean)exp.getValue(new SimpleValueFetcher()
+																		{
+																			public Object fetchValue(String name) 
+																			{
+																				Object ret = null;
+																				if("$config".equals(name) || "$configuration".equals(name))
+																				{
+																					if(cinfo.getConfiguration()!=null)
+																					{
+																						ret = cinfo.getConfiguration();
+																					}
+																					else
+																					{
+																						String[] cs = lmodel.getConfigurationNames();
+																						if(cs!=null && cs.length>0)
+																						{
+																							ret = cs[0];
+																						}
+																					}
+																				}
+																				else if("$model".equals(name))
+																				{
+																					ret = lmodel;
+																				}
+																				return ret;
+																			}
+																		});
+																		if(bool!=null && bool.booleanValue())// || (props.get("system").toString().indexOf("true")!=-1))
+																		{
+																			systemcomponent = true;
+																			// is system component, now check whether parent is ok
+																			boolean insystem = false;
+																			
+																			while(pacid.getParent()!=null && !insystem)
+																			{
+																				insystem = pacid.getLocalName().equals("system");
+																				pacid = pacid.getParent();
+																			}
+																			
+																			if(!insystem)
+																			{
+//																				System.out.println("Relocating system component: "+name+" - "+modelname);
+																				logger.info("Relocating system component: "+name+" - "+modelname);
+																				ComponentIdentifier npa = new ComponentIdentifier("system", agent.getComponentIdentifier());
+																				cinfo.setParent(npa);
+																			}
+																		}
+																	}
+																	
+																	// Lock the parent while creating
+																	final String lockkey = SUtil.createUniqueId("lock");
+																	LockEntry kt = lockentries.get(cinfo.getParent());
+																	if(kt==null)
+																	{
+																		kt= new LockEntry(cinfo.getParent());
+																		lockentries.put(cinfo.getParent(), kt);
+																	}
+																	kt.addLocker(lockkey);
+																	inited.addResultListener(createResultListener(new IResultListener<IComponentIdentifier>()
+																	{
+																		public void resultAvailable(IComponentIdentifier result)
+																		{
+																			LockEntry kt = lockentries.get(cinfo.getParent());
+																			if(kt!=null)
+																			{
+																				kt.removeLocker(lockkey);
+																				if(kt.getLockerCount()==0)
+																				{
+																					lockentries.remove(cinfo.getParent());
+																				}
+																			}
+																		}
+																		public void exceptionOccurred(Exception exception)
+																		{
+																			LockEntry kt = lockentries.get(cinfo.getParent());
+																			if(kt!=null)
+																			{
+																				kt.removeLocker(lockkey);
+																				if(kt.getLockerCount()==0)
+																				{
+																					lockentries.remove(cinfo.getParent());
+																				}
+																			}
+																		}
+																	}));
+
+																	pacid = parent.getComponentIdentifier();
+																	
 																	String paname = pacid.getName().replace('@', '.');
 																	
 																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname, addresses);
@@ -597,7 +660,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
 																		daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,
 																		persistable!=null ? persistable.booleanValue() : false, moni,
-																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause);
+																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause, systemcomponent);
 																	
 																	// Use first configuration if no config specified.
 																	String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()

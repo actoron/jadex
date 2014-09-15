@@ -1,0 +1,13 @@
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-xml')
+	compile project(':jadex-bridge')
+	compile project(':jadex-kernel-micro')
+	compile project(':jadex-kernel-component')
+	compile project(':jadex-kernel-application')
+	compile project(':jadex-platform-extension-webservice')
+	compile project(':jadex-platform-extension-webservice-desktop')
+	
+	compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.3'
+}
