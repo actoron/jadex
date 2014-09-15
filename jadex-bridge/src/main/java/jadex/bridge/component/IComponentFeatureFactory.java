@@ -1,8 +1,6 @@
 package jadex.bridge.component;
 
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IValueFetcher;
-import jadex.commons.future.IFuture;
 
 import java.util.Set;
 
