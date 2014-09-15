@@ -1,5 +1,6 @@
 package jadex.bridge.component.impl;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
@@ -7,7 +8,9 @@ import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 
 import java.util.Iterator;
@@ -23,6 +26,9 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	
 	/** The arguments. */
 	protected Map<String, Object>	arguments;
+	
+	/** The results. */
+	protected Map<String, Object>	results;
 	
 	//-------- constructors --------
 	
@@ -88,39 +94,42 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		IArgument[] margs = component.getModel().getArguments();
 		for(int i=0; i<margs.length; i++)
 		{
-			if(!arguments.containsKey(margs[i].getName()))
+			// Prevents unset arguments being added to be able to check whether a user has
+			// set an argument explicitly to null or if it just is null (e.g. for field injections)
+			if(!done.contains(margs[i].getName()) && margs[i].getDefaultValue().getValue()!=null)
 			{
 				arguments.put(margs[i].getName(), SJavaParser.getParsedValue(margs[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 			}
 		}
 		
-//		// Init the results with default values.
-//		
-//		// Hack?! add component identifier to result as long as we don't have better future type for results
-//		// could one somehow use the CallLocal for that purpose instead?
-//		setResultValue(IComponentIdentifier.RESULTCID, getComponentIdentifier());
-//		
-//		done	= new HashSet<String>();
-//		if(ci!=null)
-//		{
-//			UnparsedExpression[]	upes	= ci.getResults();
-//			for(int i=0; i<upes.length; i++)
-//			{
-//				addDefaultResult(upes[i].getName(), SJavaParser.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
-//				done.add(upes[i].getName());
-//			}
-//		}
-//		IArgument[] res = model.getResults();
-//		for(int i=0; i<res.length; i++)
-//		{
-//			// Prevents unset results being added to be able to check whether a user has
-//			// set an argument explicitly to null or if it just is null (e.g. for field injections)
-//			if(!done.contains(res[i].getName()) && res[i].getDefaultValue().getValue()!=null)
-//			{
-//				addDefaultResult(res[i].getName(), 
-//					SJavaParser.getParsedValue(res[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
-//			}
-//		}
+		// Init the results with default values.
+		
+		// Hack?! add component identifier to result as long as we don't have better future type for results
+		// could one somehow use the CallLocal for that purpose instead?
+		// Todo: generate event.
+		results.put(IComponentIdentifier.RESULTCID, getComponent().getComponentIdentifier());
+		
+		
+		if(ci!=null)
+		{
+			UnparsedExpression[]	upes	= ci.getResults();
+			for(int i=0; i<upes.length; i++)
+			{
+				addDefaultResult(upes[i].getName(), SJavaParser.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
+				done.add(upes[i].getName());
+			}
+		}
+		IArgument[] res = model.getResults();
+		for(int i=0; i<res.length; i++)
+		{
+			// Prevents unset results being added to be able to check whether a user has
+			// set an argument explicitly to null or if it just is null (e.g. for field injections)
+			if(!done.contains(res[i].getName()) && res[i].getDefaultValue().getValue()!=null)
+			{
+				addDefaultResult(res[i].getName(), 
+					SJavaParser.getParsedValue(res[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
+			}
+		}
 
 		return IFuture.DONE;
 	}
@@ -154,5 +163,22 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	public Map<String, Object> getArguments()
 	{
 		return arguments;
+	}
+	
+	/**
+	 *  Get the current results.
+	 *  @return The current result values (if any).
+	 */
+	public Map<String, Object> getResults()
+	{
+		return results;
+	}
+	
+	/**
+	 * Subscribe to receive results.
+	 */
+	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
+	{
+		throw new UnsupportedOperationException("todo");
 	}
 }
