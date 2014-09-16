@@ -4,6 +4,8 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.ILRUEntryCleaner;
+import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -39,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -126,6 +129,7 @@ public abstract class Test extends TestCase
 				testArray();
 				testList();
 				testSet();
+				testLRU();
 				testMap();
 				testEmptyArray();
 				testArrayOrder();
@@ -822,6 +826,27 @@ public abstract class Test extends TestCase
 		set.add(getABean());
 		
 		doWriteAndRead(getABean());
+	}
+	
+	/**
+	 *  Test if map transfer works.
+	 */
+	public void testLRU() throws Exception
+	{
+		LRU lru = new LRU(123);
+		ILRUEntryCleaner cleaner = new ILRUEntryCleaner()
+		{
+			@Classname("LRUTestCleanerClass")
+			public void cleanupEldestEntry(Entry eldest)
+			{
+			}
+		};
+		lru.setCleaner(cleaner);
+		lru.put("$", "A");
+		lru.put(Integer.valueOf(2), Integer.valueOf(22));
+		lru.put("obja", getABean());
+		
+		doWriteAndRead(lru);
 	}
 	
 	/**
