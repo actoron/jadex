@@ -5,6 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
@@ -29,10 +30,12 @@ import jadex.kernelbase.ExternalAccess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -68,20 +71,55 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 *  Create the component, i.e. instantiate its features.
 	 *  
 	 *  @param info The component creation info.
-	 *  @param templates The component feature templates to be instantiated for this component.
+	 *  @param facs The component feature factories to be instantiated for this component.
 	 */
-	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> templates)
+	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> facs)
 	{
 		this.info	= info;
 		this.features	= new LinkedHashMap<Class<?>, IComponentFeature>();
 		this.lfeatures	= new ArrayList<IComponentFeature>();
-		for(IComponentFeatureFactory fac: templates)
+		
+		DependencyResolver<IComponentFeatureFactory> dr = new DependencyResolver<IComponentFeatureFactory>();
+		
+		Map<Class<?>, IComponentFeatureFactory> facsm = new HashMap<Class<?>, IComponentFeatureFactory>();
+		for(IComponentFeatureFactory fac: facs)
+		{
+			facsm.put(fac.getClass(), fac);
+		}
+		
+		IComponentFeatureFactory last = null;
+		for(IComponentFeatureFactory fac: facs)
+		{
+			if(last!=null)
+			{
+				dr.addDependency(last, fac);
+			}
+			else
+			{
+				dr.addNode(fac);
+			}
+			Set<Class<? extends IComponentFeatureFactory>> sucs = fac.getSuccessors();
+			for(Class<? extends IComponentFeatureFactory> suc: sucs)
+			{
+				dr.addDependency(facsm.get(suc), facsm.get(fac.getClass()));
+			}
+			Set<Class<? extends IComponentFeatureFactory>> pres = fac.getPredecessors();
+			for(Class<? extends IComponentFeatureFactory> pre: pres)
+			{
+				dr.addDependency(facsm.get(fac.getClass()), facsm.get(pre));
+			}
+		}
+		
+		List<IComponentFeatureFactory> ofacs = dr.resolveDependencies();
+		
+		for(IComponentFeatureFactory fac: ofacs)
 		{
 			IComponentFeature	instance	= fac.createInstance(getInternalAccess(), info);
 			features.put((Class<?>)fac.getType(), instance);
 			lfeatures.add(instance);
 		}
 	}
+	
 	
 	/**
 	 *  Perform the initialization of the component.

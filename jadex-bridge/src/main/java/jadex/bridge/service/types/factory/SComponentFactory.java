@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.component.impl.SubcomponentsComponentFeature;
@@ -43,11 +44,11 @@ public class SComponentFactory
 	//-------- todo: move somewhere else? --------
 	
 	/** The default component features. */
-	public static final Collection<IComponentFeature>	DEFAULT_FEATURES;
+	public static final Collection<IComponentFeatureFactory>	DEFAULT_FEATURES;
 	
 	static
 	{
-		Collection<IComponentFeature>	def_features	= new ArrayList<IComponentFeature>();
+		Collection<IComponentFeatureFactory>	def_features	= new ArrayList<IComponentFeatureFactory>();
 		def_features.add(new ExecutionComponentFeature());
 		def_features.add(new ArgumentsComponentFeature());
 		def_features.add(new ProvidedServicesComponentFeature());

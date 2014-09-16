@@ -2,6 +2,7 @@ package jadex.bridge.service.types.factory;
 
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
@@ -81,5 +82,5 @@ public interface IComponentFactory
 	 *  @return The component features.
 	 */
 	@Excluded
-	public IFuture<Collection<IComponentFeature>> getComponentFeatures(IModelInfo model);
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model);
 }

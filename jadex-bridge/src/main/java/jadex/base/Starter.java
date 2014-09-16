@@ -11,6 +11,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -480,7 +481,7 @@ public class Starter
 					boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
 	
 					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, new LocalServiceRegistry(), null, realtime, copy);
-					Collection<IComponentFeature>	features	= cfac.getComponentFeatures(model).get();
+					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 
 					initRescueThread(cid, compargs);	// Required for bootstrapping init.

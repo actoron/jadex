@@ -3,7 +3,7 @@ package jadex.micro;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -354,10 +354,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param model The component model.
 	 *  @return The component features.
 	 */
-	public IFuture<Collection<IComponentFeature>> getComponentFeatures(IModelInfo model)
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
 	{
 		// Todo: kernel-specific features.
-		return new Future<Collection<IComponentFeature>>(SComponentFactory.DEFAULT_FEATURES);
+		return new Future<Collection<IComponentFeatureFactory>>(SComponentFactory.DEFAULT_FEATURES);
 	}
 
 //	/**
