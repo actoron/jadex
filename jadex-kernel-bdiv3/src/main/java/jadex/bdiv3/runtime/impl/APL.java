@@ -242,7 +242,7 @@ public class APL
 			numcandidates = Integer.MAX_VALUE;
 		}
 		
-		for(int i=0; i<numcandidates && candidates.size()>0; i++)
+		for(int i=0; i<numcandidates && candidates!=null && candidates.size()>0; i++)
 		{
 			ret.add(getNextCandidate(mcapa));
 		}
