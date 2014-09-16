@@ -1,6 +1,7 @@
 package jadex.extension.rs.publish;
 
 import jadex.commons.SReflect;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.rs.publish.annotation.MethodMapper;
@@ -15,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,12 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.glassfish.grizzly.CompletionHandler;
+import org.glassfish.grizzly.ReadHandler;
+import org.glassfish.grizzly.http.io.NIOReader;
+import org.glassfish.grizzly.http.multipart.MultipartEntry;
+import org.glassfish.grizzly.http.multipart.MultipartEntryHandler;
+import org.glassfish.grizzly.http.multipart.MultipartScanner;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -329,22 +337,90 @@ public class SInvokeHelper
 							{
 								if(greq!=null)
 								{
-//									SInvokeHelper.debug(greq);
-									// Hack to make grizzly allow parameter parsing
-									// Jersey calls getInputStream() hindering grizzly parsing params
-									try
+									if(greq.getContentType().startsWith("multipart/form-data;"))
 									{
-										Request r = (Request)greq;
-										Field f = r.getClass().getDeclaredField("usingInputStream");
-										f.setAccessible(true);
-										f.set(r, Boolean.FALSE);
-//										System.out.println("params: "+r.getParameterNames());
+										// Todo: why doesn't work out of the box any more!?
+										final Map<String, Object>	map	= new LinkedHashMap<String, Object>();
+										targetparams[0]	= map;
+										final Future<Void>	done	= new Future<Void>(); 
+										MultipartScanner.scan(greq, new MultipartEntryHandler()
+										{
+											public void handle(MultipartEntry me) throws Exception
+											{
+												final String	name	= me.getContentDisposition().getDispositionParamUnquoted("name");
+												final StringBuffer	value	= new StringBuffer();
+												final NIOReader	nr	= me.getNIOReader();
+												nr.notifyAvailable(new ReadHandler()
+												{
+													public void onError(Throwable e)
+													{
+														System.err.println("error reading multipart entry: "+name+"="+value);
+														e.printStackTrace();
+													}
+													
+													public void onDataAvailable() throws Exception
+													{
+														char[]	buf	= new char[8192];
+														while(nr.isReady())
+														{
+															value.append(buf, 0, nr.read(buf));
+														}
+													}
+													
+													public void onAllDataRead() throws Exception
+													{
+														char[]	buf	= new char[8192];
+														while(nr.isReady())
+														{
+															value.append(buf, 0, nr.read(buf));
+														}
+//														System.out.println("entry: "+name+"="+value);
+														map.put(name, value.toString());
+													}
+												});
+											}
+										}, new CompletionHandler<Request>()
+										{
+											public void updated(Request r)
+											{
+											}
+											
+											public void failed(Throwable e)
+											{
+												done.setException(new RuntimeException(e));
+											}
+											
+											public void completed(Request r)
+											{
+												done.setResult(null);
+											}
+											
+											public void cancelled()
+											{
+												done.setResult(null);
+											}
+										});
+										done.get(new ThreadSuspendable());
 									}
-									catch(Exception e)
+									else
 									{
-										e.printStackTrace();
+	//									SInvokeHelper.debug(greq);
+										// Hack to make grizzly allow parameter parsing
+										// Jersey calls getInputStream() hindering grizzly parsing params
+										try
+										{
+											Request r = (Request)greq;
+											Field f = r.getClass().getDeclaredField("usingInputStream");
+											f.setAccessible(true);
+											f.set(r, Boolean.FALSE);
+	//										System.out.println("params: "+r.getParameterNames());
+										}
+										catch(Exception e)
+										{
+											e.printStackTrace();
+										}
+										targetparams[0] = SInvokeHelper.convertMultiMap(greq.getParameterMap());
 									}
-									targetparams[0] = SInvokeHelper.convertMultiMap(greq.getParameterMap());
 								}
 								else if(req!=null)
 								{
