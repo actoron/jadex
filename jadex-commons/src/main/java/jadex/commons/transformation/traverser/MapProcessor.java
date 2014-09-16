@@ -1,6 +1,8 @@
 package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
+import jadex.commons.collection.ILRUEntryCleaner;
+import jadex.commons.collection.LRU;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,6 +47,16 @@ public class MapProcessor implements ITraverseProcessor
 		Map map = (Map)object;
 		
 		traversed.put(object, ret);
+		
+		if (object instanceof LRU)
+		{
+			((LRU) ret).setMaxEntries(((LRU) object).getMaxEntries());
+			ILRUEntryCleaner cleaner = ((LRU) object).getCleaner();
+			if (cleaner != null)
+			{
+				((LRU) ret).setCleaner((ILRUEntryCleaner) traverser.doTraverse(cleaner, cleaner.getClass(), traversed, processors, clone, targetcl, context));
+			}
+		}
 		
 		Set keyset = map.keySet();
 		Object[] keys = keyset.toArray(new Object[keyset.size()]);

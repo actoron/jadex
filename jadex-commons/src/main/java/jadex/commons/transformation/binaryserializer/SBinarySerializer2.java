@@ -43,6 +43,7 @@ public class SBinarySerializer2
 		ENCODER_HANDLERS.add(new CollectionCodec());
 		ENCODER_HANDLERS.add(new EnumerationCodec());
 		ENCODER_HANDLERS.add(new MultiCollectionCodec());
+		ENCODER_HANDLERS.add(new LRUCodec());
 		ENCODER_HANDLERS.add(new MapCodec());
 		if(!SReflect.isAndroid())
 		{

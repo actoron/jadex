@@ -19,6 +19,14 @@ public class LRU<K, V> extends LinkedHashMap<K, V>
 	protected ILRUEntryCleaner cleaner;
 
 	//-------- constructors --------
+	
+	/**
+	 *  Create a new LRU with 1000 entries.
+	 */
+	public LRU()
+	{
+		this(1000);
+	}
 
 	/**
 	 *  Create a new LRU.
@@ -57,6 +65,15 @@ public class LRU<K, V> extends LinkedHashMap<K, V>
 	public void setMaxEntries(int max)
 	{
 		this.max = max;
+	}
+	
+	/**
+	 *  Get the cleaner object.
+	 *  @return The cleaner object.
+	 */
+	public ILRUEntryCleaner getCleaner()
+	{
+		return cleaner;
 	}
 	
 	/**
