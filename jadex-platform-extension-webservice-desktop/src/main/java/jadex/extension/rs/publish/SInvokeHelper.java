@@ -318,11 +318,13 @@ public class SInvokeHelper
 								UriInfo ui = (UriInfo)getFieldValue("__ui", object);
 								MultivaluedMap<String, String> vals = ui.getQueryParameters();
 								targetparams[0] = SInvokeHelper.convertMultiMap(vals);
+								((Map)targetparams[0]).putAll(extractCallerValues(greq));
 							}
 							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
 							{
 								UriInfo ui = (UriInfo)getFieldValue("__ui", object);
 								targetparams[0] = SInvokeHelper.convertMultiMap(ui.getQueryParameters());
+								((Map)targetparams[0]).putAll(extractCallerValues(greq));
 							}
 						}
 					}
@@ -340,7 +342,7 @@ public class SInvokeHelper
 									if(greq.getContentType().startsWith("multipart/form-data;"))
 									{
 										// Todo: why doesn't work out of the box any more!?
-										final Map<String, Object>	map	= new LinkedHashMap<String, Object>();
+										final Map<String, String>	map	= extractCallerValues(greq);//new LinkedHashMap<String, Object>();
 										targetparams[0]	= map;
 										final Future<Void>	done	= new Future<Void>(); 
 										MultipartScanner.scan(greq, new MultipartEntryHandler()
@@ -420,16 +422,19 @@ public class SInvokeHelper
 											e.printStackTrace();
 										}
 										targetparams[0] = SInvokeHelper.convertMultiMap(greq.getParameterMap());
+										((Map<String, String>)targetparams[0]).putAll(extractCallerValues(greq));
 									}
 								}
 								else if(req!=null)
 								{
 									targetparams[0] = SInvokeHelper.convertMultiMap(req.getParameterMap());
+									((Map<String, String>)targetparams[0]).putAll(extractCallerValues(greq));
 								}
 							}
 							else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
 							{
 								targetparams[0] = SInvokeHelper.convertToMultiMap(req.getParameterMap());
+								((Map<String, String>)targetparams[0]).putAll(extractCallerValues(greq));
 							}
 						}
 					}
