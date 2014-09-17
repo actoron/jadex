@@ -113,22 +113,6 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	}	
 	
 	/**
-	 *  Execute the main activity of the feature.
-	 */
-	public IFuture<Void>	body()
-	{
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Shutdown the feature.
-	 */
-	public IFuture<Void>	shutdown()
-	{
-		return IFuture.DONE;
-	}
-
-	/**
 	 *  Create subcomponents.
 	 */
 	protected void	createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final IModelInfo model, final int i, final Future<Void> fut, final List<IComponentIdentifier> cids)

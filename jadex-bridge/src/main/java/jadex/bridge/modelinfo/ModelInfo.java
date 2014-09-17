@@ -87,7 +87,10 @@ public class ModelInfo extends Startable implements IModelInfo
 	
 	/** The breakpoints. */
 	protected String[] breakpoints;
-		
+	
+	/** The raw model. */
+	protected Object	rawmodel;
+	
 	//-------- constructors --------
 	
 	/**
@@ -96,7 +99,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public ModelInfo()
 	{
 		this(null, null, null, null, null, null, 
-			false, null, null, null, null, null, null, null, null, null);
+			false, null, null, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -108,7 +111,7 @@ public class ModelInfo extends Startable implements IModelInfo
 		String filename, Map<String, Object> properties, ClassLoader classloader, 
 		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
 		ConfigurationInfo[] configurations, SubcomponentTypeInfo[] subcomponents, String[] imports,
-		IResourceIdentifier rid)
+		IResourceIdentifier rid, Object rawmodel)
 	{
 		this.name = name;
 		this.packagename = packagename;
@@ -132,6 +135,7 @@ public class ModelInfo extends Startable implements IModelInfo
 			this.imports = SUtil.arrayToList(imports);
 		setRequiredServices(requiredservices);
 		this.rid = rid;
+		this.rawmodel	= rawmodel;
 	}
 
 	//-------- methods --------
@@ -978,5 +982,24 @@ public class ModelInfo extends Startable implements IModelInfo
 			}
 		}
 		return check;
+	}
+	
+	/**
+	 *  Get the kernel-specific model.
+	 *  @return The kernel-specific model when loaded locally, null for remote models.
+	 */
+	public Object	getRawModel()
+	{
+		return rawmodel;
+	}
+
+	/**
+	 *  Set the kernel-specific model.
+	 *  @param rawmodel The kernel-specific model when loaded locally, null for remote models.
+	 */
+	// Not bean-compliant to avoid raw model being transferred.
+	public void	internalSetRawModel(Object rawmodel)
+	{
+		this.rawmodel	= rawmodel;
 	}
 }

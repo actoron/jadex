@@ -109,34 +109,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	}
 	
 	//-------- IComponentFeature interface / instance level --------
-	
-	/**
-	 *  Initialize the feature.
-	 */
-	public IFuture<Void>	init()
-	{
-//		final Future<Void> ret = new Future<Void>();
 		
-//		return ret;
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Execute the main activity of the feature.
-	 */
-	public IFuture<Void>	body()
-	{
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Shutdown the feature.
-	 */
-	public IFuture<Void>	shutdown()
-	{
-		return IFuture.DONE;
-	}
-	
 	/**
 	 *  Add required services for a given prefix.
 	 *  @param prefix The name prefix to use.

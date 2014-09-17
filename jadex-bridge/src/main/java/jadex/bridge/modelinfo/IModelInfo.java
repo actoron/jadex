@@ -6,21 +6,21 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.IValueFetcher;
 
 import java.util.List;
 import java.util.Map;
 
 
 /**
- *  This model interface to be used (invoked) by tools and adapters.
- *  Can represent an application or an component (also capability).
- *  Applications can be loaded by the application factory.
- *  @link{IApplicationFactory}
- *  Component types can be loaded by the kernel's component factory
- *  @link{IComponentFactory}. 
+ *  This model interface represents the common properties
+ *  of all component models. The common properties are
+ *  transferable across platforms.
+ *  
+ *  Kernel-specific properties of locally loaded models
+ *  can be accessed by fetching the raw model and casting
+ *  it to the corresponding type (e.g. MBpmnModel).
  */
-@Reference(remote=false)
+@Reference(remote=false)	// Don't copy locally
 public interface IModelInfo
 {
 	/**
@@ -245,4 +245,10 @@ public interface IModelInfo
 	 *  @return The breakpoints.
 	 */
 	public String[] getBreakpoints();
+	
+	/**
+	 *  Get the kernel-specific model.
+	 *  @return The kernel-specific model when loaded locally, null for remote models.
+	 */
+	public Object	getRawModel();
 }

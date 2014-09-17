@@ -616,7 +616,9 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 						info.setImports(imports);
 						info.setResourceIdentifier(rid);
 
-						ret.setResult(new MCapabilityFlyweight(state, handle, info));
+						MCapabilityFlyweight	mcf	= new MCapabilityFlyweight(state, handle, info);
+						info.internalSetRawModel(mcf);
+						ret.setResult(mcf);
 					}
 				});
 			}
