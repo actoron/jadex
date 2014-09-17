@@ -1,8 +1,9 @@
 package jadex.bridge.component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,8 +25,8 @@ public class DependencyResolver<T>
 	 */
 	public DependencyResolver() 
 	{
-		this.nodes = new HashMap<T, NodeInfo<T>>();
-		this.nodeps = new HashSet<T>();
+		this.nodes = new LinkedHashMap<T, NodeInfo<T>>();
+		this.nodeps = new LinkedHashSet<T>();
 	}
 	
 	/**

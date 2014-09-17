@@ -81,14 +81,12 @@ public class SComponentFactory
 			IComponentFeatureFactory last = null;
 			for(IComponentFeatureFactory fac: facs)
 			{
+				dr.addNode(fac);
 				if(last!=null)
 				{
 					dr.addDependency(fac, last);
 				}
-				else
-				{
-					dr.addNode(fac);
-				}
+				
 				Set<? extends Class<? extends IComponentFeatureFactory>> sucs = fac.getSuccessors();
 				for(Class<? extends IComponentFeatureFactory> suc: sucs)
 				{
