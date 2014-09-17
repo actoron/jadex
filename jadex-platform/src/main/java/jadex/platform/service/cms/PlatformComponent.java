@@ -92,7 +92,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			if(last!=null)
 			{
-				dr.addDependency(last, fac);
+				dr.addDependency(fac, last);
 			}
 			else
 			{
@@ -114,6 +114,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		
 		for(IComponentFeatureFactory fac: ofacs)
 		{
+			System.out.println("fac: "+fac);
 			IComponentFeature	instance	= fac.createInstance(getInternalAccess(), info);
 			features.put((Class<?>)fac.getType(), instance);
 			lfeatures.add(instance);

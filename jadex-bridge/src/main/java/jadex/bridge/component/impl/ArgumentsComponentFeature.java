@@ -96,13 +96,13 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		{
 			// Prevents unset arguments being added to be able to check whether a user has
 			// set an argument explicitly to null or if it just is null (e.g. for field injections)
-			if(!done.contains(margs[i].getName()) && margs[i].getDefaultValue().getValue()!=null)
+			if(!arguments.containsKey(margs[i].getName()) && margs[i].getDefaultValue().getValue()!=null)
 			{
 				arguments.put(margs[i].getName(), SJavaParser.getParsedValue(margs[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 			}
 		}
 		
-		// Init the results with default values.
+		// Init the results with initial or default values.
 		
 		// Hack?! add component identifier to result as long as we don't have better future type for results
 		// could one somehow use the CallLocal for that purpose instead?
@@ -115,19 +115,17 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 			UnparsedExpression[]	upes	= ci.getResults();
 			for(int i=0; i<upes.length; i++)
 			{
-				addDefaultResult(upes[i].getName(), SJavaParser.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
-				done.add(upes[i].getName());
+				results.put(upes[i].getName(), SJavaParser.getParsedValue(upes[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 			}
 		}
-		IArgument[] res = model.getResults();
+		IArgument[] res = component.getModel().getResults();
 		for(int i=0; i<res.length; i++)
 		{
 			// Prevents unset results being added to be able to check whether a user has
 			// set an argument explicitly to null or if it just is null (e.g. for field injections)
-			if(!done.contains(res[i].getName()) && res[i].getDefaultValue().getValue()!=null)
+			if(!results.containsKey(res[i].getName()) && res[i].getDefaultValue().getValue()!=null)
 			{
-				addDefaultResult(res[i].getName(), 
-					SJavaParser.getParsedValue(res[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
+				results.put(res[i].getName(), SJavaParser.getParsedValue(res[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 			}
 		}
 
