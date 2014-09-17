@@ -35,6 +35,9 @@ public class DependencyResolver<T>
 	 */
 	public void addDependency(T a, T b)
 	{
+		if(a==null || b==null)
+			throw new IllegalArgumentException("Object must not null.");
+		
 		NodeInfo<T> nia = getNodeInfo(a);
 		nia.getMyDeps().add(b);
 		NodeInfo<T> nib = getNodeInfo(b);
