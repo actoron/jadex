@@ -79,20 +79,26 @@ public class SComponentFactory
 
 		for(Collection<IComponentFeatureFactory> facs: facss)
 		{
+			IComponentFeatureFactory last = null;
 			for(IComponentFeatureFactory fac: facs)
 			{
 				dr.addNode(fac);
+				if(last!=null)
+				{
+					dr.addDependency(fac, last);
+				}
 				
 				Set<Class<?>> sucs = fac.getSuccessors();
 				for(Class<?> suc: sucs)
 				{
-					dr.addDependency(facsmap.get(suc), facsmap.get(fac.getType()));
+					dr.addDependency(facsmap.get(suc), facsmap.get(fac.getClass()));
 				}
 				Set<Class<?>> pres = fac.getPredecessors();
 				for(Class<?> pre: pres)
 				{
-					dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
+					dr.addDependency(facsmap.get(fac.getClass()), facsmap.get(pre));
 				}
+				last = fac;
 			}
 		}
 
