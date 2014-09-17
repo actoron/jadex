@@ -1,10 +1,13 @@
 package jadex.bridge.component.impl;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 
 import java.util.Collections;
 import java.util.Set;
@@ -130,4 +133,5 @@ public abstract class AbstractComponentFeature	implements IComponentFeature, ICo
 	{
 		throw new UnsupportedOperationException();
 	}
+
 }

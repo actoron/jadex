@@ -21,6 +21,9 @@ import java.util.Map;
  */
 public class MicroModel extends CacheableKernelModel
 {
+	/** The micro agent class. */
+	protected Class<?> pojoclass;
+	
 	/** The agent injection targets. */
 	protected List<FieldInfo> agentinjections;
 
@@ -194,6 +197,24 @@ public class MicroModel extends CacheableKernelModel
 	{
 		return serviceinjections==null? SUtil.EMPTY_STRING_ARRAY: 
 			(String[])serviceinjections.keySet().toArray(new String[serviceinjections.size()]);
+	}
+
+	/**
+	 *  Get the pojo class.
+	 *  @return The pojoclass.
+	 */
+	public Class< ? > getPojoClass()
+	{
+		return pojoclass;
+	}
+
+	/**
+	 *  Set the pojo class.
+	 *  @param pojoclass The pojoclass to set
+	 */
+	public void setPojoClass(Class< ? > pojoclass)
+	{
+		this.pojoclass = pojoclass;
 	}
 
 	/**
