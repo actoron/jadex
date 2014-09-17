@@ -38,13 +38,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 	//-------- constructors --------
 	
 	/**
-	 *  Bean constructor.
+	 *  Create the feature.
 	 */
-	public ExecutionComponentFeature()
-	{
-	}
-	
-	protected ExecutionComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
+	public ExecutionComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 	}

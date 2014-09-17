@@ -38,7 +38,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	/**
 	 *  Create the feature.
 	 */
-	protected SubcomponentsComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
+	public SubcomponentsComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 	}

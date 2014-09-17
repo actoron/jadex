@@ -7,31 +7,17 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
-import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.ProvidedServiceImplementation;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IAsyncFilter;
-import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -41,20 +27,13 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
-import jadex.javaparser.SJavaParser;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Feature for provided services.
@@ -74,38 +53,11 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	//-------- constructors --------
 	
 	/**
-	 *  Bean constructor for type level.
-	 */
-	public RequiredServicesComponentFeature()
-	{
-	}
-	
-	/**
 	 *  Factory method constructor for instance level.
 	 */
 	protected RequiredServicesComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-	}
-	
-	//-------- IComponentFeature interface / type level --------
-	
-	/**
-	 *  Get the user interface type of the feature.
-	 */
-	public Class<?>	getType()
-	{
-		return IProvidedServicesFeature.class;
-	}
-	
-	/**
-	 *  Create an instance of the feature.
-	 *  @param access	The access of the component.
-	 *  @param info	The creation info.
-	 */
-	public IComponentFeature	createInstance(IInternalAccess access, ComponentCreationInfo info)
-	{
-		return new RequiredServicesComponentFeature(access, info);
 	}
 	
 	//-------- IComponentFeature interface / instance level --------

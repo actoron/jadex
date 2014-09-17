@@ -52,7 +52,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	/**
 	 *  Factory method constructor for instance level.
 	 */
-	protected ProvidedServicesComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
+	public ProvidedServicesComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 	}
