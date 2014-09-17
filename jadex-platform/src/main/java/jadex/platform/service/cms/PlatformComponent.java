@@ -75,45 +75,11 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> facs)
 	{
-		this.info	= info;
+		this.info	= info;		
 		this.features	= new LinkedHashMap<Class<?>, IComponentFeature>();
 		this.lfeatures	= new ArrayList<IComponentFeature>();
-		
-		DependencyResolver<IComponentFeatureFactory> dr = new DependencyResolver<IComponentFeatureFactory>();
-		
-		Map<Class<?>, IComponentFeatureFactory> facsm = new HashMap<Class<?>, IComponentFeatureFactory>();
+
 		for(IComponentFeatureFactory fac: facs)
-		{
-			facsm.put(fac.getClass(), fac);
-		}
-		
-		IComponentFeatureFactory last = null;
-		for(IComponentFeatureFactory fac: facs)
-		{
-			if(last!=null)
-			{
-				dr.addDependency(fac, last);
-			}
-			else
-			{
-				dr.addNode(fac);
-			}
-			Set<Class<? extends IComponentFeatureFactory>> sucs = fac.getSuccessors();
-			for(Class<? extends IComponentFeatureFactory> suc: sucs)
-			{
-				dr.addDependency(facsm.get(suc), facsm.get(fac.getClass()));
-			}
-			Set<Class<? extends IComponentFeatureFactory>> pres = fac.getPredecessors();
-			for(Class<? extends IComponentFeatureFactory> pre: pres)
-			{
-				dr.addDependency(facsm.get(fac.getClass()), facsm.get(pre));
-			}
-			last = fac;
-		}
-		
-		List<IComponentFeatureFactory> ofacs = dr.resolveDependencies();
-		
-		for(IComponentFeatureFactory fac: ofacs)
 		{
 			System.out.println("fac: "+fac);
 			IComponentFeature	instance	= fac.createInstance(getInternalAccess(), info);

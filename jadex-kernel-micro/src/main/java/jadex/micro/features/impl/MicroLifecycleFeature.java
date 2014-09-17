@@ -11,7 +11,7 @@ import jadex.commons.Tuple3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroModel;
-import jadex.micro.features.IMicroArgumentsInjectionFeature;
+import jadex.micro.features.IMicroInjectionFeature;
 import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.lang.reflect.Field;

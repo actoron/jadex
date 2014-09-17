@@ -4,7 +4,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.component.impl.ArgumentsComponentFeature;
+import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -14,23 +17,25 @@ import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.MicroModel;
-import jadex.micro.features.IMicroArgumentsInjectionFeature;
+import jadex.micro.features.IMicroInjectionFeature;
 import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Inject agent arguments into annotated field values.
  */
-public class MicroArgumentsInjectionComponentFeature extends	AbstractComponentFeature
+public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 {
 	//-------- type level --------
 	
 	/**
 	 *  Bean constructor for type level.
 	 */
-	public MicroArgumentsInjectionComponentFeature()
+	public MicroInjectionComponentFeature()
 	{
 	}
 	
@@ -39,7 +44,7 @@ public class MicroArgumentsInjectionComponentFeature extends	AbstractComponentFe
 	 */
 	public Class<?>	getType()
 	{
-		return IMicroArgumentsInjectionFeature.class;
+		return IMicroInjectionFeature.class;
 	}
 	
 	/**
@@ -49,7 +54,23 @@ public class MicroArgumentsInjectionComponentFeature extends	AbstractComponentFe
 	 */
 	public IComponentFeature	createInstance(IInternalAccess access, ComponentCreationInfo info)
 	{
-		return new MicroArgumentsInjectionComponentFeature(access, info);
+		return new MicroInjectionComponentFeature(access, info);
+	}
+
+	/**
+	 *  Get the predecessors, i.e. features that should be inited first.
+	 */
+	public Set<? extends Class<? extends IComponentFeatureFactory>>	getPredecessors()
+	{
+		return Collections.singleton(ArgumentsComponentFeature.class);
+	}
+	
+	/**
+	 *  Get the successors, i.e. features that should be inited after this feature.
+	 */
+	public Set<? extends Class<? extends IComponentFeatureFactory>>	getSuccessors()
+	{
+		return Collections.singleton(ProvidedServicesComponentFeature.class);
 	}
 	
 	//-------- instance level --------
@@ -57,7 +78,7 @@ public class MicroArgumentsInjectionComponentFeature extends	AbstractComponentFe
 	/**
 	 *  Factory method constructor for instance level.
 	 */
-	public MicroArgumentsInjectionComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
+	public MicroInjectionComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 	}
@@ -74,6 +95,24 @@ public class MicroArgumentsInjectionComponentFeature extends	AbstractComponentFe
 		Map<String, Object>	results	= getComponent().getComponentFeature(IArgumentsFeature.class).getResults();
 		MicroModel	model	= (MicroModel)getComponent().getModel().getRawModel();
 
+		// Inject agent fields.
+		FieldInfo[] fields = model.getAgentInjections();
+		Object	agent	= getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		for(int i=0; i<fields.length; i++)
+		{
+			try
+			{
+				Field f = fields[i].getField(getComponent().getClassLoader());
+				f.setAccessible(true);
+				f.set(agent, getComponent());
+			}
+			catch(Exception e)
+			{
+				getComponent().getLogger().warning("Agent injection failed: "+e);
+			}
+		}
+
+		// Inject argument values
 		if(args!=null)
 		{
 			String[] names = model.getArgumentInjectionNames();

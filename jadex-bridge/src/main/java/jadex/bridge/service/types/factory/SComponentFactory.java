@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
@@ -30,8 +31,11 @@ import jadex.commons.transformation.annotations.Classname;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 
@@ -56,6 +60,52 @@ public class SComponentFactory
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
 	
+	/**
+	 *  Build an ordered list of component features.
+	 *  The ordering inside a single list will be respected.
+	 *  Features of different lists may be interleaved.
+	 *  @param facss	A list of component feature lists.
+	 *  @return An ordered list of component features.
+	 */
+	public static Collection<IComponentFeatureFactory> orderComponentFeatures(Collection<Collection<IComponentFeatureFactory>> facss)
+	{
+		DependencyResolver<IComponentFeatureFactory> dr = new DependencyResolver<IComponentFeatureFactory>();
+		Map<Class<? extends IComponentFeatureFactory>, IComponentFeatureFactory> facsmap = new HashMap<Class<? extends IComponentFeatureFactory>, IComponentFeatureFactory>();
+		for(Collection<IComponentFeatureFactory> facs: facss)
+		{
+			for(IComponentFeatureFactory fac: facs)
+			{
+				facsmap.put(fac.getClass(), fac);
+			}
+
+			IComponentFeatureFactory last = null;
+			for(IComponentFeatureFactory fac: facs)
+			{
+				if(last!=null)
+				{
+					dr.addDependency(fac, last);
+				}
+				else
+				{
+					dr.addNode(fac);
+				}
+				Set<? extends Class<? extends IComponentFeatureFactory>> sucs = fac.getSuccessors();
+				for(Class<? extends IComponentFeatureFactory> suc: sucs)
+				{
+					dr.addDependency(facsmap.get(suc), facsmap.get(fac.getClass()));
+				}
+				Set<? extends Class<? extends IComponentFeatureFactory>> pres = fac.getPredecessors();
+				for(Class<? extends IComponentFeatureFactory> pre: pres)
+				{
+					dr.addDependency(facsmap.get(fac.getClass()), facsmap.get(pre));
+				}
+				last = fac;
+			}
+		}
+
+		return dr.resolveDependencies();
+	}
+
 	//-------- methods --------
 	
 	/**

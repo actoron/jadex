@@ -54,7 +54,7 @@ public abstract class AbstractComponentFeature	implements IComponentFeature, ICo
 	/**
 	 *  Get the predecessors, i.e. features that should be inited first.
 	 */
-	public Set<Class<? extends IComponentFeatureFactory>>	getPredecessors()
+	public Set<? extends Class<? extends IComponentFeatureFactory>>	getPredecessors()
 	{
 		return Collections.emptySet();
 	}
@@ -62,7 +62,7 @@ public abstract class AbstractComponentFeature	implements IComponentFeature, ICo
 	/**
 	 *  Get the successors, i.e. features that should be inited after this feature.
 	 */
-	public Set<Class<? extends IComponentFeatureFactory>>	getSuccessors()
+	public Set<? extends Class<? extends IComponentFeatureFactory>>	getSuccessors()
 	{
 		return Collections.emptySet();
 	}
