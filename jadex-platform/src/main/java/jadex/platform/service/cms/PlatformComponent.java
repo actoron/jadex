@@ -5,7 +5,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
@@ -30,12 +29,10 @@ import jadex.kernelbase.ExternalAccess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -81,7 +78,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 
 		for(IComponentFeatureFactory fac: facs)
 		{
-			System.out.println("fac: "+fac);
+//			System.out.println("fac: "+fac);
 			IComponentFeature	instance	= fac.createInstance(getInternalAccess(), info);
 			features.put((Class<?>)fac.getType(), instance);
 			lfeatures.add(instance);
