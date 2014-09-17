@@ -50,6 +50,7 @@ public class BDIClassReaderAndroid extends BDIClassReader
 		
 		ModelInfo modelinfo = new ModelInfo();
 		BDIModel ret = new BDIModel(modelinfo, new MCapability(cma.getName()));
+		modelinfo.internalSetRawModel(ret);
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
 		if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))

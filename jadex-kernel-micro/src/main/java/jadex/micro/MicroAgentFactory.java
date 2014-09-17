@@ -3,10 +3,16 @@ package jadex.micro;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.DependencyResolver;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.impl.ArgumentsComponentFeature;
+import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.component.impl.SubcomponentsComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -19,11 +25,20 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
+import jadex.micro.features.impl.MicroInjectionComponentFeature;
+import jadex.micro.features.impl.MicroLifecycleFeature;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -43,6 +58,18 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	
 	/** The image icon. */
 	protected static final LazyResource ICON = new LazyResource(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png");
+	
+	/** The specific component features for micro agents. */
+	public static final Collection<IComponentFeatureFactory>	MICRO_FEATURES;
+	
+	static
+	{
+		Collection<IComponentFeatureFactory>	features	= new ArrayList<IComponentFeatureFactory>();
+		features.add(new MicroInjectionComponentFeature());
+		features.add(new MicroLifecycleFeature());
+		MICRO_FEATURES	= Collections.unmodifiableCollection(features);
+	}
+
 
 	//-------- attributes --------
 	
@@ -60,6 +87,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
+	
+	/** The standard + micro component features. */
+	protected Collection<IComponentFeatureFactory>	features;
 	
 	//-------- constructors --------
 	
@@ -88,6 +118,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				return IFuture.DONE;
 			}
 		};
+		
+		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
 	
 	/**
@@ -99,6 +131,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroModelLoader();
+		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
 	
 	/**
@@ -357,7 +390,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
 	{
 		// Todo: kernel-specific features.
-		return new Future<Collection<IComponentFeatureFactory>>(SComponentFactory.DEFAULT_FEATURES);
+		return new Future<Collection<IComponentFeatureFactory>>(features);
 	}
 
 //	/**

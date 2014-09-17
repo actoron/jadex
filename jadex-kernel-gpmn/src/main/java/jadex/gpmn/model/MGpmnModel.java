@@ -77,6 +77,7 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 		this.activationedges = new ArrayList();
 		this.planedges = new ArrayList();
 		this.modelinfo = new ModelInfo();
+		modelinfo.internalSetRawModel(rawmodel);
 		modelinfo.setType(GpmnFactory.FILETYPE_GPMNPROCESS);
 	}
 	
