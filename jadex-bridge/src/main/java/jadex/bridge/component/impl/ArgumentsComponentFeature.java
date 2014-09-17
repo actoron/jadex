@@ -33,33 +33,11 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	//-------- constructors --------
 	
 	/**
-	 *  Bean constructor.
+	 *  Create the feature.
 	 */
-	public ArgumentsComponentFeature()
-	{
-	}
-	
-	protected ArgumentsComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
+	public ArgumentsComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-	}
-	
-	//-------- IComponentFeature interface --------
-	
-	/**
-	 *  Get the user interface type of the feature.
-	 */
-	public Class<?>	getType()
-	{
-		return IArgumentsFeature.class;
-	}
-	
-	/**
-	 *  Create an instance of the feature.
-	 */
-	public IComponentFeature createInstance(IInternalAccess access, ComponentCreationInfo info)
-	{
-		return new ArgumentsComponentFeature(access, info);
 	}
 	
 	/**

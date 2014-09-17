@@ -8,15 +8,15 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.DependencyResolver;
-import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.component.impl.ArgumentsComponentFeature;
-import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.component.impl.SubcomponentsComponentFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.ProvidedServicesComponentFeature;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,51 +52,47 @@ public class SComponentFactory
 	static
 	{
 		Collection<IComponentFeatureFactory>	def_features	= new ArrayList<IComponentFeatureFactory>();
-		def_features.add(new ExecutionComponentFeature());
-		def_features.add(new ArgumentsComponentFeature());
-		def_features.add(new ProvidedServicesComponentFeature());
-		def_features.add(new SubcomponentsComponentFeature());
+		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class));
+		def_features.add(new ComponentFeatureFactory(IArgumentsFeature.class));
+		def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class));
+		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class));
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
 	
 	/**
 	 *  Build an ordered list of component features.
-	 *  The ordering inside a single list will be respected.
-	 *  Features of different lists may be interleaved.
 	 *  @param facss	A list of component feature lists.
 	 *  @return An ordered list of component features.
 	 */
 	public static Collection<IComponentFeatureFactory> orderComponentFeatures(Collection<Collection<IComponentFeatureFactory>> facss)
 	{
 		DependencyResolver<IComponentFeatureFactory> dr = new DependencyResolver<IComponentFeatureFactory>();
-		Map<Class<? extends IComponentFeatureFactory>, IComponentFeatureFactory> facsmap = new HashMap<Class<? extends IComponentFeatureFactory>, IComponentFeatureFactory>();
+		Map<Class<?>, IComponentFeatureFactory> facsmap = new HashMap<Class<?>, IComponentFeatureFactory>();
+		
 		for(Collection<IComponentFeatureFactory> facs: facss)
 		{
 			for(IComponentFeatureFactory fac: facs)
 			{
-				facsmap.put(fac.getClass(), fac);
+				facsmap.put(fac.getType(), fac);
 			}
+		}
 
-			IComponentFeatureFactory last = null;
+		for(Collection<IComponentFeatureFactory> facs: facss)
+		{
 			for(IComponentFeatureFactory fac: facs)
 			{
 				dr.addNode(fac);
-				if(last!=null)
-				{
-					dr.addDependency(fac, last);
-				}
 				
-				Set<? extends Class<? extends IComponentFeatureFactory>> sucs = fac.getSuccessors();
-				for(Class<? extends IComponentFeatureFactory> suc: sucs)
+				Set<Class<?>> sucs = fac.getSuccessors();
+				for(Class<?> suc: sucs)
 				{
 					dr.addDependency(facsmap.get(suc), facsmap.get(fac.getClass()));
 				}
-				Set<? extends Class<? extends IComponentFeatureFactory>> pres = fac.getPredecessors();
-				for(Class<? extends IComponentFeatureFactory> pre: pres)
+				Set<Class<?>> pres = fac.getPredecessors();
+				for(Class<?> pre: pres)
 				{
 					dr.addDependency(facsmap.get(fac.getClass()), facsmap.get(pre));
 				}
-				last = fac;
 			}
 		}
 

@@ -1,21 +1,14 @@
 package jadex.bridge.component.impl;
 
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
-import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-
-import java.util.Collections;
-import java.util.Set;
 
 /**
- *  Feature for provided services.
+ *  Abstract feature that implements basic feature methods. 
  */
-public abstract class AbstractComponentFeature	implements IComponentFeature, IComponentFeatureFactory
+public abstract class AbstractComponentFeature	implements IComponentFeature
 {
 	//-------- attributes --------
 	
@@ -50,37 +43,6 @@ public abstract class AbstractComponentFeature	implements IComponentFeature, ICo
 	{
 		return component;
 	}
-	
-	//-------- IComponentFeature interface / type level --------
-	
-
-	/**
-	 *  Get the predecessors, i.e. features that should be inited first.
-	 */
-	public Set<? extends Class<? extends IComponentFeatureFactory>>	getPredecessors()
-	{
-		return Collections.emptySet();
-	}
-	
-	/**
-	 *  Get the successors, i.e. features that should be inited after this feature.
-	 */
-	public Set<? extends Class<? extends IComponentFeatureFactory>>	getSuccessors()
-	{
-		return Collections.emptySet();
-	}
-	
-	/**
-	 *  Get the user interface type of the feature.
-	 */
-	public abstract Class<?>	getType();
-	
-	/**
-	 *  Create an instance of the feature.
-	 *  @param access	The access of the component.
-	 *  @param info	The creation info.
-	 */
-	public abstract IComponentFeature	createInstance(IInternalAccess access, ComponentCreationInfo info);
 	
 	//-------- IComponentFeature interface / instance level --------
 	

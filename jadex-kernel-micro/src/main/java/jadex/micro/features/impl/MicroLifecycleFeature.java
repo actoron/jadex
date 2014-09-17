@@ -29,35 +29,6 @@ import java.lang.reflect.Method;
  */
 public class MicroLifecycleFeature extends	AbstractComponentFeature implements IMicroLifecycleFeature
 {
-	//-------- type level --------
-	
-	/**
-	 *  Bean constructor for type level.
-	 */
-	public MicroLifecycleFeature()
-	{
-	}
-	
-	/**
-	 *  Get the user interface type of the feature.
-	 */
-	public Class<?>	getType()
-	{
-		return IMicroLifecycleFeature.class;
-	}
-	
-	/**
-	 *  Create an instance of the feature.
-	 *  @param access	The access of the component.
-	 *  @param info	The creation info.
-	 */
-	public IComponentFeature	createInstance(IInternalAccess access, ComponentCreationInfo info)
-	{
-		return new MicroLifecycleFeature(access, info);
-	}
-	
-	//-------- instance level --------
-	
 	/** The pojo agent. */
 	protected Object pojoagent;
 	

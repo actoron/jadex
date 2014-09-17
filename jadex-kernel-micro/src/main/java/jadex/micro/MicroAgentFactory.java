@@ -3,16 +3,13 @@ package jadex.micro;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.DependencyResolver;
-import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.component.impl.ArgumentsComponentFeature;
-import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.component.impl.SubcomponentsComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.ProvidedServicesComponentFeature;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -25,8 +22,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
-import jadex.micro.features.impl.MicroInjectionComponentFeature;
-import jadex.micro.features.impl.MicroLifecycleFeature;
+import jadex.micro.features.IMicroInjectionFeature;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -34,11 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -65,11 +58,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	static
 	{
 		Collection<IComponentFeatureFactory>	features	= new ArrayList<IComponentFeatureFactory>();
-		features.add(new MicroInjectionComponentFeature());
-		features.add(new MicroLifecycleFeature());
+		features.add(new ComponentFeatureFactory(IMicroInjectionFeature.class, 
+			new Class<?>[]{IArgumentsFeature.class}, new Class<?>[]{IProvidedServicesFeature.class}));
+		features.add(new ComponentFeatureFactory(IMicroLifecycleFeature.class));
 		MICRO_FEATURES	= Collections.unmodifiableCollection(features);
 	}
-
 
 	//-------- attributes --------
 	

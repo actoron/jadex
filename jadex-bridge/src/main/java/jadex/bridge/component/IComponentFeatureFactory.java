@@ -21,12 +21,12 @@ public interface IComponentFeatureFactory
 	/**
 	 *  Get the predecessors, i.e. features that should be inited first.
 	 */
-	public Set<? extends Class<? extends IComponentFeatureFactory>>	getPredecessors();
+	public Set<Class<?>>	getPredecessors();
 	
 	/**
 	 *  Get the successors, i.e. features that should be inited after this feature.
 	 */
-	public Set<? extends Class<? extends IComponentFeatureFactory>>	getSuccessors();
+	public Set<Class<?>>	getSuccessors();
 	
 	/**
 	 *  Get the user interface type of the feature.

@@ -50,38 +50,11 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	//-------- constructors --------
 	
 	/**
-	 *  Bean constructor for type level.
-	 */
-	public ProvidedServicesComponentFeature()
-	{
-	}
-	
-	/**
 	 *  Factory method constructor for instance level.
 	 */
 	protected ProvidedServicesComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-	}
-	
-	//-------- IComponentFeature interface / type level --------
-	
-	/**
-	 *  Get the user interface type of the feature.
-	 */
-	public Class<?>	getType()
-	{
-		return IProvidedServicesFeature.class;
-	}
-	
-	/**
-	 *  Create an instance of the feature.
-	 *  @param access	The access of the component.
-	 *  @param info	The creation info.
-	 */
-	public IComponentFeature	createInstance(IInternalAccess access, ComponentCreationInfo info)
-	{
-		return new ProvidedServicesComponentFeature(access, info);
 	}
 	
 	//-------- IComponentFeature interface / instance level --------
