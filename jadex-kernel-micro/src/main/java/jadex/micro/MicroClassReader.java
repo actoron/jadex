@@ -119,6 +119,7 @@ public class MicroClassReader
 	{
 		ModelInfo modelinfo = new ModelInfo();
 		MicroModel ret = new MicroModel(modelinfo);
+		modelinfo.internalSetRawModel(ret);
 		
 //		System.out.println("read micro: "+cma);
 		

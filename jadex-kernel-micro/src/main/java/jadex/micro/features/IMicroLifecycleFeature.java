@@ -5,4 +5,8 @@ package jadex.micro.features;
  */
 public interface IMicroLifecycleFeature
 {
+	/**
+	 *  Get the POJO agent object.
+	 */
+	public Object	getPojoAgent();
 }
