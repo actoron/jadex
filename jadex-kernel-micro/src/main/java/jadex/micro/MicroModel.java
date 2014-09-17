@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
@@ -9,7 +10,6 @@ import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.kernelbase.CacheableKernelModel;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class MicroModel extends CacheableKernelModel
 {
 	/** The micro agent class. */
-	protected Class<?> pojoclass;
+	protected ClassInfo pojoclass;
 	
 	/** The agent injection targets. */
 	protected List<FieldInfo> agentinjections;
@@ -203,7 +203,7 @@ public class MicroModel extends CacheableKernelModel
 	 *  Get the pojo class.
 	 *  @return The pojoclass.
 	 */
-	public Class< ? > getPojoClass()
+	public ClassInfo getPojoClass()
 	{
 		return pojoclass;
 	}
@@ -212,7 +212,7 @@ public class MicroModel extends CacheableKernelModel
 	 *  Set the pojo class.
 	 *  @param pojoclass The pojoclass to set
 	 */
-	public void setPojoClass(Class< ? > pojoclass)
+	public void setPojoClass(ClassInfo pojoclass)
 	{
 		this.pojoclass = pojoclass;
 	}

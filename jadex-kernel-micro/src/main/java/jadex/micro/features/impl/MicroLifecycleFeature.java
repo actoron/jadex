@@ -72,7 +72,7 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 		{
 			// Create the pojo agent
 			MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
-			this.pojoagent = model.getPojoClass().newInstance();
+			this.pojoagent = model.getPojoClass().getType(model.getClassloader()).newInstance();
 		}
 		catch(Exception e)
 		{
