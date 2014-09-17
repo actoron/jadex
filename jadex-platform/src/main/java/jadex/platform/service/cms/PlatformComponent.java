@@ -108,6 +108,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			{
 				dr.addDependency(facsm.get(fac.getClass()), facsm.get(pre));
 			}
+			last = fac;
 		}
 		
 		List<IComponentFeatureFactory> ofacs = dr.resolveDependencies();
