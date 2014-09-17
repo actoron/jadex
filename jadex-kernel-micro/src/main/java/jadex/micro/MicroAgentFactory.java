@@ -24,6 +24,8 @@ import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
 import jadex.micro.features.IMicroInjectionFeature;
 import jadex.micro.features.IMicroLifecycleFeature;
+import jadex.micro.features.impl.MicroInjectionComponentFeature;
+import jadex.micro.features.impl.MicroLifecycleFeature;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -53,16 +55,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	protected static final LazyResource ICON = new LazyResource(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png");
 	
 	/** The specific component features for micro agents. */
-	public static final Collection<IComponentFeatureFactory>	MICRO_FEATURES;
-	
-	static
-	{
-		Collection<IComponentFeatureFactory>	features	= new ArrayList<IComponentFeatureFactory>();
-		features.add(new ComponentFeatureFactory(IMicroInjectionFeature.class, 
-			new Class<?>[]{IArgumentsFeature.class}, new Class<?>[]{IProvidedServicesFeature.class}));
-		features.add(new ComponentFeatureFactory(IMicroLifecycleFeature.class));
-		MICRO_FEATURES	= Collections.unmodifiableCollection(features);
-	}
+	public static final Collection<IComponentFeatureFactory>	MICRO_FEATURES	= Collections.unmodifiableCollection(
+		Arrays.asList(
+			MicroInjectionComponentFeature.FACTORY,
+			MicroLifecycleFeature.FACTORY
+		));
 
 	//-------- attributes --------
 	

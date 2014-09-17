@@ -3,11 +3,10 @@ package jadex.micro.features.impl;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.AbstractComponentFeature;
-import jadex.bridge.component.impl.ArgumentsComponentFeature;
-import jadex.bridge.service.component.ProvidedServicesComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -21,15 +20,22 @@ import jadex.micro.features.IMicroInjectionFeature;
 import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Inject agent arguments into annotated field values.
  */
 public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 {
+	//-------- constants ---------
+	
+	/** The factory. */
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(
+		IMicroInjectionFeature.class, MicroInjectionComponentFeature.class,
+		new Class<?>[]{IArgumentsFeature.class}, new Class<?>[]{IProvidedServicesFeature.class});
+
+	//-------- constructors --------
+	
 	/**
 	 *  Factory method constructor for instance level.
 	 */

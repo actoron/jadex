@@ -4,8 +4,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -29,6 +31,13 @@ import java.lang.reflect.Method;
  */
 public class MicroLifecycleFeature extends	AbstractComponentFeature implements IMicroLifecycleFeature
 {
+	//-------- constants --------
+	
+	/** The factory. */
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMicroLifecycleFeature.class, MicroLifecycleFeature.class);
+	
+	//-------- attributes --------
+	
 	/** The pojo agent. */
 	protected Object pojoagent;
 	
