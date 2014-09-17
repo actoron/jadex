@@ -16,8 +16,11 @@ import java.util.Set;
  */
 public class ComponentFeatureFactory implements IComponentFeatureFactory
 {
-	/** The type. */
+	/** The interface type. */
 	protected Class<?> type;
+	
+	/** The implementation type. */
+	protected Class<?> impl;
 	
 	/** The presdecessors. */
 	protected Set<Class<?>> pres;
@@ -30,17 +33,18 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	/**
 	 *  Bean constructor for type level.
 	 */
-	public ComponentFeatureFactory(Class<?> type)
+	public ComponentFeatureFactory(Class<?> type, Class<?> impl)
 	{
-		this.type = type;
+		this(type, impl, null, null);
 	}
 	
 	/**
 	 *  Bean constructor for type level.
 	 */
-	public ComponentFeatureFactory(Class<?> type, Class<?>[] pres, Class<?>[] sucs)
+	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs)
 	{
 		this.type = type;
+		this.impl = impl;
 		this.pres = pres==null? null: (Set)SUtil.arrayToSet(pres);
 		this.sucs = sucs==null? null: (Set)SUtil.arrayToSet(sucs);
 	}
@@ -80,7 +84,7 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	{
 		try
 		{
-			Constructor<?> con = type.getConstructor(new Class<?>[]{IInternalAccess.class, ComponentCreationInfo.class});
+			Constructor<?> con = impl.getConstructor(new Class<?>[]{IInternalAccess.class, ComponentCreationInfo.class});
 			return (IComponentFeature)con.newInstance(new Object[]{access, info});
 		}
 		catch(Exception e)
