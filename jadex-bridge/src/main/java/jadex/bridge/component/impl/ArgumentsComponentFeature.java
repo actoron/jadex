@@ -67,13 +67,15 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	 */
 	public IFuture<Void> init()
 	{
-		this.arguments	= new LinkedHashMap<String, Object>();
-		
 		if(cinfo.getArguments()!=null)
 		{
 			for(Iterator<Map.Entry<String, Object>> it=cinfo.getArguments().entrySet().iterator(); it.hasNext(); )
 			{
 				Map.Entry<String, Object> entry = it.next();
+				if(arguments==null)
+				{
+					this.arguments	= new LinkedHashMap<String, Object>();
+				}
 				arguments.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -85,8 +87,12 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 			UnparsedExpression[]	upes	= ci.getArguments();
 			for(int i=0; i<upes.length; i++)
 			{
-				if(!arguments.containsKey(upes[i].getName()))
+				if(arguments==null || !arguments.containsKey(upes[i].getName()))
 				{
+					if(arguments==null)
+					{
+						this.arguments	= new LinkedHashMap<String, Object>();
+					}
 					arguments.put(upes[i].getName(), SJavaParser.getParsedValue(upes[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 				}
 			}
@@ -96,8 +102,12 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		{
 			// Prevents unset arguments being added to be able to check whether a user has
 			// set an argument explicitly to null or if it just is null (e.g. for field injections)
-			if(!arguments.containsKey(margs[i].getName()) && margs[i].getDefaultValue().getValue()!=null)
+			if((arguments==null || !arguments.containsKey(margs[i].getName())) && margs[i].getDefaultValue().getValue()!=null)
 			{
+				if(arguments==null)
+				{
+					this.arguments	= new LinkedHashMap<String, Object>();
+				}
 				arguments.put(margs[i].getName(), SJavaParser.getParsedValue(margs[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 			}
 		}
@@ -107,8 +117,8 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		// Hack?! add component identifier to result as long as we don't have better future type for results
 		// could one somehow use the CallLocal for that purpose instead?
 		// Todo: generate event.
+		this.results	= new LinkedHashMap<String, Object>();
 		results.put(IComponentIdentifier.RESULTCID, getComponent().getComponentIdentifier());
-		
 		
 		if(ci!=null)
 		{
