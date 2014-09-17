@@ -8,16 +8,15 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.DependencyResolver;
-import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.component.impl.ArgumentsComponentFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
-import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.component.impl.SubcomponentsComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.ProvidedServicesComponentFeature;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -34,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,10 +52,10 @@ public class SComponentFactory
 	static
 	{
 		Collection<IComponentFeatureFactory>	def_features	= new ArrayList<IComponentFeatureFactory>();
-		def_features.add(new ComponentFeatureFactory(ExecutionComponentFeature.class));
-		def_features.add(new ComponentFeatureFactory(ArgumentsComponentFeature.class));
-		def_features.add(new ComponentFeatureFactory(ProvidedServicesComponentFeature.class));
-		def_features.add(new ComponentFeatureFactory(SubcomponentsComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class));
+		def_features.add(new ComponentFeatureFactory(IArgumentsFeature.class));
+		def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class));
+		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class));
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
 	
