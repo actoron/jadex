@@ -30,51 +30,6 @@ import java.util.Set;
  */
 public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 {
-	//-------- type level --------
-	
-	/**
-	 *  Bean constructor for type level.
-	 */
-	public MicroInjectionComponentFeature()
-	{
-	}
-	
-	/**
-	 *  Get the user interface type of the feature.
-	 */
-	public Class<?>	getType()
-	{
-		return IMicroInjectionFeature.class;
-	}
-	
-	/**
-	 *  Create an instance of the feature.
-	 *  @param access	The access of the component.
-	 *  @param info	The creation info.
-	 */
-	public IComponentFeature	createInstance(IInternalAccess access, ComponentCreationInfo info)
-	{
-		return new MicroInjectionComponentFeature(access, info);
-	}
-
-	/**
-	 *  Get the predecessors, i.e. features that should be inited first.
-	 */
-	public Set<? extends Class<? extends IComponentFeatureFactory>>	getPredecessors()
-	{
-		return Collections.singleton(ArgumentsComponentFeature.class);
-	}
-	
-	/**
-	 *  Get the successors, i.e. features that should be inited after this feature.
-	 */
-	public Set<? extends Class<? extends IComponentFeatureFactory>>	getSuccessors()
-	{
-		return Collections.singleton(ProvidedServicesComponentFeature.class);
-	}
-	
-	//-------- instance level --------
-	
 	/**
 	 *  Factory method constructor for instance level.
 	 */

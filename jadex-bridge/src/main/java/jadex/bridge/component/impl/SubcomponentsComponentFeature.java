@@ -3,7 +3,6 @@ package jadex.bridge.component.impl;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
@@ -36,36 +35,12 @@ import java.util.Map;
  */
 public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	implements ISubcomponentsFeature, IInternalSubcomponentsFeature
 {
-	//-------- constructors --------
-	
 	/**
-	 *  Bean constructor.
+	 *  Create the feature.
 	 */
-	public SubcomponentsComponentFeature()
-	{
-	}
-	
 	protected SubcomponentsComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-	}
-	
-	//-------- IComponentFeature interface --------
-	
-	/**
-	 *  Get the user interface type of the feature.
-	 */
-	public Class<?>	getType()
-	{
-		return ISubcomponentsFeature.class;
-	}
-	
-	/**
-	 *  Create an instance of the feature.
-	 */
-	public IComponentFeature createInstance(IInternalAccess access, ComponentCreationInfo info)
-	{
-		return new SubcomponentsComponentFeature(access, info);
 	}
 	
 	/**

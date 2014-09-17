@@ -7,6 +7,7 @@ import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.component.impl.SubcomponentsComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -65,11 +66,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	static
 	{
 		Collection<IComponentFeatureFactory>	features	= new ArrayList<IComponentFeatureFactory>();
-		features.add(new MicroInjectionComponentFeature());
-		features.add(new MicroLifecycleFeature());
+		features.add(new ComponentFeatureFactory(MicroInjectionComponentFeature.class, 
+			new Class<?>[]{ArgumentsComponentFeature.class}, new Class<?>[]{ProvidedServicesComponentFeature.class}));
+		features.add(new ComponentFeatureFactory(MicroLifecycleFeature.class));
 		MICRO_FEATURES	= Collections.unmodifiableCollection(features);
 	}
-
 
 	//-------- attributes --------
 	

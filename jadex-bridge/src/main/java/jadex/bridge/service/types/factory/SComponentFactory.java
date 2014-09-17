@@ -11,6 +11,7 @@ import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.component.impl.SubcomponentsComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -53,10 +54,10 @@ public class SComponentFactory
 	static
 	{
 		Collection<IComponentFeatureFactory>	def_features	= new ArrayList<IComponentFeatureFactory>();
-		def_features.add(new ExecutionComponentFeature());
-		def_features.add(new ArgumentsComponentFeature());
-		def_features.add(new ProvidedServicesComponentFeature());
-		def_features.add(new SubcomponentsComponentFeature());
+		def_features.add(new ComponentFeatureFactory(ExecutionComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(ArgumentsComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(ProvidedServicesComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(SubcomponentsComponentFeature.class));
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
 	
@@ -70,14 +71,18 @@ public class SComponentFactory
 	public static Collection<IComponentFeatureFactory> orderComponentFeatures(Collection<Collection<IComponentFeatureFactory>> facss)
 	{
 		DependencyResolver<IComponentFeatureFactory> dr = new DependencyResolver<IComponentFeatureFactory>();
-		Map<Class<? extends IComponentFeatureFactory>, IComponentFeatureFactory> facsmap = new HashMap<Class<? extends IComponentFeatureFactory>, IComponentFeatureFactory>();
+		Map<Class<?>, IComponentFeatureFactory> facsmap = new HashMap<Class<?>, IComponentFeatureFactory>();
+		
 		for(Collection<IComponentFeatureFactory> facs: facss)
 		{
 			for(IComponentFeatureFactory fac: facs)
 			{
-				facsmap.put(fac.getClass(), fac);
+				facsmap.put(fac.getType(), fac);
 			}
+		}
 
+		for(Collection<IComponentFeatureFactory> facs: facss)
+		{
 			IComponentFeatureFactory last = null;
 			for(IComponentFeatureFactory fac: facs)
 			{
@@ -89,13 +94,13 @@ public class SComponentFactory
 				{
 					dr.addNode(fac);
 				}
-				Set<? extends Class<? extends IComponentFeatureFactory>> sucs = fac.getSuccessors();
-				for(Class<? extends IComponentFeatureFactory> suc: sucs)
+				Set<Class<?>> sucs = fac.getSuccessors();
+				for(Class<?> suc: sucs)
 				{
 					dr.addDependency(facsmap.get(suc), facsmap.get(fac.getClass()));
 				}
-				Set<? extends Class<? extends IComponentFeatureFactory>> pres = fac.getPredecessors();
-				for(Class<? extends IComponentFeatureFactory> pre: pres)
+				Set<Class<?>> pres = fac.getPredecessors();
+				for(Class<?> pre: pres)
 				{
 					dr.addDependency(facsmap.get(fac.getClass()), facsmap.get(pre));
 				}
