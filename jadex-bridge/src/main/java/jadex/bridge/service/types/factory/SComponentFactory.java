@@ -86,12 +86,12 @@ public class SComponentFactory
 				Set<Class<?>> sucs = fac.getSuccessors();
 				for(Class<?> suc: sucs)
 				{
-					dr.addDependency(facsmap.get(suc), facsmap.get(fac.getClass()));
+					dr.addDependency(facsmap.get(suc), facsmap.get(fac.getType()));
 				}
 				Set<Class<?>> pres = fac.getPredecessors();
 				for(Class<?> pre: pres)
 				{
-					dr.addDependency(facsmap.get(fac.getClass()), facsmap.get(pre));
+					dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
 				}
 			}
 		}
