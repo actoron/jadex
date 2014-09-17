@@ -653,4 +653,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		return false;
 //		throw new UnsupportedOperationException();
 	}
+	
+	
 }

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  The micro agent model. 
  */
 public class MicroModel extends CacheableKernelModel
 {
