@@ -12,10 +12,12 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * 
+ *  Feature factory allowing the creation of component features.
  */
 public class ComponentFeatureFactory implements IComponentFeatureFactory
 {
+	//-------- attributes --------
+	
 	/** The interface type. */
 	protected Class<?> type;
 	
@@ -33,16 +35,26 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	/**
 	 *  Bean constructor for type level.
 	 */
+	public ComponentFeatureFactory()
+	{
+	}
+	
+	/**
+	 *  Create a new feature factory.
+	 */
 	public ComponentFeatureFactory(Class<?> type, Class<?> impl)
 	{
 		this(type, impl, null, null);
 	}
 	
 	/**
-	 *  Bean constructor for type level.
+	 *  Create a new feature factory.
 	 */
 	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs)
 	{
+		if(type==null)
+			System.out.println("argl");
+		
 		this.type = type;
 		this.impl = impl;
 		this.pres = pres==null? null: (Set)SUtil.arrayToSet(pres);
@@ -60,11 +72,29 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	}
 	
 	/**
+	 *  The predecessors to set.
+	 *  @param predecessors The predecessors to set
+	 */
+	public void setPredecessors(Set<Class<?>> pres)
+	{
+		this.pres = pres;
+	}
+	
+	/**
 	 *  Get the successors, i.e. features that should be inited after this feature.
 	 */
 	public Set<Class<?>>	getSuccessors()
 	{
 		return sucs!=null? sucs: (Set)Collections.emptySet();
+	}
+	
+	/**
+	 *  The successors to set.
+	 *  @param sucs The successors to set
+	 */
+	public void setSuccessors(Set<Class<?>> sucs)
+	{
+		this.sucs = sucs;
 	}
 	
 	/**
@@ -75,6 +105,33 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 		return type;
 	}
 	
+	/**
+	 *  The type to set.
+	 *  @param type The type to set
+	 */
+	public void setType(Class<?> type)
+	{
+		this.type = type;
+	}
+	
+	/**
+	 *  Get the impl.
+	 *  @return The impl
+	 */
+	public Class<?> getImplementationClass()
+	{
+		return impl;
+	}
+
+	/**
+	 *  The impl to set.
+	 *  @param impl The impl to set
+	 */
+	public void setImplementationClass(Class<?> impl)
+	{
+		this.impl = impl;
+	}
+
 	/**
 	 *  Create an instance of the feature.
 	 *  @param access	The access of the component.
