@@ -64,7 +64,7 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 	public void refreshCombo()
 	{
 		// Search starting from remote CMS.
-		SServiceProvider.getService(platformaccess.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(platformaccess, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(AbstractComponentSelectorPanel.this) 
 		{
 			public void customResultAvailable(IComponentManagementService cms) 
@@ -112,7 +112,7 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
 		// Get external access using local CMS (speedup in case remote component found by remote platform is actually local).
-		SServiceProvider.getService(jccaccess.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(jccaccess, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, IAbstractViewerPanel>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
@@ -98,12 +99,12 @@ public class SFuture
 					if(!ret.isDone())
 					{
 						ret.sendForwardCommand(IForwardCommandFuture.Type.UPDATETIMER);
-						ia.waitForDelay(w, this, realtime);
+						ia.getComponentFeature(IExecutionFeature.class).waitForDelay(w, this, realtime);
 					}
 					return IFuture.DONE;
 				}
 			};
-			ia.waitForDelay(w, step, realtime);
+			ia.getComponentFeature(IExecutionFeature.class).waitForDelay(w, step, realtime);
 		}
 	}
 	

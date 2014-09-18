@@ -2,7 +2,7 @@ package jadex.base.gui;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -35,7 +35,7 @@ public class ComponentIdentifierPanel extends JPanel
 	//-------- attributes --------
 
 	/** The service provider. */
-	protected IServiceProvider provider;
+	protected IExternalAccess access;
 	
 	/** The component identifier.*/
 	protected IComponentIdentifier cid;
@@ -64,9 +64,9 @@ public class ComponentIdentifierPanel extends JPanel
 	 *  Create a new component identifier panel.
 	 *  @param cid The component identifier (or null for new).
 	 */
-	public ComponentIdentifierPanel(IComponentIdentifier cid, final IServiceProvider provider)
+	public ComponentIdentifierPanel(IComponentIdentifier cid, final IExternalAccess access)
 	{
-		this.provider = provider;
+		this.access = access;
 		this.cid = cid!=null? cid: new ComponentIdentifier();//cms.createComponentIdentifier(null, false, null);
 		this.editable	= true;
 
@@ -89,7 +89,7 @@ public class ComponentIdentifierPanel extends JPanel
 			public void tableChanged(TableModelEvent e)
 			{
 				//System.out.println("event: "+e);
-				SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 				{
 					public void customResultAvailable(Object result)
@@ -142,7 +142,7 @@ public class ComponentIdentifierPanel extends JPanel
 		add(content, BorderLayout.CENTER);
 		add(help, BorderLayout.SOUTH);
 		
-		SServiceProvider.getService(provider, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -246,7 +246,7 @@ public class ComponentIdentifierPanel extends JPanel
 		
 		protected void	update()
 		{
-			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
+			SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 			{
 				public void customResultAvailable(Object result)
 				{

@@ -88,7 +88,7 @@ public class DebuggerMainPanel extends JSplitPane
 		this.setOneTouchExpandable(true);
 		setDividerLocation(0.3);
 				
-		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
 		{
 			public void customResultAvailable(final IComponentManagementService	cms)
@@ -178,7 +178,7 @@ public class DebuggerMainPanel extends JSplitPane
 					public void actionPerformed(ActionEvent e)
 					{
 						pause.setEnabled(false);
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class)
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
 						{
 							public void customResultAvailable(IComponentManagementService ces)
@@ -196,7 +196,7 @@ public class DebuggerMainPanel extends JSplitPane
 					{
 						step.setEnabled(false);
 						run.setEnabled(false);
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class)
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
 						{
 							public void customResultAvailable(final IComponentManagementService cms)
@@ -243,7 +243,7 @@ public class DebuggerMainPanel extends JSplitPane
 						step.setEnabled(false);
 						run.setEnabled(false);
 						pause.setEnabled(true);
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class)
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
 						{
 							public void customResultAvailable(final IComponentManagementService ces)

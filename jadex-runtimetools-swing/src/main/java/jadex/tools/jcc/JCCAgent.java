@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TimeoutIntermediateResultListener;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -169,7 +170,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						// If no platform found, search again after 1 second.
 						if(!connected)
 						{
-							agent.waitForDelay(RETRY_DELAY, JCCAgent.this, true)
+							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(RETRY_DELAY, JCCAgent.this, true)
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}
@@ -179,7 +180,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						// If no platform found, search again after 1 second.
 						if(!connected)
 						{
-							agent.waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this, true)
+							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this, true)
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}
@@ -201,7 +202,7 @@ public class JCCAgent	implements IComponentStep<Void>
 		if(cc!=null)
 		{
 			cc.shutdown()
-				.addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)));
+				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 		}
 		else
 		{
@@ -251,7 +252,7 @@ public class JCCAgent	implements IComponentStep<Void>
 					SecurityServicePlugin.class.getName()
 	//				DeployerPlugin.class.getName()
 				},
-			saveonexit).addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)));
+			saveonexit).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 		}
 		else
 		{

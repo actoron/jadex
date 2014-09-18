@@ -274,12 +274,4 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 		return getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
-	/**
-	 *  Create a result listener that is executed on the
-	 *  component thread.
-	 */
-	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener)
-	{
-		return getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(listener);
-	}
 }

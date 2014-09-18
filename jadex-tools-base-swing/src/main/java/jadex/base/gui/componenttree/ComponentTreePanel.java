@@ -465,7 +465,7 @@ public class ComponentTreePanel extends JSplitPane
 					{
 //						Object obj = ((ProvidedServiceInfoNode)node).getService();
 						IServiceIdentifier sid = ((ProvidedServiceInfoNode)node).getServiceIdentifier();
-						IFuture<Object> fut = SServiceProvider.getService(access.getServiceProvider(), sid);
+						IFuture<Object> fut = SServiceProvider.getService(access, sid);
 						fut.addResultListener(new SwingDefaultResultListener<Object>()
 						{
 							public void customResultAvailable(Object obj)
@@ -518,7 +518,7 @@ public class ComponentTreePanel extends JSplitPane
 					final IComponentIdentifier	cid	= pctn.getComponentIdentifier();
 					if(cid!=null)
 					{
-						SServiceProvider.getService(access.getServiceProvider(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService(access, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener<ISecurityService>(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(final ISecurityService sec)
@@ -918,7 +918,7 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		});
 
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService result)
@@ -1087,7 +1087,7 @@ public class ComponentTreePanel extends JSplitPane
 				final ProvidedServiceInfoNode node = (ProvidedServiceInfoNode)tmp;
 	//					final IService service = node.getService();
 				
-				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), node.getServiceIdentifier())
+				SServiceProvider.getService(jcc.getJCCAccess(), node.getServiceIdentifier())
 					.addResultListener(new ExceptionDelegationResultListener<Object, JComponent>(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -1142,7 +1142,7 @@ public class ComponentTreePanel extends JSplitPane
 				final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 				final IComponentIdentifier cid = node.getComponentIdentifier();
 				
-				SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class)
+				SServiceProvider.getServiceUpwards(jcc.getJCCAccess(), IComponentManagementService.class)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, JComponent>(ret)
 				{
 					public void customResultAvailable(final IComponentManagementService cms)
@@ -1226,7 +1226,7 @@ public class ComponentTreePanel extends JSplitPane
 				else
 				{
 					// Unknown -> start search to find out asynchronously
-					SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), sid)
+					SServiceProvider.getService(jcc.getJCCAccess(), sid)
 						.addResultListener(new SwingDefaultResultListener<Object>()
 					{
 						public void customResultAvailable(Object result)
@@ -1263,7 +1263,7 @@ public class ComponentTreePanel extends JSplitPane
 				else
 				{
 					// Unknown -> start search to find out asynchronously
-					IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class);
+					IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(jcc.getJCCAccess(), IComponentManagementService.class);
 					fut.addResultListener(new DefaultResultListener<IComponentManagementService>()
 					{
 						public void resultAvailable(IComponentManagementService result)
@@ -1308,7 +1308,7 @@ public class ComponentTreePanel extends JSplitPane
 	protected static IFuture<Void>	killComponent(IExternalAccess access, final IComponentIdentifier cid)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

@@ -1,6 +1,8 @@
 package jadex.base.gui;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.gui.SGUI;
 
@@ -31,7 +33,7 @@ public class ComponentIdentifierDialog
 	protected Component	parent;
 	
 	/** The service provider. */
-	protected IServiceProvider provider;
+	protected IExternalAccess access;
 	
 	/** The dialog (created lazily). */
 	protected JDialog	dia;
@@ -47,10 +49,10 @@ public class ComponentIdentifierDialog
 	/**
 	 *  Create a new dialog.
 	 */
-	public ComponentIdentifierDialog(Component parent, IServiceProvider provider)
+	public ComponentIdentifierDialog(Component parent, IExternalAccess access)
 	{
 		this.parent	= parent;
-		this.provider	= provider;
+		this.access = access;
 	}
 
 	//-------- methods --------
@@ -62,7 +64,7 @@ public class ComponentIdentifierDialog
 	public IComponentIdentifier getComponentIdentifier(final IComponentIdentifier def)
 	{
 		// Create dialog.
-		this.dia = createDialog(def, provider);
+		this.dia = createDialog(def, access);
 
 		aborted	= false;
 		dia.setVisible(true);
@@ -73,9 +75,9 @@ public class ComponentIdentifierDialog
 	/**
 	 *  Create the dialog.
 	 */
-	public JDialog createDialog(IComponentIdentifier def, IServiceProvider provider)
+	public JDialog createDialog(IComponentIdentifier def, IExternalAccess access)
 	{
-		final ComponentIdentifierPanel pip = new ComponentIdentifierPanel(null, provider);
+		final ComponentIdentifierPanel pip = new ComponentIdentifierPanel(null, access);
 		
 		final JButton ok = new JButton("OK");
 		final JButton cancel = new JButton("Cancel");

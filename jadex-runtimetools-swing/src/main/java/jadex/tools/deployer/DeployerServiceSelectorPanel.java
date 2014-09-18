@@ -57,7 +57,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	{
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
-		SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)

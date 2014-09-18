@@ -1,6 +1,8 @@
 package jadex.bridge.component.impl;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
@@ -52,30 +54,14 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		
 		if(component.getConfiguration()!=null)
 		{
-			final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
 			ConfigurationInfo conf = component.getModel().getConfiguration(component.getConfiguration());
 			final ComponentInstanceInfo[] components = conf.getComponentInstances();
-			SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
-				.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			createComponents(components).addResultListener(createResultListener(
+				new ExceptionDelegationResultListener<List<IComponentIdentifier>, Void>(ret)
 			{
-				public void customResultAvailable(IComponentManagementService cms)
+				public void customResultAvailable(List<IComponentIdentifier> cids)
 				{
-					// NOTE: in current implementation application waits for subcomponents
-					// to be finished and cms implements a hack to get the external
-					// access of an uninited parent.
-					
-					// (NOTE1: parent cannot wait for subcomponents to be all created
-					// before setting itself inited=true, because subcomponents need
-					// the parent external access.)
-					
-					// (NOTE2: subcomponents must be created one by one as they
-					// might depend on each other (e.g. bdi factory must be there for jcc)).
-					
-					createComponent(components, cms, component.getModel(), 0, ret, cids);
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					super.exceptionOccurred(exception);
+					ret.setResult(null);
 				}
 			}));
 		}
@@ -86,6 +72,97 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		
 		return ret;
 	}	
+	
+	/**
+	 *  Get the file name of a component type.
+	 *  @param ctype The component type.
+	 *  @return The file name of this component type.
+	 */
+	public String getComponentFilename(final String ctype)
+	{
+		String ret = null;
+		
+		SubcomponentTypeInfo[] subcomps = getComponent().getModel().getSubcomponentTypes();
+		for(int i=0; ret==null && i<subcomps.length; i++)
+		{
+			SubcomponentTypeInfo subct = (SubcomponentTypeInfo)subcomps[i];
+			if(subct.getName().equals(ctype))
+				ret = subct.getFilename();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the local type name of this component as defined in the parent.
+	 *  @return The type of this component type.
+	 */
+	public String getLocalType()
+	{
+		return getComponent().getComponentDescription().getLocalType();
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<List<IComponentIdentifier>> createComponents(final ComponentInstanceInfo[] components)
+	{
+		final Future<Void> res = new Future<Void>();
+		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
+		SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
+			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(res)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				// NOTE: in current implementation application waits for subcomponents
+				// to be finished and cms implements a hack to get the external
+				// access of an uninited parent.
+				
+				// (NOTE1: parent cannot wait for subcomponents to be all created
+				// before setting itself inited=true, because subcomponents need
+				// the parent external access.)
+				
+				// (NOTE2: subcomponents must be created one by one as they
+				// might depend on each other (e.g. bdi factory must be there for jcc)).
+				
+				createComponent(components, cms, component.getModel(), 0, res, cids);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				super.exceptionOccurred(exception);
+			}
+		}));
+		
+		final Future<List<IComponentIdentifier>> ret = new Future<List<IComponentIdentifier>>();
+		res.addResultListener(new ExceptionDelegationResultListener<Void, List<IComponentIdentifier>>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				ret.setResult(cids);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a subcomponent.
+	 *  @param component The instance info.
+	 */
+	public IFuture<IComponentIdentifier> createChild(final ComponentInstanceInfo component)
+	{
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		createComponents(new ComponentInstanceInfo[]{component}).addResultListener(createResultListener(
+			new ExceptionDelegationResultListener<List<IComponentIdentifier>, IComponentIdentifier>(ret)
+			{
+				public void customResultAvailable(List<IComponentIdentifier> cids)
+				{
+					ret.setResult(cids.get(0));
+				}
+			}));
+		return ret;
+	}
 	
 	/**
 	 *  Create subcomponents.
@@ -210,5 +287,22 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	public IFuture<Void>	componentCreated(IComponentDescription desc, IModelInfo model)
 	{
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Create a result listener that is executed on the
+	 *  component thread.
+	 */
+	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
+	{
+		return getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(listener);
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isExternalThread()
+	{
+		return !getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 	}
 }

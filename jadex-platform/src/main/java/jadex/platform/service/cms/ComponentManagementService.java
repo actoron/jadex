@@ -2496,10 +2496,10 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		IComponentDescription[] ret = new IComponentDescription[components.size()];
 		int i=0;
-//		for(Iterator<IComponentAdapter> it=adapters.values().iterator(); i<ret.length; i++)
-//		{
-//			ret[i] = (IComponentDescription)((CMSComponentDescription)((IComponentAdapter)it.next()).getDescription()).clone();
-//		}
+		for(Iterator<IPlatformComponentAccess> it=components.values().iterator(); i<ret.length; i++)
+		{
+			ret[i] = (IComponentDescription)((CMSComponentDescription)it.next().getInternalAccess().getComponentDescription()).clone();
+		}
 		
 		fut.setResult(ret);
 		return fut;

@@ -9,8 +9,10 @@ import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DelegationResultListener;
@@ -19,8 +21,10 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *  This feature provides component step execution.
@@ -70,7 +74,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 	 */
 	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		Future<T>	ret	= new Future<T>();
+		final Future ret = createStepFuture(step);
+		
 		synchronized(this)
 		{
 			if(steps==null)
@@ -91,7 +96,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 	 */
 	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step)
 	{
-		Future<T>	ret	= new Future<T>();
+		final Future ret = createStepFuture(step);
+		
 		synchronized(this)
 		{
 			if(isteps==null)
@@ -288,5 +294,33 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 		}
 		
 		return again;
+	}
+	
+	/**
+	 *  Create intermediate of direct future.
+	 */
+	protected Future<?> createStepFuture(IComponentStep<?> step)
+	{
+		Future<?> ret;
+		try
+		{
+			Method method = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+			Class<?> clazz = method.getReturnType();
+//			ret = FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(getLogger()));
+			// Must not be fetched before properties are available!
+			ret = FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(new IResultCommand<Logger, Void>()
+			{
+				public Logger execute(Void args)
+				{
+					return getComponent().getLogger();
+				}
+			}));
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return ret;
 	}
 }

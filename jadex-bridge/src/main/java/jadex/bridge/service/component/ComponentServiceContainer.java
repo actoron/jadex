@@ -266,7 +266,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		
 		IFuture<T>	fut	= super.getRequiredService(info, binding, rebind, filter);
 		
-		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
+		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance));
 	}
 	
 	/**

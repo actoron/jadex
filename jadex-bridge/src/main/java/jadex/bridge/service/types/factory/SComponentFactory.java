@@ -20,7 +20,9 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ProvidedServicesComponentFeature;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -31,7 +33,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.javaparser.javaccimpl.ArgumentsNode;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,6 +61,7 @@ public class SComponentFactory
 		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class, ExecutionComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IArgumentsFeature.class, ArgumentsComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class));
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
@@ -172,7 +174,7 @@ public class SComponentFactory
 //						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
 //						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
-						fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+						fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 						{
 							public void customResultAvailable(IComponentFactory fac)
 							{
@@ -225,7 +227,7 @@ public class SComponentFactory
 //						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
 //						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
-						fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
+						fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
 						{
 							public void customResultAvailable(IComponentFactory fac)
 							{
@@ -313,7 +315,7 @@ public class SComponentFactory
 		
 //				final long start = System.currentTimeMillis(); 
 				final Future<Boolean> ret = new Future<Boolean>();
-				SServiceProvider.getServices(ea.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getServices(ea, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> facs)
@@ -420,7 +422,7 @@ public class SComponentFactory
 //							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
 //						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 						getFactory(new FactoryFilter(model, null, rid), ia)
-							.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
+							.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
 						{
 							public void customResultAvailable(IComponentFactory fac)
 							{
@@ -466,7 +468,7 @@ public class SComponentFactory
 //					IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(type));
 //				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
 				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(type), ia);
-				fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, byte[]>(ret)
+				fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, byte[]>(ret)
 				{
 					public void customResultAvailable(IComponentFactory fac)
 					{
@@ -535,7 +537,7 @@ public class SComponentFactory
 			public IFuture<Object> execute(final IInternalAccess ia)
 			{
 				final Future<Object> ret = new Future<Object>();
-				SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getServices(ia, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Object>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> result)
@@ -597,8 +599,8 @@ public class SComponentFactory
 			public IFuture<String> execute(final IInternalAccess ia)
 			{
 				final Future<String> ret = new Future<String>();
-				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, String>(ret)
+				SServiceProvider.getService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ILibraryService, String>(ret)
 				{
 					public void customResultAvailable(ILibraryService ls)
 					{
@@ -606,7 +608,7 @@ public class SComponentFactory
 //							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid));
 //						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
-						fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
+						fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
 						{
 							public void customResultAvailable(IComponentFactory fac)
 							{
@@ -642,10 +644,10 @@ public class SComponentFactory
 	{
 		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
-		IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), 
+		IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(ia, 
 			IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 		
-		fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
+		fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
 		{
 			public void customResultAvailable(Collection<IComponentFactory> facs)
 			{

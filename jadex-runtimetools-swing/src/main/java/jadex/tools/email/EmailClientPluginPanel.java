@@ -124,7 +124,7 @@ public class EmailClientPluginPanel extends JPanel
 				}
 				final long vd = mil;
 				
-				SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(jcc.getPlatformAccess(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new DefaultResultListener<ISecurityService>()
 				{
 					public void resultAvailable(ISecurityService sser)

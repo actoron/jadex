@@ -10,6 +10,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
@@ -17,6 +18,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.BunchFileData;
@@ -102,9 +104,9 @@ public class SRemoteGui
 				final Future<Object[]>	ret	= new Future<Object[]>();
 				try
 				{
-					final RequiredServiceInfo[]	ris	= ia.getServiceContainer().getRequiredServiceInfos();
+					final RequiredServiceInfo[]	ris	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfos();
 	//				final IServiceIdentifier[] sid
-					IIntermediateFuture<IService>	ds	= SServiceProvider.getDeclaredServices((IServiceProvider)ia.getServiceContainer());
+					IIntermediateFuture<IService>	ds	= SServiceProvider.getDeclaredServices(ia);
 					ds.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, Object[]>(ret)
 					{
 						public void customResultAvailable(Collection<IService> result)
@@ -147,26 +149,27 @@ public class SRemoteGui
 	public static IFuture<Void> removeService(IComponentManagementService cms,
 			IServiceProvider container, final IServiceIdentifier sid)
 	{
-		final Future<Void>	ret	= new Future<Void>();
-		cms.getExternalAccess(sid.getProviderId())
-			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-		{
-			public void customResultAvailable(IExternalAccess exta)
-			{
-				exta.scheduleStep(new IComponentStep<Void>()
-				{
-					@Classname("removeService")
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						ia.getServiceContainer().removeService(sid);
-						return IFuture.DONE;
-					}
-				})
-				.addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
+//		final Future<Void>	ret	= new Future<Void>();
+//		cms.getExternalAccess(sid.getProviderId())
+//			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//		{
+//			public void customResultAvailable(IExternalAccess exta)
+//			{
+//				exta.scheduleStep(new IComponentStep<Void>()
+//				{
+//					@Classname("removeService")
+//					public IFuture<Void> execute(IInternalAccess ia)
+//					{
+//						ia.getServiceContainer().removeService(sid);
+//						return IFuture.DONE;
+//					}
+//				})
+//				.addResultListener(new DelegationResultListener<Void>(ret));
+//			}
+//		});
+//		return ret;
 		
-		return ret;
+		throw new UnsupportedOperationException();
 	}
 	
 	/**
@@ -179,10 +182,7 @@ public class SRemoteGui
 		
 		try
 		{
-			// Can throw component terminated exception
-			IServiceProvider sp = access.getServiceProvider(); 
-		
-			SServiceProvider.getService(sp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService	cms)
@@ -204,8 +204,8 @@ public class SRemoteGui
 									final Future<Void>	ret	= new Future<Void>();
 									try
 									{
-										SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-											.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+										SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 										{
 											public void customResultAvailable(IComponentManagementService cms)
 											{
@@ -244,7 +244,7 @@ public class SRemoteGui
 	public static IFuture<Void>	deregisterRemoteCMSListener(final IExternalAccess access, final IComponentIdentifier cid, final String id0)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -262,8 +262,8 @@ public class SRemoteGui
 								final Future<Void>	ret	= new Future<Void>();
 								try
 								{
-									SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+									SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 									{
 										public void customResultAvailable(IComponentManagementService cms)
 										{
@@ -317,7 +317,7 @@ public class SRemoteGui
 				{
 					// Test, if model can be loaded.
 					SComponentFactory.loadModel(ia.getExternalAccess(), name, rid)
-						.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, String>>(ret)
+						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, String>>(ret)
 					{
 						public void customResultAvailable(IModelInfo result)
 						{
@@ -1097,7 +1097,7 @@ public class SRemoteGui
 												{
 													if(model!=null && model.getReport()==null)
 													{
-														SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+														SServiceProvider.getService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 															.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Boolean>(ret)
 														{
 															public void customResultAvailable(ILibraryService ls)
@@ -1243,7 +1243,7 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
 					{
 						public void customResultAvailable(final ILibraryService ls)

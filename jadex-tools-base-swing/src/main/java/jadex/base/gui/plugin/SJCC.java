@@ -36,7 +36,7 @@ public class SJCC
 	public static IFuture<IExternalAccess>	getRootAccess(final IExternalAccess access)
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

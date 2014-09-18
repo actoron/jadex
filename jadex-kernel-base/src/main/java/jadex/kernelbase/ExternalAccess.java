@@ -8,6 +8,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
+import jadex.bridge.component.impl.ArgumentsComponentFeature;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -64,7 +66,7 @@ public class ExternalAccess implements IExternalAccess
 	
 	/** The local type (cached when persisted). */
 	// Todo: should not be kept in memory?
-	protected String	localtype;
+//	protected String	localtype;
 	
 	/** The results (cached after termination). */
 	protected Map<String, Object>	results;
@@ -142,19 +144,19 @@ public class ExternalAccess implements IExternalAccess
 ////		return ret;
 //	}
 	
-	/**
-	 *  Get the parent access (if any).
-	 *  @return The parent access.
-	 */
-	public IExternalAccess getParentAccess()
-	{
-		if(!valid)
-		{
-			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
-		}
-
-		return adapter.getParent();
-	}
+//	/**
+//	 *  Get the parent access (if any).
+//	 *  @return The parent access.
+//	 */
+//	public IExternalAccess getParentAccess()
+//	{
+//		if(!valid)
+//		{
+//			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
+//		}
+//
+//		return adapter.getParent();
+//	}
 	
 	/**
 	 *  Get the application component.
@@ -166,7 +168,7 @@ public class ExternalAccess implements IExternalAccess
 			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
 		}
 
-		return provider;
+		return (IServiceProvider)ia.getServiceContainer();
 	}
 
 	/**
@@ -180,7 +182,7 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
 		}
-		else if(adapter.isExternalThread())
+		else if(!ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
@@ -190,9 +192,9 @@ public class ExternalAccess implements IExternalAccess
 //					Thread.dumpStack();
 //				}
 //				System.out.println("ext kill: "+cid);
-				adapter.invokeLater(new Runnable() 
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run() 
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 //						System.out.println("int kill");
 						if(!valid)
@@ -204,13 +206,15 @@ public class ExternalAccess implements IExternalAccess
 						{
 							ia.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 						}
+						
+						return IFuture.DONE;
 					}
 					
 //					public String toString()
 //					{
 //						return "JOOOOOOOOOOOOOOOOOOOOO";
 //					}
-				});
+				}); 
 			}
 			catch(final Exception e)
 			{
@@ -236,6 +240,7 @@ public class ExternalAccess implements IExternalAccess
 		return ret;
 	}
 	
+	
 	/**
 	 *  Create a result listener that will be 
 	 *  executed on the component thread.
@@ -247,48 +252,48 @@ public class ExternalAccess implements IExternalAccess
 		return application.createResultListener(listener);
 	}*/
 	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildren(final String type)
-	{
-		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
-		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get the children (if any).
+//	 *  @return The children.
+//	 */
+//	public IFuture<IComponentIdentifier[]> getChildren(final String type)
+//	{
+//		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
+//		
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Create a subcomponent.
@@ -302,15 +307,17 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
 		}
-		else if(adapter.isExternalThread())
+		else if(isExternalThread())
 		{
 			try
 			{
-				adapter.invokeLater(new Runnable() 
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run() 
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+						ia.getComponentFeature(ISubcomponentsFeature.class).createChild(component)
+							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -327,7 +334,8 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ia.createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+			ia.getComponentFeature(ISubcomponentsFeature.class).createChild(component)
+				.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 		}
 		
 		return ret;
@@ -347,15 +355,15 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
 		}
-		else if(adapter.isExternalThread())
+		else if(isExternalThread())
 		{
 			try
 			{
-				adapter.invokeLater(new Runnable() 
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run() 
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						String fn = ia.getComponentFilename(ctype);
+						String fn = ia.getComponentFeature(ISubcomponentsFeature.class).getComponentFilename(ctype);
 						if(fn!=null)
 						{
 							ret.setResult(fn);
@@ -364,6 +372,7 @@ public class ExternalAccess implements IExternalAccess
 						{
 							ret.setException(new RuntimeException("Unknown component type: "+ctype));
 						}
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -380,7 +389,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			String fn = ia.getComponentFilename(ctype);
+			String fn = ia.getComponentFeature(ISubcomponentsFeature.class).getComponentFilename(ctype);
 			if(fn!=null)
 			{
 				ret.setResult(fn);
@@ -404,14 +413,14 @@ public class ExternalAccess implements IExternalAccess
 		{
 			throw new ComponentTerminatedException(cid);
 		}
-		else if(!valid)
-		{
-			return localtype;
-		}
-		else
-		{
-			return ia.getLocalType();
-		}
+//		else if(!valid)
+//		{
+//			return localtype;
+//		}
+//		else
+//		{
+			return ia.getComponentFeature(ISubcomponentsFeature.class).getLocalType();
+//		}
 	}
 	
 	/**
@@ -515,8 +524,8 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			SServiceProvider.getService(ia.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+			SServiceProvider.getService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -553,8 +562,8 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			SServiceProvider.getService(ia.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+			SServiceProvider.getService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -582,38 +591,39 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<IExtensionInstance> ret = new Future<IExtensionInstance>();
 		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						ret.setResult(ia.getExtension(name));
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ret.setResult(ia.getExtension(name));
-		}
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						ret.setResult(ia.getExtension(name));
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ret.setResult(ia.getExtension(name));
+//		}
 		
+		ret.setException(new UnsupportedOperationException());
 		return ret;
 	}
 
@@ -630,17 +640,18 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
 		}
-		else if(adapter.isExternalThread())
+		else if(isExternalThread())
 		{
 			try
 			{
-				adapter.invokeLater(new Runnable() 
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run() 
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.subscribeToEvents(filter, initial, elm);
 						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 						fut.addResultListener(lis);
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -677,17 +688,18 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
 		}
-		else if(adapter.isExternalThread())
+		else if(isExternalThread())
 		{
 			try
 			{
-				adapter.invokeLater(new Runnable() 
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run() 
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.subscribeToResults(); 
+						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getComponentFeature(ArgumentsComponentFeature.class).subscribeToResults(); 
 						TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 						fut.addResultListener(lis);
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -704,7 +716,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.subscribeToResults(); 
+			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getComponentFeature(ArgumentsComponentFeature.class).subscribeToResults(); 
 			TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 			fut.addResultListener(lis);
 		}
@@ -724,15 +736,16 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
 		}
-		else if(adapter.isExternalThread())
+		else if(isExternalThread())
 		{
 			try
 			{
-				adapter.invokeLater(new Runnable() 
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run() 
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(ia.getArguments());
+						ret.setResult(ia.getComponentFeature(ArgumentsComponentFeature.class).getArguments());
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -749,7 +762,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(ia.getArguments());
+			ret.setResult(ia.getComponentFeature(ArgumentsComponentFeature.class).getArguments());
 		}
 		
 		return ret;
@@ -767,15 +780,16 @@ public class ExternalAccess implements IExternalAccess
 		{
 			ret.setResult(results);
 		}
-		else if(adapter.isExternalThread())
+		else if(isExternalThread())
 		{
 			try
 			{
-				adapter.invokeLater(new Runnable() 
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run() 
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(ia.getResults());
+						ret.setResult(ia.getComponentFeature(ArgumentsComponentFeature.class).getResults());
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -786,7 +800,7 @@ public class ExternalAccess implements IExternalAccess
 					public void run()
 					{
 						// Should be possible to get the results even if component is already terminated?!
-						ret.setResult(ia.getResults());
+						ret.setResult(ia.getComponentFeature(ArgumentsComponentFeature.class).getResults());
 //						ret.setException(e);
 					}
 				});
@@ -794,7 +808,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(ia.getResults());
+			ret.setResult(ia.getComponentFeature(ArgumentsComponentFeature.class).getResults());
 		}
 		
 		return ret;
@@ -809,39 +823,40 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
 		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						ia.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-//						ret.setResult(interpreter.getNFPropertyNames());
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ia.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
-		}
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						ia.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+////						ret.setResult(interpreter.getNFPropertyNames());
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ia.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
+//		}
 		
+		ret.setException(new UnsupportedOperationException());
 		return ret;
 	}
 	
@@ -853,46 +868,47 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						if(!valid)
-						{
-							ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-						}
-						else
-						{
-							ia.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
-						}
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-//						ret.setResult(interpreter.getNFPropertyNames());
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ia.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
-		}
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						if(!valid)
+//						{
+//							ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//						}
+//						else
+//						{
+//							ia.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+//						}
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+////						ret.setResult(interpreter.getNFPropertyNames());
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ia.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+//		}
 		
+		ret.setException(new UnsupportedOperationException());
 		return ret;
 	}
 	
@@ -904,39 +920,40 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						ia.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-//						ret.setResult(interpreter.getNFPropertyNames());
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ia.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
-		}
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						ia.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+////						ret.setResult(interpreter.getNFPropertyNames());
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ia.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+//		}
 		
+		ret.setException(new UnsupportedOperationException());
 		return ret;
 	}
 	
@@ -949,39 +966,40 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
 		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						ia.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-//						ret.setResult(interpreter.getNFPropertyMetaInfo(name));
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ia.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
-		}
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						ia.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+////						ret.setResult(interpreter.getNFPropertyMetaInfo(name));
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ia.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+//		}
 		
+		ret.setException(new UnsupportedOperationException());
 		return ret;
 	}
 	
@@ -993,83 +1011,86 @@ public class ExternalAccess implements IExternalAccess
 	public <T> IFuture<T> getNFPropertyValue(final String name)
 	{
 		final Future<T> ret = new Future<T>();
-		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						IFuture<T> fut = ia.getNFPropertyValue(name);
-						fut.addResultListener(new IResultListener<T>()
-						{
-							public void resultAvailable(T result)
-							{
-								ret.setResult(result);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								IExternalAccess parent = adapter.getParent();
-								if (parent != null)
-								{
-									IFuture<T> fut = parent.getNFPropertyValue(name);
-									fut.addResultListener(new DelegationResultListener<T>(ret));
-								}
-								else
-								{
-									ret.setResult(null);
-								}
-							}
-						});
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-//						IFuture<T> fut = interpreter.getNFPropertyValue(name);
+//		
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						IFuture<T> fut = ia.getNFPropertyValue(name);
+//						fut.addResultListener(new IResultListener<T>()
+//						{
+//							public void resultAvailable(T result)
+//							{
+//								ret.setResult(result);
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								IExternalAccess parent = adapter.getParent();
+//								if (parent != null)
+//								{
+//									IFuture<T> fut = parent.getNFPropertyValue(name);
+//									fut.addResultListener(new DelegationResultListener<T>(ret));
+//								}
+//								else
+//								{
+//									ret.setResult(null);
+//								}
+//							}
+//						});
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+////						IFuture<T> fut = interpreter.getNFPropertyValue(name);
+////						fut.addResultListener(new DelegationResultListener<T>(ret));
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			IFuture<T> fut = ia.getNFPropertyValue(name);
+//			fut.addResultListener(new IResultListener<T>()
+//			{
+//				public void resultAvailable(T result)
+//				{
+//					ret.setResult(result);
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					IExternalAccess parent = adapter.getParent();
+//					if (parent != null)
+//					{
+//						IFuture<T> fut = parent.getNFPropertyValue(name);
 //						fut.addResultListener(new DelegationResultListener<T>(ret));
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			IFuture<T> fut = ia.getNFPropertyValue(name);
-			fut.addResultListener(new IResultListener<T>()
-			{
-				public void resultAvailable(T result)
-				{
-					ret.setResult(result);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					IExternalAccess parent = adapter.getParent();
-					if (parent != null)
-					{
-						IFuture<T> fut = parent.getNFPropertyValue(name);
-						fut.addResultListener(new DelegationResultListener<T>(ret));
-					}
-					else
-					{
-						ret.setResult(null);
-					}
-				}
-			});
-		}
+//					}
+//					else
+//					{
+//						ret.setResult(null);
+//					}
+//				}
+//			});
+//		}
+//		
+//		return ret;
 		
+		ret.setException(new UnsupportedOperationException());
 		return ret;
 	}
 	
@@ -1084,83 +1105,84 @@ public class ExternalAccess implements IExternalAccess
 	public <T, U> IFuture<T> getNFPropertyValue(final String name, final U unit)
 	{
 		final Future<T> ret = new Future<T>();
-		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						IFuture<T> fut = ia.getNFPropertyValue(name, unit);
-						fut.addResultListener(new IResultListener<T>()
-						{
-							public void resultAvailable(T result)
-							{
-								ret.setResult(result);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								IExternalAccess parent = adapter.getParent();
-								if (parent != null)
-								{
-									IFuture<T> fut = parent.getNFPropertyValue(name, unit);
-									fut.addResultListener(new DelegationResultListener<T>(ret));
-								}
-								else
-								{
-									ret.setResult(null);
-								}
-							}
-						});
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-//						IFuture<T> fut = interpreter.getNFPropertyValue(name, unit);
+//		
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						IFuture<T> fut = ia.getNFPropertyValue(name, unit);
+//						fut.addResultListener(new IResultListener<T>()
+//						{
+//							public void resultAvailable(T result)
+//							{
+//								ret.setResult(result);
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								IExternalAccess parent = adapter.getParent();
+//								if (parent != null)
+//								{
+//									IFuture<T> fut = parent.getNFPropertyValue(name, unit);
+//									fut.addResultListener(new DelegationResultListener<T>(ret));
+//								}
+//								else
+//								{
+//									ret.setResult(null);
+//								}
+//							}
+//						});
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+////						IFuture<T> fut = interpreter.getNFPropertyValue(name, unit);
+////						fut.addResultListener(new DelegationResultListener<T>(ret));
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			IFuture<T> fut = ia.getNFPropertyValue(name, unit);
+//			fut.addResultListener(new IResultListener<T>()
+//			{
+//				public void resultAvailable(T result)
+//				{
+//					ret.setResult(result);
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					IExternalAccess parent = adapter.getParent();
+//					if (parent != null)
+//					{
+//						IFuture<T> fut = parent.getNFPropertyValue(name, unit);
 //						fut.addResultListener(new DelegationResultListener<T>(ret));
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			IFuture<T> fut = ia.getNFPropertyValue(name, unit);
-			fut.addResultListener(new IResultListener<T>()
-			{
-				public void resultAvailable(T result)
-				{
-					ret.setResult(result);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					IExternalAccess parent = adapter.getParent();
-					if (parent != null)
-					{
-						IFuture<T> fut = parent.getNFPropertyValue(name, unit);
-						fut.addResultListener(new DelegationResultListener<T>(ret));
-					}
-					else
-					{
-						ret.setResult(null);
-					}
-				}
-			});
-		}
-		
+//					}
+//					else
+//					{
+//						ret.setResult(null);
+//					}
+//				}
+//			});
+//		}
+//		
+		ret.setException(new UnsupportedOperationException());
 		return ret;
 	}
 	
@@ -1170,45 +1192,46 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IFuture<Void> addNFProperty(final INFProperty<?, ?> nfprop)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						ia.addNFProperty(nfprop);
-						ret.setResult(null);
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-//						interpreter.addNFProperty(nfprop);
+//		final Future<Void> ret = new Future<Void>();
+//		
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(adapter.isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						ia.addNFProperty(nfprop);
 //						ret.setResult(null);
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ia.addNFProperty(nfprop);
-			ret.setResult(null);
-		}
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+////						interpreter.addNFProperty(nfprop);
+////						ret.setResult(null);
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ia.addNFProperty(nfprop);
+//			ret.setResult(null);
+//		}
 		
-		return ret;
+//		return ret;
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -1217,43 +1240,45 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IFuture<Void> removeNFProperty(final String name)
 	{
-		final Future<Void> ret = new Future<Void>();
+//		final Future<Void> ret = new Future<Void>();
 		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						ia.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-//						interpreter.removeNFProperty(name);
-//						ret.setResult(null);
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ia.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
-		}
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(adapter.isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						ia.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+////						interpreter.removeNFProperty(name);
+////						ret.setResult(null);
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ia.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
+//		}
+//		
+//		return ret;
 		
-		return ret;
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -1263,56 +1288,57 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						ia.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-//						interpreter.removeNFProperty(name);
-//						ret.setResult(null);
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ia.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
-		}
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				adapter.invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						ia.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+////						interpreter.removeNFProperty(name);
+////						ret.setResult(null);
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ia.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
+//		}
 		
-		return ret;
+//		return ret;
+		return IFuture.DONE;
 	}
 	
-	/**
-	 *  Get the interpreter.
-	 *  @return the interpreter.
-	 */
-	public StatelessAbstractInterpreter getInterpreter()
-	{
-		if(!valid)
-		{
-			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
-		}
-
-		return ia;
-	}
+//	/**
+//	 *  Get the interpreter.
+//	 *  @return the interpreter.
+//	 */
+//	public StatelessAbstractInterpreter getInterpreter()
+//	{
+//		if(!valid)
+//		{
+//			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
+//		}
+//
+//		return ia;
+//	}
 	
 	/**
 	 *  Test if current thread is external thread.
@@ -1325,7 +1351,7 @@ public class ExternalAccess implements IExternalAccess
 			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
 		}
 
-		return adapter.isExternalThread();
+		return !ia.getComponentFeature(IExecutionFeature.class).isComponentThread();
 	}
 	
 	/**
@@ -1338,30 +1364,39 @@ public class ExternalAccess implements IExternalAccess
 		return valid;
 	}
 	
+//	/**
+//	 *  Invalidate the external access.
+//	 *  @param terminated	Invalidated due to termination?
+//	 */
+//	public void	invalidate(boolean terminated)
+//	{
+//		this.terminated	= terminated;
+//		this.valid	= false;
+//		this.results	= ia.getResults();
+//		
+//		if(terminated)
+//		{
+//			model	= null;
+//			localtype	= null;
+//		}
+//		else
+//		{
+//			model	= ia.getModel();
+//			localtype	= ia.getLocalType();
+//		}
+//		
+//		this.ia	= null;
+//		this.adapter	= null;
+//		this.provider	= null;
+//	}
+	
 	/**
-	 *  Invalidate the external access.
-	 *  @param terminated	Invalidated due to termination?
+	 *  Create a result listener that is executed on the
+	 *  component thread.
 	 */
-	public void	invalidate(boolean terminated)
+	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
-		this.terminated	= terminated;
-		this.valid	= false;
-		this.results	= ia.getResults();
-		
-		if(terminated)
-		{
-			model	= null;
-			localtype	= null;
-		}
-		else
-		{
-			model	= ia.getModel();
-			localtype	= ia.getLocalType();
-		}
-		
-		this.ia	= null;
-		this.adapter	= null;
-		this.provider	= null;
+		return ia.getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 
 	/**

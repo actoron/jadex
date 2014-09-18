@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -633,14 +634,14 @@ public class ConversationPanel extends JSplitPane
 			{
 				final Future	ret	= new Future();
 						
-				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IMessageService	ms	= (IMessageService)result;
 						ms.sendMessage(sendmsg, mt, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null, null)
-							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+							.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 					}
 				}));
 				return ret;

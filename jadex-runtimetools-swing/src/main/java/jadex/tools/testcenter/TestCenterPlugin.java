@@ -336,7 +336,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	public IFuture loadPlatformProperties()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(getJCC().getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getJCC().getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -384,7 +384,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	public IFuture pushPlatformSettings()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(getJCC().getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getJCC().getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

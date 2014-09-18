@@ -134,7 +134,7 @@ public class ComponentIconCache
 	 */
 	protected void	doSearch(final Future<Icon> ret, final String type, final List<IComponentIdentifier> todo, final int i)
 	{
-		SServiceProvider.getService(jccaccess.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(jccaccess, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Icon>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

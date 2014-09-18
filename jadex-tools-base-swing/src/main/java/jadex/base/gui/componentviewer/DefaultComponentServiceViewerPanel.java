@@ -55,7 +55,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		IFuture<Void>	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
-		SServiceProvider.getDeclaredServices(component.getServiceProvider())
+		SServiceProvider.getDeclaredServices(component)
 			.addResultListener(new IResultListener<Collection<IService>>()
 		{
 			public void resultAvailable(Collection<IService> result)

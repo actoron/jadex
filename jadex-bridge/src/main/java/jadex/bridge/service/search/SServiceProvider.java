@@ -28,6 +28,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -438,13 +439,20 @@ public class SServiceProvider
 	 */
 	public static <T> ITerminableIntermediateFuture<T> getServices(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)
 	{
-		return (ITerminableIntermediateFuture<T>)provider.scheduleImmediate(new IComponentStep<Collection<T>>()
+		final TerminableIntermediateDelegationFuture<T> ret = new TerminableIntermediateDelegationFuture<T>();
+		
+		provider.scheduleImmediate(new IComponentStep<Collection<T>>()
 		{
 			public IFuture<Collection<T>> execute(IInternalAccess ia)
 			{
-				return getServices(ia, type, scope, filter);
+				getServices(ia, type, scope, filter).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				Future<Collection<T>> ret = new Future<Collection<T>>();
+				ret.setResult(null);
+				return ret;
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

@@ -104,11 +104,11 @@ public interface IExternalAccess extends INFPropertyProvider//extends IRemotable
 	 */
 	public IFuture<Map<String, Object>> killComponent();
 	
-	/**
-	 *  Get the children (if any) component identifiers.
-	 *  @return The children component identifiers.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildren(String type);
+//	/**
+//	 *  Get the children (if any) component identifiers.
+//	 *  @return The children component identifiers.
+//	 */
+//	public IFuture<IComponentIdentifier[]> getChildren(String type);
 	
 	/**
 	 *  Get the model name of a component type.

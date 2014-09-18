@@ -250,7 +250,7 @@ public class ModelTreePanel extends FileTreePanel
 		});
 		
 		final String lid = exta.getServiceProvider().getId().toString() + localexta.getServiceProvider().getId().toString() + "_" + LISTENER_COUNTER++;
-		SServiceProvider.getService(exta.getServiceProvider(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(exta, IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -265,7 +265,7 @@ public class ModelTreePanel extends FileTreePanel
 			}
 		});
 		
-		SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(exta, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -380,7 +380,7 @@ public class ModelTreePanel extends FileTreePanel
 			{
 				final IResourceIdentifier rid = ((RIDNode)node).getResourceIdentifier();
 				
-				SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(exta, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 				{
 					public void customResultAvailable(final ILibraryService ls)
@@ -479,7 +479,7 @@ public class ModelTreePanel extends FileTreePanel
 	{
 		if(kernellistener!=null)
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+			SServiceProvider.getService(exta, IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -494,7 +494,7 @@ public class ModelTreePanel extends FileTreePanel
 		}
 		if(libservicelistener!=null)
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(exta, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)

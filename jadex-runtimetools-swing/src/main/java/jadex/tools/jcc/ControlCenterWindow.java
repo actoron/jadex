@@ -162,7 +162,7 @@ public class ControlCenterWindow extends JFrame
 			{
 				final boolean sel = soe.isSelected();
 				controlcenter.setSaveOnExit(sel);
-				SServiceProvider.getService(controlcenter.getPCC().getPlatformAccess().getServiceProvider(),ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(controlcenter.getPCC().getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new IResultListener<ISettingsService>()
 				{
 					public void resultAvailable(ISettingsService setser)

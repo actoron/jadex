@@ -138,7 +138,7 @@ public class AppStorePanel extends JPanel
 		final Future<Void> ret = new Future<Void>();
 		
 		apps.clear();
-		IIntermediateFuture<IAppProviderService> fut = SServiceProvider.getServices(access.getServiceProvider(), IAppProviderService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+		IIntermediateFuture<IAppProviderService> fut = SServiceProvider.getServices(access, IAppProviderService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 		fut.addResultListener(new SwingIntermediateExceptionDelegationResultListener<IAppProviderService, Void>(ret)
 		{
 			protected boolean fin = false;

@@ -237,7 +237,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		
 		if(cid==null)
 		{
-			SServiceProvider.getService(access.getServiceProvider(), desc.getName(), IProxyAgentService.class)
+			SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(IProxyAgentService pas)
@@ -267,7 +267,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	protected IFuture<State> getConnectionState()
 	{
 		final Future<State> ret = new Future<State>();
-		SServiceProvider.getService(access.getServiceProvider(), desc.getName(), IProxyAgentService.class)
+		SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
 			.addResultListener(new IResultListener<IProxyAgentService>()
 //			.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()
 		{

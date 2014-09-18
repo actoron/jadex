@@ -1,5 +1,6 @@
 package jadex.platform.service.cms;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -10,7 +11,10 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -18,6 +22,7 @@ import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.DelegationResultListener;
@@ -25,6 +30,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.kernelbase.ExternalAccess;
 
 import java.util.ArrayList;
@@ -309,38 +315,39 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IServiceContainer getServiceContainer()
 	{
 		// Todo: wrapped services with local interceptor chain
-		return new IServiceContainer()
-		{
-			public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
-			{
-				return SServiceProvider.getServices(PlatformComponent.this, type, scope);
-			}
-			
-			public <T> IIntermediateFuture<T> searchServices(Class<T> type)
-			{
-				return SServiceProvider.getServices(PlatformComponent.this, type);
-			}
-			
-			public <T> IFuture<T> searchServiceUpwards(Class<T> type)
-			{
-				return SServiceProvider.getServiceUpwards(PlatformComponent.this, type);
-			}
-			
-			public <T> IFuture<T> searchService(Class<T> type, String scope)
-			{
-				return SServiceProvider.getService(PlatformComponent.this, type, scope);
-			}
-			
-			public <T> IFuture<T> searchService(Class<T> type)
-			{
-				return SServiceProvider.getService(PlatformComponent.this, type);
-			}
-			
-			public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
-			{
-				return SServiceProvider.getService(PlatformComponent.this, cid, type);
-			}
-		};
+		return new ServiceContainer();
+//		return new IServiceContainer()
+//		{
+//			public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
+//			{
+//				return SServiceProvider.getServices(PlatformComponent.this, type, scope);
+//			}
+//			
+//			public <T> IIntermediateFuture<T> searchServices(Class<T> type)
+//			{
+//				return SServiceProvider.getServices(PlatformComponent.this, type);
+//			}
+//			
+//			public <T> IFuture<T> searchServiceUpwards(Class<T> type)
+//			{
+//				return SServiceProvider.getServiceUpwards(PlatformComponent.this, type);
+//			}
+//			
+//			public <T> IFuture<T> searchService(Class<T> type, String scope)
+//			{
+//				return SServiceProvider.getService(PlatformComponent.this, type, scope);
+//			}
+//			
+//			public <T> IFuture<T> searchService(Class<T> type)
+//			{
+//				return SServiceProvider.getService(PlatformComponent.this, type);
+//			}
+//			
+//			public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
+//			{
+//				return SServiceProvider.getService(PlatformComponent.this, cid, type);
+//			}
+//		};
 	}
 	
 	/**
@@ -617,5 +624,64 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //		throw new UnsupportedOperationException();
 	}
 	
-	
+	/**
+	 * 
+	 */
+	public class ServiceContainer implements IServiceContainer, IServiceProvider
+	{
+		public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
+		{
+			return SServiceProvider.getServices(PlatformComponent.this, type, scope);
+		}
+		
+		public <T> IIntermediateFuture<T> searchServices(Class<T> type)
+		{
+			return SServiceProvider.getServices(PlatformComponent.this, type);
+		}
+		
+		public <T> IFuture<T> searchServiceUpwards(Class<T> type)
+		{
+			return SServiceProvider.getServiceUpwards(PlatformComponent.this, type);
+		}
+		
+		public <T> IFuture<T> searchService(Class<T> type, String scope)
+		{
+			return SServiceProvider.getService(PlatformComponent.this, type, scope);
+		}
+		
+		public <T> IFuture<T> searchService(Class<T> type)
+		{
+			return SServiceProvider.getService(PlatformComponent.this, type);
+		}
+		
+		public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
+		{
+			return SServiceProvider.getService(PlatformComponent.this, cid, type);
+		}
+		
+		public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IAsyncFilter<IService> filter)
+		{
+			return (ITerminableIntermediateFuture)SServiceProvider.getServices(PlatformComponent.this, type.getType(PlatformComponent.this.getClassLoader()), scope, (IAsyncFilter)filter);
+		}
+		
+		public IFuture<IService> getService(ClassInfo type, String scope, IAsyncFilter<IService> filter)
+		{
+			return (IFuture)SServiceProvider.getService(PlatformComponent.this, type.getType(PlatformComponent.this.getClassLoader()), scope, (IAsyncFilter)filter);
+		}
+		
+		public IFuture<IService> getService(IServiceIdentifier sid)
+		{
+			return (IFuture)SServiceProvider.getService(PlatformComponent.this, sid);
+		}
+		
+		public IFuture<Collection<IService>> getDeclaredServices()
+		{
+			return SServiceProvider.getDeclaredServices(PlatformComponent.this);
+		}
+		
+		public IComponentIdentifier	getId()
+		{
+			return PlatformComponent.this.getComponentIdentifier();
+		}
+	}
 }

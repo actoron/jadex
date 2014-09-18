@@ -67,7 +67,7 @@ public class DaemonPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(agent, IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener<IDaemonService>()
 				{
 					public void customResultAvailable(IDaemonService result)
@@ -107,7 +107,7 @@ public class DaemonPanel extends JPanel
 		
 		this.listener = new DaemonChangeListener(platformt);
 		
-		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(agent, IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener<IDaemonService>()
 		{
 			public void customResultAvailable(IDaemonService result)
@@ -125,7 +125,7 @@ public class DaemonPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(agent, IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener<IDaemonService>()
 				{
 					public void customResultAvailable(IDaemonService result)
@@ -154,7 +154,7 @@ public class DaemonPanel extends JPanel
 	public IFuture<Void> shutdown()
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(agent, IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDaemonService, Void>(ret)
 		{
 			public void customResultAvailable(IDaemonService ds)

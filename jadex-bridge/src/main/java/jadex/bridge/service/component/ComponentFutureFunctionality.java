@@ -2,12 +2,13 @@ package jadex.bridge.service.component;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+
+import java.util.logging.Logger;
 
 /**
  *  Schedule future executions on component thread. 
@@ -17,21 +18,17 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	//-------- attributes --------
 	
 	/** The adapter. */
-	protected IComponentAdapter	adapter;
-	
-	/** The external acces. */
-	protected IExternalAccess	ea;
+	protected IInternalAccess	access;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new future.
 	 */
-	public ComponentFutureFunctionality(IExternalAccess ea, IComponentAdapter adapter)
+	public ComponentFutureFunctionality(IInternalAccess access)
 	{
-		super(adapter.getLogger());
-		this.ea	= ea;
-		this.adapter	= adapter;
+		super((Logger)null);
+		this.access = access;
 	}
 
 	/**
@@ -65,11 +62,11 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	public void notifyListener(final IResultListener<Void> notify) 
 	{
 		// Hack!!! Notify multiple listeners at once?
-		if(adapter.isExternalThread())
+		if(!access.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
-				ea.scheduleStep(new IComponentStep<Void>()
+				access.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

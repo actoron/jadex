@@ -528,7 +528,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 								{
 									try
 									{
-										SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), cid[0].getRoot(), ISecurityService.class)
+										SServiceProvider.getService(jcc.getJCCAccess(), cid[0].getRoot(), ISecurityService.class)
 											.addResultListener(new IResultListener<ISecurityService>()
 										{
 											public void resultAvailable(ISecurityService ss)

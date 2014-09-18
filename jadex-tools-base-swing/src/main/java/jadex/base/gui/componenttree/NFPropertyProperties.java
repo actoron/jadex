@@ -98,7 +98,7 @@ public class NFPropertyProperties extends PropertiesPanel
 					
 					if(sid!=null)
 					{
-						IFuture<IService> fut = SServiceProvider.getService(ea.getServiceProvider(), sid);
+						IFuture<IService> fut = SServiceProvider.getService(ea, sid);
 						fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
 						{
 							public void resultAvailable(IService ser) 

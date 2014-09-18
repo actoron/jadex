@@ -249,14 +249,14 @@ public class StarterPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			ComponentIdentifierDialog dia = new ComponentIdentifierDialog(getView(), jcc.getPlatformAccess().getServiceProvider());
+			ComponentIdentifierDialog dia = new ComponentIdentifierDialog(getView(), jcc.getPlatformAccess());
 			final IComponentIdentifier cid = dia.getComponentIdentifier(null);
 			if(cid!=null)
 			{
 				final Map args = new HashMap();
 				args.put("component", cid);
 				
-				SServiceProvider.getService(getJCC().getPlatformAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(getJCC().getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new DefaultResultListener()		
 				{
 					public void resultAvailable(Object result)

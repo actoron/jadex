@@ -740,7 +740,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		
 		if(tp==null)
 		{
-			SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), IDaemonThreadPoolService.class)
+			SServiceProvider.getServiceUpwards(jcc.getJCCAccess(), IDaemonThreadPoolService.class)
 				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
 			{
 				public void customResultAvailable(IDaemonThreadPoolService result)

@@ -229,7 +229,7 @@ public class ComponentSelectorDialog
 		JScrollPane	sp	= new JScrollPane(list);
 		sp.setPreferredSize(new Dimension(200, 100));
 		final boolean[]	editing	= new boolean[1];
-		final ComponentIdentifierPanel	aidpanel = new ComponentIdentifierPanel(null, access.getServiceProvider())
+		final ComponentIdentifierPanel	aidpanel = new ComponentIdentifierPanel(null, access)
 		{
 			protected void cidChanged()
 			{
@@ -263,7 +263,7 @@ public class ComponentSelectorDialog
 					if(selected!=null)
 					{
 						final IComponentIdentifier fselected = selected;
-						SServiceProvider.getService(access.getServiceProvider(), selected, IProxyAgentService.class)
+						SServiceProvider.getService(access, selected, IProxyAgentService.class)
 							.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()
 						{
 							public void resultAvailable(IProxyAgentService ps)

@@ -1,7 +1,5 @@
 package jadex.bridge.service.component;
 
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;

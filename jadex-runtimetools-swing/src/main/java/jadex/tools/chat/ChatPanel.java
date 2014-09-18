@@ -1537,7 +1537,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public void addMessage(final IComponentIdentifier cid, final String text, final String nick, final boolean privatemessage, final boolean sendfailure)
 	{
-		SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getJCC().getJCCAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 		{
 			public void resultAvailable(final IClockService clock)

@@ -43,7 +43,7 @@ public class PropertyUpdateHandler
 	{
 		this.access	= access;
 	
-		SServiceProvider.getService(access.getServiceProvider(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IMonitoringService>()
 		{
 			public void resultAvailable(IMonitoringService monser)
