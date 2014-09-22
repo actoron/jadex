@@ -11,10 +11,12 @@ import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.component.impl.SubcomponentsComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
@@ -63,6 +65,7 @@ public class SComponentFactory
 		def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
 	

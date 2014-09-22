@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IFilter;
 

@@ -11,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IServiceContainer;

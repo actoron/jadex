@@ -2,6 +2,7 @@ package jadex.bridge.component.impl;
 
 import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IntermediateComponentResultListener;
@@ -14,6 +15,7 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
@@ -26,6 +28,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -33,7 +36,7 @@ import java.util.logging.Logger;
 /**
  *  This feature provides component step execution.
  */
-public class ExecutionComponentFeature	extends	AbstractComponentFeature	implements IExecutionFeature, IExecutable
+public class ExecutionComponentFeature	extends	AbstractComponentFeature implements IExecutionFeature, IExecutable
 {
 	//-------- attributes --------
 	
@@ -42,6 +45,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 	
 	/** The immediate component steps. */
 	protected List<Tuple2<IComponentStep<?>, Future<?>>>	isteps;
+	
+	/** The current timer. */
+	protected List<ITimer> timers = new ArrayList<ITimer>();
 	
 	//-------- constructors --------
 	
@@ -214,6 +220,39 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 				}
 			}
 		}));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Wait for the next tick.
+	 *  @param time The time.
+	 */
+	public IFuture<Void> waitForTick(final IComponentStep<Void> run)
+	{
+//		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
+		final Future<Void> ret = new Future<Void>();
+		
+		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		final ITimer[] ts = new ITimer[1];
+		ts[0] = cs.createTickTimer(new ITimedObject()
+		{
+			public void timeEventOccurred(final long currenttime)
+			{
+				try
+				{
+					scheduleStep(new ExecuteWaitForStep(ts[0], run));
+				}
+				catch(ComponentTerminatedException e)
+				{
+				}
+			}
+		});
+		if(timers==null)
+			timers	= new ArrayList<ITimer>();
+		timers.add(ts[0]);
+//		ret.setResult(new TimerWrapper(ts[0]));
+		ret.setResult(null);
 		
 		return ret;
 	}
@@ -391,5 +430,124 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Wrap a timer and remove it from the agent when it is cancelled.
+	 */
+	protected class TimerWrapper implements ITimer 
+	{
+		//-------- attributes --------
+		
+		/** The wrapped timer. */
+		ITimer	timer;
+		
+		//-------- constructors--------
+		
+		/**
+		 *  Wrap a timer.
+		 */
+		public TimerWrapper(ITimer timer)
+		{
+			this.timer	= timer;
+		}
+		
+		//-------- ITimer interface --------
+		
+		public void cancel()
+		{
+			assert timers!=null;
+			timers.remove(timer);
+			timer.cancel();
+		}
+
+		public long getNotificationTime()
+		{
+			return timer.getNotificationTime();
+		}
+
+		public ITimedObject getTimedObject()
+		{
+			return timer.getTimedObject();
+		}
+
+		public void setNotificationTime(long time)
+		{
+			timer.setNotificationTime(time);
+		}
+
+		public boolean equals(Object obj)
+		{
+			return timer.equals(obj);
+		}
+
+		public int hashCode()
+		{
+			return timer.hashCode();
+		}
+
+		public String toString()
+		{
+			return timer.toString();
+		}
+	}
+	
+	/**
+	 *  Step to execute a wait for entry.
+	 */
+	public static class ExecuteWaitForStep implements IComponentStep<Void>
+	{
+		//-------- attributes --------
+
+		/** The timer. */
+		private final ITimer ts;
+
+		/** The component step. */
+		private final IComponentStep<Void> run;
+
+		//-------- constructors--------
+
+		/**
+		 * This class is constructed with an array of {@link ITimer}s and the {@link IComponentStep}
+		 * which is scheduled for execution.
+		 * @param ts an array of {@link ITimer}s
+		 * @param run the {@link IComponentStep} which is scheduled for execution
+		 */
+		public ExecuteWaitForStep(ITimer ts, IComponentStep<Void> run)
+		{
+			this.ts = ts;
+			this.run = run;
+		}
+
+		//-------- methods --------
+
+		/**
+		 * Removes the first entry from the {@link ITimer} array from the micro agents
+		 * {@link MicroAgent#timers} {@link List} and executes the {@link IComponentStep}.
+		 */
+		public IFuture<Void> execute(IInternalAccess ia)
+		{
+			assert ((ExecutionComponentFeature)ia.getComponentFeature(IExecutionFeature.class)).timers!=null;
+			((ExecutionComponentFeature)ia.getComponentFeature(IExecutionFeature.class)).timers.remove(ts);
+			run.execute(ia);
+			return IFuture.DONE;
+		}
+
+		/**
+		 * @return "microagent.waitFor_#" plus the hash code of this class
+		 */
+		public String toString()
+		{
+			return ts==null? super.toString(): ts.getTimedObject()!=null? ts.getTimedObject().toString(): ts.toString();
+		}
+		
+		/**
+		 * Returns the {@link IComponentStep} that is scheduled for execution.
+		 * @return The {@link IComponentStep} that is scheduled for execution
+		 */
+		public IComponentStep<Void> getComponentStep()
+		{
+			return run;
+		}
 	}
 }

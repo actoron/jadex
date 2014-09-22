@@ -2,6 +2,7 @@ package jadex.micro.examples.messagequeue.replicated;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -9,7 +10,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -46,7 +46,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 
 	/** The map of local subscribers. */
 	protected Map<String, List<SubscriptionIntermediateFuture<Event>>> localsubscribers;
@@ -124,7 +124,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 				});
 
 				// repeat
-				agent.waitFor(searchinterval, this);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(searchinterval, this);
 				return IFuture.DONE;
 			}
 		};

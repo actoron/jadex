@@ -84,7 +84,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 
 		for(IComponentFeatureFactory fac: facs)
 		{
-			System.out.println("fac: "+fac);
+//			System.out.println("fac: "+fac);
 			IComponentFeature	instance	= fac.createInstance(getInternalAccess(), info);
 			features.put((Class<?>)fac.getType(), instance);
 			lfeatures.add(instance);
@@ -429,7 +429,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	protected void initLogger(Logger logger)
 	{
 		// Todo: properties
-		logger.setLevel(Level.INFO);
+		logger.setLevel(Level.SEVERE);
 		
 //		// get logging properties (from ADF)
 //		// the level of the logger

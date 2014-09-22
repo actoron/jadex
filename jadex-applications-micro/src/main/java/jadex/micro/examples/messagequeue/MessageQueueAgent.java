@@ -1,10 +1,10 @@
 package jadex.micro.examples.messagequeue;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
@@ -30,7 +30,7 @@ public class MessageQueueAgent implements IMessageQueueService
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The map of subscribers. */
 	protected Map<String, List<SubscriptionIntermediateFuture<Event>>> subscribers;

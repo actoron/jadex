@@ -90,7 +90,7 @@ public class EchoChatAgent
 	{
 		ThreadSuspendable sus = new ThreadSuspendable();
 		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get(sus);
-		IComponentManagementService cms = SServiceProvider.getService(pl.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+		IComponentManagementService cms = SServiceProvider.getService(pl, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
 		
 		for(int i=0; i<10000; i++)
 		{
