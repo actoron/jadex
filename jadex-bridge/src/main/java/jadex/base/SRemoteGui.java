@@ -126,6 +126,11 @@ public class SRemoteGui
 							
 							ret.setResult(new Object[]{pis, ris, sis});
 						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							super.exceptionOccurred(exception);
+						}
 					});
 				}
 				catch(Exception e)

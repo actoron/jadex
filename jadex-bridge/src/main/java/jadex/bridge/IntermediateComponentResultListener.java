@@ -1,7 +1,8 @@
 package jadex.bridge;
 
 import jadex.base.Starter;
-import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
 
@@ -20,9 +21,9 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 	 *  @param listener The listener.
 	 *  @param adapter The adapter.
 	 */
-	public IntermediateComponentResultListener(IIntermediateResultListener<E> listener, IComponentAdapter adapter)
+	public IntermediateComponentResultListener(IIntermediateResultListener<E> listener, IInternalAccess component)
 	{
-		super(listener, adapter);
+		super(listener, component);
 	}
 
 	//-------- IIntermediateResultListener interface --------
@@ -33,13 +34,13 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 	 */
 	public void intermediateResultAvailable(final E result)
 	{
-		if(adapter.isExternalThread())
+		if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
-				adapter.invokeLater(new Runnable()
+				component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run()
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						if(undone && listener instanceof IUndoneIntermediateResultListener)
 						{
@@ -49,6 +50,7 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 						{
 							((IIntermediateResultListener<E>)listener).intermediateResultAvailable(result);
 						}
+						return IFuture.DONE;
 					}
 					
 					public String toString()
@@ -82,13 +84,13 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
      */
     public void finished()
     {
-		if(adapter.isExternalThread())
+    	if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
-				adapter.invokeLater(new Runnable()
+				component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run()
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						if(undone && listener instanceof IUndoneIntermediateResultListener)
 						{
@@ -98,6 +100,7 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 						{
 							((IIntermediateResultListener<E>)listener).finished();
 						}
+						return IFuture.DONE;
 					}
 					
 					public String toString()
@@ -108,7 +111,7 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(component.getComponentIdentifier(), new Runnable()
 				{
 					public void run()
 					{

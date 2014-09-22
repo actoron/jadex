@@ -3,6 +3,7 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
@@ -125,7 +126,7 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 						}
 					});
 					
-					fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IService, Void>(ret)
+					fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IService, Void>(ret)
 					{
 						public void customResultAvailable(IService result) 
 						{

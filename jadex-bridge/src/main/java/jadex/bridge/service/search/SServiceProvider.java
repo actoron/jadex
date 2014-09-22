@@ -336,6 +336,7 @@ public class SServiceProvider
 		{
 			ret.addIntermediateResult((IService)s);
 		}
+		ret.setFinished();
 		
 		return ret;
 	}

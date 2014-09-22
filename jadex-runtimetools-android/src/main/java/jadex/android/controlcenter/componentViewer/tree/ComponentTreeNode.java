@@ -139,25 +139,25 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 		getModel().fireNodeChanged(ComponentTreeNode.this);
 
 		cms.getComponentDescription(desc.getName()).addResultListener(
-				new IResultListener<IComponentDescription>()
-				{
-					public void resultAvailable(IComponentDescription result)
-					{
-						ComponentTreeNode.this.desc = (IComponentDescription) result;
-						broken = false;
-						busy = false;
-						getModel().fireNodeChanged(ComponentTreeNode.this);
+			new IResultListener<IComponentDescription>()
+		{
+			public void resultAvailable(IComponentDescription result)
+			{
+				ComponentTreeNode.this.desc = (IComponentDescription) result;
+				broken = false;
+				busy = false;
+				getModel().fireNodeChanged(ComponentTreeNode.this);
 
-						ComponentTreeNode.super.refresh(recurse);
-					}
+				ComponentTreeNode.super.refresh(recurse);
+			}
 
-					public void exceptionOccurred(Exception exception)
-					{
-						broken = true;
-						busy = false;
-						getModel().fireNodeChanged(ComponentTreeNode.this);
-					}
-				});
+			public void exceptionOccurred(Exception exception)
+			{
+				broken = true;
+				busy = false;
+				getModel().fireNodeChanged(ComponentTreeNode.this);
+			}
+		});
 	}
 
 	/**

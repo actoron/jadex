@@ -4,6 +4,7 @@ import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -11,11 +12,14 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -115,37 +119,103 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 	/**
 	 *  Wait for some time and execute a component step afterwards.
 	 */
-	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime)
+	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step)
 	{
-		// Todo:
-		return new Future<T>();
+		return waitForDelay(delay, step, false);
 	}
-
+	
 	/**
 	 *  Wait for some time and execute a component step afterwards.
 	 */
-	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
+	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step, final boolean realtime)
 	{
-		// Todo:
-		return new Future<T>();
-	}
-
-	/**
-	 *  Wait for some time.
-	 */
-	public IFuture<Void> waitForDelay(long delay, boolean realtime)
-	{
-		// Todo:
-		return new Future<Void>();
+		// todo: remember and cleanup timers in case of component removal.
+		
+		final Future<T> ret = new Future<T>();
+		
+		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+		{
+			public void customResultAvailable(IClockService cs)
+			{
+				ITimedObject	to	= new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
+					}
+					
+					public String toString()
+					{
+						return "waitForDelay[Step]("+getComponent().getComponentIdentifier()+")";
+					}
+				};
+				if(realtime)
+				{
+					cs.createRealtimeTimer(delay, to);
+				}
+				else
+				{
+					cs.createTimer(delay, to);					
+				}
+			}
+		}));
+		
+		return ret;
 	}
 	
 	/**
 	 *  Wait for some time.
 	 */
-	public IFuture<Void> waitForDelay(long delay)
+	public IFuture<Void> waitForDelay(final long delay)
 	{
-		// Todo:
-		return new Future<Void>();
+		return waitForDelay(delay, false);
+	}
+
+	/**
+	 *  Wait for some time.
+	 */
+	public IFuture<Void> waitForDelay(final long delay, final boolean realtime)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+		{
+			public void customResultAvailable(IClockService cs)
+			{
+				ITimedObject	to	=  	new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								ret.setResult(null);
+								return IFuture.DONE;
+							}
+						});
+					}
+					
+					public String toString()
+					{
+						return "waitForDelay("+getComponent().getComponentIdentifier()+")";
+					}
+				};
+				
+				if(realtime)
+				{
+					cs.createRealtimeTimer(delay, to);
+				}
+				else
+				{
+					cs.createTimer(delay, to);
+				}
+			}
+		}));
+		
+		return ret;
 	}
 	
 	// todo:?
@@ -243,8 +313,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature	implemen
 	 */
 	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener)
 	{
-		// Todo
-		return null;
+		return new IntermediateComponentResultListener<T>(listener, component);
 	}
 	
 	//-------- IExecutable interface --------
