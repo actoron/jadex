@@ -2,12 +2,10 @@ package jadex.micro.examples.messagequeue;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.DefaultResultListener;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -29,7 +27,7 @@ public class UserAgent
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The message queue. */
 	@AgentService
@@ -69,7 +67,7 @@ public class UserAgent
 				mq.publish(topic, new Event("some type", cnt[0]++, agent.getComponentIdentifier()));
 				if(cnt[0]<10)
 				{
-					agent.waitFor(1000, this);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
 				}
 				else
 				{
@@ -78,6 +76,6 @@ public class UserAgent
 				return IFuture.DONE;
 			}
 		};
-		agent.waitFor(1000, step);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
 	}
 }

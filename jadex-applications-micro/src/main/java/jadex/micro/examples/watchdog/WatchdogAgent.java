@@ -2,12 +2,15 @@ package jadex.micro.examples.watchdog;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -32,9 +35,14 @@ import java.util.Map;
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true)))
 @Arguments(@Argument(clazz=long.class, name="delay", description="Delay between pings.", defaultvalue="3000"))
 @Service
-public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
+@Agent
+public class WatchdogAgent	implements IWatchdogService
 {
 	//-------- attributes --------
+	
+	/** The micro agent class. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** The found watchdogs. */
 	protected Map	watchdogs;
@@ -49,9 +57,9 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 		try
 		{
 			this.watchdogs	= new LinkedHashMap();
-			final long	delay	= ((Number)getArgument("delay")).longValue();
+			final long	delay	= ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay")).longValue();
 			
-			scheduleStep(new IComponentStep<Void>()
+			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -62,7 +70,7 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 						public void resultAvailable(Object result)
 						{
 							// Pinging finished: Search for new watchdogs.
-							getRequiredServices("watchdogs").addResultListener(new IResultListener()
+							agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("watchdogs").addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -79,13 +87,13 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 										}
 									}
 									
-									waitFor(delay, step);
+									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
 //									throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
-									getLogger().warning("Exception occurred: "+exception);
+									agent.getLogger().warning("Exception occurred: "+exception);
 								}
 							});
 						}
@@ -93,7 +101,7 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 						public void exceptionOccurred(Exception exception)
 						{
 //							throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
-							getLogger().warning("Exception occurred: "+exception);
+							agent.getLogger().warning("Exception occurred: "+exception);
 						}
 					});
 	
@@ -138,13 +146,13 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 	 */
 	public String	getInfo()
 	{
-		return getComponentIdentifier().getName();
+		return agent.getComponentIdentifier().getName();
 	}
 	
 	/**
 	 *  Test if this watchdog is alive.
 	 */
-	public IFuture ping()
+	public IFuture<Void> ping()
 	{
 		return IFuture.DONE;
 	}

@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.RemoteChangeListenerHandler;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClock;
@@ -37,7 +38,7 @@ public class SRemoteClock
 	public static IFuture<Void>	setDilation(final double dilation, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(exta.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)
@@ -81,7 +82,7 @@ public class SRemoteClock
 	public static IFuture<Void>	setDelta(final long delta, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(exta.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)
@@ -409,7 +410,7 @@ public class SRemoteClock
 		public void changeOccurred(ChangeEvent event)
 		{
 			// Code in component result listener as clock runs on its own thread. 
-			simservice.isExecuting().addResultListener(instance.createResultListener(new IResultListener()
+			simservice.isExecuting().addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -485,7 +486,7 @@ public class SRemoteClock
 		public void changeOccurred(ChangeEvent event)
 		{
 			// Code in component result listener as clock runs on its own thread. 
-			simservice.isExecuting().addResultListener(instance.createResultListener(new IResultListener()
+			simservice.isExecuting().addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

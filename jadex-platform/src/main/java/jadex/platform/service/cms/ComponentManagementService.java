@@ -14,6 +14,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
@@ -204,14 +205,14 @@ public class ComponentManagementService implements IComponentManagementService
 //	/**
 //	 *  Invoke kill on adapter.
 //	 */
-//	public IFuture<Void> killComponent(IComponentAdapter adapter)
+//	public IFuture<Void> killComponent(PlatformComponent adapter)
 //	{
 //		Future<Void> ret = new Future<Void>();
-//		((StandaloneComponentAdapter)adapter).killComponent()
-//			.addResultListener(new DelegationResultListener<Void>(ret));
+//		adapter.killComponent()
+//			.addResultListener(new ExceDelegationResultListener<Void>(ret));
 //		return ret;
 //	}
-	
+//
 //	/**
 //	 *  Cancel the execution.
 //	 */
@@ -222,7 +223,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			.addResultListener(new DelegationResultListener<Void>(ret));
 //		return ret;
 //	}
-
+//
 //	/**
 //	 *  Do a step.
 //	 */
@@ -1256,21 +1257,24 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			InitInfo infos	= getInitInfo(cid);
 //			IComponentAdapter adapter	= infos!=null ? infos.getAdapter() : (IComponentAdapter)adapters.get(cid);
+			IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : components.get(cid);
 			
 //			if(adapter!=null && adapter.getDescription().getModelName().indexOf("Proxy")==-1)
 //				System.out.println("Terminating component: "+cid.getName());
 			
 			// Terminate component that is shut down during init.
+			
+			// todo:
 			if(infos!=null && !infos.getInitFuture().isDone())
 			{
 				// Propagate failed component init.
-				if(adapter!=null && adapter.getException()!=null)
-				{
-					infos.getInitFuture().setException(adapter.getException());
-				}
+//				if(comp!=null && comp.getException()!=null)
+//				{
+//					infos.getInitFuture().setException(adapter.getException());
+//				}
 				
 				// Component terminated from outside: wait for init to complete, will be removed as cleanup future is registered (cfs).
-				else
+//				else
 				{
 //					if(cid.toString().indexOf("Mandelbrot")!=-1)
 //						System.out.println("Queued component termination during init: "+cid.getName());
@@ -1279,11 +1283,11 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			
 			// Terminate normally inited component.
-			else if(adapter!=null)
+			else if(comp!=null)
 			{				
 				// Kill subcomponents
 				logger.info("Terminating component structure: "+cid.getName());
-				final CMSComponentDescription	desc = (CMSComponentDescription)adapter.getDescription();
+				final CMSComponentDescription	desc = (CMSComponentDescription)((PlatformComponent)comp).getComponentDescription();
 				final IComponentIdentifier[] achildren = desc.getChildren();
 				
 //				if(achildren.length>0)
@@ -1303,8 +1307,9 @@ public class ComponentManagementService implements IComponentManagementService
 						CleanupCommand	cc	= null;
 						IFuture<Void>	fut	= null;
 //						IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+						IPlatformComponentAccess comp = components.get(cid);
 						// Component may be already killed (e.g. when autoshutdown).
-						if(adapter!=null)
+						if(comp!=null)
 						{
 //							if(cid.toString().indexOf("AutoTerminate")!=-1)
 //								System.out.println("destroy1: "+cid.getName());
@@ -1319,7 +1324,8 @@ public class ComponentManagementService implements IComponentManagementService
 								cc	= new CleanupCommand(cid);
 								ccs.put(cid, cc);
 								logger.info("Terminating component: "+cid.getName());
-								fut	= killComponent(adapter);
+//								fut	= killComponent(comp);
+								fut = comp.shutdown();
 //									component.killComponent(cc);	
 							}
 							else
@@ -1461,14 +1467,15 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			CMSComponentDescription desc;
 //			final IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-			if(adapter==null)
+			final IPlatformComponentAccess comp = components.get(cid);
+			if(comp==null)
 			{
 				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
 				return ret;
 			}
 			
 			// Suspend subcomponents
-			desc = (CMSComponentDescription)adapter.getDescription();
+			desc = (CMSComponentDescription)((PlatformComponent)comp).getComponentDescription();
 			IComponentIdentifier[] achildren = desc.getChildren();
 //				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
 			for(int i=0; i<achildren.length; i++)
@@ -1858,14 +1865,16 @@ public class ComponentManagementService implements IComponentManagementService
 
 //			System.out.println("CleanupCommand remove called for: "+cid);
 //			adapter = (IComponentAdapter)adapters.remove(cid);
-			if(adapter==null)
+			PlatformComponent comp = (PlatformComponent)components.remove(cid);
+			PlatformComponent pad = null;
+			if(comp==null)
 				throw new RuntimeException("Component Identifier not registered: "+cid);
 			
 //				if(cid.getName().indexOf("Peer")==-1)
 //					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
 			
-			desc	= (CMSComponentDescription)adapter.getDescription();
-			results = getComponentInstance(adapter).getResults();
+			desc	= (CMSComponentDescription)comp.getComponentDescription();
+			results = comp.getComponentFeature(IArgumentsFeature.class).getResults();
 			
 //				desc.setState(IComponentDescription.STATE_TERMINATED);
 //				ccs.remove(cid);
@@ -1875,7 +1884,7 @@ public class ComponentManagementService implements IComponentManagementService
 			if(desc.getName().getParent()!=null)
 			{
 				// Stop execution of component. When root component services are already shutdowned.
-				cancel(adapter);
+//				cancel(comp);
 //				exeservice.cancel(adapter);
 				
 				killparent = desc.isMaster();
@@ -1904,23 +1913,25 @@ public class ComponentManagementService implements IComponentManagementService
 							&& (childcount==null || childcount.intValue()<=1));
 					}
 				}
-//				pad	= (IComponentAdapter)adapters.get(desc.getName().getParent());
+				pad	= (PlatformComponent)components.get(desc.getName().getParent());
 			}
 			
 			// Must be executed out of sync block due to deadlocks
 			// agent->cleanupcommand->space.componentRemoved (holds adapter mon -> needs space mone)
 			// space executor->general loop->distributed percepts->(holds space mon -> needs adapter mon for getting external access)
-			if(pad!=null)
-			{
-				try
-				{
-					getComponentInstance(pad).componentDestroyed(desc);
-				}
-				catch(ComponentTerminatedException cte)
-				{
-					// Parent just killed: ignore.
-				}
-			}
+			
+			// todo:
+//			if(pad!=null)
+//			{
+//				try
+//				{
+//					pad.componentDestroyed(desc);
+//				}
+//				catch(ComponentTerminatedException cte)
+//				{
+//					// Parent just killed: ignore.
+//				}
+//			}
 			// else parent has just been killed.
 			
 			exitDestroy(cid, desc, exception, results);
@@ -1928,7 +1939,7 @@ public class ComponentManagementService implements IComponentManagementService
 			notifyListenersRemoved(cid, desc, results);
 			
 			// Use adapter exception before cleanup exception as it probably happened first.
-			Exception	ex	= adapter.getException()!=null ? adapter.getException() : exception;
+//			Exception	ex	= adapter.getException()!=null ? adapter.getException() : exception;
 //			if(exceptions!=null && exceptions.containsKey(cid))
 //			{
 //				ex	= (Exception)exceptions.get(cid);
@@ -1938,23 +1949,23 @@ public class ComponentManagementService implements IComponentManagementService
 //			System.out.println("kill lis: "+cid+" "+reslis+" "+results+" "+ex);
 			if(reslis!=null)	// null for platform.
 			{
-				if(ex!=null)
-				{
-					reslis.exceptionOccurred(ex);
-				}
-				else
+//				if(ex!=null)
+//				{
+//					reslis.exceptionOccurred(ex);
+//				}
+//				else
 				{
 					reslis.finished();
 	//					reslis.resultAvailable(results);
 				}
 			
-				if(ex!=null && !reslis.isInitial())
-				{
-					// Unhandled component exception
-					// Todo: delegate printing to parent component (if any).
-					adapter.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-					ex.printStackTrace();
-				}
+//				if(ex!=null && !reslis.isInitial())
+//				{
+//					// Unhandled component exception
+//					// Todo: delegate printing to parent component (if any).
+//					adapter.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+//					ex.printStackTrace();
+//				}
 			}
 			
 //			System.out.println("CleanupCommand end.");

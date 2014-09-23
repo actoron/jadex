@@ -3,6 +3,7 @@ package jadex.micro.examples.eliza;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
@@ -124,7 +125,7 @@ public class ElizaAgent
 		
 		
 		// Regularly clean up old conversations after 5 minutes of inactivity.
-		agent.waitForDelay(60000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(60000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

@@ -4,12 +4,15 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -29,9 +32,14 @@ import java.util.Set;
 	@Argument(name="timeout", clazz=long.class, description="Timeout for reply", defaultvalue="1000"),
 	@Argument(name="content", clazz=String.class, description="Ping message content", defaultvalue="\"ping\"")
 })
-public class PingingAgent extends MicroAgent
-{
+@Agent
+public class PingingAgent 
+{	
 	//-------- attributes --------
+
+	/** The micro agent class. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** The receiver. */
 	protected IComponentIdentifier receiver;
@@ -51,10 +59,10 @@ public class PingingAgent extends MicroAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		receiver = (IComponentIdentifier)getArgument("receiver");
-		final int missed_max = ((Number)getArgument("missed_max")).intValue();
-		final long timeout = ((Number)getArgument("timeout")).longValue();
-		final Object content = getArgument("content");
+		receiver = (IComponentIdentifier)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("receiver");
+		final int missed_max = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("missed_max")).intValue();
+		final long timeout = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("timeout")).longValue();
+		final Object content = agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("content");
 		sent = new HashSet();
 		
 		final IComponentStep step = new IComponentStep<Void>()
@@ -63,13 +71,13 @@ public class PingingAgent extends MicroAgent
 			{
 				if(dif>missed_max)
 				{
-					getLogger().warning("Ping target does not respond: "+receiver);
+					agent.getLogger().warning("Ping target does not respond: "+receiver);
 //					killAgent();
 					ret.setResult(null);
 				}
 				else
 				{
-					String convid = SUtil.createUniqueId(getAgentName());
+					String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getName());
 					Map msg = new HashMap();
 					msg.put(SFipa.CONTENT, content);
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
@@ -78,8 +86,8 @@ public class PingingAgent extends MicroAgent
 //					msg.put(SFipa.SENDER, getComponentIdentifier());
 					dif++;
 					sent.add(convid);
-					sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
-					waitFor(timeout, this);
+					agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(timeout, this);
 				}
 				return IFuture.DONE;
 			}
@@ -87,7 +95,7 @@ public class PingingAgent extends MicroAgent
 		
 		if(receiver==null)
 		{
-			receiver = new ComponentIdentifier("Ping", getComponentIdentifier().getParent());
+			receiver = new ComponentIdentifier("Ping", agent.getComponentIdentifier().getParent());
 		}
 //			createComponentIdentifier("Ping").addResultListener(new DefaultResultListener()
 //			{
@@ -103,7 +111,7 @@ public class PingingAgent extends MicroAgent
 //			scheduleStep(step);
 //		}
 
-		scheduleStep(step);
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 		
 		return ret;
 	}

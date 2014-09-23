@@ -1,4 +1,4 @@
-package jadex.micro;
+package jadex.bridge.component;
 
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.service.types.message.MessageType;

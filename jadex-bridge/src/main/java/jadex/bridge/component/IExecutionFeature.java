@@ -42,6 +42,13 @@ public interface IExecutionFeature
 	 */
 	public IFuture<Void> waitForDelay(long delay);
 	
+	/**
+	 *  Wait for the next tick.
+	 *  @param time The time.
+	 */
+	// TimerWrapper
+	public IFuture<Void> waitForTick(final IComponentStep<Void> run);
+	
 	// todo:?
 //	/**
 //	 *  Wait for some time and execute a component step afterwards.

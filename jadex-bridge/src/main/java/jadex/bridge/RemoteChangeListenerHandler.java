@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.collection.MultiCollection;
@@ -267,7 +268,7 @@ public abstract class RemoteChangeListenerHandler
 									IInternalAccess	tmp	= instance;	// instance might be set to null concurrently.
 									if(tmp!=null)
 									{
-										fut.addResultListener(tmp.createResultListener(new IResultListener()
+										fut.addResultListener(tmp.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
