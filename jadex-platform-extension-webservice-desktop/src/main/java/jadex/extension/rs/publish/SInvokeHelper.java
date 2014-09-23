@@ -389,17 +389,20 @@ public class SInvokeHelper
 											
 											public void failed(Throwable e)
 											{
-												done.setException(new RuntimeException(e));
+												// Todo: why called multiple times?
+												done.setExceptionIfUndone(new RuntimeException(e));
 											}
 											
 											public void completed(Request r)
 											{
-												done.setResult(null);
+												// Todo: why called multiple times?
+												done.setResultIfUndone(null);
 											}
 											
 											public void cancelled()
 											{
-												done.setResult(null);
+												// Todo: why called multiple times?
+												done.setResultIfUndone(null);
 											}
 										});
 										done.get(new ThreadSuspendable());
