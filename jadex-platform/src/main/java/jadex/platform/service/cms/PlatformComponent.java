@@ -15,9 +15,11 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -150,7 +152,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				return executeShutdownOnFeatures(lfeatures.iterator());
+				return executeShutdownOnFeatures(lfeatures, 0);
 			}
 		}).addResultListener(new DelegationResultListener<Void>(ret));
 		
@@ -208,19 +210,17 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/**
 	 *  Recursively shutdown the features.
 	 */
-	protected IFuture<Void>	executeShutdownOnFeatures(final Iterator<IComponentFeature> features)
+	protected IFuture<Void>	executeShutdownOnFeatures(final List<IComponentFeature> features, final int cnt)
 	{
-		// todo: other execution order
-		
-		if(features.hasNext())
+		if(cnt<features.size())
 		{
 			final Future<Void>	ret	= new Future<Void>();
-			features.next().shutdown()
+			features.get(features.size()-cnt-1).shutdown()
 				.addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
-					executeShutdownOnFeatures(features).addResultListener(new DelegationResultListener<Void>(ret));
+					executeShutdownOnFeatures(features, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 			return ret;
@@ -355,8 +355,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
-		// Todo:
-		return new Future<Map<String, Object>>();
+		IComponentManagementService cms = SServiceProvider.getLocalService(this, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return cms.destroyComponent(getComponentIdentifier());
 	}
 	
 	/**
