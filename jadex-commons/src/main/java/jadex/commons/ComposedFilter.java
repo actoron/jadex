@@ -46,7 +46,7 @@ public class ComposedFilter<T> implements IFilter<T>,	Serializable
 	 *  @param filters The filters.
 	 *  @param operator The operator.
 	 */
-	public ComposedFilter(IFilter<T>[] filters)
+	public ComposedFilter(IFilter<T>... filters)
 	{
 		this(filters, AND);
 	}

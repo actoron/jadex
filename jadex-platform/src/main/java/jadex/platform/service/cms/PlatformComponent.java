@@ -9,6 +9,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IPropertiesFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.IService;
@@ -27,6 +28,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -35,15 +37,20 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.kernelbase.ExternalAccess;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *  Standalone platform component implementation.
@@ -428,94 +435,90 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	protected void initLogger(Logger logger)
 	{
-		// Todo: properties
-		logger.setLevel(Level.SEVERE);
+		// get logging properties (from ADF)
+		// the level of the logger
+		// can be Integer or Level
+		Object prop = getComponentFeature(IPropertiesFeature.class).getProperty("logging.level");
+		Level level = prop!=null? (Level)prop : logger.getParent()!=null && logger.getParent().getLevel()!=null ? logger.getParent().getLevel() : Level.SEVERE;
+		logger.setLevel(level);
 		
-//		// get logging properties (from ADF)
-//		// the level of the logger
-//		// can be Integer or Level
-//		
-//		Object prop = component.getProperty("logging.level");
-//		Level level = prop!=null? (Level)prop : logger.getParent()!=null && logger.getParent().getLevel()!=null ? logger.getParent().getLevel() : Level.SEVERE;
-//		logger.setLevel(level);
-//		
-//		// if logger should use Handlers of parent (global) logger
-//		// the global logger has a ConsoleHandler(Level:INFO) by default
-//		prop = component.getProperty("logging.useParentHandlers");
-//		if(prop!=null)
-//		{
-//			logger.setUseParentHandlers(((Boolean)prop).booleanValue());
-//		}
-//			
-//		// add a ConsoleHandler to the logger to print out
-//        // logs to the console. Set Level to given property value
-//		prop = component.getProperty("logging.addConsoleHandler");
-//		if(prop!=null)
-//		{
-//			Handler console;
-//			/*if[android]
-//			console = new jadex.commons.android.AndroidHandler();
-//			 else[android]*/
-//			console = new ConsoleHandler();
-//			/* end[android]*/
-//			
-//            console.setLevel(Level.parse(prop.toString()));
-//            logger.addHandler(console);
-//        }
-//		
-//		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
-//		// if logger should add a filehandler to capture log data in a file. 
-//		// The user specifies the directory to contain the log file.
-//		// $scope.getAgentName() can be used to have agent-specific log files 
-//		//
-//		// The directory name can use special patterns defined in the
-//		// class, java.util.logging.FileHandler, 
-//		// such as "%h" for the user's home directory.
-//		// 
-//		String logfile =	(String)component.getProperty("logging.file");
-//		if(logfile!=null)
-//		{
-//		    try
-//		    {
-//			    Handler fh	= new FileHandler(logfile);
-//		    	fh.setFormatter(new SimpleFormatter());
-//		    	logger.addHandler(fh);
-//		    }
-//		    catch (IOException e)
-//		    {
-//		    	System.err.println("I/O Error attempting to create logfile: "
-//		    		+ logfile + "\n" + e.getMessage());
-//		    }
-//		}
-//		
-//		// Add further custom log handlers.
-//		prop = component.getProperty("logging.handlers");
-//		if(prop!=null)
-//		{
-//			if(prop instanceof Handler)
-//			{
-//				logger.addHandler((Handler)prop);
-//			}
-//			else if(SReflect.isIterable(prop))
-//			{
-//				for(Iterator<?> it=SReflect.getIterator(prop); it.hasNext(); )
-//				{
-//					Object obj = it.next();
-//					if(obj instanceof Handler)
-//					{
-//						logger.addHandler((Handler)obj);
-//					}
-//					else
-//					{
-//						logger.warning("Property is not a logging handler: "+obj);
-//					}
-//				}
-//			}
-//			else
-//			{
-//				logger.warning("Property 'logging.handlers' must be Handler or list of handlers: "+prop);
-//			}
-//		}
+		// if logger should use Handlers of parent (global) logger
+		// the global logger has a ConsoleHandler(Level:INFO) by default
+		prop = getComponentFeature(IPropertiesFeature.class).getProperty("logging.useParentHandlers");
+		if(prop!=null)
+		{
+			logger.setUseParentHandlers(((Boolean)prop).booleanValue());
+		}
+			
+		// add a ConsoleHandler to the logger to print out
+        // logs to the console. Set Level to given property value
+		prop = getComponentFeature(IPropertiesFeature.class).getProperty("logging.addConsoleHandler");
+		if(prop!=null)
+		{
+			Handler console;
+			/*if[android]
+			console = new jadex.commons.android.AndroidHandler();
+			 else[android]*/
+			console = new ConsoleHandler();
+			/* end[android]*/
+			
+            console.setLevel(Level.parse(prop.toString()));
+            logger.addHandler(console);
+        }
+		
+		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
+		// if logger should add a filehandler to capture log data in a file. 
+		// The user specifies the directory to contain the log file.
+		// $scope.getAgentName() can be used to have agent-specific log files 
+		//
+		// The directory name can use special patterns defined in the
+		// class, java.util.logging.FileHandler, 
+		// such as "%h" for the user's home directory.
+		// 
+		String logfile =	(String)getComponentFeature(IPropertiesFeature.class).getProperty("logging.file");
+		if(logfile!=null)
+		{
+		    try
+		    {
+			    Handler fh	= new FileHandler(logfile);
+		    	fh.setFormatter(new SimpleFormatter());
+		    	logger.addHandler(fh);
+		    }
+		    catch (IOException e)
+		    {
+		    	System.err.println("I/O Error attempting to create logfile: "
+		    		+ logfile + "\n" + e.getMessage());
+		    }
+		}
+		
+		// Add further custom log handlers.
+		prop = getComponentFeature(IPropertiesFeature.class).getProperty("logging.handlers");
+		if(prop!=null)
+		{
+			if(prop instanceof Handler)
+			{
+				logger.addHandler((Handler)prop);
+			}
+			else if(SReflect.isIterable(prop))
+			{
+				for(Iterator<?> it=SReflect.getIterator(prop); it.hasNext(); )
+				{
+					Object obj = it.next();
+					if(obj instanceof Handler)
+					{
+						logger.addHandler((Handler)obj);
+					}
+					else
+					{
+						logger.warning("Property is not a logging handler: "+obj);
+					}
+				}
+			}
+			else
+			{
+				logger.warning("Property 'logging.handlers' must be Handler or list of handlers: "+prop);
+			}
+		}
 	}
 	
 	/**

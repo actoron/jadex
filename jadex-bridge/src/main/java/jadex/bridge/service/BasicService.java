@@ -361,10 +361,10 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	public IFuture<Void> setComponentAccess(IInternalAccess access)
 	{
 		internalaccess = access;
-		setParent(internalaccess.getExternalAccess());
-		
-		// init properties when access is available
-		initNFProperties();
+//		setParent(internalaccess.getExternalAccess());
+//		
+//		// init properties when access is available
+//		initNFProperties();
 		
 		return IFuture.DONE;
 	}

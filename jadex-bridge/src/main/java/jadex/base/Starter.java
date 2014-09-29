@@ -10,7 +10,6 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;

@@ -2,6 +2,7 @@ package jadex.bridge.component.impl;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IMessageAdapter;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -25,7 +26,7 @@ import java.util.Map;
 /**
  *  Feature to send messages and receive messages via handlers.
  */
-public class MessageComponentFeature extends AbstractComponentFeature implements IMessageFeature
+public class MessageComponentFeature extends AbstractComponentFeature implements IMessageFeature, IInternalMessageFeature
 {
 	//-------- attributes --------
 	
@@ -93,9 +94,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		
 		addMessageHandler(new IMessageHandler()
 		{
-			IFilter filter = handler.getFilter()==null? 
-				(IFilter)new MessageConversationFilter(me, mt):
-				new ComposedFilter(new IFilter[]{new MessageConversationFilter(me, mt), handler.getFilter()});
+			IFilter<IMessageAdapter> filter = handler.getFilter()==null ? new MessageConversationFilter(me, mt)
+				: new ComposedFilter<IMessageAdapter>(new MessageConversationFilter(me, mt), handler.getFilter());
 				
 			public long getTimeout()
 			{
@@ -122,7 +122,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				return handler.isRealtime();
 			}
 			
-			public IFilter getFilter()
+			public IFilter<IMessageAdapter> getFilter()
 			{
 				return filter;
 			}
@@ -174,6 +174,56 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		if(messagehandlers!=null)
 		{
 			messagehandlers.remove(handler);
+		}
+	}
+	
+	//-------- IInternalMessageFeature interface --------
+	
+	/**
+	 *  Inform the component that a message has arrived.
+	 *  @param message The message that arrived.
+	 */
+	public void messageArrived(IMessageAdapter message)
+	{
+		getComponent().getComponentFeature(IExecutionFeature.class)
+			.scheduleStep(new HandleMessageStep(message));
+	}
+	
+	/**
+	 *  Step to handle a message.
+	 */
+	public class HandleMessageStep	implements IComponentStep<Void>
+	{
+		private final IMessageAdapter message;
+
+		public HandleMessageStep(IMessageAdapter message)
+		{
+			this.message = message;
+		}
+
+		public IFuture<Void> execute(IInternalAccess ia)
+		{
+			if(messagehandlers!=null)
+			{
+				for(int i=0; i<messagehandlers.size(); i++)
+				{
+					IMessageHandler mh = (IMessageHandler)messagehandlers.get(i);
+					if(mh.getFilter().filter(message))
+					{
+						mh.handleMessage(message.getParameterMap(), message.getMessageType());
+						if(mh.isRemove())
+						{
+							messagehandlers.remove(i);
+						}
+					}
+				}
+			}
+			return IFuture.DONE;
+		}
+
+		public String toString()
+		{
+			return "messageArrived()_#"+this.hashCode();
 		}
 	}
 }
