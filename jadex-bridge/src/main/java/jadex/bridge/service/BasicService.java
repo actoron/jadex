@@ -30,7 +30,7 @@ import java.util.Map;
  *  Basic service provide a simple default isValid() implementation
  *  that returns true after start service and false afterwards.
  */
-public class BasicService extends NFMethodPropertyProvider implements IInternalService
+public class BasicService implements IInternalService //extends NFMethodPropertyProvider implements IInternalService
 {
 	//-------- constants --------
 	
@@ -157,7 +157,7 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	// todo: remove type!!!
 	public BasicService(IComponentIdentifier providerid, Class<?> type, Class<?> impltype, Map<String, Object> properties)
 	{
-		super(null);
+//		super(null);
 		
 //		if(!SReflect.isSupertype(type, getClass()))
 //			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
@@ -229,77 +229,77 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 //		}
 	}
 	
-	/**
-	 * 
-	 */
-	public void initNFProperties()
-	{
-		IService ser = (IService)internalaccess.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
-		
-		List<Class<?>> classes = new ArrayList<Class<?>>();
-		Class<?> superclazz = type;
-		while(superclazz != null && !Object.class.equals(superclazz))
-		{
-			classes.add(superclazz);
-			superclazz = superclazz.getSuperclass();
-		}
-		superclazz = impltype!=null? impltype: this.getClass();
-		while(superclazz != null && !BasicService.class.equals(superclazz) && !Object.class.equals(superclazz))
-		{
-			classes.add(superclazz);
-			superclazz = superclazz.getSuperclass();
-		}
-		Collections.reverse(classes);
-		
-		for(Class<?> sclazz: classes)
-		{
-			if(sclazz.isAnnotationPresent(NFProperties.class))
-			{
-				if(nfproperties==null)
-					nfproperties = new HashMap<String, INFProperty<?,?>>();
-				addNFProperties(sclazz.getAnnotation(NFProperties.class), nfproperties, ser, null);
-			}
-			
-			Method[] methods = sclazz.getMethods();
-			for(Method m : methods)
-			{
-				if(m.isAnnotationPresent(NFProperties.class))
-				{
-					if(methodnfproperties==null)
-						methodnfproperties = new HashMap<MethodInfo, Map<String,INFProperty<?,?>>>();
-					
-					Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(new MethodInfo(m));
-					if(nfmap == null)
-					{
-						nfmap = new HashMap<String, INFProperty<?,?>>();
-						methodnfproperties.put(new MethodInfo(m), nfmap);
-					}
-				}
-			}
-		}
-		
-		if(methodnfproperties!=null)
-		{
-			for(MethodInfo key: methodnfproperties.keySet())
-			{
-				Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(key);
-				addNFProperties(key.getMethod(internalaccess.getClassLoader()).getAnnotation(NFProperties.class), nfmap, ser, key);
-			}
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	public void initNFProperties()
+//	{
+//		IService ser = (IService)internalaccess.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
+//		
+//		List<Class<?>> classes = new ArrayList<Class<?>>();
+//		Class<?> superclazz = type;
+//		while(superclazz != null && !Object.class.equals(superclazz))
+//		{
+//			classes.add(superclazz);
+//			superclazz = superclazz.getSuperclass();
+//		}
+//		superclazz = impltype!=null? impltype: this.getClass();
+//		while(superclazz != null && !BasicService.class.equals(superclazz) && !Object.class.equals(superclazz))
+//		{
+//			classes.add(superclazz);
+//			superclazz = superclazz.getSuperclass();
+//		}
+//		Collections.reverse(classes);
+//		
+//		for(Class<?> sclazz: classes)
+//		{
+//			if(sclazz.isAnnotationPresent(NFProperties.class))
+//			{
+//				if(nfproperties==null)
+//					nfproperties = new HashMap<String, INFProperty<?,?>>();
+//				addNFProperties(sclazz.getAnnotation(NFProperties.class), nfproperties, ser, null);
+//			}
+//			
+//			Method[] methods = sclazz.getMethods();
+//			for(Method m : methods)
+//			{
+//				if(m.isAnnotationPresent(NFProperties.class))
+//				{
+//					if(methodnfproperties==null)
+//						methodnfproperties = new HashMap<MethodInfo, Map<String,INFProperty<?,?>>>();
+//					
+//					Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(new MethodInfo(m));
+//					if(nfmap == null)
+//					{
+//						nfmap = new HashMap<String, INFProperty<?,?>>();
+//						methodnfproperties.put(new MethodInfo(m), nfmap);
+//					}
+//				}
+//			}
+//		}
+//		
+//		if(methodnfproperties!=null)
+//		{
+//			for(MethodInfo key: methodnfproperties.keySet())
+//			{
+//				Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(key);
+//				addNFProperties(key.getMethod(internalaccess.getClassLoader()).getAnnotation(NFProperties.class), nfmap, ser, key);
+//			}
+//		}
+//	}
 	
-	/**
-	 *  Add nf properties from a type.
-	 */
-	public void addNFProperties(NFProperties nfprops, Map<String, INFProperty<?, ?>> nfps, IService ser, MethodInfo mi)
-	{
-		for(NFProperty nfprop : nfprops.value())
-		{
-			Class<?> clazz = nfprop.value();
-			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, internalaccess, ser, mi);
-			nfps.put(prop.getName(), prop);
-		}
-	}
+//	/**
+//	 *  Add nf properties from a type.
+//	 */
+//	public void addNFProperties(NFProperties nfprops, Map<String, INFProperty<?, ?>> nfps, IService ser, MethodInfo mi)
+//	{
+//		for(NFProperty nfprop : nfprops.value())
+//		{
+//			Class<?> clazz = nfprop.value();
+//			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, internalaccess, ser, mi);
+//			nfps.put(prop.getName(), prop);
+//		}
+//	}
 	
 	//-------- methods --------
 	

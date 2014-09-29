@@ -22,13 +22,13 @@ public abstract class NFMethodPropertyProvider extends NFPropertyProvider implem
 	/** Non-functional properties of methods. */
 	protected Map<MethodInfo, Map<String, INFProperty<?, ?>>> methodnfproperties;
 	
-	/**
-	 *  Create a new provider.
-	 */
-	public NFMethodPropertyProvider(INFPropertyProvider parent)
-	{
-		super(parent);
-	}
+//	/**
+//	 *  Create a new provider.
+//	 */
+//	public NFMethodPropertyProvider(INFPropertyProvider parent)
+//	{
+//		super(parent);
+//	}
 	
 	/**
 	 *  Returns meta information about a non-functional properties of all methods.

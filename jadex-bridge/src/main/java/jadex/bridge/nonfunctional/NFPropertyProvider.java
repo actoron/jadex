@@ -20,7 +20,7 @@ import java.util.Set;
 public abstract class NFPropertyProvider implements INFPropertyProvider
 {
 	/** The parent. */
-	protected INFPropertyProvider nfparent;
+//	protected INFPropertyProvider nfparent;
 	
 	/** Non-functional properties. */
 	protected Map<String, INFProperty<?, ?>> nfproperties;
@@ -32,13 +32,13 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	{
 	}
 	
-	/**
-	 *  Create a new provider.
-	 */
-	public NFPropertyProvider(INFPropertyProvider parent)
-	{
-		this.nfparent = parent;
-	}
+//	/**
+//	 *  Create a new provider.
+//	 */
+//	public NFPropertyProvider(INFPropertyProvider parent)
+//	{
+//		this.nfparent = parent;
+//	}
 	
 	/**
 	 *  Returns the names of all non-functional properties of this service.
@@ -279,19 +279,25 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	 *  Get the parent.
 	 *  return The parent.
 	 */
-	public INFPropertyProvider getParent()
-	{
-		return nfparent;
-	}
-
-	/**
-	 *  Set the parent. 
-	 *  @param parent The parent to set.
-	 */
-	public void setParent(INFPropertyProvider parent)
-	{
-		this.nfparent = parent;
-	}
+	public abstract INFPropertyProvider getParent();
+	
+//	/**
+//	 *  Get the parent.
+//	 *  return The parent.
+//	 */
+//	public INFPropertyProvider getParent()
+//	{
+//		return nfparent;
+//	}
+//
+//	/**
+//	 *  Set the parent. 
+//	 *  @param parent The parent to set.
+//	 */
+//	public void setParent(INFPropertyProvider parent)
+//	{
+//		this.nfparent = parent;
+//	}
 	
 	/**
 	 *  Shutdown the provider.

@@ -415,4 +415,13 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		T[] ret = getProvidedServices(clazz);
 		return ret.length>0? ret[0]: null;
 	}
+
+	/**
+	 *  Get the services.
+	 *  @return The services.
+	 */
+	public Map<Class<?>, Collection<IInternalService>> getServices() 
+	{
+		return services;
+	}
 }

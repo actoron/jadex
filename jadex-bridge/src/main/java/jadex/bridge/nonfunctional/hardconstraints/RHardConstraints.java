@@ -1,5 +1,6 @@
 package jadex.bridge.nonfunctional.hardconstraints;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
@@ -130,9 +131,9 @@ public class RHardConstraints
 	{
 		IAsyncFilter<IService> ret = null;
 		
-		if (unboundconstantfilters.isEmpty())
+		if(unboundconstantfilters.isEmpty())
 		{
-			ret = IAsyncFilter.ALWAYS;
+			ret = (IAsyncFilter)IAsyncFilter.ALWAYS;
 		}
 		else
 		{
@@ -226,16 +227,16 @@ public class RHardConstraints
 		unboundconstantfilters = newunboundconstantfilters;
 	}
 	
-	public static <T> ITerminableIntermediateFuture<T> getServices(final IServiceProvider provider, final Class<T> type, final String scope, final MethodInfo method, final RHardConstraints hardconstraints)
+	public static <T> ITerminableIntermediateFuture<T> getServices(final IInternalAccess ea, final Class<T> type, final String scope, final MethodInfo method, final RHardConstraints hardconstraints)
 	{
 		if(hardconstraints == null)
 		{
-			return SServiceProvider.getServices(provider, type, scope);
+			return SServiceProvider.getServices(ea, type, scope);
 		}
 		else
 		{
 			final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
-			SServiceProvider.getServices(provider, type, scope, (IAsyncFilter<T>) hardconstraints.getRemotableFilter()).addResultListener(new IResultListener<Collection<T>>()
+			SServiceProvider.getServices(ea, type, scope, (IAsyncFilter<T>) hardconstraints.getRemotableFilter()).addResultListener(new IResultListener<Collection<T>>()
 			{
 				public void resultAvailable(Collection<T> results)
 				{

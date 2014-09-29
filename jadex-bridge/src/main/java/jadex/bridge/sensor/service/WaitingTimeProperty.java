@@ -47,7 +47,7 @@ public class WaitingTimeProperty extends TimedProperty
 		this.method = method;
 		this.sid = service.getServiceIdentifier();
 		
-		SServiceProvider.getService((IServiceProvider)comp.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(comp, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IClockService>()
 		{
 			public void resultAvailable(IClockService result)

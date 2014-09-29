@@ -13,7 +13,7 @@ import java.util.Map;
  *  The interface for platform services.
  */
 @Reference
-public interface IService extends INFMixedPropertyProvider //extends IRemotable INFPropertyProvider, INFMethodPropertyProvider, 
+public interface IService //extends INFMixedPropertyProvider //extends IRemotable INFPropertyProvider, INFMethodPropertyProvider, 
 {
 	//-------- constants --------
 	

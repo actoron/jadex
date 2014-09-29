@@ -9,6 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.search.SServiceProvider;
@@ -128,14 +129,14 @@ public class ComponentStartTest extends	TestCase
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						return ia.waitForDelay(500, false);
+						return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(500, false);
 					}
 				}).addResultListener(lis);
 				ea.scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						return ia.waitForDelay(500, true);
+						return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true);
 					}
 				}).addResultListener(lis);
 				
@@ -230,7 +231,7 @@ public class ComponentStartTest extends	TestCase
 			"-gui", "false"
 		};
 		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(pargs).get(new ThreadSuspendable());
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp, IComponentManagementService.class).get(new ThreadSuspendable());
 		dorun(cms, "jadex/micro/testcases/blocking/ShutdownAgent.class");
 //		dorun(cms, "jadex/micro/benchmarks/MessagePerformanceAgent.class");
 //		dorun(cms, "jadex/micro/examples/ping/PingScenario.application.xml");
