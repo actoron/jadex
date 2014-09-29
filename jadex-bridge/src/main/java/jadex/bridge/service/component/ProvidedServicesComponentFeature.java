@@ -3,7 +3,6 @@ package jadex.bridge.service.component;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -24,7 +23,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +31,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -168,22 +165,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 			
 			// Start the services.
-			if(services!=null && services.size()>0)
+			Collection<IInternalService>	allservices	= getAllServices();
+			if(!allservices.isEmpty())
 			{
-				List<IInternalService> allservices = new ArrayList<IInternalService>();
-				for(Iterator<Collection<IInternalService>> it=services.values().iterator(); it.hasNext(); )
-				{
-					// Service may occur at different positions if added with more than one interface
-					Collection<IInternalService> col = it.next();
-					for(IInternalService ser: col)
-					{
-						if(!allservices.contains(ser))
-						{
-							allservices.add(ser);
-						}
-					}
-//					allservices.addAll(it.next());
-				}
 				initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else
@@ -194,6 +178,24 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		catch(Exception e)
 		{
 			ret.setException(e);
+		}
+		
+		return ret;
+	}
+	
+	public IFuture<Void> shutdown()
+	{
+		Future<Void>	ret	= new Future<Void>();
+		
+		// Shutdown the services.
+		Collection<IInternalService>	allservices	= getAllServices();
+		if(!allservices.isEmpty())
+		{
+			shutdownServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		else
+		{
+			ret.setResult(null);
 		}
 		
 		return ret;
@@ -272,6 +274,36 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	}
 	
 	/**
+	 *  Get all services in a single collection.
+	 */
+	protected Collection<IInternalService>	getAllServices()
+	{
+		Collection<IInternalService> allservices;
+		if(services!=null && services.size()>0)
+		{
+			allservices = new LinkedHashSet<IInternalService>();
+			for(Iterator<Collection<IInternalService>> it=services.values().iterator(); it.hasNext(); )
+			{
+				// Service may occur at different positions if added with more than one interface
+				Collection<IInternalService> col = it.next();
+				for(IInternalService ser: col)
+				{
+					if(!allservices.contains(ser))
+					{
+						allservices.add(ser);
+					}
+				}
+			}
+		}
+		else
+		{
+			allservices	= Collections.emptySet();
+		}
+		
+		return allservices;
+	}
+	
+	/**
 	 *  Init the services one by one.
 	 */
 	protected IFuture<Void> initServices(final Iterator<IInternalService> services)
@@ -299,6 +331,38 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 							ret.setException(exception);
 						}
 					});
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Shutdown the services one by one.
+	 */
+	protected IFuture<Void> shutdownServices(final Iterator<IInternalService> services)
+	{
+		final Future<Void> ret = new Future<Void>();
+		if(services.hasNext())
+		{
+			final IInternalService	is	= services.next();
+			component.getLogger().info("Stopping service: "+is.getServiceIdentifier());
+			is.shutdownService().addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					component.getLogger().info("Stopped service: "+is.getServiceIdentifier());
+					
+					shutdownServices(services).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
 				}
 			});
 		}

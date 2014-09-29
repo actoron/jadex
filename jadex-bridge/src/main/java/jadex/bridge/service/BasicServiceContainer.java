@@ -41,7 +41,8 @@ import java.util.logging.Logger;
  *  services. It allows for starting/shutdowning the container and fetching
  *  service by their type/name.
  */
-public abstract class BasicServiceContainer implements  IServiceContainer, IServiceProvider
+// old! todo: remove
+//public abstract class BasicServiceContainer implements  IServiceContainer, IServiceProvider
 {	
 	//-------- attributes --------
 	

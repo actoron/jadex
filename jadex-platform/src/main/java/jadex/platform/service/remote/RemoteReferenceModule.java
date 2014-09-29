@@ -5,7 +5,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Excluded;
@@ -32,7 +31,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.SJavaParser;
-import jadex.kernelbase.ExternalAccess;
 import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
@@ -410,7 +408,7 @@ public class RemoteReferenceModule
 //				}
 //				if(methods[j].getName().indexOf("subscribe")!=-1)
 //					System.out.println("hjgff");
-				long to = BasicServiceContainer.getMethodTimeout(remoteinterfaces, methods[j], true);
+				long to = BasicService.getMethodTimeout(remoteinterfaces, methods[j], true);
 				// Do not save default value (overhead)
 				if(to!=Timeout.UNSET && to!=BasicService.getRemoteDefaultTimeout())
 					ret.addMethodTimeout(new MethodInfo(methods[j]), to);
@@ -1291,7 +1289,7 @@ public class RemoteReferenceModule
 		if(DEBUG)
 		{
 			// Hack!
-			if(((ExternalAccess)rsms.getComponent()).getInterpreter().getComponentAdapter().isExternalThread())
+			if(rsms.getComponent().isExternalThread())
 			{
 				System.out.println("wrong thread: "+Thread.currentThread());
 				Thread.dumpStack();

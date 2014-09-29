@@ -4,7 +4,6 @@ import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.interceptors.CallAccess;
@@ -211,7 +210,7 @@ public class ServiceInvocationContext
 //			if(method.getName().indexOf("service")!=-1)
 //				System.out.println("ggo");
 			// Only set defined timeouts. Otherwise the default timeout is used
-			long to = BasicServiceContainer.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall());
+			long to = BasicService.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall());
 			if(Timeout.UNSET!=to)
 			{
 				call.setProperty(ServiceCall.TIMEOUT, Long.valueOf(to));			

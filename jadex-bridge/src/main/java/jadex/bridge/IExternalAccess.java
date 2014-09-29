@@ -91,6 +91,12 @@ public interface IExternalAccess extends INFPropertyProvider//extends IRemotable
 	 */
 	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step, long delay);
 	
+	/**
+	 *  Test if current thread is an external thread.
+	 *  @return True if the current thread is not the component thread.
+	 */
+	public boolean isExternalThread();
+
 	//-------- normal --------
 		
 	/**
