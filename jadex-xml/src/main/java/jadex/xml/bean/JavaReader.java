@@ -139,6 +139,19 @@ public class JavaReader
 				}
 			};
 			
+			TypeInfo ti_lru = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "LRU")}),
+				new ObjectInfo(Map.class), new MappingInfo(null,
+				new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("maxEntries", null))	
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("cleaner")),
+				new SubobjectInfo(new XMLInfo("entry"), new AccessInfo("entry", null, null, null,  
+					new BeanAccessInfo(Map.class.getMethod("put", new Class[]{Object.class, Object.class}), null, "", MapEntry.class.getMethod("getKey", new Class[0]))), 
+				new SubObjectConverter(entryconv, null), true, null)
+			}));
+			typeinfos.add(ti_lru);
+			
 			TypeInfo ti_map = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Map")}),
 				new ObjectInfo(Map.class), new MappingInfo(null, new SubobjectInfo[]{
 				new SubobjectInfo(new XMLInfo("entry"), new AccessInfo("entry", null, null, null,  

@@ -206,7 +206,7 @@ public class MGoal extends MClassBasedElement
 	 */
 	public boolean isDeclarative()
 	{
-		return conditions!=null && (conditions.get(CONDITION_TARGET)!=null || conditions.get(CONDITION_TARGET)!=null);
+		return conditions!=null && (conditions.get(CONDITION_TARGET)!=null || conditions.get(CONDITION_MAINTAIN)!=null);
 //		return declarative;
 	}
 

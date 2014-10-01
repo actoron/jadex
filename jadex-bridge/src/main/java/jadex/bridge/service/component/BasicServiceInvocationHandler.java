@@ -503,6 +503,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			if (service instanceof BasicService)
 			{
+				serprops.putAll(((BasicService) service).getPropertyMap());
 				((BasicService) service).setPropertyMap(serprops);
 			}
 			
@@ -542,6 +543,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 
 			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, serclass, null);
 			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope);
+			serprops.putAll(mgmntservice.getPropertyMap());
 			mgmntservice.setPropertyMap(serprops);
 			
 			// Do not try to call isAnnotationPresent for Proxy on Android

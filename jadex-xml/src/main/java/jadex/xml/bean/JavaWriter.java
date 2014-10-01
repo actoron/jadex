@@ -7,6 +7,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
+import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.xml.AccessInfo;
@@ -125,6 +126,19 @@ public class JavaWriter
 		
 		try
 		{
+			// jadex.commons.collection.LRU
+			TypeInfo ti_lru = new TypeInfo(null, new ObjectInfo(LRU.class),
+				new MappingInfo(null,
+				new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("maxEntries", null))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("cleaner")),
+				new SubobjectInfo(new AccessInfo("entries", null, null, null,
+				new BeanAccessInfo(null, Map.class.getMethod("entrySet", new Class[0]))), null, true)
+			}));
+			typeinfos.add(ti_lru);
+			
 			// java.util.Map
 			TypeInfo ti_map = new TypeInfo(null, new ObjectInfo(Map.class),
 				new MappingInfo(null, new SubobjectInfo[]{
