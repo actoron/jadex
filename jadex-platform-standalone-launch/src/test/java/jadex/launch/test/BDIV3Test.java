@@ -33,6 +33,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 			new String[]
 			{
 				"INegotiationAgent",	// Not an agent.
+				"QuickstartBDI",	// blocks due to opened dialog
 				"Ambulance",	// sub agent
 				"Commander",	// sub agent
 				"FireBrigade",	// sub agent
