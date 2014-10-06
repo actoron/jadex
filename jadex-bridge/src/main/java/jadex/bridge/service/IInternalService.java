@@ -33,4 +33,10 @@ public interface IInternalService extends IService
 	 */
 	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope);
 	
+	/**
+	 *  Get the implementation type.
+	 *  @return The implementation type.
+	 */
+	public Class<?> getImplementationType();
+	
 }

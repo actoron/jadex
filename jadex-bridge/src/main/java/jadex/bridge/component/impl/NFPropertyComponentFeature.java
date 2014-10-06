@@ -1,20 +1,10 @@
 package jadex.bridge.component.impl;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
@@ -40,6 +30,14 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * 
@@ -83,11 +81,14 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		if(psf!=null)
 		{
 			Map<Class<?>, Collection<IInternalService>> sers = ((ProvidedServicesComponentFeature)psf).getServices();
-			for(Class<?> type: sers.keySet())
+			if(sers!=null)
 			{
-				for(IInternalService ser: sers.get(type))
+				for(Class<?> type: sers.keySet())
 				{
-					IInternalService 
+					for(IInternalService ser: sers.get(type))
+					{
+						initNFProperties(ser); 
+					}
 				}
 			}
 		}
@@ -255,25 +256,26 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	public void initNFProperties(IInternalService ser)
 	{
 		List<Class<?>> classes = new ArrayList<Class<?>>();
-		Class<?> superclazz = ser.getServiceIdentifier().getServiceType().getType(cl);
+		Class<?> superclazz = ser.getServiceIdentifier().getServiceType().getType(getComponent().getClassLoader());
 		while(superclazz != null && !Object.class.equals(superclazz))
 		{
 			classes.add(superclazz);
 			superclazz = superclazz.getSuperclass();
 		}
-		superclazz = ser.impltype!=null? impltype: this.getClass();
+		superclazz = ser.getImplementationType()!=null? ser.getImplementationType(): this.getClass();
 		while(superclazz != null && !BasicService.class.equals(superclazz) && !Object.class.equals(superclazz))
 		{
 			classes.add(superclazz);
 			superclazz = superclazz.getSuperclass();
 		}
-		Collections.reverse(classes);
+//		Collections.reverse(classes);
 		
+		Map<MethodInfo, Method> meths = new HashMap<MethodInfo, Method>();
 		for(Class<?> sclazz: classes)
 		{
 			if(sclazz.isAnnotationPresent(NFProperties.class))
 			{
-				addNFProperties(sclazz.getAnnotation(NFProperties.class), nfproperties, ser, null);
+				addNFProperties(sclazz.getAnnotation(NFProperties.class), null, null);
 			}
 			
 			Method[] methods = sclazz.getMethods();
@@ -281,40 +283,47 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			{
 				if(m.isAnnotationPresent(NFProperties.class))
 				{
-					if(methodnfproperties==null)
-						methodnfproperties = new HashMap<MethodInfo, Map<String,INFProperty<?,?>>>();
-					
-					Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(new MethodInfo(m));
-					if(nfmap == null)
+					MethodInfo mis = new MethodInfo(m.getName(), m.getParameterTypes());
+					if(!meths.containsKey(mis))
 					{
-						nfmap = new HashMap<String, INFProperty<?,?>>();
-						methodnfproperties.put(new MethodInfo(m), nfmap);
+						meths.put(mis, m);
 					}
 				}
 			}
 		}
 		
-		if(methodnfproperties!=null)
+		for(MethodInfo key: meths.keySet())
 		{
-			for(MethodInfo key: methodnfproperties.keySet())
-			{
-				Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(key);
-				addNFProperties(key.getMethod(internalaccess.getClassLoader()).getAnnotation(NFProperties.class), nfmap, ser, key);
-			}
+			addNFProperties(meths.get(key).getAnnotation(NFProperties.class), ser, key);
+		}
+	}
+	
+	// todo: make async methods
+	/**
+	 *  Add nf properties from a type.
+	 */
+	public void addNFProperties(NFProperties nfprops, IService ser, MethodInfo mi)
+	{
+		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getServiceIdentifier());
+		for(NFProperty nfprop : nfprops.value())
+		{
+			Class<?> clazz = nfprop.value();
+			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, null);
+			prov.addNFProperty(prop);
 		}
 	}
 	
 	/**
 	 *  Add nf properties from a type.
 	 */
-	public void addNFProperties(NFProperties nfprops, Map<String, INFProperty<?,?>> nfps, IService ser, MethodInfo mi)
+	public void addNFMethodProperties(NFProperties nfprops, IService ser, MethodInfo mi)
 	{
 		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getServiceIdentifier());
 		for(NFProperty nfprop : nfprops.value())
 		{
-			Class<?> clazz = nfprop.value();
+			Class<?> clazz = ((NFProperty)nfprop).value();
 			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, mi);
-			prov.addNFProperty(prop);
+			prov.addMethodNFProperty(mi, prop);
 		}
 	}
 }

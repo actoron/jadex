@@ -584,4 +584,22 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 //		return ret==Timeout.UNSET? remote? BasicService.getRemoteDefaultTimeout(): BasicService.getLocalDefaultTimeout(): ret;
 		return ret;
 	}
+	
+	/**
+	 *  Get the implementation type.
+	 *  @return The implementation type.
+	 */
+	public Class<?> getImplementationType()
+	{
+		return impltype;
+	}
+	
+	/**
+	 *  Get the interface type.
+	 *  @return The interface type.
+	 */
+	public Class<?> getInterfaceType()
+	{
+		return type;
+	}
 }
