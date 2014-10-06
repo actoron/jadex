@@ -331,14 +331,12 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	public IFuture<Void> publishExternal(URI uri, String rootpath)
 	{		
 		HttpServer server = getHttpServer(uri, null);
+		
+	    StaticHttpHandler handler	= new StaticHttpHandler(rootpath);
+	    handler.setFileCacheEnabled(false);	// see http://stackoverflow.com/questions/13307489/grizzly-locks-static-served-resources
+		
         ServerConfiguration sc = server.getServerConfiguration();
-		sc.addHttpHandler(new StaticHttpHandler(rootpath)
-		{
-			public void service(Request request, Response resp) throws Exception
-			{
-				super.service(request, resp);
-			}
-		}, uri.getPath());
+		sc.addHttpHandler(handler, uri.getPath());
 		
 //		System.out.println("published at: "+uri.getPath());
 		

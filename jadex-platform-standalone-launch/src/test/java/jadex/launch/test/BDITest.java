@@ -5,7 +5,6 @@ import jadex.commons.SReflect;
 import java.io.File;
 
 import junit.framework.Test;
-import junit.framework.TestResult;
 
 
 /**
@@ -41,6 +40,7 @@ public class BDITest	extends	ComponentTestSuite
 				
 				// Agents not to be started in isolation
 				"Worker",
+				"Rich",
 				"GarbageBurner",
 				"GarbageCollector.agent",
 				"Cleaner.agent",

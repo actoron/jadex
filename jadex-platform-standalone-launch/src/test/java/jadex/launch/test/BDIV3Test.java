@@ -32,9 +32,11 @@ public class BDIV3Test	extends	ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
-				"Ambulance",
-				"Commander",
-				"FireBrigade",
+				"INegotiationAgent",	// Not an agent.
+				"QuickstartBDI",	// blocks due to opened dialog
+				"Ambulance",	// sub agent
+				"Commander",	// sub agent
+				"FireBrigade",	// sub agent
 				"ComponentPlanAgent",	// sub agent
 				"Carry",	// sub agent
 				"Producer",	// sub agent
