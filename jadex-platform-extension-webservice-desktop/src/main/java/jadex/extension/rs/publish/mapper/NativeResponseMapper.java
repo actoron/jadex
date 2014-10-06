@@ -4,15 +4,11 @@ import jadex.commons.SUtil;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-
-import org.glassfish.grizzly.http.server.Request;
 
 /**
  *  The native response mapper allows for sending back native response objects.
@@ -72,10 +68,12 @@ public class NativeResponseMapper implements IValueMapper
 					ret = ret.type(cttype);
 				}
 			}
+			ret.header("Access-Control-Allow-Origin", "*");
 		}
 		else if(o instanceof String)
 		{
 			ret = Response.ok(o);
+			ret.header("Access-Control-Allow-Origin", "*");
 		}
 		else if(o instanceof Exception)
 		{
@@ -83,11 +81,13 @@ public class NativeResponseMapper implements IValueMapper
 			{
 				ret = Response.status(Status.INTERNAL_SERVER_ERROR).entity("<html><head></head>" +
 					"<body><pre>\n"+SUtil.getExceptionStacktrace((Exception)o)+"\n</pre></body></html>");
+				ret.header("Access-Control-Allow-Origin", "*");
 			}
 			else
 			{
 				ret = Response.status(Status.INTERNAL_SERVER_ERROR).entity("<html><head></head>" +
 					"<body><h1>500 Internal server error</h1></body></html>");
+				ret.header("Access-Control-Allow-Origin", "*");
 			}
 		}
 		else if(o instanceof URI)
@@ -98,6 +98,7 @@ public class NativeResponseMapper implements IValueMapper
 				uri = new URI("http://"+uri.toString());
 			}
 			ret = Response.status(Status.SEE_OTHER).location(uri);
+			ret.header("Access-Control-Allow-Origin", "*");
 		}
 		
 //		ret	= buildResponse(ret, value);
