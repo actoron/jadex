@@ -70,7 +70,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.getScaledLocalDefaultTimeout(10), false, true, true);
+		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.getScaledLocalDefaultTimeout(10), true, true, true);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class ComponentTestSuite extends TestSuite
 			"-simulation", "true",
 			"-asyncexecution", "true",
 //			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-			"-logging", "true",
+//			"-logging", "true",
 //			"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
 			"-logging_level", "java.util.logging.Level.WARNING",
 //			"-debugfutures", "true",
