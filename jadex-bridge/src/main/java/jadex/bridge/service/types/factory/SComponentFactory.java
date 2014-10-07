@@ -69,7 +69,7 @@ public class SComponentFactory
 		def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
-//		def_features.add(new ComponentFeatureFactory(INFPropertyComponentFeature.class, NFPropertyComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(INFPropertyComponentFeature.class, NFPropertyComponentFeature.class));
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
 	

@@ -292,14 +292,14 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	public IFuture<Void> publishResources(final URI uri, final String path)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IComponentManagementService	cms	= SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IComponentManagementService	cms	= SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getComponentIdentifier();
 		cms.getComponentDescription(cid)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
 		{
 			public void customResultAvailable(IComponentDescription desc)
 			{
-				ILibraryService	ls	= SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				ILibraryService	ls	= SServiceProvider.getLocalService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				ls.getClassLoader(desc.getResourceIdentifier())
 					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
