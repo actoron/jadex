@@ -3,6 +3,7 @@ package jadex.kernelbase;
 import jadex.base.Starter;
 import jadex.bridge.ComponentPersistedException;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.ExternalFeatureProvider;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -41,7 +42,7 @@ import java.util.logging.Logger;
 /**
  *  External access for applications.
  */
-public class ExternalAccess implements IExternalAccess
+public class ExternalAccess extends ExternalFeatureProvider implements IExternalAccess
 {
 	//-------- attributes --------
 
@@ -1398,7 +1399,15 @@ public class ExternalAccess implements IExternalAccess
 	{
 		return ia.getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
-
+	
+	/**
+	 * 
+	 */
+	public IInternalAccess getComponent()
+	{
+		return ia;
+	}
+	
 	/**
 	 *  Get the string representation.
 	 */

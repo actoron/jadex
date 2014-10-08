@@ -26,10 +26,13 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -58,6 +61,9 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	/** The max number of preserved req service providers. */
 	protected int maxreq;
 	
+	/** The parent provider. */
+	protected INFPropertyProvider parent;
+	
 	//-------- constructors --------
 	
 	/**
@@ -77,6 +83,9 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		final Future<Void> ret = new Future<Void>();
 //		getComponent().getComponentDescription().
 		
+		int cnt = 0;
+		LateCounterListener<Void> lis = new LateCounterListener<Void>(new DelegationResultListener<Void>(ret));
+		
 		IProvidedServicesFeature psf = getComponent().getComponentFeature(IProvidedServicesFeature.class);
 		if(psf!=null)
 		{
@@ -87,65 +96,51 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 				{
 					for(IInternalService ser: sers.get(type))
 					{
-						initNFProperties(ser); 
+						cnt++;
+						initNFProperties(ser, psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass()).addResultListener(lis);
 					}
 				}
 			}
 		}
 		
-		IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		IComponentIdentifier pacid = getComponent().getComponentIdentifier().getParent();
-		if(pacid!=null)
+		final IComponentIdentifier pacid = getComponent().getComponentIdentifier().getParent();
+		this.compprovider = new NFPropertyProvider() 
 		{
-			cms.getExternalAccess(pacid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret) 
+			public IInternalAccess getInternalAccess() 
 			{
-				public void customResultAvailable(IExternalAccess exta) 
+				return getComponent();
+			}
+			
+			public IFuture<INFPropertyProvider> getParent()
+			{
+				final Future<INFPropertyProvider> ret = new Future<INFPropertyProvider>();
+				if(parent!=null)
 				{
-					exta.scheduleStep(new IComponentStep<INFPropertyProvider>() 
+					ret.setResult(parent);
+				}
+				else if(pacid!=null)
+				{
+					IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					cms.getExternalAccess(pacid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyProvider>(ret) 
 					{
-						public IFuture<INFPropertyProvider> execute(IInternalAccess ia) 
+						public void customResultAvailable(IExternalAccess exta) 
 						{
-							INFPropertyComponentFeature nff = ia.getComponentFeature(INFPropertyComponentFeature.class);
-							return new Future<INFPropertyProvider>(nff.getComponentPropertyProvider());
-						}
-					}).addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, Void>(ret) 
-					{
-						public void customResultAvailable(final INFPropertyProvider nfp) 
-						{
-							compprovider = new NFPropertyProvider() 
+							exta.scheduleStep(new IComponentStep<INFPropertyProvider>() 
 							{
-								public IInternalAccess getInternalAccess() 
+								public IFuture<INFPropertyProvider> execute(IInternalAccess ia) 
 								{
-									return getComponent();
+									INFPropertyComponentFeature nff = ia.getComponentFeature(INFPropertyComponentFeature.class);
+									return new Future<INFPropertyProvider>(nff.getComponentPropertyProvider());
 								}
-								
-								public INFPropertyProvider getParent()
-								{
-									return nfp;
-								}
-							};
-							ret.setResult(null);
+							}).addResultListener(new DelegationResultListener<INFPropertyProvider>(ret)); 
 						}
 					});
 				}
-			});
-		}
-		else
-		{
-			this.compprovider = new NFPropertyProvider() 
-			{
-				public IInternalAccess getInternalAccess() 
-				{
-					return getComponent();
-				}
-				
-				public INFPropertyProvider getParent()
-				{
-					return null;
-				}
-			};
-			ret.setResult(null);
-		}
+				return ret;
+			}
+		};
+		
+		lis.setMax(cnt);
 		
 		return ret;
 	}
@@ -190,9 +185,9 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 				}
 				
 				// parent of required service property?
-				public INFPropertyProvider getParent()
+				public IFuture<INFPropertyProvider> getParent()
 				{
-					return null;
+					return new Future<INFPropertyProvider>((INFMixedPropertyProvider)null);
 				}
 			}; 
 			reqserprops.put(sid, ret);
@@ -233,9 +228,9 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 					return getComponent();
 				}
 				
-				public INFPropertyProvider getParent()
+				public IFuture<INFPropertyProvider> getParent()
 				{
-					return compprovider;
+					return new Future<INFPropertyProvider>(compprovider);
 				}
 			}; 
 			proserprops.put(sid, ret);
@@ -253,8 +248,13 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	/**
 	 * 
 	 */
-	public void initNFProperties(IInternalService ser)
+	public IFuture<Void> initNFProperties(final IInternalService ser, Class<?> impltype)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(impltype==null)
+			System.out.println("sdgjkhsd");
+		
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		Class<?> superclazz = ser.getServiceIdentifier().getServiceType().getType(getComponent().getClassLoader());
 		while(superclazz != null && !Object.class.equals(superclazz))
@@ -262,20 +262,26 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			classes.add(superclazz);
 			superclazz = superclazz.getSuperclass();
 		}
-		superclazz = ser.getImplementationType()!=null? ser.getImplementationType(): this.getClass();
+						
+		superclazz = impltype;
 		while(superclazz != null && !BasicService.class.equals(superclazz) && !Object.class.equals(superclazz))
 		{
 			classes.add(superclazz);
 			superclazz = superclazz.getSuperclass();
 		}
-//		Collections.reverse(classes);
+//				Collections.reverse(classes);
+		
+		int cnt = 0;
+		
+		LateCounterListener<Void> lis = new LateCounterListener<Void>(new DelegationResultListener<Void>(ret));
 		
 		Map<MethodInfo, Method> meths = new HashMap<MethodInfo, Method>();
 		for(Class<?> sclazz: classes)
 		{
 			if(sclazz.isAnnotationPresent(NFProperties.class))
 			{
-				addNFProperties(sclazz.getAnnotation(NFProperties.class), null, null);
+				addNFProperties(sclazz.getAnnotation(NFProperties.class), null, null).addResultListener(lis);
+				cnt++;
 			}
 			
 			Method[] methods = sclazz.getMethods();
@@ -294,36 +300,92 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		
 		for(MethodInfo key: meths.keySet())
 		{
-			addNFProperties(meths.get(key).getAnnotation(NFProperties.class), ser, key);
+			addNFProperties(meths.get(key).getAnnotation(NFProperties.class), ser, key).addResultListener(lis);
+			cnt++;
 		}
+		
+		// Set the number of issued calls
+		lis.setMax(cnt);
+		
+		return ret;
 	}
 	
-	// todo: make async methods
 	/**
 	 *  Add nf properties from a type.
 	 */
-	public void addNFProperties(NFProperties nfprops, IService ser, MethodInfo mi)
+	public IFuture<Void> addNFProperties(NFProperties nfprops, IService ser, MethodInfo mi)
 	{
+		Future<Void> ret = new Future<Void>();
 		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getServiceIdentifier());
+		
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(nfprops.value().length, new DelegationResultListener<Void>(ret));
 		for(NFProperty nfprop : nfprops.value())
 		{
 			Class<?> clazz = nfprop.value();
 			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, null);
-			prov.addNFProperty(prop);
+			prov.addNFProperty(prop).addResultListener(lis);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Add nf properties from a type.
 	 */
-	public void addNFMethodProperties(NFProperties nfprops, IService ser, MethodInfo mi)
+	public IFuture<Void> addNFMethodProperties(NFProperties nfprops, IService ser, MethodInfo mi)
 	{
+		Future<Void> ret = new Future<Void>();
+		
 		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getServiceIdentifier());
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(nfprops.value().length, new DelegationResultListener<Void>(ret));
 		for(NFProperty nfprop : nfprops.value())
 		{
 			Class<?> clazz = ((NFProperty)nfprop).value();
 			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, mi);
-			prov.addMethodNFProperty(mi, prop);
+			prov.addMethodNFProperty(mi, prop).addResultListener(lis);
 		}
+		
+		return ret;
 	}
+	
+	/**
+	 *  Counter listener that allows to set the max after usage.
+	 */
+	public static class LateCounterListener<T> implements IResultListener<T>
+	{
+		IResultListener<T> delegate;
+		int max = -1;
+		int cnt = 0;
+		
+		public LateCounterListener(IResultListener<T> delegate)
+		{
+			this.delegate = delegate;
+		}
+		
+		public void resultAvailable(T result)
+		{
+			cnt++;
+			check();
+		}
+		
+		public void exceptionOccurred(Exception exception)
+		{
+			cnt++;
+			check();
+		}
+		
+		protected void check()
+		{
+			if(max>-1 && max==cnt)
+			{
+				delegate.resultAvailable(null);
+			}
+		}
+		
+		public void setMax(int max)
+		{
+			this.max = max;
+			check();
+		}
+	};
 }

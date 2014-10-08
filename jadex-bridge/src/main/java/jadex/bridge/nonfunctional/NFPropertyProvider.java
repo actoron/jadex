@@ -6,6 +6,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -57,29 +58,36 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		final String[] myprops = nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
-		if(getParent()!=null)
+		getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, String[]>(ret)
 		{
-			getParent().getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
+			public void customResultAvailable(INFPropertyProvider parent)
 			{
-				public void customResultAvailable(String[] result)
+				if(parent!=null)
 				{
-					Set<String> tmp = new LinkedHashSet<String>();
-					for(String p: result)
+					parent.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
 					{
-						tmp.add(p);
-					}
-					for(String p: myprops)
-					{
-						tmp.add(p);
-					}
-					ret.setResult((String[])tmp.toArray(new String[tmp.size()]));
+						public void customResultAvailable(String[] result)
+						{
+							Set<String> tmp = new LinkedHashSet<String>();
+							for(String p: result)
+							{
+								tmp.add(p);
+							}
+							for(String p: myprops)
+							{
+								tmp.add(p);
+							}
+							ret.setResult((String[])tmp.toArray(new String[tmp.size()]));
+						}
+					});
 				}
-			});
-		}
-		else
-		{
-			ret.setResult(myprops);
-		}
+				else
+				{
+					ret.setResult(myprops);
+				}
+			}
+		});
+			
 		return ret;
 	}
 	
@@ -111,9 +119,9 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.
 	 */
-	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(String name)
+	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(final String name)
 	{
-		Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
+		final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
 		
 		INFPropertyMetaInfo mi = nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
 		
@@ -121,13 +129,22 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 		{
 			ret.setResult(mi);
 		}
-		else if(getParent()!=null)
+		else 
 		{
-			getParent().getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
-		}
-		else
-		{
-			ret.setException(new RuntimeException("Property not found: "+name));
+			getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, INFPropertyMetaInfo>(ret)
+			{
+				public void customResultAvailable(INFPropertyProvider parent)
+				{
+					if(parent!=null)
+					{
+						parent.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+					}
+					else
+					{
+						ret.setException(new RuntimeException("Property not found: "+name));
+					}
+				}
+			});
 		}
 		
 		return ret;
@@ -139,9 +156,9 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T> IFuture<T> getNFPropertyValue(String name)
+	public <T> IFuture<T> getNFPropertyValue(final String name)
 	{
-		Future<T> ret = new Future<T>();
+		final Future<T> ret = new Future<T>();
 		
 		INFProperty<T, ?> prop = (INFProperty<T, ?>) (nfproperties != null? nfproperties.get(name) : null);
 		
@@ -156,15 +173,24 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 				ret.setException(e);
 			}
 		}
-		else if(getParent()!=null)
+		else 
 		{
-			IFuture<T> fut = getParent().getNFPropertyValue(name);
-			fut.addResultListener(new DelegationResultListener<T>(ret));
-		}
-		else
-		{
-			ret.setException(new RuntimeException("Property not found: "+name));
-		}
+			getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, T>(ret)
+			{
+				public void customResultAvailable(INFPropertyProvider parent)
+				{
+					if(parent!=null)
+					{
+						IFuture<T> fut = parent.getNFPropertyValue(name);
+						fut.addResultListener(new DelegationResultListener<T>(ret));
+					}
+					else
+					{
+						ret.setException(new RuntimeException("Property not found: "+name));
+					}
+				}
+			});
+		}	
 		
 		return ret;
 	}
@@ -176,9 +202,9 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	 *  @return The current value of a non-functional property of this service.
 	 */
 //	public<T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit)
-	public<T, U> IFuture<T> getNFPropertyValue(String name, U unit)
+	public<T, U> IFuture<T> getNFPropertyValue(final String name, final U unit)
 	{
-		Future<T> ret = new Future<T>();
+		final Future<T> ret = new Future<T>();
 		
 		INFProperty<T, U> prop = (INFProperty<T, U>) (nfproperties != null? nfproperties.get(name) : null);
 		
@@ -194,16 +220,24 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 		//			ret.setException(new ClassCastException("Requested value type (" + String.valueOf(type) + ") does not match value type (" + String.valueOf(reto.getClass()) + ") for this non-functional property: " + name));
 			}
 		}
-		else if(getParent()!=null)
+		else 
 		{
-//			internalaccess.getExternalAccess().getNFPropertyValue(name, unit).addResultListener(new DelegationResultListener<T>(ret));
-			IFuture<T> fut = getParent().getNFPropertyValue(name, unit);
-			fut.addResultListener(new DelegationResultListener<T>(ret));
-		}
-		else
-		{
-			ret.setException(new RuntimeException("Property not found: "+name));
-		}
+			getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, T>(ret)
+			{
+				public void customResultAvailable(INFPropertyProvider parent)
+				{
+					if(parent!=null)
+					{
+						IFuture<T> fut = parent.getNFPropertyValue(name, unit);
+						fut.addResultListener(new DelegationResultListener<T>(ret));
+					}
+					else
+					{
+						ret.setException(new RuntimeException("Property not found: "+name));
+					}
+				}
+			});
+		}	
 		
 		return ret;
 	}
@@ -279,7 +313,7 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	 *  Get the parent.
 	 *  return The parent.
 	 */
-	public abstract INFPropertyProvider getParent();
+	public abstract IFuture<INFPropertyProvider> getParent();
 	
 //	/**
 //	 *  Get the parent.

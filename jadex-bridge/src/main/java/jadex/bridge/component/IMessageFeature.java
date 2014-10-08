@@ -36,11 +36,11 @@ public interface IMessageFeature
 	 *  Add a message handler.
 	 *  @param  The handler.
 	 */
-	public void addMessageHandler(IMessageHandler handler);
+	public IFuture<Void> addMessageHandler(IMessageHandler handler);
 	
 	/**
 	 *  Remove a message handler.
 	 *  @param handler The handler.
 	 */
-	public void removeMessageHandler(IMessageHandler handler);
+	public IFuture<Void> removeMessageHandler(IMessageHandler handler);
 }

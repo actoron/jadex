@@ -134,7 +134,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  Add a message handler.
 	 *  @param  The handler.
 	 */
-	public void addMessageHandler(final IMessageHandler handler)
+	public IFuture<Void> addMessageHandler(final IMessageHandler handler)
 	{
 		if(handler.getFilter()==null)
 			throw new RuntimeException("Filter must not null in handler: "+handler);
@@ -163,18 +163,21 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}, handler.isRealtime());
 		}
 		messagehandlers.add(handler);
+		
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Remove a message handler.
 	 *  @param handler The handler.
 	 */
-	public void removeMessageHandler(IMessageHandler handler)
+	public IFuture<Void> removeMessageHandler(IMessageHandler handler)
 	{
 		if(messagehandlers!=null)
 		{
 			messagehandlers.remove(handler);
 		}
+		return IFuture.DONE;
 	}
 	
 	//-------- IInternalMessageFeature interface --------

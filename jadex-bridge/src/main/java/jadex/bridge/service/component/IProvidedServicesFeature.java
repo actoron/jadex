@@ -1,6 +1,7 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 
 /**
  *  Component feature for provided services.
@@ -62,4 +63,12 @@ public interface IProvidedServicesFeature
 	 *  @return The service.
 	 */
 	public Object getProvidedServiceRawImpl(String name);
+	
+	/**
+	 *  Get the provided service implementation object by name.
+	 *  
+	 *  @param name The service identifier.
+	 *  @return The service.
+	 */
+	public Object getProvidedServiceRawImpl(IServiceIdentifier sid);
 }

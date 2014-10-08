@@ -35,6 +35,7 @@ import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
 import jadex.platform.service.remote.replacements.DefaultHashcodeMethodReplacement;
+import jadex.platform.service.remote.replacements.GetComponentFeatureMethodReplacement;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -434,6 +435,21 @@ public class RemoteReferenceModule
 				ret.addMethodReplacement(mis[i], new DefaultHashcodeMethodReplacement());
 			}
 		}
+		
+		// Add replacement for external component features (just provides a new fascade)
+		if(target instanceof IExternalAccess)
+		{
+			Method getfeat = SReflect.getMethod(Object.class, "getExternalComponentFeature", new Class[]{Class.class});
+			if(ret.getMethodReplacement(getfeat)==null)
+			{
+				MethodInfo[] mis = getMethodInfo(getfeat, targetclass, true);
+				for(int i=0; i<mis.length; i++)
+				{
+					ret.addMethodReplacement(mis[i], new GetComponentFeatureMethodReplacement());
+				}
+			}
+		}
+		
 		// Add getClass as excluded. Otherwise the target class must be present on
 		// the computer which only uses the proxy.
 		Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
@@ -713,7 +729,7 @@ public class RemoteReferenceModule
 			IServiceIdentifier sid = (IServiceIdentifier)rr.getTargetIdentifier();
 			
 			// fetch service via its id
-			SServiceProvider.getService(rsms.getComponent().getServiceProvider(), sid)
+			SServiceProvider.getService(rsms.getComponent(), sid)
 				.addResultListener(new DelegationResultListener<Object>(ret));
 		}
 		else if(rr.getTargetIdentifier() instanceof IComponentIdentifier)
@@ -721,7 +737,7 @@ public class RemoteReferenceModule
 			final IComponentIdentifier cid = (IComponentIdentifier)rr.getTargetIdentifier();
 			
 			// fetch component via target component id
-			SServiceProvider.getServiceUpwards(rsms.getComponent().getServiceProvider(), IComponentManagementService.class)
+			SServiceProvider.getService(rsms.getComponent(), IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 //					.addResultListener(component.createResultListener(new IResultListener()
 			{
@@ -991,7 +1007,7 @@ public class RemoteReferenceModule
 						{
 							final RemoteReference rr = (RemoteReference)proxydates.remove(dates[i]);
 //							System.out.println("renewal sent for: "+rr);
-							IResultListener<Void> lis = agent.createResultListener(new IResultListener<Void>()
+							IResultListener<Void> lis = agent.get createResultListener(new IResultListener<Void>()
 							{
 								public void resultAvailable(Void result)
 								{

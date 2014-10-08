@@ -24,10 +24,10 @@ public interface INFPropertyComponentFeature
 	 */
 	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid);
 
-	/**
-	 *  Has the service a property provider.
-	 */
-	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid);
+//	/**
+//	 *  Has the service a property provider.
+//	 */
+//	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid);
 	
 //	/**
 //	 *  Get the provided service property provider for a service.

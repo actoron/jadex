@@ -49,6 +49,7 @@ import jadex.platform.service.remote.commands.RemoteResultCommand;
 import jadex.platform.service.remote.commands.RemoteSearchCommand;
 import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
 import jadex.platform.service.remote.replacements.DefaultHashcodeMethodReplacement;
+import jadex.platform.service.remote.replacements.GetComponentFeatureMethodReplacement;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -101,6 +102,7 @@ public class RemoteServiceManagementAgent
 		STransformation.registerClass(RemoteSearchCommand.class);
 		STransformation.registerClass(DefaultEqualsMethodReplacement.class);
 		STransformation.registerClass(DefaultHashcodeMethodReplacement.class);
+		STransformation.registerClass(GetComponentFeatureMethodReplacement.class);
 		
 		SServiceProvider.getService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)

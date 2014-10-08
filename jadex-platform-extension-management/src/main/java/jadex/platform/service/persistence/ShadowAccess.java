@@ -76,7 +76,7 @@ public class ShadowAccess implements IExternalAccess
 		this.access	= access;
 		this.provider	= new ShadowServiceProvider();
 		
-		SServiceProvider.getService(access.getServiceProvider(), ISwapService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, ISwapService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<ISwapService>()
 		{
 			public void resultAvailable(ISwapService swapservice)

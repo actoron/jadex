@@ -6,6 +6,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -96,29 +97,37 @@ public abstract class NFMethodPropertyProvider extends NFPropertyProvider implem
 		final Future<String[]> ret = new Future<String[]>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		final String[] myprops = nfmap != null? nfmap.keySet().toArray(new String[nfproperties.size()]) : new String[0];
-		if(getParent()!=null)
+		
+		getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, String[]>(ret)
 		{
-			getParent().getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
+			public void customResultAvailable(INFPropertyProvider parent)
 			{
-				public void customResultAvailable(String[] result)
+				if(parent!=null)
 				{
-					Set<String> tmp = new LinkedHashSet<String>();
-					for(String p: result)
+					parent.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
 					{
-						tmp.add(p);
-					}
-					for(String p: myprops)
-					{
-						tmp.add(p);
-					}
-					ret.setResult((String[])tmp.toArray(new String[tmp.size()]));
+						public void customResultAvailable(String[] result)
+						{
+							Set<String> tmp = new LinkedHashSet<String>();
+							for(String p: result)
+							{
+								tmp.add(p);
+							}
+							for(String p: myprops)
+							{
+								tmp.add(p);
+							}
+							ret.setResult((String[])tmp.toArray(new String[tmp.size()]));
+						}
+					});
 				}
-			});
-		}
-		else
-		{
-			ret.setResult(myprops);
-		}
+				else
+				{
+					ret.setResult(myprops);
+				}
+			}
+		});
+			
 		return ret;
 	}
 	

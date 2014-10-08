@@ -441,6 +441,44 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	}
 	
 	/**
+	 *  Get the provided service implementation object by name.
+	 *  
+	 *  @param name The service identifier.
+	 *  @return The service.
+	 */
+	public Object getProvidedServiceRawImpl(IServiceIdentifier sid)
+	{
+		Object ret = null;
+		
+		Object[] services = getProvidedServices(sid.getServiceType().getType(getComponent().getClassLoader()));
+		if(services!=null)
+		{
+			IService service = null;
+			for(Object ser: services)
+			{
+				if(((IService)ser).getServiceIdentifier().equals(sid))
+				{
+					service = (IService)ser;
+				}
+			}
+			if(service!=null)
+			{
+				if(Proxy.isProxyClass(service.getClass()))
+				{
+					BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+					ret = handler.getDomainService();
+				}
+				else
+				{
+					ret = service;
+				}
+			}
+		}
+		
+		return ret;	
+	}
+	
+	/**
 	 *  Get provided (declared) service.
 	 *  @param clazz The interface.
 	 *  @return The service.

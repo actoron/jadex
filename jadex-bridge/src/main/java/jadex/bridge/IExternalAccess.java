@@ -185,4 +185,12 @@ public interface IExternalAccess extends INFPropertyProvider//extends IRemotable
 //	 *  is persisted or terminated.
 //	 */
 //	public boolean	isValid();
+	
+	/**
+	 *  Get an external interface feature.
+	 *  @param type The interface type of the feature.
+	 *  @return The feature.
+	 */
+	public <T> T getExternalComponentFeature(Class<T> type);
+	
 }

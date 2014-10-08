@@ -46,7 +46,7 @@ public abstract class AbstractConstraintFilter<T> implements IAsyncFilter<T>
 		}
 		
 		final Future<Boolean> ret = new Future<Boolean>();
-		((IService) service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+		((IService)service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
 			{
