@@ -29,4 +29,17 @@ public interface IComponentFeature	extends IValueFetcher
 	 *  Shutdown the feature.
 	 */
 	public IFuture<Void>	shutdown();
+	
+	/**
+	 *  Get external feature facade.
+	 */
+//	public <T> IFuture<T> getExternalFacade(Class<T> type, Object context);
+//	public <T> IFuture<T> getExternalFacade(Object context);
+	public <T> T getExternalFacade(Object context);
+	
+//	/**
+//	 *  Get external feature facade.
+//	 */
+////	public <T> IFuture<Class<T>> getExternalFacadeType(Object context);
+//	public <T> Class<T> getExternalFacadeType(Object context);
 }

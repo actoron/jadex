@@ -4,6 +4,7 @@ import jadex.bridge.ExternalFeatureProvider;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
@@ -586,14 +587,14 @@ public class BasicService extends ExternalFeatureProvider implements IInternalSe
 		return ret;
 	}
 	
-	/**
-	 *  Get the implementation type.
-	 *  @return The implementation type.
-	 */
-	public IFuture<Class<?>> getImplementationType()
-	{
-		return new Future<Class<?>>(impltype!=null? impltype: getClass());
-	}
+//	/**
+//	 *  Get the implementation type.
+//	 *  @return The implementation type.
+//	 */
+//	public IFuture<Class<?>> getImplementationType()
+//	{
+//		return new Future<Class<?>>(impltype!=null? impltype: getClass());
+//	}
 	
 	/**
 	 *  Get the interface type.
@@ -603,4 +604,13 @@ public class BasicService extends ExternalFeatureProvider implements IInternalSe
 	{
 		return type;
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public Class<?> getFeatureClass(Class<?> type)
+//	{
+//		IComponentFeature feat = (IComponentFeature)getInternalAccess().getComponentFeature(type);
+//		return feat.getExternalFacadeType(this);
+//	}
 }

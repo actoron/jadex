@@ -2,6 +2,7 @@ package jadex.bridge.nonfunctional;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -67,7 +68,7 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 							NFRootProperty.this.root = root;
 							INFPropertyMetaInfo mi = getMetaInfo();
 							NFPropertyMetaInfo cmi = new NFPropertyMetaInfo(mi.getName(), mi.getType(), mi.getUnit(), mi.isDynamic(), mi.getUpdateRate(), mi.isRealtime(), Target.Root);
-							root.addNFProperty(new NFPropertyRef<T, U>(comp.getExternalAccess(), root, cmi)).addResultListener(new DelegationResultListener<Void>(ret));
+							((INFPropertyProvider)root.getExternalComponentFeature(INFPropertyComponentFeature.class)).addNFProperty(new NFPropertyRef<T, U>((INFPropertyProvider)comp.getExternalAccess().getExternalComponentFeature(INFPropertyComponentFeature.class), root, cmi)).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					});
 				}
@@ -88,7 +89,7 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 	{
 		if(root!=null && injected)
 		{
-			root.removeNFProperty(getName());//.addResultListener(new DelegationResultListener<Void>(ret));
+			((INFPropertyProvider)root.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(getName());//.addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		return super.dispose();
 	}

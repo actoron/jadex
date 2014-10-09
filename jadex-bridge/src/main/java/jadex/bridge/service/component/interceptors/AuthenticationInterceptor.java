@@ -123,7 +123,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		Object[] t = new Object[]{context.getCaller().getPlatformPrefix(), classname, methodname, args};
 		final byte[] content = BinarySerializer.objectToByteArray(t, null);
 		
-		SServiceProvider.getService((IServiceProvider)getComponent().getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getComponent(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService sser)
@@ -199,7 +199,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 				{
 					// if not contained in direct names check virtual name mappings
 					final String[] virtuals = au.virtuals();
-					SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(ia, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 					{
 						public void customResultAvailable(ISecurityService sser)
@@ -245,7 +245,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		Object[] t = new Object[]{callername, classname, methodname, args};
 		final byte[] content = BinarySerializer.objectToByteArray(t, null);
 		
-		SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(ia, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService sser)

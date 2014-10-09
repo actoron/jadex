@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
@@ -1400,10 +1401,19 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 		return ia.getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
+//	/**
+//	 * 
+//	 */
+//	public Class<?> getFeatureClass(Class<?> type)
+//	{
+//		IComponentFeature feat = (IComponentFeature)ia.getComponentFeature(type);
+//		return feat.getExternalFacadeType(this);
+//	}
+	
 	/**
 	 * 
 	 */
-	public IInternalAccess getComponent()
+	public IInternalAccess getInternalAccess()
 	{
 		return ia;
 	}

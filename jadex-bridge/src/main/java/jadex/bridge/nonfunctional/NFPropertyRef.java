@@ -2,6 +2,7 @@ package jadex.bridge.nonfunctional;
 
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -51,7 +52,7 @@ public class NFPropertyRef<T, U> extends AbstractNFProperty<T, U>
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				comp.removeNFProperty(getName());
+				((INFPropertyProvider)comp.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(getName());
 				ret.setException(exception);
 			}
 		});

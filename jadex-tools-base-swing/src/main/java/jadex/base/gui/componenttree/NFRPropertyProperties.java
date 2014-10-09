@@ -3,11 +3,13 @@ package jadex.base.gui.componenttree;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -91,7 +93,7 @@ public class NFRPropertyProperties extends PropertiesPanel
 				{
 					public IFuture<Object> execute(IInternalAccess ia)
 					{
-						Object res = fmultiple? ia.getServiceContainer().getLastRequiredServices(fname): ia.getServiceContainer().getLastRequiredService(fname);
+						Object res = fmultiple? ia.getComponentFeature(IRequiredServicesFeature.class).getLastRequiredServices(fname): ia.getComponentFeature(IRequiredServicesFeature.class).getLastRequiredService(fname);
 						return new Future<Object>(res);
 					}
 				}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
@@ -166,7 +168,7 @@ public class NFRPropertyProperties extends PropertiesPanel
 							public IFuture<Object> execute(IInternalAccess ia)
 							{
 								Future<Object> ret = new Future<Object>();
-								INFMixedPropertyProvider pp = ia.getServiceContainer().getRequiredServicePropertyProvider(sid);
+								INFMixedPropertyProvider pp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(sid);
 								if(fmi!=null)
 								{
 									pp.getMethodNFPropertyValue(fmi, fname, u).addResultListener(new DelegationResultListener<Object>(ret));

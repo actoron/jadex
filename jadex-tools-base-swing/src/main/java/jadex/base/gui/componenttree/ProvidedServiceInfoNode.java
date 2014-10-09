@@ -6,6 +6,7 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.INFPropertyComponentFeature;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -134,7 +135,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		{
 			public void resultAvailable(final IService ser)
 			{
-				ser.getExternalComponentFeature(INFPropertyComponentFeature.class).getProvidedServicePropertyProvider(sid).getNFPropertyMetaInfos()
+				((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyMetaInfos()
 					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 //					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 				{
@@ -151,7 +152,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 						
 						final NFPropertyContainerNode sercon = cn;
 						
-						ser.getExternalComponentFeature(INFPropertyComponentFeature.class).getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos()
+						((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getMethodNFPropertyMetaInfos()
 //						ser.getMethodNFPropertyMetaInfos()
 							.addResultListener(new SwingResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>(new IResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>()
 						{

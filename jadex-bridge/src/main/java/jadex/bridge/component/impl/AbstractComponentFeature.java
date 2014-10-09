@@ -3,6 +3,7 @@ package jadex.bridge.component.impl;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -69,6 +70,23 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	public IFuture<Void>	shutdown()
 	{
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Get external feature facade.
+	 */
+//	public <T> IFuture<T> getExternalFacade(Object context)
+	public <T> T getExternalFacade(Object context)
+	{
+		return (T)this;
+	}
+	
+	/**
+	 * 
+	 */
+	public <T> Class<T> getExternalFacadeType(Object context)
+	{
+		return null;
 	}
 	
 	//-------- IValueFetcher interface --------

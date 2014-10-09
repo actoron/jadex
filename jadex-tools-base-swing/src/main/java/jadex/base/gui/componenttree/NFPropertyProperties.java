@@ -1,7 +1,10 @@
 package jadex.base.gui.componenttree;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.INFPropertyComponentFeature;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
@@ -105,11 +108,11 @@ public class NFPropertyProperties extends PropertiesPanel
 							{
 								if(mi!=null)
 								{
-									ser.getMethodNFPropertyValue(mi, propmi.getName(), u).addResultListener(lis);
+									((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getMethodNFPropertyValue(mi, propmi.getName(), u).addResultListener(lis);
 								}
 								else
 								{
-									ser.getNFPropertyValue(propmi.getName(), u).addResultListener(lis);
+									((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyValue(propmi.getName(), u).addResultListener(lis);
 								}
 							}
 							
@@ -120,7 +123,7 @@ public class NFPropertyProperties extends PropertiesPanel
 					}
 					else
 					{
-						IFuture<Object> fut = ea.getNFPropertyValue(propmi.getName(), u);
+						IFuture<Object> fut = ((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyValue(propmi.getName(), u);
 						fut.addResultListener(lis);
 					}
 				}

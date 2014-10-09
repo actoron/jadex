@@ -1,5 +1,6 @@
 package jadex.bridge.nonfunctional.search;
 
+import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
 import jadex.bridge.service.IService;
@@ -102,7 +103,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 		}
 		else
 		{
-			getPropertyValue(service).addResultListener(listener);
+			getPropertyValue((INFMixedPropertyProvider)service.getExternalComponentFeature(INFPropertyComponentFeature.class)).addResultListener(listener);
 		}
 		
 		return ret;

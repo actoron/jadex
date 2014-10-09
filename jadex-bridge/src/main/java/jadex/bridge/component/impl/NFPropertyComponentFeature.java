@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.INFPropertyComponentFeature;
+import jadex.bridge.modelinfo.NFPropertyInfo;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
@@ -80,11 +81,32 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	 */
 	public IFuture<Void>	init()
 	{
+//		System.out.println("init start: "+getComponent().getComponentIdentifier());
+		
 		final Future<Void> ret = new Future<Void>();
-//		getComponent().getComponentDescription().
 		
 		int cnt = 0;
 		LateCounterListener<Void> lis = new LateCounterListener<Void>(new DelegationResultListener<Void>(ret));
+		
+		// Init nf component props
+		List<NFPropertyInfo> nfprops = getComponent().getModel().getNFProperties();
+		if(nfprops!=null)
+		{
+			for(NFPropertyInfo nfprop: nfprops)
+			{
+				try
+				{
+					Class<?> clazz = nfprop.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
+					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getComponent(), null, null);
+					cnt++;
+					getComponentPropertyProvider().addNFProperty(nfp).addResultListener(lis);
+				}
+				catch(Exception e)
+				{
+					getComponent().getLogger().warning("Property creation problem: "+e);
+				}
+			}
+		}
 		
 		IProvidedServicesFeature psf = getComponent().getComponentFeature(IProvidedServicesFeature.class);
 		if(psf!=null)
@@ -103,44 +125,20 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			}
 		}
 		
-		final IComponentIdentifier pacid = getComponent().getComponentIdentifier().getParent();
-		this.compprovider = new NFPropertyProvider() 
-		{
-			public IInternalAccess getInternalAccess() 
-			{
-				return getComponent();
-			}
-			
-			public IFuture<INFPropertyProvider> getParent()
-			{
-				final Future<INFPropertyProvider> ret = new Future<INFPropertyProvider>();
-				if(parent!=null)
-				{
-					ret.setResult(parent);
-				}
-				else if(pacid!=null)
-				{
-					IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-					cms.getExternalAccess(pacid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyProvider>(ret) 
-					{
-						public void customResultAvailable(IExternalAccess exta) 
-						{
-							exta.scheduleStep(new IComponentStep<INFPropertyProvider>() 
-							{
-								public IFuture<INFPropertyProvider> execute(IInternalAccess ia) 
-								{
-									INFPropertyComponentFeature nff = ia.getComponentFeature(INFPropertyComponentFeature.class);
-									return new Future<INFPropertyProvider>(nff.getComponentPropertyProvider());
-								}
-							}).addResultListener(new DelegationResultListener<INFPropertyProvider>(ret)); 
-						}
-					});
-				}
-				return ret;
-			}
-		};
-		
 		lis.setMax(cnt);
+		
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("init end: "+getComponent().getComponentIdentifier());
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("init end ex: "+getComponent().getComponentIdentifier());
+//			}
+//		});
 		
 		return ret;
 	}
@@ -150,6 +148,47 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	 */
 	public INFPropertyProvider getComponentPropertyProvider()
 	{
+		if(compprovider==null)
+		{
+			this.compprovider = new NFPropertyProvider() 
+			{
+				public IInternalAccess getInternalAccess() 
+				{
+					return getComponent();
+				}
+				
+				public IFuture<INFPropertyProvider> getParent()
+				{
+					final Future<INFPropertyProvider> ret = new Future<INFPropertyProvider>();
+					final IComponentIdentifier pacid = getComponent().getComponentIdentifier().getParent();
+
+					if(parent!=null)
+					{
+						ret.setResult(parent);
+					}
+					else if(pacid!=null)
+					{
+						IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+						cms.getExternalAccess(pacid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyProvider>(ret) 
+						{
+							public void customResultAvailable(IExternalAccess exta) 
+							{
+								exta.scheduleStep(new IComponentStep<INFPropertyProvider>() 
+								{
+									public IFuture<INFPropertyProvider> execute(IInternalAccess ia) 
+									{
+										INFPropertyComponentFeature nff = ia.getComponentFeature(INFPropertyComponentFeature.class);
+										return new Future<INFPropertyProvider>(nff.getComponentPropertyProvider());
+									}
+								}).addResultListener(new DelegationResultListener<INFPropertyProvider>(ret)); 
+							}
+						});
+					}
+					return ret;
+				}
+			};
+		}
+		
 		return compprovider;
 	}
 	
@@ -252,9 +291,6 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(impltype==null)
-			System.out.println("sdgjkhsd");
-		
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		Class<?> superclazz = ser.getServiceIdentifier().getServiceType().getType(getComponent().getClassLoader());
 		while(superclazz != null && !Object.class.equals(superclazz))
@@ -347,6 +383,38 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get external feature facade.
+	 */
+	public <T> T getExternalFacade(Object context)
+	{
+		T ret = null;
+		if(context instanceof IService)
+		{
+//			IServiceIdentifier sid = (IServiceIdentifier)context;
+			ret = (T)getProvidedServicePropertyProvider(((IService)context).getServiceIdentifier());
+		}
+		else 
+		{
+			ret = (T)getComponentPropertyProvider();
+		}
+		
+		return ret;
+	}
+	
+//	/**
+//	 * 
+//	 */
+//	public <T> Class<T> getExternalFacadeType(Object context)
+//	{
+//		Class<T> ret = (Class<T>)INFPropertyComponentFeature.class;
+//		if(context instanceof IService)
+//		{
+//			ret = (Class<T>)INFMixedPropertyProvider.class;
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Counter listener that allows to set the max after usage.

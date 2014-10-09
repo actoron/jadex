@@ -8,8 +8,10 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -205,7 +207,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 					final IntermediateFuture<INFPropertyMetaInfo> ret = new IntermediateFuture<INFPropertyMetaInfo>();
 					if(fmi!=null)
 					{
-						INFMixedPropertyProvider pp = ia.getServiceContainer().getRequiredServicePropertyProvider(null);
+						INFMixedPropertyProvider pp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(null);
 						pp.getMethodNFPropertyMetaInfos(fmi).addResultListener(
 							new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 						{
@@ -225,7 +227,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 					}
 					else
 					{
-						INFMixedPropertyProvider pp = ia.getServiceContainer().getRequiredServicePropertyProvider(null);
+						INFMixedPropertyProvider pp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(null);
 						pp.getNFPropertyMetaInfos().addResultListener(
 							new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 						{
@@ -252,14 +254,14 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 		{
 			if(sid!=null)
 			{
-				IFuture<IService> fut = SServiceProvider.getService(ea.getServiceProvider(), sid);
+				IFuture<IService> fut = SServiceProvider.getService(ea, sid);
 				fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
 				{
 					public void resultAvailable(IService ser) 
 					{
 						if(mi!=null)
 						{
-							ser.getMethodNFPropertyMetaInfos(mi).addResultListener(
+							((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getMethodNFPropertyMetaInfos(mi).addResultListener(
 								new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 							{
 								public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
@@ -274,7 +276,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 						}
 						else
 						{
-							ser.getNFPropertyMetaInfos().addResultListener(
+							((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyMetaInfos().addResultListener(
 								new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 							{
 								public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
@@ -297,7 +299,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 			}
 			else if(ea!=null)
 			{
-				ea.getNFPropertyMetaInfos().addResultListener(
+				((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyMetaInfos().addResultListener(
 					new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 				{
 					public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
