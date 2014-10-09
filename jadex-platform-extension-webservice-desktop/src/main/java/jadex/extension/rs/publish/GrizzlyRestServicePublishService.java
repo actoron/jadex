@@ -226,7 +226,16 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
         
         if(htmlh==null)
         {
-        	htmlh	= new HtmlHandler();
+        	htmlh	= new HtmlHandler()
+    	    {
+    	    	public void service(Request request, Response response)
+    	    	{
+    	    		// Hack!!! required for investment planner
+    	    		// Todo: make accessible to outside
+    	    		response.addHeader("Access-Control-Allow-Origin", "*");
+    	    		super.service(request, response);
+    	    	}
+    	    };
     		sc.addHttpHandler(htmlh, uri.getPath());
         }
         
@@ -308,11 +317,14 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 						HttpServer server = getHttpServer(uri, null);
 				        ServerConfiguration sc = server.getServerConfiguration();
 						sc.addHttpHandler(new CLStaticHttpHandler(cl, path.endsWith("/")? path: path+"/")
-						{
-							public void service(Request request, Response resp) throws Exception
-							{
-								super.service(request, resp);
-							}
+					    {
+					    	public void service(Request request, Response response) throws Exception
+					    	{
+					    		// Hack!!! required for investment planner
+					    		// Todo: make accessible to outside
+					    		response.addHeader("Access-Control-Allow-Origin", "*");
+					    		super.service(request, response);
+					    	}
 						}, uri.getPath());
 						
 						System.out.println("Resource published at: "+uri.getPath());
@@ -332,7 +344,16 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	{		
 		HttpServer server = getHttpServer(uri, null);
 		
-	    StaticHttpHandler handler	= new StaticHttpHandler(rootpath);
+	    StaticHttpHandler handler	= new StaticHttpHandler(rootpath)
+	    {
+	    	public void service(Request request, Response response) throws Exception
+	    	{
+	    		// Hack!!! required for investment planner
+	    		// Todo: make accessible to outside
+	    		response.addHeader("Access-Control-Allow-Origin", "*");
+	    		super.service(request, response);
+	    	}
+	    };
 	    handler.setFileCacheEnabled(false);	// see http://stackoverflow.com/questions/13307489/grizzly-locks-static-served-resources
 		
         ServerConfiguration sc = server.getServerConfiguration();
