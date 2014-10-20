@@ -18,6 +18,7 @@
 		<module>jadex-xml</module>
 		<module>jadex-javaparser</module>
 		<module>jadex-bridge</module>
+		<module>jadex-kernel-bdiv3</module>
 		<module>jadex-kernel-bdi</module>
 		<module>jadex-kernel-micro</module>
 		<module>jadex-kernel-bpmn</module>
