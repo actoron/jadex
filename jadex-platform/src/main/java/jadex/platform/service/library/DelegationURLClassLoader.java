@@ -281,7 +281,9 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	protected Class<?>	loadClass(String name, boolean resolve)	throws ClassNotFoundException
 	{	
-//		System.out.println("loadClass: "+name);
+//		if(name.indexOf("Pojo")!=-1)
+//			System.out.println("loadClass: "+name);
+		
 		Class<?> ret = null;
 		
 		if(basecl!=null)

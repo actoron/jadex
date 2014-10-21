@@ -36,3 +36,10 @@ subprojects
         testCompile 'junit:junit:4.11'
     }
 }
+
+task docs(type: Javadoc) {
+    source subprojects.collect {project -> project.sourceSets.main.allJava } 
+    classpath = files(subprojects.collect {project -> project.sourceSets.main.compileClasspath}) 
+    destinationDir = new File(projectDir, 'build/docs')
+    options.links("http://docs.oracle.com/javase/7/docs/api/")
+}
