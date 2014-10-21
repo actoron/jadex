@@ -25,6 +25,9 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 	/** Flag indicating class names should not be written (can be temporarily disabled for one write). */
 	protected boolean ignorewriteclass;
 	
+	/** The bytes written to the output. */
+	protected long writtenbytes;
+	
 	public AbstractEncodingContext(Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
 	{
 		this.rootobject = rootobject;
@@ -59,6 +62,16 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 	public Object getRootObject()
 	{
 		return rootobject;
+	}
+	
+	/**
+	 *  Returns the number of bytes written.
+	 *  
+	 *  @return The number of bytes written.
+	 */
+	public long getWrittenBytes()
+	{
+		return writtenbytes;
 	}
 	
 	/**
