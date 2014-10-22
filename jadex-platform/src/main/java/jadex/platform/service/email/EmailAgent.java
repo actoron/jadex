@@ -176,12 +176,12 @@ public class EmailAgent implements IEmailService
 		
 		if(!account.isNoAuthentication())
 		{
-			props.put("mail.smtp.auth", "true");
-			props.setProperty("mail.smtps.auth", "true");
 			sess = Session.getInstance(props);
 		}
 		else
 		{
+			props.put("mail.smtp.auth", "true");
+			props.setProperty("mail.smtps.auth", "true");
 			sess = Session.getInstance(props, new Authenticator()
 			{
 				protected PasswordAuthentication getPasswordAuthentication()
