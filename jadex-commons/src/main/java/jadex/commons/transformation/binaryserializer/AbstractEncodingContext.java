@@ -30,6 +30,9 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 	/** The cache for non-inner classes. */
 	protected Set<Class> nonanonclasscache = new HashSet<Class>();
 	
+	/** The bytes written to the output. */
+	protected long writtenbytes;
+	
 	public AbstractEncodingContext(Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
 	{
 		this.rootobject = rootobject;
@@ -64,6 +67,16 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 	public Object getRootObject()
 	{
 		return rootobject;
+	}
+	
+	/**
+	 *  Returns the number of bytes written.
+	 *  
+	 *  @return The number of bytes written.
+	 */
+	public long getWrittenBytes()
+	{
+		return writtenbytes;
 	}
 	
 	/**
