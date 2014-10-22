@@ -26,6 +26,7 @@ allprojects
 subprojects 
 {
 	apply plugin: 'java'
+	apply plugin: 'maven-publish'
 	
 	sourceCompatibility = 1.6
 	sourceSets.main.resources.srcDirs	'src/main/java'
@@ -35,6 +36,17 @@ subprojects
     {
         testCompile 'junit:junit:4.11'
     }
+    
+    publishing 
+	{
+	    publications 
+	    {
+	        mavenJava(MavenPublication) 
+	        {
+	            from components.java
+	        }
+	    }
+	}
 }
 
 task docs(type: Javadoc) {
