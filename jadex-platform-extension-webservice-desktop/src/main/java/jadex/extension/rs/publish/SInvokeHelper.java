@@ -16,7 +16,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +32,7 @@ import org.glassfish.grizzly.http.multipart.MultipartEntry;
 import org.glassfish.grizzly.http.multipart.MultipartEntryHandler;
 import org.glassfish.grizzly.http.multipart.MultipartScanner;
 import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.util.Constants;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -339,7 +339,7 @@ public class SInvokeHelper
 							{
 								if(greq!=null)
 								{
-									if(greq.getContentType().startsWith("multipart/form-data;"))
+									if(greq.getContentType()!=null && greq.getContentType().startsWith("multipart/form-data"))
 									{
 										// Todo: why doesn't work out of the box any more!?
 										final Map<String, String>	map	= extractCallerValues(greq);//new LinkedHashMap<String, Object>();
@@ -424,6 +424,13 @@ public class SInvokeHelper
 										{
 											e.printStackTrace();
 										}
+										
+										// Hack!!! Assume urlencoded when text/plain (required e.g. for XDomainRequest in IE <10).
+										if(greq.getContentType()==null || greq.getContentType().startsWith("text/plain"))
+										{
+											greq.getRequest().setContentType(Constants.FORM_POST_CONTENT_TYPE);
+										}
+										
 										targetparams[0] = SInvokeHelper.convertMultiMap(greq.getParameterMap());
 										((Map<String, String>)targetparams[0]).putAll(extractCallerValues(greq));
 									}
