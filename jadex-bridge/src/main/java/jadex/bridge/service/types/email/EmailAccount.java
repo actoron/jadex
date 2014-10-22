@@ -37,6 +37,9 @@ public class EmailAccount
 	/** Flag if starttls should be used. */
 	protected boolean starttls;
 	
+	/** Flag if no authentication should be used. */
+	protected boolean noauth;
+	
 	//-------- receive info --------
 	
 	/** The imap address. */
@@ -73,7 +76,7 @@ public class EmailAccount
 	 */
 	public EmailAccount(String user, String password, String sender, 
 		String smtphost, Integer smtpport, boolean ssl, boolean starttls,
-		String receivehost, String receiveprotocol)
+		String receivehost, String receiveprotocol, boolean noauth)
 	{
 		this.smtphost = smtphost;
 		this.smtpport = smtpport;
@@ -84,6 +87,7 @@ public class EmailAccount
 		this.starttls = starttls;
 		this.receivehost = receivehost;
 		this.receiveprotocol = receiveprotocol;
+		this.noauth = noauth;
 	}
 
 	//-------- methods --------
@@ -249,6 +253,24 @@ public class EmailAccount
 	{
 		this.receiveprotocol = receiveprotocol;
 	}
+	
+	/**
+	 *  Get the noAuthentication.
+	 *  @return The noAuthentication
+	 */
+	public boolean isNoAuthentication()
+	{
+		return noauth;
+	}
+
+	/**
+	 *  Set the noAuthentication.
+	 *  @param noAuthentication The noAuthentication to set
+	 */
+	public void setNoAuthentication(boolean noauth)
+	{
+		this.noauth = noauth;
+	}
 
 	/**
 	 *  Store data to a property file.
@@ -268,6 +290,7 @@ public class EmailAccount
 			ps.setProperty("starttls", ""+isStartTls());
 			ps.setProperty("receivehost", getReceiveHost());
 			ps.setProperty("receiveprotocol", getReceiveProtocol());
+			ps.setProperty("noauth", ""+isNoAuthentication());
 			
 			OutputStream	os	= new FileOutputStream(new File(filename));
 			ps.store(os, null);
@@ -305,6 +328,8 @@ public class EmailAccount
 		    	setSsl(Boolean.parseBoolean(ps.getProperty("ssl")));
 		    if(ps.getProperty("starttls")!=null)
 		    	setStartTls(Boolean.parseBoolean(ps.getProperty("starttls")));
+		    if(ps.getProperty("noauth")!=null)
+		    	setNoAuthentication(Boolean.parseBoolean(ps.getProperty("noauth")));
 		    if(ps.getProperty("receivehost")!=null)
 		    	setReceiveHost(ps.getProperty("receivehost"));
 		    if(ps.getProperty("receiveprotocol")!=null)

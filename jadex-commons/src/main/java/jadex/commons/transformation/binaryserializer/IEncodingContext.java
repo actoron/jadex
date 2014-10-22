@@ -102,4 +102,11 @@ public interface IEncodingContext
 	 *  @param name The name of the class.
 	 */
 	public int writeClassname(String name);
+	
+	/**
+	 *  Returns the number of bytes written.
+	 *  
+	 *  @return The number of bytes written.
+	 */
+	public long getWrittenBytes();
 }

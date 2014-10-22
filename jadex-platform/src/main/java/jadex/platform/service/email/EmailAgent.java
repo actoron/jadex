@@ -156,8 +156,12 @@ public class EmailAgent implements IEmailService
 		Properties props = new Properties();
 		props.put("mail.smtp.host", account.getSmtpHost());
 		props.put("mail.from", email.getSender());
-		props.put("mail.smtp.auth", "true");
-		props.setProperty("mail.smtps.auth", "true");
+		
+		if(!account.isNoAuthentication())
+		{
+			props.put("mail.smtp.auth", "true");
+			props.setProperty("mail.smtps.auth", "true");
+		}
 		
 		props.put("mail.debug", "true");
 		

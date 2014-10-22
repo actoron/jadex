@@ -12,12 +12,15 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.io.Writer;
 import java.net.URI;
 import java.util.Arrays;
@@ -27,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
+import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
@@ -127,21 +131,46 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			{
 				System.out.println("Starting new server: "+uri.getPort());
 				
+				ErrorPageGenerator epg = null;
+				
 				String	keystore	= null;
 				String	keystorepass	= null;
 				if(info!=null)
 				{
 					for(UnparsedExpression upex: info.getProperties())
 					{
+//						System.out.println("found publish expression: "+upex.getName());
+						
 						if("sslkeystore".equals(upex.getName()))
 						{
-							keystore	= (String) SJavaParser.getParsedValue(upex, null,
+							keystore	= (String)SJavaParser.getParsedValue(upex, null,
 								component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
 						}
 						else if("sslkeystorepass".equals(upex.getName()))
 						{
-							keystorepass	= (String) SJavaParser.getParsedValue(upex, null,
+							keystorepass	= (String)SJavaParser.getParsedValue(upex, null,
 								component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
+						}
+						else if("errorpage".equals(upex.getName()))
+						{
+							String errpage = (String)SJavaParser.getParsedValue(upex, null,
+								component!=null? component.getFetcher(): null, component!=null? component.getClassLoader(): null);
+							
+							if(errpage!=null)
+							{
+								final String errp = SUtil.readFile(errpage);
+								
+//								System.out.println("errorpage path: "+errpage);
+//								System.out.println("errorpage: "+errp);
+								
+								epg = new ErrorPageGenerator()
+								{
+						             public String generate(Request request, int status, String reasonPhrase, String description, Throwable exception) 
+						             {
+						            	 return errp;
+						             }
+								};
+							}
 						}
 					}
 				}
@@ -159,10 +188,13 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 				}
 				else
 				{
-					server	= GrizzlyHttpServerFactory.createHttpServer(uri);
+					server	= GrizzlyHttpServerFactory.createHttpServer(uri, false);
 				}
 				
-				
+				if(epg!=null)
+				{
+					server.getServerConfiguration().setDefaultErrorPageGenerator(epg);
+				}
 				server.start();
 				
 				if(portservers==null)
@@ -233,6 +265,11 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
     	    		// Hack!!! required for investment planner
     	    		// Todo: make accessible to outside
     	    		response.addHeader("Access-Control-Allow-Origin", "*");
+    	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+    	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
+    	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+    	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+
     	    		super.service(request, response);
     	    	}
     	    };
@@ -322,7 +359,11 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 					    	{
 					    		// Hack!!! required for investment planner
 					    		// Todo: make accessible to outside
-					    		response.addHeader("Access-Control-Allow-Origin", "*");
+				   	    		response.addHeader("Access-Control-Allow-Origin", "*");
+			    	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+			    	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
+			    	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+			    	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
 					    		super.service(request, response);
 					    	}
 						}, uri.getPath());
@@ -350,7 +391,11 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	    	{
 	    		// Hack!!! required for investment planner
 	    		// Todo: make accessible to outside
-	    		response.addHeader("Access-Control-Allow-Origin", "*");
+   	    		response.addHeader("Access-Control-Allow-Origin", "*");
+	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
+	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
 	    		super.service(request, response);
 	    	}
 	    };
