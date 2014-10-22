@@ -265,6 +265,11 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
     	    		// Hack!!! required for investment planner
     	    		// Todo: make accessible to outside
     	    		response.addHeader("Access-Control-Allow-Origin", "*");
+    	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+    	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
+    	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+    	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+
     	    		super.service(request, response);
     	    	}
     	    };
@@ -354,7 +359,11 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 					    	{
 					    		// Hack!!! required for investment planner
 					    		// Todo: make accessible to outside
-					    		response.addHeader("Access-Control-Allow-Origin", "*");
+				   	    		response.addHeader("Access-Control-Allow-Origin", "*");
+			    	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+			    	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
+			    	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+			    	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
 					    		super.service(request, response);
 					    	}
 						}, uri.getPath());
@@ -382,7 +391,11 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	    	{
 	    		// Hack!!! required for investment planner
 	    		// Todo: make accessible to outside
-	    		response.addHeader("Access-Control-Allow-Origin", "*");
+   	    		response.addHeader("Access-Control-Allow-Origin", "*");
+	    		// http://stackoverflow.com/questions/3136140/cors-not-working-on-chrome
+	    		response.addHeader("Access-Control-Allow-Credentials", "true ");
+	    		response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+	    		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
 	    		super.service(request, response);
 	    	}
 	    };
