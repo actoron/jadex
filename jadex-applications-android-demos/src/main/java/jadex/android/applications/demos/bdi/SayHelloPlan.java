@@ -1,7 +1,6 @@
 package jadex.android.applications.demos.bdi;
 
 import jadex.bdi.runtime.Plan;
-import android.app.Activity;
 import android.widget.Toast;
 
 /**
@@ -17,8 +16,13 @@ public class SayHelloPlan extends Plan
 	{
 		final String	message = (String)getBeliefbase().getBelief("HelloMessage").getFact();
 		
-		
-		// TODO use AndroidContextService
+		BDIDemoActivity.INSTANCE.runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				Toast.makeText(BDIDemoActivity.INSTANCE, message, Toast.LENGTH_LONG).show();				
+			}
+		});
 		
 //		final Activity	act = (Activity)getBeliefbase().getBelief("androidContext").getFact();
 //		

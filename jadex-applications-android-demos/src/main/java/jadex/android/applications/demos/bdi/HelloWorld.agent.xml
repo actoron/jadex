@@ -13,6 +13,7 @@
 
 	<imports>
 		<import>jadex.bridge.service.types.cms.*</import>
+		<import>jadex.bridge.service.types.context.*</import>
 	</imports>
 <!--
  	<capabilities>
@@ -47,6 +48,9 @@
 			<implementation class="DisplayTextServiceImpl"/>
 		</providedservice>
 		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
+		<requiredservice name="context" class="IContextService">
 			<binding scope="platform"/>
 		</requiredservice>
 	</services>
