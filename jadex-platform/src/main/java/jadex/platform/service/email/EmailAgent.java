@@ -174,7 +174,7 @@ public class EmailAgent implements IEmailService
 		
 		Session sess;
 		
-		if(!account.isNoAuthentication())
+		if(account.isNoAuthentication())
 		{
 			sess = Session.getInstance(props);
 		}
