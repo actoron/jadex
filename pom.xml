@@ -621,7 +621,6 @@
 				<module>jadex-applications-android/jadex-applications-android-puzzle</module>
 				<module>docs/android/jadex-android-example-project-maven</module>
 				<module>docs/android/jadex-android-clientapp-example-maven</module>
-				<module>jadex-android-maven-plugin</module>
 			</modules>
 		</profile>
 		

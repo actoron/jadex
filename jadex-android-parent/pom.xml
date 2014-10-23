@@ -15,7 +15,7 @@
 	<properties>
 		<!-- <jadex-android-maven-plugin-version>1.1-SNAPSHOT</jadex-android-maven-plugin-version> -->
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
-		<android-maven-plugin-version>3.8.1</android-maven-plugin-version>
+		<android-maven-plugin-version>3.8.2</android-maven-plugin-version>
 		<android-api-version>2.2.1</android-api-version>
 		<android-support-version>r7</android-support-version>
 		<munge-default-excludes>**/.svn/,**/ui/,**/gui/</munge-default-excludes>
@@ -23,13 +23,26 @@
 		<munge-generated-sources-dir>src/gen/java</munge-generated-sources-dir>
 	</properties>
 	
-	<!-- 
 	<repositories>
 		<repository>
 			<id>jadex-android</id>
 			<url>http://jadex.julakali.org/nexus/content/groups/public/</url>
+			<snapshots>
+	        	<enabled>true</enabled>
+	      	</snapshots>
 		</repository>
 	</repositories>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jadex-android</id>
+			<name>jadex-android</name>
+			<url>http://jadex.julakali.org/nexus/content/groups/public/</url>
+			<snapshots>
+	        	<enabled>true</enabled>
+	      	</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 	
 	<distributionManagement>
 		<repository>
@@ -43,7 +56,7 @@
 			<url>http://jadex.julakali.org/nexus/content/repositories/jadex-public-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
-	-->
+	
 	
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
@@ -234,26 +247,6 @@
 									</pluginExecutionFilter>
 									<action>
 										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											com.jayway.maven.plugins.android.generation2
-										</groupId>
-										<artifactId>
-											android-maven-plugin
-										</artifactId>
-										<versionRange>
-											[3.8.1,)
-										</versionRange>
-										<goals>
-											<goal>generate-sources</goal>
-											<goal>proguard</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute></execute>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
