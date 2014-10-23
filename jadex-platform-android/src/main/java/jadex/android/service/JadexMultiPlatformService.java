@@ -17,6 +17,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.ITuple2ResultListener;
 import jadex.commons.future.TupleResult;
@@ -219,8 +220,12 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	{
 		return startComponent(platformId, name, modelPath, new CreationInfo());
 	}
+	
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath, final CreationInfo creationInfo) {
+		return startComponent(platformId, name, modelPath, creationInfo, null);
+	}
 
-	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath, final CreationInfo creationInfo)
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath, final CreationInfo creationInfo, final IResultListener<Map<String,Object>> terminationListener)
 	{
 		checkIfPlatformIsRunning(platformId, "startComponent()");
 		Map<String, Object> arguments = creationInfo.getArguments();
@@ -256,6 +261,9 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 					@Override
 					public void secondResultAvailable(Map<String, Object> result) {
 						// occurs when execution is terminated.
+						if (terminationListener != null) {
+							terminationListener.resultAvailable(result);
+						}
 					}
 
 					@Override
