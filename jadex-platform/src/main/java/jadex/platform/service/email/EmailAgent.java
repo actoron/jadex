@@ -174,7 +174,9 @@ public class EmailAgent implements IEmailService
 		
 		Session sess;
 		
-		if(!account.isNoAuthentication())
+//		System.out.println("account: auth? "+account.isNoAuthentication());
+
+		if(account.isNoAuthentication())
 		{
 			sess = Session.getInstance(props);
 		}
@@ -252,18 +254,19 @@ public class EmailAgent implements IEmailService
 			
 			if(account.isNoAuthentication())
 			{
+//				System.out.println("connect0: "+account.getSmtpHost()+" "+account.getSmtpPort()+" "+account.getUser()+" "+account.getPassword());
 				tr.connect();
 			}
 			else
 			{
 				if(account.getSmtpPort()!=null)
 				{
-	//				System.out.println("connect: "+account.getSmtpHost()+" "+account.getSmtpPort()+" "+account.getUser()+" "+account.getPassword());
+//					System.out.println("connect1: "+account.getSmtpHost()+" "+account.getSmtpPort()+" "+account.getUser()+" "+account.getPassword());
 					tr.connect(account.getSmtpHost(), account.getSmtpPort().intValue(), account.getUser(), account.getPassword());
 				}
 				else
 				{
-	//				System.out.println("connect: "+account.getSmtpHost()+" "+account.getUser()+" "+account.getPassword());
+//					System.out.println("connect2: "+account.getSmtpHost()+" "+account.getUser()+" "+account.getPassword());
 					tr.connect(account.getSmtpHost(), account.getUser(), account.getPassword());
 				}
 			}
