@@ -22,16 +22,16 @@ allprojects
     repositories
     {
         mavenCentral()
-        maven
-        {
-            name 'www1'
-            url 'http://www1.activecomponents.org/nexus/content/repositories/snapshots/'
-            credentials
-            {
-                username 'jadex'
-                  password '***REMOVED***'
-            }
-        }
+        //maven
+        //{
+        //    name 'www1'
+        //    url 'http://www1.activecomponents.org/nexus/content/repositories/snapshots/'
+        //    credentials
+        //    {
+        //        username 'deployment'
+        //        password 'laxlax'
+        //    }
+        //}
     }
 
     ext."signing.keyId" = 'B6C31C37'
@@ -43,7 +43,7 @@ subprojects
 {
     apply plugin: 'java'
     apply plugin: 'maven'
-    apply plugin: 'maven-publish'
+    //apply plugin: 'maven-publish'
     apply plugin: 'signing'
 
     sourceCompatibility = 1.6
@@ -60,16 +60,16 @@ subprojects
         sign configurations.archives
     }
 
-    publishing
-    {
-        publications
-        {
-            mavenJava(MavenPublication)
-            {
-                from components.java
-            }
-        }
-    }
+    //publishing
+    //{
+    //    publications
+    //    {
+    //        mavenJava(MavenPublication)
+    //        {
+    //            from components.java
+    //        }
+    //    }
+    //}
 
     //uploadArchives
     //{
@@ -83,8 +83,17 @@ subprojects
     {
         repositories.mavenDeployer
         {
+        	beforeDeployment
+        	{
+        		MavenDeployment deployment -> signing.signPom(deployment)
+        	}
+        	
             configuration = configurations.deployerJars
-            repository(url: "http://www2.activecomponents.org/nexus/content/repositories/snapshots/")
+            snapshotRepository(url: "http://www2.activecomponents.org/nexus/content/repositories/snapshots/")
+            {
+                authentication(userName: "deployment", password: "laxlax")
+            }
+            repository(url: "http://www2.activecomponents.org/nexus/content/repositories/releases/")
             {
                 authentication(userName: "deployment", password: "laxlax")
             }
