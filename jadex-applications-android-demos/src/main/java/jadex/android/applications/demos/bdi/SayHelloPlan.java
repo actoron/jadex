@@ -17,17 +17,20 @@ public class SayHelloPlan extends Plan
 	{
 		final String	message = (String)getBeliefbase().getBelief("HelloMessage").getFact();
 		
-		final Activity	act = (Activity)getBeliefbase().getBelief("androidContext").getFact();
 		
-		act.runOnUiThread(new Runnable()
-		{
-			
-			@Override
-			public void run()
-			{
-				Toast.makeText(act, message, Toast.LENGTH_LONG).show();
-			}
-		});
+		// TODO use AndroidContextService
+		
+//		final Activity	act = (Activity)getBeliefbase().getBelief("androidContext").getFact();
+//		
+//		act.runOnUiThread(new Runnable()
+//		{
+//			
+//			@Override
+//			public void run()
+//			{
+//				Toast.makeText(act, message, Toast.LENGTH_LONG).show();
+//			}
+//		});
 		
 	}
 	

@@ -46,6 +46,7 @@ public class QuestionActivity extends JadexAndroidActivity {
 				
 				// inform calling task, that we are finished with this activity and give back the control flow
 				ShowActivityWithResultTask.finish(i);
+				finish();
 			}
 		});
 	}

@@ -12,11 +12,16 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.platform.IJadexMultiPlatformBinder;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.ITuple2ResultListener;
+import jadex.commons.future.TupleResult;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -223,9 +228,6 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 			arguments = new HashMap<String, Object>();
 			creationInfo.setArguments(arguments);
 		}
-		if (!arguments.containsKey("androidContext")) {
-			arguments.put("androidContext", this);
-		}
 		
 		// Add RID to show jadex the class location
 		IResourceIdentifier rid = creationInfo.getResourceIdentifier();
@@ -242,8 +244,25 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(name, modelPath, creationInfo, null)
-					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+				ITuple2Future<IComponentIdentifier,Map<String,Object>> fut = cms.createComponent(name, modelPath, creationInfo);
+				
+				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>() {
+
+					@Override
+					public void firstResultAvailable(IComponentIdentifier result) {
+						ret.setResult(result);
+					}
+
+					@Override
+					public void secondResultAvailable(Map<String, Object> result) {
+						// occurs when execution is terminated.
+					}
+
+					@Override
+					public void exceptionOccurred(Exception exception) {
+						ret.setException(exception);
+					}
+				});
 			}
 		});
 
