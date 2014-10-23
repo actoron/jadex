@@ -202,7 +202,6 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 			{
 				HashMap<String, Object> args = new HashMap<String, Object>();
 
-				args.put("androidContext", PlatformProvidingClientAppFragment.this);
 				cms.createComponent(name, modelPath, new CreationInfo(args), null).addResultListener(
 						new DelegationResultListener<IComponentIdentifier>(ret));
 			}

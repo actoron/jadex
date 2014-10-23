@@ -11,23 +11,15 @@
     <jadex:modelname>SimpleWorkflow</jadex:modelname>
     <jadex:description>Simple Workflow Test</jadex:description>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
-    <jadex:arguments>
-      <jadex:argument name="androidContext" type="android.content.Context">
-        <jadex:description>The android application context</jadex:description>
-      </jadex:argument>
-    </jadex:arguments>
-    <jadex:results>
-      <jadex:result name="androidContext" type="android.content.Context">
-        <jadex:description>The android application context</jadex:description>
-      </jadex:result>
-    </jadex:results>
+    <jadex:requiredservices>
+      <jadex:requiredservice name="androidcontext" interface="jadex.bridge.service.types.context.IContextService" scope="platform" dynamic="false" create="false"/>
+    </jadex:requiredservices>
   </semantic:extension>
   <semantic:process name="Pool" id="_ryEFAU29EeGhL9ZmcZLCEw">
     <semantic:task name="How are you ?" id="_ryEsEU29EeGhL9ZmcZLCEw">
       <semantic:outgoing>_0tnqEFYpEeGXrobMFNo4qg</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.android.applications.demos.bpmn.tasks.ShowActivityWithResultTask</jadex:class>
-        <jadex:parameter direction="in" name="androidContext" type="android.content.Context">androidContext</jadex:parameter>
         <jadex:parameter direction="in" name="activityClass" type="java.lang.Class">jadex.android.applications.demos.bpmn.QuestionActivity.class</jadex:parameter>
         <jadex:parameter direction="inout" name="attributes" type="java.util.HashMap">jadex.commons.SUtil.createHashMap(new Object[] {&quot;question&quot;, &quot;choices&quot;}, new Object[] {&quot;How are you doing ?&quot;, new String[] {&quot;Fine&quot;, &quot;Worried&quot;}})</jadex:parameter>
       </semantic:extensionElements>
@@ -36,7 +28,6 @@
       <semantic:incoming>_84TR4VY8EeGyHKgzTbb6-g</semantic:incoming>
       <semantic:extensionElements>
         <jadex:class>jadex.android.applications.demos.bpmn.tasks.ShowActivityTask</jadex:class>
-        <jadex:parameter direction="in" name="androidContext" type="android.content.Context">androidContext</jadex:parameter>
         <jadex:parameter direction="in" name="activityClass" type="java.lang.Class">jadex.android.applications.demos.bpmn.AnswerActivity.class</jadex:parameter>
         <jadex:parameter direction="in" name="attributes" type="java.util.HashMap">jadex.commons.SUtil.createHashMap(new Object[] {&quot;answer&quot;}, new Object[] {&quot;Sorry to hear that.&quot;})</jadex:parameter>
       </semantic:extensionElements>
@@ -50,7 +41,6 @@
       <semantic:incoming>_8iuDcVY8EeGyHKgzTbb6-g</semantic:incoming>
       <semantic:extensionElements>
         <jadex:class>jadex.android.applications.demos.bpmn.tasks.ShowActivityTask</jadex:class>
-        <jadex:parameter direction="in" name="androidContext" type="android.content.Context">androidContext</jadex:parameter>
         <jadex:parameter direction="in" name="activityClass" type="java.lang.Class">jadex.android.applications.demos.bpmn.AnswerActivity.class</jadex:parameter>
         <jadex:parameter direction="in" name="attributes" type="java.util.HashMap">jadex.commons.SUtil.createHashMap(new Object[] {&quot;answer&quot;}, new Object[] {&quot;Glad to hear that.&quot;})</jadex:parameter>
       </semantic:extensionElements>

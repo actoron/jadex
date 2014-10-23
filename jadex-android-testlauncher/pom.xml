@@ -20,11 +20,11 @@
 	<dependencies>
 	
 		<!-- Hack? why doesn't maven include this by default? -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>junit</groupId> -->
+<!-- 			<artifactId>junit</artifactId> -->
+<!-- 			<version>4.11</version> -->
+<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>

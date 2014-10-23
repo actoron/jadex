@@ -6,8 +6,14 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.micro.annotation.RequiredService;
+import jadex.platform.service.context.ContextService;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -31,24 +37,17 @@ public class ShowActivityWithResultTask implements ITask, Serializable
 	
 	public IFuture<Void> execute(ITaskContext taskContext, IInternalAccess process)
 	{
+		// retrieve service that is set as required in workflow definition
+		IFuture<Object> requiredService = process.getServiceContainer().getRequiredService("androidcontext");
+		IContextService contextService = (IContextService) requiredService.get();
 		// get task attributes
-		android.content.Context androidContext = (android.content.Context)taskContext.getParameterValue("androidContext");
+//		android.content.Context androidContext = (android.content.Context)taskContext.getParameterValue("androidContext");
 		Class activityClass = (Class)taskContext.getParameterValue("activityClass");
 		attributes = (HashMap<String, Serializable>)taskContext.getParameterValue("attributes"); // it is expected, that the attribute map only contains serializable values to pass to the activity
 		
-		// create intent
-		Intent intent = new Intent(androidContext, activityClass);
-		
-		// put all attributes into this intent
-		Iterator<String> iter = attributes.keySet().iterator();
-		while(iter.hasNext())
-		{
-			String key = iter.next();
-			intent.putExtra(key, attributes.get(key));
-		}
-		
-		// start the activity
-		androidContext.startActivity(intent);
+		// send event to start new activity
+		StartActivityEvent event = new StartActivityEvent(activityClass, attributes);
+		contextService.dispatchEvent(event);
 
 		// Controlflow is given back to the process once 'setResult' is called on the returnFuture (see finish())
 		returnFuture = new Future();

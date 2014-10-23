@@ -137,9 +137,16 @@ public class SokratesService extends JadexPlatformService
 							{
 								result.setResult(null);
 							}
+							
+							@Override
+							public void exceptionOccurred(Exception exception) {
+								result.setResult(null);
+							}
 						});
 					}
 				});
+			} else {
+				result.setResult(null);
 			}
 			sokratesRunning = false;
 			return result;
@@ -180,7 +187,14 @@ public class SokratesService extends JadexPlatformService
 			args.put("delay", delay);
 			ci.setArguments(args);
 			IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
-					"jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci);
+					"jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci, new DefaultResultListener<Map<String,Object>>() {
+
+						@Override
+						public void resultAvailable(Map<String, Object> result) {
+							sokratesComponent = null;
+							sokratesRunning = false;
+						}
+					});
 
 			future.addResultListener(new DefaultResultListener<IComponentIdentifier>()
 			{

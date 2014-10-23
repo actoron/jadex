@@ -6,6 +6,8 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.context.IContextService;
+import jadex.commons.future.IFuture;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -21,27 +23,21 @@ import android.content.Intent;
 public class ShowActivityTask extends AbstractTask
 {
 
-	public void doExecute(ITaskContext taskContext, IInternalAccess instance) throws Exception
+	public void doExecute(ITaskContext taskContext, IInternalAccess process) throws Exception
 	{
 		System.out.println("ShowActivityTask: activityClass=" + ((Class)taskContext.getParameterValue("activityClass")).getName());
+		
+		// retrieve service that is set as required in workflow definition
+		IFuture<Object> requiredService = process.getServiceContainer().getRequiredService("androidcontext");
+		IContextService contextService = (IContextService) requiredService.get();
 		
 		// get task attributes
 		android.content.Context androidContext = (android.content.Context)taskContext.getParameterValue("androidContext");
 		Class activityClass = (Class)taskContext.getParameterValue("activityClass");
 		HashMap<String, Serializable> attributes = (HashMap<String, Serializable>)taskContext.getParameterValue("attributes"); // it is expected, that the attribute map only contains serializable values to pass to the activity
 		
-		// create intent
-		Intent i = new Intent(androidContext, activityClass);
-		
-		// put all attributes into this intent
-		Iterator<String> iter = attributes.keySet().iterator();
-		while(iter.hasNext())
-		{
-			String key = iter.next();
-			i.putExtra(key, attributes.get(key));
-		}
-		
-		// start the activity
-		androidContext.startActivity(i);
+		// send event to start new activity
+		StartActivityEvent event = new StartActivityEvent(activityClass, attributes);
+		contextService.dispatchEvent(event);
 	}
 }

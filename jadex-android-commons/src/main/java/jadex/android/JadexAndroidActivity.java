@@ -206,7 +206,6 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 			{
 				HashMap<String, Object> args = new HashMap<String, Object>();
 
-				args.put("androidContext", JadexAndroidActivity.this);
 				cms.createComponent(name, modelPath, new CreationInfo(args), null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 			}
 		});
