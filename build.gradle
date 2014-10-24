@@ -1,13 +1,19 @@
+if(file('gradle.properties').exists())
+{
+	apply from: "gradle.properties"
+}
+
+//if(gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload"))
+//{
+//	println("upload detected")
+//}
 
 allprojects
 {
+	apply plugin: 'java-library-distribution'
+	
     version = '2.5-SNAPSHOT'
     group = 'net.sourceforge.jadex'
-
-    //configurations
-    //{
-    //    all*.exclude group: "commons-logging", module: "commons-logging"
-    //}
 
     configurations
     {
@@ -33,10 +39,6 @@ allprojects
         //    }
         //}
     }
-
-    ext."signing.keyId" = 'B6C31C37'
-    ext."signing.secretKeyRingFile" = '../docs/keys/secring.gpg'
-    ext."signing.password" = 'lax'
 }
 
 subprojects
@@ -45,6 +47,7 @@ subprojects
     apply plugin: 'maven'
     //apply plugin: 'maven-publish'
     apply plugin: 'signing'
+    //apply plugin: 'java-library-distribution'
 
     sourceCompatibility = 1.6
     sourceSets.main.resources.srcDirs    'src/main/java'
@@ -54,22 +57,48 @@ subprojects
     {
         testCompile 'junit:junit:4.11'
     }
+    
+	task sourcesJar(type: Jar, dependsOn: classes) {
+    	classifier 'sources'
+    	from sourceSets.main.allSource
+	}
+	//sourcesJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload") }
 
-    signing
-    {
-        sign configurations.archives
-    }
+	task javadocJar(type: Jar) {
+		classifier = 'javadoc'
+		from javadoc.destinationDir
+	} 
+	javadocJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload") }
+ 
+	artifacts 
+	{
+    	archives sourcesJar
+    	archives javadocJar
+	}
 
-    //publishing
-    //{
+	signing
+	{
+		if(project.hasProperty("ext.signing.keyId"))
+		{
+	    	sign configurations.archives
+		}
+	}
+
+	// cannot sign with maven-publish :-( http://stackoverflow.com/questions/16560235/how-to-sign-maven-publications-with-gradle
+    // publishing
+    // {
     //    publications
     //    {
     //        mavenJava(MavenPublication)
     //        {
-    //            from components.java
-    //        }
-    //    }
-    //}
+    //			from components.java
+    //		
+    //			artifact sourceJar {
+    //            	classifier "sources"
+    //        	}
+    //		}
+    //	}
+   	//}
 
     //uploadArchives
     //{
@@ -89,6 +118,7 @@ subprojects
         	}
         	
             configuration = configurations.deployerJars
+            
             snapshotRepository(url: "http://www2.activecomponents.org/nexus/content/repositories/snapshots/")
             {
                 authentication(userName: "deployment", password: "laxlax")
@@ -101,9 +131,56 @@ subprojects
     }
 }
 
-task docs(type: Javadoc) {
+task docs(type: Javadoc, dependsOn:javadoc) {
     source subprojects.collect {project -> project.sourceSets.main.allJava }
     classpath = files(subprojects.collect {project -> project.sourceSets.main.compileClasspath})
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")
+}
+
+task srcZip(type: Zip) {
+	archiveName = 'sources.zip'
+    classifier = 'src'
+    //from(sourceSets.main.allSource){}
+    //from sourceSets*.allSource.srcDirs*.collect { relativePath(it) }.flatten()
+    
+    from('build.gradle'){into('sources')}
+    from('settings.gradle'){into('sources')}
+    
+    subprojects.each {subproject ->
+		from( subproject.projectDir.name ) {
+             include 'build.gradle'
+             into 'sources/'+subproject.projectDir.name
+        }
+
+		from(subproject.sourceSets.main.java) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
+		from(subproject.sourceSets.main.resources) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
+	} 
+	
+	from('jadex-kernel-extension-envsupport-opengl/lib/gluegen-rt.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+	from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+}   
+
+task buildDist(type: Zip, dependsOn: srcZip) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from(subprojects.configurations.runtime){ into('lib') }
+    from(subprojects.jar){ into('lib') }
+    from(sourceSets.main.allSource){ into('src') }
+    from('docs/junit-3.8.1.jar'){ into('lib') }
+    
+    from(srcZip.archivePath)
+    from('build/sources.zip'){}
+    from('docs/readme.txt'){}
+    from('docs/license.txt')
+    from('docs/api-changes.txt')
+    from('docs/jcc.settings.xml') 
+    from('docs/default.settings.xml')
+    from('docs/jadex.bat')
+    from('docs/jadex_no_awareness.bat') 
+    from('docs/jadex.sh')
+    from('docs/jadex_no_awareness.sh')
+    from('docs/bpmn_editor.bat')
+    from('docs/bpmn_editor.sh')
+    from('docs/howtostart.txt')
 }
