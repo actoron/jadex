@@ -167,23 +167,20 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 				{
 					File jarFile = artifact.getFile();
 					
-					// enhance the jar
+					if (jarFile.isDirectory()) {
+						// we are probably running inside eclipse M2E and got a project dependency
+						// so jarFile is the path to target/classes of the dependency
+						
+						// copy classes
+						FileUtils.copyDirectory(jarFile, depOutputDir);
+					} else {
+						// unzip the jar
+						unzipJar(jarFile, depOutputDir);
+					}
 					
-					unzipJar(jarFile, depOutputDir);
-
+					// ignore original jar
 					artifact.setFile(dummy);
 
-//					File enhanceJar;
-//					try
-//					{
-//						enhanceJar = enhanceJar(jarFile, outputDir);
-//						artifact.setFile(enhanceJar);
-//					}
-//					catch (IOException e)
-//					{
-//						getLog().error("Could not enhance jar: " + jarFile);
-//						e.printStackTrace();
-//					}
 				}
 				// add real deps to random artifact
 				relevantCompileArtifacts.iterator().next().setFile(allDepsFile);

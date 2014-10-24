@@ -18,17 +18,17 @@ public class BDIV3Test	extends	ComponentTestSuite
 	 *  Constructor called by Maven JUnit runner.
 	 */
 	public BDIV3Test()	throws Exception {
-		this("../jadex-applications-bdiv3/target/classes/", "../jadex-applications-bdiv3/target/classes" );
+		this("../jadex-applications-bdiv3/target/classes" );
 	}
 
 	/**
 	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
-	public BDIV3Test(String path, String root)	throws Exception
+	public BDIV3Test(String cpRoot)	throws Exception
 	{
 		// Use BDI classes directory as classpath root,
-		super(new File(path),
-			new File(root),
+		super(new File(SReflect.isAndroid() ? "jadex.bdiv3.testcases" : "../jadex-applications-bdiv3/target/classes/"),
+			new File(cpRoot),
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{

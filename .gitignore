@@ -1,3 +1,4 @@
+build
 target
 bin
 gen
@@ -18,5 +19,4 @@ jadex-platform-standalone-launch/highscore.dmp
 /micromem.properties
 /jadex-platform-android/tmp/cached-robolectric-classes.jar
 /jadex-platform-standalone-launch/.repoindices/Maven Central
-/build/
 /docs/keys/random_seed

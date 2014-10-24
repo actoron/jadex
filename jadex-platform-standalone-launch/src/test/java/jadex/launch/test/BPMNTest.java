@@ -1,6 +1,7 @@
 package jadex.launch.test;
 
 import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SReflect;
 
 import java.io.File;
 
@@ -17,15 +18,15 @@ public class BPMNTest	extends ComponentTestSuite
 	public BPMNTest()	throws Exception
 	{
 		// Use classes directory as classpath root,
-		this("../jadex-applications-bpmn/target/classes/", "../jadex-applications-bpmn/target/classes");
+		this("../jadex-applications-bpmn/target/classes");
 	}
 	
 	/**
 	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
-	public BPMNTest(String root, String path) throws Exception
+	public BPMNTest(String cpRoot) throws Exception
 	{
-		super(new File(root), new File(path),
+		super(new File(SReflect.isAndroid() ? "jadex.bpmn.testcases" : "../jadex-applications-bpmn/target/classes/"), new File(cpRoot),
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{

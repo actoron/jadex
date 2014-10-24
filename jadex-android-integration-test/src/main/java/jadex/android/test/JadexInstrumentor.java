@@ -1,6 +1,7 @@
 package jadex.android.test;
 
 import jadex.android.AndroidContextManager;
+import jadex.android.commons.Logger;
 import jadex.android.service.JadexPlatformManager;
 import jadex.base.test.impl.BrokenComponentTest;
 import jadex.bridge.ErrorReport;
@@ -26,20 +27,50 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 
 	private String	sourceDir;
 
+	private String testClassesArg;
+
+	private boolean logOnly;
+
+	private static final String ARGUMENT_TEST_CLASS = "class";
+    private static final String ARGUMENT_LOG_ONLY = "log";
+	
 	@Override
 	public void onCreate(Bundle arguments)
 	{
+		Log.i(LOG_TAG, "JadexInstrumentor created...");
 		Context targetContext = getTargetContext();
 		sourceDir = targetContext.getApplicationInfo().sourceDir;
 		jadexCl = this.getClass().getClassLoader();
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// Set Context:
 		AndroidContextManager.getInstance().setAndroidContext(targetContext);
 		// Set Classloader for app:
 		JadexPlatformManager.getInstance().setAppClassLoader(sourceDir, jadexCl);
 		
+		String testClassesArg = arguments.getString(ARGUMENT_TEST_CLASS);
+		if (testClassesArg != null) {
+			// super.onCreate would now try to instanciate a single TestCase, but without passing the needed arguments.
+			// so we handle this in getTestSuite instead and clear the argument here.
+			this.testClassesArg = testClassesArg;
+			arguments.remove(ARGUMENT_TEST_CLASS);
+		}
+		
+		logOnly = getBooleanArgument(arguments, ARGUMENT_LOG_ONLY);
+		
 		super.onCreate(arguments);
 	}
+	
+    private boolean getBooleanArgument(Bundle arguments, String tag) {
+        String tagString = arguments.getString(tag);
+        return tagString != null && Boolean.parseBoolean(tagString);
+    }
 	
 	@Override
 	public TestSuite getTestSuite()
@@ -49,26 +80,33 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		
 		try
 		{
-			Thread.sleep(10000);
+//			Thread.sleep(10000);
 			
 			// To execute a single test:
 //			Test singleTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases.stream.InitiatorAgent", sourceDir);
 //			suite.addTest(singleTest);
 			
 			// Make sure that also the dependencies are placed in pom.
-			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
-			Test bdiTest = createTest("jadex.launch.test.BDITest", "jadex.bdi.testcases", sourceDir);
-			Test bpmnTest = createTest("jadex.launch.test.BPMNTest", "jadex.bpmn.testcases", sourceDir);
-			Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", "jadex.bdibpmn.testcases", sourceDir);
-			Test gpmnTest = createTest("jadex.launch.test.GPMNTest", "jadex.gpmn.testcases", sourceDir);
-			Test bdiv3Test = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", sourceDir);
-
-			suite.addTest(microTest);
-			suite.addTest(bdiTest);
-			suite.addTest(bpmnTest);
-			suite.addTest(bdibpmnTest);
-			suite.addTest(gpmnTest);
-			suite.addTest(bdiv3Test);
+			Log.i(LOG_TAG, "JadexInstrumentor creating JUnit ComponentTest classes...");
+			
+			if (testClassesArg != null) {
+				Test requestedTest = createTest(testClassesArg, sourceDir);
+				suite.addTest(requestedTest);
+			} else {
+				Test microTest = createTest("jadex.launch.test.MicroTest", sourceDir);
+				Test bdiTest = createTest("jadex.launch.test.BDITest", sourceDir);
+				Test bpmnTest = createTest("jadex.launch.test.BPMNTest", sourceDir);
+				Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", sourceDir);
+				Test gpmnTest = createTest("jadex.launch.test.GPMNTest", sourceDir);
+				Test bdiv3Test = createTest("jadex.launch.test.BDIV3Test", sourceDir);
+	
+				suite.addTest(microTest);
+				suite.addTest(bdiTest);
+				suite.addTest(bpmnTest);
+				suite.addTest(bdibpmnTest);
+				suite.addTest(gpmnTest);
+				suite.addTest(bdiv3Test);
+			}
 			
 		}
 		catch (Exception e)
@@ -91,14 +129,14 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	}
 
 
-	private Test createTest(String testClassName, String testsPackage, String classRoot) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+	private Test createTest(String testClassName, String classRoot) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
 			InvocationTargetException
 	{
 		Class<?> test = jadexCl.loadClass(testClassName);
-		Constructor<?> constructor = test.getConstructor(String.class, String.class);
+		Constructor<?> constructor = test.getConstructor(String.class);
 		Object testCase = null;
 		try {
-			testCase = constructor.newInstance(testsPackage, classRoot);
+			testCase = constructor.newInstance(classRoot);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			ErrorReport errorReport = new ErrorReport();
@@ -120,7 +158,7 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	@Override
 	protected AndroidTestRunner getAndroidTestRunner()
 	{
-		AndroidTestRunner jadexTestRunner = new JadexTestRunner();
+		AndroidTestRunner jadexTestRunner = new JadexTestRunner(logOnly);
 		return jadexTestRunner;
 	}
 }

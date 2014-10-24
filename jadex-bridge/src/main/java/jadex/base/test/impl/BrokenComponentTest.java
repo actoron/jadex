@@ -4,7 +4,6 @@ package jadex.base.test.impl;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.IModelInfo;
 import junit.framework.TestCase;
-import junit.framework.TestResult;
 
 /**
  *  Test a component.
@@ -56,24 +55,19 @@ public class BrokenComponentTest extends	TestCase
 	/**
 	 *  Test the component.
 	 */
-	public void run(TestResult result)
+	public void runBare()
 	{
-		try
-		{
-			result.startTest(this);
-		}
-		catch(IllegalStateException e)
-		{
+//		try
+//		{
+//			result.startTest(this);
+//		}
+//		catch(IllegalStateException e)
+//		{
 			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
 			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
-		}
+//		}
 		
-		result.addError(this, new RuntimeException(error.getErrorText()));			
-
-		result.endTest(this);
-		
-		// Remove references to Jadex resources to aid GC cleanup.
-		error	= null;
+		throw new RuntimeException(error.getErrorText());			
 	}
 	
 	public String getName()
