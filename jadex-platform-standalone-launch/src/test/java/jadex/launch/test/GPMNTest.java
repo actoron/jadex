@@ -1,6 +1,7 @@
 package jadex.launch.test;
 
 import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SReflect;
 
 import java.io.File;
 
@@ -17,15 +18,15 @@ public class GPMNTest	extends ComponentTestSuite
 	public GPMNTest()	throws Exception
 	{
 		// Use classes directory as classpath root,
-		this("../jadex-applications-gpmn/target/classes/", "../jadex-applications-gpmn/target/classes");
+		this("../jadex-applications-gpmn/target/classes");
 	}
 	
 	/**
 	 *  Constructor called by JadexInstrumentor for Android tests.
 	 */
-	public GPMNTest(String root, String path) throws Exception
+	public GPMNTest(String cpRoot) throws Exception
 	{
-		super(new File(root), new File(path),
+		super(new File(SReflect.isAndroid() ? "jadex.gpmn.testcases" : "../jadex-applications-gpmn/target/classes/"), new File(cpRoot),
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{

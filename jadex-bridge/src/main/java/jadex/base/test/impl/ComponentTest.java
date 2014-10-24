@@ -69,7 +69,7 @@ public class ComponentTest extends TestCase
 	/**
 	 *  Test the component.
 	 */
-	public void run(TestResult result)
+	public void runBare()
 	{
 		
 		if(suite.isAborted())
@@ -77,64 +77,55 @@ public class ComponentTest extends TestCase
 			return;
 		}
 		
-		try
-		{
-			result.startTest(this);
-		}
-		catch(IllegalStateException e)
-		{
+//		try
+//		{
+//			result.startTest(this);
+//		}
+//		catch(IllegalStateException e)
+//		{
 			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
 			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
-		}
+//		}
 		
-		try
-		{
-			// Start the component.
+		// Start the component.
 //			Map	args	= new HashMap();
 //			args.put("timeout", new Long(3000000));
 //			CreationInfo	ci	= new CreationInfo(args);
-			ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
+		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
 
-			// Evaluate the results.
-			Map<String, Object>	res	= fut.getSecondResult();
-			Testcase	tc	= null;
-			for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )
-			{
-				Map.Entry<String, Object> tup = it.next();
-				if(tup.getKey().equals("testresults"))
-				{
-					tc = (Testcase)tup.getValue();
-					break;
-				}
-			}
-			
-			if(tc!=null && tc.getReports()!=null)
-			{
-				TestReport[]	reports	= tc.getReports();
-				if(tc.getTestCount()!=reports.length)
-				{
-					result.addFailure(this, new AssertionFailedError("Number of testcases do not match. Expected "+tc.getTestCount()+" but was "+reports.length+"."));			
-				}
-				for(int i=0; i<reports.length; i++)
-				{
-					if(!reports[i].isSucceeded())
-					{
-						result.addFailure(this, new AssertionFailedError(reports[i].getDescription()+" Failed with reason: "+reports[i].getReason()));
-					}
-				}
-			}
-			else
-			{
-				result.addFailure(this,  new AssertionFailedError("No test results provided by component: "+res));
-			}
-		}
-		catch(Exception e)
+		// Evaluate the results.
+		Map<String, Object>	res	= fut.getSecondResult();
+		Testcase	tc	= null;
+		for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )
 		{
-			result.addError(this, e);
+			Map.Entry<String, Object> tup = it.next();
+			if(tup.getKey().equals("testresults"))
+			{
+				tc = (Testcase)tup.getValue();
+				break;
+			}
 		}
-
-		result.endTest(this);
+		
+		if(tc!=null && tc.getReports()!=null)
+		{
+			TestReport[]	reports	= tc.getReports();
+			if(tc.getTestCount()!=reports.length)
+			{
+				throw new AssertionFailedError("Number of testcases do not match. Expected "+tc.getTestCount()+" but was "+reports.length+".");			
+			}
+			for(int i=0; i<reports.length; i++)
+			{
+				if(!reports[i].isSucceeded())
+				{
+					throw new AssertionFailedError(reports[i].getDescription()+" Failed with reason: "+reports[i].getReason());
+				}
+			}
+		}
+		else
+		{
+			throw new AssertionFailedError("No test results provided by component: "+res);
+		}
 
 		// Remove references to Jadex resources to aid GC cleanup.
 		cms	= null;

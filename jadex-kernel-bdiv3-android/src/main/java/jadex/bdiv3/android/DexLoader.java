@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
-import com.android.dx.dex.DexFormat;
+//import com.android.dx.dex.DexFormat;
 
 public class DexLoader
 {
@@ -31,7 +31,7 @@ public class DexLoader
         File result = File.createTempFile("Generated", ".jar", dexCache);
         result.deleteOnExit();
         JarOutputStream jarOut = new JarOutputStream(new FileOutputStream(result));
-        jarOut.putNextEntry(new JarEntry(DexFormat.DEX_IN_JAR_NAME));
+//        jarOut.putNextEntry(new JarEntry(DexFormat.DEX_IN_JAR_NAME));
         jarOut.write(dex);
         jarOut.closeEntry();
         jarOut.close();

@@ -6,6 +6,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SReflect;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -62,8 +63,13 @@ public class ShutdownAgent
 						{
 							public void customResultAvailable(IBlockService bs)
 							{
-								for(int i=0; i<1000; i++)
+								int numBlocks = 1000;
+								if (SReflect.isAndroid()) {
+									numBlocks = 100;
+								}
+								for(int i=0; i<numBlocks; i++) {
 									bs.block(-1);
+								}
 								
 								agent.waitForDelay(1000).addResultListener(new DelegationResultListener<Void>(ret)
 								{

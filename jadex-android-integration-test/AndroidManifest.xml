@@ -13,9 +13,6 @@
         android:name="jadex.android.test.JadexInstrumentor"
         android:targetPackage="jadex.android.testlauncher"
          />
-    <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="jadex.android.testlauncher" />
 
     <application>
         <uses-library android:name="android.test.runner" />

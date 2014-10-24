@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -154,7 +155,7 @@ public class ComponentTestSuite extends TestSuite
 		}
 		
 		// Scan for test cases.
-		System.out.println("Scanning for testcases: "+path);
+		Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + path);
 		List<String> scanForTestCases = scanForTestCases(root, path);
 		for (String abspath : scanForTestCases)
 		{	

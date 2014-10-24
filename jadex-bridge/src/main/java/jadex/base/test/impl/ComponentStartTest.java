@@ -75,94 +75,87 @@ public class ComponentStartTest extends	TestCase
 		return 1;
 	}
 	
+	
+	
 	/**
 	 *  Test the component.
 	 */
-	public void run(TestResult result)
+	public void runBare()
 	{
 		if(suite.isAborted())
 		{
 			return;
 		}
 		
-		try
-		{
-			result.startTest(this);
-		}
-		catch(IllegalStateException e)
-		{
+//		try
+//		{
+//			result.startTest(this);
+//		}
+//		catch(IllegalStateException e)
+//		{
 			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
 			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
-		}
+//		}
 		
 		// Start the component.
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+//			System.out.println("starting: "+comp.getFilename());
+		Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
+		final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
+			new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
 		try
 		{
-//			System.out.println("starting: "+comp.getFilename());
-			Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
-			final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
-				new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
-			try
-			{
 //				if(comp.getFilename().indexOf("Heatbugs")!=-1)
 //				{
 //					System.out.println("killing: "+comp.getFilename());
 //					SyncExecutionService.DEBUG	= true;
 //				}
-				
-				// Wait some time (simulation and real time) and kill the component afterwards.
-				final IResultListener<Void>	lis	= new CounterResultListener<Void>(2, new DefaultResultListener<Void>()
-				{
-					public synchronized void resultAvailable(Void result)
-					{
-						IComponentManagementService	mycms	= cms;
-						if(mycms!=null)
-						{
-							mycms.destroyComponent(cid);
-						}
-					}
-				});
-				IExternalAccess	ea	= cms.getExternalAccess(cid.getRoot()).get();
-				ea.scheduleStep(new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						return ia.waitForDelay(500, false);
-					}
-				}).addResultListener(lis);
-				ea.scheduleStep(new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						return ia.waitForDelay(500, true);
-					}
-				}).addResultListener(lis);
-				
-				finished.get(BasicService.getLocalDefaultTimeout());
-//				System.out.println("killed: "+comp.getFilename());
-			}
-			catch(ComponentTerminatedException cte)
-			{				
-				// Ignore if component already terminated.
-			}
-			catch(RuntimeException e)
+			
+			// Wait some time (simulation and real time) and kill the component afterwards.
+			final IResultListener<Void>	lis	= new CounterResultListener<Void>(2, new DefaultResultListener<Void>()
 			{
-				// Ignore if component already terminated.
-				if(!(e.getCause() instanceof ComponentTerminatedException))
+				public synchronized void resultAvailable(Void result)
 				{
-					throw e;
+					IComponentManagementService	mycms	= cms;
+					if(mycms!=null)
+					{
+						mycms.destroyComponent(cid);
+					}
 				}
-			}
+			});
+			IExternalAccess	ea	= cms.getExternalAccess(cid.getRoot()).get();
+			ea.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					return ia.waitForDelay(500, false);
+				}
+			}).addResultListener(lis);
+			ea.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					return ia.waitForDelay(500, true);
+				}
+			}).addResultListener(lis);
+			
+			finished.get(BasicService.getLocalDefaultTimeout());
+//				System.out.println("killed: "+comp.getFilename());
 		}
-		catch(Exception e)
+		catch(ComponentTerminatedException cte)
+		{				
+			// Ignore if component already terminated.
+		}
+		catch(RuntimeException e)
 		{
-			result.addError(this, e);
+			// Ignore if component already terminated.
+			if(!(e.getCause() instanceof ComponentTerminatedException))
+			{
+				throw e;
+			}
 		}
 		ISuspendable.SUSPENDABLE.set(null);
 		
-		result.endTest(this);
-
 		// Remove references to Jadex resources to aid GC cleanup.
 		cms	= null;
 		suite	= null;
