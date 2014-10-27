@@ -23,6 +23,8 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	 * Note that getActivity() will return null during this method, use the given parameter
 	 * instead.
 	 * 
+	 * If you need an options menu, be sure to call setHasOptionsMenu in onCreate!
+	 * 
 	 * @param mainActivity
 	 */
 	public void onPrepare(Activity mainActivity)
