@@ -11,7 +11,11 @@ public class JadexTestRunner extends AndroidTestRunner
 
 	public JadexTestRunner(boolean logOnly) {
 		this.logOnly = logOnly;
-		Logger.i("logOnly is set, not executing any test in this run.");
+		if (logOnly) {
+			Logger.i("logOnly is set, not executing any test in this run.");
+		} else {
+			Logger.i("logOnly is not set, executing tests...");
+		}
 	}
 
 	@Override
