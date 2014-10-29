@@ -1,0 +1,6 @@
+dependencies 
+{
+    compile project(':jadex-platform-android')
+    compile project(':jadex-android-commons')
+    compile project(':jadex-tools-base')
+}
