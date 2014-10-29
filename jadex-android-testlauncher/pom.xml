@@ -32,17 +32,17 @@
 		</dependency>
 		
 		
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-applications-gpmn</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 					<artifactId>jadex-kernel-gpmn</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-gpmn</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-gpmn</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -64,29 +64,29 @@
 			</exclusions>
 		</dependency>
 		
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-applications-bdi</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>com.toedter</groupId> -->
-<!-- 					<artifactId>jcalendar</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 					<artifactId>jadex-tools-base-swing</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 					<artifactId>jadex-kernel-extension-envsupport</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 					<artifactId>jadex-kernel-bdi</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-bdi</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.toedter</groupId>
+					<artifactId>jcalendar</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-base-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-bdi</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		
 		
 		<dependency>

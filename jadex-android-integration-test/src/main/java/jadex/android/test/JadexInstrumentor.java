@@ -58,7 +58,9 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			maxHeapKilos = Runtime.getRuntime().maxMemory() / 1024;
 			if (maxHeapKilos < 32768) {
 				Log.e(LOG_TAG, "Couldn't increase Heap size."
-						+ "Test execution will likely fail with a max heapsize of less than 32MB!");
+						+ "Test execution will likely fail with a max heapsize of less than 32MB!"
+						+ "\nNote: It seems to be impossible to increase heapsize on x86 images.");
+				
 			}
 		}
 		
@@ -111,17 +113,17 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 				suite.addTest(requestedTest);
 			} else {
 				Test microTest = createTest("jadex.launch.test.MicroTest", sourceDir);
-				Test bdiTest = createTest("jadex.launch.test.BDITest", sourceDir);
-				Test bpmnTest = createTest("jadex.launch.test.BPMNTest", sourceDir);
-				Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", sourceDir);
-				Test gpmnTest = createTest("jadex.launch.test.GPMNTest", sourceDir);
+//				Test bdiTest = createTest("jadex.launch.test.BDITest", sourceDir);
+//				Test bpmnTest = createTest("jadex.launch.test.BPMNTest", sourceDir);
+//				Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", sourceDir);
+//				Test gpmnTest = createTest("jadex.launch.test.GPMNTest", sourceDir);
 				Test bdiv3Test = createTest("jadex.launch.test.BDIV3Test", sourceDir);
 	
 				suite.addTest(microTest);
-				suite.addTest(bdiTest);
-				suite.addTest(bpmnTest);
-				suite.addTest(bdibpmnTest);
-				suite.addTest(gpmnTest);
+//				suite.addTest(bdiTest);
+//				suite.addTest(bpmnTest);
+//				suite.addTest(bdibpmnTest);
+//				suite.addTest(gpmnTest);
 				suite.addTest(bdiv3Test);
 			}
 			
@@ -149,8 +151,6 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	private Test createTest(String testClassName, String classRoot) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
 			InvocationTargetException
 	{
-//		PathClassLoader newCl = new PathClassLoader("./", jadexCl);
-//		Class<?> test = newCl.loadClass(testClassName);
 		Class<?> test= jadexCl.loadClass(testClassName);
 		Constructor<?> constructor = test.getConstructor(String.class);
 		Object testCase = null;
@@ -180,4 +180,7 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		AndroidTestRunner jadexTestRunner = new JadexTestRunner(logOnly);
 		return jadexTestRunner;
 	}
+	
+	
+	
 }
