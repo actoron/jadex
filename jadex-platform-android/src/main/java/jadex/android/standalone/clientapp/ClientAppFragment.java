@@ -13,7 +13,7 @@ public class ClientAppFragment extends ActivityAdapterFragment
 {
 	private UniversalClientServiceBinder universalService;
 	
-	/** ApplicationInfo, set on instanciating this Fragment */
+	/** ApplicationInfo, set on instantiating this Fragment */
 	private ApplicationInfo appInfo;
 
 	/**
@@ -49,31 +49,14 @@ public class ClientAppFragment extends ActivityAdapterFragment
 		else 
 		{
 			String clientServiceName = originalComponent.getClassName();
-			if (clientServiceName.equals("jadex.android.service.JadexPlatformService"))
+			if (universalService.isClientServiceConnection(conn))
 			{
-				result = super.bindService(service, conn, flags);
+				// TODO: check for valid clientServiceName
+				throw new JadexAndroidError("already bound: " + clientServiceName);
 			}
 			else
 			{
-				// individual user service requested
-				if (universalService.isClientServiceConnection(conn))
-				{
-					// TODO: check for valid clientServiceName
-					throw new JadexAndroidError("already bound: " + clientServiceName);
-				}
-				else
-				{
-//					final Handler handler = new Handler();
-//					handler.post(new Runnable()
-//					{
-//						@Override
-//						public void run()
-//						{
-							result = universalService.bindClientService(service, conn, flags, appInfo);	
-//						}
-//					});
-				}
-//				result = true;
+				result = universalService.bindClientService(service, conn, flags, appInfo);	
 			}
 		}
 		return result;
@@ -84,7 +67,6 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	{
 		if (universalService.isClientServiceConnection(conn))
 		{
-//			boolean unbindClientService =
 			universalService.unbindClientService(conn);
 		}
 		else
@@ -98,18 +80,11 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	{
 		ComponentName originalComponent = service.getComponent();
 		if (originalComponent == null) {
+			// external service, pass-through intent
 			super.startService(service);
 		} else {
-			String clientServiceName = originalComponent.getClassName();
-			if (clientServiceName.equals("jadex.android.service.JadexPlatformService"))
-			{
-				super.startService(service);
-			}
-			else
-			{
-				// individual user service requested
-				universalService.startClientService(service, appInfo);
-			}
+			// individual user service requested
+			universalService.startClientService(service, appInfo);
 		}
 	}
 

@@ -56,7 +56,7 @@ public class SokratesLoaderActivity extends ClientAppFragment implements Service
 		View view = getView();
 		statusTextView = (TextView) view.findViewById(R.id.statusTextView);
 		
-		final Intent i = new Intent(getContext(), SokratesActivity.class);
+		final Intent i = new Intent(getContext(), SokratesFragment.class);
 		
 		startBDIButton = (Button) view.findViewById(R.id.startBDI);
 		startBDIButton.setOnClickListener(new OnClickListener()
@@ -65,7 +65,7 @@ public class SokratesLoaderActivity extends ClientAppFragment implements Service
 			@Override
 			public void onClick(View v)
 			{
-				i.putExtra("mode", SokratesActivity.BDI);
+				i.putExtra("mode", SokratesFragment.BDI);
 				startActivity(i);
  			}
 		});
@@ -77,7 +77,7 @@ public class SokratesLoaderActivity extends ClientAppFragment implements Service
 			@Override
 			public void onClick(View v)
 			{
-				i.putExtra("mode", SokratesActivity.BDIV3);
+				i.putExtra("mode", SokratesFragment.BDIV3);
 				startActivity(i);
  			}
 		});
@@ -89,7 +89,7 @@ public class SokratesLoaderActivity extends ClientAppFragment implements Service
 			@Override
 			public void onClick(View v)
 			{
-				i.putExtra("mode", SokratesActivity.BDIBenchmark);
+				i.putExtra("mode", SokratesFragment.BDIBenchmark);
 				startActivity(i);
  			}
 		});
@@ -101,7 +101,7 @@ public class SokratesLoaderActivity extends ClientAppFragment implements Service
 			@Override
 			public void onClick(View v)
 			{
-				i.putExtra("mode", SokratesActivity.BDIV3Benchmark);
+				i.putExtra("mode", SokratesFragment.BDIV3Benchmark);
 				startActivity(i);
  			}
 		});
