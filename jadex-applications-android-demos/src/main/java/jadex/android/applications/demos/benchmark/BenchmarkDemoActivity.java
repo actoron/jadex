@@ -1,8 +1,8 @@
 package jadex.android.applications.demos.benchmark;
 
-import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
 import jadex.android.commons.JadexPlatformOptions;
+import jadex.android.standalone.clientapp.PlatformProvidingClientAppFragment;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -29,11 +29,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -43,7 +45,7 @@ import android.widget.TextView;
  *  Starts the platform and allows launching the different benchmarks.
  */
 @Reference
-public class BenchmarkDemoActivity extends JadexAndroidActivity
+public class BenchmarkDemoActivity extends PlatformProvidingClientAppFragment
 {
 	//-------- attributes --------
 	
@@ -69,16 +71,28 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.benchmark_demo);
+		setHasOptionsMenu(true);
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.benchmark_demo, container, false);
 
-		textView = (TextView) findViewById(R.id.benchmark_logTextView);
-		final ScrollView scrollView = (ScrollView) findViewById(R.id.benchmark_logScrollView);
+		textView = (TextView) view.findViewById(R.id.benchmark_logTextView);
+		scrollView = (ScrollView) view.findViewById(R.id.benchmark_logScrollView);
 		
-		chooseButton = (Button) findViewById(R.id.benchmark_openMenuButton);
+		chooseButton = (Button) view.findViewById(R.id.benchmark_openMenuButton);
 		chooseButton.setOnClickListener(chooseButtonClickListener);
 		chooseButton.setEnabled(false);
 		
-		SUtil.addSystemOutListener(new IChangeListener<String>()
+		return view;
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		listener = new IChangeListener<String>()
 		{
 			public void changeOccurred(final ChangeEvent<String> event)
 			{
@@ -91,7 +105,17 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 					}
 				});
 			}
-		});
+		};
+		SUtil.addSystemOutListener(listener);
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		if (listener != null) {
+			SUtil.removeSystemOutListener(listener);
+			listener = null;
+		}
 	}
 	
 	private OnClickListener chooseButtonClickListener = new OnClickListener()
@@ -99,18 +123,18 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 		@Override
 		public void onClick(View v)
 		{
-			openOptionsMenu();
+			getActivity().openOptionsMenu();
 		}
 	};
+	private IChangeListener<String> listener;
+	private ScrollView scrollView;
 
 	/**
 	 *  Called when the menu is shown.
 	 */
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.benchmark_menu, menu);
-	    return true;
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.benchmark_menu, menu);
 	}
 	
 	/**
