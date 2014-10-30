@@ -38,13 +38,15 @@ public class MicroCreationTest //extends TestCase
 	@Test
 	public void	testMicroCreation() throws Exception
 	{
+		System.out.println("cur dir is: "+new File(".").getAbsolutePath());
+		
 		long timeout	= BasicService.getLocalDefaultTimeout();
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
 //			"-logging_level", "java.util.logging.Level.INFO",
 			//"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
-			"-libpath", "new String[]{\""+new File("jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
+			"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 //			"-componentfactory", "jadex.component.ComponentComponentFactory",
