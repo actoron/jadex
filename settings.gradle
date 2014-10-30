@@ -1,6 +1,7 @@
 include 'jadex-applications-bdi', 
 'jadex-applications-bdiv3',
 'jadex-applications-bdibpmn',
+'jadex-applications-bpmn',
 'jadex-applications-gpmn',
 'jadex-applications-micro',
 'jadex-applications-mixed',

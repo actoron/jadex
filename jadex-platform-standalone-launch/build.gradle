@@ -32,6 +32,11 @@ dependencies
 	compile project(':jadex-kernel-extension-agr')
 	compile project(':jadex-kernel-extension-envsupport')
 	compile project(':jadex-kernel-extension-envsupport-opengl')
+
+	// Tests
+	testCompile project(':jadex-applications-micro')
+	testCompile project(':jadex-applications-bdiv3')
+	testCompile project(':jadex-applications-bpmn')
 }
 
 jar 
