@@ -9,6 +9,8 @@ import jadex.bridge.ErrorReport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import dalvik.system.PathClassLoader;
+import dalvik.system.VMRuntime;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import android.content.Context;
@@ -38,16 +40,33 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	public void onCreate(Bundle arguments)
 	{
 		Log.i(LOG_TAG, "JadexInstrumentor created...");
-		Context targetContext = getTargetContext();
-		sourceDir = targetContext.getApplicationInfo().sourceDir;
+		
 		jadexCl = this.getClass().getClassLoader();
 		
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+//		try {
+//			Thread.sleep(10000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		long maxHeapKilos = Runtime.getRuntime().maxMemory() / 1024;
+		Log.i(LOG_TAG, "Got " + maxHeapKilos + "kB max allowed heap size.");
+		if (maxHeapKilos < 32768) {
+			Log.i(LOG_TAG, "Max Heap size smaller than 32MB. Trying to increase minimum heapsize...");
+			VMRuntime.getRuntime().setMinimumHeapSize(32*1024*1024);
+			maxHeapKilos = Runtime.getRuntime().maxMemory() / 1024;
+			if (maxHeapKilos < 32768) {
+				Log.e(LOG_TAG, "Couldn't increase Heap size."
+						+ "Test execution will likely fail with a max heapsize of less than 32MB!"
+						+ "\nNote: It seems to be impossible to increase heapsize on x86 images.");
+				
+			}
 		}
+		
+		Context targetContext = getTargetContext();
+		sourceDir = targetContext.getApplicationInfo().sourceDir;
+
 		
 		// Set Context:
 		AndroidContextManager.getInstance().setAndroidContext(targetContext);
@@ -94,17 +113,17 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 				suite.addTest(requestedTest);
 			} else {
 				Test microTest = createTest("jadex.launch.test.MicroTest", sourceDir);
-				Test bdiTest = createTest("jadex.launch.test.BDITest", sourceDir);
-				Test bpmnTest = createTest("jadex.launch.test.BPMNTest", sourceDir);
-				Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", sourceDir);
-				Test gpmnTest = createTest("jadex.launch.test.GPMNTest", sourceDir);
+//				Test bdiTest = createTest("jadex.launch.test.BDITest", sourceDir);
+//				Test bpmnTest = createTest("jadex.launch.test.BPMNTest", sourceDir);
+//				Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", sourceDir);
+//				Test gpmnTest = createTest("jadex.launch.test.GPMNTest", sourceDir);
 				Test bdiv3Test = createTest("jadex.launch.test.BDIV3Test", sourceDir);
 	
 				suite.addTest(microTest);
-				suite.addTest(bdiTest);
-				suite.addTest(bpmnTest);
-				suite.addTest(bdibpmnTest);
-				suite.addTest(gpmnTest);
+//				suite.addTest(bdiTest);
+//				suite.addTest(bpmnTest);
+//				suite.addTest(bdibpmnTest);
+//				suite.addTest(gpmnTest);
 				suite.addTest(bdiv3Test);
 			}
 			
@@ -132,7 +151,7 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	private Test createTest(String testClassName, String classRoot) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
 			InvocationTargetException
 	{
-		Class<?> test = jadexCl.loadClass(testClassName);
+		Class<?> test= jadexCl.loadClass(testClassName);
 		Constructor<?> constructor = test.getConstructor(String.class);
 		Object testCase = null;
 		try {
@@ -161,4 +180,7 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		AndroidTestRunner jadexTestRunner = new JadexTestRunner(logOnly);
 		return jadexTestRunner;
 	}
+	
+	
+	
 }

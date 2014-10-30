@@ -7,6 +7,7 @@ import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -36,6 +37,8 @@ import android.util.Log;
 /**
  * Android Service to start/stop Jadex Platforms. Platforms are terminated on
  * destroy.
+ * 
+ * Every ClientApp has access to it's own instance of this Service.
  */
 public class JadexMultiPlatformService extends Service implements IJadexMultiPlatformBinder, JadexPlatformOptions
 {
@@ -275,6 +278,11 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		});
 
 		return ret;
+	}
+	
+	@Override
+	public IResourceIdentifier getResourceIdentifier() {
+		return jadexPlatformManager.getRID(appInfo.sourceDir);
 	}
 	
 	

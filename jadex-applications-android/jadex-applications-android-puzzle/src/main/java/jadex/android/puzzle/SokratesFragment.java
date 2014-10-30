@@ -18,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SokratesActivity extends ClientAppFragment implements ServiceConnection
+public class SokratesFragment extends ClientAppFragment implements ServiceConnection
 {
 	protected static final String BDI = "BDI";
 	protected static final String BDIBenchmark = "BDIBenchmark";
@@ -42,7 +42,6 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View view = inflater.inflate(R.layout.sokrates, container, false);
-
 		return view;
 	}
 	

@@ -4,6 +4,8 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -211,4 +213,14 @@ public interface IJadexMultiPlatformBinder
 	 * @return ComponentIdentifier of the created agent.
 	 */
 	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final Class<?> clazz);
+	
+	/**
+	 * Returns the ResourceIdentifier of the /ClientApp/ classes.
+	 * As one JadexService exists per ClientApp, this will never change.
+	 * Use this RID to launch new components that are defined within the ClientApp.
+	 *  
+	 * @return
+	 */
+	public IResourceIdentifier getResourceIdentifier();
+	
 }

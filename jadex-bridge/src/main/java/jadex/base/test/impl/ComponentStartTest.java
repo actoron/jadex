@@ -25,9 +25,10 @@ import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
-import junit.framework.TestResult;
 
 /**
  *  Test if a component can be started.
@@ -52,6 +53,10 @@ public class ComponentStartTest extends	TestCase
 	protected ComponentTestSuite	suite;
 	
 	//-------- constructors --------
+	
+	public ComponentStartTest() {
+		Logger.getLogger("ComponentStartTest").log(Level.SEVERE, "ComponentSTartTest empty constructor called");
+	}
 	
 	/**
 	 *  Create a component test.
@@ -87,15 +92,6 @@ public class ComponentStartTest extends	TestCase
 			return;
 		}
 		
-//		try
-//		{
-//			result.startTest(this);
-//		}
-//		catch(IllegalStateException e)
-//		{
-			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
-			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
-//		}
 		
 		// Start the component.
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());

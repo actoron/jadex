@@ -4,6 +4,7 @@ import jadex.android.IEventReceiver;
 import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -93,7 +94,7 @@ public interface IJadexPlatformBinder extends IJadexMultiPlatformBinder
 	 */
 	public void shutdownJadexPlatform();
 
-	// ---------- agent creation ----------
+	// ---------- component creation ----------
 
 	/**
 	 * Start a new micro agent on a given platform.
@@ -106,7 +107,7 @@ public interface IJadexPlatformBinder extends IJadexMultiPlatformBinder
 	 *            class of the agent to instantiate
 	 * @return ComponentIdentifier of the created agent.
 	 * 
-	 * @deprecated Use startComponent() instead for all agent types.
+	 * @deprecated Use startComponent() instead for all component types.
 	 */
 	public IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz);
 
@@ -119,7 +120,7 @@ public interface IJadexPlatformBinder extends IJadexMultiPlatformBinder
 	 *            Path to the model file of the new component
 	 * @param creationInfo
 	 * 			  {@link CreationInfo} to pass to the started Component.
-	 * @return ComponentIdentifier of the created agent.
+	 * @return ComponentIdentifier of the created component.
 	 */
 	public IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath, final CreationInfo creationInfo);
 
@@ -130,10 +131,10 @@ public interface IJadexPlatformBinder extends IJadexMultiPlatformBinder
 	 * @param platformId
 	 *            Identifier of the jadex platform
 	 * @param name
-	 *            name of the newly created agent
+	 *            name of the newly created component
 	 * @param modelPath
-	 *            Path to the bpmn model file of the new agent
-	 * @return ComponendIdentifier of the created agent.
+	 *            Path to the model file of the new component
+	 * @return ComponentIdentifier of the created component.
 	 */
 	public IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath);
 	
@@ -147,7 +148,7 @@ public interface IJadexPlatformBinder extends IJadexMultiPlatformBinder
 	 *            Class of the new component
 	 * @param creationInfo
 	 * 			  {@link CreationInfo} to pass to the started Component.
-	 * @return ComponentIdentifier of the created agent.
+	 * @return ComponentIdentifier of the created component.
 	 */
 	public IFuture<IComponentIdentifier> startComponent(final String name, final Class<?> clazz, final CreationInfo creationInfo);
 
@@ -155,13 +156,12 @@ public interface IJadexPlatformBinder extends IJadexMultiPlatformBinder
 	 * Start a new Component on a given platform with default {@link CreationInfo}.
 	 * 
 	 * @param name
-	 *            name of the newly created agent
+	 *            name of the newly created component
 	 * @param modelPath
-	 *            Path to the bpmn model file of the new agent
-	 * @return ComponentIdentifier of the created agent.
+	 *            Path to the model file of the new component
+	 * @return ComponentIdentifier of the created component.
 	 */
 	public IFuture<IComponentIdentifier> startComponent(final String name, final Class<?> clazz);
-
 	
 	// ---------- Event-stuff ----------
 

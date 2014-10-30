@@ -244,8 +244,16 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		try
 		{
 			@SuppressWarnings("unchecked")
-			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
-			act = actClass.newInstance();
+			Class<?> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
+			Object newInstance = actClass.newInstance();
+			if (newInstance instanceof ClientAppFragment) {
+				act = (ClientAppFragment) newInstance;
+			} else {
+				throw new JadexAndroidError("Could not start Fragment: <" + className
+						+ "> of type: <" 
+						+ newInstance.getClass().getName()
+						+ "> \nJadex ClientApps must only consist of ClientAppFragments!");
+			}
 		}
 		catch (IllegalAccessException e)
 		{

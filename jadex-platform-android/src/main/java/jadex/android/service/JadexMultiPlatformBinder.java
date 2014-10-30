@@ -4,6 +4,7 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -129,5 +130,11 @@ public class JadexMultiPlatformBinder extends Binder implements IJadexMultiPlatf
 	{
 		return service.startJadexPlatform(kernels, platformId, options);
 	}
+
+	public IResourceIdentifier getResourceIdentifier() {
+		return service.getResourceIdentifier();
+	}
+	
+	
 
 }
