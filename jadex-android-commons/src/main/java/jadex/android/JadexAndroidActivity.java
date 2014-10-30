@@ -16,6 +16,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	 * @param autostart
 	 */
 	protected void setPlatformAutostart(boolean autostart) {
-		if (!isJadexPlatformRunning()) {
+		if (!isPlatformRunning()) {
 			this.platformAutostart = autostart;
 		} else {
 			throw new IllegalStateException("Cannot set autostart, platform already running!");
@@ -121,7 +122,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		this.platformName = name;
 	}
 
-	protected boolean isJadexPlatformRunning()
+	protected boolean isPlatformRunning()
 	{
 		if (platformService != null) {
 			return platformService.isPlatformRunning(platformId);
@@ -134,8 +135,16 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		checkIfJadexIsRunning("getPlatformAccess()");
 		return platformService.getExternalPlatformAccess(platformId);
 	}
+	
+	/**
+	 * Gets the platform service.
+	 * @return PlatformService binder
+	 */
+	protected IJadexPlatformBinder getPlatformService() {
+		return platformService;
+	}
 
-	protected boolean isJadexPlatformRunning(IComponentIdentifier platformId)
+	protected boolean isPlatformRunning(IComponentIdentifier platformId)
 	{
 		if (platformService != null) {
 			return platformService.isPlatformRunning(platformId);
@@ -150,29 +159,17 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	 * @param clazz Class which defines the Micro Agent
 	 * @return IFuture<IComponentIdentifier>
 	 */
-	protected IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz)
+	public IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz)
 	{
 		checkIfJadexIsRunning("startMicroAgent()");
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		platformService.getCMS(platformId).addResultListener(new DefaultResultListener<IComponentManagementService>()
-		{
-
-			public void resultAvailable(IComponentManagementService cms)
-			{
-				HashMap<String, Object> args = new HashMap<String, Object>();
-
-				cms.createComponent(name, clazz.getName().replaceAll("\\.", "/") + ".class", new CreationInfo(args), null).addResultListener(
-						new DelegationResultListener<IComponentIdentifier>(ret));
-			}
-		});
-
-		return ret;
+		return platformService.startMicroAgent(name, clazz);
 	}
 	
 	/**
 	 * Starts a Component.
 	 * @param name Name of the Component created
 	 * @param modelPath Path to the Component XML definition file
+	 * @deprecated Use startComponent for all Component types instead.
 	 * @return IFuture<IComponentIdentifier>
 	 */
 	protected IFuture<IComponentIdentifier> startBDIAgent(final String name, final String modelPath) {
@@ -183,6 +180,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	 * Starts a Component.
 	 * @param name Name of the Component created
 	 * @param modelPath Path to the Component XML definition file
+	 * @deprecated Use startComponent for all Component types instead.
 	 * @return IFuture<IComponentIdentifier>	 
 	 */
 	protected IFuture<IComponentIdentifier> startBPMNAgent(final String name, final String modelPath) {
@@ -191,38 +189,29 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	
 	/**
 	 * Starts a Component.
-	 * @param name Name of the Component created
-	 * @param modelPath Path to the Component XML definition file
+	 * 
+	 * @param name
+	 *            Name of the Component created
+	 * @param modelPath
+	 *            Path to the Component
 	 * @return IFuture<IComponentIdentifier>
 	 */
 	protected IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath)
 	{
 		checkIfJadexIsRunning("startComponent()");
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		platformService.getCMS(platformId).addResultListener(new DefaultResultListener<IComponentManagementService>()
-		{
-
-			public void resultAvailable(IComponentManagementService cms)
-			{
-				HashMap<String, Object> args = new HashMap<String, Object>();
-
-				cms.createComponent(name, modelPath, new CreationInfo(args), null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-			}
-		});
-
-		return ret;
+		return platformService.startComponent(name, modelPath);
 	}
-
+	
 	protected void registerEventReceiver(IEventReceiver<?> rec)
 	{
 		checkIfJadexIsRunning("registerEventReceiver");
 		platformService.registerEventReceiver(rec);
 	}
 
-	protected void unregisterEventReceiver(IEventReceiver<?> rec)
+	protected boolean unregisterEventReceiver(IEventReceiver<?> rec)
 	{
 		checkIfJadexIsRunning("unregisterEventReceiver");
-		platformService.unregisterEventReceiver(rec);
+		return platformService.unregisterEventReceiver(rec);
 	}
 
 	/**
@@ -273,12 +262,20 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		}
 	}
 	
+	/**
+	 * @deprecated use getPlatformService().getSservice() instead.
+	 * @return
+	 */
 	protected IFuture<IMessageService> getMS()
 	{
 		checkIfJadexIsRunning("getMS");
 		return platformService.getMS(platformId);
 	}
 	
+	/**
+	 * @deprecated use getPlatformService().getSservice() instead.
+	 * @return
+	 */
 	protected IFuture<IComponentManagementService> getCMS()
 	{
 		checkIfJadexIsRunning("getCMS");
@@ -298,15 +295,6 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		platformService = null;
 	}
 
-	
-	/**
-	 * Terminates a given Jadex platform.
-	 * @param platformID Identifier of the platform to terminate
-	 */
-	public void shutdownJadexPlatform(IComponentIdentifier platformID) {
-		platformService.shutdownJadexPlatform(platformID);
-	}
-	
 	/**
 	 * Called right before the platform startup.
 	 */
@@ -361,10 +349,21 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	
 	/**
 	 * Stops all running jadex platforms.
+	 * @deprecated use shutdownJadexPlatforms() instead.
 	 */
 	protected void stopPlatforms()
 	{
+		shutdownJadexPlatform();
+	}
+
+	public void shutdownJadexPlatform() {
 		platformService.shutdownJadexPlatforms();
 	}
+	
+	public void shutdownJadexPlatform(IComponentIdentifier platformID) {
+		platformService.shutdownJadexPlatform(platformID);
+	}
+	
+	
 
 }

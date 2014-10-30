@@ -47,7 +47,6 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 		platformAutostart = false;
 		platformKernels = JadexPlatformOptions.DEFAULT_KERNELS;
 		platformOptions = "";
-//		platformName = JadexPlatformManager.getInstance().getRandomPlatformID();
 	}
 
 	@Override
@@ -104,10 +103,6 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 		this.platformOptions = options;
 	}
 	
-	protected IJadexPlatformBinder getPlatformService() {
-		return platformService;
-	}
-
 	/**
 	 * Sets the name of the platform that is started by this activity.
 	 * 
@@ -134,6 +129,14 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	{
 		checkIfJadexIsRunning("getPlatformAccess()");
 		return platformService.getExternalPlatformAccess(platformId);
+	}
+	
+	/**
+	 * Gets the platform service.
+	 * @return PlatformService binder
+	 */
+	protected IJadexPlatformBinder getPlatformService() {
+		return platformService;
 	}
 
 	protected boolean isPlatformRunning(IComponentIdentifier platformId)
@@ -165,11 +168,13 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	
 	protected void registerEventReceiver(IEventReceiver<?> rec)
 	{
+		checkIfJadexIsRunning("registerEventReceiver");
 		platformService.registerEventReceiver(rec);
 	}
 
 	protected void unregisterEventReceiver(IEventReceiver<?> rec)
 	{
+		checkIfJadexIsRunning("unregisterEventReceiver");
 		platformService.unregisterEventReceiver(rec);
 	}
 	
@@ -193,18 +198,6 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	public void onServiceDisconnected(ComponentName name)
 	{
 		platformService = null;
-	}
-	
-	/**
-	 * Terminates a given Jadex platform.
-	 * 
-	 * @param platformID
-	 *            Identifier of the platform to terminate
-	 */
-	public void shutdownJadexPlatform(IComponentIdentifier platformID)
-	{
-		checkIfJadexIsRunning("shutdownJadexPlatform()");
-		platformService.shutdownJadexPlatform(platformID);
 	}
 	
 	/**
@@ -277,6 +270,18 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	{
 		checkIfJadexIsRunning("stopPlatforms()");
 		platformService.shutdownJadexPlatforms();
+	}
+	
+	/**
+	 * Terminates a given Jadex platform.
+	 * 
+	 * @param platformID
+	 *            Identifier of the platform to terminate
+	 */
+	public void shutdownJadexPlatform(IComponentIdentifier platformID)
+	{
+		checkIfJadexIsRunning("shutdownJadexPlatform()");
+		platformService.shutdownJadexPlatform(platformID);
 	}
 
 }
