@@ -14,6 +14,7 @@ allprojects
 	
     version = '2.5-SNAPSHOT'
     group = 'net.sourceforge.jadex'
+    jmonkey.version = '3.0.0.20130125-SNAPSHOT'
 
     configurations
     {
@@ -172,6 +173,36 @@ task buildDist(type: Zip, dependsOn: srcZip) {
     from(srcZip.archivePath)
     from('build/sources.zip'){}
     from('docs/readme.txt'){}
+    from('docs/license.txt')
+    from('docs/api-changes.txt')
+    from('docs/jcc.settings.xml') 
+    from('docs/default.settings.xml')
+    from('docs/jadex.bat')
+    from('docs/jadex_no_awareness.bat') 
+    from('docs/jadex.sh')
+    from('docs/jadex_no_awareness.sh')
+    from('docs/bpmn_editor.bat')
+    from('docs/bpmn_editor.sh')
+    from('docs/howtostart.txt')
+}
+
+task buildDistPro(type: Zip, dependsOn: srcZip) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	String[] excl = []//['*-jmonkey', '*-launch', '*-web', '*-distribution-*', '*-backup']
+    from(subprojects.configurations.runtime){ into('lib') exclude(excl) }
+    from('subprojects.jar'){ into('lib') exclude(excl) }
+   
+    from('sourceSets.main.allSource') { into('src') exclude(excl) }
+    from('docs/junit-3.8.1.jar'){ into('lib') }
+    
+    from(srcZip.archivePath) // todo: srcZipPro
+    from('jadex-platform-extension-management/win') { into('win') exclude(excl) }
+    //from('build/sources.zip')
+    from('docs/junit-3.8.1.jar'){ into('lib') exclude(excl) }
+    from('jadex-platform-standalone-launch/build/lib/jadex-platform-standalone-launch-${version}.jar')
+    from('build/jadex-example-project.zip')
+    from('docs/readme.txt')
     from('docs/license.txt')
     from('docs/api-changes.txt')
     from('docs/jcc.settings.xml') 

@@ -22,8 +22,14 @@
 		<import>jadex.extension.envsupport.observer.perspective.*</import>
 	</imports>
 	
+	<!-- <arguments>
+		<argument name="width" class="Number">20</argument>
+		<argument name="height" class="Number">20</argument>
+	</arguments> -->
+	
 	<extensiontypes>
 		<env:envspacetype name="gc2dspace" width="20" height="20" class="Grid2D">
+		<!-- <env:envspacetype name="gc2dspace" width="$args.width" height="$args.height" class="Grid2D">-->
 			<env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property>
 
 			<env:objecttypes>
