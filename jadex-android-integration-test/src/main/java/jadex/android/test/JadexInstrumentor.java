@@ -1,7 +1,6 @@
 package jadex.android.test;
 
 import jadex.android.AndroidContextManager;
-import jadex.android.commons.Logger;
 import jadex.android.service.JadexPlatformManager;
 import jadex.base.test.impl.BrokenComponentTest;
 import jadex.bridge.ErrorReport;
@@ -9,8 +8,6 @@ import jadex.bridge.ErrorReport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import dalvik.system.PathClassLoader;
-import dalvik.system.VMRuntime;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import android.content.Context;
@@ -19,6 +16,7 @@ import android.test.AndroidTestRunner;
 import android.test.InstrumentationTestRunner;
 import android.test.suitebuilder.TestSuiteBuilder;
 import android.util.Log;
+import dalvik.system.VMRuntime;
 
 public class JadexInstrumentor extends InstrumentationTestRunner
 {
@@ -35,6 +33,20 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 
 	private static final String ARGUMENT_TEST_CLASS = "class";
     private static final String ARGUMENT_LOG_ONLY = "log";
+    
+    /**
+     * Defines which TestSuites are included in the instrumentation run.
+     * Make sure that the corresponding dependencies are defined in pom.xml,
+     * especially the jadex-applications-xyz modules.
+     */
+    private static final String[] ACTIVATED_TESTS = new String[]{
+    	"jadex.launch.test.MicroTest",
+//    	"jadex.launch.test.BDITest",
+//    	"jadex.launch.test.BPMNTest",
+//    	"jadex.launch.test.BDIBPMNTest",
+//    	"jadex.launch.test.GPMNTest",
+    	"jadex.launch.test.BDIV3Test"
+    };
 	
 	@Override
 	public void onCreate(Bundle arguments)
@@ -67,9 +79,9 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		Context targetContext = getTargetContext();
 		sourceDir = targetContext.getApplicationInfo().sourceDir;
 
-		
 		// Set Context:
 		AndroidContextManager.getInstance().setAndroidContext(targetContext);
+		
 		// Set Classloader for app:
 		JadexPlatformManager.getInstance().setAppClassLoader(sourceDir, jadexCl);
 		
@@ -105,26 +117,15 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 //			Test singleTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases.stream.InitiatorAgent", sourceDir);
 //			suite.addTest(singleTest);
 			
-			// Make sure that also the dependencies are placed in pom.
 			Log.i(LOG_TAG, "JadexInstrumentor creating JUnit ComponentTest classes...");
 			
 			if (testClassesArg != null) {
-				Test requestedTest = createTest(testClassesArg, sourceDir);
+				Test requestedTest = createTest(testClassesArg, sourceDir, jadexCl);
 				suite.addTest(requestedTest);
 			} else {
-				Test microTest = createTest("jadex.launch.test.MicroTest", sourceDir);
-//				Test bdiTest = createTest("jadex.launch.test.BDITest", sourceDir);
-//				Test bpmnTest = createTest("jadex.launch.test.BPMNTest", sourceDir);
-//				Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", sourceDir);
-//				Test gpmnTest = createTest("jadex.launch.test.GPMNTest", sourceDir);
-				Test bdiv3Test = createTest("jadex.launch.test.BDIV3Test", sourceDir);
-	
-				suite.addTest(microTest);
-//				suite.addTest(bdiTest);
-//				suite.addTest(bpmnTest);
-//				suite.addTest(bdibpmnTest);
-//				suite.addTest(gpmnTest);
-				suite.addTest(bdiv3Test);
+				for (String testSuiteName : ACTIVATED_TESTS) {
+					suite.addTest(createTest(testSuiteName, sourceDir, jadexCl));
+				}
 			}
 			
 		}
@@ -148,10 +149,10 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	}
 
 
-	private Test createTest(String testClassName, String classRoot) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+	public static Test createTest(String testClassName, String classRoot, ClassLoader loader) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
 			InvocationTargetException
 	{
-		Class<?> test= jadexCl.loadClass(testClassName);
+		Class<?> test= loader.loadClass(testClassName);
 		Constructor<?> constructor = test.getConstructor(String.class);
 		Object testCase = null;
 		try {
@@ -163,8 +164,10 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			BrokenComponentTest error = new BrokenComponentTest(testClassName, errorReport);
 			testCase = error;
 		}
-		return (Test) testCase;
+		Test testCase2 = (Test) testCase;
+		return testCase2;
 	}
+
 
 	@Override
 	public ClassLoader getLoader()
