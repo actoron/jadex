@@ -43,7 +43,8 @@ public class MicroCreationTest //extends TestCase
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
 //			"-logging_level", "java.util.logging.Level.INFO",
-			"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
+			//"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
+			"-libpath", "new String[]{\""+new File("jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 //			"-componentfactory", "jadex.component.ComponentComponentFactory",
