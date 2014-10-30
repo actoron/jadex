@@ -28,6 +28,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 
 public class JadexMiddlewareActivity extends FragmentActivity implements ServiceConnection
@@ -318,10 +319,19 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 			super.startActivityFromFragment(fragment, intent, requestCode);
 		} else {
 			String className = intent.getComponent().getClassName();
+			boolean backstack = intent.getBooleanExtra(ClientAppFragment.EXTRA_KEY_BACKSTACK, true);
 			ApplicationInfo appInfo = ((ClientAppFragment) fragment).getApplicationInfo();
 			ClientAppFragment newFragment = createClientAppFragment(currentCl, className, intent, appInfo);
-			activateClientAppFragment(newFragment, true);
+			Logger.d("Activating ClientAppFragment: " + className);
+			activateClientAppFragment(newFragment, backstack);
 		}
 	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+	}
+	
+	
 	
 }

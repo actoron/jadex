@@ -8,13 +8,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 public class ClientAppFragment extends ActivityAdapterFragment
 {
+	/**
+	 * Extra key to alter back stack behavior when switching to another Fragment via startActivity().
+	 * Set to true (default) to include the previous fragment in the back stack,
+	 * or to false to not include it.
+	 */
+	public static final String EXTRA_KEY_BACKSTACK = "jadex.android.standalone.clientapp.ClientAppFragment.backstack";
+	
 	private UniversalClientServiceBinder universalService;
 	
 	/** ApplicationInfo, set on instantiating this Fragment */
 	private ApplicationInfo appInfo;
+
+	/** indicates whether this fragment should be finished upon next attach **/
+	protected boolean finished;
 
 	/**
 	 * This method is called upon instantiation of the Fragment and before the
@@ -35,7 +49,23 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	{
 		return getActivity().getApplicationContext();
 	}
-
+	
+	/**
+	 * Finishes the fragment, e.g. pops the back stack to display
+	 * the previous fragment again.
+	 */
+	protected void finishFragment() {
+		finished = true;
+	}
+	
+	@Override
+	public void onStart() {
+		if (finished) {
+			getActivity().getSupportFragmentManager().popBackStack();
+		}
+		super.onStart();
+	}
+	
 	@Override
 	public boolean bindService(final Intent service, final ServiceConnection conn, final int flags)
 	{
@@ -115,4 +145,5 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	{
 		return appInfo;
 	}
+	
 }
