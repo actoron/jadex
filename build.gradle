@@ -14,8 +14,7 @@ allprojects
 	
     version = '2.5-SNAPSHOT'
     group = 'net.sourceforge.jadex'
-    jmonkey.version = '3.0.0.20130125-SNAPSHOT'
-
+    
     configurations
     {
         deployerJars
