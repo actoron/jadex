@@ -8,10 +8,13 @@ if(file('gradle.properties').exists())
 //	println("upload detected")
 //}
 
+def stdexcl = ['-backup', '-management', '-maven', '-servletfilter-', '-jmonkey', 
+	'-launch', '-web', '-distribution-', '-webservice', '-securetransport', '-relay'] //*:*-relay-standalone
+
+def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup']
+
 allprojects
 {
-	apply plugin: 'java-library-distribution'
-	
     version = '2.5-SNAPSHOT'
     group = 'net.sourceforge.jadex'
     
@@ -41,8 +44,14 @@ allprojects
     }
 }
 
+configurations
+{
+	excludeset
+}
+
 subprojects
 {
+	//ext.junit = "junit:junit:4.11"
     apply plugin: 'java'
     apply plugin: 'maven'
     //apply plugin: 'maven-publish'
@@ -131,7 +140,7 @@ subprojects
     }
 }
 
-task docs(type: Javadoc, dependsOn:javadoc) {
+task docs(type: Javadoc) {
     source subprojects.collect {project -> project.sourceSets.main.allJava }
     classpath = files(subprojects.collect {project -> project.sourceSets.main.compileClasspath})
     destinationDir = new File(projectDir, 'build/docs')
@@ -142,87 +151,89 @@ task srcZip(type: Zip) {
 	archiveName = 'sources.zip'
     classifier = 'src'
     
-    String[] excl = ['*:*-backup', '*:*-management', '*:*-maven', '*:*-servletfilter-*', '*:*-jmonkey', 
-		'*:*-launch', '*:*-web', '*:*-distribution-*', '*:*-webservice*', '*:*-securetransport', '*:*-relay*'] //*:*-relay-standalone
-    
     //from(sourceSets.main.allSource){}
     //from sourceSets*.allSource.srcDirs*.collect { relativePath(it) }.flatten()
     
-    from('build.gradle'){ into('sources') exclude(excl) }
-    from('settings.gradle'){ into('sources') exclude(excl) }
+    from('build.gradle'){ into('sources') }
+    from('settings.gradle'){ into('sources') }
     
     subprojects.each {subproject ->
-		from( subproject.projectDir.name ) {
-             include 'build.gradle'
-             into 'sources/'+subproject.projectDir.name
-        }
-
-		from(subproject.sourceSets.main.java) { into 'sources/'+subproject.projectDir.name+'/src/main/java' exclude(excl) }
-		from(subproject.sourceSets.main.resources) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' exclude(excl) }
+    	if(!isExcluded(stdexcl, subproject.name))
+		{
+			from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
+			from(subproject.sourceSets.main.java) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
+			from(subproject.sourceSets.main.resources) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
+		}
 	} 
 	
 	from('jadex-kernel-extension-envsupport-opengl/lib/gluegen-rt.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
 	from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
 }   
 
-task buildDist(type: Zip, dependsOn: srcZip) {
-	//String[] excl = ['*-backup', '*-management', '*-maven', '*-servletfilter-*', '*-jmonkey', 
-	//	'*-launch', '*-web', '*-distribution-*', '*-webservice*', '*-securetransport', '*-relay*']
-	String[] excl = ['*:*-backup', '*:*-management', '*:*-maven', '*:*-servletfilter-*', '*:*-jmonkey', 
-		'*:*-launch', '*:*-web', '*:*-distribution-*', '*:*-webservice*', '*:*-securetransport', '*:*-relay*']
-	
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+def func(task, excl) {
+	println(excl)
 
-    from(subprojects.configurations.runtime){ into('lib') excludes(excl) }
-    from(subprojects.jar){ into('lib') excludes(excl)}
-    from(sourceSets.main.allSource){ into('src') excludes(excl) }
-    from('docs/junit-3.8.1.jar'){ into('lib') }
+	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	subprojects.each {subproject ->
+		if(!isExcluded(excl, subproject.name))
+		{
+			task.from(subproject.configurations.runtime) { into('lib') }
+			task.from(subproject.jar) { into('lib') }
+		}
+		else
+		{
+			println("Excluded: "+subproject.name)
+		}
+	}
+	 	
+    //from(subprojects.configurations.runtime){ into('lib') }
+    //from('subprojects.jar'){ into('lib') }
+    //from('sourceSets.main.allSource') { into('src') }
+    task.from('docs/junit-3.8.1.jar'){ into('lib') }
     
-    from(srcZip.archivePath)
-    from('docs/readme.txt')
-    from('docs/license.txt')
-    from('docs/api-changes.txt')
-    from('docs/jcc.settings.xml') 
-    from('docs/default.settings.xml')
-    from('docs/jadex.bat')
-    from('docs/jadex_no_awareness.bat') 
-    from('docs/jadex.sh')
-    from('docs/jadex_no_awareness.sh')
-    from('docs/bpmn_editor.bat')
-    from('docs/bpmn_editor.sh')
-    from('docs/howtostart.txt')
+    task.from(srcZip.archivePath) // todo: srcZipPro
+    //task.from('jadex-platform-extension-management/win') { into('win') }
+    //from('build/sources.zip')
+    task.from('docs/junit-3.8.1.jar'){ into('lib') }
+    task.from("jadex-platform-standalone-launch/build/lib/jadex-platform-standalone-launch-${version}.jar")
+    task.from('build/jadex-example-project.zip')
+    task.from('docs/readme.txt')
+    task.from('docs/license.txt')
+    task.from('docs/api-changes.txt')
+    task.from('docs/jcc.settings.xml') 
+    task.from('docs/default.settings.xml')
+    task.from('docs/jadex.bat')
+    task.from('docs/jadex_no_awareness.bat') 
+    task.from('docs/jadex.sh')
+    task.from('docs/jadex_no_awareness.sh')
+    task.from('docs/bpmn_editor.bat')
+    task.from('docs/bpmn_editor.sh')
+    task.from('docs/howtostart.txt')
 }
 
-		
+task buildDist(type: Zip, dependsOn: srcZip) {
+	func(buildDist, stdexcl)
+}
 
 task buildDistPro(type: Zip, dependsOn: srcZip) {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	func(buildDistPro, proexcl)
+	from('jadex-platform-extension-management/win') { into('win') }
+}
 
-	//String[] excl = ['*-jmonkey', '*-launch', '*-web', '*-distribution-*', '*-backup']
- 	String[] excl = ['*:*-jmonkey', '*:*-launch', '*:*-web', '*:*-distribution-*', '*:*-backup']
- 	
-    from(subprojects.configurations.runtime){ into('lib') exclude(excl) }
-    from('subprojects.jar'){ into('lib') exclude(excl) }
-   
-    from('sourceSets.main.allSource') { into('src') exclude(excl) }
-    from('docs/junit-3.8.1.jar'){ into('lib') }
-    
-    from(srcZip.archivePath) // todo: srcZipPro
-    from('jadex-platform-extension-management/win') { into('win') exclude(excl) }
-    //from('build/sources.zip')
-    from('docs/junit-3.8.1.jar'){ into('lib') exclude(excl) }
-    from('jadex-platform-standalone-launch/build/lib/jadex-platform-standalone-launch-${version}.jar')
-    from('build/jadex-example-project.zip')
-    from('docs/readme.txt')
-    from('docs/license.txt')
-    from('docs/api-changes.txt')
-    from('docs/jcc.settings.xml') 
-    from('docs/default.settings.xml')
-    from('docs/jadex.bat')
-    from('docs/jadex_no_awareness.bat') 
-    from('docs/jadex.sh')
-    from('docs/jadex_no_awareness.sh')
-    from('docs/bpmn_editor.bat')
-    from('docs/bpmn_editor.sh')
-    from('docs/howtostart.txt')
+def isExcluded(excl, name)
+{
+	boolean ret = false;
+	if(excl!=null)
+	{
+		for(ex in excl)
+		{
+			if(name.indexOf(ex)!=-1)
+			{
+				ret = true;
+				break;
+			}
+		}
+	}
+	return ret;
 }
