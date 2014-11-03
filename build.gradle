@@ -15,6 +15,8 @@ def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup']
 
 allprojects
 {
+	apply plugin: 'java-library-distribution'
+
     version = '2.5-SNAPSHOT'
     group = 'net.sourceforge.jadex'
     
@@ -148,30 +150,38 @@ task docs(type: Javadoc) {
 }
 
 task srcZip(type: Zip) {
-	archiveName = 'sources.zip'
-    classifier = 'src'
+	buildDistributionSource(srcZip, stdexcl) 
+}   
+
+task srcZipPro(type: Zip) {
+	buildDistributionSource(srcZipPro, proexcl) 
+} 
+
+def buildDistributionSource(task, excl) {
+	task.archiveName = 'sources.zip'
+    task.classifier = 'src'
     
     //from(sourceSets.main.allSource){}
     //from sourceSets*.allSource.srcDirs*.collect { relativePath(it) }.flatten()
     
-    from('build.gradle'){ into('sources') }
-    from('settings.gradle'){ into('sources') }
+    task.from('build.gradle'){ into('sources') }
+    task.from('settings.gradle'){ into('sources') }
     
     subprojects.each {subproject ->
-    	if(!isExcluded(stdexcl, subproject.name))
+    	if(!isExcluded(excl, subproject.name))
 		{
-			from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
-			from(subproject.sourceSets.main.java) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
-			from(subproject.sourceSets.main.resources) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
+			task.from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
+			task.from(subproject.sourceSets.main.java) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
+			task.from(subproject.sourceSets.main.resources) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
 		}
 	} 
 	
-	from('jadex-kernel-extension-envsupport-opengl/lib/gluegen-rt.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
-	from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
-}   
+	task.from('jadex-kernel-extension-envsupport-opengl/lib/gluegen-rt.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+	task.from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+}
 
-def func(task, excl) {
-	println(excl)
+def buildDistribution(task, excl) {
+	println("diststart"+excl)
 
 	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
@@ -192,8 +202,6 @@ def func(task, excl) {
     //from('sourceSets.main.allSource') { into('src') }
     task.from('docs/junit-3.8.1.jar'){ into('lib') }
     
-    task.from(srcZip.archivePath) // todo: srcZipPro
-    //task.from('jadex-platform-extension-management/win') { into('win') }
     //from('build/sources.zip')
     task.from('docs/junit-3.8.1.jar'){ into('lib') }
     task.from("jadex-platform-standalone-launch/build/lib/jadex-platform-standalone-launch-${version}.jar")
@@ -210,15 +218,18 @@ def func(task, excl) {
     task.from('docs/bpmn_editor.bat')
     task.from('docs/bpmn_editor.sh')
     task.from('docs/howtostart.txt')
+    println("distend")
 }
 
 task buildDist(type: Zip, dependsOn: srcZip) {
-	func(buildDist, stdexcl)
+	buildDistribution(buildDist, stdexcl)
+	from(srcZip.archivePath)
 }
 
-task buildDistPro(type: Zip, dependsOn: srcZip) {
-	func(buildDistPro, proexcl)
-	from('jadex-platform-extension-management/win') { into('win') }
+task buildDistPro(type: Zip, dependsOn: srcZipPro) {
+	buildDistribution(buildDistPro, proexcl)
+	//from(srcZipPro.archivePath)
+	//from('jadex-platform-extension-management/win') { into('win') }
 }
 
 def isExcluded(excl, name)
