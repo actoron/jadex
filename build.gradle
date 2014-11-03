@@ -141,11 +141,15 @@ task docs(type: Javadoc, dependsOn:javadoc) {
 task srcZip(type: Zip) {
 	archiveName = 'sources.zip'
     classifier = 'src'
+    
+    String[] excl = ['*:*-backup', '*:*-management', '*:*-maven', '*:*-servletfilter-*', '*:*-jmonkey', 
+		'*:*-launch', '*:*-web', '*:*-distribution-*', '*:*-webservice*', '*:*-securetransport', '*:*-relay*'] //*:*-relay-standalone
+    
     //from(sourceSets.main.allSource){}
     //from sourceSets*.allSource.srcDirs*.collect { relativePath(it) }.flatten()
     
-    from('build.gradle'){into('sources')}
-    from('settings.gradle'){into('sources')}
+    from('build.gradle'){ into('sources') exclude(excl) }
+    from('settings.gradle'){ into('sources') exclude(excl) }
     
     subprojects.each {subproject ->
 		from( subproject.projectDir.name ) {
@@ -153,8 +157,8 @@ task srcZip(type: Zip) {
              into 'sources/'+subproject.projectDir.name
         }
 
-		from(subproject.sourceSets.main.java) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
-		from(subproject.sourceSets.main.resources) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
+		from(subproject.sourceSets.main.java) { into 'sources/'+subproject.projectDir.name+'/src/main/java' exclude(excl) }
+		from(subproject.sourceSets.main.resources) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' exclude(excl) }
 	} 
 	
 	from('jadex-kernel-extension-envsupport-opengl/lib/gluegen-rt.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
@@ -162,16 +166,20 @@ task srcZip(type: Zip) {
 }   
 
 task buildDist(type: Zip, dependsOn: srcZip) {
+	//String[] excl = ['*-backup', '*-management', '*-maven', '*-servletfilter-*', '*-jmonkey', 
+	//	'*-launch', '*-web', '*-distribution-*', '*-webservice*', '*-securetransport', '*-relay*']
+	String[] excl = ['*:*-backup', '*:*-management', '*:*-maven', '*:*-servletfilter-*', '*:*-jmonkey', 
+		'*:*-launch', '*:*-web', '*:*-distribution-*', '*:*-webservice*', '*:*-securetransport', '*:*-relay*']
+	
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    from(subprojects.configurations.runtime){ into('lib') }
-    from(subprojects.jar){ into('lib') }
-    from(sourceSets.main.allSource){ into('src') }
+    from(subprojects.configurations.runtime){ into('lib') excludes(excl) }
+    from(subprojects.jar){ into('lib') excludes(excl)}
+    from(sourceSets.main.allSource){ into('src') excludes(excl) }
     from('docs/junit-3.8.1.jar'){ into('lib') }
     
     from(srcZip.archivePath)
-    from('build/sources.zip'){}
-    from('docs/readme.txt'){}
+    from('docs/readme.txt')
     from('docs/license.txt')
     from('docs/api-changes.txt')
     from('docs/jcc.settings.xml') 
@@ -185,10 +193,14 @@ task buildDist(type: Zip, dependsOn: srcZip) {
     from('docs/howtostart.txt')
 }
 
+		
+
 task buildDistPro(type: Zip, dependsOn: srcZip) {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-	String[] excl = []//['*-jmonkey', '*-launch', '*-web', '*-distribution-*', '*-backup']
+	//String[] excl = ['*-jmonkey', '*-launch', '*-web', '*-distribution-*', '*-backup']
+ 	String[] excl = ['*:*-jmonkey', '*:*-launch', '*:*-web', '*:*-distribution-*', '*:*-backup']
+ 	
     from(subprojects.configurations.runtime){ into('lib') exclude(excl) }
     from('subprojects.jar'){ into('lib') exclude(excl) }
    
