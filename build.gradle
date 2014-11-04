@@ -70,11 +70,13 @@ subprojects
     def allSource
 
     if (isAndroidProject(project)) {
-        apply plugin: 'android'
-        allSource   = android.sourceSets.main.java.srcDirs
-        dependencies
-        {
-            androidTestCompile junit
+        if (hasAndroidSdkHome()) {
+            apply plugin: 'android'
+            allSource   = android.sourceSets.main.java.srcDirs
+            dependencies
+            {
+                androidTestCompile junit
+            }
         }
     } else {
         apply plugin: 'java'
@@ -173,11 +175,11 @@ subprojects
 
 // additional android config
 subprojects {
-    if(isAndroidProject(project))
+    if(isAndroidProject(project) && hasAndroidSdkHome())
     {
         android {
             compileSdkVersion 8
-            buildToolsVersion "19" //"21.1"
+            buildToolsVersion "19.1.0" //"21.1"
 
             defaultConfig {
                 minSdkVersion 8
@@ -244,6 +246,15 @@ subprojects {
 
         }
     }
+}
+
+def hasAndroidSdkHome() {
+    def androidHome = System.env.'ANDROID_HOME'
+    if (androidHome != null && !androidHome.isEmpty()) {
+        def adb = new File(androidHome + "/platform-tools/adb")
+        return adb.exists();
+    }
+    return false;
 }
 
 def isAndroidProject(project) {
