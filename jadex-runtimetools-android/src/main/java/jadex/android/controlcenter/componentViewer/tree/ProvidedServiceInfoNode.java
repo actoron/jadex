@@ -1,13 +1,5 @@
 package jadex.android.controlcenter.componentViewer.tree;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-
 import jadex.android.controlcenter.componentViewer.properties.PropertyItem;
 import jadex.android.controlcenter.componentViewer.properties.ServicePropertyActivity;
 import jadex.base.gui.asynctree.AbstractTreeNode;
@@ -17,11 +9,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
-import jadex.commons.gui.future.SwingDefaultResultListener;
+
+import java.util.ArrayList;
 
 /**
  *  Node object representing a service.

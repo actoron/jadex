@@ -2,7 +2,15 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>net.sourceforge.jadex</groupId>
+  <parent>
+   <groupId>net.sourceforge.jadex</groupId>
+   <artifactId>jadex-parent</artifactId>
+   <version> 2.5-SNAPSHOT </version>
+   <relativePath>../jadex-parent/pom.xml</relativePath>
+   </parent>
+<description>
+   Maven Plugin for BDI V3 class generation on compile time.
+</description>
   <artifactId>jadex-android-maven-plugin</artifactId>
   <version>2.5-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
@@ -18,18 +26,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>net.sourceforge.jadex</groupId>
-      <artifactId>jadex-bridge</artifactId>
-      <version>2.5-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.jadex</groupId>
-      <artifactId>jadex-kernel-bdiv3</artifactId>
-      <version>2.5-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>3.1.1</version>
@@ -38,6 +34,12 @@
     <dependency>
       <groupId>net.sourceforge.jadex</groupId>
       <artifactId>jadex-platform</artifactId>
+      <version>2.5-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.jadex</groupId>
+      <artifactId>jadex-bridge</artifactId>
       <version>2.5-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
@@ -63,6 +65,12 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>3.1.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.jadex</groupId>
+      <artifactId>jadex-kernel-bdiv3</artifactId>
+      <version>2.5-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>

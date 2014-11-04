@@ -67,16 +67,18 @@ subprojects
     def mainSrcDir  = 'src/main/java'
     def testSrcDir  = 'src/test/java'
     def junit       = 'junit:junit:4.11'
-    def allSource
+    def allSource   = ''
 
     if (isAndroidProject(project)) {
-        if (hasAndroidSdkHome()) {
+        if (isAndroidLibraryProject(project)) {
+            apply plugin: 'android-library'
+        } else {
             apply plugin: 'android'
-            allSource   = android.sourceSets.main.java.srcDirs
-            dependencies
-            {
-                androidTestCompile junit
-            }
+        }
+        allSource   = android.sourceSets.main.java.srcDirs //.java.srcDirs
+        dependencies
+        {
+            androidTestCompile junit
         }
     } else {
         apply plugin: 'java'
@@ -90,11 +92,9 @@ subprojects
         }
     }
 
-	//ext.junit = "junit:junit:4.11"
     apply plugin: 'maven'
     //apply plugin: 'maven-publish'
     apply plugin: 'signing'
-    //apply plugin: 'java-library-distribution'
 
     sourceCompatibility = 1.6
 
@@ -175,7 +175,7 @@ subprojects
 
 // additional android config
 subprojects {
-    if(isAndroidProject(project) && hasAndroidSdkHome())
+    if(isAndroidProject(project))
     {
         android {
             compileSdkVersion 8
@@ -188,17 +188,41 @@ subprojects {
                 versionName project.version
             }
 
+            sourceSets {
+                main {
+                    manifest.srcFile 'AndroidManifest.xml'
+                    resources.srcDirs = ['src/main/java']
+                    aidl.srcDirs = ['src/main/java']
+                    res.srcDirs = ['res']
+                }
+            }
+
             buildTypes {
                 release {
                     // runProguard true
                     // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
                 }
             }
+
+            packagingOptions {
+                exclude 'LICENSE.txt'
+                exclude 'META-INF/license.txt'
+                exclude 'META-INF/notice.txt'
+            }
+
+            lintOptions {
+                abortOnError false
+            }
         }
 
         configurations {
             // add new configuration to define provided deps
-            provided
+            provided {
+                dependencies.all { dep ->
+                    configurations.default.exclude group: dep.group, module: dep.name
+                }
+            }
+            compile.extendsFrom provided
             // exclude transitive deps that are not supported on android
             all*.exclude group:'org.javassist', module:'javassist'
             all*.exclude group:'javax.mail', module:'mail'
@@ -209,9 +233,15 @@ subprojects {
         }
 
         // include 'provided' configuration only in compile classpath:
-        android.applicationVariants.each { variant ->
-            variant.javaCompile.classpath += configurations.provided
-        }
+//        if (isAndroidLibraryProject(project)) {
+//            android.libraryVariants.each { variant ->
+//                variant.compile.classpath += configurations.provided
+//            }
+//        } else {
+//            android.applicationVariants.each { variant ->
+//                variant.compile.classpath += configurations.provided
+//            }
+//        }
 
         // library definitions to be used in subprojects
         ext.libraries = [
@@ -245,20 +275,16 @@ subprojects {
         task classes(dependsOn: 'compileDebugSources') {
 
         }
-    }
-}
 
-def hasAndroidSdkHome() {
-    def androidHome = System.env.'ANDROID_HOME'
-    if (androidHome != null && !androidHome.isEmpty()) {
-        def adb = new File(androidHome + "/platform-tools/adb")
-        return adb.exists();
     }
-    return false;
 }
 
 def isAndroidProject(project) {
-    return (project.hasProperty("androidProject") && project.property("androidProject") == 'true')
+    project.hasProperty("androidProject") && project.property("androidProject") == 'true'
+}
+
+def isAndroidLibraryProject(project) {
+    project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
 }
 
 def getSourceDir(project) {
@@ -279,7 +305,11 @@ def getResourcesDir(project) {
 
 def getCompileClassPath(project) {
     if (isAndroidProject(project)) {
-        project.android.applicationVariants.javaCompile.classpath
+        if (isAndroidLibraryProject(project)) {
+            project.android.libraryVariants.javaCompile.classpath
+        } else {
+            project.android.applicationVariants.javaCompile.classpath
+        }
     } else {
         project.sourceSets.main.compileClasspath
     }

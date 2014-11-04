@@ -1,7 +1,11 @@
 dependencies 
 {
 
-    compile project(':jadex-android-platformapp')
+    releaseProvided project(':jadex-android-platformapp')
+    debugProvided project(':jadex-android-platformapp')
+
+//    compile(project(':jadex-android-commons'))
+
     compile(project(':jadex-applications-bpmn')) {
         exclude module: 'jadex-kernel-bpmn'
     }
@@ -36,5 +40,6 @@ dependencies
         exclude module: 'asm4'
         exclude module: 'jadex-kernel-bdiv3'
         exclude module: 'de.huxhorn.sulky.3rdparty.jlayer'
+        exclude module: 'findbugs'
     }
 }
