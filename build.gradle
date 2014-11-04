@@ -157,6 +157,16 @@ task srcZipPro(type: Zip) {
 	buildDistributionSource(srcZipPro, proexcl) 
 } 
 
+task srcZip3d(type: Zip) {
+	archiveName = 'sources3d.zip'
+    classifier = 'src'
+    
+    def pr = project(":jadex-kernel-extension-envsupport-jmonkey")
+    from(pr.projectDir.name) { include 'build.gradle' into 'sources/'+pr.projectDir.name }
+	from(pr.sourceSets.main.java) { into 'sources/'+pr.projectDir.name+'/src/main/java' }
+	from(pr.sourceSets.main.resources) { into 'sources/'+pr.projectDir.name+'/src/main/resources' }
+}
+
 def buildDistributionSource(task, excl) {
 	task.archiveName = 'sources.zip'
     task.classifier = 'src'
@@ -202,9 +212,8 @@ def buildDistribution(task, excl) {
     //from('sourceSets.main.allSource') { into('src') }
     task.from('docs/junit-3.8.1.jar'){ into('lib') }
     
-    //from('build/sources.zip')
     task.from('docs/junit-3.8.1.jar'){ into('lib') }
-    task.from("jadex-platform-standalone-launch/build/lib/jadex-platform-standalone-launch-${version}.jar")
+    task.from(project(":jadex-platform-standalone-launch").jar) { into('lib') }
     task.from('build/jadex-example-project.zip')
     task.from('docs/readme.txt')
     task.from('docs/license.txt')
@@ -228,8 +237,20 @@ task buildDist(type: Zip, dependsOn: srcZip) {
 
 task buildDistPro(type: Zip, dependsOn: srcZipPro) {
 	buildDistribution(buildDistPro, proexcl)
-	//from(srcZipPro.archivePath)
-	//from('jadex-platform-extension-management/win') { into('win') }
+	from(srcZipPro.archivePath)
+	from('jadex-platform-extension-management/win') { into('win') }
+}
+
+task buildDist3d(type: Zip, dependsOn: srcZip3d) {
+	archiveName = '3d.zip'
+	
+	println(project(":jadex-kernel-extension-envsupport-jmonkey"))
+	println(project(":jadex-kernel-extension-envsupport-jmonkey").jar)
+	
+	from(project(":jadex-kernel-extension-envsupport-jmonkey").jar) { into('lib') }
+	buildDistribution(buildDistPro, proexcl)
+	from(srcZip3d.archivePath)
+	from('docs/readme-3d.txt')
 }
 
 def isExcluded(excl, name)
