@@ -1,0 +1,10 @@
+dependencies 
+{
+	compile project(':jadex-bridge')
+    compile project(':jadex-platform')
+    compile project(':jadex-runtimetools-android')
+    compile libraries.protobuf
+    androidTestCompile libraries.android_test
+    compile libraries.android_support
+    provided libraries.android
+}

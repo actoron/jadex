@@ -7,18 +7,22 @@ import jadex.android.applications.demos.bpmn.BPMNDemoActivity;
 import jadex.android.applications.demos.controlcenter.ControlCenterDemoActivity;
 import jadex.android.applications.demos.event.EventDemoActivity;
 import jadex.android.applications.demos.rest.RestDemoActivity;
+import jadex.android.standalone.JadexClientLauncherActivity;
+import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.bridge.IComponentIdentifier;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
 /**
  * This Activity lets the user choose a demo to run.
  */
-public class DemoChooserActivity extends Activity
+public class DemoChooserActivity extends ClientAppFragment
 {
 	
 	//-------- attributes --------
@@ -37,30 +41,39 @@ public class DemoChooserActivity extends Activity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
 
-		launchBPMNButton = (Button) findViewById(R.id.main_launchBPMNDemoButton);
+		View view = inflater.inflate(R.layout.main, container, false);
+
+		launchBPMNButton = (Button) view.findViewById(R.id.main_launchBPMNDemoButton);
 		launchBPMNButton.setOnClickListener(buttonListener);
 		
-		launchBDIButton = (Button) findViewById(R.id.main_launchBDIDemoButton);
+		launchBDIButton = (Button) view.findViewById(R.id.main_launchBDIDemoButton);
 		launchBDIButton.setOnClickListener(buttonListener);
 		
-		launchBDIV3Button = (Button) findViewById(R.id.main_launchBDIV3DemoButton);
+		launchBDIV3Button = (Button) view.findViewById(R.id.main_launchBDIV3DemoButton);
 		launchBDIV3Button.setOnClickListener(buttonListener);
 
-		launchBenchmarkButton = (Button) findViewById(R.id.main_launchBenchmarkDemoButton);
+		launchBenchmarkButton = (Button) view.findViewById(R.id.main_launchBenchmarkDemoButton);
 		launchBenchmarkButton.setOnClickListener(buttonListener);
 
-		launchEventButton = (Button) findViewById(R.id.main_launchEventDemoButton);
+		launchEventButton = (Button) view.findViewById(R.id.main_launchEventDemoButton);
 		launchEventButton.setOnClickListener(buttonListener);
 		
-		launchRestButton = (Button) findViewById(R.id.main_launchRestDemoButton);
+		launchRestButton = (Button) view.findViewById(R.id.main_launchRestDemoButton);
 		launchRestButton.setOnClickListener(buttonListener);
 		
-		launchControlCenterButton = (Button) findViewById(R.id.main_launchControlCenterButton);
+		launchControlCenterButton = (Button) view.findViewById(R.id.main_launchControlCenterButton);
 		launchControlCenterButton.setOnClickListener(buttonListener);
-
+		
+		return view;
 	}
+	
+	
 
 	private OnClickListener buttonListener = new OnClickListener()
 	{
@@ -68,37 +81,37 @@ public class DemoChooserActivity extends Activity
 		{
 			if (view == launchBPMNButton)
 			{
-				Intent i = new Intent(DemoChooserActivity.this, BPMNDemoActivity.class);
+				Intent i = new Intent(getContext(), BPMNDemoActivity.class);
 				startActivity(i);
 			} 
 			else if (view == launchBDIButton)
 			{
-				Intent i = new Intent(DemoChooserActivity.this, BDIDemoActivity.class);
+				Intent i = new Intent(getContext(), BDIDemoActivity.class);
 				startActivity(i);
 			}
 			else if (view == launchBDIV3Button)
 			{
-				Intent i = new Intent(DemoChooserActivity.this, BDIV3DemoActivity.class);
+				Intent i = new Intent(getContext(), BDIV3DemoActivity.class);
 				startActivity(i);
 			}
 			else if (view == launchBenchmarkButton)
 			{
-				Intent i = new Intent(DemoChooserActivity.this, BenchmarkDemoActivity.class);
+				Intent i = new Intent(getContext(), BenchmarkDemoActivity.class);
 				startActivity(i);
 			}
 			else if (view == launchRestButton) 
 			{
-				Intent i = new Intent(DemoChooserActivity.this, RestDemoActivity.class);
+				Intent i = new Intent(getContext(), RestDemoActivity.class);
 				startActivity(i);
 			}
 			else if (view == launchEventButton)
 			{
-				Intent i = new Intent(DemoChooserActivity.this, EventDemoActivity.class);
+				Intent i = new Intent(getContext(), EventDemoActivity.class);
 				startActivity(i);
 			}
 			else if (view == launchControlCenterButton)
 			{
-				Intent i = new Intent(DemoChooserActivity.this, ControlCenterDemoActivity.class);
+				Intent i = new Intent(getContext(), ControlCenterDemoActivity.class);
 				startActivity(i);
 			}
 		}

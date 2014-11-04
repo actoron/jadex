@@ -9,14 +9,25 @@ if(file('gradle.properties').exists())
 //}
 
 def stdexcl = ['-backup', '-management', '-maven', '-servletfilter-', '-jmonkey', 
-	'-launch', '-web', '-distribution-', '-webservice', '-securetransport', '-relay'] //*:*-relay-standalone
+	'-launch', '-web', '-distribution-', '-webservice', '-securetransport', '-relay', '-android'] //*:*-relay-standalone
 
-def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup']
+def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup', '-android']
+
+apply plugin: 'java-library-distribution'
+
+buildscript {
+    repositories
+    {
+        mavenCentral()
+    }
+    dependencies
+    {
+        classpath 'com.android.tools.build:gradle:0.14.0'
+    }
+}
 
 allprojects
 {
-	apply plugin: 'java-library-distribution'
-
     version = '2.5-SNAPSHOT'
     group = 'net.sourceforge.jadex'
     
@@ -53,39 +64,57 @@ configurations
 
 subprojects
 {
+    def mainSrcDir  = 'src/main/java'
+    def testSrcDir  = 'src/test/java'
+    def junit       = 'junit:junit:4.11'
+    def allSource
+
+    if (isAndroidProject(project)) {
+        apply plugin: 'android'
+        allSource   = android.sourceSets.main.java.srcDirs
+        dependencies
+        {
+            androidTestCompile junit
+        }
+    } else {
+        apply plugin: 'java'
+        apply plugin: 'java-library-distribution'
+        allSource   = sourceSets.main.allSource
+        sourceSets.main.resources.srcDirs    mainSrcDir
+        sourceSets.test.resources.srcDirs    testSrcDir
+        dependencies
+        {
+            testCompile junit
+        }
+    }
+
 	//ext.junit = "junit:junit:4.11"
-    apply plugin: 'java'
     apply plugin: 'maven'
     //apply plugin: 'maven-publish'
     apply plugin: 'signing'
     //apply plugin: 'java-library-distribution'
 
     sourceCompatibility = 1.6
-    sourceSets.main.resources.srcDirs    'src/main/java'
-    sourceSets.test.resources.srcDirs    'src/test/java'
 
-    dependencies
-    {
-        testCompile 'junit:junit:4.11'
+    task sourcesJar(type: Jar, dependsOn: 'classes') {
+        classifier 'sources'
+        from allSource
     }
-    
-	task sourcesJar(type: Jar, dependsOn: classes) {
-    	classifier 'sources'
-    	from sourceSets.main.allSource
-	}
+
+    task javadocJar(type: Jar, dependsOn: 'javadoc') {
+        classifier = 'javadoc'
+        from new File(projectDir, 'build/docs')
+    }
+
+    javadocJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload") }
+
 	//sourcesJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload") }
 
-	task javadocJar(type: Jar) {
-		classifier = 'javadoc'
-		from javadoc.destinationDir
-	} 
-	javadocJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload") }
- 
-	artifacts 
-	{
-    	archives sourcesJar
-    	archives javadocJar
-	}
+    artifacts
+    {
+        archives sourcesJar
+        archives javadocJar
+    }
 
 	signing
 	{
@@ -142,20 +171,123 @@ subprojects
     }
 }
 
+// additional android config
+subprojects {
+    if(isAndroidProject(project))
+    {
+        android {
+            compileSdkVersion 8
+            buildToolsVersion "19" //"21.1"
+
+            defaultConfig {
+                minSdkVersion 8
+                targetSdkVersion 8
+                versionCode 1
+                versionName project.version
+            }
+
+            buildTypes {
+                release {
+                    // runProguard true
+                    // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+                }
+            }
+        }
+
+        configurations {
+            // add new configuration to define provided deps
+            provided
+            // exclude transitive deps that are not supported on android
+            all*.exclude group:'org.javassist', module:'javassist'
+            all*.exclude group:'javax.mail', module:'mail'
+            all*.exclude group:'org.antlr', module:'antlr-runtime'
+            all*.exclude group:'bouncycastle', module:'bcprov-jdk15'
+            all*.exclude group:'org.ow2.asm', module:'asm-all'
+            runtime.exclude module:'junit' // no junit in runtime classpath
+        }
+
+        // include 'provided' configuration only in compile classpath:
+        android.applicationVariants.each { variant ->
+            variant.javaCompile.classpath += configurations.provided
+        }
+
+        // library definitions to be used in subprojects
+        ext.libraries = [
+                android_support: "com.google.android:support-v4:r7",
+                android_compat: "com.android.support:appcompat-v7:19.0.1",
+                android: 'com.google.android:android:2.2.1',
+                android_test: "com.google.android:android-test:2.2.1",
+                protobuf: "com.google.protobuf:protobuf-java:2.4.1",
+                junit: 'junit:junit:4.11'
+        ]
+
+        // general dependencies for all android modules
+        dependencies {
+            compile libraries.android
+            androidTestCompile 'com.pivotallabs:robolectric:1.0'
+            provided 'org.javassist:javassist:3.14.0-GA'
+            provided 'javax.mail:mail:1.4.5'
+            provided 'org.antlr:antlr-runtime:3.1.3'
+            provided 'bouncycastle:bcprov-jdk15:140'
+        }
+
+        // dummy tasks to allow dependencies on tasks that are missing in android-plugin
+        task jar(type:Jar) {
+
+        }
+
+        task javadoc(type:Javadoc) {
+
+        }
+
+        task classes(dependsOn: 'compileDebugSources') {
+
+        }
+    }
+}
+
+def isAndroidProject(project) {
+    return (project.hasProperty("androidProject") && project.property("androidProject") == 'true')
+}
+
+def getSourceDir(project) {
+    if (isAndroidProject(project)) {
+        project.android.sourceSets.main.java.srcDirs
+    } else {
+        project.sourceSets.main.allJava
+    }
+}
+
+def getResourcesDir(project) {
+    if (isAndroidProject(project)) {
+        project.android.sourceSets.main.res.srcDirs
+    } else {
+        project.sourceSets.main.resources
+    }
+}
+
+def getCompileClassPath(project) {
+    if (isAndroidProject(project)) {
+        project.android.applicationVariants.javaCompile.classpath
+    } else {
+        project.sourceSets.main.compileClasspath
+    }
+}
+
 task docs(type: Javadoc) {
-    source subprojects.collect {project -> project.sourceSets.main.allJava }
-    classpath = files(subprojects.collect {project -> project.sourceSets.main.compileClasspath})
+    source subprojects.collect {project -> getSourceDir(project)}
+    classpath = files(subprojects.collect {project -> getCompileClassPath(project)})
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")
 }
 
 task srcZip(type: Zip) {
-	buildDistributionSource(srcZip, stdexcl) 
-}   
+	buildDistributionSource(srcZip, stdexcl)
+}
 
 task srcZipPro(type: Zip) {
-	buildDistributionSource(srcZipPro, proexcl) 
-} 
+	buildDistributionSource(srcZipPro, proexcl)
+}
 
 task srcZip3d(type: Zip) {
 	archiveName = 'sources3d.zip'
@@ -181,8 +313,8 @@ def buildDistributionSource(task, excl) {
     	if(!isExcluded(excl, subproject.name))
 		{
 			task.from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
-			task.from(subproject.sourceSets.main.java) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
-			task.from(subproject.sourceSets.main.resources) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
+			task.from(getSourceDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
+			task.from(getResourcesDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
 		}
 	} 
 	

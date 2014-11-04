@@ -1,0 +1,8 @@
+// tests are disabled because currently, there is no jadex-commons test-jar gradle build.
+//check.dependsOn -= test
+
+dependencies
+{
+    compile project(':jadex-xml')
+    //testCompile('net.sourceforge.jadex:jadex-commons:2.5-SNAPSHOT:test-jar')
+}

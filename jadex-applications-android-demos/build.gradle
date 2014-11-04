@@ -1,0 +1,6 @@
+dependencies
+{
+    compile project(':jadex-android-platformclient')
+    provided project(':jadex-android-platformapp')
+    //testCompile('net.sourceforge.jadex:jadex-commons:2.5-SNAPSHOT:test-jar')
+}

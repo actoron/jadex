@@ -1,0 +1,7 @@
+dependencies 
+{
+    provided libraries.android_test
+    provided libraries.junit
+    provided project(':jadex-android-testlauncher')
+//    provided project(':jadex-android-testlauncher@jar')
+}
