@@ -9,9 +9,9 @@ if(file('gradle.properties').exists())
 //}
 
 def stdexcl = ['-backup', '-management', '-maven', '-servletfilter-', '-jmonkey', 
-	'-launch', '-web', '-distribution-', '-webservice', '-securetransport', '-relay'] //*:*-relay-standalone
+	'-launch', '-web', '-distribution-', '-webservice', '-securetransport', '-relay', '-android'] //*:*-relay-standalone
 
-def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup']
+def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup', '-android']
 
 apply plugin: 'java-library-distribution'
 
