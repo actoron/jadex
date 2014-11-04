@@ -39,7 +39,8 @@ def androidIncl = ['jadex-android-commons',
                 'jadex-platform',
                 'jadex-platform-extension-webservice',
                 'jadex-android-maven-plugin',
-                'jadex-android-platformapp']
+                'jadex-android-platformapp',
+                'jadex-applications-android-demos']
 
 apply plugin: 'java-library-distribution'
 
@@ -304,50 +305,11 @@ subprojects {
 
         }
 
-        // add task to create jar
-//        if (isAndroidLibraryProject(project)) {
-//            android.libraryVariants.all { variant ->
-//                def name = variant.buildType.name
-//                if (name.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
-//                    return; // Skip debug builds.
-//                }
-//                def task = project.tasks.create "jar${name.capitalize()}", Jar
-//                task.dependsOn variant.javaCompile
-//                task.from variant.javaCompile.destinationDir
-//                task.dependsOn variant.processJavaResources
-//                task.from variant.processJavaResources.destinationDir
-//                artifacts.add('archives', task);
-//                // make buildDist depend on jar creation
-//                buildDistAndroid.dependsOn task;
-//            }
-//        }
-//
-//        task clearJar(type:Delete) {
-//            delete 'build/libs/' + project.name + '.jar'
-//        }
-//
-//        task makeJar(type:Copy, dependsOn: clearJar) {
-//            from('build/intermediates/bundles/release/')
-//            into('build/libs/')
-//            include('classes.jar')
-//            rename ('classes.jar', project.name + '.jar')
-//        }
-
-//        assemble.dependsOn makeJar
-
-
-//        jar.from('build/intermediates/classes/release')
-
         if (isAndroidLibraryProject(project)) {
             afterEvaluate {
                 def variant = getReleaseVariant(project)
-//                android.libraryVariants.all {variant ->
-//                    if (variantIsRelease(variant)) {
-                        jar.from(variant.javaCompile.destinationDir)
-                        jar.dependsOn variant.javaCompile
-//                    }
-//                }
-
+                jar.from(variant.javaCompile.destinationDir)
+                jar.dependsOn variant.javaCompile
             }
         }
 
@@ -361,10 +323,6 @@ def isAndroidProject(project) {
 def isAndroidLibraryProject(project) {
     project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
 }
-
-//def variantIsRelease(appVariant) {
-//    appVariant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)
-//}
 
 def getReleaseVariant(project) {
     if (isAndroidLibraryProject(project)) {
@@ -476,10 +434,9 @@ def buildDistribution(task, excl, incl) {
 			task.from(subproject.jar) { into('lib') }
             if (isAndroidProject(subproject) && !isAndroidLibraryProject(subproject)) {
                 subproject.afterEvaluate {
-//                    task.from(subproject.android.applicationVariants.matching({v -> variantIsRelease(v)}).outputFile) {into('apk')}
-                    task.from(getReleaseVariant(subproject).outputFile) {into('apk')}
+                    def releaseApkVariant = getReleaseVariant(subproject).outputs.find({o -> o.name.contains('release')})
+                    task.from(releaseApkVariant.outputFile) {into('apk')}
                 }
-//                task.from(subproject.android) {into('apk')}
             }
 		}
 		else
