@@ -250,7 +250,7 @@ subprojects {
 
 def hasAndroidSdkHome() {
     def androidHome = System.env.'ANDROID_HOME'
-    if (!androidHome.isEmpty()) {
+    if (androidHome != null && !androidHome.isEmpty()) {
         def adb = new File(androidHome + "/platform-tools/adb")
         return adb.exists();
     }
