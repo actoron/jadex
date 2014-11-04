@@ -13,6 +13,34 @@ def stdexcl = ['-backup', '-management', '-maven', '-servletfilter-', '-jmonkey'
 
 def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup', '-android']
 
+def androidIncl = ['jadex-android-commons',
+                'jadex-android-antlr',
+                'jadex-android-xmlpull',
+                'jadex-android-platformclient',
+                'jadex-platform-android',
+                'jadex-runtimetools-android',
+                'jadex-platform-extension-webservice-android',
+                'jadex-commons',
+                'jadex-tools-base',
+                'jadex-bridge',
+                'jadex-javaparser',
+                'jadex-xml',
+                'jadex-rules',
+                'jadex-rules-eca',
+                'jadex-kernel-base',
+                'jadex-kernel-micro',
+                'jadex-kernel-component',
+                'jadex-kernel-bdi',
+                'jadex-kernel-bdiv3',
+                'jadex-kernel-bdiv3-android',
+                'jadex-kernel-bpmn',
+                'jadex-model-bpmn',
+                'jadex-kernel-bdibpmn',
+                'jadex-platform',
+                'jadex-platform-extension-webservice',
+                'jadex-android-maven-plugin',
+                'jadex-android-platformapp']
+
 apply plugin: 'java-library-distribution'
 
 buildscript {
@@ -276,6 +304,53 @@ subprojects {
 
         }
 
+        // add task to create jar
+//        if (isAndroidLibraryProject(project)) {
+//            android.libraryVariants.all { variant ->
+//                def name = variant.buildType.name
+//                if (name.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
+//                    return; // Skip debug builds.
+//                }
+//                def task = project.tasks.create "jar${name.capitalize()}", Jar
+//                task.dependsOn variant.javaCompile
+//                task.from variant.javaCompile.destinationDir
+//                task.dependsOn variant.processJavaResources
+//                task.from variant.processJavaResources.destinationDir
+//                artifacts.add('archives', task);
+//                // make buildDist depend on jar creation
+//                buildDistAndroid.dependsOn task;
+//            }
+//        }
+//
+//        task clearJar(type:Delete) {
+//            delete 'build/libs/' + project.name + '.jar'
+//        }
+//
+//        task makeJar(type:Copy, dependsOn: clearJar) {
+//            from('build/intermediates/bundles/release/')
+//            into('build/libs/')
+//            include('classes.jar')
+//            rename ('classes.jar', project.name + '.jar')
+//        }
+
+//        assemble.dependsOn makeJar
+
+
+//        jar.from('build/intermediates/classes/release')
+
+        if (isAndroidLibraryProject(project)) {
+            afterEvaluate {
+                def variant = getReleaseVariant(project)
+//                android.libraryVariants.all {variant ->
+//                    if (variantIsRelease(variant)) {
+                        jar.from(variant.javaCompile.destinationDir)
+                        jar.dependsOn variant.javaCompile
+//                    }
+//                }
+
+            }
+        }
+
     }
 }
 
@@ -285,6 +360,26 @@ def isAndroidProject(project) {
 
 def isAndroidLibraryProject(project) {
     project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
+}
+
+//def variantIsRelease(appVariant) {
+//    appVariant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)
+//}
+
+def getReleaseVariant(project) {
+    if (isAndroidLibraryProject(project)) {
+        project.android.libraryVariants.each {variant ->
+            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+                return variant
+            }
+        }
+    } else {
+        project.android.applicationVariants.each {variant ->
+            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+                return variant
+            }
+        }
+    }
 }
 
 def getSourceDir(project) {
@@ -322,12 +417,16 @@ task docs(type: Javadoc) {
     options.links("http://docs.oracle.com/javase/7/docs/api/")
 }
 
+task srcAndroidZip(type: Zip) {
+    buildDistributionSource(srcAndroidZip, null, androidIncl)
+}
+
 task srcZip(type: Zip) {
-	buildDistributionSource(srcZip, stdexcl)
+	buildDistributionSource(srcZip, stdexcl, null)
 }
 
 task srcZipPro(type: Zip) {
-	buildDistributionSource(srcZipPro, proexcl)
+	buildDistributionSource(srcZipPro, proexcl, null)
 }
 
 task srcZip3d(type: Zip) {
@@ -340,7 +439,7 @@ task srcZip3d(type: Zip) {
 	from(pr.sourceSets.main.resources) { into 'sources/'+pr.projectDir.name+'/src/main/resources' }
 }
 
-def buildDistributionSource(task, excl) {
+def buildDistributionSource(task, excl, incl) {
 	task.archiveName = 'sources.zip'
     task.classifier = 'src'
     
@@ -351,8 +450,9 @@ def buildDistributionSource(task, excl) {
     task.from('settings.gradle'){ into('sources') }
     
     subprojects.each {subproject ->
-    	if(!isExcluded(excl, subproject.name))
-		{
+        if ((excl != null && !isExcluded(excl, subproject.name))
+                || (incl != null && isExcluded(incl, subproject.name)))
+        {
 			task.from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
 			task.from(getSourceDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
 			task.from(getResourcesDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
@@ -363,20 +463,28 @@ def buildDistributionSource(task, excl) {
 	task.from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
 }
 
-def buildDistribution(task, excl) {
-	println("diststart"+excl)
+def buildDistribution(task, excl, incl) {
+	println("diststart:" + task.name + " excludes: " + excl + " includes: " + incl)
 
 	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
 	subprojects.each {subproject ->
-		if(!isExcluded(excl, subproject.name))
+		if ((excl != null && !isExcluded(excl, subproject.name))
+            || (incl != null && incl.contains(subproject.name)))
 		{
 			task.from(subproject.configurations.runtime) { into('lib') }
 			task.from(subproject.jar) { into('lib') }
+            if (isAndroidProject(subproject) && !isAndroidLibraryProject(subproject)) {
+                subproject.afterEvaluate {
+//                    task.from(subproject.android.applicationVariants.matching({v -> variantIsRelease(v)}).outputFile) {into('apk')}
+                    task.from(getReleaseVariant(subproject).outputFile) {into('apk')}
+                }
+//                task.from(subproject.android) {into('apk')}
+            }
 		}
 		else
 		{
-			println("Excluded: "+subproject.name)
+//			println("Excluded: "+subproject.name)
 		}
 	}
 	 	
@@ -403,13 +511,19 @@ def buildDistribution(task, excl) {
     println("distend")
 }
 
+task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip]) {
+    archiveName = project.name + "-android-" + project.version + ".zip"
+    buildDistribution(buildDistAndroid, null, androidIncl)
+    from(srcAndroidZip.archivePath)
+}
+
 task buildDist(type: Zip, dependsOn: srcZip) {
-	buildDistribution(buildDist, stdexcl)
+	buildDistribution(buildDist, stdexcl, null)
 	from(srcZip.archivePath)
 }
 
 task buildDistPro(type: Zip, dependsOn: srcZipPro) {
-	buildDistribution(buildDistPro, proexcl)
+	buildDistribution(buildDistPro, proexcl, null)
 	from(srcZipPro.archivePath)
 	from('jadex-platform-extension-management/win') { into('win') }
 }
@@ -421,7 +535,7 @@ task buildDist3d(type: Zip, dependsOn: srcZip3d) {
 	println(project(":jadex-kernel-extension-envsupport-jmonkey").jar)
 	
 	from(project(":jadex-kernel-extension-envsupport-jmonkey").jar) { into('lib') }
-	buildDistribution(buildDistPro, proexcl)
+	buildDistribution(buildDistPro, proexcl, null)
 	from(srcZip3d.archivePath)
 	from('docs/readme-3d.txt')
 }
