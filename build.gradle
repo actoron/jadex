@@ -13,7 +13,10 @@ def stdexcl = ['-backup', '-management', '-maven', '-servletfilter-', '-jmonkey'
 
 def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup', '-android']
 
+def andro = false
+
 apply plugin: 'java-library-distribution'
+apply plugin: 'maven-publish' // PublishToMavenLocal
 
 buildscript {
     repositories
@@ -69,14 +72,17 @@ subprojects
     def junit       = 'junit:junit:4.11'
     def allSource
 
-    if (isAndroidProject(project)) {
+    if(isAndroidProject(project)) 
+    {
         apply plugin: 'android'
         allSource   = android.sourceSets.main.java.srcDirs
         dependencies
         {
             androidTestCompile junit
         }
-    } else {
+    } 
+    else 
+    {
         apply plugin: 'java'
         apply plugin: 'java-library-distribution'
         allSource   = sourceSets.main.allSource
@@ -172,7 +178,8 @@ subprojects
 }
 
 // additional android config
-subprojects {
+subprojects 
+{
     if(isAndroidProject(project))
     {
         android {
@@ -222,7 +229,8 @@ subprojects {
         ]
 
         // general dependencies for all android modules
-        dependencies {
+        dependencies 
+        {
             compile libraries.android
             androidTestCompile 'com.pivotallabs:robolectric:1.0'
             provided 'org.javassist:javassist:3.14.0-GA'
