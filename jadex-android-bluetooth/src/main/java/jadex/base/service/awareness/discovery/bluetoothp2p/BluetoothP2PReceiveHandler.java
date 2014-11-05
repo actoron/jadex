@@ -2,8 +2,8 @@ package jadex.base.service.awareness.discovery.bluetoothp2p;
 
 import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.util.Helper;
-import jadex.base.service.awareness.discovery.DiscoveryAgent;
-import jadex.base.service.awareness.discovery.ReceiveHandler;
+import jadex.platform.service.awareness.discovery.DiscoveryAgent;
+import jadex.platform.service.awareness.discovery.ReceiveHandler;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

@@ -1,7 +1,7 @@
 package jadex.base.service.message.transport.btmtp;
 
-import jadex.android.JadexAndroidContext;
-import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
+import jadex.android.AndroidContextManager;
+import jadex.android.AndroidContextManager.AndroidContextChangeListener;
 import jadex.android.bluetooth.JadexBluetoothActivity;
 import jadex.android.bluetooth.exceptions.ActivityIsNotJadexBluetoothActivityException;
 import jadex.android.bluetooth.message.BluetoothMessage;
@@ -17,6 +17,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -101,7 +102,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 */
 	public BTTransport(final IServiceProvider container) {
 		this.container = container;
-		JadexAndroidContext.getInstance().addContextChangeListener(this);
+		AndroidContextManager.getInstance().addContextChangeListener(this);
 	}
 
 	/**
@@ -110,6 +111,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	public IFuture<Void> start() {
 		started = true;
 		final Future<Void> ret = new Future<Void>();
+		
 		try {
 			if (context != null && binder == null) {
 				Intent intent = new Intent(context, ConnectionService.class);
@@ -390,10 +392,9 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 		return ret;
 	}
 	
-
 	@Override
-	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc)
-	{
+	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc,
+			String address) {
 		return false;
 	}
 

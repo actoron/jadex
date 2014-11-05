@@ -3,6 +3,7 @@ package jadex.android;
 
 import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
+import jadex.commons.SUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,16 +37,16 @@ public class AndroidContextManager
 	static
 	{
 		identifiers = new HashSet<String>();
-		identifiers.add(android.os.Build.BRAND.toLowerCase());
-		identifiers.add(android.os.Build.MANUFACTURER.toLowerCase());
-		if (!android.os.Build.MANUFACTURER.equals(android.os.Build.UNKNOWN))
+		identifiers.add(android.os.Build.BRAND != null ? android.os.Build.BRAND.toLowerCase(): "");
+		identifiers.add(android.os.Build.MANUFACTURER != null ? android.os.Build.MANUFACTURER.toLowerCase() : "");
+		if (android.os.Build.MANUFACTURER != null && !android.os.Build.MANUFACTURER.equals(android.os.Build.UNKNOWN))
 		{
 			// stupid full text on x86 emulator, so skip it if emulated
 			identifiers.add(android.os.Build.MODEL.toLowerCase());
 			identifiers.add(android.os.Build.DEVICE.toLowerCase());
 		}
-		identifiers.add(android.os.Build.PRODUCT.toLowerCase());
-		identifiers.add(android.os.Build.BOARD.toLowerCase());
+		identifiers.add(android.os.Build.PRODUCT != null ? android.os.Build.PRODUCT.toLowerCase() : "");
+		identifiers.add(android.os.Build.PRODUCT != null ? android.os.Build.BOARD.toLowerCase() : "");
 	}
 	
 	/**

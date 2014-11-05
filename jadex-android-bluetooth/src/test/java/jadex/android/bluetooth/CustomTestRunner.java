@@ -1,5 +1,6 @@
 package jadex.android.bluetooth;
 
+import jadex.android.bluetooth.shadows.MyShadowBluetoothAdapter;
 import jadex.android.bluetooth.shadows.MyShadowLog;
 
 import org.junit.runners.model.InitializationError;
