@@ -21,6 +21,12 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcprov-jdk15</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
