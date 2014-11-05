@@ -15,6 +15,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.SJavassist;
 import jadex.extension.rs.publish.annotation.MethodMapper;
@@ -198,9 +199,23 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	 *  @param service The original service.
 	 *  @param pid The publish id (e.g. url or name).
 	 */
-	public IFuture<Void> publishService(ClassLoader cl, IService service, PublishInfo pi)
+	public IFuture<Void> publishService(ClassLoader cl, IService service, final PublishInfo pi)
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+		//System.out.println("start publish: "+pi.getPublishId());
+		ret.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				System.out.println("end publish: "+pi.getPublishId());
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
 		
 		try
 		{

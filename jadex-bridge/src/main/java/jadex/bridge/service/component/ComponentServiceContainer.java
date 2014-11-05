@@ -755,10 +755,11 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			{
 				String pid = (String)SJavaParser.evaluateExpression(pi.getPublishId(), instance.getModel().getAllImports(), instance.getFetcher(), instance.getClassLoader());
 				pi.setPublishId(pid);
-//				System.out.println("pid is now: "+pid);
+				System.out.println("pid is now: "+pid);
 			}
 			catch(Exception e)
 			{
+				e.printStackTrace();
 			}
 			
 			getPublishService(instance, pi.getPublishType(), (Iterator<IPublishService>)null)
