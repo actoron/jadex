@@ -25,7 +25,16 @@ task pluginDescriptor( type: Exec ) {
         assert pom.file, "[$pom.canonicalPath] was not created"
 
         pom.text = pom.text.
-                replace('<groupId>unknown</groupId>', "<groupId>${project.group}</groupId>").
+                replace('<groupId>unknown</groupId>', """<parent>
+                        |   <groupId>${project.group}</groupId>
+                        |   <artifactId>jadex-parent</artifactId>
+                        |   <version> ${version} </version>
+                        |   <relativePath>../jadex-parent/pom.xml</relativePath>
+                        |   </parent>
+                        |<description>
+                        |   Maven Plugin for BDI V3 class generation on compile time.
+                        |</description>
+                        |""".stripMargin().trim()).
                 replace('<artifactId>empty-project</artifactId>', "<artifactId>${project.name}</artifactId>").
                 replace('<version>0</version>', """
                                                               |<version>${version}</version>

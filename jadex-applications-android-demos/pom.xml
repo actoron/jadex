@@ -21,73 +21,63 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-platformclient</artifactId>
+			<artifactId>jadex-platform-android</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-android-commons</artifactId> -->
-<!-- 			<version>${jadex.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency>		 -->
 		
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-kernel-component</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-kernel-bpmn</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
-		
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-kernel-bdi</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency>		 -->
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-kernel-bdiv3-android</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency>		 -->
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-runtimetools-android</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-platform-extension-webservice-android</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-android-xmlpull</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-platformapp</artifactId>
+			<artifactId>jadex-kernel-component</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bpmn</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdi</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdiv3-android</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-runtimetools-android</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-extension-webservice-android</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-xmlpull</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-antlr</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>

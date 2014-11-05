@@ -45,20 +45,34 @@ include 'jadex-applications-bdi',
 'jadex-platform-relay-web', 
 'jadex-platform-extension-relay',
 'jadex-platform-extension-webservice',
-'jadex-platform-extension-webservice-desktop',
+'jadex-platform-extension-webservice-desktop'
 // android-specific modules:
-'jadex-android-antlr',
-'jadex-android-commons',
-'jadex-android-xmlpull',
-'jadex-android-bluetooth',
-'jadex-android-integration-test',
-'jadex-android-maven-plugin',
-'jadex-android-platformapp',
-'jadex-android-platformclient',
-'jadex-android-testlauncher',
-'jadex-applications-android',
-'jadex-applications-android-demos',
-'jadex-kernel-bdiv3-android',
-'jadex-platform-android',
-'jadex-platform-extension-webservice-android',
-'jadex-runtimetools-android'
+if (androidSdkExists()) {
+    include 'jadex-android-antlr',
+    'jadex-android-commons',
+    'jadex-android-xmlpull',
+//    'jadex-android-bluetooth',
+//    'jadex-android-integration-test',
+    'jadex-android-maven-plugin',
+    'jadex-android-platformapp',
+    'jadex-android-platformclient',
+//    'jadex-android-testlauncher',
+//    'jadex-applications-android',
+    'jadex-applications-android-demos',
+    'jadex-kernel-bdiv3-android',
+    'jadex-platform-android',
+    'jadex-platform-extension-webservice-android',
+    'jadex-runtimetools-android'
+} else {
+    logger.warn('Cannot compile android projects: No Android SDK found.\n' +
+            'To include android projects in build, set ANDROID_HOME to your android sdk root.')
+}
+
+def androidSdkExists() {
+    def androidHome = System.env.'ANDROID_HOME'
+    if (androidHome != null && !androidHome.isEmpty()) {
+        def adb = new File(androidHome + "/platform-tools/adb")
+        return adb.exists();
+    }
+    return false;
+}

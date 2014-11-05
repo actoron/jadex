@@ -747,19 +747,21 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	{
 		final Future<Void> ret = new Future<Void>();
 		ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceIdentifier());
-		final PublishInfo pi = info==null? null: info.getPublish();
-		if(pi!=null)
+		PublishInfo pit = info==null? null: info.getPublish();
+		if(pit!=null)
 		{
 			// Hack?! evaluate the publish id string 
+			// Must clone info to not change the model
+			final PublishInfo pi = new PublishInfo(pit);
 			try
 			{
 				String pid = (String)SJavaParser.evaluateExpression(pi.getPublishId(), instance.getModel().getAllImports(), instance.getFetcher(), instance.getClassLoader());
 				pi.setPublishId(pid);
-				System.out.println("pid is now: "+pid);
+//				System.out.println("pid is now: "+pid);
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 			
 			getPublishService(instance, pi.getPublishType(), (Iterator<IPublishService>)null)
