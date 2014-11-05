@@ -13,7 +13,34 @@ def stdexcl = ['-backup', '-management', '-maven', '-servletfilter-', '-jmonkey'
 
 def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup', '-android']
 
-def andro = false
+def androidIncl = ['jadex-android-commons',
+                'jadex-android-antlr',
+                'jadex-android-xmlpull',
+                'jadex-android-platformclient',
+                'jadex-platform-android',
+                'jadex-runtimetools-android',
+                'jadex-platform-extension-webservice-android',
+                'jadex-commons',
+                'jadex-tools-base',
+                'jadex-bridge',
+                'jadex-javaparser',
+                'jadex-xml',
+                'jadex-rules',
+                'jadex-rules-eca',
+                'jadex-kernel-base',
+                'jadex-kernel-micro',
+                'jadex-kernel-component',
+                'jadex-kernel-bdi',
+                'jadex-kernel-bdiv3',
+                'jadex-kernel-bdiv3-android',
+                'jadex-kernel-bpmn',
+                'jadex-model-bpmn',
+                'jadex-kernel-bdibpmn',
+                'jadex-platform',
+                'jadex-platform-extension-webservice',
+                'jadex-android-maven-plugin',
+                'jadex-android-platformapp',
+                'jadex-applications-android-demos']
 
 apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // PublishToMavenLocal
@@ -70,12 +97,18 @@ subprojects
     def mainSrcDir  = 'src/main/java'
     def testSrcDir  = 'src/test/java'
     def junit       = 'junit:junit:4.11'
-    def allSource
+    def allSource   = ''
 
     if(isAndroidProject(project)) 
     {
         apply plugin: 'android'
         allSource   = android.sourceSets.main.java.srcDirs
+        if (isAndroidLibraryProject(project)) {
+            apply plugin: 'android-library'
+        } else {
+            apply plugin: 'android'
+        }
+        allSource   = android.sourceSets.main.java.srcDirs //.java.srcDirs
         dependencies
         {
             androidTestCompile junit
@@ -94,11 +127,9 @@ subprojects
         }
     }
 
-	//ext.junit = "junit:junit:4.11"
     apply plugin: 'maven'
     //apply plugin: 'maven-publish'
     apply plugin: 'signing'
-    //apply plugin: 'java-library-distribution'
 
     sourceCompatibility = 1.6
 
@@ -184,7 +215,7 @@ subprojects
     {
         android {
             compileSdkVersion 8
-            buildToolsVersion "19" //"21.1"
+            buildToolsVersion "19.1.0" //"21.1"
 
             defaultConfig {
                 minSdkVersion 8
@@ -193,17 +224,41 @@ subprojects
                 versionName project.version
             }
 
+            sourceSets {
+                main {
+                    manifest.srcFile 'AndroidManifest.xml'
+                    resources.srcDirs = ['src/main/java']
+                    aidl.srcDirs = ['src/main/java']
+                    res.srcDirs = ['res']
+                }
+            }
+
             buildTypes {
                 release {
                     // runProguard true
                     // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
                 }
             }
+
+            packagingOptions {
+                exclude 'LICENSE.txt'
+                exclude 'META-INF/license.txt'
+                exclude 'META-INF/notice.txt'
+            }
+
+            lintOptions {
+                abortOnError false
+            }
         }
 
         configurations {
             // add new configuration to define provided deps
-            provided
+            provided {
+                dependencies.all { dep ->
+                    configurations.default.exclude group: dep.group, module: dep.name
+                }
+            }
+            compile.extendsFrom provided
             // exclude transitive deps that are not supported on android
             all*.exclude group:'org.javassist', module:'javassist'
             all*.exclude group:'javax.mail', module:'mail'
@@ -214,9 +269,15 @@ subprojects
         }
 
         // include 'provided' configuration only in compile classpath:
-        android.applicationVariants.each { variant ->
-            variant.javaCompile.classpath += configurations.provided
-        }
+//        if (isAndroidLibraryProject(project)) {
+//            android.libraryVariants.each { variant ->
+//                variant.compile.classpath += configurations.provided
+//            }
+//        } else {
+//            android.applicationVariants.each { variant ->
+//                variant.compile.classpath += configurations.provided
+//            }
+//        }
 
         // library definitions to be used in subprojects
         ext.libraries = [
@@ -251,11 +312,40 @@ subprojects
         task classes(dependsOn: 'compileDebugSources') {
 
         }
+
+        if (isAndroidLibraryProject(project)) {
+            afterEvaluate {
+                def variant = getReleaseVariant(project)
+                jar.from(variant.javaCompile.destinationDir)
+                jar.dependsOn variant.javaCompile
+            }
+        }
+
     }
 }
 
 def isAndroidProject(project) {
-    return (project.hasProperty("androidProject") && project.property("androidProject") == 'true')
+    project.hasProperty("androidProject") && project.property("androidProject") == 'true'
+}
+
+def isAndroidLibraryProject(project) {
+    project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
+}
+
+def getReleaseVariant(project) {
+    if (isAndroidLibraryProject(project)) {
+        project.android.libraryVariants.each {variant ->
+            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+                return variant
+            }
+        }
+    } else {
+        project.android.applicationVariants.each {variant ->
+            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+                return variant
+            }
+        }
+    }
 }
 
 def getSourceDir(project) {
@@ -276,7 +366,11 @@ def getResourcesDir(project) {
 
 def getCompileClassPath(project) {
     if (isAndroidProject(project)) {
-        project.android.applicationVariants.javaCompile.classpath
+        if (isAndroidLibraryProject(project)) {
+            project.android.libraryVariants.javaCompile.classpath
+        } else {
+            project.android.applicationVariants.javaCompile.classpath
+        }
     } else {
         project.sourceSets.main.compileClasspath
     }
@@ -289,12 +383,16 @@ task docs(type: Javadoc) {
     options.links("http://docs.oracle.com/javase/7/docs/api/")
 }
 
+task srcAndroidZip(type: Zip) {
+    buildDistributionSource(srcAndroidZip, null, androidIncl)
+}
+
 task srcZip(type: Zip) {
-	buildDistributionSource(srcZip, stdexcl)
+	buildDistributionSource(srcZip, stdexcl, null)
 }
 
 task srcZipPro(type: Zip) {
-	buildDistributionSource(srcZipPro, proexcl)
+	buildDistributionSource(srcZipPro, proexcl, null)
 }
 
 task srcZip3d(type: Zip) {
@@ -307,7 +405,7 @@ task srcZip3d(type: Zip) {
 	from(pr.sourceSets.main.resources) { into 'sources/'+pr.projectDir.name+'/src/main/resources' }
 }
 
-def buildDistributionSource(task, excl) {
+def buildDistributionSource(task, excl, incl) {
 	task.archiveName = 'sources.zip'
     task.classifier = 'src'
     
@@ -318,8 +416,9 @@ def buildDistributionSource(task, excl) {
     task.from('settings.gradle'){ into('sources') }
     
     subprojects.each {subproject ->
-    	if(!isExcluded(excl, subproject.name))
-		{
+        if ((excl != null && !isExcluded(excl, subproject.name))
+                || (incl != null && isExcluded(incl, subproject.name)))
+        {
 			task.from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
 			task.from(getSourceDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
 			task.from(getResourcesDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
@@ -330,20 +429,27 @@ def buildDistributionSource(task, excl) {
 	task.from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
 }
 
-def buildDistribution(task, excl) {
-	println("diststart"+excl)
+def buildDistribution(task, excl, incl) {
+	println("diststart:" + task.name + " excludes: " + excl + " includes: " + incl)
 
 	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
 	subprojects.each {subproject ->
-		if(!isExcluded(excl, subproject.name))
+		if ((excl != null && !isExcluded(excl, subproject.name))
+            || (incl != null && incl.contains(subproject.name)))
 		{
 			task.from(subproject.configurations.runtime) { into('lib') }
 			task.from(subproject.jar) { into('lib') }
+            if (isAndroidProject(subproject) && !isAndroidLibraryProject(subproject)) {
+                subproject.afterEvaluate {
+                    def releaseApkVariant = getReleaseVariant(subproject).outputs.find({o -> o.name.contains('release')})
+                    task.from(releaseApkVariant.outputFile) {into('apk')}
+                }
+            }
 		}
 		else
 		{
-			println("Excluded: "+subproject.name)
+//			println("Excluded: "+subproject.name)
 		}
 	}
 	 	
@@ -370,13 +476,19 @@ def buildDistribution(task, excl) {
     println("distend")
 }
 
+task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip]) {
+    archiveName = project.name + "-android-" + project.version + ".zip"
+    buildDistribution(buildDistAndroid, null, androidIncl)
+    from(srcAndroidZip.archivePath)
+}
+
 task buildDist(type: Zip, dependsOn: srcZip) {
-	buildDistribution(buildDist, stdexcl)
+	buildDistribution(buildDist, stdexcl, null)
 	from(srcZip.archivePath)
 }
 
 task buildDistPro(type: Zip, dependsOn: srcZipPro) {
-	buildDistribution(buildDistPro, proexcl)
+	buildDistribution(buildDistPro, proexcl, null)
 	from(srcZipPro.archivePath)
 	from('jadex-platform-extension-management/win') { into('win') }
 }
@@ -388,7 +500,7 @@ task buildDist3d(type: Zip, dependsOn: srcZip3d) {
 	println(project(":jadex-kernel-extension-envsupport-jmonkey").jar)
 	
 	from(project(":jadex-kernel-extension-envsupport-jmonkey").jar) { into('lib') }
-	buildDistribution(buildDistPro, proexcl)
+	buildDistribution(buildDistPro, proexcl, null)
 	from(srcZip3d.archivePath)
 	from('docs/readme-3d.txt')
 }
