@@ -91,6 +91,11 @@ public class PublishInfo
 		}
 	}
 	
+//	/**
+//	 * 
+//	 */
+//	public PublishInfo(Publish)
+	
 	//-------- methods --------
 
 	/**
