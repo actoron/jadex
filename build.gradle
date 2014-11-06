@@ -384,29 +384,27 @@ task docs(type: Javadoc) {
 }
 
 task srcAndroidZip(type: Zip) {
-    buildDistributionSource(srcAndroidZip, null, androidIncl)
+    buildDistributionSource(srcAndroidZip, null, androidIncl, null, false)
 }
 
 task srcZip(type: Zip) {
-	buildDistributionSource(srcZip, stdexcl, null)
+	buildDistributionSource(srcZip, stdexcl, null, null, true)
 }
 
 task srcZipPro(type: Zip) {
-	buildDistributionSource(srcZipPro, proexcl, null)
+	buildDistributionSource(srcZipPro, proexcl, null, null, false)
 }
 
 task srcZip3d(type: Zip) {
-	archiveName = 'sources3d.zip'
-    classifier = 'src'
-    
-    def pr = project(":jadex-kernel-extension-envsupport-jmonkey")
-    from(pr.projectDir.name) { include 'build.gradle' into 'sources/'+pr.projectDir.name }
-	from(pr.sourceSets.main.java) { into 'sources/'+pr.projectDir.name+'/src/main/java' }
-	from(pr.sourceSets.main.resources) { into 'sources/'+pr.projectDir.name+'/src/main/resources' }
+    buildDistributionSource(srcZip3d, null, ['jadex-kernel-extension-envsupport-jmonkey'], 'sources3d.zip', true)
 }
 
-def buildDistributionSource(task, excl, incl) {
-	task.archiveName = 'sources.zip'
+task srcZipWebservice(type: Zip) {
+    buildDistributionSource(srcZipWebservice, null, ['jadex-applications-webservice', 'jadex-platform-extension-webservice', 'jadex-platform-extension-webservice-desktop'], 'sourcesws.zip', false)
+}
+
+def buildDistributionSource(task, excl, incl, name, opengl) {
+	task.archiveName = name!=null? name: 'sources.zip'
     task.classifier = 'src'
     
     //from(sourceSets.main.allSource){}
@@ -419,18 +417,28 @@ def buildDistributionSource(task, excl, incl) {
         if ((excl != null && !isExcluded(excl, subproject.name))
                 || (incl != null && isExcluded(incl, subproject.name)))
         {
+        	//println('including: '+task.name+" "+subproject.projectDir.name)
 			task.from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
 			task.from(getSourceDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
 			task.from(getResourcesDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
 		}
 	} 
 	
-	task.from('jadex-kernel-extension-envsupport-opengl/lib/gluegen-rt.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
-	task.from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+	if(opengl)
+	{
+		task.from('jadex-kernel-extension-envsupport-opengl/lib/gluegen-rt.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+		task.from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+	}
+}
+
+task buildExampleProject(type: Zip) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveName = 'jadex-example-project.zip'
+	from('docs/jadex-example-project')
 }
 
 def buildDistribution(task, excl, incl) {
-	println("diststart:" + task.name + " excludes: " + excl + " includes: " + incl)
+	//println("diststart:" + task.name + " excludes: " + excl + " includes: " + incl)
 
 	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
@@ -473,7 +481,7 @@ def buildDistribution(task, excl, incl) {
     task.from('docs/bpmn_editor.bat')
     task.from('docs/bpmn_editor.sh')
     task.from('docs/howtostart.txt')
-    println("distend")
+    //println("distend")
 }
 
 task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip]) {
@@ -482,9 +490,11 @@ task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip]) {
     from(srcAndroidZip.archivePath)
 }
 
-task buildDist(type: Zip, dependsOn: srcZip) {
+task buildDist(type: Zip, dependsOn: [srcZip, buildExampleProject]) {
+	archiveName = 'jadex-'+version+'.zip' //baseName
 	buildDistribution(buildDist, stdexcl, null)
 	from(srcZip.archivePath)
+	from(buildExampleProject.archivePath)
 }
 
 task buildDistPro(type: Zip, dependsOn: srcZipPro) {
@@ -494,15 +504,26 @@ task buildDistPro(type: Zip, dependsOn: srcZipPro) {
 }
 
 task buildDist3d(type: Zip, dependsOn: srcZip3d) {
-	archiveName = '3d.zip'
-	
-	println(project(":jadex-kernel-extension-envsupport-jmonkey"))
-	println(project(":jadex-kernel-extension-envsupport-jmonkey").jar)
-	
+	archiveName = 'jadex-3d-addon-'+version+'.zip' //baseName
 	from(project(":jadex-kernel-extension-envsupport-jmonkey").jar) { into('lib') }
-	buildDistribution(buildDistPro, proexcl, null)
+	from(project(":jadex-kernel-extension-envsupport-jmonkey").configurations.runtime) { into('lib') exclude("*jadex*") } // exclude jadex dependencies
 	from(srcZip3d.archivePath)
 	from('docs/readme-3d.txt')
+}
+
+task buildDistWebservice(type: Zip, dependsOn: srcZipWebservice) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	
+	archiveName = ' jadex-webservice-addon-'+version+'.zip' 
+	
+	from(project(":jadex-applications-webservice").jar) { into('lib') }
+	from(project(":jadex-applications-webservice").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(project(":jadex-platform-extension-webservice").jar) { into('lib') }
+	from(project(":jadex-platform-extension-webservice").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(project(":jadex-platform-extension-webservice-desktop").jar) { into('lib') }
+	from(project(":jadex-platform-extension-webservice-desktop").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	
+	from(srcZipWebservice.archivePath)
 }
 
 def isExcluded(excl, name)
