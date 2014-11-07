@@ -70,13 +70,13 @@ public class InvokerAgent
 		}
 		
 		final Future<Void> ret = new Future<Void>();
-		ret.addResultListener(agent.createResultListener(new IResultListener<Void>()
+		ret.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 //				System.out.println("tests finished");
 
-				agent.setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				agent.killAgent();				
 			}
 			
@@ -84,12 +84,12 @@ public class InvokerAgent
 			{
 				System.out.println(agent.isComponentThread()+" "+agent.getComponentIdentifier());
 				
-				agent.setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				agent.killAgent();	
 			}
 		}));
 			
-//		testLocal().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
+//		testLocal().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 //		{
 //			public void customResultAvailable(Void result)
 //			{
@@ -97,7 +97,7 @@ public class InvokerAgent
 //			}
 //		}));
 		
-//		testRemote().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
+//		testRemote().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 //		{
 //			public void customResultAvailable(Void result)
 //			{
@@ -105,7 +105,7 @@ public class InvokerAgent
 //			}
 //		}));
 		
-		testLocal(1, 100, 3).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
+		testLocal(1, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 		{
 			public void customResultAvailable(TestReport[] result)
 			{
@@ -117,7 +117,7 @@ public class InvokerAgent
 				} 
 				else 
 				{
-					testRemote(2, 100, 3).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
+					testRemote(2, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 					{
 						public void customResultAvailable(TestReport[] result)
 						{
@@ -139,12 +139,12 @@ public class InvokerAgent
 	{
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
 		performTestA(agent.getComponentIdentifier().getRoot(), testno, delay, max)
-			.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 		{
 			public void customResultAvailable(final TestReport result1)
 			{
 				performTestB(agent.getComponentIdentifier().getRoot(), testno+1, delay, max)
-					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 				{
 					public void customResultAvailable(final TestReport result2)
 					{
@@ -171,18 +171,18 @@ public class InvokerAgent
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-gui", "false", "-simulation", "false", "-printpass", "false"
-		}).addResultListener(agent.createResultListener(
+		}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				performTestA(platform.getComponentIdentifier(), testno, delay, max)
-					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 				{
 					public void customResultAvailable(final TestReport result1)
 					{
 						performTestB(platform.getComponentIdentifier(), testno+1, delay, max)
-							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 						{
 							public void customResultAvailable(final TestReport result2)
 							{
@@ -250,7 +250,7 @@ public class InvokerAgent
 							{
 //								System.out.println("cid is: "+cid);
 								SServiceProvider.getService(agent.getServiceProvider(), cid, IPullResultService.class)
-									.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
+									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 								{
 									public void customResultAvailable(IPullResultService service)
 									{
@@ -258,7 +258,7 @@ public class InvokerAgent
 //										System.out.println("Invoking");
 										IPullIntermediateFuture<String> fut = service.getResultsA(max);
 										
-										fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<String>()
+										fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
 										{
 											protected List<String> res = new ArrayList<String>();
 											
@@ -359,14 +359,14 @@ public class InvokerAgent
 							{
 //								System.out.println("cid is: "+cid);
 								SServiceProvider.getService(agent.getServiceProvider(), cid, IPullResultService.class)
-									.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
+									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 								{
 									public void customResultAvailable(IPullResultService service)
 									{
 										// Invoke service agent
 										IPullSubscriptionIntermediateFuture<String> fut2 = service.getResultsB(max);
 										
-										fut2.addResultListener(agent.createResultListener(new IIntermediateResultListener<String>()
+										fut2.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
 										{
 											protected List<String> res = new ArrayList<String>();
 											

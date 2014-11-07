@@ -42,7 +42,7 @@ public class TestAgent implements ITestService
 		{
 			tr.setSucceeded(true);
 		}
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killAgent();
 	}
 	

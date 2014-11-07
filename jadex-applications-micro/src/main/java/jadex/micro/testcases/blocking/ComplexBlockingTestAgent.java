@@ -64,12 +64,12 @@ public class ComplexBlockingTestAgent
 		
 		if("[1, 1, 2, 2, 3, 3]".equals(steps.toString()))
 		{
-			agent.setResultValue("testresults", new Testcase(1,
+			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test interleaved blocking.", true, null)}));
 		}
 		else
 		{
-			agent.setResultValue("testresults", new Testcase(1,
+			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test interleaved blocking.", false, "Wrong steps: "+steps)}));
 		}
 	}

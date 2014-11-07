@@ -45,7 +45,7 @@ public class UserAgent
 	@AgentBody
 	public void body()
 	{
-		ITestService ser = (ITestService)agent.getServiceContainer().getRequiredService("testser").get();
+		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser").get();
 		
 		final List<TestReport> results = new ArrayList<TestReport>();
 		final long wa = SReflect.isAndroid() ? 5000 : 500;
@@ -106,7 +106,7 @@ public class UserAgent
 			e.printStackTrace();
 		}
 		
-		agent.setResultValue("testresults", new Testcase(results.size(), 
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killAgent();
 	}

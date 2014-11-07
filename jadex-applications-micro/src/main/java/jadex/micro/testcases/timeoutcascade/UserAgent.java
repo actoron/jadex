@@ -52,7 +52,7 @@ public class UserAgent
 		}
 		
 		tc.addReport(tr);
-		agent.setResultValue("testresults", tc);
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 		agent.killAgent();
 	}
 }

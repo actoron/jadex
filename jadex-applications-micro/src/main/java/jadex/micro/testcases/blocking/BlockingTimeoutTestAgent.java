@@ -33,7 +33,7 @@ public class BlockingTimeoutTestAgent
 		runTests(agent, tests);
 		runTests(agent, tests);	// perform tests twice
 
-		agent.setResultValue("testresults", new Testcase(tests.size(), tests.toArray(new TestReport[tests.size()])));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(tests.size(), tests.toArray(new TestReport[tests.size()])));
 	}
 
 	/**

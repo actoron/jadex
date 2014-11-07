@@ -63,19 +63,19 @@ public class InvokerAgent
 		
 		
 		final Future<Void> ret = new Future<Void>();
-		ret.addResultListener(agent.createResultListener(new IResultListener<Void>()
+		ret.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 //				System.out.println("tests finished: "+tc);
-				agent.setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				agent.killAgent();				
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				tc.addReport(new TestReport("#0", "Unexpected exception", exception));
 //				System.out.println("tests finished: "+tc);
-				agent.setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				agent.killAgent();
 			}
 		}));
@@ -135,7 +135,7 @@ public class InvokerAgent
 			"-gui", "false",
 //			"-usepass", "false",
 			"-simulation", "false", "-printpass", "false"
-		}).addResultListener(agent.createResultListener(
+		}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -182,7 +182,7 @@ public class InvokerAgent
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 				
 				cms.createComponent(null, "jadex/micro/testcases/terminate/TerminableProviderAgent.class", new CreationInfo(rid), null)
-					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
 				{	
 					public void customResultAvailable(final IComponentIdentifier cid)
 					{

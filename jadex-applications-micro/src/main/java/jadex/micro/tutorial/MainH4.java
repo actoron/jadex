@@ -42,7 +42,7 @@ public class MainH4
 		System.out.println("Started platform: "+platform.getComponentIdentifier());
 		
 		// Get the CMS service from the platform
-		IComponentManagementService	cms	= SServiceProvider.getService(platform.getServiceProvider(),
+		IComponentManagementService	cms	= SServiceProvider.getService(platform,
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
 		
 		// Start the chat component
@@ -50,7 +50,7 @@ public class MainH4
 		System.out.println("Started chat component: "+cid);
 		
 		// Fetch the chat service
-		IChatService	chat	= SServiceProvider.getService(platform.getServiceProvider(), cid, IChatService.class).get(sus);
+		IChatService	chat	= SServiceProvider.getService(platform, cid, IChatService.class).get(sus);
 		chat.message("Main", "Chat started.");
 
 	}

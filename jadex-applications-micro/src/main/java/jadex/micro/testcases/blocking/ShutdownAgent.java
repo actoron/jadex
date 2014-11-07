@@ -44,7 +44,7 @@ public class ShutdownAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)

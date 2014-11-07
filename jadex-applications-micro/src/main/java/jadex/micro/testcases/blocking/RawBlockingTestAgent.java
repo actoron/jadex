@@ -30,7 +30,7 @@ public class RawBlockingTestAgent
 		
 		cms.getComponentDescriptions().get();
 		
-		agent.setResultValue("testresults", new Testcase(1,
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
 			new TestReport[]{new TestReport("#1", "Test blocking wait.", true, null)}));
 	}
 }

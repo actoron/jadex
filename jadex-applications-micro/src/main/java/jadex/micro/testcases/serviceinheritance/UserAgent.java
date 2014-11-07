@@ -63,7 +63,7 @@ public class UserAgent
 					public void customResultAvailable(TestReport tr)
 					{
 						tc.addReport(tr);
-						agent.setResultValue("testresults", tc);
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 						ret.setResult(null);
 					}
 				});

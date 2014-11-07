@@ -35,7 +35,7 @@ public class IntermediateInvokerAgent	extends InvokerAgent
 		
 		int	max	= 3;
 		final ITerminableIntermediateFuture<String> fut = service.getResults(delay, max);
-		fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<String>()
+		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
 		{
 			public void resultAvailable(Collection<String> result)
 			{

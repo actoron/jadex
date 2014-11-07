@@ -2,10 +2,11 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.service.BasicServiceContainer;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
@@ -29,7 +30,7 @@ import jadex.micro.annotation.Results;
 public class RequiredServiceConfigurationsAgent //extends MicroAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Agent created.
@@ -37,8 +38,8 @@ public class RequiredServiceConfigurationsAgent //extends MicroAgent
 	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
-		BasicServiceContainer con = (BasicServiceContainer)agent.getServiceContainer();
-		RequiredServiceInfo rsi = con.getRequiredServiceInfo("as");
+//		BasicServiceContainer con = (BasicServiceContainer)agent.getServiceContainer();
+		RequiredServiceInfo rsi = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfo("as");
 //		System.out.println(rsi.getDefaultBinding().getScope());
 		TestReport tr = new TestReport("#1", "Test required service overriding.");
 		if(rsi.getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_LOCAL))
@@ -49,7 +50,7 @@ public class RequiredServiceConfigurationsAgent //extends MicroAgent
 		{
 			tr.setFailed("Wrong service implementation: "+rsi.getDefaultBinding().getScope());
 		}
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		return IFuture.DONE;
 	}
 	

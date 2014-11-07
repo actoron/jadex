@@ -43,7 +43,7 @@ public class ListenerAgent
 		final Future<Void>	ret	= new Future<Void>();
 		final Collection<TestReport>	reports	= new ArrayList<TestReport>();
 		
-		ITestService ts = (ITestService)agent.getServiceContainer().getRequiredService("test").get();
+		ITestService ts = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("test").get();
 		ISubscriptionIntermediateFuture<String> fut = ts.test();
 		
 		TestReport	tr	= new TestReport("#1", "Test addition of wrong listener.");
@@ -88,7 +88,7 @@ public class ListenerAgent
 			protected void	proceed()
 			{
 				reports.add(tr2);
-				agent.setResultValue("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
 				ret.setResult(null);				
 			}
 		});

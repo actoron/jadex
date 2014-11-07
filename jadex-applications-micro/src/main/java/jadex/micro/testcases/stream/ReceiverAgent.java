@@ -65,7 +65,7 @@ public class ReceiverAgent
 			final FileOutputStream fos = new FileOutputStream(f);
 			
 			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
-			fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<byte[]>()
+			fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
 			{
 				public void resultAvailable(Collection<byte[]> result)
 				{
@@ -101,7 +101,7 @@ public class ReceiverAgent
 					{
 //						System.out.println("finished, size: "+cnt[0]);
 						fos.close();
-						agent.setResultValue("filesize", Long.valueOf(cnt[0]));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("filesize", Long.valueOf(cnt[0]));
 						agent.killAgent();
 					}
 					catch(Exception e)

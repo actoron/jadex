@@ -266,9 +266,9 @@ public class PojoAgentCreationAgent
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				agent.setResultValue("microcreationtime", new Tuple(""+pera, "s"));
-				agent.setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
-				agent.setResultValue("micromem", new Tuple(""+upera, "kb"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 				agent.killComponent();
 			}
 		});

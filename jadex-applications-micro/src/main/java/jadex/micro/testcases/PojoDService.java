@@ -4,9 +4,12 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -38,7 +41,7 @@ public class PojoDService implements IDService
 		
 		if("first".equals(agent.getConfiguration()))
 		{
-			IFuture<IComponentManagementService> cmsfut = agent.getServiceContainer().getRequiredService("cms");
+			IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 			cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -71,7 +74,7 @@ public class PojoDService implements IDService
 			ret.setResult(null);
 		}
 		
-		res.addResultListener(agent.createResultListener(new IResultListener()
+		res.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -86,7 +89,7 @@ public class PojoDService implements IDService
 					tr.setReason("Wrong parameter value received.");
 				}
 				
-				agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				
 				ret.setResult(null);
 //				if(result!=null)
@@ -95,7 +98,7 @@ public class PojoDService implements IDService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				agent.setResultValue("testresults", new Testcase(0, new TestReport[]{}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(0, new TestReport[]{}));
 				ret.setResult(null);
 				agent.killComponent();
 			}

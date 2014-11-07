@@ -1,7 +1,7 @@
 package jadex.micro.tutorial;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentService;
@@ -18,7 +18,7 @@ import java.util.Date;
 public class ChatC1Agent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	@AgentService
 	protected IClockService clockservice;
@@ -41,7 +41,7 @@ public class ChatC1Agent
 //	@AgentBody
 //	public void executeBody()
 //	{
-//		agent.getServiceContainer().getRequiredService("clockservice")
+//		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")
 //			.addResultListener(new DefaultResultListener()
 //		{
 //			public void resultAvailable(Object result)

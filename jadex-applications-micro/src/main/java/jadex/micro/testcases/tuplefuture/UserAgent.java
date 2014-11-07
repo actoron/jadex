@@ -42,7 +42,7 @@ public class UserAgent
 	@AgentBody
 	public void body()
 	{
-		ITestService ts = (ITestService)agent.getServiceContainer().getRequiredService("ts").get();
+		ITestService ts = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ts").get();
 		
 		ITuple2Future<String, Integer> fut = ts.getSomeResults();
 		
@@ -93,7 +93,7 @@ public class UserAgent
 					tr2.setFailed("Received wrong results.");
 				}
 				
-				agent.setResultValue("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 				agent.killAgent();
 			}
 			

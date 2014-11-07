@@ -3,12 +3,13 @@ package jadex.micro.tutorial;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -44,7 +45,7 @@ public class ChatE3Agent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The nickname. */
 	@AgentArgument
@@ -58,7 +59,7 @@ public class ChatE3Agent
 	public IFuture<Void> init()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IRegistryServiceE3>	fut	= agent.getServiceContainer().getRequiredService("regservice");
+		IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
 		fut.addResultListener(new ExceptionDelegationResultListener<IRegistryServiceE3, Void>(ret)
 		{
 			public void customResultAvailable(final IRegistryServiceE3 rs)
@@ -77,14 +78,14 @@ public class ChatE3Agent
 	@AgentBody
 	public void executeBody()
 	{
-//		IFuture<IRegistryServiceE3>	regservice	= agent.getServiceContainer().getRequiredService("regservice");
+//		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
 //		regservice.addResultListener(new DefaultResultListener<IRegistryServiceE3>()
 //		{
 //			public void resultAvailable(final IRegistryServiceE3 rs)
 //			{
 				regservice.register(agent.getComponentIdentifier(), nickname);
 				
-				agent.waitFor(10000, new IComponentStep<Void>()
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

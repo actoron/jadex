@@ -22,6 +22,8 @@ public interface IArgumentsFeature
 	 */
 	public Map<String, Object> getResults();
 	
+	// todo: allow for setResult() or must use a monitored map to be able to send out intermediate results
+	
 	/**
 	 * Subscribe to receive results.
 	 */

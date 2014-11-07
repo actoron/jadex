@@ -43,7 +43,7 @@ public class ReqServiceBlockAgent implements IBlockService
 		trs[0] = new TestReport("#1", "Test if required service can be fetched with get()");
 		try
 		{
-			IBlockService bs = (IBlockService)agent.getServiceContainer().getRequiredService("myser").get(1000);
+			IBlockService bs = (IBlockService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("myser").get(1000);
 			trs[0].setSucceeded(true);
 		}
 		catch(Exception e)
@@ -55,7 +55,7 @@ public class ReqServiceBlockAgent implements IBlockService
 		trs[1] = new TestReport("#2", "Test if not available required service can be fetched with get()");
 		try
 		{
-			IStepService ss = (IStepService)agent.getServiceContainer().getRequiredService("stepser").get(10);
+			IStepService ss = (IStepService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("stepser").get(10);
 			trs[1].setFailed("Non-available service found: "+ss.toString());
 		}
 		catch(Exception e)
@@ -64,7 +64,7 @@ public class ReqServiceBlockAgent implements IBlockService
 //			e.printStackTrace();
 		}
 		
-		agent.setResultValue("testresults", new Testcase(2, trs));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, trs));
 	}
 	
 	/**

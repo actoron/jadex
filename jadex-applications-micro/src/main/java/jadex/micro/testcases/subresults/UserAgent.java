@@ -45,7 +45,7 @@ public class UserAgent
 		
 		final TestReport tr = new TestReport("#1", "Test if intermediate results are retrieved.");
 		
-		ea.subscribeToResults().addResultListener(agent.createResultListener(
+		ea.subscribeToResults().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new IIntermediateResultListener<Tuple2<String, Object>>()
 		{
 			boolean ok = false;
@@ -73,7 +73,7 @@ public class UserAgent
 				{
 					tr.setFailed("No intermediate results have been retrieved.");
 				}
-				agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killAgent();
 			}
 			
@@ -81,7 +81,7 @@ public class UserAgent
 			{
 				System.out.println("ra: "+result);
 				tr.setFailed("No intermediate results have been retrieved: "+result);
-				agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killAgent();
 			}
 			
@@ -89,7 +89,7 @@ public class UserAgent
 			{
 				System.out.println("ex: "+exception);
 				tr.setFailed("Exception occrred: "+exception);
-				agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killAgent();
 			}
 		}));

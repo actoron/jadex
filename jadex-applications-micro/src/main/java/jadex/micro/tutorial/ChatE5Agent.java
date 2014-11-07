@@ -3,10 +3,11 @@ package jadex.micro.tutorial;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -44,7 +45,7 @@ public class ChatE5Agent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The nickname. */
 	@AgentArgument
@@ -61,14 +62,14 @@ public class ChatE5Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IRegistryServiceE3>	regservice	= agent.getServiceContainer().getRequiredService("regservice");
+		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
 		regservice.addResultListener(new DefaultResultListener<IRegistryServiceE3>()
 		{
 			public void resultAvailable(final IRegistryServiceE3 rs)
 			{
 				rs.register(agent.getComponentIdentifier(), nickname);
 				
-				agent.waitFor(10000, new IComponentStep<Void>()
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

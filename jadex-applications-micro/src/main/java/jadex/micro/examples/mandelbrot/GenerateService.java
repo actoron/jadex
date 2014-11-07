@@ -155,19 +155,19 @@ public class GenerateService implements IGenerateService
 						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
 							new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
 							agent.getParentAccess().getComponentIdentifier()), null)
-							.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 						{
 							// Component created, now get the calculation service.
 							public void customResultAvailable(Object result)
 							{
 								cms.getExternalAccess((IComponentIdentifier)result).addResultListener(
-									agent.createResultListener(new DelegationResultListener(ret)
+									agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
 										SServiceProvider.getService(((IExternalAccess)result).getServiceProvider(),
 											ICalculateService.class, RequiredServiceInfo.SCOPE_LOCAL).addResultListener(
-											agent.createResultListener(new DelegationResultListener(ret)
+											agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 										{
 											public void customResultAvailable(Object result)
 											{
@@ -283,7 +283,7 @@ public class GenerateService implements IGenerateService
 		// Assign tasks to service pool.
 		final int number	= areas.size();
 		manager.setMax(data.getParallel());
-		manager.performTasks(areas, true, data).addResultListener(agent.createResultListener(
+		manager.performTasks(areas, true, data).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new IIntermediateResultListener<Object>()
 		{
 			int	cnt	= 0;

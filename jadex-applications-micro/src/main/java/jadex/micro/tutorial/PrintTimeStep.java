@@ -4,6 +4,7 @@ import java.util.Date;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -20,7 +21,7 @@ public class PrintTimeStep implements IComponentStep<Void>
 	 */
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
-		IFuture<IClockService> fut = ia.getServiceContainer().getRequiredService("clockservice");
+		IFuture<IClockService> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
 		fut.addResultListener(new DefaultResultListener<IClockService>()
 		{
 			public void resultAvailable(IClockService cs)

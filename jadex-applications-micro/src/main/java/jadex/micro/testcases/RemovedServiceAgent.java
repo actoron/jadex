@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -90,14 +91,14 @@ public class RemovedServiceAgent
 		{
 			public void resultAvailable(Collection<TestReport> results)
 			{				
-				agent.setResultValue("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
 				ret.setResult(null);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				final TestReport	tr	= new TestReport("#1", "Exception during test.");
 				tr.setFailed(exception.toString());
-				agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				ret.setResult(null);
 			}
 		});
@@ -210,7 +211,7 @@ public class RemovedServiceAgent
 															}
 														}
 														
-														agent.setResultValue("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
+														agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
 														testfut.setFinished();														
 													}
 												});

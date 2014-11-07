@@ -77,13 +77,13 @@ public class UserAgent
 		}
 		
 		final Future<TestReport> ret = new Future<TestReport>();
-		ret.addResultListener(agent.createResultListener(new IResultListener<TestReport>()
+		ret.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<TestReport>()
 		{
 			public void resultAvailable(TestReport result)
 			{
 //				System.out.println("tests finished");
 
-				agent.setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				agent.killAgent();				
 			}
 			
@@ -91,12 +91,12 @@ public class UserAgent
 			{
 				System.out.println(agent.isComponentThread()+" "+agent.getComponentIdentifier());
 				
-				agent.setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				agent.killAgent();	
 			}
 		}));
 			
-//			testLocal().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
+//			testLocal().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 //			{
 //				public void customResultAvailable(Void result)
 //				{
@@ -104,7 +104,7 @@ public class UserAgent
 //				}
 //			}));
 		
-//			testRemote().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
+//			testRemote().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 //			{
 //				public void customResultAvailable(Void result)
 //				{
@@ -112,7 +112,7 @@ public class UserAgent
 //				}
 //			}));
 		
-		testLocal(1, 100, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+		testLocal(1, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
@@ -123,7 +123,7 @@ public class UserAgent
 				}
 				else
 				{
-					testRemote(2, 100, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+					testRemote(2, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 					{
 						public void customResultAvailable(TestReport result)
 						{
@@ -201,13 +201,13 @@ public class UserAgent
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-gui", "false", "-simulation", "false", "-printpass", "false"
-		}).addResultListener(agent.createResultListener(
+		}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				performTest(platform.getComponentIdentifier(), testno, delay, max)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
 					{
@@ -267,7 +267,7 @@ public class UserAgent
 					public void customResultAvailable(final IComponentIdentifier cid)
 					{
 						SServiceProvider.getService(agent.getServiceProvider(), cid, IAService.class)
-							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
 						{
 							public void customResultAvailable(IAService service)
 							{

@@ -42,7 +42,7 @@ public class MainH3
 		System.out.println("Started platform: "+platform.getComponentIdentifier());
 		
 		// Get the CMS service from the platform
-		IComponentManagementService	cms	= SServiceProvider.getService(platform.getServiceProvider(),
+		IComponentManagementService	cms	= SServiceProvider.getService(platform,
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
 		
 		// Start the chat component

@@ -60,7 +60,7 @@ public class InitiatorAgent extends TestAgent
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		testLocal(1).addResultListener(agent.createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(Collection<TestReport> result)
 			{
@@ -88,7 +88,7 @@ public class InitiatorAgent extends TestAgent
 				} 
 				else 
 				{
-					testRemote(3).addResultListener(agent.createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+					testRemote(3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
 						public void customResultAvailable(Collection<TestReport> result)
 						{
@@ -122,7 +122,7 @@ public class InitiatorAgent extends TestAgent
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
 		performTests(agent.getComponentIdentifier().getRoot(), testno, true)
-			.addResultListener(agent.createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
 		
 		return ret;
 	}
@@ -134,13 +134,13 @@ public class InitiatorAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		createPlatform(null/*new String[]{"-gui", "true", "-logging", "true"}*/).addResultListener(agent.createResultListener(
+		createPlatform(null/*new String[]{"-gui", "true", "-logging", "true"}*/).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				performTests(platform.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		

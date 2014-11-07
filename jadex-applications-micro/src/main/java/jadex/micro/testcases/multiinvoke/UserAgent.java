@@ -51,7 +51,7 @@ public class UserAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IMultiplexExampleService> fut = agent.getServiceContainer().getRequiredService("ms");
+		IFuture<IMultiplexExampleService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IMultiplexExampleService, Void>(ret)
 		{
 			public void customResultAvailable(IMultiplexExampleService ser)
@@ -67,7 +67,7 @@ public class UserAgent
 					{
 //						System.out.println("countlis: "+agent.isComponentThread());
 						
-						agent.setResultValue("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
 						ret.setResult(null);
 					}
 

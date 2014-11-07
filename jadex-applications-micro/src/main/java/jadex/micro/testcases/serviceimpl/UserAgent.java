@@ -39,7 +39,7 @@ public class UserAgent
 	{
 		TestReport tr1 = test(1, PojoProviderAgent.class.getName()+".class");
 		TestReport tr2 = test(2, MicroProviderAgent.class.getName()+".class");
-		agent.setResultValue("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 		return IFuture.DONE;
 	}
 	
@@ -54,7 +54,7 @@ public class UserAgent
 		TestReport tr = new TestReport(""+no, "Test if creating service without explicit implementation works.");
 		try
 		{
-			IComponentManagementService cms = (IComponentManagementService)agent.getServiceContainer().getRequiredService("cms").get();
+			IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null).get();
 			IInfoService ser = agent.getServiceContainer().getService(IInfoService.class, cid).get();
 			String res = ser.getInfo().get();

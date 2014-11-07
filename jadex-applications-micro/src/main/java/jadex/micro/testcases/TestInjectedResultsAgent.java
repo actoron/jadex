@@ -3,7 +3,10 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -11,7 +14,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -35,7 +37,7 @@ public class TestInjectedResultsAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  The agent body.
@@ -47,7 +49,7 @@ public class TestInjectedResultsAgent
 
 		final TestReport tr	= new TestReport("#1", "Test if injected results work.");
 		
-		IFuture<IComponentManagementService> fut = agent.getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -74,19 +76,19 @@ public class TestInjectedResultsAgent
 							tr.setFailed("Wrong result values: myres="+myres+", myint="+myint);
 						}
 						
-						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 						ret.setResult(null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						tr.setFailed("Exception occurred: "+exception);
-						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 						ret.setResult(null);
 					}
 				});
 				
-//				, agent.createResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
+//				, agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
 //				{
 //					public void resultAvailable(Collection<Tuple2<String, Object>> results)
 //					{
@@ -102,14 +104,14 @@ public class TestInjectedResultsAgent
 //							tr.setFailed("Wrong result values: myres="+myres+", myint="+myint);
 //						}
 //						
-//						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+//						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //						ret.setResult(null);
 //					}
 //					
 //					public void exceptionOccurred(Exception exception)
 //					{
 //						tr.setFailed("Exception occurred: "+exception);
-//						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+//						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //						ret.setResult(null);
 //					}
 //				}));

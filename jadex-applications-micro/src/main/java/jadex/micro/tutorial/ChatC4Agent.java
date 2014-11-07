@@ -1,13 +1,12 @@
 package jadex.micro.tutorial;
 
 import jadex.bridge.FactoryFilter;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -22,7 +21,7 @@ public class ChatC4Agent
 {
 	/** The underlying mirco agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Execute the functional body of the agent.
@@ -34,10 +33,11 @@ public class ChatC4Agent
 //		IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent.getServiceContainer(), 
 //			new ComponentFactorySelector(MicroAgentFactory.FILETYPE_MICROAGENT));
 		
-		IFuture<IComponentFactory>	factory	= SServiceProvider.getService((IServiceProvider)agent.getServiceContainer(), 
+		IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent, 
 			IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT));
 		
-		factory.addResultListener(agent.createResultListener(new IResultListener<IComponentFactory>()
+		//factory.addResultListener(agent.getCompocreateResultListener(new IResultListener<IComponentFactory>()
+		factory.addResultListener(new IResultListener<IComponentFactory>()
 		{
 			public void resultAvailable(IComponentFactory result)
 			{
@@ -47,6 +47,6 @@ public class ChatC4Agent
 			{
 				System.out.println("Not found: "+e);				
 			}
-		}));
+		});
 	}
 }

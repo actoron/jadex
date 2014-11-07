@@ -3,6 +3,7 @@ package jadex.micro.tutorial;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -66,7 +67,7 @@ public class ChatGuiD5 extends JFrame
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IIntermediateFuture<IChatService>	fut	= ia.getServiceContainer().getRequiredServices("chatservices");
+						IIntermediateFuture<IChatService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
 						fut.addResultListener(new IIntermediateResultListener<IChatService>()
 						{
 							public void resultAvailable(Collection<IChatService> result)

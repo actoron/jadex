@@ -53,7 +53,7 @@ public class ConditionAgent implements IContractService
 		{
 			public void resultAvailable(Void result)
 			{
-				agent.setResultValue("testresults", new Testcase(results.size(), 
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 					(TestReport[])results.toArray(new TestReport[results.size()])));
 				ret.setResult(null);
 			}

@@ -1,10 +1,11 @@
 package jadex.micro.tutorial;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -23,7 +24,7 @@ public class ChatC3Agent
 {
 	/** The underlying mirco agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Execute the functional body of the agent.
@@ -32,7 +33,7 @@ public class ChatC3Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IComponentManagementService>	cms	= agent.getServiceContainer().getRequiredService("cms");
+		IFuture<IComponentManagementService>	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 		cms.addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(final IComponentManagementService cms)

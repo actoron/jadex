@@ -168,7 +168,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		}
 		results.add(tr);
 		
-		agent.setResultValue("testresults", new Testcase(results.size(), 
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killAgent();
 	}

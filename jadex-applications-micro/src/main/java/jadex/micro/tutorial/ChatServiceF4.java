@@ -3,6 +3,7 @@ package jadex.micro.tutorial;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.IPojoMicroAgent;
@@ -35,7 +36,7 @@ public class ChatServiceF4 implements IChatService
 		final ChatBotF4Agent	chatbot	= (ChatBotF4Agent)((IPojoMicroAgent)agent).getPojoAgent();
 		if(text.toLowerCase().indexOf(chatbot.getKeyword().toLowerCase())!=-1)
 		{
-			IFuture<Collection<IChatService>> fut = agent.getServiceContainer().getRequiredServices("chatservices");
+			IFuture<Collection<IChatService>> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
 			fut.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 			{
 				public void resultAvailable(Collection<IChatService> result)

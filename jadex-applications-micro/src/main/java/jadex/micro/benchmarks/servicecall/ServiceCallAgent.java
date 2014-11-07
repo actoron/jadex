@@ -146,7 +146,7 @@ public class ServiceCallAgent	extends TestAgent
 	protected IFuture<Void>	performSingleTest(final String servicename, final int factor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		IFuture<IServiceCallService>	fut	= agent.getServiceContainer().getRequiredService(servicename);
+		IFuture<IServiceCallService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
 		fut.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Void>(ret)
 		{
 			public void customResultAvailable(final IServiceCallService service)

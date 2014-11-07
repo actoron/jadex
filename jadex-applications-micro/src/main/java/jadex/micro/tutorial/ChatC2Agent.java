@@ -1,9 +1,10 @@
 package jadex.micro.tutorial;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -24,7 +25,7 @@ public class ChatC2Agent
 {
 	/** The underlying mirco agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Execute the functional body of the agent.
@@ -33,7 +34,7 @@ public class ChatC2Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IClockService> fut = agent.getServiceContainer().getRequiredService("clockservice");
+		IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
 		fut.addResultListener(new DefaultResultListener<IClockService>()
 		{
 			public void resultAvailable(IClockService cs)

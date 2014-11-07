@@ -28,7 +28,7 @@ public class ResultProducerAgent
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				agent.setResultValue("res", Integer.valueOf(cnt[0]));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("res", Integer.valueOf(cnt[0]));
 				if(cnt[0]++<5)
 				{
 					agent.scheduleStep(this, delay);

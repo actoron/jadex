@@ -46,12 +46,12 @@ public class InitiatorAgent extends TestAgent
 			maxLocal /=100;
 			maxRemote /=100;
 		}
-		testLocal(1, maxLocal).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1, maxLocal).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				testRemote(2, maxRemote).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2, maxRemote).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
@@ -75,7 +75,7 @@ public class InitiatorAgent extends TestAgent
 		System.out.println("Test local: "+agent.getModel().getFullName());
 		
 		performTest(agent.getComponentIdentifier().getRoot(), testno, max, true)
-			.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
 			{
@@ -95,7 +95,7 @@ public class InitiatorAgent extends TestAgent
 		
 		System.out.println("Test remote: "+agent.getModel().getFullName());
 		
-		createPlatform(null).addResultListener(agent.createResultListener(
+		createPlatform(null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -103,7 +103,7 @@ public class InitiatorAgent extends TestAgent
 				System.out.println("Test remote1: "+agent.getModel().getFullName());
 				
 				performTest(platform.getComponentIdentifier(), testno, max, false)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		

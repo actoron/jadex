@@ -91,12 +91,12 @@ public class IntermediateBlockingTestAgent
 			&& "[1, 2, 3]".equals(steps2.toString())
 			&& "[1, 1, 2, 2, 3, 3]".equals(stepsall.toString()))
 		{
-			agent.setResultValue("testresults", new Testcase(1,
+			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test intermediate blocking.", true, null)}));
 		}
 		else
 		{
-			agent.setResultValue("testresults", new Testcase(1,
+			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test intermediate blocking.", false, "Wrong steps: "+steps1+", "+steps2+", "+stepsall)}));
 		}
 	}

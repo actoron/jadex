@@ -6,6 +6,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -57,7 +58,7 @@ public class ChatServiceD5 implements IChatService
 		final Future<Void> ret = new Future<Void>();
 		
 		this.format = new SimpleDateFormat("hh:mm:ss");
-		IFuture<IClockService> fut = agent.getServiceContainer().getRequiredService("clockservice");
+		IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
 		fut.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(IClockService result)

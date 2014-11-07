@@ -1,13 +1,14 @@
 package jadex.micro.testcases.authenticate;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -28,7 +29,7 @@ public class CallAllServicesAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Call the service methods.
@@ -38,7 +39,7 @@ public class CallAllServicesAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IIntermediateFuture<ITestService> fut = agent.getServiceContainer().getRequiredServices("ts");
+		IIntermediateFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("ts");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{
 			public void intermediateResultAvailable(final ITestService ts)

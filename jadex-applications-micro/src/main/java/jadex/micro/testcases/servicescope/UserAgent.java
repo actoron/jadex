@@ -42,7 +42,7 @@ public class UserAgent
 		final Testcase tc = new Testcase();
 		tc.setTestCount(2);
 		
-		IComponentManagementService cms = (IComponentManagementService)agent.getServiceContainer().getRequiredService("cms").get();
+		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 		
 		// Create user as subcomponent -> should be able to find the service with publication scope application
 		IComponentIdentifier cid = null;
@@ -104,6 +104,6 @@ public class UserAgent
 		}
 		tc.addReport(tr);
 		
-		agent.setResultValue("testresults", tc);
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 	}
 }
