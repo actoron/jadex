@@ -4,6 +4,8 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -43,7 +45,7 @@ public class BlockingTimeoutTestAgent
 	{
 		// Test if unused timeout timer entries are ignored.
 		final Future<String>	fut	= new Future<String>();
-		agent.waitForDelay(250, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(250, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -53,7 +55,7 @@ public class BlockingTimeoutTestAgent
 		});
 		fut.get(500);
 		final Future<String>	fut2	= new Future<String>();
-		agent.waitForDelay(250, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(250, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -62,7 +64,7 @@ public class BlockingTimeoutTestAgent
 			}
 		});
 		fut2.get(500);
-		agent.waitForDelay(1000).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
 		tests.add(new TestReport("#1", "Test if unused timeout timer entries are ignored.", true, null));
 
 		// Test if wake up after timeout works.

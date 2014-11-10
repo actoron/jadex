@@ -110,7 +110,7 @@ public abstract class TestAgent
 				//agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
-//				agent.killAgent();				
+//				agent.killComponent()				
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -121,7 +121,7 @@ public abstract class TestAgent
 				
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
-//				agent.killAgent();	
+//				agent.killComponent()	
 			}
 		}));
 		

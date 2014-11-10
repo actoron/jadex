@@ -2,11 +2,13 @@ package jadex.micro.testcases.serviceinheritance;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
@@ -40,7 +42,7 @@ import jadex.micro.annotation.Results;
 public class UserAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  The agent body.
@@ -81,7 +83,7 @@ public class UserAgent
 		final Future<TestReport> ret = new Future<TestReport>();
 		final TestReport tr = new TestReport();
 		
-		IFuture<IBasicService> fut = agent.getRequiredService("basicser");
+		IFuture<IBasicService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("basicser");
 		fut.addResultListener(new IResultListener<IBasicService>()
 		{
 			public void resultAvailable(IBasicService service)
@@ -123,7 +125,7 @@ public class UserAgent
 		final Future<TestReport> ret = new Future<TestReport>();
 		final TestReport tr = new TestReport();
 		
-		IFuture<IExtendedService> fut = agent.getRequiredService("extser");
+		IFuture<IExtendedService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("extser");
 		fut.addResultListener(new IResultListener<IExtendedService>()
 		{
 			public void resultAvailable(IExtendedService service)

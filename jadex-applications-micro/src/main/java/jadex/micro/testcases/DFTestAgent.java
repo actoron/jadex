@@ -6,8 +6,13 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
@@ -18,7 +23,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -34,9 +39,13 @@ import java.util.Map;
  */
 @Description("Test DF usage from micro agent.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class DFTestAgent extends MicroAgent
+@Agent
+public class DFTestAgent //extends MicroAgent
 {
 	//-------- attributes --------
+	
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** The reports of executed tests, used as result. */
 	protected List	reports;
@@ -59,16 +68,16 @@ public class DFTestAgent extends MicroAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		// Store test results.
-		setResultValue("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 
 		// Deregister agent.
 		// Todo: use fix component service container
-		getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDF, Void>(ret)
 		{
 			public void customResultAvailable(IDF df)
 			{
-				IDFComponentDescription ad = df.createDFComponentDescription(getComponentIdentifier(), null);
+				IDFComponentDescription ad = df.createDFComponentDescription(agent.getComponentIdentifier(), null);
 				df.deregister(ad).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
@@ -85,22 +94,24 @@ public class DFTestAgent extends MicroAgent
 		final TestReport tr	= new TestReport("#1", "Test DF registration.");
 		reports.add(tr);
 
-		getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		//agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(agent, IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)  
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IDF df = (IDF)result;
 				IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
-				IDFComponentDescription ad = df.createDFComponentDescription(getComponentIdentifier(), sd);
+				IDFComponentDescription ad = df.createDFComponentDescription(agent.getComponentIdentifier(), sd);
 
 				IFuture re = df.register(ad); 
-				re.addResultListener(createResultListener(new IResultListener()
+				re.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
 						// Set test success and continue test.
 						tr.setSucceeded(true);
-						searchDF().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
+						searchDF().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 					}
 					
 					public void exceptionOccurred(Exception e)
@@ -112,7 +123,7 @@ public class DFTestAgent extends MicroAgent
 					}
 				}));
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -128,7 +139,8 @@ public class DFTestAgent extends MicroAgent
 		reports.add(tr);
 
 		// Create a service description to search for.
-		getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(agent, IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)  
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -138,7 +150,7 @@ public class DFTestAgent extends MicroAgent
 				ISearchConstraints	cons = df.createSearchConstraints(-1, 0);
 				
 				IFuture re = df.search(ad, cons); 
-				re.addResultListener(createResultListener(new IResultListener() 
+				re.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener() 
 				{
 					public void resultAvailable(Object result)
 					{
@@ -154,7 +166,7 @@ public class DFTestAgent extends MicroAgent
 						{
 							// Set test failure and kill agent.
 							tr.setFailed("No suitable service found.");
-							killAgent();
+							agent.killComponent();
 							ret.setResult(null);
 						}
 					}
@@ -168,7 +180,7 @@ public class DFTestAgent extends MicroAgent
 					}
 				}));
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -182,13 +194,13 @@ public class DFTestAgent extends MicroAgent
 
 		Map hlefMessage = new HashMap();
 		hlefMessage.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-		hlefMessage.put(SFipa.SENDER, getComponentIdentifier());
+		hlefMessage.put(SFipa.SENDER, agent.getComponentIdentifier());
 		hlefMessage.put(SFipa.RECEIVERS, cid);
 		hlefMessage.put(SFipa.CONTENT, "testMessage");
 		
-		sendMessage(hlefMessage, SFipa.FIPA_MESSAGE_TYPE);
+		agent.getComponentFeature(IMessageFeature.class).sendMessage(hlefMessage, SFipa.FIPA_MESSAGE_TYPE);
 		
-		waitFor(1000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -218,7 +230,7 @@ public class DFTestAgent extends MicroAgent
 		}
 
 		// All tests done.
-		killAgent();
+		agent.killComponent();
 	}
 
 	

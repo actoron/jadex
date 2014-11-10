@@ -1,15 +1,15 @@
 package jadex.micro.testcases.servicescope;
 
-import java.util.Map;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ITuple2Future;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
@@ -19,6 +19,8 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+
+import java.util.Map;
 
 @Agent
 @RequiredServices(
@@ -31,7 +33,7 @@ import jadex.micro.annotation.Results;
 public class UserAgent 
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -51,7 +53,7 @@ public class UserAgent
 		{
 			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getComponentIdentifier()));
 			cid = fut.getFirstResult();
-			IExampleService ser = (IExampleService)agent.getRequiredService("exaser").get();
+			IExampleService ser = (IExampleService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("exaser").get();
 //			System.out.println("Correct: could find service: "+ser.getInfo().get());
 			tr.setSucceeded(true);
 		}
@@ -81,7 +83,7 @@ public class UserAgent
 		{
 			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getModel().getResourceIdentifier()));
 			cid = fut.getFirstResult();
-			IExampleService ser = (IExampleService)agent.getRequiredService("exaser").get();
+			IExampleService ser = (IExampleService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("exaser").get();
 			System.out.println("Problem: could find hidden service: "+ser.getInfo().get());
 			tr.setFailed("Problem: could find hidden service");
 		}

@@ -1,6 +1,7 @@
 package jadex.micro.testcases.blocking;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -32,7 +33,7 @@ public class BlockAgent	implements	IBlockService
 		Future<Void> ret = new Future<Void>();
 		if(millis>0)
 		{
-			agent.waitForDelay(millis).get();
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(millis).get();
 			ret.setResult(null);
 		}
 		else

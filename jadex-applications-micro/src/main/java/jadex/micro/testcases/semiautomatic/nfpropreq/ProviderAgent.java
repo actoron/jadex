@@ -36,7 +36,7 @@ public class ProviderAgent implements IAService
 	public IFuture<String> test()
 	{
 		System.out.println("invoked service: "+sid.getProviderId()+" cnt="+(++cnt)+" wait="+wait);
-		agent.waitForDelay(wait).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait).get();
 		return new Future<String>(sid.toString());
 	}
 }

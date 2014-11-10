@@ -3,6 +3,7 @@ package jadex.micro.tutorial;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;

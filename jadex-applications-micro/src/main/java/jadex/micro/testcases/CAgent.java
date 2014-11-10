@@ -2,8 +2,11 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -11,7 +14,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -34,8 +37,12 @@ import java.util.List;
 @RequiredServices(@RequiredService(name="cservice", type=ICService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL)))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Service(ICService.class)
-public class CAgent extends MicroAgent implements ICService
+@Agent
+public class CAgent implements ICService //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	/**
 	 *  Test if copy parameters work.
 	 */
@@ -46,7 +53,7 @@ public class CAgent extends MicroAgent implements ICService
 		final List<TestReport> testcases = new ArrayList<TestReport>();
 		
 		// Test with required service proxy.
-		IFuture<ICService>	fut	= getRequiredService("cservice");
+		IFuture<ICService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cservice");
 		fut.addResultListener(new DefaultResultListener<ICService>()
 		{
 			public void resultAvailable(ICService result)
@@ -57,7 +64,7 @@ public class CAgent extends MicroAgent implements ICService
 					public void resultAvailable(Void result)
 					{
 						// Test with provided service proxy.
-						SServiceProvider.getService(getServiceProvider(), ICService.class)
+						SServiceProvider.getService(agent, ICService.class)
 							.addResultListener(new DefaultResultListener<ICService>()
 						{
 							public void resultAvailable(ICService result)
@@ -67,7 +74,7 @@ public class CAgent extends MicroAgent implements ICService
 								{
 									public void resultAvailable(Void result)
 									{										
-										setResultValue("testresults", new Testcase(testcases.size(),
+										agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(testcases.size(),
 											(TestReport[])testcases.toArray(new TestReport[testcases.size()])));
 //										killAgent();
 										ret.setResult(null);

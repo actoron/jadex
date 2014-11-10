@@ -1,12 +1,13 @@
 package jadex.micro.testcases;
 
-import java.util.Map;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
@@ -15,6 +16,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.component.ComponentInterpreter;
+
+import java.util.Map;
 
 /**
  *  Behavior of the component result test.
@@ -28,7 +31,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 	{
 		final TestReport	tr1	= new TestReport("#1", "Default configuration.");
 		testComponentResult(null, "initial1", ia)
-			.addResultListener(ia.createResultListener(new IResultListener()
+			.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -46,7 +49,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 			{
 				final TestReport	tr2	= new TestReport("#2", "Custom configuration");
 				testComponentResult("config2", "initial2", ia)
-					.addResultListener(ia.createResultListener(new IResultListener()
+					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -62,7 +65,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 					
 					protected void next()
 					{
-						((ComponentInterpreter)ia).setResultValue("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+						((ComponentInterpreter)ia).getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 						ia.killComponent();
 					}
 				}));
@@ -78,13 +81,13 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 	protected IFuture testComponentResult(final String config, final String expected, final IInternalAccess ia)
 	{
 		final Future	fut	= new Future();
-		ia.getServiceContainer().getRequiredService("cms").addResultListener(new DelegationResultListener(fut)
+		ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService	cms	= (IComponentManagementService)result;
 				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, ia.getComponentIdentifier()), null)
-					.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
+					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)
 					{

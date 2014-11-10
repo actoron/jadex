@@ -3,13 +3,17 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -23,8 +27,11 @@ import jadex.micro.annotation.Results;
 @Description("Testing broken init.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
-public class BrokenInitTestAgent extends MicroAgent
+public class BrokenInitTestAgent //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	/**
 	 *  Perform the tests
 	 */
@@ -35,7 +42,7 @@ public class BrokenInitTestAgent extends MicroAgent
 		final TestReport	tr1	= new TestReport("#1", "Direct subcomponent.");
 		
 		testBrokenComponent(BrokenInitAgent.class.getName()+".class")
-			.addResultListener(createResultListener(new IResultListener<Void>()
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -53,7 +60,7 @@ public class BrokenInitTestAgent extends MicroAgent
 			{
 				final TestReport	tr2	= new TestReport("#2", "Nested subcomponent.");
 				testBrokenComponent("jadex/micro/testcases/BrokenInit.component.xml")
-					.addResultListener(createResultListener(new IResultListener<Void>()
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -71,7 +78,7 @@ public class BrokenInitTestAgent extends MicroAgent
 					{
 						final TestReport	tr3	= new TestReport("#3", "Exception in agent created.");
 						testBrokenComponent(PojoBrokenInitAgent.class.getName()+".class")
-							.addResultListener(createResultListener(new IResultListener<Void>()
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
@@ -87,7 +94,7 @@ public class BrokenInitTestAgent extends MicroAgent
 							
 							protected void next()
 							{
-								setResultValue("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
+								agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
 								ret.setResult(null);
 								//killAgent();
 							}
@@ -107,13 +114,13 @@ public class BrokenInitTestAgent extends MicroAgent
 	protected IFuture<Void> testBrokenComponent(final String model)
 	{
 		final Future<Void>	fut1	= new Future<Void>();
-		IFuture<IComponentManagementService> fut = getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut1)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.createComponent(null, model, new CreationInfo(getComponentIdentifier()), null)
-					.addResultListener(createResultListener(new IResultListener<IComponentIdentifier>()
+				cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
 				{
 					public void resultAvailable(IComponentIdentifier result)
 					{

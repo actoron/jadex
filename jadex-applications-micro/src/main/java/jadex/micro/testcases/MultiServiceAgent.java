@@ -73,7 +73,7 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 			public void resultAvailable(Object result)
 			{
 				tr.setSucceeded(true);
-				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+				getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}
@@ -81,7 +81,7 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 			public void exceptionOccurred(Exception exception)
 			{
 				tr.setFailed(exception.toString());
-				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+				getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}

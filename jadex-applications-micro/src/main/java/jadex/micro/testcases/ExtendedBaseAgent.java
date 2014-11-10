@@ -2,6 +2,8 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -9,7 +11,6 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SUtil;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
@@ -52,7 +53,7 @@ public class ExtendedBaseAgent extends BaseAgent
 {
 	@Agent
 	/** The micro agent. */
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  The agent body.
@@ -170,6 +171,6 @@ public class ExtendedBaseAgent extends BaseAgent
 		
 		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
-		agent.killAgent();
+		agent.killComponent();
 	}
 }

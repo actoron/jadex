@@ -2,7 +2,10 @@ package jadex.micro.testcases.prepostconditions;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -11,7 +14,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Implementation;
@@ -35,7 +37,7 @@ public class ConditionAgent implements IContractService
 {
 	/** The agent. */
 	@Agent
-	MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  The body.
@@ -47,8 +49,9 @@ public class ConditionAgent implements IContractService
 		
 		final List<TestReport> results = new ArrayList<TestReport>();
 		
-		IContractService ts = (IContractService)agent.getServiceContainer().getProvidedServices(IContractService.class)[0];
-
+//		IContractService ts = (IContractService)agent.getServiceContainer().getProvidedServices(IContractService.class)[0];
+		IContractService ts = (IContractService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(IContractService.class)[0];
+		
 		CounterResultListener<Void> lis = new CounterResultListener<Void>(12, new DefaultResultListener<Void>()
 		{
 			public void resultAvailable(Void result)

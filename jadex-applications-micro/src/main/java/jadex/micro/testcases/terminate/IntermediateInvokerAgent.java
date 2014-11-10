@@ -4,7 +4,7 @@ package jadex.micro.testcases.terminate;
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.remote.RemoteException;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
@@ -62,7 +62,7 @@ public class IntermediateInvokerAgent	extends InvokerAgent
 			}
 		}));
 		
-		agent.waitFor(delay*(max-1)+delay/2, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay*(max-1)+delay/2, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

@@ -4,6 +4,9 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -17,7 +20,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -51,22 +54,26 @@ import java.util.Map;
     @Component(type="a"),
     @Component(type="b")
 }))
-public class DependendServicesAgent extends MicroAgent
+@Agent
+public class DependendServicesAgent //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
     /**
      *  Init code.
      */
     public IFuture<Void> agentCreated()
     {
         final Future<Void> ret = new Future<Void>();
-        getChildrenAccesses().addResultListener(createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
+        getChildrenAccesses().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
         {
             public void resultAvailable(Collection<IExternalAccess> result)
             {
             	IExternalAccess[] childs = (IExternalAccess[])result.toArray(new IExternalAccess[0]);
 //   			System.out.println("childs: "+SUtil.arrayToString(childs));
                 final CollectionResultListener<Collection<TestReport>> lis = new CollectionResultListener<Collection<TestReport>>(childs.length, true, 
-                	createResultListener(new DefaultResultListener<Collection<Collection<TestReport>>>()
+                	agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<Collection<TestReport>>>()
                 {
                     public void resultAvailable(Collection<Collection<TestReport>> result)
                     {
@@ -78,9 +85,9 @@ public class DependendServicesAgent extends MicroAgent
 							Collection<TestReport> tmp = (Collection<TestReport>)it.next();
 							tests.addAll(tmp);
 						}
-						setResultValue("testresults", new Testcase(tests.size(), (TestReport[])tests.toArray(new TestReport[tests.size()])));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(tests.size(), (TestReport[])tests.toArray(new TestReport[tests.size()])));
 						
-						killAgent();
+						agent.killComponent();
                     }
                 }));
 
@@ -92,7 +99,7 @@ public class DependendServicesAgent extends MicroAgent
 					{
 						public void intermediateResultAvailable(IMonitoringEvent result)
 						{
-							child.getResults().addResultListener(createResultListener(new IResultListener<Map<String, Object>>()
+							child.getResults().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
                             {
                                 public void resultAvailable(Map<String, Object> res)
                                 {
@@ -120,7 +127,7 @@ public class DependendServicesAgent extends MicroAgent
      */
     public IFuture<Void> executeBody()
     {
-        getChildrenAccesses().addResultListener(createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
+        getChildrenAccesses().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
         {
             public void resultAvailable(Collection<IExternalAccess> result)
             {
@@ -143,14 +150,14 @@ public class DependendServicesAgent extends MicroAgent
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 		
-		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(agent, IComponentManagementService.class)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
-				cms.getChildren(getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
+				cms.getChildren(agent.getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier[] children)
 					{

@@ -89,7 +89,7 @@ public class ServiceSearchAgent
 //		BasicEvaluatorConstraints cts = new BasicEvaluatorConstraints(null, evaluator, evaluationsize)
 //		SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM, new Basic)
 		
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -101,7 +101,7 @@ public class ServiceSearchAgent
 //					public void resultAvailable(Collection<ICoreDependentService> result)
 //					{
 //						System.out.println(Arrays.toString(((List<ICoreDependentService>) result).toArray()));
-//						agent.scheduleStep(step, SEARCH_DELAY);
+//						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step, SEARCH_DELAY);
 //					}
 //
 //					public void exceptionOccurred(Exception exception)
@@ -116,7 +116,7 @@ public class ServiceSearchAgent
 //					public void resultAvailable(Collection<Tuple2<ICoreDependentService, Double>> result)
 //					{
 //						System.out.println(Arrays.toString(((List<Tuple2<ICoreDependentService, Double>>)result).toArray()));
-//						agent.scheduleStep(step, SEARCH_DELAY);
+//						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step, SEARCH_DELAY);
 //					}
 //	
 //					public void exceptionOccurred(Exception exception)
@@ -132,7 +132,7 @@ public class ServiceSearchAgent
 //					public void resultAvailable(Collection<ICoreDependentService> result)
 //					{
 //						System.out.println(Arrays.toString(((List<ICoreDependentService>)result).toArray()));
-//						agent.scheduleStep(step, SEARCH_DELAY);
+//						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step, SEARCH_DELAY);
 //					}
 //	
 //					public void exceptionOccurred(Exception exception)
@@ -148,7 +148,7 @@ public class ServiceSearchAgent
 					public void resultAvailable(Collection<Tuple2<ICoreDependentService, Double>> result)
 					{
 						System.out.println(Arrays.toString(result.toArray()));
-						agent.scheduleStep(step, SEARCH_DELAY);
+						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step, SEARCH_DELAY);
 					}
 	
 					public void exceptionOccurred(Exception exception)

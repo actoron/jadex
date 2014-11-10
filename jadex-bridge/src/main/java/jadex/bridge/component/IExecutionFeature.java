@@ -1,5 +1,7 @@
 package jadex.bridge.component;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentStep;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -73,4 +75,8 @@ public interface IExecutionFeature
 	 */
 	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener);
 
+	/** 
+	 *  Kill the component.
+	 */
+	public IFuture<Map<String, Object>> killComponent();
 }

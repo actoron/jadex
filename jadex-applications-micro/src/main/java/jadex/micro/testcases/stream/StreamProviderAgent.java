@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
@@ -11,7 +12,6 @@ import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -19,7 +19,6 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
-import java.rmi.server.RemoteServer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ import java.util.Map;
 public class StreamProviderAgent implements IStreamService
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Pass an Input stream to the user.
@@ -193,7 +192,7 @@ public class StreamProviderAgent implements IStreamService
 				size[0]++;
 				if(cnt[0]++<50)
 				{
-					agent.waitForDelay(50, this);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(50, this);
 				}
 				else
 				{
@@ -203,7 +202,7 @@ public class StreamProviderAgent implements IStreamService
 				return IFuture.DONE;
 			}
 		};
-		agent.waitForDelay(1000, step);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
 		
 		return ret;
 	}

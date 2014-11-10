@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -353,6 +354,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener)
 	{
 		return new IntermediateComponentResultListener<T>(listener, component);
+	}
+	
+	/** 
+	 *  Kill the component.
+	 */
+	public IFuture<Map<String, Object>> killComponent()
+	{
+		return getComponent().killComponent();
 	}
 	
 	//-------- IExecutable interface --------

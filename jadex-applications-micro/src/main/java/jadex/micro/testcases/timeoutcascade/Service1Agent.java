@@ -1,8 +1,9 @@
 package jadex.micro.testcases.timeoutcascade;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
@@ -20,11 +21,11 @@ import jadex.micro.annotation.RequiredServices;
 public class Service1Agent implements IService1
 {
 	@Agent
-	protected MicroAgent	agent;
+	protected IInternalAccess agent;
 
 	public IFuture<Void> service()
 	{
-		IService2 ser2 = (IService2)agent.getRequiredService("ser2").get();
+		IService2 ser2 = (IService2)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ser2").get();
 		ser2.service().get();
 
 		return IFuture.DONE;

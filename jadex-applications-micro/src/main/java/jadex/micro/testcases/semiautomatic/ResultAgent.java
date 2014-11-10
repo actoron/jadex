@@ -29,13 +29,13 @@ public class ResultAgent extends MicroAgent
 		
 		if(Math.random()<0.3)
 		{
-			setResultValue("result", "last: "+getAgentName()+": "+Math.random());
+			getComponentFeature(IArgumentsFeature.class).put("result", "last: "+getAgentName()+": "+Math.random());
 //			killAgent();
 			ret.setResult(null);
 		}
 		else
 		{
-			setResultValue("result", "not last: "+getAgentName()+": "+Math.random());
+			getComponentFeature(IArgumentsFeature.class).put("result", "not last: "+getAgentName()+": "+Math.random());
 			
 			getServiceContainer().searchService(IComponentManagementService.class)
 				.addResultListener(new DefaultResultListener()

@@ -3,7 +3,11 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.TimeoutResultListener;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
@@ -12,7 +16,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -33,8 +37,12 @@ import java.util.Collection;
 @Description("Testing broken components.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
-public class BrokenTestAgent extends MicroAgent
+@Agent
+public class BrokenTestAgent //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent; 
+	
 	/**
 	 *  Perform the tests
 	 */
@@ -45,7 +53,7 @@ public class BrokenTestAgent extends MicroAgent
 		final TestReport	tr1	= new TestReport("#1", "Body exception subcomponent.");
 		
 		testBrokenComponent(BodyExceptionAgent.class.getName()+".class")
-			.addResultListener(createResultListener(new IResultListener<Void>()
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -63,7 +71,7 @@ public class BrokenTestAgent extends MicroAgent
 			{
 				final TestReport	tr2	= new TestReport("#2", "Protected body agent.");
 				testBrokenComponent(ProtectedBodyAgent.class.getName()+".class")
-					.addResultListener(createResultListener(new IResultListener<Void>()
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -81,7 +89,7 @@ public class BrokenTestAgent extends MicroAgent
 					{
 						final TestReport	tr3	= new TestReport("#3", "PojoBodyExceptionAgent");
 						testBrokenComponent(PojoBodyExceptionAgent.class.getName()+".class")
-							.addResultListener(createResultListener(new IResultListener<Void>()
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
@@ -97,7 +105,7 @@ public class BrokenTestAgent extends MicroAgent
 							
 							protected void next()
 							{
-								setResultValue("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
+								agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
 //								killAgent();
 								ret.setResult(null);
 							}
@@ -116,13 +124,13 @@ public class BrokenTestAgent extends MicroAgent
 	protected IFuture<Void> testBrokenComponent(final String model)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IFuture<IComponentManagementService> fut = getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				IResultListener<Collection<Tuple2<String, Object>>> lis = new TimeoutResultListener<Collection<Tuple2<String, Object>>>(3000, 
-					getExternalAccess(), new IResultListener<Collection<Tuple2<String, Object>>>()
+					agent.getExternalAccess(), new IResultListener<Collection<Tuple2<String, Object>>>()
 				{
 					public void resultAvailable(Collection<Tuple2<String, Object>> result)
 					{
@@ -145,8 +153,8 @@ public class BrokenTestAgent extends MicroAgent
 					}
 				});
 				
-				cms.createComponent(null, model, new CreationInfo(getComponentIdentifier()), lis)
-					.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), lis)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{

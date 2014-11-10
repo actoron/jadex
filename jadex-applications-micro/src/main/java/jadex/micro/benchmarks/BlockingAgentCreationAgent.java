@@ -154,9 +154,9 @@ public class BlockingAgentCreationAgent
 					System.out.println("Still used memory: "+stillused+"kB.");
 					
 					// Todo
-//					ia.setResultValue("microcreationtime", new Tuple(""+pera, "s"));
-//					ia.setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
-//					ia.setResultValue("micromem", new Tuple(""+upera, "kb"));
+//					ia.getComponentFeature(IArgumentsFeature.class).put("microcreationtime", new Tuple(""+pera, "s"));
+//					ia.getComponentFeature(IArgumentsFeature.class).put("microkillingtime", new Tuple(""+killpera, "s"));
+//					ia.getComponentFeature(IArgumentsFeature.class).put("micromem", new Tuple(""+upera, "kb"));
 
 					ia.killComponent();
 

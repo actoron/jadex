@@ -4,13 +4,15 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -31,7 +33,7 @@ import java.util.Collection;
 public class UserAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -39,7 +41,7 @@ public class UserAgent
 	@AgentBody
 	public void body()
 	{
-		IComponentManagementService cms = (IComponentManagementService)agent.getRequiredService("cms").get();
+		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 		IComponentIdentifier cid = cms.createComponent("producer", new CreationInfo(agent.getComponentIdentifier())).getFirstResult();
 		IExternalAccess ea = cms.getExternalAccess(cid).get();
 		
@@ -74,7 +76,7 @@ public class UserAgent
 					tr.setFailed("No intermediate results have been retrieved.");
 				}
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-				agent.killAgent();
+				agent.killComponent();
 			}
 			
 			public void resultAvailable(Collection<Tuple2<String, Object>> result)
@@ -82,7 +84,7 @@ public class UserAgent
 				System.out.println("ra: "+result);
 				tr.setFailed("No intermediate results have been retrieved: "+result);
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-				agent.killAgent();
+				agent.killComponent();
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -90,7 +92,7 @@ public class UserAgent
 				System.out.println("ex: "+exception);
 				tr.setFailed("Exception occrred: "+exception);
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-				agent.killAgent();
+				agent.killComponent();
 			}
 		}));
 	}

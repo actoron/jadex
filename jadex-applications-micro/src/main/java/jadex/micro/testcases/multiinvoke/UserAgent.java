@@ -2,6 +2,9 @@ package jadex.micro.testcases.multiinvoke;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -9,7 +12,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -23,8 +25,6 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +41,7 @@ import java.util.List;
 public class UserAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  The agent body.
@@ -65,7 +65,7 @@ public class UserAgent
 				{
 					public void resultAvailable(Void result)
 					{
-//						System.out.println("countlis: "+agent.isComponentThread());
+//						System.out.println("countlis: "+agent.getComponentFeature(IExecutionFeature.class).isComponentThread());
 						
 						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
 						ret.setResult(null);

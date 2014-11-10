@@ -3,6 +3,8 @@ package jadex.micro.testcases.blocking;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -45,7 +47,7 @@ public class ComplexBlockingTestAgent
 		IStepService	step	= agent.getServiceContainer().searchService(IStepService.class).get();
 		
 		IIntermediateFuture<Integer>	first	= step.performSteps(3, 1000);
-		agent.waitForDelay(500).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
 		IIntermediateFuture<Integer>	second	= step.performSteps(3, 1000);
 
 		final List<Integer>	steps	= new ArrayList<Integer>();

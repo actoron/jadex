@@ -2,11 +2,12 @@ package jadex.micro.testcases.stream;
 
 import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.service.annotation.Service;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentService;
@@ -32,7 +33,7 @@ import java.util.Collection;
 public class ReceiverAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	@AgentArgument
 	protected String filename;
@@ -102,25 +103,25 @@ public class ReceiverAgent
 //						System.out.println("finished, size: "+cnt[0]);
 						fos.close();
 						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("filesize", Long.valueOf(cnt[0]));
-						agent.killAgent();
+						agent.killComponent();
 					}
 					catch(Exception e)
 					{
-						agent.killAgent();
+						agent.killComponent();
 //						e.printStackTrace();
 					}
 				}
 				public void exceptionOccurred(Exception exception)
 				{
 //					System.out.println("ex:"+exception);
-					agent.killAgent();
+					agent.killComponent();
 				}
 			}));
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
-			agent.killAgent();
+			agent.killComponent();
 		}
 	}
 	
@@ -168,14 +169,14 @@ public class ReceiverAgent
 ////				}
 ////				catch(Exception e)
 ////				{
-////					agent.killAgent();
+////					agent.killComponent()
 ////					e.printStackTrace();
 ////				}
-////				agent.waitFor(1000, this);
+////				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
 ////				return null;
 ////			}
 ////		};
-////		agent.waitFor(1000, step);
+////		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
 //	}
 	
 //	@AgentKilled

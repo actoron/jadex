@@ -1,14 +1,15 @@
 package jadex.micro.testcases.nflatency;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -25,7 +26,7 @@ import java.util.Collection;
 public class UserAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 		
 	/**
 	 *  The agent body.
@@ -42,12 +43,12 @@ public class UserAgent
 			{
 //				ComposedEvaluator<ITestService> ranker = new ComposedEvaluator<ITestService>();
 //				ranker.addEvaluator(new ExecutionTimeEvaluator(new MethodInfo(ITestService.class.getMethod("methodA", new Class[]{long.class})), true));
-//				ITerminableIntermediateFuture<ITestService> sfut = agent.getRequiredServices("aser");
+//				ITerminableIntermediateFuture<ITestService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
 //				Collection<Tuple2<ITestService, Double>> res = SServiceProvider.rankServicesWithScores(sfut, ranker, null).get();
 //				System.out.println("Found: "+res);
 //				ITestService aser = res.iterator().next().getFirstEntity();
 				
-				ITerminableIntermediateFuture<ITestService> sfut = agent.getRequiredServices("aser");
+				ITerminableIntermediateFuture<ITestService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
 				Collection<ITestService> tss = sfut.get();
 				if(tss.size()>0)
 				{

@@ -3,6 +3,8 @@ package jadex.micro.testcases.subscriptionlistener;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.CollectingIntermediateResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

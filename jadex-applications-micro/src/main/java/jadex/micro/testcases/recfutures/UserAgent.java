@@ -5,9 +5,12 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -22,7 +25,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -58,7 +60,7 @@ import jadex.micro.annotation.Results;
 public class UserAgent 
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -84,15 +86,15 @@ public class UserAgent
 //				System.out.println("tests finished");
 
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
-				agent.killAgent();				
+				agent.killComponent();			
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(agent.isComponentThread()+" "+agent.getComponentIdentifier());
+				System.out.println(agent.getComponentFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getComponentIdentifier());
 				
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
-				agent.killAgent();	
+				agent.killComponent();	
 			}
 		}));
 			
@@ -135,7 +137,7 @@ public class UserAgent
 			}
 		}));
 		
-//		IAService aser = (IAService)agent.getRequiredService("aser").get();
+//		IAService aser = (IAService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("aser").get();
 //		
 //		IFuture<IFuture<String>> futa = aser.methodA();
 //		futa.addResultListener(new DefaultResultListener<IFuture<String>>()
@@ -266,7 +268,7 @@ public class UserAgent
 				{	
 					public void customResultAvailable(final IComponentIdentifier cid)
 					{
-						SServiceProvider.getService(agent.getServiceProvider(), cid, IAService.class)
+						SServiceProvider.getService(agent, cid, IAService.class)
 							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
 						{
 							public void customResultAvailable(IAService service)

@@ -82,7 +82,7 @@ public class GeneratePanel extends JPanel
 					final int par = Integer.parseInt(pp.getTextField("parallel").getText());
 					final int tasksize = Integer.parseInt(pp.getTextField("task size").getText());
 				
-					agent.scheduleStep(new IComponentStep<Void>()
+					agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(final IInternalAccess ia)
 						{

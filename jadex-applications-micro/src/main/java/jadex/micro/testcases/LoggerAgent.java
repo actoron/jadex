@@ -110,7 +110,7 @@ public class LoggerAgent extends MicroAgent
 					tr2.setReason("TestLogHandler was not found: "+SUtil.arrayToString(handlers));
 				reports.add(tr2);
 				
-				setResultValue("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
+				getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 //				killAgent();
 				ret.setResult(null);
 			}

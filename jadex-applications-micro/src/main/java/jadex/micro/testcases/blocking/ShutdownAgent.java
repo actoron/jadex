@@ -2,8 +2,10 @@ package jadex.micro.testcases.blocking;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -65,7 +67,7 @@ public class ShutdownAgent
 								for(int i=0; i<1000; i++)
 									bs.block(-1);
 								
-								agent.waitForDelay(1000).addResultListener(new DelegationResultListener<Void>(ret)
+								agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).addResultListener(new DelegationResultListener<Void>(ret)
 								{
 									public void customResultAvailable(Void result)
 									{

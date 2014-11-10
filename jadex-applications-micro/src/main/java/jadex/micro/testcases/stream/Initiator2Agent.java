@@ -5,6 +5,8 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -12,7 +14,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.testcases.TestAgent;
 

@@ -4,12 +4,14 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
@@ -107,7 +109,7 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				// Hack: announce platform immediately
-				IFuture<IComponentManagementService> fut = agent.getRequiredService("cms");
+				IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 				fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 				{
 					public void customResultAvailable(IComponentManagementService cms)
@@ -198,7 +200,7 @@ public class InitiatorAgent extends TestAgent
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();
 		
-		IIntermediateFuture<ITestService> fut = agent.getRequiredServices("aser");
+		IIntermediateFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{
 			boolean called;

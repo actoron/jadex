@@ -1,5 +1,6 @@
 package jadex.micro.testcases.pull;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.ICommand;
 import jadex.commons.future.IPullIntermediateFuture;
@@ -7,7 +8,6 @@ import jadex.commons.future.IPullSubscriptionIntermediateFuture;
 import jadex.commons.future.PullIntermediateFuture;
 import jadex.commons.future.PullSubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -27,7 +27,7 @@ public class PullResultProviderAgent implements IPullResultService
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- constructors ---------
 

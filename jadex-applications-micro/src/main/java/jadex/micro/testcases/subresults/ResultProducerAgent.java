@@ -2,8 +2,9 @@ package jadex.micro.testcases.subresults;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -14,7 +15,7 @@ import jadex.micro.annotation.Results;
 public class ResultProducerAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -24,21 +25,21 @@ public class ResultProducerAgent
 	{
 		final long delay = 1000;
 		final int[] cnt = new int[1];
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("res", Integer.valueOf(cnt[0]));
 				if(cnt[0]++<5)
 				{
-					agent.scheduleStep(this, delay);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
 				}
 				else
 				{
-					agent.killAgent();
+					agent.killComponent();
 				}
 				return IFuture.DONE;
 			}
-		}, delay);
+		});
 	}
 }

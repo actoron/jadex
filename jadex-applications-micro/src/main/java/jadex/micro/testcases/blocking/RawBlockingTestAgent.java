@@ -3,6 +3,7 @@ package jadex.micro.testcases.blocking;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -25,7 +26,7 @@ public class RawBlockingTestAgent
 	@AgentBody(keepalive=false)
 	public void	execute(final IInternalAccess agent)
 	{
-		IComponentManagementService	cms	= SServiceProvider.getService((IServiceProvider)agent.getServiceContainer(),
+		IComponentManagementService	cms	= SServiceProvider.getService(agent,
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		cms.getComponentDescriptions().get();

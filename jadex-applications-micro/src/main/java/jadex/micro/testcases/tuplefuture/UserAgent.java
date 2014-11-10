@@ -2,10 +2,12 @@ package jadex.micro.testcases.tuplefuture;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.ITuple2Future;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -34,7 +36,7 @@ import jadex.micro.annotation.Results;
 public class UserAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -94,7 +96,7 @@ public class UserAgent
 				}
 				
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
-				agent.killAgent();
+				agent.killComponent();
 			}
 			
 			public void exceptionOccurred(Exception exception)

@@ -2,12 +2,14 @@ package jadex.micro.testcases.nfmethodprop;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -37,7 +39,7 @@ public class UserAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  The agent body. 
@@ -108,7 +110,7 @@ public class UserAgent
 		
 		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
-		agent.killAgent();
+		agent.killComponent()
 	}
 }
 

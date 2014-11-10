@@ -38,7 +38,7 @@ public class PojoBreakpointAgent
 	{
 		step	= "hop";	// first step
 		
-		agent.waitFor(1000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{			
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -46,7 +46,7 @@ public class PojoBreakpointAgent
 				
 				step	= "step";	// second step
 
-				agent.waitFor(1000, new IComponentStep<Void>()
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 				{			
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -54,13 +54,13 @@ public class PojoBreakpointAgent
 
 						step	= "jump";	// third step
 						
-						agent.waitFor(1000, new IComponentStep<Void>()
+						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 						{			
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								System.out.println("Current step: "+step);
 
-								agent.killAgent();
+								agent.killComponent()
 								
 								return IFuture.DONE;
 							}

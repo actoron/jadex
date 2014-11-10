@@ -51,7 +51,7 @@ public class TesterAgent implements ITestService
 	@AgentBody
 	public void body()
 	{
-		final IComponentManagementService cms = (IComponentManagementService)agent.getRequiredService("cms").get();
+		final IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 
 		if(agent.getConfiguration().equals("created"))
 		{

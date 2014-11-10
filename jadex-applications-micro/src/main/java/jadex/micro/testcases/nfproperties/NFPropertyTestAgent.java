@@ -1,5 +1,6 @@
 package jadex.micro.testcases.nfproperties;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.service.IService;
@@ -18,12 +19,12 @@ import jadex.micro.annotation.ProvidedServices;
 public class NFPropertyTestAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	@AgentBody
 	public IFuture<Void> body()
 	{
-		ICoreDependentService cds = SServiceProvider.getService(agent.getServiceProvider(), ICoreDependentService.class).get();
+		ICoreDependentService cds = SServiceProvider.getService(agent, ICoreDependentService.class).get();
 		IService iscds = (IService) cds;
 		String[] names = iscds.getNFPropertyNames().get();
 		

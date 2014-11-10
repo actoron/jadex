@@ -2,11 +2,11 @@ package jadex.micro.testcases.intermediate;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -26,7 +26,7 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- constructors ---------
 
@@ -45,7 +45,7 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 //		final long delay = 200;
 		
 //		System.out.println("start: "+System.currentTimeMillis());
-		agent.waitFor(delay, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -57,7 +57,7 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 				}
 				else
 				{
-					agent.waitFor(delay, this);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
 				}
 				return null;
 			}

@@ -2,12 +2,12 @@ package jadex.micro.testcases.recfutures;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -18,7 +18,7 @@ import jadex.micro.annotation.ProvidedServices;
 public class AAgent implements IAService
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -42,11 +42,11 @@ public class AAgent implements IAService
 						return IFuture.DONE;
 					}
 				};
-				agent.scheduleStep(step2, 1000);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step2);
 				return IFuture.DONE;
 			}
 		};
-		agent.scheduleStep(step1, 1000);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step1);
 		
 		return ret1;
 	}
@@ -73,7 +73,7 @@ public class AAgent implements IAService
 						ret2.addIntermediateResult(""+cnt[0]++);
 						if(cnt[0]<3)
 						{
-							agent.scheduleStep(this, 1000);
+							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
 						}
 						else
 						{
@@ -82,11 +82,11 @@ public class AAgent implements IAService
 						return IFuture.DONE;
 					}
 				};
-				agent.scheduleStep(step2, 1000);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step2);
 				return IFuture.DONE;
 			}
 		};
-		agent.scheduleStep(step1, 1000);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step1);
 		
 		return ret1;
 	}

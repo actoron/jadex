@@ -2,6 +2,8 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -9,7 +11,6 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -26,10 +27,10 @@ import java.util.List;
 //@Results(@Result(name="exception", typename="Exception"))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IBService.class)
-public class BAgent extends MicroAgent implements IBService
+public class BAgent implements IBService // extends MicroAgent
 {
 	@ServiceComponent
-	protected IInternalAccess access;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Init service method.
@@ -40,32 +41,35 @@ public class BAgent extends MicroAgent implements IBService
 		final List<TestReport> tests = new ArrayList<TestReport>();
 
 		final Future<Void> ret = new Future<Void>();
-		access.getServiceContainer().searchService(IAService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getServiceContainer().searchService(IAService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IAService>()
 		{
 			public void resultAvailable(IAService ser)
 			{
 //				System.out.println("found service");
 //				final IAService ser = (IAService)result;
-				String reason = getComponentAdapter().isExternalThread()? "Wrong thread: "+Thread.currentThread(): null;
-				tests.add(new TestReport("#B1", "Test if service could be found in init.", !getComponentAdapter().isExternalThread(), reason));
+				boolean ext = !agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
+				String reason = ext? "Wrong thread: "+Thread.currentThread(): null;
+				tests.add(new TestReport("#B1", "Test if service could be found in init.", !ext, reason));
 
 				ser.test().addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
-						String reason = getComponentAdapter().isExternalThread()? "Wrong thread: "+Thread.currentThread(): null;
-						tests.add(new TestReport("#B2", "Test if comes back on component thread.", !getComponentAdapter().isExternalThread(), reason));
-						setResultValue("testcases", tests);
+						boolean ext = !agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
+						String reason = ext? "Wrong thread: "+Thread.currentThread(): null;
+						tests.add(new TestReport("#B2", "Test if comes back on component thread.", !ext, reason));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testcases", tests);
 //						System.out.println("invoked service: "+ser);
 						ret.setResult(result);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						String reason = getComponentAdapter().isExternalThread()? "Wrong thread: "+Thread.currentThread(): null;
-						tests.add(new TestReport("#B2", "Test if comes back on component thread.", !getComponentAdapter().isExternalThread(), reason));
-						setResultValue("testcases", tests);
+						boolean ext = !agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
+						String reason = ext? "Wrong thread: "+Thread.currentThread(): null;
+						tests.add(new TestReport("#B2", "Test if comes back on component thread.", !ext, reason));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testcases", tests);
 						ret.setResult(null);
 					}
 				});
@@ -74,7 +78,7 @@ public class BAgent extends MicroAgent implements IBService
 			public void exceptionOccurred(Exception exception)
 			{
 				tests.add(new TestReport("#B1", "Test if service could be found in init.", exception));
-				setResultValue("testcases", tests);
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testcases", tests);
 				ret.setResult(null);
 			}
 		});

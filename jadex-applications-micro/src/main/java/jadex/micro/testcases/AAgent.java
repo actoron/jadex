@@ -1,18 +1,21 @@
 package jadex.micro.testcases;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.base.test.TestReport;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Simple test agent with one service.
@@ -21,17 +24,22 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IAService.class)
 @Agent
-public class AAgent extends MicroAgent implements IAService
+public class AAgent implements IAService //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent; 
+	
 	/**
 	 *  Init service method.
 	 */
+	@AgentCreated
 	public IFuture<Void> test()
 	{
-		String reason = getComponentAdapter().isExternalThread()? "Wrong thread: "+Thread.currentThread(): null;
+		boolean ext = !agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		String reason = ext? "Wrong thread: "+Thread.currentThread(): null;
 		List<TestReport> tests = new ArrayList<TestReport>();
-		tests.add(new TestReport("#A1", "Test if service is called on component thread.", !getComponentAdapter().isExternalThread(), reason));
-		setResultValue("testcases", tests);
+		tests.add(new TestReport("#A1", "Test if service is called on component thread.", !ext, reason));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testcases", tests);
 		
 //		System.out.println("called service");
 		return IFuture.DONE;

@@ -2,6 +2,7 @@ package jadex.micro.quickstart;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -66,7 +67,7 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 		
 		// Wait until the next full five seconds.
 		long	millis	= d.getTime()+5000-System.currentTimeMillis();
-		ia.waitForDelay(millis, this);
+		ia.getComponentFeature(IExecutionFeature.class).waitForDelay(millis, this);
 		
 		// Return empty non-finished future to keep agent alive.
 		return new Future<Void>();

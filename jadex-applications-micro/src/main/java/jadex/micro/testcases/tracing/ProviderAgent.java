@@ -1,5 +1,6 @@
 package jadex.micro.testcases.tracing;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -8,7 +9,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -24,7 +24,7 @@ import jadex.micro.annotation.ProvidedServices;
 public class ProviderAgent implements ITestService
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Call a method that must use a secure
@@ -37,7 +37,7 @@ public class ProviderAgent implements ITestService
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		System.out.println("Called method1: "+msg+" "+sc+" "+Thread.currentThread());
 		
-		SServiceProvider.getService(agent.getServiceProvider(), ITestService.class, RequiredServiceInfo.SCOPE_LOCAL)
+		SServiceProvider.getService(agent, ITestService.class, RequiredServiceInfo.SCOPE_LOCAL)
 			.addResultListener(new ExceptionDelegationResultListener<ITestService, Void>(ret)
 		{
 			public void customResultAvailable(ITestService ts)

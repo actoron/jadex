@@ -217,7 +217,7 @@ public class HelplinePanel extends JPanel
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 //			.addResultListener(new SwingDefaultResultListener(HelplinePanel.this)
 //			(agent.getServiceProvider(), IHelpline.class, remote, true)
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -252,7 +252,7 @@ public class HelplinePanel extends JPanel
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 		final IntermediateFuture<InformationEntry> ret = new IntermediateFuture<InformationEntry>();
 		
-		IIntermediateFuture<IHelpline> fut = (IIntermediateFuture<IHelpline>)agent.scheduleStep(new IComponentStep<Collection<IHelpline>>()
+		IIntermediateFuture<IHelpline> fut = (IIntermediateFuture<IHelpline>)agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Collection<IHelpline>>()
 		{
 			public IIntermediateFuture<IHelpline> execute(IInternalAccess ia)
 			{
@@ -361,7 +361,7 @@ public class HelplinePanel extends JPanel
 			{
 			}
 		};
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

@@ -7,6 +7,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -154,7 +157,7 @@ public class InitiatorAgent extends TestAgent
 		
 		try
 		{
-			final InputStream is = SUtil.getResource((String)agent.getArgument("filename"), agent.getClassLoader());
+			final InputStream is = SUtil.getResource((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("filename"), agent.getClassLoader());
 			
 			final TestReport tr = new TestReport(""+testno, "Test if file is transferred correctly.");
 			
@@ -212,8 +215,8 @@ public class InitiatorAgent extends TestAgent
 							{
 								public void resultAvailable(Integer result)
 								{
-									agent.scheduleStep(self);
-//									agent.waitFor(10, self);
+									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(self);
+//									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10, self);
 								}
 								public void exceptionOccurred(Exception exception)
 								{
@@ -236,7 +239,7 @@ public class InitiatorAgent extends TestAgent
 					return IFuture.DONE;
 				}
 			};
-			agent.scheduleStep(step);
+			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 //			con.close();
 		}
 		catch(Exception e)

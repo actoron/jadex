@@ -3,9 +3,9 @@ package jadex.micro.testcases.stream;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentStreamArrived;
 
@@ -13,7 +13,7 @@ import jadex.micro.annotation.AgentStreamArrived;
 public class Receiver2Agent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -43,7 +43,7 @@ public class Receiver2Agent
 					{
 						if(cnt[0]++<max)
 						{
-							agent.waitFor(50, self);
+							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(50, self);
 						}
 						else
 						{
@@ -59,7 +59,7 @@ public class Receiver2Agent
 				return IFuture.DONE;
 			}
 		};
-		agent.waitFor(200, step);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(200, step);
 	}
 	
 	/**

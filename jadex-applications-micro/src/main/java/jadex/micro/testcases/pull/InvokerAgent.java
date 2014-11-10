@@ -5,9 +5,12 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -23,15 +26,12 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,7 +49,7 @@ public class InvokerAgent
 	//-------- attributes --------
 	
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 
 	//-------- methods --------
 	
@@ -77,15 +77,15 @@ public class InvokerAgent
 //				System.out.println("tests finished");
 
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
-				agent.killAgent();				
+				agent.killComponent();				
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(agent.isComponentThread()+" "+agent.getComponentIdentifier());
+				System.out.println(agent.getComponentFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getComponentIdentifier());
 				
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
-				agent.killAgent();	
+				agent.killComponent();	
 			}
 		}));
 			
@@ -249,7 +249,7 @@ public class InvokerAgent
 							public void customResultAvailable(final IComponentIdentifier cid)
 							{
 //								System.out.println("cid is: "+cid);
-								SServiceProvider.getService(agent.getServiceProvider(), cid, IPullResultService.class)
+								SServiceProvider.getService(agent, cid, IPullResultService.class)
 									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 								{
 									public void customResultAvailable(IPullResultService service)
@@ -358,7 +358,7 @@ public class InvokerAgent
 							public void customResultAvailable(final IComponentIdentifier cid)
 							{
 //								System.out.println("cid is: "+cid);
-								SServiceProvider.getService(agent.getServiceProvider(), cid, IPullResultService.class)
+								SServiceProvider.getService(agent, cid, IPullResultService.class)
 									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 								{
 									public void customResultAvailable(IPullResultService service)

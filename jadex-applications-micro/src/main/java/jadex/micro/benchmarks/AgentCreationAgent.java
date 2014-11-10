@@ -280,9 +280,9 @@ public class AgentCreationAgent extends MicroAgent
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				setResultValue("microcreationtime", new Tuple(""+pera, "s"));
-				setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
-				setResultValue("micromem", new Tuple(""+upera, "kb"));
+				getComponentFeature(IArgumentsFeature.class).put("microcreationtime", new Tuple(""+pera, "s"));
+				getComponentFeature(IArgumentsFeature.class).put("microkillingtime", new Tuple(""+killpera, "s"));
+				getComponentFeature(IArgumentsFeature.class).put("micromem", new Tuple(""+upera, "kb"));
 				killComponent();
 			}
 		}));

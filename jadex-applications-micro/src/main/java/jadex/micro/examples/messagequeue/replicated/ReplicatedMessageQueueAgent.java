@@ -129,7 +129,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 			}
 		};
 
-		this.agent.waitForTick(searchServicesStep);
+		this.agent.getComponentFeature(IExecutionFeature.class).waitForDelayTick(searchServicesStep);
 	}
 
 	/**

@@ -82,7 +82,7 @@ public class UserAgent
 				
 				if(cnt[0] < 10)
 				{
-					agent.waitFor(1000, this);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
 				}
 				else
 				{
@@ -91,6 +91,6 @@ public class UserAgent
 				return IFuture.DONE;
 			}
 		};
-		agent.waitFor(1000, step);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
 	}
 }

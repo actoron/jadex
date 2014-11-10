@@ -2,6 +2,7 @@ package jadex.micro.testcases.blocking;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -45,13 +46,13 @@ public class StepAgent	implements	IStepService
 	{
 		final IntermediateFuture<Integer>	ret	= new IntermediateFuture<Integer>();
 		
-		agent.waitForDelay(0, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				for(int i=1; i<=steps; i++)
 				{
-					ia.waitForDelay(millis).get();
+					ia.getComponentFeature(IExecutionFeature.class).waitForDelay(millis).get();
 					ret.addIntermediateResult(Integer.valueOf(i));
 				}
 				ret.setFinished();
@@ -69,13 +70,13 @@ public class StepAgent	implements	IStepService
 	{
 		final SubscriptionIntermediateFuture<Integer>	ret	= new SubscriptionIntermediateFuture<Integer>();
 		
-		agent.waitForDelay(0, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				for(int i=1; !ret.isDone(); i++)
 				{
-					ia.waitForDelay(millis).get();
+					ia.getComponentFeature(IExecutionFeature.class).waitForDelay(millis).get();
 					ret.addIntermediateResult(Integer.valueOf(i));
 				}
 				return IFuture.DONE;

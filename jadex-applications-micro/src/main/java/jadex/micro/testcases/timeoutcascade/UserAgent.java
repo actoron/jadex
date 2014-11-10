@@ -2,7 +2,9 @@ package jadex.micro.testcases.timeoutcascade;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.micro.MicroAgent;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -32,7 +34,7 @@ import jadex.micro.annotation.Results;
 public class UserAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 
 	@AgentBody
 	public void body()
@@ -40,7 +42,7 @@ public class UserAgent
 		Testcase tc = new Testcase(1);
 		
 		TestReport tr = new TestReport("#1", "Test if timeout annotations are respected in cascading service calls.");
-		IService1 ser1 = (IService1)agent.getRequiredService("ser1").get();
+		IService1 ser1 = (IService1)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ser1").get();
 		try
 		{
 			ser1.service().get();
@@ -53,6 +55,6 @@ public class UserAgent
 		
 		tc.addReport(tr);
 		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
-		agent.killAgent();
+		agent.killComponent();
 	}
 }

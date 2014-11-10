@@ -4,11 +4,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.ICommand;
 import jadex.commons.future.Future;
-import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IPullIntermediateFuture;
@@ -20,7 +19,6 @@ import jadex.commons.future.PullIntermediateFuture;
 import jadex.commons.future.PullSubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -36,7 +34,7 @@ import jadex.micro.annotation.ProvidedServices;
 public class ProviderAgent implements ITestService
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Call a method that must use a secure
@@ -120,7 +118,7 @@ public class ProviderAgent implements ITestService
 	
 		long wait = to>0? to*3: 0;
 //		System.out.println("waiting: "+wait+", "+System.currentTimeMillis());
-		agent.waitForDelay(wait, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

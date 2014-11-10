@@ -1,12 +1,12 @@
 package jadex.micro.testcases.blocking;
 
-import javax.xml.ws.BindingType;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;

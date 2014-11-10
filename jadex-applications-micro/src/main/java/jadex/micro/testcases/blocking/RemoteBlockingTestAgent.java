@@ -26,7 +26,7 @@ public class RemoteBlockingTestAgent	extends TestAgent
 	{
 		IExternalAccess	exta	= createPlatform(null).get();
 		
-		IComponentManagementService	cms	= SServiceProvider.getService(exta.getServiceProvider(),
+		IComponentManagementService	cms	= SServiceProvider.getService(exta,
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		cms.getComponentDescriptions().get();

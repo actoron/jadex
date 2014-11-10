@@ -3,14 +3,15 @@ package jadex.micro.testcases.search;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
@@ -26,7 +27,7 @@ import java.util.Map;
 public class UserAgent 
 {
     @Agent
-    protected MicroAgent agent;
+    protected IInternalAccess agent;
     
     @AgentCreated
     public void init() 
@@ -41,7 +42,7 @@ public class UserAgent
 	{
     	ThreadSuspendable sus = new ThreadSuspendable();
 		IExternalAccess plat = Starter.createPlatform(new String[]{"-gui", "false"}).get(sus);
-		IComponentManagementService cms = SServiceProvider.getService(plat.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+		IComponentManagementService cms = SServiceProvider.getService(plat, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
 		
 		final Future<Void> fut = new Future<Void>();
 		

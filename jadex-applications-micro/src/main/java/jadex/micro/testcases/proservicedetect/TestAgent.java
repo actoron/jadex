@@ -2,15 +2,14 @@ package jadex.micro.testcases.proservicedetect;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -29,11 +28,11 @@ public class TestAgent implements ITestService
 	 * The agent body.
 	 */
 	@AgentBody
-	public void body(MicroAgent agent)
+	public void body(IInternalAccess agent)
 	{
 		// test if agent has the provided service
 		TestReport tr = new TestReport("#1", "Test if provided service is present.");
-		IService iser = agent.getServiceContainer().getProvidedService(ITestService.class);
+		IService iser = (IService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(ITestService.class);
 		if(iser==null)
 		{
 			tr.setFailed("Auto provided service not found.");
@@ -43,7 +42,7 @@ public class TestAgent implements ITestService
 			tr.setSucceeded(true);
 		}
 		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-		agent.killAgent();
+		agent.killComponent();
 	}
 	
 	/**

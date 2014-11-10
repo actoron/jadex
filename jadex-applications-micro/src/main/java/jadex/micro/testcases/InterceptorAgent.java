@@ -57,7 +57,7 @@ public class InterceptorAgent extends MicroAgent implements IAService
 					{
 //						System.out.println("testresults: "+testresults);
 						TestReport[] tr = (TestReport[])testresults.toArray(new TestReport[testresults.size()]);
-						setResultValue("testresults", new Testcase(tr.length, tr));
+						getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(tr.length, tr));
 //						killAgent();
 						ret.setResult(null);
 					}

@@ -38,7 +38,7 @@ public class PojoHelloWorldAgent
 	@AgentBody
 	public void executeBody()
 	{
-//		System.out.println(agent.getArgument("welcome text"));
+//		System.out.println(agent.getComponentFeature(IArgumentsFeature.class).getArgument("welcome text"));
 		System.out.println(text);
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{			

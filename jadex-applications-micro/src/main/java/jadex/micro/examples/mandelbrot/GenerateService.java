@@ -80,7 +80,7 @@ public class GenerateService implements IGenerateService
 				ad.setCalculatorId((IComponentIdentifier)service.getServiceIdentifier().getProviderId());
 				
 //				System.out.println("invoke: "+service);
-				agent.getRequiredService("displayservice").addResultListener(new DefaultResultListener()
+				agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("displayservice").addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -144,12 +144,12 @@ public class GenerateService implements IGenerateService
 			public IFuture createService()
 			{
 				final Future	ret	= new Future();
-				agent.getRequiredService("cmsservice").addResultListener(new DelegationResultListener(ret)
+				agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cmsservice").addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService cms = (IComponentManagementService)result;
-						Object delay = agent.getArgument("delay");
+						Object delay = agent.getComponentFeature(IArgumentsFeature.class).getArgument("delay");
 						if(delay==null)
 							delay = Long.valueOf(5000);
 						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 

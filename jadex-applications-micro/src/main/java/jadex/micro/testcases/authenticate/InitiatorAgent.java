@@ -4,6 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Tuple2;
@@ -37,12 +38,12 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		testLocal(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
@@ -74,7 +75,7 @@ public class InitiatorAgent extends TestAgent
 					public void customResultAvailable(Void result)
 					{
 						performTest(agent.getComponentIdentifier().getRoot(), testno)
-							.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 						{
 							public void customResultAvailable(final TestReport result)
 							{
@@ -98,13 +99,13 @@ public class InitiatorAgent extends TestAgent
 		
 		createPlatform(new String[]{"-virtualnames",
 			"jadex.commons.SUtil.createHashMap(new String[]{\"testuser\"}, new Object[]{jadex.commons.SUtil.createHashSet(new String[]{\"testcases\"})})"})
-			.addResultListener(agent.createResultListener(
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				performTest(platform.getComponentIdentifier(), testno)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		

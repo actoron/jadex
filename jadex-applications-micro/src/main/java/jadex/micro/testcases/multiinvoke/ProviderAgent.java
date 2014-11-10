@@ -2,6 +2,7 @@ package jadex.micro.testcases.multiinvoke;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
@@ -12,10 +13,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.Result;
-import jadex.micro.annotation.Results;
-
-import java.util.List;
 
 /**
  *  Simple test agent with one service.
@@ -54,7 +51,7 @@ public class ProviderAgent implements IExampleService
 				if(cnt[0]++<num)
 				{
 					ret.addIntermediateResult("item: "+agent.getComponentIdentifier().getName()+" "+cnt[0]);
-					agent.waitForDelay(delay, this);	
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);	
 				}
 				else
 				{
@@ -63,7 +60,7 @@ public class ProviderAgent implements IExampleService
 				return IFuture.DONE;
 			}
 		};
-		agent.waitForDelay(delay, step);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
 		
 		return ret;
 	}

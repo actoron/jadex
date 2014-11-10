@@ -2,8 +2,8 @@ package jadex.micro.testcases.terminate;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
@@ -13,7 +13,6 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -33,7 +32,7 @@ public class TerminableProviderAgent implements ITerminableService
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** A future to indicate that termination was called successfully. */
 	protected IntermediateFuture<Void>	termfut;	
@@ -71,7 +70,7 @@ public class TerminableProviderAgent implements ITerminableService
 			}
 		});
 
-		agent.waitFor(delay, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -123,7 +122,7 @@ public class TerminableProviderAgent implements ITerminableService
 		final int[] cnt = new int[1];
 		
 //		System.out.println("getResult invoked");
-		agent.waitFor(delay, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -136,7 +135,7 @@ public class TerminableProviderAgent implements ITerminableService
 					}
 					else
 					{
-						agent.waitFor(delay, this);
+						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
 					}
 				}
 				return null;

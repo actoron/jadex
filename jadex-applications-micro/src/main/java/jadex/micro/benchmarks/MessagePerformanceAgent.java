@@ -351,7 +351,7 @@ public class MessagePerformanceAgent extends MicroAgent
 				{
 					long dur = result.longValue() - starttime;
 					System.out.println("Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
-					setResultValue("result", "Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
+					getComponentFeature(IArgumentsFeature.class).put("result", "Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
 					
 					future.addResultListener(new IResultListener<Void>()
 					{

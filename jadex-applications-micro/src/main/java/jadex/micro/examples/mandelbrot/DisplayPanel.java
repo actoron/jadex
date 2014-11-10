@@ -386,7 +386,7 @@ public class DisplayPanel extends JComponent
 						{
 							if(calculating)
 							{
-								agent.scheduleStep(new IComponentStep<Void>()
+								agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
@@ -1011,7 +1011,7 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			agent.scheduleStep(new IComponentStep<Void>()
+			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

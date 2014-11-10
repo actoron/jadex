@@ -5,12 +5,14 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.remote.RemoteException;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -22,7 +24,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
@@ -44,7 +45,7 @@ public class InvokerAgent
 	//-------- attributes --------
 	
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 
 	//-------- methods --------
 	
@@ -69,14 +70,14 @@ public class InvokerAgent
 			{
 //				System.out.println("tests finished: "+tc);
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
-				agent.killAgent();				
+				agent.killComponent();				
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				tc.addReport(new TestReport("#0", "Unexpected exception", exception));
 //				System.out.println("tests finished: "+tc);
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
-				agent.killAgent();
+				agent.killComponent();
 			}
 		}));
 		
@@ -89,9 +90,12 @@ public class InvokerAgent
 					tc.addReport(rep);
 				}
 				
-				if (SReflect.isAndroid()) {
+				if (SReflect.isAndroid()) 
+				{
 					ret.setResult(null);
-				} else {
+				} 
+				else 
+				{
 					testRemote(3, 1000).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
 							{
 						public void customResultAvailable(Collection<TestReport> result)
@@ -103,7 +107,7 @@ public class InvokerAgent
 							
 							ret.setResult(null);
 						}
-							});
+					});
 				}
 			}
 		});
