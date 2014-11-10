@@ -1,10 +1,12 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -15,15 +17,19 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Description("This agent uses an add service.")
 @RequiredServices(@RequiredService(name="addservice", type=IAddService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
-public class UserAgent extends MicroAgent
+@Agent
+public class UserAgent //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	/**
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
 	public IFuture<Void> executeBody()
 	{
-		getRequiredService("addservice").addResultListener(new DefaultResultListener()
+		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("addservice").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -32,7 +38,7 @@ public class UserAgent extends MicroAgent
 				{
 					public void resultAvailable(Object result)
 					{
-						System.out.println("add service result: "+result+" "+getComponentIdentifier().getLocalName());
+						System.out.println("add service result: "+result+" "+agent.getComponentIdentifier().getLocalName());
 					}
 					
 					public void exceptionOccurred(Exception exception)

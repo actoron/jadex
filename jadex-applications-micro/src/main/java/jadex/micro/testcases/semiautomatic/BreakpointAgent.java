@@ -2,9 +2,10 @@ package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
 
@@ -16,10 +17,15 @@ import java.util.HashSet;
  */
 @Description("A simple agent showing how to use breakpoints in the micro kernel.")
 @Breakpoints(value={"hop", "step", "jump"})
-public class BreakpointAgent extends MicroAgent
+@Agent
+public class BreakpointAgent //extends MicroAgent
 {
 	/** The current step. */
 	protected String	step;
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Execute a series of steps.
@@ -28,7 +34,7 @@ public class BreakpointAgent extends MicroAgent
 	{
 		step	= "hop";	// first step
 		
-		waitFor(1000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{			
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -36,7 +42,7 @@ public class BreakpointAgent extends MicroAgent
 				
 				step	= "step";	// second step
 
-				waitFor(1000, new IComponentStep<Void>()
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 				{			
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -44,13 +50,13 @@ public class BreakpointAgent extends MicroAgent
 
 						step	= "jump";	// third step
 						
-						waitFor(1000, new IComponentStep<Void>()
+						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 						{			
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								System.out.println("Current step: "+step);
 
-								killAgent();
+								agent.killComponent();
 								
 								return IFuture.DONE;
 							}

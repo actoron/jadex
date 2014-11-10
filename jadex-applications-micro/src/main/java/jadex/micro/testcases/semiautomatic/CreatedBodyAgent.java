@@ -1,9 +1,6 @@
 package jadex.micro.testcases.semiautomatic;
 
-import jadex.bridge.service.annotation.ServiceStart;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -16,7 +13,7 @@ public class CreatedBodyAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Init the service.

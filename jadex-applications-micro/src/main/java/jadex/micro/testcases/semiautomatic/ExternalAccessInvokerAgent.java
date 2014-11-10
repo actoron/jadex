@@ -13,7 +13,8 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 
 import javax.swing.SwingUtilities;
 
@@ -21,24 +22,29 @@ import javax.swing.SwingUtilities;
  *  Agent that opens a component selector dialog and then executes a 
  *  step on the selected component.
  */
-public class ExternalAccessInvokerAgent extends MicroAgent
+@Agent
+public class ExternalAccessInvokerAgent //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	/**
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, getExternalAccess(), getExternalAccess(), 
-					new CMSUpdateHandler(getExternalAccess()), null, new ComponentIconCache(getExternalAccess()));
+				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, agent.getExternalAccess(), agent.getExternalAccess(), 
+					new CMSUpdateHandler(agent.getExternalAccess()), null, new ComponentIconCache(agent.getExternalAccess()));
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{
-					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
+					SServiceProvider.getServiceUpwards(agent.getExternalAccess(), IComponentManagementService.class)
 						.addResultListener(new DefaultResultListener<IComponentManagementService>()
 					{
 						public void resultAvailable(IComponentManagementService cms)

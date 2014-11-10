@@ -1,5 +1,6 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.Future;
@@ -15,9 +16,9 @@ public class MathService extends BasicService implements IMathService
 	/**
 	 *  Create a new add service.
 	 */
-	public MathService(IServiceProvider provider)
+	public MathService(IComponentIdentifier cid)
 	{
-		super(provider.getId(), IMathService.class, null);
+		super(cid, IMathService.class, null);
 	}
 	
 	//-------- methods --------

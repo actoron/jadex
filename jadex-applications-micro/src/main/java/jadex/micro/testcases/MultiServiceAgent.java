@@ -2,12 +2,16 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -31,8 +35,12 @@ import jadex.micro.testcases.semiautomatic.compositeservice.ISubService;
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Service(IAddService.class) // todo: multi interfaces?
-public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubService
+@Agent
+public class MultiServiceAgent	implements IAddService, ISubService
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	//-------- testcase implementation --------
 	
 	/**
@@ -43,12 +51,12 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 		final Future<Void>	ret	= new Future<Void>();
 		final Future fut = new Future();
 		
-		getRequiredService("add").addResultListener(new DelegationResultListener(fut)
+		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("add").addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
 				final IAddService	add	= (IAddService)result;
-				getRequiredService("sub").addResultListener(new DelegationResultListener(fut)
+				agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("sub").addResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -68,12 +76,12 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 		
 		// Check result of service execution and store test result.
 		final TestReport	tr	= new TestReport("#1", "Test if multiple services can be used.");
-		fut.addResultListener(createResultListener(new IResultListener()
+		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				tr.setSucceeded(true);
-				getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}
@@ -81,7 +89,7 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 			public void exceptionOccurred(Exception exception)
 			{
 				tr.setFailed(exception.toString());
-				getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}

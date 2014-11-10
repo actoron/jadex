@@ -1,16 +1,17 @@
 package jadex.micro.testcases.semiautomatic.nfpropreq;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.sensor.service.ExecutionTimeEvaluator;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.MethodInfo;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -27,7 +28,7 @@ import java.util.Collection;
 public class UserAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 		
 	/**
 	 *  The agent body.

@@ -2,15 +2,16 @@ package jadex.micro.testcases.semiautomatic.monitoring;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -43,7 +44,7 @@ public class TesterAgent implements ITestService
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -55,7 +56,7 @@ public class TesterAgent implements ITestService
 
 		if(agent.getConfiguration().equals("created"))
 		{
-			ITestService tsa = SServiceProvider.getService(agent.getServiceProvider(), 
+			ITestService tsa = SServiceProvider.getService(agent, 
 				agent.getComponentIdentifier().getParent(), ITestService.class).get();
 			tsa.test(0).get();
 		}
@@ -116,7 +117,7 @@ public class TesterAgent implements ITestService
 //		System.out.println("invoked test on: "+agent.getComponentIdentifier()+" level="+level+" "+ServiceCall.getCurrentInvocation().getCause());
 		if(level<10)
 		{
-			Collection<ITestService> tss = SServiceProvider.getServices(agent.getServiceProvider(), ITestService.class).get();
+			Collection<ITestService> tss = SServiceProvider.getServices(agent, ITestService.class).get();
 			if(tss.size()>0)
 			{
 				int num = (int)(Math.random()*tss.size());

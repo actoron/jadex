@@ -3,19 +3,20 @@ package jadex.micro.testcases.semiautomatic.nfpropvis;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.sensor.service.AverageEvaluator;
 import jadex.bridge.sensor.service.WaitqueueEvaluator;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.MethodInfo;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -67,7 +68,7 @@ import org.jfree.data.xy.XYDataset;
 public class UserAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The evaluator. */
 	protected ComposedEvaluator<ICryptoService> ranker;

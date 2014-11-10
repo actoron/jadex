@@ -1,18 +1,18 @@
 package jadex.micro.testcases.semiautomatic;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentBreakpoint;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 
 /**
@@ -25,7 +25,7 @@ public class PojoBreakpointAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The current step. */
 	protected String	step;
@@ -60,7 +60,7 @@ public class PojoBreakpointAgent
 							{
 								System.out.println("Current step: "+step);
 
-								agent.killComponent()
+								agent.killComponent();
 								
 								return IFuture.DONE;
 							}

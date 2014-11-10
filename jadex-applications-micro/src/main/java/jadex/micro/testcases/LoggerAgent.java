@@ -2,14 +2,18 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Imports;
@@ -43,16 +47,21 @@ import java.util.logging.LogRecord;
 	@NameValue(name="logging.handlers", clazz=TestLogHandler.class)
 //	@NameValue(name="logging.handlers", value="new LoggerAgent$TestLogHandler()")
 })
-public class LoggerAgent extends MicroAgent
+@Agent
+public class LoggerAgent //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	/**
 	 *  Just finish the test by setting the result and killing the agent.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		getRequiredService("clockservice").addResultListener(new DelegationResultListener(ret)
+		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice").addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -64,8 +73,8 @@ public class LoggerAgent extends MicroAgent
 				List<TestReport> reports = new ArrayList<TestReport>();
 				
 				final TestReport tr = new TestReport("#1", "Test logging.");
-				getLogger().setLevel(Level.FINEST);
-				getLogger().addHandler(new Handler()
+				agent.getLogger().setLevel(Level.FINEST);
+				agent.getLogger().addHandler(new Handler()
 				{
 					public void publish(LogRecord record)
 					{
@@ -93,11 +102,11 @@ public class LoggerAgent extends MicroAgent
 				});
 				reports.add(tr);
 				
-				getLogger().info("test log message");
+				agent.getLogger().info("test log message");
 				
 				TestReport tr2 = new TestReport("#2", "Test logging handler.");
 				
-				Handler[] handlers = getLogger().getHandlers();
+				Handler[] handlers = agent.getLogger().getHandlers();
 				for(int i=0; i<handlers.length; i++)
 				{
 					if(handlers[i] instanceof TestLogHandler)
@@ -110,7 +119,7 @@ public class LoggerAgent extends MicroAgent
 					tr2.setReason("TestLogHandler was not found: "+SUtil.arrayToString(handlers));
 				reports.add(tr2);
 				
-				getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 //				killAgent();
 				ret.setResult(null);
 			}

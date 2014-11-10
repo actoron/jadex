@@ -1,12 +1,17 @@
 package jadex.micro.testcases.semiautomatic;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -16,8 +21,13 @@ import jadex.micro.annotation.Results;
  */
 @Description("This agent starts a subagent and fetches its result.")
 @Results(@Result(name="result", clazz=String.class, defaultvalue="0", description="Result value."))
-public class ResultAgent extends MicroAgent
+@Agent
+public class ResultAgent //extends MicroAgent
 {
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
 	//-------- methods --------
 	
 	/**
@@ -29,26 +39,27 @@ public class ResultAgent extends MicroAgent
 		
 		if(Math.random()<0.3)
 		{
-			getComponentFeature(IArgumentsFeature.class).put("result", "last: "+getAgentName()+": "+Math.random());
+			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("result", "last: "+agent.getComponentIdentifier()+": "+Math.random());
 //			killAgent();
 			ret.setResult(null);
 		}
 		else
 		{
-			getComponentFeature(IArgumentsFeature.class).put("result", "not last: "+getAgentName()+": "+Math.random());
+			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("result", "not last: "+agent.getComponentIdentifier()+": "+Math.random());
 			
-			getServiceContainer().searchService(IComponentManagementService.class)
-				.addResultListener(new DefaultResultListener()
+//			getServiceContainer().searchService(IComponentManagementService.class)
+			SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 				
-					cms.createComponent(null, ResultAgent.this.getClass().getName()+".class", new CreationInfo(getComponentIdentifier()), createResultListener(new IResultListener()
+					cms.createComponent(null, ResultAgent.this.getClass().getName()+".class", new CreationInfo(agent.getComponentIdentifier()), agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							System.out.println(getAgentName()+" got result: "+result);
+							System.out.println(agent.getComponentIdentifier()+" got result: "+result);
 							ret.setResult(null);
 //							killAgent();
 						}
@@ -73,7 +84,7 @@ public class ResultAgent extends MicroAgent
 						}
 					});
 				}
-			});
+			}));
 		}
 		
 		return ret;

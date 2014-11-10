@@ -206,7 +206,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param service	The service object.
 	 *  @param info	 The service info.
 	 */
-	protected void	addService(IInternalService service, ProvidedServiceInfo info)
+	public void	addService(IInternalService service, ProvidedServiceInfo info)
 	{
 		// Find service types
 		Class<?>	type	= info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());

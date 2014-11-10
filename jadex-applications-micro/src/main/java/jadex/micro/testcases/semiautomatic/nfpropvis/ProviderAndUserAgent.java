@@ -1,5 +1,6 @@
 package jadex.micro.testcases.semiautomatic.nfpropvis;
 
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceIdentifier;

@@ -2,9 +2,10 @@ package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
 
@@ -18,10 +19,15 @@ import java.util.Set;
  */
 @Description("A simple agent showing how to use breakpoints in the micro kernel.")
 @Breakpoints(value={"2", "5", "odd", "even", "every tenth"})
-public class CountingAgent extends MicroAgent
+@Agent
+public class CountingAgent //extends MicroAgent
 {
 	/** The counter. */
 	protected int	cnt;
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Execute a series of steps.
@@ -40,11 +46,11 @@ public class CountingAgent extends MicroAgent
 				cnt++;
 
 				// Hack!!! Blocks jcc without wait, why?
-				waitFor(10, new IComponentStep<Void>()
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						scheduleStep(step);
+						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 						return IFuture.DONE;
 					}
 				});
@@ -60,7 +66,7 @@ public class CountingAgent extends MicroAgent
 			}			
 		};
 		
-		scheduleStep(step);
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 		
 		return new Future<Void>(); //never kill?!
 	}

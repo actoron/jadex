@@ -1,6 +1,6 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -15,6 +15,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@ProvidedService(type=IAddService.class, implementation=@Implementation(PojoAddService.class)),
 	@ProvidedService(type=ISubService.class, implementation=@Implementation(expression="new SubService($component)"))
 })
-public class CalculatorAgent extends MicroAgent
+@Agent
+public class CalculatorAgent //extends MicroAgent
 {
 }

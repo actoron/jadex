@@ -1,10 +1,13 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -23,11 +26,16 @@ import jadex.micro.annotation.RequiredServices;
 //		@Binding(name="subservice", create=true, componentfilename="jadex.micro.testcases.semiautomatic.compositeservice.Subtractor.component.xml")
 //	})
 //})
-public class CompositeCalculatorAgent extends MicroAgent
+@Agent
+public class CompositeCalculatorAgent //extends MicroAgent
 {
+	@Agent 
+	protected IInternalAccess agent; 
+	
 	/**
 	 *  The body.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		add(1,1).addResultListener(new IResultListener()
@@ -65,7 +73,7 @@ public class CompositeCalculatorAgent extends MicroAgent
 	protected IFuture add(final double a, final double b)
 	{
 		final Future ret = new Future();
-		getRequiredService("addservice").addResultListener(new IResultListener()
+		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("addservice").addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
