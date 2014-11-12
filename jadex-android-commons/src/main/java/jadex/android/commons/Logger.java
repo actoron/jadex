@@ -33,5 +33,13 @@ public class Logger {
 	public static void e(String s) {
 		Log.e(LOG_TAG, s);
 	}
+	
+	public static void w(Object o) {
+		w(String.valueOf(o));
+	}
+	
+	public static void w(String s) {
+		Log.w(LOG_TAG, s);
+	}
 
 }
