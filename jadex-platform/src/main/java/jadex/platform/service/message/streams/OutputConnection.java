@@ -5,6 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -109,7 +110,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 			{
 				final IComponentStep<Void> self = this;
 				
-				waitForReady().addResultListener(ia.createResultListener(new IResultListener<Integer>()
+				waitForReady().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Integer>()
 				{
 					public void resultAvailable(Integer bytes)
 					{
@@ -164,7 +165,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 									// a non-ending loop of calls in local case (same platform, two components)
 									// (ia.createResultListener() does not help as is on right thread)
 //									waitForReady().addResultListener(ia.createResultListener(this));
-									waitForReady().addResultListener(ia.createResultListener(new IResultListener<Integer>()
+									waitForReady().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Integer>()
 									{
 										public void resultAvailable(Integer result)
 										{

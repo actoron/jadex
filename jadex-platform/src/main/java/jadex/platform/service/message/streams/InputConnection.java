@@ -5,6 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -417,7 +418,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 				{
 					final ISubscriptionIntermediateFuture<byte[]> fut = aread();
 
-					fut.addResultListener(ia.createResultListener(new IIntermediateResultListener<byte[]>()
+					fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
 					{
 						public void resultAvailable(Collection<byte[]> result)
 						{

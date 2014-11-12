@@ -5,8 +5,10 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -68,7 +70,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IFuture<IAwarenessManagementService>	awa	= agent.getServiceContainer().getRequiredService("awa");
+		IFuture<IAwarenessManagementService>	awa	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("awa");
 		awa.addResultListener(new ExceptionDelegationResultListener<IAwarenessManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IAwarenessManagementService awa)
@@ -176,7 +178,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 					msg.put(SFipa.CONTENT, "ping");
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
 					msg.put(SFipa.CONVERSATION_ID, SUtil.createUniqueId("msg_dis"));
-					getMicroAgent().sendMessageAndWait(msg, SFipa.FIPA_MESSAGE_TYPE, new AbstractMessageHandler(null, 5000, true, true)
+					getMicroAgent().getComponentFeature(IMessageFeature.class).sendMessageAndWait(msg, SFipa.FIPA_MESSAGE_TYPE, new AbstractMessageHandler(null, 5000, true, true)
 					{
 						public void handleMessage(Map<String, Object> msg, MessageType type)
 						{
@@ -248,7 +250,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 			
 //			System.out.println(System.currentTimeMillis()+" "+getMicroAgent().getComponentIdentifier()+" received: "+info.getSender());
 			
-			IFuture<IAwarenessManagementService>	msfut	= getMicroAgent().getRequiredService("management");
+			IFuture<IAwarenessManagementService>	msfut	= getMicroAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("management");
 			msfut.addResultListener(new DefaultResultListener<IAwarenessManagementService>(getMicroAgent().getLogger())
 			{
 				public void resultAvailable(IAwarenessManagementService ms)

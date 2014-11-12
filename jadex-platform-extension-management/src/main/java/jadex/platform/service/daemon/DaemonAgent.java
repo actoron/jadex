@@ -1,13 +1,14 @@
 package jadex.platform.service.daemon;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Binding;
@@ -34,7 +35,7 @@ public class DaemonAgent //extends MicroAgent
 	//-------- attributes --------
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -46,7 +47,7 @@ public class DaemonAgent //extends MicroAgent
 	{
 		if(SFipa.FIPA_MESSAGE_TYPE.equals(mt))
 		{
-			DaemonService	ds	= (DaemonService)agent.getRawService(IDaemonService.class);
+			DaemonService	ds	= (DaemonService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(IDaemonService.class);
 			ds.messageReceived((IComponentIdentifier)msg.get(SFipa.SENDER), (String)msg.get(SFipa.CONTENT));
 		}
 	}

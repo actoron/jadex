@@ -3,9 +3,10 @@ package jadex.platform.persistence;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.modelinfo.IPersistInfo;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -42,7 +43,7 @@ public class PersistableAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService((IServiceProvider)agent.getServiceContainer(), IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(agent, IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IPersistenceService, Void>(ret)
 		{
 			public void customResultAvailable(IPersistenceService result)
@@ -53,13 +54,13 @@ public class PersistableAgent
 					public void resultAvailable(IPersistInfo result)
 					{
 						System.out.println("Worked");
-						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", true, null)}));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", true, null)}));
 						ret.setResult(null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", exception)}));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", exception)}));
 						ret.setResult(null);
 					}
 				});

@@ -1,6 +1,5 @@
 package jadex.platform.service.cms;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -12,10 +11,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPropertiesFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
@@ -25,16 +21,16 @@ import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
-import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.kernelbase.ExternalAccess;
 
 import java.io.IOException;
@@ -298,6 +294,24 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 
 	/**
+	 *  Get the realtime setting.
+	 *  @return If is realtime.
+	 */
+	public boolean isRealtime()
+	{
+		return info.isRealtime();
+	}
+	
+	/**
+	 *  Get the copy setting.
+	 *  @return If is copy.
+	 */
+	public boolean isCopy()
+	{
+		return info.isCopy();
+	}
+
+	/**
 	 *  Get a feature of the component.
 	 *  @param feature	The type of the feature.
 	 *  @return The feature instance.
@@ -314,49 +328,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 	}
 
-	/**
-	 *  Get the service provider.
-	 *  @return The service provider.
-	 */
-	// Todo: convenience object? -> fix search!?
-	public IServiceContainer getServiceContainer()
-	{
-		// Todo: wrapped services with local interceptor chain
-		return new ServiceContainer();
-//		return new IServiceContainer()
-//		{
-//			public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
-//			{
-//				return SServiceProvider.getServices(PlatformComponent.this, type, scope);
-//			}
-//			
-//			public <T> IIntermediateFuture<T> searchServices(Class<T> type)
-//			{
-//				return SServiceProvider.getServices(PlatformComponent.this, type);
-//			}
-//			
-//			public <T> IFuture<T> searchServiceUpwards(Class<T> type)
-//			{
-//				return SServiceProvider.getServiceUpwards(PlatformComponent.this, type);
-//			}
-//			
-//			public <T> IFuture<T> searchService(Class<T> type, String scope)
-//			{
-//				return SServiceProvider.getService(PlatformComponent.this, type, scope);
-//			}
-//			
-//			public <T> IFuture<T> searchService(Class<T> type)
-//			{
-//				return SServiceProvider.getService(PlatformComponent.this, type);
-//			}
-//			
-//			public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
-//			{
-//				return SServiceProvider.getService(PlatformComponent.this, cid, type);
-//			}
-//		};
-	}
-	
 	/**
 	 *  Kill the component.
 	 */
@@ -628,63 +599,84 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
-	 * 
+	 *  Get the children (if any).
+	 *  @return The children.
 	 */
-	public class ServiceContainer implements IServiceContainer, IServiceProvider
+	public IFuture<IComponentIdentifier[]> getChildren(final String type)
 	{
-		public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
+		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
+		final String filename = getComponentFilename(type);
+		
+		if(filename==null)
 		{
-			return SServiceProvider.getServices(PlatformComponent.this, type, scope);
+			ret.setException(new IllegalArgumentException("Unknown type: "+type));
+		}
+		else
+		{
+			SServiceProvider.getService(this, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier[]>(ret)
+			{
+				public void customResultAvailable(final IComponentManagementService cms)
+				{
+					// Can use the parent resource identifier as child must depend on parent
+					cms.loadComponentModel(filename, getModel().getResourceIdentifier()).addResultListener(getComponentFeature(IExecutionFeature.class).createResultListener(
+						new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier[]>(ret)
+					{
+						public void customResultAvailable(IModelInfo model)
+						{
+							final String modelname = model.getFullName();
+						
+							final Future<Collection<IExternalAccess>>	childaccesses	= new Future<Collection<IExternalAccess>>();
+							cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret)
+							{
+								public void customResultAvailable(IComponentIdentifier[] children)
+								{
+									IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
+										new DelegationResultListener<Collection<IExternalAccess>>(childaccesses));
+									for(int i=0; !ret.isDone() && i<children.length; i++)
+									{
+										cms.getExternalAccess(children[i]).addResultListener(crl);
+									}
+								}
+							});
+							childaccesses.addResultListener(getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, IComponentIdentifier[]>(ret)
+							{
+								public void customResultAvailable(Collection<IExternalAccess> col)
+								{
+									List<IComponentIdentifier> res = new ArrayList<IComponentIdentifier>();
+									for(Iterator<IExternalAccess> it=col.iterator(); it.hasNext(); )
+									{
+										IExternalAccess subcomp = it.next();
+										if(modelname.equals(subcomp.getModel().getFullName()))
+										{
+											res.add(subcomp.getComponentIdentifier());
+										}
+									}
+									ret.setResult((IComponentIdentifier[])res.toArray(new IComponentIdentifier[0]));
+								}
+							}));
+						}
+					}));
+				}	
+			}));
 		}
 		
-		public <T> IIntermediateFuture<T> searchServices(Class<T> type)
+		return ret;
+	}
+	
+	/**
+	 *  Get the file name for a logical type name of a subcomponent of this application.
+	 */
+	public String getComponentFilename(String type)
+	{
+		String ret = null;
+		SubcomponentTypeInfo[] subcomps = getModel().getSubcomponentTypes();
+		for(int i=0; ret==null && i<subcomps.length; i++)
 		{
-			return SServiceProvider.getServices(PlatformComponent.this, type);
+			SubcomponentTypeInfo subct = (SubcomponentTypeInfo)subcomps[i];
+			if(subct.getName().equals(type))
+				ret = subct.getFilename();
 		}
-		
-		public <T> IFuture<T> searchServiceUpwards(Class<T> type)
-		{
-			return SServiceProvider.getServiceUpwards(PlatformComponent.this, type);
-		}
-		
-		public <T> IFuture<T> searchService(Class<T> type, String scope)
-		{
-			return SServiceProvider.getService(PlatformComponent.this, type, scope);
-		}
-		
-		public <T> IFuture<T> searchService(Class<T> type)
-		{
-			return SServiceProvider.getService(PlatformComponent.this, type);
-		}
-		
-		public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
-		{
-			return SServiceProvider.getService(PlatformComponent.this, cid, type);
-		}
-		
-		public ITerminableIntermediateFuture<IService> getServices(ClassInfo type, String scope, IAsyncFilter<IService> filter)
-		{
-			return (ITerminableIntermediateFuture)SServiceProvider.getServices(PlatformComponent.this, type.getType(PlatformComponent.this.getClassLoader()), scope, (IAsyncFilter)filter);
-		}
-		
-		public IFuture<IService> getService(ClassInfo type, String scope, IAsyncFilter<IService> filter)
-		{
-			return (IFuture)SServiceProvider.getService(PlatformComponent.this, type.getType(PlatformComponent.this.getClassLoader()), scope, (IAsyncFilter)filter);
-		}
-		
-		public IFuture<IService> getService(IServiceIdentifier sid)
-		{
-			return (IFuture)SServiceProvider.getService(PlatformComponent.this, sid);
-		}
-		
-		public IFuture<Collection<IService>> getDeclaredServices()
-		{
-			return SServiceProvider.getDeclaredServices(PlatformComponent.this);
-		}
-		
-		public IComponentIdentifier	getId()
-		{
-			return PlatformComponent.this.getComponentIdentifier();
-		}
+		return ret;
 	}
 }

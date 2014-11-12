@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -149,7 +150,7 @@ public class InitiatorAgent extends TestAgent
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if returning changed nf props works");
 		
-		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
+		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
 		
 //		fut.addResultListener(new IResultListener()
 //		{

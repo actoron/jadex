@@ -1,7 +1,7 @@
 package jadex.kernelbase;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IPersistInfo;
-import jadex.bridge.service.ServiceContainerPersistInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 
 import java.util.Map;
@@ -35,7 +35,7 @@ public class DefaultPersistInfo	implements IPersistInfo
 	protected Map<String, Object> properties;
 
 	/**	The service container. */
-	protected ServiceContainerPersistInfo	servicecontainer;
+	//protected ServiceContainerPersistInfo	servicecontainer;
 	
 	//-------- constructors --------
 	
@@ -49,15 +49,15 @@ public class DefaultPersistInfo	implements IPersistInfo
 	/**
 	 *  Creates the state info object.
 	 */
-	public DefaultPersistInfo(StatelessAbstractInterpreter interpreter)
+	public DefaultPersistInfo(IInternalAccess interpreter)
 	{
 		modelfilename	= interpreter.getModel().getFilename();
 		desc = interpreter.getComponentDescription();
 		config = interpreter.getConfiguration();
-		arguments = interpreter.getArguments();
-		results = interpreter.getResults();
-		properties = interpreter.getProperties();
-		servicecontainer	= interpreter.getServiceContainer().getPersistInfo();
+//		arguments = interpreter.getArguments();
+//		results = interpreter.getResults();
+//		properties = interpreter.getProperties();
+		//servicecontainer	= interpreter.getServiceContainer().getPersistInfo();
 
 	}
 	
@@ -183,21 +183,21 @@ public class DefaultPersistInfo	implements IPersistInfo
 		this.properties = properties;
 	}
 
-	/**
-	 *  Get service state.
-	 *  @return The service container info.
-	 */
-	public ServiceContainerPersistInfo getServiceContainer()
-	{
-		return servicecontainer;
-	}
-	
-	/**
-	 *  Set service state.
-	 *  @param container	The service container info.
-	 */
-	public void	setServiceContainer(ServiceContainerPersistInfo container)
-	{
-		this.servicecontainer	= container;
-	}
+//	/**
+//	 *  Get service state.
+//	 *  @return The service container info.
+//	 */
+//	public ServiceContainerPersistInfo getServiceContainer()
+//	{
+//		return servicecontainer;
+//	}
+//	
+//	/**
+//	 *  Set service state.
+//	 *  @param container	The service container info.
+//	 */
+//	public void	setServiceContainer(ServiceContainerPersistInfo container)
+//	{
+//		this.servicecontainer	= container;
+//	}
 }

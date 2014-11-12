@@ -5,9 +5,11 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutResultListener;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -114,7 +116,7 @@ public class DaemonService implements IDaemonService
 					// Wait for process
 					if(wait>0)
 					{
-						agent.waitForDelay(wait, new IComponentStep<Void>()
+						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
@@ -246,7 +248,7 @@ public class DaemonService implements IDaemonService
 		// Clone current classpath if not set. 
 		if(options.getClassPath()==null || options.getClassPath().length()==0)
 		{
-			IFuture<ILibraryService> fut = agent.getServiceContainer().getRequiredService("libservice");
+			IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("libservice");
 			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, StartOptions>(ret)
 			{
 				public void customResultAvailable(ILibraryService result)
@@ -438,7 +440,7 @@ public class DaemonService implements IDaemonService
 			for(int i = 0; i < alisteners.length; i++)
 			{
 				final IRemoteChangeListener<IComponentIdentifier> lis = alisteners[i];
-				alisteners[i].changeOccurred(event).addResultListener(agent.createResultListener(new IResultListener<Void>()
+				alisteners[i].changeOccurred(event).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{

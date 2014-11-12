@@ -9,6 +9,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
@@ -335,6 +336,57 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(name);
 		return fetcher.getLastServices();
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public <T> IFuture<T> searchService(Class<T> type)
+	{
+		return SServiceProvider.getService(getComponent(), type);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public <T> IFuture<T> searchService(Class<T> type, String scope)
+	{
+		return SServiceProvider.getService(getComponent(), type, scope);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> searchServices(Class<T> type)
+	{
+		return SServiceProvider.getServices(getComponent(), type);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> searchServices(Class<T> type, String scope)
+	{
+		return SServiceProvider.getServices(getComponent(), type, scope);
+	}
+	
+	/**
+	 *  Get one service of a type from a specific component.
+	 *  @param type The class.
+	 *  @param cid The component identifier of the target component.
+	 *  @return The corresponding service.
+	 */
+	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid)
+	{
+		return SServiceProvider.getService(getComponent(), cid, type);
 	}
 	
 	/**

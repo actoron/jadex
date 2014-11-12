@@ -2,7 +2,6 @@ package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -18,7 +17,7 @@ public class SubService extends BasicService implements ISubService
 	 */
 	public SubService(IInternalAccess comp)
 	{
-		super(((IServiceProvider)comp.getServiceContainer()).getId(), ISubService.class, null);
+		super(comp.getComponentIdentifier(), ISubService.class, null);
 	}
 	
 	//-------- methods --------

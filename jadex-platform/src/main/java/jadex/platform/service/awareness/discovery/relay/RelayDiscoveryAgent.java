@@ -4,8 +4,10 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.TimeoutResultListener;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -106,7 +108,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 		final Future<Void> ret = new Future<Void>();
 		
 		// Announce virtual offline info. 
-		IFuture<IAwarenessManagementService>	msfut	= agent.getRequiredService("management");
+		IFuture<IAwarenessManagementService>	msfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("management");
 		msfut.addResultListener(new ExceptionDelegationResultListener<IAwarenessManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IAwarenessManagementService ms)
@@ -147,7 +149,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 			
 			agent.getLogger().info("Sending awareness info to server...");
 			final Future<Void>	fut	= new Future<Void>();
-			IFuture<IMessageService>	msfut =	agent.getServiceContainer().getRequiredService("ms");
+			IFuture<IMessageService>	msfut =	agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
 			msfut.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(fut)
 			{
 				public void customResultAvailable(final IMessageService ms)
@@ -186,7 +188,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 										msg.put(SFipa.CONTENT, awainfo);
 										// Send content object without inner codec.
 										msg.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
-										agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE)
+										agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE)
 											.addResultListener(new DelegationResultListener<Void>(fut));
 									}
 								});

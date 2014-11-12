@@ -3,8 +3,6 @@ package jadex.bridge;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.nonfunctional.INFPropertyProvider;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -49,11 +47,11 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 	 */
 	public IComponentIdentifier	getComponentIdentifier();
 	
-	/**
-	 *  Get the service provider.
-	 *  @return The service provider.
-	 */
-	public IServiceProvider getServiceProvider();
+//	/**
+//	 *  Get the service provider.
+//	 *  @return The service provider.
+//	 */
+//	public IServiceProvider getServiceProvider();
 	
 	/**
 	 *  Schedule a step of the component.
@@ -110,11 +108,11 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 	 */
 	public IFuture<Map<String, Object>> killComponent();
 	
-//	/**
-//	 *  Get the children (if any) component identifiers.
-//	 *  @return The children component identifiers.
-//	 */
-//	public IFuture<IComponentIdentifier[]> getChildren(String type);
+	/**
+	 *  Get the children (if any) component identifiers.
+	 *  @return The children component identifiers.
+	 */
+	public IFuture<IComponentIdentifier[]> getChildren(String type);
 	
 	/**
 	 *  Get the model name of a component type.

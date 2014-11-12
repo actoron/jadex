@@ -87,7 +87,7 @@ public class SwitchPlatformCommand extends ACliCommand
 		{
 			final IComponentIdentifier cid = new ComponentIdentifier((String)args.get(null));
 			
-			SServiceProvider.getServices(comp.getServiceProvider(), IInternalCliService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			SServiceProvider.getServices(comp, IInternalCliService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 				.addResultListener(new IIntermediateResultListener<IInternalCliService>()
 			{
 				boolean found = false;
@@ -97,7 +97,7 @@ public class SwitchPlatformCommand extends ACliCommand
 					if(plat.equals(cid) && !ret.isDone())
 					{
 						found = true;
-						SServiceProvider.getService(comp.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService(comp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IInternalCliService>(ret)
 						{
 							public void customResultAvailable(IComponentManagementService cms)

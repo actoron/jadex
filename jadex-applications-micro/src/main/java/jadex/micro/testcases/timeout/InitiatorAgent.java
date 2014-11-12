@@ -9,6 +9,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
@@ -152,7 +153,7 @@ public class InitiatorAgent extends TestAgent
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if timeout works "+(to==-1? "without ": "with "+to)+" timeout.");
 		
-		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
+		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
 		
 //		fut.addResultListener(new IResultListener()
 //		{

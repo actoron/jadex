@@ -1,7 +1,10 @@
 package jadex.bridge.service.component;
 
-import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 
 /**
@@ -15,7 +18,7 @@ public class ComponentSuspendable implements ISuspendable
 	//-------- attributes --------
 	
 	/** The component adapter. */
-	protected IComponentAdapter	adapter;
+	protected IInternalAccess	adapter;
 	
 	/** The current future. */
 	protected Future<?>	future;
@@ -25,7 +28,7 @@ public class ComponentSuspendable implements ISuspendable
 	/**
 	 *  Create a component suspendable.
 	 */
-	public ComponentSuspendable(IComponentAdapter adapter)
+	public ComponentSuspendable(IInternalAccess adapter)
 	{
 		this.adapter	= adapter;
 	}
@@ -65,11 +68,11 @@ public class ComponentSuspendable implements ISuspendable
 	{
 //		System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
 //		Thread.dumpStack();
-		if(adapter.isExternalThread())
+		if(!adapter.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
-			adapter.invokeLater(new Runnable()
+			adapter.getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
 			{
-				public void run()
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					synchronized(ComponentSuspendable.this)
 					{

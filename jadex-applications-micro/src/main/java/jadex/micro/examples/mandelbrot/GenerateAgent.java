@@ -2,7 +2,7 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.Description;
@@ -24,6 +24,7 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="cmsservice", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="generateservice", type=IGenerateService.class)
 })
-public class GenerateAgent extends MicroAgent
+@Agent
+public class GenerateAgent //extends MicroAgent
 {
 }

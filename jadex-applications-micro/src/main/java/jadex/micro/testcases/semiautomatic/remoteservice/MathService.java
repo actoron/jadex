@@ -2,7 +2,6 @@ package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 

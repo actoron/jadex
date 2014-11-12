@@ -2,7 +2,10 @@ package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.CounterResultListener;
@@ -10,12 +13,17 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Agent;
 
 /**
  *  Agent that invokes methods on a remote service.
  */
-public class UserAgent extends MicroAgent
+@Agent
+public class UserAgent //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	/**
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
@@ -40,7 +48,7 @@ public class UserAgent extends MicroAgent
 		});
 		
 		// get remote management service 
-		getServiceContainer().searchServiceUpwards(IComponentManagementService.class)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -48,7 +56,7 @@ public class UserAgent extends MicroAgent
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
 				// get remote management service and fetch service via rms.getProxy()
-				getServiceContainer().searchService(IRemoteServiceManagementService.class)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class)
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -59,7 +67,7 @@ public class UserAgent extends MicroAgent
 							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
 						// Search for remote service
-						rms.getServiceProxy(platid, IMathService.class, RequiredServiceInfo.SCOPE_PLATFORM, null).addResultListener(createResultListener(new IResultListener()
+						rms.getServiceProxy(platid, IMathService.class, RequiredServiceInfo.SCOPE_PLATFORM, null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -86,7 +94,7 @@ public class UserAgent extends MicroAgent
 		});
 		
 		// search on local platform and find service via ProxyAgent to other platform
-		getServiceContainer().searchService(IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

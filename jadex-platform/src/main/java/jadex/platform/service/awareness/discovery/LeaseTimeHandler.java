@@ -4,6 +4,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -128,7 +129,7 @@ public class LeaseTimeHandler
 	 */
 	public void startRemoveBehavior()
 	{
-		agent.getMicroAgent().scheduleStep(new IComponentStep<Void>()
+		agent.getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("rem")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -189,7 +190,7 @@ public class LeaseTimeHandler
 			{
 				try
 				{
-					agent.getMicroAgent().scheduleStep(step);
+					agent.getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 				}
 				catch(ComponentTerminatedException e)
 				{

@@ -8,7 +8,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
@@ -17,7 +16,6 @@ import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
@@ -160,18 +158,18 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 //		return adapter.getParent();
 //	}
 	
-	/**
-	 *  Get the application component.
-	 */
-	public IServiceProvider getServiceProvider()
-	{
-		if(!valid)
-		{
-			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
-		}
-
-		return (IServiceProvider)ia.getServiceContainer();
-	}
+//	/**
+//	 *  Get the application component.
+//	 */
+//	public IServiceProvider getServiceProvider()
+//	{
+//		if(!valid)
+//		{
+//			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
+//		}
+//
+//		return (IServiceProvider)ia.getServiceContainer();
+//	}
 
 	/**
 	 *  Kill the component.
@@ -254,48 +252,48 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 		return application.createResultListener(listener);
 	}*/
 	
-//	/**
-//	 *  Get the children (if any).
-//	 *  @return The children.
-//	 */
-//	public IFuture<IComponentIdentifier[]> getChildren(final String type)
-//	{
-//		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
-//		
-//		if(!valid)
-//		{
-//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-//		}
-//		else if(isExternalThread())
-//		{
-//			try
-//			{
-//				adapter.invokeLater(new Runnable() 
-//				{
-//					public void run() 
-//					{
-//						ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
-//					}
-//				});
-//			}
-//			catch(final Exception e)
-//			{
-//				Starter.scheduleRescueStep(cid, new Runnable()
-//				{
-//					public void run()
-//					{
-//						ret.setException(e);
-//					}
-//				});
-//			}
-//		}
-//		else
-//		{
-//			ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
-//		}
-//		
-//		return ret;
-//	}
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture<IComponentIdentifier[]> getChildren(final String type)
+	{
+		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
+		
+		if(!valid)
+		{
+			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+		}
+		else if(isExternalThread())
+		{
+			try
+			{
+				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(cid, new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Create a subcomponent.

@@ -3,8 +3,8 @@ package jadex.micro.examples.messagequeue.replicated;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -129,7 +129,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 			}
 		};
 
-		this.agent.getComponentFeature(IExecutionFeature.class).waitForDelayTick(searchServicesStep);
+		this.agent.getComponentFeature(IExecutionFeature.class).waitForTick(searchServicesStep);
 	}
 
 	/**
@@ -310,9 +310,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 */
 	private IIntermediateFuture<IMessageQueueReplicationService> getOtherServices() 
 	{
-		IServiceContainer sc = this.agent.getServiceContainer();
-		IIntermediateFuture<IMessageQueueReplicationService> services = sc.getRequiredServices("replication");
-		return services;
+		return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("replication");
 	}
 
 	/**

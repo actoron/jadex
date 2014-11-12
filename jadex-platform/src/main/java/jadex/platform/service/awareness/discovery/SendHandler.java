@@ -2,6 +2,7 @@ package jadex.platform.service.awareness.discovery;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -53,7 +54,7 @@ public abstract class SendHandler
 		final String sendid = SUtil.createUniqueId(agent.getMicroAgent().getComponentIdentifier().getLocalName());
 		this.sendid = sendid;	
 		
-		agent.getMicroAgent().scheduleStep(new IComponentStep<Void>()
+		agent.getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("send")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -62,7 +63,7 @@ public abstract class SendHandler
 				final Future<Void> ret = new Future<Void>();
 				if(!agent.isKilled() && sendid.equals(getSendId()))
 				{
-					createAwarenessInfo().addResultListener(agent.getMicroAgent()
+					createAwarenessInfo().addResultListener(agent.getMicroAgent().getComponentFeature(IExecutionFeature.class)
 						.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
 					{
 						public void customResultAvailable(AwarenessInfo info)

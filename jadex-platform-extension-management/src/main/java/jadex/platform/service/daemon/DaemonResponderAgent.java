@@ -1,10 +1,11 @@
 package jadex.platform.service.daemon;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -29,7 +30,7 @@ public class DaemonResponderAgent
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent	agent;
+	protected IInternalAccess	agent;
 	
 	/** The message receiver. */
 	@AgentArgument
@@ -52,6 +53,6 @@ public class DaemonResponderAgent
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 		msg.put(SFipa.RECEIVERS, cid);
 		msg.put(SFipa.CONTENT, content);
-		return agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
+		return agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
 	}
 }

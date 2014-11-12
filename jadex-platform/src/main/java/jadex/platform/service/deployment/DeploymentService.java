@@ -161,7 +161,7 @@ public class DeploymentService implements IDeploymentService
 	public IFuture<Void> openFile(final String path)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(agent.getServiceProvider(), IContextService.class)
+		SServiceProvider.getService(agent, IContextService.class)
 			.addResultListener(new DefaultResultListener<IContextService>()
 		{
 			public void resultAvailable(IContextService cs)

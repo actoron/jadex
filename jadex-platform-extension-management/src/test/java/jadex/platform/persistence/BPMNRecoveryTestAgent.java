@@ -4,9 +4,13 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.commons.Tuple2;
@@ -16,7 +20,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -37,7 +40,7 @@ public class BPMNRecoveryTestAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -57,7 +60,7 @@ public class BPMNRecoveryTestAgent
 			public void customResultAvailable(TestReport result)
 			{
 				trs.add(result);
-				agent.setResultValue("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
 				ret.setResult(null);
 			}
 		});
@@ -72,8 +75,8 @@ public class BPMNRecoveryTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IPersistenceService	ps	= agent.getServiceContainer().searchService(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IPersistenceService	ps	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 		IExternalAccess	exta	= cms.getExternalAccess(fut.getFirstResult()).get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
@@ -98,7 +101,7 @@ public class BPMNRecoveryTestAgent
 		
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
-		agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).get();
+		agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).get();
 		
 		cres.get();
 		

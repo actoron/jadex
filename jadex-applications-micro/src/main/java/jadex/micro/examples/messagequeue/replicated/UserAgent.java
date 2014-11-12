@@ -2,10 +2,10 @@ package jadex.micro.examples.messagequeue.replicated;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -30,7 +30,7 @@ public class UserAgent
 
 	/** The agent. */
 	@Agent
-	protected MicroAgent						agent;
+	protected IInternalAccess					agent;
 
 	/** The message queue. */
 	@AgentService

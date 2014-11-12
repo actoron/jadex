@@ -3,13 +3,13 @@ package jadex.micro.testcases.semiautomatic.compositeservice;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.AbstractApplicableInterceptor;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -37,9 +37,9 @@ public class CorruptAdderAgent //extends MicroAgent
 	 */
 	public IFuture agentCreated()
 	{
-		IService addser = getServiceContainer().getProvidedServices(IAddService.class)[0];
+		IService addser = (IService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(IAddService.class)[0];
 		
-		getServiceContainer().addInterceptor(new AbstractApplicableInterceptor()
+		agent.getComponentFeature(IProvidedServicesFeature.class).addInterceptor(new AbstractApplicableInterceptor()
 		{
 			public IFuture execute(ServiceInvocationContext context)
 			{
@@ -48,7 +48,7 @@ public class CorruptAdderAgent //extends MicroAgent
 				{
 					if(context.getMethod().equals(IAddService.class.getMethod("add", new Class[]{double.class, double.class})))
 					{
-						context.setResult(new Future(new ComponentTerminatedException(getComponentIdentifier())));
+						context.setResult(new Future(new ComponentTerminatedException(agent.getComponentIdentifier())));
 //						System.out.println("hello interceptor");
 //						if(calls++>0)
 						{

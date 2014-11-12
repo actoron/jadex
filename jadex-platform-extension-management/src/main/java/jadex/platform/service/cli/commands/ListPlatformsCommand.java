@@ -1,26 +1,12 @@
-/**
- * 
- */
 package jadex.platform.service.cli.commands;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.awareness.DiscoveryInfo;
-import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IProxyAgentService.State;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
@@ -32,13 +18,9 @@ import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-
-import javax.swing.DefaultListModel;
 
 /**
  *  List all currently known platforms.
@@ -88,7 +70,7 @@ public class ListPlatformsCommand extends ACliCommand
 		
 		final boolean state = args.containsKey("-s");
 		
-		SServiceProvider.getServices(comp.getServiceProvider(), IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getServices(comp, IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
 		{
 			protected int ongoing = 0;

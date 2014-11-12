@@ -242,11 +242,6 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		return reqserprops!=null? reqserprops.get(sid)!=null: false;
 	}
 	
-//	/**
-//	 *  Get the required service property provider for a service.
-//	 */
-//	public INFMixedPropertyProvider getRequiredServicePropertyProvider(String name);
-	
 	/**
 	 *  Get the provided service property provider for a service.
 	 */

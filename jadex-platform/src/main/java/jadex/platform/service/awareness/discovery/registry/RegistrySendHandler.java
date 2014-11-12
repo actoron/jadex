@@ -2,6 +2,7 @@ package jadex.platform.service.awareness.discovery.registry;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -41,7 +42,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 				.getComponentIdentifier().getLocalName());
 			this.sendid = sendid;	
 			
-			getAgent().getMicroAgent().scheduleStep(new IComponentStep<Void>()
+			getAgent().getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("send")
 				public IFuture<Void> execute(IInternalAccess ia)
@@ -52,7 +53,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 					if(!getAgent().isKilled() && sendid.equals(getSendId()))
 					{
 //						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
-						createAwarenessInfo().addResultListener(agent.getMicroAgent()
+						createAwarenessInfo().addResultListener(agent.getMicroAgent().getComponentFeature(IExecutionFeature.class)
 							.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
 						{
 							public void customResultAvailable(AwarenessInfo info)

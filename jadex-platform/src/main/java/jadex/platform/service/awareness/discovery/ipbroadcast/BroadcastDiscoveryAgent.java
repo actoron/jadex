@@ -1,6 +1,7 @@
 package jadex.platform.service.awareness.discovery.ipbroadcast;
 
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -191,7 +192,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						socket.setBroadcast(true);
 						
 						createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId())
-							.addResultListener(agent.createResultListener(new DefaultResultListener<AwarenessInfo>(agent.getLogger())
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<AwarenessInfo>(agent.getLogger())
 						{
 							public void resultAvailable(AwarenessInfo info)
 							{

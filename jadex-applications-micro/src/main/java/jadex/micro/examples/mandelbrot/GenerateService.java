@@ -2,12 +2,16 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -45,7 +49,7 @@ public class GenerateService implements IGenerateService
 	
 	/** The agent. */
 	@ServiceComponent
-	protected GenerateAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The generate panel. */
 	protected GeneratePanel panel;
@@ -64,7 +68,7 @@ public class GenerateService implements IGenerateService
 //		System.out.println("start: "+agent.getAgentName());
 		this.panel = (GeneratePanel)GeneratePanel.createGui(agent.getExternalAccess());
 		
-		this.manager	= new ServicePoolManager(agent, "calculateservices", new IServicePoolHandler()
+		this.manager = new ServicePoolManager(agent, "calculateservices", new IServicePoolHandler()
 		{
 			public boolean selectService(IService service)
 			{
@@ -149,7 +153,7 @@ public class GenerateService implements IGenerateService
 					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService cms = (IComponentManagementService)result;
-						Object delay = agent.getComponentFeature(IArgumentsFeature.class).getArgument("delay");
+						Object delay = agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay");
 						if(delay==null)
 							delay = Long.valueOf(5000);
 						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
@@ -165,7 +169,7 @@ public class GenerateService implements IGenerateService
 								{
 									public void customResultAvailable(Object result)
 									{
-										SServiceProvider.getService(((IExternalAccess)result).getServiceProvider(),
+										SServiceProvider.getService((IExternalAccess)result,
 											ICalculateService.class, RequiredServiceInfo.SCOPE_LOCAL).addResultListener(
 											agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 										{

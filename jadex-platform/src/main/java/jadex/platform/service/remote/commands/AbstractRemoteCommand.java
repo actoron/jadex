@@ -3,6 +3,7 @@ package jadex.platform.service.remote.commands;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.security.DefaultAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -62,7 +63,7 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 		this.receiver = target;
 		
 		final Future<Void>	ret	= new Future<Void>();
-		component.getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<ISecurityService>()
 		{
 			public void resultAvailable(ISecurityService sec)

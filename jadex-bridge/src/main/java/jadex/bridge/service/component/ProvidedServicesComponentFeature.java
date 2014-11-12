@@ -12,12 +12,16 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -526,4 +530,259 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	{
 		return services;
 	}
+
+	/**
+	 *  Add a service to the platform. 
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
+	 *  @param service The service.
+	 */
+	public void addService(String name, Class<?> type, Object service)
+	{
+		addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null);
+	}
+	
+	/**
+	 *  Add a service to the platform.
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
+	 *  @param service The service.
+	 *  @param type The proxy type (@see{BasicServiceInvocationHandler}).
+	 */
+	public void	addService(String name, Class<?> type, Object service, String proxytype)
+	{
+		addService(name, type, proxytype, null, service, null);
+	}
+	
+	// todo:
+//	/**
+//	 *  Add a service to the platform. 
+//	 *  If under the same name and type a service was contained,
+//	 *  the old one is removed and shutdowned.
+//	 *  @param type The public service interface.
+//	 *  @param service The service.
+//	 */
+//	public void addService(String name, Class<?> type, Object service, PublishInfo pi)
+//	{
+//		addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, pi);
+//	}
+	
+	/**
+	 *  Add a service to the platform. 
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
+	 *  @param service The service.
+	 */
+	public void	addService(String name, Class<?> type, Object service, PublishInfo pi)
+	{
+		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, null, pi, null): null;
+		addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi);
+	}
+
+	/**
+	 *  Removes a service from the platform (shutdowns also the service).
+	 *  @param service The service.
+	 */
+	public IFuture<Void> removeService(final IServiceIdentifier sid)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(sid==null)
+		{
+			ret.setException(new IllegalArgumentException("Service identifier nulls."));
+			return ret;
+		}
+			
+		getServiceTypes(sid).addResultListener(new ExceptionDelegationResultListener<Collection<Class<?>>, Void>(ret)
+		{
+			public void customResultAvailable(final Collection<Class<?>> servicetypes)
+			{
+//				System.out.println("Removing service: " + servicetype);
+				synchronized(this)
+				{
+					IInternalService service = null;
+					
+					for(Class<?> servicetype: servicetypes)
+					{
+						Collection<IInternalService> tmp = services!=null? services.get(servicetype): null;
+						
+						service = null;
+						
+						if(tmp!=null)
+						{
+							for(Iterator<IInternalService> it=tmp.iterator(); it.hasNext() && service==null; )
+							{
+								final IInternalService tst = it.next();
+								if(tst.getServiceIdentifier().equals(sid))
+								{
+									service = tst;
+									tmp.remove(service);
+								}
+							}
+							
+							// Remove collection if last service
+							if(tmp.isEmpty())
+							{
+								services.remove(servicetype);
+							}
+						}
+						
+						if(service==null)
+						{
+							ret.setException(new IllegalArgumentException("Service not found: "+sid));
+							break;
+						}
+					}
+					
+					if(service!=null)
+					{
+						final IInternalService fservice = service;
+						// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
+	//					if(!terminated)
+	//					{
+//							if(sid.toString().indexOf("Context")!=-1)
+//									System.out.println("Terminating service: "+sid);
+							getComponent().getLogger().info("Terminating service: "+sid);
+							
+							// Dispose nonfunc properties
+							
+							// todo: how to shutdown?
+							
+							ret.setResult(null);
+							
+//							service.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret)
+//							{
+//								public void customResultAvailable(Void result)
+//								{
+////									if(fservice.getServiceIdentifier().toString().indexOf("ContextSer")!=-1)
+////										System.out.println("hierda");
+//									
+//									fservice.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
+//									{
+//										public void customResultAvailable(Void result)
+//										{
+////											if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
+////												System.out.println("Terminated service: "+sid);
+//											getLogger().info("Terminated service: "+sid);
+//											
+//											for(Class<?> key: servicetypes)
+//											{
+//												getServiceRegistry().removeService(new ClassInfo(key), fservice);
+//											}
+//											
+//											serviceShutdowned(fservice).addResultListener(new DelegationResultListener<Void>(ret));
+//										}
+//										
+//										public void exceptionOccurred(Exception exception)
+//										{
+//											exception.printStackTrace();
+//											super.exceptionOccurred(exception);
+//										}
+//									});
+//								}
+//								
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									exception.printStackTrace();
+//									super.exceptionOccurred(exception);
+//								}
+//							});							
+	//					}
+	//					else
+	//					{
+	//						ret.setResult(null);
+	//					}
+					}
+				}
+			}
+		});
+		
+		return ret;
+	}
+
+	/**
+	 * 
+	 */
+	public IFuture<Collection<Class<?>>> getServiceTypes(final IServiceIdentifier sid)
+	{
+		final Future<Collection<Class<?>>> ret = new Future<Collection<Class<?>>>();
+		getServiceType(sid).addResultListener(new ExceptionDelegationResultListener<Class<?>, Collection<Class<?>>>(ret)
+		{
+			public void customResultAvailable(Class<?> result)
+			{
+				// todo: cache results
+				Set<Class<?>> res = new LinkedHashSet<Class<?>>();
+				res.add(result);
+				
+				Class<?>[] sins = SReflect.getSuperInterfaces(new Class[]{result});
+				for(Class<?> sin: sins)
+				{
+					if(sin.isAnnotationPresent(Service.class))
+					{
+						res.add(sin);
+					}
+				}
+				
+				ret.setResult(res);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<Class<?>> getServiceType(final IServiceIdentifier sid)
+	{
+		final Future<Class<?>> ret = new Future<Class<?>>();
+		if(sid.getServiceType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports())!=null)
+		{
+			ret.setResult(sid.getServiceType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports())); // todo: only local? remote would cause nullpointer
+		}
+		else
+		{
+			ILibraryService ls = SServiceProvider.getLocalService(getComponent(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			ls.getClassLoader(sid.getResourceIdentifier())
+				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Class<?>>(ret)
+			{
+				public void customResultAvailable(ClassLoader cl)
+				{
+					ret.setResult(sid.getServiceType().getType(cl));
+				}
+			});
+		}
+		return ret;
+	}
+	
+	
+	/**
+	 *  Add a service to the component. 
+	 *  @param type The service interface.
+	 *  @param service The service.
+	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
+	 */
+	public IInternalService addService(final String name, final Class<?> type, final String proxytype, 
+		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info)
+	{
+//		System.out.println("addS:"+service);
+
+		PublishEventLevel elm = getComponent().getComponentDescription().getMonitoring()!=null? getComponent().getComponentDescription().getMonitoring(): null;
+		// todo: remove this? currently the level cannot be turned on due to missing interceptor
+//		boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
+		
+		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
+		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
+			getComponent(), service, name, type, proxytype, ics, getComponent().isCopy(), 
+			getComponent().isRealtime(), moni, 
+			info, info!=null? info.getScope(): null);
+		
+		addService(proxy, info);
+		
+		return proxy;
+	}
+
 }

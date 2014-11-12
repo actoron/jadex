@@ -1,16 +1,16 @@
 package jadex.platform.service.email;
 
-import java.util.List;
-
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.email.Email;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+
+import java.util.List;
 
 /**
  *  Agent that is responsible for fetching mails for one subscription.
@@ -21,7 +21,7 @@ public class EmailFetcherAgent implements IEmailFetcherService
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Fetch emails for a subscription.
@@ -33,12 +33,12 @@ public class EmailFetcherAgent implements IEmailFetcherService
 		List<Email> emails = sub.getNewEmails();
 		
 		// Hack, needed because pool cannot be used (pro)
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				System.out.println("kill: "+agent);
-				agent.killAgent();
+				agent.killComponent();
 				return IFuture.DONE;
 			}
 		});

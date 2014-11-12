@@ -1,7 +1,6 @@
 package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -58,7 +57,7 @@ public interface IInternalAccess
 	 *  @return The service provider.
 	 */
 	// Todo: convenience object? -> fix search!?
-	public IServiceContainer getServiceContainer();
+//	public IServiceContainer getServiceContainer();
 	
 	/**
 	 *  Kill the component.
@@ -198,4 +197,17 @@ public interface IInternalAccess
 //	 *  Has the service a property provider.
 //	 */
 //	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid);
+	
+	/**
+	 *  Get the realtime setting.
+	 *  @return If is realtime.
+	 */
+	public boolean isRealtime();
+	
+	/**
+	 *  Get the copy setting.
+	 *  @return If is copy.
+	 */
+	public boolean isCopy();
+	
 }

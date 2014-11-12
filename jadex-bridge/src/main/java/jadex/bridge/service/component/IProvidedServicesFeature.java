@@ -1,9 +1,8 @@
 package jadex.bridge.service.component;
 
-import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.PublishInfo;
 import jadex.commons.future.IFuture;
 
 /**
@@ -18,14 +17,34 @@ public interface IProvidedServicesFeature
 	 *  @param info The provided service info.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public void addService(IInternalService service, ProvidedServiceInfo info);
+//	public void addService(IInternalService service, ProvidedServiceInfo info);
+	public void addService(String name, Class<?> type, Object service);
 
+	/**
+	 *  Add a service to the platform.
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
+	 *  @param service The service.
+	 *  @param type The proxy type (@see{BasicServiceInvocationHandler}).
+	 */
+	public void	addService(String name, Class<?> type, Object service, String proxytype);
+	
+	/**
+	 *  Add a service to the platform. 
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
+	 *  @param service The service.
+	 */
+	public void addService(String name, Class<?> type, Object service, PublishInfo pi);
+	
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).
 	 *  @param service The service identifier.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public void removeService(IServiceIdentifier sid);
+	public IFuture<Void> removeService(IServiceIdentifier sid);
 		
 	/**
 	 *  Get provided (declared) service.

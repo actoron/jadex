@@ -65,7 +65,7 @@ public class AAgent implements IAService
 				return IFuture.DONE;
 			}
 		};
-		agent.scheduleStep(step);
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 		return ret;
 	}
 	

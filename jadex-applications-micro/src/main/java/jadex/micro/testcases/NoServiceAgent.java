@@ -3,7 +3,9 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -31,7 +33,7 @@ public class NoServiceAgent //extends MicroAgent
 		
 		final TestReport	tr	= new TestReport("#1", "Searching for services.");
 		
-		getServiceContainer().searchServices(INoService.class).addResultListener(new IResultListener()
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(INoService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -43,7 +45,7 @@ public class NoServiceAgent //extends MicroAgent
 				{
 					tr.setFailed("Expected empty list but was: "+result);
 				}
-				getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}
@@ -51,7 +53,7 @@ public class NoServiceAgent //extends MicroAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				tr.setFailed("Exception during test: "+exception);
-				getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}

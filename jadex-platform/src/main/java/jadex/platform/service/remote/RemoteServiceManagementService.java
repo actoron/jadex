@@ -9,13 +9,14 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -26,8 +27,8 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
-import jadex.commons.IFilter;
 import jadex.commons.IAsyncFilter;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -167,7 +168,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public RemoteServiceManagementService(IExternalAccess component, 
 		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice)//, boolean binarymode)
 	{
-		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
+		super(component.getComponentIdentifier(), IRemoteServiceManagementService.class, null);
 
 //		System.out.println("binary: "+binarymode);
 		
@@ -800,7 +801,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						pre.setResult(null);
 					}
 					
-					pre.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
+					pre.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
 					{
 						public void customResultAvailable(Void v)
 						{
@@ -814,7 +815,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							if(future instanceof ISubscriptionIntermediateFuture)
 							{
 								// IResultListener not allowed for subscription future.
-								((ISubscriptionIntermediateFuture)future).addResultListener(ia.createResultListener(new IIntermediateFutureCommandResultListener<Object>()
+								((ISubscriptionIntermediateFuture)future).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener<Object>()
 								{
 									public void intermediateResultAvailable(Object result)
 									{
@@ -840,7 +841,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							}
 							else
 							{
-								future.addResultListener(ia.createResultListener(new IFutureCommandResultListener<Object>()
+								future.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IFutureCommandResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
 									{
@@ -866,8 +867,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							msg.put(SFipa.CONVERSATION_ID, callid);
 							msg.put(SFipa.X_NONFUNCTIONAL, nonfunc);
 							
-							getResourceIdentifier((IServiceProvider)ia.getServiceContainer(), ((AbstractRemoteCommand)content).getSender())
-								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Object>(future)
+							getResourceIdentifier(ia.getExternalAccess(), ((AbstractRemoteCommand)content).getSender())
+								.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Object>(future)
 							{
 								public void customResultAvailable(IResourceIdentifier rid)
 								{
@@ -884,12 +885,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 									// todo:
 //									msg.put(SFipa.X_RECEIVER, realrec);
 									
-									ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									ia.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 										.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(future)
 									{
 										public void customResultAvailable(final ILibraryService ls)
 										{
-											ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 												.addResultListener(new ExceptionDelegationResultListener<IMessageService, Object>(future)
 											{
 												public void customResultAvailable(final IMessageService ms)
@@ -1659,7 +1660,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 * 
 	 */
-	protected static IFuture<IResourceIdentifier> getResourceIdentifier(IServiceProvider provider, final IComponentIdentifier sender)
+	protected static IFuture<IResourceIdentifier> getResourceIdentifier(IExternalAccess provider, final IComponentIdentifier sender)
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 //		ret.addResultListener(new IResultListener<IResourceIdentifier>()

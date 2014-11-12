@@ -5,9 +5,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
@@ -84,7 +85,7 @@ public class DownloadFileCommand extends ACliCommand
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				getDeploymentService(ia, p)
-					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, String>(ret)
+					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IDeploymentService, String>(ret)
 //					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, Collection<Long>>(ret)
 				{
 					public void customResultAvailable(final IDeploymentService ds)
@@ -143,7 +144,7 @@ public class DownloadFileCommand extends ACliCommand
 								}
 							});
 							
-							sic.writeToOutputStream(fos, comp).addResultListener(ia.createResultListener(new IIntermediateResultListener<Long>()
+							sic.writeToOutputStream(fos, comp).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
 							{
 								public void intermediateResultAvailable(Long result) 
 								{
@@ -187,8 +188,8 @@ public class DownloadFileCommand extends ACliCommand
 		if(cid!=null)
 		{
 			// global search not a good idea due to long timeout but what to do else?
-			ia.getServiceContainer().searchServices(IDeploymentService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-				.addResultListener(ia.createResultListener(new IIntermediateResultListener<IDeploymentService>()
+			ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(IDeploymentService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IDeploymentService>()
 			{
 				public void intermediateResultAvailable(IDeploymentService result)
 				{
@@ -243,8 +244,8 @@ public class DownloadFileCommand extends ACliCommand
 		}
 		else
 		{
-			SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(ia.createResultListener(new DelegationResultListener<IDeploymentService>(ret)));
+			SServiceProvider.getService(ia, IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IDeploymentService>(ret)));
 		}
 		
 		return ret;

@@ -3,7 +3,10 @@ package jadex.platform.service.awareness.discovery;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -17,7 +20,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -68,7 +70,7 @@ public abstract class DiscoveryAgent
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The send (remotes) delay. */
 	@AgentArgument
@@ -131,17 +133,17 @@ public abstract class DiscoveryAgent
 		
 //		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
 		
-		SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IMessageService.class)
-			.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+		SServiceProvider.getServiceUpwards(agent, IMessageService.class)
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
 			public void customResultAvailable(final IMessageService msgser)
 			{
-				msgser.getDefaultCodecs().addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
+				msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
 				{
 					public void customResultAvailable(ICodec[] result)
 					{
 						defaultcodecs = result;
-						msgser.getAllCodecs().addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Map<Byte, ICodec>, Void>(ret)
+						msgser.getAllCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<Byte, ICodec>, Void>(ret)
 						{
 							public void customResultAvailable(Map<Byte, ICodec> result)
 							{
@@ -171,7 +173,7 @@ public abstract class DiscoveryAgent
 		this.receiver = createReceiveHandler();
 		if(receiver!=null)
 		{
-			receiver.startReceiving().addResultListener(getMicroAgent()
+			receiver.startReceiving().addResultListener(getMicroAgent().getComponentFeature(IExecutionFeature.class)
 				.createResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
@@ -224,7 +226,7 @@ public abstract class DiscoveryAgent
 		if(sender!=null)
 		{
 			createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId())
-				.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
+				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
 			{
 				public void customResultAvailable(AwarenessInfo info)
 				{
@@ -436,7 +438,7 @@ public abstract class DiscoveryAgent
 			{
 				try
 				{
-					agent.scheduleStep(step);
+					agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 				}
 				catch(ComponentTerminatedException e)
 				{
@@ -512,12 +514,12 @@ public abstract class DiscoveryAgent
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
 //		System.out.println("awa: "+awa);
-		IFuture<IMessageService> fut = agent.getServiceContainer().getRequiredService("ms");
-		fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
+		IFuture<IMessageService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
+		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
 		{
 			public void customResultAvailable(IMessageService cms)
 			{
-				cms.updateComponentIdentifier(getRoot()).addResultListener(agent.createResultListener(
+				cms.updateComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 					new ExceptionDelegationResultListener<IComponentIdentifier, AwarenessInfo>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier root)
@@ -539,12 +541,12 @@ public abstract class DiscoveryAgent
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
-		IFuture<IMessageService> fut = agent.getServiceContainer().getRequiredService("ms");
-		fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
+		IFuture<IMessageService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
+		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
 		{
 			public void customResultAvailable(IMessageService cms)
 			{
-				cms.updateComponentIdentifier(getRoot()).addResultListener(agent.createResultListener(
+				cms.updateComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 					new ExceptionDelegationResultListener<IComponentIdentifier, AwarenessInfo>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier root)
@@ -563,7 +565,7 @@ public abstract class DiscoveryAgent
 	 *  Get the agent.
 	 *  @return the agent.
 	 */
-	public MicroAgent getMicroAgent()
+	public IInternalAccess getMicroAgent()
 	{
 		return agent;
 	}

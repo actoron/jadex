@@ -70,7 +70,7 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 		final IComponentIdentifier compid = cid!=null? 
 			(IComponentIdentifier)cid: component.getComponentIdentifier();
 			
-		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
 			.addResultListener(new IResultListener<IComponentManagementService>()
 //			.addResultListener(component.createResultListener(new IResultListener()
 		{

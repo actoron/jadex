@@ -15,7 +15,6 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -28,9 +27,9 @@ import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.ChangeEvent;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
-import jadex.commons.IAsyncFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -60,7 +59,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -152,7 +150,7 @@ public class SRemoteGui
 	 *  @param sid	The service to remove.
 	 */
 	public static IFuture<Void> removeService(IComponentManagementService cms,
-			IServiceProvider container, final IServiceIdentifier sid)
+			IExternalAccess container, final IServiceIdentifier sid)
 	{
 //		final Future<Void>	ret	= new Future<Void>();
 //		cms.getExternalAccess(sid.getProviderId())
@@ -429,7 +427,7 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
 					{
 						public void customResultAvailable(final ILibraryService ls)
@@ -545,7 +543,7 @@ public class SRemoteGui
 				final Future<Void>	ret	= new Future<Void>();
 				try
 				{
-					ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 					{
 						public void customResultAvailable(ILibraryService ls)
@@ -1177,7 +1175,7 @@ public class SRemoteGui
 				final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 				try
 				{
-					ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Map<String, Object>>(ret)
 					{
 						public void customResultAvailable(ILibraryService ls)

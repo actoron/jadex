@@ -6,6 +6,7 @@ import jadex.bridge.SFuture;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.email.Email;
 import jadex.bridge.service.types.email.EmailAccount;
 import jadex.bridge.service.types.email.IEmailService;
@@ -17,7 +18,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.IntervalBehavior;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -37,7 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -72,7 +71,7 @@ public class EmailAgent implements IEmailService
 	
 	/** The component. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The delay between checking for mail. */
 	@AgentArgument
@@ -353,7 +352,7 @@ public class EmailAgent implements IEmailService
 			{
 				SubscriptionInfo si = subscriptions.get(fut);
 				final long start = System.currentTimeMillis();
-				IEmailFetcherService fetcher = (IEmailFetcherService)agent.getServiceContainer().getRequiredService("emailfetcher").get();
+				IEmailFetcherService fetcher = (IEmailFetcherService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("emailfetcher").get();
 //				System.out.println("Email fetcher ser: "+fetcher);
 				fetcher.fetchEmails(si).addResultListener(new IResultListener<Collection<Email>>()
 				{

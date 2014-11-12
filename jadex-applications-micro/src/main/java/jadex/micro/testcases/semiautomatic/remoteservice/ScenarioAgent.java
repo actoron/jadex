@@ -1,32 +1,39 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 
 import java.util.List;
 
 /**
  *  Just for starting the scenario.
  */
-public class ScenarioAgent extends MicroAgent
+@Agent
+public class ScenarioAgent //extends MicroAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	/**
 	 *  Execute the body.
 	 */
 	public IFuture<Void> executeBody()
 	{
-		getServiceContainer().searchService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				ILibraryService libservice = (ILibraryService)result;
 //				libservice.getURLStrings().addResultListener(createResultListener(new DefaultResultListener()
-				libservice.getAllResourceIdentifiers().addResultListener(createResultListener(new DefaultResultListener()
+				libservice.getAllResourceIdentifiers().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -38,7 +45,7 @@ public class ScenarioAgent extends MicroAgent
 						}
 //						String[] libpaths = (String[])((List)result).toArray(new String[0]);
 						StartScenario.startScenario(libpaths).addResultListener(
-							createResultListener(new DefaultResultListener()
+							agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{

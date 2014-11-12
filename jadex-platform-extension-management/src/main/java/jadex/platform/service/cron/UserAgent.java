@@ -1,14 +1,15 @@
 package jadex.platform.service.cron;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -33,7 +34,7 @@ public class UserAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -45,12 +46,12 @@ public class UserAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<ICronService> fut = agent.getServiceContainer().getRequiredService("crons");
+		IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("crons");
 		fut.addResultListener(new ExceptionDelegationResultListener<ICronService, Void>(ret)
 		{
 			public void customResultAvailable(final ICronService crons)
 			{
-				IFuture<ILibraryService> fut = agent.getServiceContainer().getRequiredService("libs");
+				IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("libs");
 				fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
 					public void customResultAvailable(ILibraryService libs)

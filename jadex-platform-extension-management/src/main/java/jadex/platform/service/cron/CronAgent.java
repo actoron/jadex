@@ -4,9 +4,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -24,7 +25,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -100,7 +100,7 @@ public class CronAgent implements ICronService
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -144,18 +144,18 @@ public class CronAgent implements ICronService
 					long sleep = (min - cur);
 					if(sleep>0)
 					{
-						agent.waitFor(sleep, this);
+						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(sleep, this);
 					}
 					else
 					{
-						agent.scheduleStep(this);
+						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(this);
 					}
 					
 					return IFuture.DONE;
 				}
 			};
 			
-			agent.scheduleStep(check);
+			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(check);
 		}
 	}
 	
@@ -201,7 +201,7 @@ public class CronAgent implements ICronService
 						if(jobs.containsKey(job.getId()))
 						{
 							final IComponentStep<Void> self = this;
-							IFuture<IClockService> fut = agent.getRequiredService("clockser");
+							IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser");
 							fut.addResultListener(new DefaultResultListener<IClockService>()
 							{
 								public void resultAvailable(IClockService clockser)
@@ -251,11 +251,11 @@ public class CronAgent implements ICronService
 //										System.out.println("waiting for: "+wait);
 										if(wait>0)
 										{
-											agent.waitFor(wait, self);
+											agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait, self);
 										}
 										else
 										{
-											agent.scheduleStep(self);
+											agent.getComponentFeature(IExecutionFeature.class).scheduleStep(self);
 										}
 									}
 									catch(Exception e)
@@ -269,7 +269,7 @@ public class CronAgent implements ICronService
 						return IFuture.DONE;
 					}
 				};
-				agent.scheduleStep(check);
+				agent.getComponentFeature(IExecutionFeature.class).scheduleStep(check);
 			}
 		}
 		
@@ -311,19 +311,19 @@ public class CronAgent implements ICronService
 		
 		if(useworkeragent)
 		{
-			IFuture<IComponentManagementService> fut = SServiceProvider.getService((IServiceProvider)agent.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			IFuture<IComponentManagementService> fut = SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(final IComponentManagementService cms)
 				{
 					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
 //					cms.createComponent(null, "invocation", ci, null)
 					cms.createComponent(null, "jadex/platform/service/cron/WorkerAgent.class", ci, null)
-						.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+						.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier cid) 
 						{
-							cms.getExternalAccess(cid).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+							cms.getExternalAccess(cid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 							{
 								public void customResultAvailable(IExternalAccess exta) 
 								{
@@ -334,7 +334,7 @@ public class CronAgent implements ICronService
 									{
 										public IFuture<Object> execute(final IInternalAccess ia)
 										{
-											doExecuteCommand(jobtup, time).addResultListener(ia.createResultListener(new IResultListener<Void>()
+											doExecuteCommand(jobtup, time).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 											{
 												public void resultAvailable(Void result)
 												{

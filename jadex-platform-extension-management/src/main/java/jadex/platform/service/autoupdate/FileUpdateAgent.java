@@ -1,6 +1,7 @@
 package jadex.platform.service.autoupdate;
 
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
@@ -317,7 +318,7 @@ public class FileUpdateAgent extends UpdateAgent
 		}
 		else if(newestversion!=-1)
 		{
-			IFuture<ILibraryService> fut = agent.getRequiredService("libservice");
+			IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("libservice");
 			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Long>(ret)
 			{
 				public void customResultAvailable(ILibraryService libser)

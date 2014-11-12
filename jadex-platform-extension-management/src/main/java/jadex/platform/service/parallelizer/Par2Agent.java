@@ -3,6 +3,7 @@ package jadex.platform.service.parallelizer;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -63,7 +64,7 @@ public class Par2Agent implements IParallelService
 		{
 			public void customResultAvailable(Void result)
 			{
-				IFuture<ISequentialService> fut = agent.getServiceContainer().getRequiredService("seqser");
+				IFuture<ISequentialService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("seqser");
 				fut.addResultListener(new ExceptionDelegationResultListener<ISequentialService, Void>(ret)
 				{
 					public void customResultAvailable(ISequentialService result)

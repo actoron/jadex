@@ -93,7 +93,7 @@ public class DestroyComponentCommand extends ACliCommand
 				{
 					final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 			
-					SServiceProvider.getService(comp.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(comp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 					{
 						public void customResultAvailable(IComponentManagementService cms)

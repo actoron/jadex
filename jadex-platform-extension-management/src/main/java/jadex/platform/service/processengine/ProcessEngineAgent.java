@@ -9,10 +9,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.SFuture;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -48,7 +50,6 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
@@ -89,7 +90,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 
 	/** The remove commands. */
 	protected Map<Tuple2<String, IResourceIdentifier>, List<Runnable>> remcoms;
@@ -139,7 +140,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Tuple2<String, IResourceIdentifier> key = new Tuple2<String, IResourceIdentifier>(model, urid);
 
 		// find classloader for rid
-		SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<ILibraryService>()
 		{
 			public void resultAvailable(ILibraryService libs)
@@ -509,8 +510,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
 		
-		SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(agent.createResultListener(new IResultListener<IComponentManagementService>()
+		SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
@@ -587,7 +588,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		if(BasicService.getLocalDefaultTimeout()>0)
 		{
-			agent.waitFor(BasicService.getLocalDefaultTimeout(), new IComponentStep<Void>()
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(BasicService.getLocalDefaultTimeout(), new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -702,7 +703,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		}
 		else
 		{
-			IFuture<ICronService> fut = agent.getServiceContainer().getRequiredService("crons");
+			IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("crons");
 			fut.addResultListener(new ExceptionDelegationResultListener<ICronService, Collection<CMSStatusEvent>>(ret2)
 			{
 				public void customResultAvailable(final ICronService crons)

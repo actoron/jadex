@@ -2,12 +2,9 @@ package jadex.platform.service.nfmethodprops;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.nonfunctional.annotation.NFProperties;
-import jadex.bridge.nonfunctional.annotation.NFProperty;
-import jadex.bridge.sensor.service.ExecutionTimeProperty;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -21,7 +18,7 @@ import jadex.micro.annotation.ProvidedServices;
 public class ProviderAgent implements ITestService
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -30,13 +27,13 @@ public class ProviderAgent implements ITestService
 	public IFuture<Void> methodA(long wait)
 	{
 		System.out.println("a");
-		return agent.scheduleStep(new IComponentStep<Void>()
+		return agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				return IFuture.DONE;
 			}
-		}, wait);
+		});
 	}
 	
 	/**

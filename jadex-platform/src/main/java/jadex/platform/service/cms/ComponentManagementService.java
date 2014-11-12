@@ -30,6 +30,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.clock.IClockService;
@@ -1495,7 +1496,9 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			
 			desc.setState(IComponentDescription.STATE_SUSPENDED);
-			cancel(adapter).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
+			// todo: fixme
+			ret.setException(new UnsupportedOperationException());
+//			cancel(adapter).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 //					exeservice.cancel(adapter).addResultListener(new DelegationResultListener(ret));
 			
 			notifyListenersChanged(cid, desc);
@@ -1696,15 +1699,15 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		else
 		{
-//			final IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+			final PlatformComponent adapter = (PlatformComponent)components.get(cid);
 			if(adapter==null)
 			{
 				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
 				return ret;
 			}
-			if(!IComponentDescription.STATE_SUSPENDED.equals(adapter.getDescription().getState()))
+			if(!IComponentDescription.STATE_SUSPENDED.equals(adapter.getComponentDescription().getState()))
 			{
-				ret.setException(new RuntimeException("Only suspended components can be stepped: "+cid+" "+adapter.getDescription().getState()));
+				ret.setException(new RuntimeException("Only suspended components can be stepped: "+cid+" "+adapter.getComponentDescription().getState()));
 				return ret;
 			}
 			
@@ -1716,7 +1719,10 @@ public class ComponentManagementService implements IComponentManagementService
 					desc.setStepInfo(stepinfo);
 				}
 			}
-			doStep(adapter).addResultListener(new DelegationResultListener<Void>(ret));
+			
+			// todo:
+			ret.setException(new UnsupportedOperationException());
+			//doStep(adapter).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;
@@ -2035,7 +2041,7 @@ public class ComponentManagementService implements IComponentManagementService
 		if(isRemoteComponent(cid))
 		{
 //			System.out.println("getExternalAccess: remote");
-			agent.getServiceContainer().searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IExternalAccess>(ret)
 			{
 				public void customResultAvailable(IRemoteServiceManagementService rms)

@@ -1,6 +1,6 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -19,6 +19,7 @@ import jadex.micro.annotation.Configurations;
 		@Component(type="Display")
 	})
 )
-public class MandelbrotAgent extends MicroAgent
+@Agent
+public class MandelbrotAgent //extends MicroAgent
 {
 }

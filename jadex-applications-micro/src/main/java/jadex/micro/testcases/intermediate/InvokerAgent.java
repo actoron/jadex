@@ -12,6 +12,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -200,12 +201,12 @@ public class InvokerAgent
 		});
 		
 		// Start service agent
-		agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				agent.getServiceContainer().getService(IClockService.class, root)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, root)
 					.addResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
 				{
 					public void customResultAvailable(final IClockService clock)

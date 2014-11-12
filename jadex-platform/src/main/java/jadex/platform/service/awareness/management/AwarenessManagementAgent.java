@@ -6,8 +6,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -176,7 +179,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IFuture<ISettingsService>	setfut	= agent.getServiceContainer().getRequiredService("settings");
+		IFuture<ISettingsService>	setfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("settings");
 		setfut.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
@@ -199,10 +202,10 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			
 			protected void	proceed()
 			{
-				final String mechas = (String)getArgument("mechanisms");
+				final String mechas = (String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("mechanisms");
 				if(mechas!=null)
 				{
-					IFuture<IComponentManagementService> cmsfut = getServiceContainer().getRequiredService("cms");
+					IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 					cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
 						public void customResultAvailable(IComponentManagementService cms)
@@ -218,8 +221,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 								}
 							});
 							
-							CreationInfo info = new CreationInfo(getComponentIdentifier());
-							info.setConfiguration(getConfiguration());
+							CreationInfo info = new CreationInfo(agent.getComponentIdentifier());
+							info.setConfiguration(agent.getConfiguration());
 							Map<String, Object> args = new HashMap<String, Object>();
 							args.put("delay", Long.valueOf(getDelay()));
 							args.put("fast", Boolean.valueOf(isFastAwareness()));
@@ -254,19 +257,19 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	protected void initArguments()
 	{
-		this.delay = ((Number)getArgument("delay")).longValue();
-		this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
-		this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
+		this.delay = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay")).longValue();
+		this.autocreate = ((Boolean)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("autocreate")).booleanValue();
+		this.autodelete = ((Boolean)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("autodelete")).booleanValue();
 		
 		this.includes	= new ArrayList<String>();
-		StringTokenizer	stok	= new StringTokenizer((String)getArgument("includes"), ",");
+		StringTokenizer	stok	= new StringTokenizer((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("includes"), ",");
 		while(stok.hasMoreTokens())
 		{
 			includes.add(stok.nextToken().trim());
 		}
 		
 		this.excludes	= new ArrayList<String>();
-		stok	= new StringTokenizer((String)getArgument("excludes"), ",");
+		stok	= new StringTokenizer((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("excludes"), ",");
 		while(stok.hasMoreTokens())
 		{
 			excludes.add(stok.nextToken().trim());
@@ -279,7 +282,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	public IFuture<Void> executeBody()
 	{
-		root = getComponentIdentifier().getRoot();
+		root = agent.getComponentIdentifier().getRoot();
 		startRemoveBehaviour();
 		return new Future<Void>(); // never kill by return
 	}
@@ -299,12 +302,12 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			timer	= null;
 		}
 		
-		IFuture<ISettingsService>	setfut	= getServiceContainer().getRequiredService("settings");
+		IFuture<ISettingsService>	setfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("settings");
 		setfut.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
 			{
-				settings.deregisterPropertiesProvider(getAgentName())
+				settings.deregisterPropertiesProvider(agent.getComponentIdentifier().getName())
 					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			
@@ -569,7 +572,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 //			startSendBehaviour();
 		}
 		
-		IIntermediateFuture<IDiscoveryService>	disfut	= getRequiredServices("discoveries");
+		IIntermediateFuture<IDiscoveryService>	disfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("discoveries");
 		disfut.addResultListener(new IntermediateDefaultResultListener<IDiscoveryService>()
 		{
 			public void intermediateResultAvailable(IDiscoveryService ds)
@@ -593,7 +596,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	{
 		this.fast = fast;
 
-		IIntermediateFuture<IDiscoveryService>	disfut	= getRequiredServices("discoveries");
+		IIntermediateFuture<IDiscoveryService>	disfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("discoveries");
 		disfut.addResultListener(new IntermediateDefaultResultListener<IDiscoveryService>()
 		{
 			public void intermediateResultAvailable(IDiscoveryService ds)
@@ -674,7 +677,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			this.includes	= new ArrayList<String>(Arrays.asList(includes));
 		}
 		
-		IIntermediateFuture<IDiscoveryService>	disfut	= getRequiredServices("discoveries");
+		IIntermediateFuture<IDiscoveryService>	disfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("discoveries");
 		disfut.addResultListener(new IntermediateDefaultResultListener<IDiscoveryService>()
 		{
 			public void intermediateResultAvailable(IDiscoveryService ds)
@@ -700,7 +703,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			this.excludes	= new ArrayList<String>(Arrays.asList(excludes));
 		}
 		
-		IIntermediateFuture<IDiscoveryService>	disfut	= getRequiredServices("discoveries");
+		IIntermediateFuture<IDiscoveryService>	disfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("discoveries");
 		disfut.addResultListener(new IntermediateDefaultResultListener<IDiscoveryService>()
 		{
 			public void intermediateResultAvailable(IDiscoveryService ds)
@@ -738,7 +741,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	protected void startRemoveBehaviour()
 	{
-		scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("rem")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -825,7 +828,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		final ComponentIdentifier cid = new ComponentIdentifier("platforms", getComponentIdentifier().getRoot());
+		final ComponentIdentifier cid = new ComponentIdentifier("platforms", agent.getComponentIdentifier().getRoot());
 		
 		cms.getExternalAccess(cid).addResultListener(new IResultListener<IExternalAccess>()
 		{
@@ -856,7 +859,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		else
 		{
 			pcreatefut = new Future<IComponentIdentifier>();
-			CreationInfo	ci	= new CreationInfo(getComponentIdentifier().getRoot());
+			CreationInfo	ci	= new CreationInfo(agent.getComponentIdentifier().getRoot());
 			ci.setDaemon(Boolean.TRUE);
 			cms.createComponent("platforms", RemotePlatformAgent.class.getName()+".class", ci, null)
 				.addResultListener(new DelegationResultListener<IComponentIdentifier>(pcreatefut));
@@ -909,7 +912,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 //					System.out.println("create proxy: "+(++cnt));
 					
 					cms.createComponent(dif.getComponentIdentifier().getLocalName(), "jadex/platform/service/remote/ProxyAgent.class", ci, 
-						createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(getLogger())
+						agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(agent.getLogger())
 					{
 						public void resultAvailable(Collection<Tuple2<String, Object>> result)
 						{
@@ -1086,7 +1089,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			{
 				try
 				{
-					scheduleStep(step);
+					agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
 				}
 				catch(ComponentTerminatedException e)
 				{
@@ -1103,7 +1106,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	public IFuture<Void> setProperties(final jadex.commons.Properties props)
 	{
-		return scheduleStep(new IComponentStep<Void>()
+		return agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1144,7 +1147,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	public IFuture<jadex.commons.Properties> getProperties()
 	{
-		return scheduleStep(new IComponentStep<jadex.commons.Properties>()
+		return agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<jadex.commons.Properties>()
 		{
 			public IFuture<jadex.commons.Properties> execute(IInternalAccess ia)
 			{

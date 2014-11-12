@@ -1,7 +1,7 @@
 package jadex.platform.service.ecarules;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.ecarules.IRulebaseEvent;
 import jadex.bridge.service.types.ecarules.IRulebaseService;
@@ -13,9 +13,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.rules.eca.IRule;
@@ -42,7 +40,7 @@ public class RulebaseAgent implements IRulebaseService
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The subscriptions. */
 	protected List<SubscriptionIntermediateFuture<IRulebaseEvent>> rbsubscribers = new ArrayList<SubscriptionIntermediateFuture<IRulebaseEvent>>();

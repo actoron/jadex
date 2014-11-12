@@ -3,6 +3,7 @@ package jadex.micro.testcases.subscriptionlistener;
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -43,7 +44,7 @@ public class GetterAgent	extends TestAgent
 				{
 					public void customResultAvailable(final IComponentIdentifier provider)
 					{
-						agent.getServiceContainer().getService(ITestService.class, provider)
+						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, provider)
 							.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 						{
 							public void customResultAvailable(ITestService ts)

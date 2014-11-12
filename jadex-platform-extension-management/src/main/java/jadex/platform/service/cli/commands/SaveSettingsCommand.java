@@ -61,7 +61,7 @@ public class SaveSettingsCommand extends ACliCommand
 		final String filename = (String)args.get(null);
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
-		SServiceProvider.getService(comp.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(comp, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
 		{
 			public void customResultAvailable(ISettingsService ss)

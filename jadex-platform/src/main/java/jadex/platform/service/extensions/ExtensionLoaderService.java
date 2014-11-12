@@ -2,12 +2,13 @@ package jadex.platform.service.extensions;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IExtensionLoaderService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -37,8 +38,8 @@ public class ExtensionLoaderService implements IExtensionLoaderService
 	{
 		IFuture<Void>	ret	= IFuture.DONE;
 		
-		String	extensions	= component.getArguments()!=null
-			? (String)component.getArguments().get("extensions") : null;
+		String	extensions	= component.getComponentFeature(IArgumentsFeature.class).getArguments()!=null
+			? (String)component.getComponentFeature(IArgumentsFeature.class).getArguments().get("extensions") : null;
 		
 		if(extensions!=null)
 		{
@@ -47,7 +48,7 @@ public class ExtensionLoaderService implements IExtensionLoaderService
 			{
 				final Future<Void>	fut	= new Future<Void>();
 				ret	= fut;
-				IFuture<IComponentManagementService> rsfut = component.getServiceContainer().getRequiredService("cms");
+				IFuture<IComponentManagementService> rsfut = component.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 				rsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut)
 				{
 					public void customResultAvailable(final IComponentManagementService cms)

@@ -2,6 +2,7 @@ package jadex.platform.service.watchdog;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -34,6 +35,6 @@ public class OutOfMemAgent	implements IComponentStep<Void>
 			System.out.println(getClass().getSimpleName()+" accumulated "+objects.size()+" MB");
 		}
 		objects.add(new byte[1024*1024]);
-		return ia.waitForDelay(10, this, false);
+		return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(10, this, false);
 	}
 }

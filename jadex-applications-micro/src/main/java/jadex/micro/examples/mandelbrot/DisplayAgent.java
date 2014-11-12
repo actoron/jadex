@@ -4,19 +4,17 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.IFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -34,7 +32,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
 
 /**
  *  Agent offering a display service.
@@ -50,9 +47,14 @@ import javax.swing.SwingUtilities;
 	@RequiredService(name="cmsservice", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="mandelservice", type=IMandelbrotService.class)
 })
-public class DisplayAgent extends MicroAgent
+@Agent
+public class DisplayAgent //extends MicroAgent
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** The GUI. */
 	protected DisplayPanel	panel;
@@ -66,17 +68,17 @@ public class DisplayAgent extends MicroAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IFuture<IMandelbrotService> fut = getRequiredService("mandelservice");
+		IFuture<IMandelbrotService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("mandelservice");
 		fut.addResultListener(new SwingExceptionDelegationResultListener<IMandelbrotService, Void>(ret)
 		{
 			public void customResultAvailable(IMandelbrotService result)
 			{
-				DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess(), result);
+				DisplayAgent.this.panel	= new DisplayPanel(agent.getExternalAccess(), result);
 
 //				addService(new DisplayService(this));
 				
-				final IExternalAccess	access	= getExternalAccess();
-				final JFrame	frame	= new JFrame(getAgentName());
+				final IExternalAccess	access	= agent.getExternalAccess();
+				final JFrame	frame	= new JFrame(agent.getComponentIdentifier().getName());
 				JScrollPane	scroll	= new JScrollPane(panel);
 
 				JTextPane helptext = new JTextPane();

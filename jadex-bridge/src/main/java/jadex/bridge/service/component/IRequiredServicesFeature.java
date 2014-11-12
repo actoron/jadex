@@ -1,8 +1,10 @@
 package jadex.bridge.service.component;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 import java.util.Collection;
@@ -98,6 +100,44 @@ public interface IRequiredServicesFeature
 	 *  @return The last result.
 	 */
 	public <T> Collection<T> getLastRequiredServices(String name);
+	
+	// extra methods for searching
+	
+	/**
+	 *  Get one service of a type from a specific component.
+	 *  @param type The class.
+	 *  @param cid The component identifier of the target component.
+	 *  @return The corresponding service.
+	 */
+	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid);
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public <T> IFuture<T> searchService(Class<T> type);
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public <T> IFuture<T> searchService(Class<T> type, String scope);
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> IIntermediateFuture<T> searchServices(Class<T> type);
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope);
 }
 
 

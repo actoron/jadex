@@ -1,6 +1,8 @@
 package jadex.platform.service.cli;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.email.Email;
 import jadex.bridge.service.types.email.EmailAccount;
@@ -19,7 +21,6 @@ import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -81,7 +82,7 @@ public class CliEmailAgent
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The email account. */
 	@AgentArgument
@@ -101,12 +102,12 @@ public class CliEmailAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<ICliService> clifut = agent.getServiceContainer().getRequiredService("cliser");
+		IFuture<ICliService> clifut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cliser");
 		clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Void>(ret)
 		{
 			public void customResultAvailable(final ICliService cliser)
 			{
-				IFuture<IEmailService> emlfut = agent.getServiceContainer().getRequiredService("emailser");
+				IFuture<IEmailService> emlfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("emailser");
 				emlfut.addResultListener(new ExceptionDelegationResultListener<IEmailService, Void>(ret)
 				{
 					public void customResultAvailable(final IEmailService emailser)
@@ -175,7 +176,7 @@ public class CliEmailAgent
 		String content = eml.getContent();
 		if(content!=null)
 		{
-			IFuture<ICliService> clifut = agent.getServiceContainer().getRequiredService("cliser");
+			IFuture<ICliService> clifut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cliser");
 			clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Email>(ret)
 			{
 				public void customResultAvailable(final ICliService cliser)
@@ -236,7 +237,7 @@ public class CliEmailAgent
 	//						System.out.println("dur: "+dur);
 	//						System.out.println("content: "+content);
 							
-							IFuture<ISecurityService> secfut = agent.getServiceContainer().getRequiredService("secser");
+							IFuture<ISecurityService> secfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("secser");
 							secfut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Email>(ret)
 							{
 								public void customResultAvailable(final ISecurityService secser)

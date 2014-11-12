@@ -1,7 +1,7 @@
 package jadex.platform.service.parallelizer;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -32,7 +32,7 @@ public class ParallelizerAgent
 	//-------- attributes --------
 	
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 
 //	/**
 //	 * 

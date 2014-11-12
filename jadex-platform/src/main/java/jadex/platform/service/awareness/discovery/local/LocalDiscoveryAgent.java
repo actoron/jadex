@@ -4,8 +4,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
@@ -16,7 +19,6 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
@@ -56,7 +58,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 	
 	/** Access to agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The last awareness file that has been posted. */
 	protected File lastpostedfile;
@@ -80,15 +82,15 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 		if (!(DISCOVERY_DIR.isDirectory() && DISCOVERY_DIR.canRead() && DISCOVERY_DIR.canWrite()))
 		{
 			agent.getLogger().warning("Discovery directory not accessible: " + DISCOVERY_DIR.getAbsolutePath());
-			agent.killAgent();
+			agent.killComponent();
 		}
 		else
 		{
 			scan();
 			postInfo();
 			
-			final long updaterate = (long) (((Long) agent.getArgument("leasetime")) * 0.9);
-			agent.scheduleStep(new IComponentStep<Void>()
+			final long updaterate = (long) (((Long) agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("leasetime")) * 0.9);
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(updaterate, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -98,10 +100,10 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 					}
 					
 					postInfo();
-					agent.scheduleStep(this, updaterate);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(updaterate, this);
 					return IFuture.DONE;
 				}
-			}, updaterate);
+			});
 			
 			try
 			{
@@ -134,7 +136,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				Method registermethod = pathclazz.getMethod("register", new Class<?>[] { wsclazz, kindsarray.getClass() });
 				registermethod.invoke(path, new Object[] { watchservice, kindsarray });
 				
-				IFuture<IThreadPool> fut = agent.getServiceContainer().getRequiredService("threadpool");
+				IFuture<IThreadPool> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("threadpool");
 				IThreadPool tp = fut.get();
 				final IExternalAccess ea = agent.getExternalAccess();
 				
@@ -211,12 +213,12 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 	{
 //		final String awa = SReflect.getInnerClassName(this.getClass());
 		final String awa = "Local";
-		IFuture<IMessageService> fut = agent.getServiceContainer().getRequiredService("ms");
+		IFuture<IMessageService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
 		IMessageService cms = fut.get();
 		
 		IFuture<IComponentIdentifier> fut2 = cms.updateComponentIdentifier(agent.getComponentIdentifier().getRoot());
 		IComponentIdentifier root = fut2.get();
-		long leasetime = (Long) agent.getArgument("leasetime");
+		long leasetime = (Long) agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("leasetime");
 		AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
 		byte[] data = BinarySerializer.objectToByteArray(info, null, null, null, agent.getClassLoader());
 		long deadline = leasetime + System.currentTimeMillis();
@@ -277,7 +279,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 					{
 						byte[] awadata = SUtil.readFile(file);
 						final AwarenessInfo awainfo = (AwarenessInfo) BinarySerializer.objectFromByteArray(awadata, null, null, agent.getClassLoader(), null);
-						IFuture<IAwarenessManagementService> msfut = agent.getRequiredService("management");
+						IFuture<IAwarenessManagementService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("management");
 						msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
 						{
 							public void resultAvailable(IAwarenessManagementService ms)

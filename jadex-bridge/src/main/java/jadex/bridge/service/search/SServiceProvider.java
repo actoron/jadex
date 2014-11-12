@@ -1,9 +1,11 @@
 package jadex.bridge.service.search;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.nonfunctional.search.IRankingSearchTerminationDecider;
 import jadex.bridge.nonfunctional.search.IServiceRanker;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener;
@@ -28,7 +30,6 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
-import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -161,12 +162,14 @@ public class SServiceProvider
 			}
 			else
 			{
-				((IPlatformComponentAccess)provider).getServiceRegistry().searchService(type, provider.getComponentIdentifier(), scope, filter).addResultListener(new DelegationResultListener<T>(ret));
+				((IPlatformComponentAccess)provider).getServiceRegistry().searchService(type, provider.getComponentIdentifier(), scope, filter)
+				.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 			}
 		}
 		else
 		{
-			((IPlatformComponentAccess)provider).getServiceRegistry().searchGlobalService(type, provider.getComponentIdentifier(), filter).addResultListener(new DelegationResultListener<T>(ret));
+			((IPlatformComponentAccess)provider).getServiceRegistry().searchGlobalService(type, provider.getComponentIdentifier(), filter)
+				.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 		}
 		
 		return ret;
@@ -179,7 +182,7 @@ public class SServiceProvider
 	 *  @param clazz The class.
 	 *  @return The corresponding service.
 	 */
-	public static <T> IFuture<T> getService(IInternalAccess provider, final IServiceIdentifier sid)
+	public static <T> IFuture<T> getService(final IInternalAccess provider, final IServiceIdentifier sid)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -204,7 +207,7 @@ public class SServiceProvider
 								{
 									return getService(ia, sid);
 								}
-							}).addResultListener(new DelegationResultListener<T>(ret));
+							}).addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 						}
 					});
 				}
@@ -221,7 +224,7 @@ public class SServiceProvider
 	 *  @param type The service type.
 	 *  @return The corresponding service.
 	 */
-	public static <T> IFuture<T> getService(IInternalAccess provider, final IComponentIdentifier cid, final Class<T> type)
+	public static <T> IFuture<T> getService(final IInternalAccess provider, final IComponentIdentifier cid, final Class<T> type)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -246,7 +249,7 @@ public class SServiceProvider
 								{
 									return getService(ia, cid, type);
 								}
-							}).addResultListener(new DelegationResultListener<T>(ret));
+							}).addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 						}
 					});
 				}
@@ -294,12 +297,14 @@ public class SServiceProvider
 			}
 			else
 			{
-				((IPlatformComponentAccess)provider).getServiceRegistry().searchServices(type, provider.getComponentIdentifier(), scope, filter).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				((IPlatformComponentAccess)provider).getServiceRegistry().searchServices(type, provider.getComponentIdentifier(), scope, filter).addResultListener(
+					new IntermediateComponentResultListener<T>(new IntermediateDelegationResultListener<T>(ret), provider));
 			}
 		}
 		else
 		{
-			((IPlatformComponentAccess)provider).getServiceRegistry().searchGlobalServices(type, provider.getComponentIdentifier(), filter).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+			((IPlatformComponentAccess)provider).getServiceRegistry().searchGlobalServices(type, provider.getComponentIdentifier(), filter).addResultListener(
+				new IntermediateComponentResultListener<T>(new IntermediateDelegationResultListener<T>(ret), provider));
 		}
 		
 		return ret;

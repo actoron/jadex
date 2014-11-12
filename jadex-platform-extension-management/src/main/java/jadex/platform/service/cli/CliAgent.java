@@ -2,8 +2,11 @@ package jadex.platform.service.cli;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SUtil;
@@ -158,11 +161,11 @@ public class CliAgent implements ICliService, IInternalCliService
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						agent.scheduleStep(new IComponentStep<Void>()
+						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								ICliService clis = (ICliService)ia.getServiceContainer().getProvidedServices(ICliService.class)[0];
+								ICliService clis = (ICliService)ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(ICliService.class)[0];
 								String txt = tf.getText();
 								ta.append(txt+SUtil.LF);
 								tf.setText("");
@@ -200,7 +203,7 @@ public class CliAgent implements ICliService, IInternalCliService
 	 */
 	protected void createConsole()
 	{
-		IFuture<IDaemonThreadPoolService> fut = agent.getRequiredService("dtp");
+		IFuture<IDaemonThreadPoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("dtp");
 		fut.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 		{
 			public void resultAvailable(IDaemonThreadPoolService tp)
@@ -249,7 +252,7 @@ public class CliAgent implements ICliService, IInternalCliService
 										break;
 									}
 									
-									agent.scheduleStep(new IComponentStep<Void>()
+									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 										{

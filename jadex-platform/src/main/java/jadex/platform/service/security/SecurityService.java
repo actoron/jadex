@@ -13,6 +13,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -219,7 +220,7 @@ public class SecurityService implements ISecurityService
 		final Future<Void>	ret	= new Future<Void>();
 //		this.trustednets = new ArrayList<String>();
 		
-		component.getServiceContainer().searchService(IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IContextService, Void>(ret)
 		{
 			public void customResultAvailable(IContextService result)
@@ -473,7 +474,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<ISettingsService> getSettingsService()
 	{
 		final Future<ISettingsService> ret = new Future<ISettingsService>();
-		IFuture<ISettingsService> fut = component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<ISettingsService> fut = component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		fut.addResultListener(new DelegationResultListener<ISettingsService>(ret)
 		{
 			public void exceptionOccurred(Exception exception)
@@ -496,7 +497,7 @@ public class SecurityService implements ISecurityService
 		saveKeyStore();
 		
 		// Save settings
-		component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)

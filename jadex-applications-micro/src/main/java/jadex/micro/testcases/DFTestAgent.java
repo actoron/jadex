@@ -72,7 +72,7 @@ public class DFTestAgent //extends MicroAgent
 
 		// Deregister agent.
 		// Todo: use fix component service container
-		agent.getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDF, Void>(ret)
 		{
 			public void customResultAvailable(IDF df)

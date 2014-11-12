@@ -53,14 +53,14 @@ public class StartScenario
 					{
 						final IExternalAccess rplat = (IExternalAccess)result;
 						
-						SServiceProvider.getServiceUpwards(lplat.getServiceProvider(), IComponentManagementService.class)
+						SServiceProvider.getServiceUpwards(lplat, IComponentManagementService.class)
 							.addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
 								final IComponentManagementService lcms = (IComponentManagementService)result;
 					
-								SServiceProvider.getServiceUpwards(rplat.getServiceProvider(), IComponentManagementService.class)
+								SServiceProvider.getServiceUpwards(rplat, IComponentManagementService.class)
 									.addResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object result)

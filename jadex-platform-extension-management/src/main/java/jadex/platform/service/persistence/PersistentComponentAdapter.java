@@ -1,16 +1,14 @@
 package jadex.platform.service.persistence;
 
-import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.platform.service.cms.StandaloneComponentAdapter;
 
 /**
  *  Adapter with special functionality for persistence.
  *  E.g. managing time of last activity.
  */
-public class PersistentComponentAdapter extends StandaloneComponentAdapter
+public class PersistentComponentAdapter //extends StandaloneComponentAdapter
 {
 	//-------- attributes --------
 	
@@ -22,34 +20,34 @@ public class PersistentComponentAdapter extends StandaloneComponentAdapter
 	
 	//-------- constructors --------
 	
-	/**
-	 *  Create a component adapter.
-	 */
-	public PersistentComponentAdapter(IComponentDescription desc, IModelInfo model,
-		IComponentInterpreter component, IExternalAccess parent, PersistenceComponentManagementService ps)
-	{
-		super(desc, model, component, parent);
-		this.ps	= ps;
-	}
-	
-	//-------- methods --------
-
-	/**
-	 *  Execute a step.
-	 */
-	public boolean execute()
-	{
-		if(!active)
-		{
-			active	= true;
-			ps.componentActive(getComponentIdentifier());
-		}
-		boolean ret	= super.execute();
-		if(!ret)
-		{
-			active	= false;
-			ps.componentIdle(getComponentIdentifier());
-		}
-		return ret;
-	}
+//	/**
+//	 *  Create a component adapter.
+//	 */
+//	public PersistentComponentAdapter(IComponentDescription desc, IModelInfo model,
+//		IComponentInterpreter component, IExternalAccess parent, PersistenceComponentManagementService ps)
+//	{
+//		super(desc, model, component, parent);
+//		this.ps	= ps;
+//	}
+//	
+//	//-------- methods --------
+//
+//	/**
+//	 *  Execute a step.
+//	 */
+//	public boolean execute()
+//	{
+//		if(!active)
+//		{
+//			active	= true;
+//			ps.componentActive(getComponentIdentifier());
+//		}
+//		boolean ret	= super.execute();
+//		if(!ret)
+//		{
+//			active	= false;
+//			ps.componentIdle(getComponentIdentifier());
+//		}
+//		return ret;
+//	}
 }

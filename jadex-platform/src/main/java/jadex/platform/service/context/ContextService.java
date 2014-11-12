@@ -2,7 +2,6 @@ package jadex.platform.service.context;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.context.IPreferences;

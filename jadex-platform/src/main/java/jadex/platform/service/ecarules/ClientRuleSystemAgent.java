@@ -1,5 +1,6 @@
 package jadex.platform.service.ecarules;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.types.ecarules.IRuleEngineService;
 import jadex.bridge.service.types.ecarules.IRulebaseEvent;
@@ -10,7 +11,6 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentService;
@@ -36,7 +36,7 @@ public class ClientRuleSystemAgent implements IRuleEngineService
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The rule system. */
 	protected RuleSystem rulesystem;

@@ -54,7 +54,7 @@ public class PojoDService implements IDService
 						public void customResultAvailable(IComponentIdentifier cid)
 						{
 //							IComponentIdentifier cid = (IComponentIdentifier)result;
-							IFuture<IDService> serfut = agent.getServiceContainer().getService(IDService.class, cid);
+							IFuture<IDService> serfut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDService.class, cid);
 							serfut.addResultListener(new ExceptionDelegationResultListener<IDService, Void>(ret)
 							{
 								public void customResultAvailable(IDService otherser)

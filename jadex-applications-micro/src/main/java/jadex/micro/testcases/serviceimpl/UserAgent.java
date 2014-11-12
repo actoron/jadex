@@ -58,7 +58,7 @@ public class UserAgent
 		{
 			IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null).get();
-			IInfoService ser = agent.getServiceContainer().getService(IInfoService.class, cid).get();
+			IInfoService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IInfoService.class, cid).get();
 			String res = ser.getInfo().get();
 			tr.setSucceeded(true);
 		}

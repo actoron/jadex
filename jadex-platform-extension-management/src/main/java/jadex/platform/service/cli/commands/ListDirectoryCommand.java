@@ -7,7 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.deployment.FileData;
@@ -78,8 +78,8 @@ public class ListDirectoryCommand extends ACliCommand
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, FileData[]>(ret)
+				SServiceProvider.getService(ia, IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IDeploymentService, FileData[]>(ret)
 				{
 					public void customResultAvailable(final IDeploymentService ds)
 					{

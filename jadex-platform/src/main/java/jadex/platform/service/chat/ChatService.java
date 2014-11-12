@@ -15,6 +15,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -113,7 +114,7 @@ public class ChatService implements IChatService, IChatGuiService
 			status	= STATE_AWAY;	// Changes to idle only when a gui is connected.
 			
 			final PropProvider pp = new PropProvider();
-			agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener<ISettingsService>()
 			{
 				public void resultAvailable(ISettingsService settings)
@@ -156,7 +157,7 @@ public class ChatService implements IChatService, IChatGuiService
 					transfers2	= new LinkedHashMap<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>();
 					
 					// Search and post status in background for not delaying platform startup.
-					IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
+					IIntermediateFuture<IChatService>	chatfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
 					chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 					{
 						public void intermediateResultAvailable(IChatService chat)
@@ -209,7 +210,7 @@ public class ChatService implements IChatService, IChatGuiService
 			}
 			
 			final Future<Void> done	= new Future<Void>();
-			IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
+			IIntermediateFuture<IChatService>	chatfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
 			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 			{
 				public void intermediateResultAvailable(IChatService chat)
@@ -226,7 +227,7 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 			});
 			
-			agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener<ISettingsService>()
 			{
 				public void resultAvailable(ISettingsService settings)
@@ -462,7 +463,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IIntermediateFuture<IChatService> findUsers()
 	{
-		IIntermediateFuture<IChatService> ret	= agent.getServiceContainer().getRequiredServices("chatservices");
+		IIntermediateFuture<IChatService> ret	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
 //		ret.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 //		{
 //			public void resultAvailable(Collection<IChatService> result)
@@ -550,7 +551,7 @@ public class ChatService implements IChatService, IChatGuiService
 		}
 		else //if(receivers.length==0)
 		{
-			final IIntermediateFuture<IChatService> ifut = agent.getServiceContainer().getRequiredServices("chatservices");
+			final IIntermediateFuture<IChatService> ifut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
 			
 			ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
 			{
@@ -602,7 +603,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<IChatService> ret = new Future<IChatService>();
 		
-		agent.getServiceContainer().getService(IChatService.class, rec)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IChatService.class, rec)
 			.addResultListener(new DelegationResultListener<IChatService>(ret)
 		{
 			public void customResultAvailable(final IChatService chat)
@@ -698,7 +699,7 @@ public class ChatService implements IChatService, IChatGuiService
 		}
 		else //if(receivers.length==0)
 		{
-			final IIntermediateFuture<IChatService> ifut = agent.getServiceContainer().getRequiredServices("chatservices");
+			final IIntermediateFuture<IChatService> ifut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
 			ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
 			{
 				boolean	finished;
@@ -748,7 +749,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<IChatService> ret = new Future<IChatService>();
 		
-		agent.getServiceContainer().getService(IChatService.class, rec)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IChatService.class, rec)
 			.addResultListener(new DelegationResultListener<IChatService>(ret)
 		{
 			public void customResultAvailable(final IChatService chat)
@@ -979,7 +980,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		IFuture<IChatService> fut = agent.getServiceContainer().getService(IChatService.class, cid);
+		IFuture<IChatService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IChatService.class, cid);
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
 		{
 			public void customResultAvailable(IChatService cs)

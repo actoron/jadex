@@ -1,11 +1,11 @@
 package jadex.platform.service.servicepool;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.IPoolStrategy;
@@ -13,7 +13,6 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -21,8 +20,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 import java.lang.reflect.Proxy;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,9 +38,13 @@ import java.util.Map;
 	@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos.")
 })
 @ProvidedServices(@ProvidedService(type=IServicePoolService.class))
-public class ServicePoolAgent extends MicroAgent implements IServicePoolService
+public class ServicePoolAgent implements IServicePoolService
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** The registered service types. */
 	protected Map<Class<?>, ServiceHandler> servicetypes;
@@ -57,7 +58,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		PoolServiceInfo[] psis = (PoolServiceInfo[])getArgument("serviceinfos");
+		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("serviceinfos");
 		
 		if(psis!=null)
 		{
@@ -67,7 +68,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 				IPoolStrategy str = psi.getPoolStrategy()==null? new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
 					Runtime.getRuntime().availableProcessors()+1): psi.getPoolStrategy();
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
-				addServiceType(psi.getServicetype().getType(getClassLoader(), getModel().getAllImports()), str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
+				addServiceType(psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports()), str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
 			}
 		}
 		else
@@ -144,12 +145,13 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	{
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
-		ServiceHandler handler = new ServiceHandler(this, servicetype, strategy, componentmodel, info);
+		ServiceHandler handler = new ServiceHandler(agent, servicetype, strategy, componentmodel, info);
 		servicetypes.put(servicetype, handler);
 
 		// add service proxy
-		Object service = Proxy.newProxyInstance(getClassLoader(), new Class<?>[]{servicetype}, handler);
-		return addService(null, servicetype, service, pi);
+		Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
+		agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, pi);
+		return IFuture.DONE;
 	}
 	
 	
@@ -165,10 +167,10 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 		{
 			servicetypes.remove(servicetype);
 			// remove service proxy
-			ser = getServiceContainer().getProvidedService(servicetype);
+			ser = (IService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(servicetype);
 			if(ser!=null)
 			{
-				removeService(ser.getServiceIdentifier());
+				agent.getComponentFeature(IProvidedServicesFeature.class).removeService(ser.getServiceIdentifier());
 				ret.setResult(null);
 			}
 		}
@@ -179,24 +181,24 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 		return ret;
 	}
 	
-	/**
-	 *  Get the service container.
-	 *  @return The service container.
-	 */
-	public IServiceContainer createServiceContainer(Map<String, Object> args)
-	{
-		return new ComponentServiceContainer(getAgentAdapter(), getModel().getType(), this, getInterpreter().isRealtime(), getInterpreter().getServiceRegistry())
-		{
-			/**
-			 *  Get the children container.
-			 *  @return The children container.
-			 *  
-			 *  Returns no children to avoid finding them via search and pool manages these resources.
-			 */
-			public IFuture<Collection<IServiceProvider>>	getChildren()
-			{
-				return new Future<Collection<IServiceProvider>>(Collections.EMPTY_LIST);
-			}
-		};
-	}
+//	/**
+//	 *  Get the service container.
+//	 *  @return The service container.
+//	 */
+//	public IServiceContainer createServiceContainer(Map<String, Object> args)
+//	{
+//		return new ComponentServiceContainer(getAgentAdapter(), getModel().getType(), this, getInterpreter().isRealtime(), getInterpreter().getServiceRegistry())
+//		{
+//			/**
+//			 *  Get the children container.
+//			 *  @return The children container.
+//			 *  
+//			 *  Returns no children to avoid finding them via search and pool manages these resources.
+//			 */
+//			public IFuture<Collection<IServiceProvider>>	getChildren()
+//			{
+//				return new Future<Collection<IServiceProvider>>(Collections.EMPTY_LIST);
+//			}
+//		};
+//	}
 }

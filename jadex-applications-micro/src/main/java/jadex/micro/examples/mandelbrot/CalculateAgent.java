@@ -2,10 +2,11 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -31,9 +32,13 @@ import jadex.micro.annotation.ProvidedServices;
 	@Configuration(name="long lived", arguments={@NameValue(name="delay", value="-1")})
 })
 @Agent(synchronous=Boolean3.FALSE)
-public class CalculateAgent extends MicroAgent
+public class CalculateAgent //extends MicroAgent
 {
 	//-------- attributes --------
+
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** Flag indicating that the agent had a job. */
 	protected boolean hadjob;
@@ -53,7 +58,7 @@ public class CalculateAgent extends MicroAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final long delay = ((Number)getArgument("delay")).longValue();
+		final long delay = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay")).longValue();
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -65,12 +70,12 @@ public class CalculateAgent extends MicroAgent
 					ret.setResult(null);
 				}
 				setHadJob(false);
-				waitFor(delay, this);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
 				return IFuture.DONE;
 			}
 		};
 		if(delay>0)
-			waitFor(delay, step);
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
 		
 		return ret;
 	}

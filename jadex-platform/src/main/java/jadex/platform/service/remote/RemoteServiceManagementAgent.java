@@ -7,17 +7,16 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -181,11 +180,12 @@ public class RemoteServiceManagementAgent
 			&& "ping".equals(msg.get(SFipa.CONTENT)))
 		{
 //			System.out.println("replying to ping from "+msg.get(SFipa.SENDER));
-			Map rep = createReply(msg, mt);
+//			Map rep = agent.getComponentFeature(IMessageFeature.class).createReply(msg, mt);
+			Map rep = mt.createReply(msg);
 			rep.put(SFipa.CONTENT, "alive");
 			rep.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-			rep.put(SFipa.SENDER, getComponentIdentifier());
-			sendMessage(rep, mt);
+			rep.put(SFipa.SENDER, agent.getComponentIdentifier());
+			agent.getComponentFeature(IMessageFeature.class).sendMessage(rep, mt);
 			return;
 		}
 		
@@ -201,7 +201,7 @@ public class RemoteServiceManagementAgent
 //			ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
 //			next.setProperty("debugsource", "RemoteServiceManagementAgent.messageArrived("+msg+")");
 			
-			agent.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener<ILibraryService>()
 			{
 				public void resultAvailable(final ILibraryService ls)
@@ -241,7 +241,7 @@ public class RemoteServiceManagementAgent
 						{
 							public void customResultAvailable(Void result)
 							{
-								agent.getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(new IResultListener<ISecurityService>()
 								{
 									public void resultAvailable(ISecurityService sec)
@@ -269,7 +269,7 @@ public class RemoteServiceManagementAgent
 						{
 							public void resultAvailable(Void result)
 							{
-								RemoteServiceManagementService.getResourceIdentifier(getServiceProvider(), ((AbstractRemoteCommand)com).getRealReceiver())
+								RemoteServiceManagementService.getResourceIdentifier(agent.getExternalAccess(), ((AbstractRemoteCommand)com).getRealReceiver())
 									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IResourceIdentifier>()
 								{
 									public void resultAvailable(final IResourceIdentifier srid) 
@@ -297,7 +297,7 @@ public class RemoteServiceManagementAgent
 										// Terminated, when rms killed in mean time
 										if(!(exception instanceof ComponentTerminatedException))
 										{
-											getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
+											agent.getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
 										}
 									}
 								}));
@@ -374,7 +374,7 @@ public class RemoteServiceManagementAgent
 								{
 									public void resultAvailable(Void v)
 									{
-										final Map reply = createReply(msg, mt);
+										final Map reply = mt.createReply(msg);
 										if(rid[0]!=null && rid[0].getGlobalIdentifier()!=null)
 										{
 //											System.out.println("rid: "+rid+" "+result.getClass());
@@ -387,7 +387,7 @@ public class RemoteServiceManagementAgent
 										reply.put(SFipa.CONTENT, result);
 //										System.out.println("content: "+result);
 //										System.out.println("reply: "+callid);
-										sendMessage(reply, mt, null).addResultListener(new IResultListener<Void>()
+										agent.getComponentFeature(IMessageFeature.class).sendMessage(reply, mt, null).addResultListener(new IResultListener<Void>()
 										{
 											public void resultAvailable(Void res)
 											{

@@ -4,6 +4,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -35,7 +36,7 @@ public class MappingService implements IParallelService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IServicePoolService> fut = agent.getServiceContainer().getRequiredService("poolser");
+		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)
@@ -46,7 +47,7 @@ public class MappingService implements IParallelService
 				{
 					public void customResultAvailable(Void result)
 					{
-						IFuture<ISequentialService> fut = agent.getServiceContainer().getRequiredService("seqser");
+						IFuture<ISequentialService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("seqser");
 						fut.addResultListener(new ExceptionDelegationResultListener<ISequentialService, Void>(ret)
 						{
 							public void customResultAvailable(ISequentialService result)

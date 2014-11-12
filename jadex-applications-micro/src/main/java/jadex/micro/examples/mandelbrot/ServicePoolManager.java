@@ -3,8 +3,10 @@ package jadex.micro.examples.mandelbrot;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -150,7 +152,7 @@ public class ServicePoolManager
 		// Start timer to be triggered when search is not finished after 1 second.
 		if(timer==null)
 		{
-			component.getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			component.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -196,7 +198,7 @@ public class ServicePoolManager
 			searching	= true;
 			
 //			System.out.println("wurksn0");
-			component.getServiceContainer().getRequiredServices(name).addResultListener(
+			component.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(name).addResultListener(
 				new IIntermediateResultListener<Object>()
 			{
 				/**
@@ -290,7 +292,7 @@ public class ServicePoolManager
 //			System.out.println("started service: "+service.getServiceIdentifier()+", "+task);
 			
 			handler.invokeService(service, task, ad.getUserData()).addResultListener(
-				component.createResultListener(new IResultListener()
+				component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -336,7 +338,7 @@ public class ServicePoolManager
 		if(timer==null && !creating && !tasks.isEmpty() && (max==-1 || free.size()+busy.size()<max))
 		{
 			creating	= true;
-			handler.createService().addResultListener(component.createResultListener(new IResultListener()
+			handler.createService().addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

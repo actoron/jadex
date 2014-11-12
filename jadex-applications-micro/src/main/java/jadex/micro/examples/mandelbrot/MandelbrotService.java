@@ -3,6 +3,7 @@ package jadex.micro.examples.mandelbrot;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -22,7 +23,7 @@ public class MandelbrotService implements IMandelbrotService
 	 */
 	public IFuture<IGenerateService> getGenerateService()
 	{
-		IGenerateService ser = (IGenerateService)agent.getServiceContainer().getProvidedServices(IGenerateService.class)[0];
+		IGenerateService ser = (IGenerateService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(IGenerateService.class)[0];
 		return new Future<IGenerateService>(ser);
 	}
 	
@@ -32,7 +33,7 @@ public class MandelbrotService implements IMandelbrotService
 	 */
 	public IFuture<IDisplayService> getDisplayService()
 	{
-		IDisplayService ser = (IDisplayService)agent.getServiceContainer().getProvidedServices(IDisplayService.class)[0];
+		IDisplayService ser = (IDisplayService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(IDisplayService.class)[0];
 		return new Future<IDisplayService>(ser);
 	}
 }

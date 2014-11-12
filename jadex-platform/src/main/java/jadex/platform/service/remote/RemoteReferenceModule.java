@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -979,7 +980,7 @@ public class RemoteReferenceModule
 			{
 				if(renewid == RemoteReferenceModule.this.renewid)
 				{
-					final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
+//					final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
 					
 					if(DEBUG)
 					{
@@ -1007,7 +1008,7 @@ public class RemoteReferenceModule
 						{
 							final RemoteReference rr = (RemoteReference)proxydates.remove(dates[i]);
 //							System.out.println("renewal sent for: "+rr);
-							IResultListener<Void> lis = agent.get createResultListener(new IResultListener<Void>()
+							IResultListener<Void> lis = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 							{
 								public void resultAvailable(Void result)
 								{
@@ -1339,7 +1340,7 @@ public class RemoteReferenceModule
 //		{
 //			final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)args;
 //			final int[] retrycnt = new int[1];
-//			IResultListener lis = agent.createResultListener(new IResultListener()
+//			IResultListener lis = agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 //			{
 //				public void resultAvailable(Object source, Object result)
 //				{

@@ -3,6 +3,7 @@ package jadex.platform.service.processengine;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
@@ -112,7 +113,7 @@ public class EventMapper
 			try
 			{
 				IResultCommand<IFuture<Void>, Object> cmd = (IResultCommand<IFuture<Void>, Object>)mi.getInfo();
-				cmd.execute(event).addResultListener(component.createResultListener(new IResultListener<Void>()
+				cmd.execute(event).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{

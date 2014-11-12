@@ -3,6 +3,7 @@ package jadex.micro;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -58,7 +59,7 @@ public class PojoMicroAgent	implements IPojoMicroAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		invokeMethod(AgentCreated.class, null).addResultListener(
-			component.createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+			component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
 		{
 			public void customResultAvailable(Tuple2<Method, Object> result)
 			{
@@ -77,7 +78,7 @@ public class PojoMicroAgent	implements IPojoMicroAgent
 		final Future<Void> ret = new Future<Void>();
 		
 		invokeMethod(AgentBody.class, null)
-			.addResultListener(component.createResultListener(
+			.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
 		{
 			public void customResultAvailable(Tuple2<Method, Object> res)
@@ -123,7 +124,7 @@ public class PojoMicroAgent	implements IPojoMicroAgent
 	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
 		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt}).addResultListener(
-			component.createResultListener(new IResultListener<Tuple2<Method, Object>>()
+			component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Tuple2<Method, Object>>()
 		{
 			public void resultAvailable(Tuple2<Method, Object> result)
 			{
@@ -150,7 +151,7 @@ public class PojoMicroAgent	implements IPojoMicroAgent
 	public void streamArrived(IConnection con)
 	{
 		invokeMethod(AgentStreamArrived.class, new Object[]{con}).addResultListener(
-			component.createResultListener(new IResultListener<Tuple2<Method, Object>>()
+			component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Tuple2<Method, Object>>()
 		{
 			public void resultAvailable(Tuple2<Method, Object> result)
 			{
@@ -179,7 +180,7 @@ public class PojoMicroAgent	implements IPojoMicroAgent
 		final Future<Void> ret = new Future<Void>();
 
 		invokeMethod(AgentKilled.class, null).addResultListener(
-			component.createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+			component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
 		{
 			public void customResultAvailable(Tuple2<Method, Object> result)
 			{
@@ -264,7 +265,7 @@ public class PojoMicroAgent	implements IPojoMicroAgent
 					Object res = method.invoke(agent, args);
 					if(res instanceof IFuture)
 					{
-						((IFuture<Object>)res).addResultListener(component.createResultListener(
+						((IFuture<Object>)res).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(
 							new ExceptionDelegationResultListener<Object, Tuple2<Method, Object>>(ret)
 						{
 							public void customResultAvailable(Object result)

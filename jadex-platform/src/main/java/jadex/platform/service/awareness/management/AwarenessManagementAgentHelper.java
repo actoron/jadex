@@ -5,7 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -54,7 +54,7 @@ public class AwarenessManagementAgentHelper
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				final Future<Void> ret = new Future<Void>();
-				getChildrenAccesses(ia).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
+				getChildrenAccesses(ia).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
 				{
 					public void customResultAvailable(Collection<IExternalAccess> subs)
 					{
@@ -72,8 +72,8 @@ public class AwarenessManagementAgentHelper
 						// Start relay mechanism agent
 						if(on && found == null)
 						{
-							SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
-								ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+							SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
+								ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 								{
 									public void customResultAvailable(IComponentManagementService cms)
 									{
@@ -93,8 +93,8 @@ public class AwarenessManagementAgentHelper
 						else if(!on && found != null)
 						{
 							final IComponentIdentifier cid = found;
-							SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
-								ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+							SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
+								ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 								{
 									public void customResultAvailable(IComponentManagementService cms)
 									{
@@ -181,7 +181,7 @@ public class AwarenessManagementAgentHelper
 			{
 				final Future<Set<String>> ret = new Future<Set<String>>();
 
-				getChildrenAccesses(ia).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Set<String>>(ret)
+				getChildrenAccesses(ia).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Set<String>>(ret)
 				{
 					public void customResultAvailable(Collection<IExternalAccess> result)
 					{
@@ -287,7 +287,7 @@ public class AwarenessManagementAgentHelper
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 
-		SServiceProvider.getServiceUpwards((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class).addResultListener(
+		SServiceProvider.getServiceUpwards(component, IComponentManagementService.class).addResultListener(
 			new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService result)

@@ -1,11 +1,12 @@
 package jadex.platform.service.parallelizer;
 
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -35,7 +36,7 @@ public class UserAgent
 	//-------- attributes --------
 	
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -47,7 +48,7 @@ public class UserAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IParallelService> fut = agent.getRequiredService("paser");
+		IFuture<IParallelService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("paser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IParallelService, Void>(ret)
 		{
 			public void customResultAvailable(IParallelService paser)

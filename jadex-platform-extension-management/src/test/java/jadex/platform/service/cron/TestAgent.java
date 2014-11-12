@@ -3,7 +3,9 @@ package jadex.platform.service.cron;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
@@ -19,7 +21,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentService;
@@ -54,7 +55,7 @@ public class TestAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The library service. */
 	@AgentService
@@ -111,7 +112,7 @@ public class TestAgent
 			
 			public void finished()
 			{
-				agent.setResultValue("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
 				ret.setResult(null);
 			}
 			
@@ -137,7 +138,7 @@ public class TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		IFuture<ICronService> fut = agent.getServiceContainer().getRequiredService("crons");
+		IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("crons");
 		fut.addResultListener(new IResultListener<ICronService>()
 		{
 			public void resultAvailable(final ICronService crons)

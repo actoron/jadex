@@ -2,17 +2,18 @@ package jadex.platform.service.nfmethodprops;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -48,7 +49,7 @@ public class UserAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 //	/**
 //	 *  The agent body. 
@@ -58,7 +59,7 @@ public class UserAgent
 //	{
 //		registerServices().get();
 //		
-//		ITestService ser = (ITestService)agent.getServiceContainer().getRequiredService("testser").get();
+//		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser").get();
 //		
 //		for(int i=0; i<100; i++)
 //		{
@@ -76,7 +77,7 @@ public class UserAgent
 	{
 		registerServices().get();
 		
-		ITestService ser = (ITestService)agent.getServiceContainer().getRequiredService("testser").get();
+		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser").get();
 		
 		final List<TestReport> results = new ArrayList<TestReport>();
 		final long wa = 500;
@@ -148,7 +149,7 @@ public class UserAgent
 	public IFuture<Void> registerServices()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IServicePoolService> fut = agent.getRequiredService("poolser");
+		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)

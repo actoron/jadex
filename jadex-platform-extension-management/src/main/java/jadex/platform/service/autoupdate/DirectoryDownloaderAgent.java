@@ -2,6 +2,7 @@ package jadex.platform.service.autoupdate;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.HttpConnectionManager;
 import jadex.commons.future.DefaultResultListener;
@@ -126,7 +127,7 @@ public class DirectoryDownloaderAgent
 		{
 			public void resultAvailable(Void result)
 			{
-				agent.waitForDelay(interval, new IComponentStep<Void>()
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(interval, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
