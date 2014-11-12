@@ -126,7 +126,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 			Logger.e("Context.getFilesDir() returned null. This is a known bug, trying to use custom path instead...");
 			filesDir = new File(context.getApplicationInfo().dataDir, "files");
 			if (!filesDir.exists()) {
-				filesDir.mkdir();
+				filesDir.mkdirs();
 			}
 			File dataDir = new File(filesDir, name);
 			return new Future<File>(dataDir);
