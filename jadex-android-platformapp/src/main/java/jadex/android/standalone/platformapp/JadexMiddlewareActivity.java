@@ -22,6 +22,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.graphics.Path.FillType;
+import android.graphics.drawable.GradientDrawable.Orientation;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -30,6 +32,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 
 public class JadexMiddlewareActivity extends FragmentActivity implements ServiceConnection
 {
@@ -275,6 +279,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		return act;
 	}
 	
+	private static int fragmentContainerId = 4000;
 	
 	private void activateClientAppFragment(ClientAppFragment newFragment, boolean addToBackStack)
 	{
@@ -282,11 +287,18 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		newFragment.setUniversalClientService(universalService);
 		FragmentManager manager = getSupportFragmentManager();
 		FragmentTransaction ta = manager.beginTransaction();
-		ta.replace(R.id.fragmentContainer, newFragment);
+//		ta.replace(R.id.fragmentContainer, newFragment);
+		ta.replace(fragmentContainerId, newFragment);
 		if (addToBackStack) {
 			ta.addToBackStack(null);
 		}
-		setContentView(R.layout.loaderlayout);
+		LinearLayout linearLayout = new LinearLayout(this);
+		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.FILL_PARENT);
+		linearLayout.setLayoutParams(params);
+		linearLayout.setOrientation(LinearLayout.VERTICAL);
+		linearLayout.setId(4000);
+		setContentView(linearLayout);
+//		setContentView(R.layout.loaderlayout);
 		ta.commit();
 	}
 	

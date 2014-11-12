@@ -5,6 +5,10 @@ import jadex.android.service.JadexPlatformManager;
 import jadex.base.test.impl.BrokenComponentTest;
 import jadex.bridge.ErrorReport;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -160,7 +164,13 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		} catch (Throwable t) {
 			t.printStackTrace();
 			ErrorReport errorReport = new ErrorReport();
-			errorReport.setErrorText(t.getMessage());
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			t.printStackTrace(new PrintStream(baos));
+			try {
+				errorReport.setErrorText("Error constructing testcase: \n" + baos.toString("UTF8"));
+			} catch (UnsupportedEncodingException e) {
+				errorReport.setErrorText("Error constructing testcase: \n" + t.getMessage());
+			}
 			BrokenComponentTest error = new BrokenComponentTest(testClassName, errorReport);
 			testCase = error;
 		}
