@@ -2,9 +2,11 @@ package jadex.platform.service.servicepool;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.service.IService;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.DefaultPoolStrategy;
@@ -16,7 +18,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -29,7 +30,6 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  *  User agent that first registers services A, B at the service pool (which is created if not present).
@@ -52,7 +52,7 @@ public class UserAgent
 	//-------- attributes --------
 	
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -164,7 +164,7 @@ public class UserAgent
 						
 						final TestReport rep3 = new TestReport("#3", "Test if no A services besides proxy can be found");
 						// Ensure that only 
-						SServiceProvider.getServices(agent.getServiceProvider(), IAService.class)
+						SServiceProvider.getServices(agent, IAService.class)
 							.addResultListener(new ExceptionDelegationResultListener<Collection<IAService>, Void>(ret)
 						{
 							public void customResultAvailable(Collection<IAService> result)
@@ -197,7 +197,7 @@ public class UserAgent
 											public void resultAvailable(TestReport rep5)
 											{
 //												System.err.println("FFFFFFFFFFFINI: "+agent.getComponentIdentifier());
-												agent.setResultValue("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}
 											
@@ -205,7 +205,7 @@ public class UserAgent
 											{
 												TestReport rep5 = new TestReport("#5", "Test non-func props");
 												rep5.setFailed(exception);
-												agent.setResultValue("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}
 										});

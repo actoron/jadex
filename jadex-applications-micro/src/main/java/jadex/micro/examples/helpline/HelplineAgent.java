@@ -1,14 +1,17 @@
 package jadex.micro.examples.helpline;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -34,9 +37,14 @@ import javax.swing.SwingUtilities;
 })
 @ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=@Implementation(HelplineService.class)))
 @GuiClass(HelplineViewerPanel.class)
-public class HelplineAgent extends MicroAgent
+@Agent
+public class HelplineAgent //extends MicroAgent
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** The map of information. */
 	protected MultiCollection infos;
@@ -50,7 +58,7 @@ public class HelplineAgent extends MicroAgent
 	{
 //		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
 		this.infos = new MultiCollection();
-		Object ini = getArgument("infos");
+		Object ini = agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("infos");
 		if(ini!=null && SReflect.isIterable(ini))
 		{
 			for(Iterator it=SReflect.getIterator(ini); it.hasNext(); )
@@ -64,7 +72,7 @@ public class HelplineAgent extends MicroAgent
 		{
 			public void run()
 			{
-				HelplinePanel.createHelplineGui((IExternalAccess)getExternalAccess());
+				HelplinePanel.createHelplineGui((IExternalAccess)agent.getExternalAccess());
 			}
 		});
 		return IFuture.DONE;
@@ -78,7 +86,7 @@ public class HelplineAgent extends MicroAgent
 	public void addInformation(final String name, final String info)
 	{
 //		SServiceProvider.getService(getServiceProvider(), IClockService.class)
-		getRequiredService("clockservice")
+		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")
 //			.addResultListener(createResultListener(new DefaultResultListener()
 			.addResultListener(new DefaultResultListener() // not needed as decoupled service
 		{
@@ -99,6 +107,15 @@ public class HelplineAgent extends MicroAgent
 	{
 		Collection ret	= (Collection)infos.get(name); 
 		return ret!=null ? ret : Collections.EMPTY_LIST;
+	}
+
+	/**
+	 *  Get the agent.
+	 *  @return The agent
+	 */
+	public IInternalAccess getAgent()
+	{
+		return agent;
 	}
 	
 	//-------- static methods --------

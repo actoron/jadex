@@ -2,6 +2,7 @@ package jadex.micro.examples.heatbugs;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -11,7 +12,7 @@ import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Int;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,9 +22,14 @@ import java.util.Set;
 /**
  *  The heatbug agent.
  */
-public class HeatbugAgent extends MicroAgent
+@Agent
+public class HeatbugAgent //extends MicroAgent
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** The probability of a random move. */
 	protected double randomchance;
@@ -45,7 +51,7 @@ public class HeatbugAgent extends MicroAgent
 	 */
 	public IFuture<Void> executeBody()
 	{
-		getParentAccess().getExtension("mygc2dspace").addResultListener(createResultListener(new DefaultResultListener()
+		getParentAccess().getExtension("mygc2dspace").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -53,7 +59,7 @@ public class HeatbugAgent extends MicroAgent
 					return;
 				
 				final Grid2D grid = (Grid2D)result;
-				ISpaceObject avatar = grid.getAvatar(getComponentDescription());
+				ISpaceObject avatar = grid.getAvatar(agent.getComponentDescription());
 				
 //						unhappiness = Math.abs(ideal_temp - temp);
 				randomchance = ((Number)avatar.getProperty("random_move_chance")).doubleValue();
@@ -64,7 +70,7 @@ public class HeatbugAgent extends MicroAgent
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISpaceObject avatar = grid.getAvatar(getComponentDescription());
+						ISpaceObject avatar = grid.getAvatar(agent.getComponentDescription());
 						IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 						Collection coll	= grid.getSpaceObjectsByGridPosition(mypos, "patch");
 						if(coll!=null)
@@ -136,7 +142,7 @@ public class HeatbugAgent extends MicroAgent
 							}
 						}
 						
-						waitForTick(this);
+						agent.getComponentFeature(IExecutionFeature.class).waitForTick(this);
 						return IFuture.DONE;
 					}
 					

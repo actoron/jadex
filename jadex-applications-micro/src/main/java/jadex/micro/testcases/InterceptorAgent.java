@@ -2,15 +2,20 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Value;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -34,8 +39,12 @@ import java.util.List;
 @RequiredServices(@RequiredService(name="aservice", type=IAService.class, 
 	binding=@Binding(scope="local", interceptors=@Value("$component.reqinter"))))
 @Service(IAService.class)
-public class InterceptorAgent extends MicroAgent implements IAService
+@Agent
+public class InterceptorAgent implements IAService
 {	
+	@Agent
+	protected IInternalAccess agent;
+	
 	public SimpleInterceptor provinter = new SimpleInterceptor();
 	public SimpleInterceptor reqinter = new SimpleInterceptor();
 	
@@ -47,17 +56,17 @@ public class InterceptorAgent extends MicroAgent implements IAService
 		final Future<Void> ret = new Future<Void>();
 		
 		final List testresults = new ArrayList();
-		performProvidedServiceTest(testresults).addResultListener(createResultListener(new DelegationResultListener(ret)
+		performProvidedServiceTest(testresults).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				performRequiredServiceTest(testresults).addResultListener(createResultListener(new DelegationResultListener(ret)
+				performRequiredServiceTest(testresults).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 //						System.out.println("testresults: "+testresults);
 						TestReport[] tr = (TestReport[])testresults.toArray(new TestReport[testresults.size()]);
-						getComponentFeature(IArgumentsFeature.class).put("testresults", new Testcase(tr.length, tr));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 //						killAgent();
 						ret.setResult(null);
 					}
@@ -74,7 +83,7 @@ public class InterceptorAgent extends MicroAgent implements IAService
 	public IFuture performProvidedServiceTest(final List testresults)
 	{
 		final Future ret = new Future();
-		IAService ser = (IAService)getServiceContainer().getProvidedService("aservice");
+		IAService ser = (IAService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService("aservice");
 		ser.test().addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -101,7 +110,7 @@ public class InterceptorAgent extends MicroAgent implements IAService
 	public IFuture performRequiredServiceTest(final List testresults)
 	{
 		final Future ret = new Future();
-		getRequiredService("aservice").addResultListener(new DefaultResultListener()
+		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("aservice").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

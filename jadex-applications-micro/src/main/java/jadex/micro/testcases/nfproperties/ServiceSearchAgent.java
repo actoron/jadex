@@ -2,6 +2,7 @@ package jadex.micro.testcases.nfproperties;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.nonfunctional.search.BasicEvaluator;
@@ -16,7 +17,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Implementation;
@@ -25,7 +25,6 @@ import jadex.micro.annotation.ProvidedServices;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @Agent
 
@@ -44,7 +43,7 @@ public class ServiceSearchAgent
 	 * The agent.
 	 */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 
 	/**
 	 *  Body.
@@ -89,7 +88,7 @@ public class ServiceSearchAgent
 //		BasicEvaluatorConstraints cts = new BasicEvaluatorConstraints(null, evaluator, evaluationsize)
 //		SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM, new Basic)
 		
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(SEARCH_DELAY, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -141,14 +140,14 @@ public class ServiceSearchAgent
 //					}
 //				}); 
 				
-				ITerminableIntermediateFuture<ICoreDependentService> fut = SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				ITerminableIntermediateFuture<ICoreDependentService> fut = SServiceProvider.getServices(agent, ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				ITerminableIntermediateFuture<Tuple2<ICoreDependentService, Double>> res = SServiceProvider.rankServicesWithScores(fut, ce, new CountThresholdSearchTerminationDecider<ICoreDependentService>(10));
 				res.addResultListener(new IResultListener<Collection<Tuple2<ICoreDependentService, Double>>>()
 				{
 					public void resultAvailable(Collection<Tuple2<ICoreDependentService, Double>> result)
 					{
 						System.out.println(Arrays.toString(result.toArray()));
-						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step, SEARCH_DELAY);
+						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(SEARCH_DELAY, step);
 					}
 	
 					public void exceptionOccurred(Exception exception)
@@ -159,7 +158,7 @@ public class ServiceSearchAgent
 				
 				return IFuture.DONE;
 			}
-		}, SEARCH_DELAY);
+		});
 		
 		return done;
 	}

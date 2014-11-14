@@ -1,16 +1,14 @@
 package jadex.bridge.nonfunctional.hardconstraints;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.INFPropertyComponentFeature;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.ComposedRemoteFilter;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -180,7 +178,11 @@ public class RHardConstraints
 					for (int i = 0; i < unboundconstantfilters.size(); ++i)
 					{
 						final ConstantValueFilter filter = unboundconstantfilters.get(i);
-						service.getMethodNFPropertyValue(method, filter.getValueName()).addResultListener(new IResultListener<Object>()
+						
+						INFMixedPropertyProvider prov = ((INFMixedPropertyProvider)((IService)service).getExternalComponentFeature(INFPropertyComponentFeature.class));
+//						((IService)service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+						prov.getMethodNFPropertyValue(method, filter.getValueName()).addResultListener(new IResultListener<Object>()
+//						service.getMethodNFPropertyValue(method, filter.getValueName()).addResultListener(new IResultListener<Object>()
 						{
 							public void resultAvailable(Object result)
 							{

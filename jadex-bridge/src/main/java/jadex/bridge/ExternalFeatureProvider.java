@@ -20,8 +20,6 @@ public abstract class ExternalFeatureProvider
 	{
 //		System.out.println("called: "+type);
 		T ret = (T)((IComponentFeature)getInternalAccess().getComponentFeature(type)).getExternalFacade(this);
-		if(ret==null)
-			System.out.println("here");
 		return ret;
 //		return (T)Proxy.newProxyInstance(getInternalAccess().getClassLoader(), new Class[]{getFeatureClass(type)}, new FeatureInvocationHandler(type));
 	}

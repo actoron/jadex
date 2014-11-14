@@ -1,12 +1,10 @@
 package jadex.micro.benchmarks.servicecall;
 
 import jadex.base.test.TestReport;
-import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -14,7 +12,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
@@ -24,7 +21,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -48,7 +44,7 @@ public class ServiceCallAgent	extends TestAgent
 	protected IInternalAccess	agent;
 	
 	@Agent
-	protected MicroAgent ag;
+	protected IInternalAccess ag;
 	
 	/** The invocation count. */
 	@AgentArgument

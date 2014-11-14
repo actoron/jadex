@@ -3,6 +3,7 @@ package jadex.micro.examples.hunterprey;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -13,7 +14,7 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,8 @@ import java.util.Map;
 /**
  *  Simple agent participating in hunter prey.
  */
-public class MicroPreyAgent extends MicroAgent
+@Agent
+public class MicroPreyAgent //extends MicroAgent
 {
 	//-------- attributes --------
 	
@@ -40,6 +42,10 @@ public class MicroPreyAgent extends MicroAgent
 	/** The result listener starting the next action. */
 	protected IResultListener	listener;
 	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
 	//-------- MicroAgent methods --------
 
 	/**
@@ -47,7 +53,7 @@ public class MicroPreyAgent extends MicroAgent
 	 */
 	public IFuture<Void> executeBody()
 	{
-		getParentAccess().getExtension("my2dspace").addResultListener(createResultListener(new DefaultResultListener()
+		getParentAccess().getExtension("my2dspace").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -56,7 +62,7 @@ public class MicroPreyAgent extends MicroAgent
 				
 				env	= (Grid2D)result;
 		
-				myself	= env.getAvatar(getComponentDescription());
+				myself	= env.getAvatar(agent.getComponentDescription());
 				listener = new IResultListener()
 				{
 					public void exceptionOccurred(Exception e)
@@ -64,7 +70,7 @@ public class MicroPreyAgent extends MicroAgent
 		//				e.printStackTrace();
 						try
 						{
-							getExternalAccess().scheduleStep(new IComponentStep<Void>()
+							agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 							{
 								@Classname("act")
 								public IFuture<Void> execute(IInternalAccess agent)
@@ -100,7 +106,7 @@ public class MicroPreyAgent extends MicroAgent
 					
 					public void resultAvailable(Object result)
 					{
-						getExternalAccess().scheduleStep(new IComponentStep<Void>()
+						agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 						{
 							@Classname("act2")
 							public IFuture<Void> execute(IInternalAccess ia)
@@ -140,7 +146,7 @@ public class MicroPreyAgent extends MicroAgent
 		{
 			// Perform eat action.
 			Map params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
+			params.put(ISpaceAction.ACTOR_ID, agent.getComponentDescription());
 			params.put(ISpaceAction.OBJECT_ID, food);
 			env.performSpaceAction("eat", params, listener);
 		}
@@ -177,7 +183,7 @@ public class MicroPreyAgent extends MicroAgent
 			
 			// Perform move action.
 			Map params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, getComponentDescription());
+			params.put(ISpaceAction.ACTOR_ID, agent.getComponentDescription());
 			params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
 			env.performSpaceAction("move", params, listener);
 		}

@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -44,7 +45,7 @@ public class ComplexBlockingTestAgent
 	@AgentBody(keepalive=false)
 	public void	execute(final IInternalAccess agent)
 	{
-		IStepService	step	= agent.getServiceContainer().searchService(IStepService.class).get();
+		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IStepService.class).get();
 		
 		IIntermediateFuture<Integer>	first	= step.performSteps(3, 1000);
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();

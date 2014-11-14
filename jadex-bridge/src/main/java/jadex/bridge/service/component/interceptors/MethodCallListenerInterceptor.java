@@ -1,8 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
@@ -20,9 +20,6 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 	/** The service indentifier. */
 	protected IServiceIdentifier sid;
 	
-	/** The service container. */
-	protected IServiceContainer container;
-
 	/**
 	 *  Create a new interceptor.
 	 */
@@ -30,7 +27,6 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 	{
 		super(component);
 		this.sid = sid;
-		this.container = component.getServiceContainer();
 	}
 	
 	/**
@@ -43,7 +39,7 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 //		if(context.getMethod().getName().indexOf("methodA")!=-1)
 //			System.out.println("interceptor: "+component.getComponentIdentifier());
 //		boolean ret = component.getServiceContainer().hasMethodListeners(sid, new MethodInfo(context.getMethod()));
-		boolean ret = super.isApplicable(context) && container.hasMethodListeners(sid, new MethodInfo(context.getMethod()));
+		boolean ret = super.isApplicable(context) && getComponent().getComponentFeature(IProvidedServicesFeature.class).hasMethodListeners(sid, new MethodInfo(context.getMethod()));
 //		System.out.println("app: "+context.getMethod().getName()+" "+ret);
 		return ret;
 	}
@@ -56,7 +52,7 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 	{
 //		System.out.println("method call lis start: "+sic.hashCode());
 		Future<Void> ret = new Future<Void>();
-		container.notifyMethodListeners(sid, true, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+		getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, true, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 		sic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -69,18 +65,18 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 					{
 						public void resultAvailable(Object result)
 						{
-							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 					});
 				}
 				else
 				{
-					getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+					getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 				}
 				super.customResultAvailable(result);
 			}

@@ -1,12 +1,14 @@
 package jadex.micro.benchmarks;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -19,25 +21,30 @@ import java.util.Map;
  */
 @Description("<h1>Tree Stress Test</h1>Creates a complex tree structure of sub components.")
 @Arguments(@Argument(name="depth", clazz=int.class, defaultvalue="5", description="Depth of the tree."))
-public class TreeStressTestAgent extends MicroAgent
+@Agent
+public class TreeStressTestAgent //extends MicroAgent
 {
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
 	/**
 	 *  Execute the agent.
 	 */
 	public IFuture<Void> executeBody()
 	{
-		getServiceContainer().searchServiceUpwards(IComponentManagementService.class)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IComponentManagementService	cms	= (IComponentManagementService)result;
-				int	depth	= ((Number)getArgument("depth")).intValue();
+				int	depth	= ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("depth")).intValue();
 				if(depth>0)
 				{
 					Map	args	= new HashMap();
 					args.put("depth", Integer.valueOf(depth-1));
-					CreationInfo	ci	= new CreationInfo(args, getComponentIdentifier());
+					CreationInfo	ci	= new CreationInfo(args, agent.getComponentIdentifier());
 					for(int i=0; i<depth; i++)
 					{
 						cms.createComponent(null, TreeStressTestAgent.this.getClass().getName()+".class", ci, null);

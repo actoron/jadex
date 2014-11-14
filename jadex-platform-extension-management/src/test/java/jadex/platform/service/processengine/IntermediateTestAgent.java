@@ -3,19 +3,20 @@ package jadex.platform.service.processengine;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.future.TupleResult;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -48,7 +49,7 @@ public class IntermediateTestAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -100,7 +101,7 @@ public class IntermediateTestAgent
 									{
 										trs.add(tr);
 										
-										agent.setResultValue("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
+										agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
 										ret.setResult(null);
 									}
 								});
@@ -262,7 +263,7 @@ public class IntermediateTestAgent
 		event.put("value", 7);
 		pes.processEvent(event, eventtype).get();
 		
-		agent.waitForDelay(500).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 		
@@ -318,7 +319,7 @@ public class IntermediateTestAgent
 //			}
 //		});
 
-		agent.waitForDelay(500).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
 		Map<String, Object>	event	= new HashMap<String, Object>();
 		event.put("value", 7);
@@ -363,7 +364,7 @@ public class IntermediateTestAgent
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 		fut.getFirstResult();
 
-		agent.waitForDelay(500).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
 		Map<String, Object>	event	= new HashMap<String, Object>();
 		event.put("value", 8);
@@ -408,7 +409,7 @@ public class IntermediateTestAgent
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 		fut.getFirstResult();
 
-		agent.waitForDelay(500).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
 		Map<String, Object>	event	= new HashMap<String, Object>();
 		event.put("wrong", 7);
@@ -451,7 +452,7 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		agent.waitForDelay(500).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
 
 		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 		

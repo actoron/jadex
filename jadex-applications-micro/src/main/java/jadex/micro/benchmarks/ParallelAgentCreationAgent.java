@@ -4,18 +4,19 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.Boolean3;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -32,8 +33,13 @@ import java.util.Map;
 {
 	@Argument(name="num", clazz=Integer.class, defaultvalue="10000", description="Maximum number of agents to create.")
 })
-public class ParallelAgentCreationAgent extends MicroAgent
+@Agent
+public class ParallelAgentCreationAgent //extends MicroAgent
 {
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
 	//-------- methods --------
 	
 	/**
@@ -41,16 +47,16 @@ public class ParallelAgentCreationAgent extends MicroAgent
 	 */
 	public IFuture<Void> executeBody()
 	{
-		Map arguments = getArguments();			
+		Map arguments = agent.getComponentFeature(IArgumentsFeature.class).getArguments();			
 		final int num	= ((Integer)arguments.get("num")).intValue();
 		if(num>0)
 		{
-			getServiceContainer().searchServiceUpwards(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					final IComponentManagementService	cms	= (IComponentManagementService)result;
-					getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+					agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -65,7 +71,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							{
 								public void resultAvailable(Object result)
 								{
-									scheduleStep(new IComponentStep<Void>()
+									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("destroy1")
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -85,7 +91,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 											{
 												String name = createPeerName(i);
 //												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
-												final IComponentIdentifier cid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
+												final IComponentIdentifier cid = new ComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
 												cms.destroyComponent(cid).addResultListener(new IResultListener<Map<String, Object>>()
 												{
 													public void resultAvailable(Map<String, Object> result)
@@ -106,7 +112,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								
 								public void exceptionOccurred(final Exception exception)
 								{
-									scheduleStep(new IComponentStep<Void>()
+									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("destroy2")
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -131,7 +137,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							{
 								public void resultAvailable(Object result)
 								{
-									scheduleStep(new IComponentStep<Void>()
+									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("last")
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -152,7 +158,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 											System.out.println("Overall memory usage: "+omem[0]+"kB. Per agent: "+upera+" kB.");
 											System.out.println("Still used memory: "+stillused+"kB.");
 									
-											killAgent();
+											agent.killComponent();
 											
 											return IFuture.DONE;
 										}
@@ -161,7 +167,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								
 								public void exceptionOccurred(final Exception exception)
 								{
-									scheduleStep(new IComponentStep<Void>()
+									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("destroyMe")
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -177,7 +183,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							
 							Map	args	= new HashMap();
 							args.put("num", Integer.valueOf(0));
-							CreationInfo	cinfo	= new CreationInfo(null, args, getComponentDescription().getResourceIdentifier());
+							CreationInfo	cinfo	= new CreationInfo(null, args, agent.getComponentDescription().getResourceIdentifier());
 							for(int i=1; i<=num; i++)
 							{
 								cms.createComponent(createPeerName(i), ParallelAgentCreationAgent.this.getClass().getName()+".class", cinfo, killlis)
@@ -197,7 +203,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 	 */
 	protected String createPeerName(int num)
 	{
-		return getComponentIdentifier().getLocalName() + "Peer_#" + num;
+		return agent.getComponentIdentifier().getLocalName() + "Peer_#" + num;
 	}
 	
 //	/**

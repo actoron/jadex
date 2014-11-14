@@ -2,14 +2,16 @@ package jadex.platform.service.processengine;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -45,7 +47,7 @@ public class UserAgent
 {
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	
@@ -79,7 +81,7 @@ public class UserAgent
 									public void customResultAvailable(TestReport tr)
 									{
 										trs[1] = tr;
-										agent.setResultValue("testresults", new Testcase(2, trs));
+										agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, trs));
 										ret.setResult(null);
 									}
 								});

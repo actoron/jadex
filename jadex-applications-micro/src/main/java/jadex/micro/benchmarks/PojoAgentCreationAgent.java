@@ -5,7 +5,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -15,7 +17,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
 import jadex.micro.PojoMicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -44,7 +45,7 @@ public class PojoAgentCreationAgent
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent	agent;
+	protected IInternalAccess	agent;
 	
 	/** Maximum number of agents to create. */
 	@AgentArgument
@@ -164,7 +165,7 @@ public class PojoAgentCreationAgent
 										public IFuture<Void> execute(final IInternalAccess ia)
 										{
 											final Future<Void> ret = new Future<Void>();
-											ia.getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 											{
 												public void customResultAvailable(IClockService result)
@@ -276,12 +277,12 @@ public class PojoAgentCreationAgent
 	
 	protected IFuture<IComponentManagementService>	getCMS()
 	{
-		return agent.getServiceContainer().searchServiceUpwards(IComponentManagementService.class);
+		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class);
 	}
 	
 	
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getServiceContainer().searchServiceUpwards(IClockService.class);
+		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class);
 	}
 }

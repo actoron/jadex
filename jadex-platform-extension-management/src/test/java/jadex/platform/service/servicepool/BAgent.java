@@ -1,11 +1,10 @@
 package jadex.platform.service.servicepool;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -19,7 +18,7 @@ import jadex.micro.annotation.ProvidedServices;
 public class BAgent implements IBService
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Example method 1.

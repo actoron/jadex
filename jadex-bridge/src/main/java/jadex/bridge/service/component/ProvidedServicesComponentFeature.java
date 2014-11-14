@@ -6,6 +6,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
@@ -19,6 +20,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -27,10 +29,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -47,6 +51,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	
 	/** The map of platform services. */
 	protected Map<Class<?>, Collection<IInternalService>> services;
+	
+	/** The map of provided service infos. (sid -> method listener) */
+	protected Map<IServiceIdentifier, MethodListenerHandler> servicelisteners;
 	
 	//-------- constructors --------
 	
@@ -784,5 +791,105 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		
 		return proxy;
 	}
-
+	
+	/**
+	 *  Add a method invocation handler.
+	 */
+	public void addMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener)
+	{
+//		System.out.println("added lis: "+sid+" "+mi+" "+hashCode());
+		
+		if(servicelisteners==null)
+			servicelisteners = new HashMap<IServiceIdentifier, MethodListenerHandler>();
+		MethodListenerHandler handler = servicelisteners.get(sid);
+		if(handler==null)
+		{
+			handler = new MethodListenerHandler();
+			servicelisteners.put(sid, handler);
+		}
+		handler.addMethodListener(mi, listener);
+	}
+	
+	/**
+	 *  Remove a method invocation handler.
+	 */
+	public void removeMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener)
+	{
+		if(servicelisteners!=null)
+		{
+			MethodListenerHandler handler = servicelisteners.get(sid);
+			if(handler!=null)
+			{
+				handler.removeMethodListener(mi, listener);
+			}
+		}
+	}
+	
+	/**
+	 *  Notify listeners that a service method has been called.
+	 */
+	public void notifyMethodListeners(IServiceIdentifier sid, boolean start, Object proxy, final Method method, final Object[] args, Object callid, ServiceInvocationContext context)
+	{
+		if(servicelisteners!=null)
+		{
+			MethodListenerHandler handler = servicelisteners.get(sid);
+			if(handler!=null)
+			{
+//				MethodInfo mi = new MethodInfo(method);
+				handler.notifyMethodListeners(start, proxy, method, args, callid, context);
+			}
+		}
+	}
+	
+	/**
+	 *  Test if service and method has listeners.
+	 */
+	public boolean hasMethodListeners(IServiceIdentifier sid, MethodInfo mi)
+	{
+		boolean ret = false;
+		if(servicelisteners!=null)
+		{
+			MethodListenerHandler handler = servicelisteners.get(sid);
+			if(handler!=null)
+			{
+				ret = handler.hasMethodListeners(sid, mi);
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a service interceptor.
+	 *  @param interceptor The interceptor.
+	 *  @param service The service.
+	 *  @param pos The position (0=first, -1=last-1, i.e. one before method invocation).
+	 */
+	public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
+	{
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		handler.addServiceInterceptor(interceptor, pos);
+	}
+	
+	/**
+	 *  Remove a service interceptor.
+	 *  @param interceptor The interceptor.
+	 *  @param service The service.
+	 */
+	public void removeInterceptor(IServiceInvocationInterceptor interceptor, Object service)
+	{
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		handler.removeServiceInterceptor(interceptor);
+	}
+	
+	/**
+	 *  Get the interceptors of a service.
+	 *  @param service The service.
+	 *  @return The interceptors.
+	 */
+	public IServiceInvocationInterceptor[] getInterceptors(Object service)
+	{
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		return handler.getInterceptors();
+	}
 }

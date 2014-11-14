@@ -5,7 +5,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -15,7 +18,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -32,9 +35,14 @@ import java.util.Map;
 	@Argument(name="max", clazz=Integer.class, defaultvalue="10000", description="Maximum number of agents to create."),
 	@Argument(name="nested", clazz=Boolean.class, defaultvalue="Boolean.FALSE", description="If true, each agent is created as a subcomponent of the previous agent.")
 })
-public class AgentCreationAgent extends MicroAgent
+@Agent
+public class AgentCreationAgent 
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 //	/** The cms (cached for speed). */
 //	protected IFuture	cms;
@@ -51,7 +59,7 @@ public class AgentCreationAgent extends MicroAgent
 	{
 //		System.out.println("body");
 		
-		Map arguments = getArguments();	
+		Map arguments = agent.getComponentFeature(IArgumentsFeature.class).getArguments();	
 		if(arguments==null)
 			arguments = new HashMap();
 		final Map args = arguments;	
@@ -110,12 +118,12 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", Integer.valueOf(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			getCMS().addResultListener(createResultListener(new DefaultResultListener()
+			getCMS().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1, getComponentIdentifier()), AgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-						new CreationInfo(null, args, nested ? getComponentIdentifier() : null, null, null, null, null, null, null, null, null, null, getComponentDescription().getResourceIdentifier()), null);
+					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getComponentIdentifier()), AgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
+						new CreationInfo(null, args, nested ? agent.getComponentIdentifier() : null, null, null, null, null, null, null, null, null, null, agent.getComponentDescription().getResourceIdentifier()), null);
 				}
 			}));
 		}
@@ -160,10 +168,10 @@ public class AgentCreationAgent extends MicroAgent
 							public void resultAvailable(Object result)
 							{
 								IComponentManagementService	cms	= (IComponentManagementService)result;
-								String	initial	= createPeerName(1, getComponentIdentifier());
+								String	initial	= createPeerName(1, agent.getComponentIdentifier());
 //								IComponentIdentifier	cid	= cms.createComponentIdentifier(initial, true);
-								IComponentIdentifier	cid	= new ComponentIdentifier(initial, getComponentIdentifier().getRoot());
-								cms.getExternalAccess(cid).addResultListener(createResultListener(new DefaultResultListener()
+								IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
+								cms.getExternalAccess(cid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object result)
 									{
@@ -174,7 +182,7 @@ public class AgentCreationAgent extends MicroAgent
 											public IFuture<Void> execute(final IInternalAccess ia)
 											{
 												final Future<Void> ret = new Future<Void>();
-												ia.getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+												ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 													.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 												{
 													public void customResultAvailable(IClockService result)
@@ -221,7 +229,7 @@ public class AgentCreationAgent extends MicroAgent
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
 		final long omem, final double upera, final int max, final boolean nested)
 	{
-		final String name = createPeerName(cnt, getComponentIdentifier());
+		final String name = createPeerName(cnt, agent.getComponentIdentifier());
 //		System.out.println("Destroying peer: "+name);
 		getCMS().addResultListener(new DefaultResultListener()
 		{
@@ -229,8 +237,8 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 //				IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
-				IComponentIdentifier aid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
-				cms.destroyComponent(aid).addResultListener(createResultListener(new DefaultResultListener()
+				IComponentIdentifier aid = new ComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
+				cms.destroyComponent(aid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -256,7 +264,7 @@ public class AgentCreationAgent extends MicroAgent
 	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
 		final long omem, final double upera)
 	{
-		getClock().addResultListener(createResultListener(new DefaultResultListener()
+		getClock().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(final Object result)
 			{
@@ -280,10 +288,10 @@ public class AgentCreationAgent extends MicroAgent
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				getComponentFeature(IArgumentsFeature.class).put("microcreationtime", new Tuple(""+pera, "s"));
-				getComponentFeature(IArgumentsFeature.class).put("microkillingtime", new Tuple(""+killpera, "s"));
-				getComponentFeature(IArgumentsFeature.class).put("micromem", new Tuple(""+upera, "kb"));
-				killComponent();
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+				agent.killComponent();
 			}
 		}));
 	}
@@ -294,7 +302,7 @@ public class AgentCreationAgent extends MicroAgent
 		if(ret==null)
 		{
 //			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class);  // Raw service
-			ret	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Decoupled service proxy
+			ret	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class); // Decoupled service proxy
 //			cms	= getRequiredService("cmsservice");	// Required service proxy
 		}
 		return ret;
@@ -307,7 +315,7 @@ public class AgentCreationAgent extends MicroAgent
 		if(ret==null)
 		{
 //			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class);  // Raw service
-			ret	= getServiceContainer().searchServiceUpwards(IClockService.class); // Decoupled service proxy
+			ret	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class); // Decoupled service proxy
 //			clock	= getRequiredService("clockservice");	// Required service proxy
 		}
 		return ret;

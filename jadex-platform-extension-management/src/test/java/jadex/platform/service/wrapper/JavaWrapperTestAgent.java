@@ -6,6 +6,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -67,7 +69,7 @@ public class JavaWrapperTestAgent
 				{
 					public void customResultAvailable(Collection<TestReport> results)
 					{
-						agent.setResultValue("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
+						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
 						ret.setResult(null);
 					}
 				});

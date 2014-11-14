@@ -3,6 +3,7 @@ package jadex.micro.examples.fireflies;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.IFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -14,7 +15,7 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Int;
 import jadex.extension.envsupport.math.Vector2Double;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,8 +25,13 @@ import java.util.Set;
 /**
  *  The firefly agent.
  */
-public class FireflyAgent extends MicroAgent
+@Agent
+public class FireflyAgent //extends MicroAgent
 {
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
 	//-------- methods --------
 
 //	/**
@@ -45,7 +51,7 @@ public class FireflyAgent extends MicroAgent
 		IExternalAccess	paexta = (IExternalAccess)getParentAccess();
 		
 		paexta.getExtension("mygc2dspace")
-			.addResultListener(createResultListener(new IResultListener()
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -58,7 +64,7 @@ public class FireflyAgent extends MicroAgent
 						if(space==null)
 							return IFuture.DONE;
 						
-						ISpaceObject avatar = space.getAvatar(getComponentDescription());
+						ISpaceObject avatar = space.getAvatar(agent.getComponentDescription());
 						IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 						double dir = ((Number)avatar.getProperty("direction")).doubleValue();
 						int clock = ((Number)avatar.getProperty("clock")).intValue();
@@ -127,7 +133,7 @@ public class FireflyAgent extends MicroAgent
 						params.put(MoveAction.PARAMETER_CLOCK, Integer.valueOf(clock));
 						space.performSpaceAction("move", params, null);
 						
-						waitForTick(this);
+						agent.getComponentFeature(IExecutionFeature.class).waitForTick(this);
 						return IFuture.DONE;
 					}
 					
@@ -137,7 +143,7 @@ public class FireflyAgent extends MicroAgent
 					}
 				};
 				
-				waitForTick(step);
+				agent.getComponentFeature(IExecutionFeature.class).waitForTick(step);
 			}
 			
 			public void exceptionOccurred(Exception exception)

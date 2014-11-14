@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -42,7 +43,7 @@ public class IntermediateBlockingTestAgent
 	@AgentBody(keepalive=false)
 	public void	execute(final IInternalAccess agent)
 	{
-		IStepService	step	= agent.getServiceContainer().searchService(IStepService.class).get();
+		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IStepService.class).get();
 		
 		final IIntermediateFuture<Integer>	fut	= step.performSteps(3, 1000);
 

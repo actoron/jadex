@@ -2,6 +2,10 @@ package jadex.micro.benchmarks;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -11,7 +15,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -26,8 +29,11 @@ import java.util.Map;
 	@Argument(name="max", defaultvalue="20000", clazz=int.class)
 })
 @Agent(synchronous=Boolean3.FALSE)
-public class MegaParallelStarterAgent extends MicroAgent 
+public class MegaParallelStarterAgent //extends MicroAgent 
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	protected String subname;
 	
 	protected int agents;
@@ -48,12 +54,12 @@ public class MegaParallelStarterAgent extends MicroAgent
 	 */
 	public IFuture<Void> executeBody()
 	{
-		Map arguments = getArguments();	
+		Map arguments = agent.getComponentFeature(IArgumentsFeature.class).getArguments();	
 		if(arguments==null)
 			arguments = new HashMap();
 		final Map args = arguments;	
 
-		System.out.println("Created starter: "+getComponentIdentifier());
+		System.out.println("Created starter: "+agent.getComponentIdentifier());
 		this.subname = "peer";
 		
 		getClock().addResultListener(new DefaultResultListener()
@@ -75,8 +81,8 @@ public class MegaParallelStarterAgent extends MicroAgent
 						{
 							args.put("num", Integer.valueOf(i));
 //							System.out.println("Created agent: "+i);
-							cms.createComponent(subname+"_#"+i, model, new CreationInfo(new HashMap(args), getComponentIdentifier()), 
-								createResultListener(new DefaultResultListener()
+							cms.createComponent(subname+"_#"+i, model, new CreationInfo(new HashMap(args), agent.getComponentIdentifier()), 
+								agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -100,15 +106,15 @@ public class MegaParallelStarterAgent extends MicroAgent
 												System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 												System.out.println("Still used memory: "+stillused+"kB.");
 												
-												getComponentFeature(IArgumentsFeature.class).put("microcreationtime", new Tuple(""+pera, "s"));
-												getComponentFeature(IArgumentsFeature.class).put("microkillingtime", new Tuple(""+killpera, "s"));
-												getComponentFeature(IArgumentsFeature.class).put("micromem", new Tuple(""+upera, "kb"));
-												killComponent();
+												agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+												agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+												agent.getComponentFeature(IArgumentsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+												agent.killComponent();
 											}
 										});
 									}
 								}
-							})).addResultListener(createResultListener(new IResultListener()
+							})).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -166,7 +172,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 //				IComponentIdentifier aid = cms.createComponentIdentifier(name, getComponentIdentifier(), null);
-				IComponentIdentifier aid = new ComponentIdentifier(name, getComponentIdentifier());
+				IComponentIdentifier aid = new ComponentIdentifier(name, agent.getComponentIdentifier());
 				IResultListener lis = new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -194,7 +200,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 		IFuture cms = null;	// Uncomment for no caching.
 		if(cms==null)
 		{
-			cms	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Raw service
+			cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class); // Raw service
 //			cms	= getRequiredService("cmsservice");	// Required service proxy
 		}
 		return cms;
@@ -206,7 +212,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 		IFuture clock = null;	// Uncomment for no caching.
 		if(clock==null)
 		{
-			clock	= getServiceContainer().searchServiceUpwards(IClockService.class); // Raw service
+			clock	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class); // Raw service
 //			clock	= getRequiredService("clockservice");	// Required service proxy
 		}
 		return clock;

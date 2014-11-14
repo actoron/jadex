@@ -1,5 +1,8 @@
 package jadex.bridge.nonfunctional.hardconstraints;
 
+import jadex.bridge.component.INFPropertyComponentFeature;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.DelegationResultListener;
@@ -46,7 +49,9 @@ public abstract class AbstractConstraintFilter<T> implements IAsyncFilter<T>
 		}
 		
 		final Future<Boolean> ret = new Future<Boolean>();
-		((IService)service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+		INFMixedPropertyProvider prov = ((INFMixedPropertyProvider)((IService)service).getExternalComponentFeature(INFPropertyComponentFeature.class));
+//		((IService)service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+		prov.getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
 			{

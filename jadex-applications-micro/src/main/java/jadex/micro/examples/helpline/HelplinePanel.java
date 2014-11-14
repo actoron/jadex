@@ -3,6 +3,8 @@ package jadex.micro.examples.helpline;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.CollectionResultListener;
@@ -217,11 +219,11 @@ public class HelplinePanel extends JPanel
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 //			.addResultListener(new SwingDefaultResultListener(HelplinePanel.this)
 //			(agent.getServiceProvider(), IHelpline.class, remote, true)
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getServiceContainer().getRequiredServices("localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
+				ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
 				{
 					public void customResultAvailable(Object result) 
 					{
@@ -252,18 +254,18 @@ public class HelplinePanel extends JPanel
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 		final IntermediateFuture<InformationEntry> ret = new IntermediateFuture<InformationEntry>();
 		
-		IIntermediateFuture<IHelpline> fut = (IIntermediateFuture<IHelpline>)agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Collection<IHelpline>>()
+		IIntermediateFuture<IHelpline> fut = (IIntermediateFuture<IHelpline>)agent.scheduleStep(new IComponentStep<Collection<IHelpline>>()
 		{
 			public IIntermediateFuture<IHelpline> execute(IInternalAccess ia)
 			{
 				IIntermediateFuture<IHelpline> ret;
 				if(remote)
 				{
-					ret	= ia.getServiceContainer().getRequiredServices("remotehelplineservices");
+					ret	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("remotehelplineservices");
 				}
 				else
 				{
-					ret	= ia.getServiceContainer().getRequiredServices("localhelplineservices");
+					ret	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("localhelplineservices");
 				}
 				return ret;
 			}
@@ -361,7 +363,7 @@ public class HelplinePanel extends JPanel
 			{
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

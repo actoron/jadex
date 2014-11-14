@@ -4,10 +4,15 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -17,7 +22,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Configuration;
@@ -66,9 +71,14 @@ import javax.swing.SwingUtilities;
 //		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.DEFAULT_ADDRESS+"\"})"))
 //		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\"relay-http://134.100.11.200:8080/jadex-platform-relay-web/\"})"))
 })
-public class MessagePerformanceAgent extends MicroAgent
+@Agent
+public class MessagePerformanceAgent //extends MicroAgent
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
 	
 	/** The received messages. */
 	protected int received;
@@ -90,7 +100,7 @@ public class MessagePerformanceAgent extends MicroAgent
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
-		if("select".equals(getConfiguration()))
+		if("select".equals(agent.getConfiguration()))
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{				
@@ -107,7 +117,7 @@ public class MessagePerformanceAgent extends MicroAgent
 					{
 						public void actionPerformed(ActionEvent e)
 						{
-							getArguments().put("echo", (IComponentIdentifier)selcb.getSelectedItem());
+							agent.getComponentFeature(IArgumentsFeature.class).getArguments().put("echo", (IComponentIdentifier)selcb.getSelectedItem());
 							f.setVisible(false);
 							f.dispose();
 							ret.setResult(null);
@@ -119,7 +129,7 @@ public class MessagePerformanceAgent extends MicroAgent
 					f.setLocation(SGUI.calculateMiddlePosition(f));
 					f.setVisible(true);
 					
-					SServiceProvider.getServices(getServiceProvider(), IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+					SServiceProvider.getServices(agent, IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 						.addResultListener(new SwingIntermediateResultListener<IEchoService>(new IIntermediateResultListener<IEchoService>()
 					{
 						boolean first = true;
@@ -177,12 +187,12 @@ public class MessagePerformanceAgent extends MicroAgent
 				current = 1;
 				starttime = result.longValue();
 				
-				final int msgcnt = ((Integer)getArgument("max")).intValue();
-				final int msgsize = ((Integer)getArgument("size")).intValue();
-				boolean auto = ((Boolean)getArgument("auto")).booleanValue();
-				IComponentIdentifier receiver = getArgument("echo")!=null
-					? (IComponentIdentifier)getArgument("echo") : getComponentIdentifier();
-				final boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
+				final int msgcnt = ((Integer)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("max")).intValue();
+				final int msgsize = ((Integer)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("size")).intValue();
+				boolean auto = ((Boolean)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("auto")).booleanValue();
+				IComponentIdentifier receiver = agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("echo")!=null
+					? (IComponentIdentifier)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("echo") : agent.getComponentIdentifier();
+				final boolean usecodec = ((Boolean)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("codec")).booleanValue();
 				
 				final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(msgcnt, true, new IResultListener<Void>()
 				{
@@ -250,7 +260,7 @@ public class MessagePerformanceAgent extends MicroAgent
 										request.put(SFipa.CONTENT, new BenchmarkMessage(scontent, true));
 									}
 									
-									IFuture<Void>	fut	= sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
+									IFuture<Void>	fut	= agent.getComponentFeature(IMessageFeature.class).sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
 									fut.addResultListener(crl);
 									fut.addResultListener(new IResultListener<Void>()
 									{
@@ -277,7 +287,7 @@ public class MessagePerformanceAgent extends MicroAgent
 								current = i+1;
 								if(current<=msgcnt)
 								{
-									waitFor(0, this);
+									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, this);
 								}
 								else
 								{
@@ -288,7 +298,7 @@ public class MessagePerformanceAgent extends MicroAgent
 							}
 						};
 												
-						send.execute(MessagePerformanceAgent.this);
+						send.execute(agent);
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -310,7 +320,7 @@ public class MessagePerformanceAgent extends MicroAgent
 		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		if(auto)
 		{
-			getServiceContainer().searchService(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 				.addResultListener(new IResultListener<IEchoService>()
 			{
 				public void resultAvailable(IEchoService result)
@@ -342,7 +352,7 @@ public class MessagePerformanceAgent extends MicroAgent
 			System.out.println("received first message");
 		}
 		received++;
-		final int msgcnt = ((Integer)getArgument("max")).intValue();
+		final int msgcnt = ((Integer)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("max")).intValue();
 		if(received==msgcnt)
 		{
 			getTime().addResultListener(new DefaultResultListener<Long>()
@@ -351,23 +361,31 @@ public class MessagePerformanceAgent extends MicroAgent
 				{
 					long dur = result.longValue() - starttime;
 					System.out.println("Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
-					getComponentFeature(IArgumentsFeature.class).put("result", "Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
+					agent.getComponentFeature(IArgumentsFeature.class).getResults().put("result", "Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
 					
 					future.addResultListener(new IResultListener<Void>()
 					{
 						public void resultAvailable(Void result)
 						{
-							killAgent();
+							agent.killComponent();
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							killAgent();
+							agent.killComponent();
 						}
 					});
 					
 				}
 			});
 		}
+	}
+	
+	/**
+	 *  Get the time.
+	 */
+	public IFuture<Long> getTime()
+	{
+		return new Future<Long>(new Long(SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime()));
 	}
 }
