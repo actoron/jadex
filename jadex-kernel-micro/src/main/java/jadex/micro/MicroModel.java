@@ -39,6 +39,9 @@ public class MicroModel extends CacheableKernelModel
 	/** The service injection targets. */
 	protected Map<String, Object> serviceinjections;
 	
+	/** The feature injection targets. */
+	protected List<FieldInfo> featureinjections;
+	
 	/** The class loader. */
 	protected ClassLoader classloader;
 	
@@ -198,7 +201,28 @@ public class MicroModel extends CacheableKernelModel
 		return serviceinjections==null? SUtil.EMPTY_STRING_ARRAY: 
 			(String[])serviceinjections.keySet().toArray(new String[serviceinjections.size()]);
 	}
-
+	
+	/**
+	 *  Add an injection field.
+	 *  @param name The name.
+	 *  @param field The field. 
+	 */
+	public void addFeatureInjection(String name, FieldInfo field)
+	{
+		if(featureinjections==null)
+			featureinjections = new ArrayList<FieldInfo>();
+		featureinjections.add(field);
+	}
+	
+	/**
+	 *  Get the feature injection fields.
+	 *  @return The fields.
+	 */
+	public FieldInfo[] getFeatureInjections()
+	{
+		return featureinjections==null? new FieldInfo[0]: (FieldInfo[])featureinjections.toArray(new FieldInfo[featureinjections.size()]);
+	}
+	
 	/**
 	 *  Get the pojo class.
 	 *  @return The pojoclass.

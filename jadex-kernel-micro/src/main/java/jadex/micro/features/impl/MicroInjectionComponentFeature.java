@@ -137,6 +137,24 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 			}
 		}
 		
+		// Inject feature fields.
+		fields = model.getFeatureInjections();
+		for(int i=0; i<fields.length; i++)
+		{
+			try
+			{
+				Class<?> iface = getComponent().getClassLoader().loadClass(fields[i].getTypeName());
+				Object feat = getComponent().getComponentFeature(iface);
+				Field f = fields[i].getField(getComponent().getClassLoader());
+				f.setAccessible(true);
+				f.set(agent, feat);
+			}
+			catch(Exception e)
+			{
+				getComponent().getLogger().warning("Feature injection failed: "+e);
+			}
+		}
+		
 		if(!ret.isDone())
 			ret.setResult(null);
 		
