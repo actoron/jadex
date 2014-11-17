@@ -5,9 +5,7 @@ import jadex.commons.future.IFuture;
 
 /**
  *  A component feature is a pluggable part of the state and behavior
- *  of a component.
- *  This interface follows the prototype-instance-pattern and represents
- *  the type level (i.e. factory) as well as the instance level.
+ *  of a component. This interface represents the instance level of a feature.
  *  
  *  The feature can inject parameters for expression evaluation
  *  using the value fetcher super interface. The fetch order is the reverse

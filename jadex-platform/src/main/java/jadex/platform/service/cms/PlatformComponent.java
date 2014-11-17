@@ -105,19 +105,15 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void>	init()
 	{
-		Future<Void>	ret	= new Future<Void>();
-		
 		// Run init on component thread (hack!!! requires that execution feature works before its init)
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		exe.scheduleImmediate(new IComponentStep<Void>()
+		return exe.scheduleImmediate(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				return executeInitOnFeatures(lfeatures.iterator());
 			}
-		}).addResultListener(new DelegationResultListener<Void>(ret));
-		
-		return ret;
+		});
 	}
 	
 	/**
@@ -127,18 +123,14 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void>	body()
 	{
-		Future<Void>	ret	= new Future<Void>();
-		
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		exe.scheduleImmediate(new IComponentStep<Void>()
+		return exe.scheduleImmediate(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				return executeBodyOnFeatures(lfeatures.iterator());
 			}
-		}).addResultListener(new DelegationResultListener<Void>(ret));
-		
-		return ret;
+		});
 	}
 	
 	/**
@@ -148,18 +140,14 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void>	shutdown()
 	{
-		Future<Void>	ret	= new Future<Void>();
-		
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		exe.scheduleImmediate(new IComponentStep<Void>()
+		return exe.scheduleImmediate(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				return executeShutdownOnFeatures(lfeatures, 0);
 			}
-		}).addResultListener(new DelegationResultListener<Void>(ret));
-		
-		return ret;
+		});
 	}
 	
 	/**
@@ -167,11 +155,16 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	protected IFuture<Void>	executeInitOnFeatures(final Iterator<IComponentFeature> features)
 	{
-		if(features.hasNext())
+		IFuture<Void>	fut	= IFuture.DONE;
+		while(fut.isDone() && features.hasNext())
+		{
+			fut	= features.next().init();
+		}
+		
+		if(!fut.isDone())
 		{
 			final Future<Void>	ret	= new Future<Void>();
-			features.next().init()
-				.addResultListener(new DelegationResultListener<Void>(ret)
+			fut.addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
@@ -191,15 +184,20 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	protected IFuture<Void>	executeBodyOnFeatures(final Iterator<IComponentFeature> features)
 	{
-		if(features.hasNext())
+		IFuture<Void>	fut	= IFuture.DONE;
+		while(fut.isDone() && features.hasNext())
+		{
+			fut	= features.next().body();
+		}
+		
+		if(!fut.isDone())
 		{
 			final Future<Void>	ret	= new Future<Void>();
-			features.next().body()
-				.addResultListener(new DelegationResultListener<Void>(ret)
+			fut.addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
-					executeBodyOnFeatures(features).addResultListener(new DelegationResultListener<Void>(ret));
+					executeInitOnFeatures(features).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 			return ret;
@@ -213,17 +211,24 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/**
 	 *  Recursively shutdown the features.
 	 */
-	protected IFuture<Void>	executeShutdownOnFeatures(final List<IComponentFeature> features, final int cnt)
+	protected IFuture<Void>	executeShutdownOnFeatures(final List<IComponentFeature> features, int cnt)
 	{
-		if(cnt<features.size())
+		IFuture<Void>	fut	= IFuture.DONE;
+		while(fut.isDone() && cnt<features.size())
 		{
+			fut	= features.get(features.size()-cnt-1).shutdown();
+			cnt++;
+		}
+		
+		if(!fut.isDone())
+		{
+			final int	fcnt	= cnt;
 			final Future<Void>	ret	= new Future<Void>();
-			features.get(features.size()-cnt-1).shutdown()
-				.addResultListener(new DelegationResultListener<Void>(ret)
+			fut.addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
-					executeShutdownOnFeatures(features, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+					executeShutdownOnFeatures(features, fcnt+1).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 			return ret;
