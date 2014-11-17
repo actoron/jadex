@@ -249,7 +249,7 @@ public class ModelTreePanel extends FileTreePanel
 			}
 		});
 		
-		final String lid = exta.getServiceProvider().getId().toString() + localexta.getServiceProvider().getId().toString() + "_" + LISTENER_COUNTER++;
+		final String lid = exta.getComponentIdentifier().toString() + localexta.getComponentIdentifier().toString() + "_" + LISTENER_COUNTER++;
 		SServiceProvider.getService(exta, IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener()
 		{

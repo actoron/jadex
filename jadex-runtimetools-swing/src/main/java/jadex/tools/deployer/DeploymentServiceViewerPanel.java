@@ -11,20 +11,11 @@ import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
@@ -54,7 +45,7 @@ import javax.swing.tree.TreeSelectionModel;
 public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 {
 	//-------- attributes --------
-
+	
 	/** The outer panel. */
 	protected JPanel	panel;
 	

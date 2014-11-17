@@ -1,12 +1,11 @@
 package jadex.platform.service.message.transport.ssltcpmtp;
 
 
-import java.util.Collection;
-
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
@@ -14,11 +13,12 @@ import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+
+import java.util.Collection;
 
 
 /**
@@ -30,7 +30,7 @@ import jadex.micro.annotation.ProvidedServices;
 public class ProviderAgent implements ITestService
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Call a method that must use a secure
@@ -149,7 +149,7 @@ public class ProviderAgent implements ITestService
 				size[0]++;
 				if(cnt[0]++<50)
 				{
-					agent.waitForDelay(50, this, false);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(50, this, false);
 				}
 				else
 				{
@@ -159,7 +159,7 @@ public class ProviderAgent implements ITestService
 				return IFuture.DONE;
 			}
 		};
-		agent.waitForDelay(1000, step, false);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step, false);
 		
 		return ret;
 	}

@@ -45,7 +45,7 @@ public class BDIV3CreationTest //extends TestCase
 //			"-conf", "jadex.standalone.Platform.component.xml",
 			"-deftimeout", "-1",
 			"-printpass", "false"}).get(sus, timeout);
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get(sus, timeout);
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();

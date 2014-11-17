@@ -8,6 +8,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -190,5 +191,5 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 	 *  @return The feature.
 	 */
 	public <T> T getExternalComponentFeature(Class<T> type);
-	
+
 }

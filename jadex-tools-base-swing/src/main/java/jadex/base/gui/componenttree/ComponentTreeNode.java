@@ -11,7 +11,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -452,7 +451,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 										{
 											ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
 											if(scn==null)
-												scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), ea.getServiceProvider());
+												scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), ea);
 	//										System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 											children.add(0, scn);
 											
@@ -500,7 +499,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 												
 												for(int i=0; i<reqs.length; i++)
 												{
-													String nid = ea.getServiceProvider().getId()+"."+reqs[i].getName();
+													String nid = ea.getComponentIdentifier()+"."+reqs[i].getName();
 													RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
 													if(sn==null)
 														sn	= new RequiredServiceNode(scn, getModel(), getTree(), reqs[i], nid, ea);

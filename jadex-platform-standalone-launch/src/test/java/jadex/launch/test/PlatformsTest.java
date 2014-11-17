@@ -121,7 +121,7 @@ public class PlatformsTest //extends TestCase
 			}
 			
 			final Future<Void>	fut	= new Future<Void>();
-			IComponentManagementService cms = SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
+			IComponentManagementService cms = SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get(sus, timeout);
 			cms.addComponentListener(platform.getComponentIdentifier(), new ICMSComponentListener()
 			{
 				public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)

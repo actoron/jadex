@@ -49,7 +49,7 @@ public class BPMNStartElementsTest //extends TestCase
 		IExternalAccess	platform	= fut.get(sus, timeout);
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
+			.getServiceUpwards(platform, IComponentManagementService.class).get(sus, timeout);
 
 		
 		CreationInfo ci = new CreationInfo();

@@ -2,8 +2,6 @@ package jadex.base.gui;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Component;

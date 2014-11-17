@@ -273,6 +273,7 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
+						return IFuture.DONE;
 					}
 				});
 			}

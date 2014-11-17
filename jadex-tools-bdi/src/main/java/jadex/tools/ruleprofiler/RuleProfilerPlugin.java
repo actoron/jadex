@@ -266,7 +266,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 
 		split.setDividerLocation(150);
 
-		SServiceProvider.getServiceUpwards(jcc.getPlatformAccess().getServiceProvider(),
+		SServiceProvider.getServiceUpwards(jcc.getPlatformAccess(),
 			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
 		{
 			public void customResultAvailable(Object result)
@@ -363,7 +363,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 				{
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
-					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getPlatformAccess().getServiceProvider(), desc.getName());
+					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getPlatformAccess(), desc.getName());
 //					SHelp.setupHelp(panel, getHelpID());
 					detail.add(panel, desc);
 					comptree.getModel().fireNodeChanged(node);

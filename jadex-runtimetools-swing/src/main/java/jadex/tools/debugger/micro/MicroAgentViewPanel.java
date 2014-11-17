@@ -11,7 +11,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.micro.MicroAgentInterpreter;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -322,7 +321,7 @@ public class MicroAgentViewPanel extends JPanel
 		{
 			public boolean filter(IMonitoringEvent ev)
 			{
-				return ev.getType().endsWith(MicroAgentInterpreter.TYPE_STEP);	
+				return ev.getType().endsWith("step");//MicroAgentInterpreter.TYPE_STEP);	
 			}
 		}, true, PublishEventLevel.FINE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
@@ -361,7 +360,7 @@ public class MicroAgentViewPanel extends JPanel
 //						if(steps.size()>0)
 //							sl.setSelectedIndex(0);
 //					}
-					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION) && event.getType().endsWith(MicroAgentInterpreter.TYPE_STEP))
+					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION) && event.getType().endsWith("step"))//MicroAgentInterpreter.TYPE_STEP))
 					{
 						steps.addElement(event);
 						if(laststep==null && steps.size()==1)
@@ -369,7 +368,7 @@ public class MicroAgentViewPanel extends JPanel
 							sl.setSelectedIndex(0);
 						}
 					}
-					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL) && event.getType().endsWith(MicroAgentInterpreter.TYPE_STEP))
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL) && event.getType().endsWith("step"))//MicroAgentInterpreter.TYPE_STEP))
 					{
 	//					steps.removeElementAt(((Integer)event.getValue()).intValue());
 						for(int i=0; i<steps.size(); i++)

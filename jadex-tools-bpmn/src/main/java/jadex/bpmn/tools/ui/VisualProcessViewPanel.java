@@ -1003,7 +1003,7 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected void doStep()
 	{
-		SServiceProvider.getServiceUpwards(access.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(access, IComponentManagementService.class)
 			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(this)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -1051,7 +1051,7 @@ public class VisualProcessViewPanel extends JPanel
 						abps.add(bp);
 					}
 					
-					SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
 						public void customResultAvailable(final IComponentManagementService cms)
@@ -1074,7 +1074,7 @@ public class VisualProcessViewPanel extends JPanel
 	{
 		final Future<List<String>> ret = new Future<List<String>>();
 		
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, List<String>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)

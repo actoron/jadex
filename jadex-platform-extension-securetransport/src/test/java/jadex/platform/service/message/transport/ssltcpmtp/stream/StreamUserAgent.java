@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
@@ -46,16 +47,16 @@ public class StreamUserAgent extends TestAgent
 //		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 //		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 
-		testLocal(1, tc).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+		testLocal(1, tc).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 		{
 			public void customResultAvailable(Integer testcnt)
 			{
-				testRemote(testcnt.intValue(), tc, false).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+				testRemote(testcnt.intValue(), tc, false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 //				testRemote(1, tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
 					public void customResultAvailable(Integer testcnt)
 					{
-						testRemote(testcnt.intValue(), tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+						testRemote(testcnt.intValue(), tc, true).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 						{
 							public void customResultAvailable(Integer result)
 							{
@@ -85,7 +86,7 @@ public class StreamUserAgent extends TestAgent
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
-		createPlatform(sec ? new String[]{"-ssltcptransport", "true"} : null).addResultListener(agent.createResultListener(
+		createPlatform(sec ? new String[]{"-ssltcptransport", "true"} : null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Integer>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -93,7 +94,7 @@ public class StreamUserAgent extends TestAgent
 				if(!sec)
 				{
 					performTests(testno, platform.getComponentIdentifier(), tc)
-						.addResultListener(agent.createResultListener(new DelegationResultListener<Integer>(ret)
+						.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 					{
 						public void customResultAvailable(final Integer result)
 						{
@@ -112,7 +113,7 @@ public class StreamUserAgent extends TestAgent
 				else
 				{
 					performSecureTests(testno, platform.getComponentIdentifier(), tc)
-						.addResultListener(agent.createResultListener(new DelegationResultListener<Integer>(ret)
+						.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 					{
 						public void customResultAvailable(final Integer result)
 						{
@@ -148,7 +149,7 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), cid, IStreamService.class)
+				SServiceProvider.getService(agent, cid, IStreamService.class)
 					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
 				{
 					public void customResultAvailable(final IStreamService ss)
@@ -210,7 +211,7 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), cid, IStreamService.class)
+				SServiceProvider.getService(agent, cid, IStreamService.class)
 					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
 				{
 					public void customResultAvailable(final IStreamService ss)

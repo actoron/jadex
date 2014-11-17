@@ -4,7 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
@@ -67,7 +67,7 @@ class WebServiceWrapperInvocationHandler implements InvocationHandler
 		final Future<Object> ret = new Future<Object>();
 			
 //		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
-		IFuture<IComponentManagementService> fut = SServiceProvider.getService((IServiceProvider)agent.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<IComponentManagementService> fut = SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -75,11 +75,11 @@ class WebServiceWrapperInvocationHandler implements InvocationHandler
 				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
 //				cms.createComponent(null, "invocation", ci, null)
 				cms.createComponent(null, "jadex/extension/ws/invoke/WebServiceInvocationAgent.class", ci, null)
-					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
 					{
-						cms.getExternalAccess(cid).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
+						cms.getExternalAccess(cid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 						{
 							public void customResultAvailable(IExternalAccess exta) 
 							{
@@ -108,7 +108,7 @@ class WebServiceWrapperInvocationHandler implements InvocationHandler
 										}
 										return re;
 									}
-								}).addResultListener(agent.createResultListener(new DelegationResultListener<Object>(ret)));
+								}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Object>(ret)));
 							}
 						}));
 					}

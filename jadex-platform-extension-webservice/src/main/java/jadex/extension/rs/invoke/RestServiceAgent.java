@@ -1,9 +1,9 @@
 package jadex.extension.rs.invoke;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.extension.rs.RSFactory;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
@@ -28,7 +28,7 @@ public class RestServiceAgent
 	
 	/** The micro agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	//-------- methods --------
 	

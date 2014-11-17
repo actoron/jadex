@@ -210,4 +210,9 @@ public interface IInternalAccess
 	 */
 	public boolean isCopy();
 	
+	/**
+	 *  Get the children (if any) component identifiers.
+	 *  @return The children component identifiers.
+	 */
+	public IFuture<IComponentIdentifier[]> getChildren(String type);
 }

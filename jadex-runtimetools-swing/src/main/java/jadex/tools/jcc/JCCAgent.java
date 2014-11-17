@@ -10,6 +10,7 @@ import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
@@ -127,7 +128,7 @@ public class JCCAgent	implements IComponentStep<Void>
 			{
 				agent.getLogger().info("Searching for platforms matching '"+platforms+"'.");
 				
-				agent.getServiceContainer().searchServices(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 					.addResultListener(new TimeoutIntermediateResultListener<IComponentManagementService>(RETRY_DELAY, agent.getExternalAccess(),
 						new IntermediateExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{

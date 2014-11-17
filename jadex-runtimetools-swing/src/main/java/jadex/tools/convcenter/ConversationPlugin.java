@@ -14,7 +14,6 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IRemoteMessageListener;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageListener;

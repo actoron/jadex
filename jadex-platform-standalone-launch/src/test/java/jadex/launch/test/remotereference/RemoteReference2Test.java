@@ -58,23 +58,23 @@ public class RemoteReference2Test //extends TestCase
 		Map<String, Object>	args1	= new HashMap<String, Object>();
 		args1.put("component", platform2.getComponentIdentifier());
 		IComponentManagementService	cms1	= SServiceProvider
-			.getServiceUpwards(platform1.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
+			.getServiceUpwards(platform1, IComponentManagementService.class).get(sus, timeout);
 		cms1.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args1), null).get(sus, timeout);
 		Map<String, Object>	args2	= new HashMap<String, Object>();
 		args2.put("component", platform1.getComponentIdentifier());
 		IComponentManagementService	cms2	= SServiceProvider
-			.getServiceUpwards(platform2.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
+			.getServiceUpwards(platform2, IComponentManagementService.class).get(sus, timeout);
 		cms2.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args2), null).get(sus, timeout);
 		
 		// Find local service with direct remote search.
 //		System.out.println("searching local");
 		ILocalService	service1	= SServiceProvider
-			.getService(platform1.getServiceProvider(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(sus, timeout);
+			.getService(platform1, ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(sus, timeout);
 		
 		// Search for remote search service from local platform
 //		System.out.println("searching global");
 		ISearchService	search	= SServiceProvider
-			.getService(platform1.getServiceProvider(), ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(sus, timeout);
+			.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(sus, timeout);
 		// Invoke service to obtain reference to local service.
 		ILocalService	service2	= search.searchService("dummy").get(sus, timeout);
 		

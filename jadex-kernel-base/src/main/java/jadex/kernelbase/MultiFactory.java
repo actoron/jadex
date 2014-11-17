@@ -7,19 +7,19 @@ import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
-import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -425,7 +425,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		ia.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{
 			public void customResultAvailable(ILibraryService ls)
@@ -673,7 +673,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @return The component features.
 	 */
 	@Excluded
-	public IFuture<Collection<IComponentFeature>> getComponentFeatures(final IModelInfo model)
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(final IModelInfo model)
 	{
 //		if(model.getName().indexOf("ich")!=-1)
 //			System.out.println("createComponentInstance: "+model.getName());
@@ -683,7 +683,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		if(fac != null)
 			return fac.getComponentFeatures(model);
 		
-		final Future<Collection<IComponentFeature>> res = new Future<Collection<IComponentFeature>>();
+		final Future<Collection<IComponentFeatureFactory>> res = new Future<Collection<IComponentFeatureFactory>>();
 		
 		findKernel(model.getFilename(), null, model.getResourceIdentifier()).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(res)
 		{

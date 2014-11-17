@@ -3,6 +3,7 @@ package jadex.tools.ruleprofiler;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -68,7 +69,7 @@ public class RuleProfilerPanel	extends JPanel
 	 *  @param agent	The agent access.
 	 *  @param active	Flags indicating which tools should be active.
 	 */
-	public RuleProfilerPanel(IServiceProvider provider, final IComponentIdentifier observed)
+	public RuleProfilerPanel(IExternalAccess provider, final IComponentIdentifier observed)
 	{
 		this.observed	= observed;
 
@@ -104,7 +105,7 @@ public class RuleProfilerPanel	extends JPanel
 						{
 							tmp	= new Profiler(null);
 							final IProfiler prof	= tmp;
-							bdii.getAgentAdapter().invokeLater(new Runnable()
+							bdii.getComponentAdapter().invokeLater(new Runnable()
 							{
 								public void run()
 								{

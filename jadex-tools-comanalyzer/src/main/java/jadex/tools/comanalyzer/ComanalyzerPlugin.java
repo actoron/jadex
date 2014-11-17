@@ -239,7 +239,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			public void customResultAvailable(Void result)
 			{
 				// Todo: use remote access for clock !?
-				SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(getJCC().getJCCAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 				{
 					public void customResultAvailable(IClockService result)
@@ -1809,7 +1809,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			}
 		});
 		
-		SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -1826,7 +1826,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 						public void customResultAvailable(Object result)
 						{
 							IExternalAccess	ea	= (IExternalAccess)result;
-							SServiceProvider.getService(ea.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							SServiceProvider.getService(ea, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 								.addResultListener(new SwingDelegationResultListener(fut)
 							{
 								public void customResultAvailable(Object result)

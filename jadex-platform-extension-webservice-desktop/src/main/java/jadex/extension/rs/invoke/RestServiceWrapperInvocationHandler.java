@@ -4,7 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Value;
@@ -19,7 +19,6 @@ import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.annotation.ParameterMapper;
 import jadex.extension.rs.invoke.annotation.ParameterMappers;
 import jadex.extension.rs.invoke.annotation.ParametersInURL;
-import jadex.extension.rs.publish.JadexXMLBodyWriter;
 import jadex.extension.rs.publish.RSJAXAnnotationHelper;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
@@ -51,7 +50,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientResponse;
 
 /**
  *  Create a new web service wrapper invocation handler.
@@ -109,19 +107,19 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 		final Future<Object> ret = new Future<Object>();
 			
 //		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
-		IFuture<IComponentManagementService> fut = SServiceProvider.getService((IServiceProvider)agent.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
+		IFuture<IComponentManagementService> fut = SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
 //				cms.createComponent(null, "invocation", ci, null)
 				cms.createComponent(null, "jadex/extension/rs/invoke/RestServiceInvocationAgent.class", ci, null)
-					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
 					{
-						cms.getExternalAccess(cid).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
+						cms.getExternalAccess(cid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 						{
 							public void customResultAvailable(IExternalAccess exta) 
 							{
@@ -342,7 +340,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 										}
 										return re;
 									}
-								}).addResultListener(agent.createResultListener(new DelegationResultListener<Object>(ret)));
+								}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Object>(ret)));
 							}
 						}));
 					}

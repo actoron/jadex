@@ -1,9 +1,10 @@
 package jadex.launch.test.remotereference;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
@@ -27,12 +28,12 @@ public class SearchServiceProviderAgent implements ISearchService
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent	agent;
+	protected IInternalAccess	agent;
 	
 	public IFuture<ILocalService> searchService(String dummy)
 	{
 //		System.out.println("searcher");
-		IFuture<ILocalService>	ret	= agent.getRequiredService("local");
+		IFuture<ILocalService>	ret	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("local");
 		return ret;
 	}
 }
