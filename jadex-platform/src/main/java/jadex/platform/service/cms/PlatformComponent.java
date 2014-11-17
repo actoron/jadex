@@ -524,6 +524,11 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					ret	= getInternalAccess();
 					found	= true;
 				}
+				else if(ret==null && "$config".equals(name))
+				{
+					ret	= getConfiguration();
+					found	= true;
+				}
 				
 				if(!found)
 				{

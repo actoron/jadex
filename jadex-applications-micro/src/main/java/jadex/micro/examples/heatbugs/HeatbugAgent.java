@@ -152,7 +152,7 @@ public class HeatbugAgent //extends MicroAgent
 					}
 				};
 				
-				waitForTick(com);
+				agent.getComponentFeature(IExecutionFeature.class).waitForTick(com);
 			}
 		}));
 		

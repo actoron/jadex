@@ -14,6 +14,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -149,7 +150,7 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	 */
 	public Map<String, Object> getArguments()
 	{
-		return arguments;
+		return arguments==null? Collections.EMPTY_MAP: arguments;
 	}
 	
 	/**
@@ -158,7 +159,7 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	 */
 	public Map<String, Object> getResults()
 	{
-		return results;
+		return results==null? Collections.EMPTY_MAP: results;
 	}
 	
 	/**
