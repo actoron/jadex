@@ -31,7 +31,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -49,6 +48,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/** The current timer. */
 	protected List<ITimer> timers = new ArrayList<ITimer>();
+	
+	/** Retained listener notifications when switching threads due to blocking. */
+	protected List<Tuple2<Future<?>, IResultListener<?>>>	notifications;
 	
 	//-------- constructors --------
 	
@@ -85,7 +87,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		final Future ret = createStepFuture(step);
+		final Future<T> ret = createStepFuture(step);
 		
 		synchronized(this)
 		{
@@ -107,7 +109,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step)
 	{
-		final Future ret = createStepFuture(step);
+		final Future<T> ret = createStepFuture(step);
 		
 		synchronized(this)
 		{
@@ -356,12 +358,143 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		return new IntermediateComponentResultListener<T>(listener, component);
 	}
 	
-	/** 
-	 *  Kill the component.
+	//-------- IInternalExecutionFeature --------
+	
+	/**
+	 *  Block the current thread and allow execution on other threads.
+	 *  @param monitor	The monitor to wait for.
 	 */
-	public IFuture<Map<String, Object>> killComponent()
+	public void	block(final Object monitor, long timeout)
 	{
-		return getComponent().killComponent();
+		// todo...
+		
+//		if(!isComponentThread())
+//		{
+//			throw new RuntimeException("Can only block current component thread: "/*+componentthread+", "*/+Thread.currentThread());
+//		}
+//		
+//		// Retain listener notifications for new component thread.
+//		assert notifications==null;
+//		notifications	= FutureHelper.removeStackedListeners();
+////		System.out.println("removed stack size: "+notifications.size()+", "+getComponentIdentifier());
+//		
+//		Executor	exe	= Executor.EXECUTOR.get();
+//		if(exe==null)
+//		{
+//			throw new RuntimeException("Cannot block: no executor");
+//		}
+//		
+//		component.beforeBlock();
+//		
+////		if(getComponentIdentifier().toString().indexOf("@Receiver.EventSystem")!=-1)
+////		{
+////			System.err.println(getComponentIdentifier()+": !execution1 "+System.identityHashCode(Executor.EXECUTOR.get()));
+////		}
+//		this.executing	= false;
+//		this.componentthread	= null;
+////		
+////		if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
+//////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
+////		{
+////			System.out.println("Blocking: "+getComponentIdentifier()+", "+System.currentTimeMillis());
+////		}
+//		
+//		if(blocked==null)
+//		{
+//			blocked	= new HashMap<Object, Executor>();
+//		}
+//		blocked.put(monitor, exe);
+//		
+//		
+//		
+//		
+//		final boolean[]	unblocked	= new boolean[1];
+//		
+//		if(timeout!=Timeout.NONE)
+//		{
+//			waitForDelay(timeout)
+//				.addResultListener(new IResultListener<Void>()
+//			{
+//				public void resultAvailable(Void result)
+//				{
+//					if(!unblocked[0])
+//					{
+////						if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
+////						{
+////							System.out.println("Unblocking after timeout: "+getComponentIdentifier()+", "+System.currentTimeMillis());
+////						}
+//						
+//						// Cannot use timeout exception as component would not be correctly entered.
+//						// Todo: allow informing future about timeout.
+//						unblock(monitor, null); //new TimeoutException());
+//					}
+////					else if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
+////					{
+////						System.out.println("Not unblocking after timeout (already unblocked): "+getComponentIdentifier()+", "+System.currentTimeMillis());
+////					}
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//				}
+//			});
+//		}
+//		
+//		exe.blockThread(monitor);
+//		
+//		unblocked[0]	= true;
+//		
+//		
+//		
+//		
+//		assert !IComponentDescription.STATE_TERMINATED.equals(desc.getState());
+//		
+////		if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
+//////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
+////		{
+////			System.out.println("Unblocked: "+getComponentIdentifier()+", "+System.currentTimeMillis());
+////		}
+////		
+//		synchronized(this)
+//		{
+//			if(executing)
+//			{
+//				System.err.println(getComponent().getComponentIdentifier()+": double execution");
+//				new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
+//			}
+//			this.executing	= true;
+//		}
+////		if(getComponentIdentifier().toString().indexOf("@Receiver.EventSystem")!=-1)
+////		{
+////			System.err.println(getComponentIdentifier()+": execution1 "+System.identityHashCode(Executor.EXECUTOR.get()));
+////		}
+//
+//		this.componentthread	= Thread.currentThread();
+//		
+//		component.afterBlock();
+	}
+	
+	/**
+	 *  Unblock the thread waiting for the given monitor
+	 *  and cease execution on the current thread.
+	 *  @param monitor	The monitor to notify.
+	 */
+	public void	unblock(Object monitor, Throwable exception)
+	{
+		// todo...
+		
+//		if(!isComponentThread())
+//		{
+//			throw new RuntimeException("Can only unblock from component thread: "/*+componentthread+", "*/+Thread.currentThread());
+//		}
+//		
+//		Executor exe = blocked.remove(monitor);
+//		if(blocked.isEmpty())
+//		{
+//			blocked	= null;
+//		}
+//				
+//		exe.switchThread(monitor, exception);
 	}
 	
 	//-------- IExecutable interface --------
@@ -416,16 +549,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/**
 	 *  Create intermediate of direct future.
 	 */
-	protected Future<?> createStepFuture(IComponentStep<?> step)
+	protected <T> Future<T> createStepFuture(IComponentStep<T> step)
 	{
-		Future<?> ret;
+		Future<T> ret;
 		try
 		{
 			Method method = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
 			Class<?> clazz = method.getReturnType();
 //			ret = FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(getLogger()));
 			// Must not be fetched before properties are available!
-			ret = FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(new IResultCommand<Logger, Void>()
+			ret = (Future<T>)FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(new IResultCommand<Logger, Void>()
 			{
 				public Logger execute(Void args)
 				{

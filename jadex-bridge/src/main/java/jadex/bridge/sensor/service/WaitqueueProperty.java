@@ -5,6 +5,7 @@ import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.SimpleValueNFProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
@@ -59,7 +60,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 					setValue(Integer.valueOf(cnt));
 				}
 			});
-			comp.getServiceContainer().addMethodInvocationListener(sid, method, listener);
+			comp.getComponentFeature(IProvidedServicesFeature.class).addMethodInvocationListener(sid, method, listener);
 		}
 		else
 		{
@@ -81,7 +82,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	 */
 	public IFuture<Void> dispose()
 	{
-		comp.getServiceContainer().removeMethodInvocationListener(sid, method, listener);
+		comp.getComponentFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
 		return IFuture.DONE;
 	}
 }

@@ -236,155 +236,85 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 				{
 					public void resultAvailable(IExternalAccess exta)
 					{
-//						IExternalAccess exta = (IExternalAccess)result;
-						
-						if(type!=null)
+						exta.scheduleStep(new IComponentStep<Void>()
 						{
-							exta.scheduleStep(new IComponentStep<Void>()
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								public IFuture<Void> execute(IInternalAccess ia)
+								Class<?> cl = type!=null ? type.getType(ia.getClassLoader(), ia.getModel().getAllImports()) : null;
+								
+								ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(ia, cl, scope, (IAsyncFilter)filter);
+								res.addResultListener(new IIntermediateResultListener<IService>()
 								{
-									Class<?> cl = type.getType(ia.getClassLoader(), ia.getModel().getAllImports());
-									
-									ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(ia, cl, scope, (IAsyncFilter)filter);
-									res.addResultListener(new IIntermediateResultListener<IService>()
+									int cnt = 0;	
+									public void intermediateResultAvailable(IService result)
 									{
-										int cnt = 0;	
-										public void intermediateResultAvailable(IService result)
-										{
-			//								System.out.println("result command of search: "+callid+" "+result);
-											ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, result, callid, 
-												false, null, false, getNonFunctionalProperties(), ret, cnt++));
-										}
-										
-										public void finished()
-										{
-			//								System.out.println("result command of search fini: "+callid);
-											ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, null, callid, 
-												false, null, true, getNonFunctionalProperties(), ret, cnt++));
-											ret.setFinishedIfUndone();
-										}
-										
-										public void resultAvailable(Collection<IService> result)
-										{
-			//								System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);
-											// Create proxy info(s) for service(s)
-											Object content = null;
-			//								if(result instanceof Collection)
-			//								{
-												List<IService> res = new ArrayList<IService>();
-												for(Iterator<IService> it=result.iterator(); it.hasNext(); )
-												{
-													IService service = (IService)it.next();
-			//										RemoteServiceManagementService.getProxyInfo(component.getComponentIdentifier(), tmp, 
-			//											tmp.getServiceIdentifier(), tmp.getServiceIdentifier().getServiceType());
-			//										ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), tmp);
-			//										res.add(pi);
-													res.add(service);
-												}
-												content = res;
-			//								}
-			//								else //if(result instanceof Object[])
-			//								{
-			//									IService service = (IService)result;
-			////									content = getProxyInfo(component.getComponentIdentifier(), tmp);
-			//									content = service;
-			//								}
-											
-			//								ret.setResult(new RemoteResultCommand(content, null , callid, false));
-											ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, content, null, callid, 
-												false, null, getNonFunctionalProperties()));
-											ret.setFinishedIfUndone();
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-			//								ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-											ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, null, exception, callid, 
-												false, null, getNonFunctionalProperties()));
-											ret.setFinishedIfUndone();
-										}
-									});
+		//								System.out.println("result command of search: "+callid+" "+result);
+										ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, result, callid, 
+											false, null, false, getNonFunctionalProperties(), ret, cnt++));
+									}
 									
-									return IFuture.DONE;
-								}
-							}).addResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-								}
+									public void finished()
+									{
+		//								System.out.println("result command of search fini: "+callid);
+										ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, null, callid, 
+											false, null, true, getNonFunctionalProperties(), ret, cnt++));
+										ret.setFinishedIfUndone();
+									}
+									
+									public void resultAvailable(Collection<IService> result)
+									{
+		//								System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);
+										// Create proxy info(s) for service(s)
+										Object content = null;
+		//								if(result instanceof Collection)
+		//								{
+											List<IService> res = new ArrayList<IService>();
+											for(Iterator<IService> it=result.iterator(); it.hasNext(); )
+											{
+												IService service = (IService)it.next();
+		//										RemoteServiceManagementService.getProxyInfo(component.getComponentIdentifier(), tmp, 
+		//											tmp.getServiceIdentifier(), tmp.getServiceIdentifier().getServiceType());
+		//										ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), tmp);
+		//										res.add(pi);
+												res.add(service);
+											}
+											content = res;
+		//								}
+		//								else //if(result instanceof Object[])
+		//								{
+		//									IService service = (IService)result;
+		////									content = getProxyInfo(component.getComponentIdentifier(), tmp);
+		//									content = service;
+		//								}
+										
+		//								ret.setResult(new RemoteResultCommand(content, null , callid, false));
+										ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, content, null, callid, 
+											false, null, getNonFunctionalProperties()));
+										ret.setFinishedIfUndone();
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+		//								ret.setResult(new RemoteResultCommand(null, exception, callid, false));
+										ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, null, exception, callid, 
+											false, null, getNonFunctionalProperties()));
+										ret.setFinishedIfUndone();
+									}
+								});
 								
-								public void exceptionOccurred(Exception exception)
-								{
-									System.out.println("schedule exception: "+exception);
-								}
-							});
-						}
-						else
+								return IFuture.DONE;
+							}
+						}).addResultListener(new IResultListener<Void>()
 						{
-							// start search on target component
-	//						System.out.println("rem search start: "+manager+" "+decider+" "+selector);
-							exta.getServiceProvider().getServices(type, scope, filter)
-//							exta.getServiceProvider().getServices(manager, decider, selector)
-								.addResultListener(new IIntermediateResultListener<IService>()
+							public void resultAvailable(Void result)
 							{
-								int cnt = 0;	
-								public void intermediateResultAvailable(IService result)
-								{
-	//								System.out.println("result command of search: "+callid+" "+result);
-									ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, result, callid, 
-										false, null, false, getNonFunctionalProperties(), ret, cnt++));
-								}
-								
-								public void finished()
-								{
-	//								System.out.println("result command of search fini: "+callid);
-									ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, null, callid, 
-										false, null, true, getNonFunctionalProperties(), ret, cnt++));
-									ret.setFinishedIfUndone();
-								}
-								
-								public void resultAvailable(Collection<IService> result)
-								{
-	//								System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);
-									// Create proxy info(s) for service(s)
-									Object content = null;
-	//								if(result instanceof Collection)
-	//								{
-										List<IService> res = new ArrayList<IService>();
-										for(Iterator<IService> it=result.iterator(); it.hasNext(); )
-										{
-											IService service = (IService)it.next();
-	//										RemoteServiceManagementService.getProxyInfo(component.getComponentIdentifier(), tmp, 
-	//											tmp.getServiceIdentifier(), tmp.getServiceIdentifier().getServiceType());
-	//										ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), tmp);
-	//										res.add(pi);
-											res.add(service);
-										}
-										content = res;
-	//								}
-	//								else //if(result instanceof Object[])
-	//								{
-	//									IService service = (IService)result;
-	////									content = getProxyInfo(component.getComponentIdentifier(), tmp);
-	//									content = service;
-	//								}
-									
-	//								ret.setResult(new RemoteResultCommand(content, null , callid, false));
-									ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, content, null, callid, 
-										false, null, getNonFunctionalProperties()));
-									ret.setFinishedIfUndone();
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-	//								ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-									ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, null, exception, callid, 
-										false, null, getNonFunctionalProperties()));
-									ret.setFinishedIfUndone();
-								}
-							});
-						}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								System.out.println("schedule exception: "+exception);
+							}
+						});
 					}
 					
 					public void exceptionOccurred(Exception exception)
