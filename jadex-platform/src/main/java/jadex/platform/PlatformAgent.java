@@ -41,7 +41,6 @@ import jadex.platform.sensor.SensorHolderAgent;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.deployment.DeploymentService;
 import jadex.platform.service.df.DirectoryFacilitatorService;
-import jadex.platform.service.extensions.ExtensionsAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
 import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.settings.SettingsService;
@@ -111,8 +110,6 @@ import java.util.logging.Level;
 	@Argument(name="ssltcptransport", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="ssltcpport", clazz=int.class, defaultvalue="44334"),
 
-	@Argument(name="extensions", clazz=String.class, defaultvalue="\"jadex/extension/envsupport/EnvSupportAgent.class, jadex/extension/agr/AGRAgent.class\""),
-
 	@Argument(name="wspublish", clazz=boolean.class, defaultvalue="false"),
 	
 	@Argument(name="rspublish", clazz=boolean.class, defaultvalue="false"),
@@ -133,7 +130,6 @@ import java.util.logging.Level;
 @ComponentTypes({
 	@ComponentType(name="system", clazz=SystemAgent.class),
 	@ComponentType(name="monitor", clazz=MonitoringAgent.class), //filename="jadex/platform/service/monitoring/MonitoringAgent.class"),
-	@ComponentType(name="extensions", clazz=ExtensionsAgent.class), //filename="jadex/platform/service/extensions/ExtensionsAgent.class"),
 	@ComponentType(name="kernel_component", clazz=KernelComponentAgent.class), //filename="jadex/micro/KernelComponentAgent.class"),
 	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
 	@ComponentType(name="kernel_micro", clazz=KernelMicroAgent.class), // filename="jadex/micro/KernelMicroAgent.class"),
@@ -195,7 +191,6 @@ import java.util.logging.Level;
 		@Component(name="system", type="system", daemon=Boolean3.TRUE),
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="extensions", type="extensions", daemon=Boolean3.TRUE, number="($args.extensions!=null && !jadex.commons.SReflect.isAndroid()) ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
@@ -232,7 +227,6 @@ import java.util.logging.Level;
 		@Component(name="system", type="system", daemon=Boolean3.TRUE),
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="extensions", type="extensions", daemon=Boolean3.TRUE, number="$args.extensions!=null ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),

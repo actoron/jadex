@@ -3,6 +3,7 @@ package jadex.bridge.service.component;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
@@ -51,7 +52,8 @@ public class ComponentSuspendable implements ISuspendable
 			try
 			{
 				COMSUPS.set(this);
-				adapter.block(this, timeout);
+				((IInternalExecutionFeature)adapter.getComponentFeature(IExecutionFeature.class))
+					.block(this, timeout);
 			}
 			finally
 			{
@@ -79,9 +81,11 @@ public class ComponentSuspendable implements ISuspendable
 						// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 						if(future==ComponentSuspendable.this.future)
 						{
-							adapter.unblock(ComponentSuspendable.this, null);
+							((IInternalExecutionFeature)adapter.getComponentFeature(IExecutionFeature.class))
+								.unblock(ComponentSuspendable.this, null);
 						}
 					}
+					return IFuture.DONE;
 				}
 			});
 		}
@@ -92,7 +96,8 @@ public class ComponentSuspendable implements ISuspendable
 				// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 				if(future==this.future)
 				{
-					adapter.unblock(this, null);
+					((IInternalExecutionFeature)adapter.getComponentFeature(IExecutionFeature.class))
+						.unblock(this, null);
 				}
 			}			
 		}

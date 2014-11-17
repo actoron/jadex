@@ -123,12 +123,6 @@
 		<!-- Port for SSL TCP transport. -->
 		<argument name="ssltcpport" class="int">44334</argument>
 		
-		<!-- The file name(s) of extension component(s) to load (separated by comma). -->
-		<argument name="extensions" class="String">
-			"jadex/extension/envsupport/EnvSupport.component.xml, "
-			+"jadex/extension/agr/AGR.component.xml"
-		</argument>
-
 		<!-- Flag if web service publishing is enabled. -->
 		<argument name="wspublish" class="boolean">false</argument>
 		
@@ -161,7 +155,6 @@
 	
 	<componenttypes>
 		<componenttype filename="jadex/platform/System.component.xml" name="system"/>
-		<componenttype filename="jadex/platform/service/extensions/Extensions.component.xml" name="extensions"/>
 		
 		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>
 		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>
@@ -343,11 +336,6 @@
 			<components>
 			    <component name="system" type="system" daemon="true"/>
 			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
-				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
-					<arguments>
-						<argument name="extensions">$args.extensions</argument>
-					</arguments>
-				</component>
 				<component name="kernels" type="kernel_multi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;multi&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_component" type="kernel_component" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;component&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_application" type="kernel_application" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;applications&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
@@ -390,11 +378,6 @@
 			<components>
 			  	<component name="system" type="system" daemon="true"/>
 			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
-				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
-					<arguments>
-						<argument name="extensions">$args.extensions</argument>
-					</arguments>
-				</component>
 				<component name="kernels" type="kernel_multi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;multi&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_component" type="kernel_component" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;component&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_application" type="kernel_application" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;applications&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>

@@ -3,9 +3,8 @@ package jadex.bridge.sensor.service;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -88,7 +87,7 @@ public class WaitingTimeProperty extends TimedProperty
 					}
 				}
 			});
-			comp.getServiceContainer().addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
+			comp.getComponentFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
 		}
 		else
 		{
@@ -130,7 +129,7 @@ public class WaitingTimeProperty extends TimedProperty
 	 */
 	public IFuture<Void> dispose()
 	{
-		comp.getServiceContainer().removeMethodInvocationListener(sid, method, listener);
+		comp.getComponentFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
 		return IFuture.DONE;
 	}
 }

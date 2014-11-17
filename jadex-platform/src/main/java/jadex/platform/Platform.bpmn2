@@ -48,7 +48,6 @@
       <jadex:import>jadex.platform.service.execution.*</jadex:import>
       <jadex:import>jadex.platform.service.library.*</jadex:import>
       <jadex:import>jadex.platform.service.clock.*</jadex:import>
-      <jadex:import>jadex.platform.service.extensions.*</jadex:import>
       <jadex:import>jadex.bridge.service.types.marshal.*</jadex:import>
       <jadex:import>jadex.platform.service.marshal.*</jadex:import>
       <jadex:import>jadex.bridge.service.types.factory.*</jadex:import>
@@ -78,10 +77,6 @@
       <jadex:argument name="gui" type="boolean">
         <jadex:description>Start the JCC agent to open the platform GUI?</jadex:description>
         <jadex:value>true</jadex:value>
-      </jadex:argument>
-      <jadex:argument name="extensions" type="String">
-        <jadex:description>The file name(s) of extension component(s) to load (separated by comma).</jadex:description>
-        <jadex:value>&quot;jadex/extension/envsupport/EnvSupport.component.xml, jadex/extension/agr/AGR.component.xml&quot;</jadex:value>
       </jadex:argument>
       <jadex:argument name="saveonexit" type="boolean">
         <jadex:description>Save platform settings on shutdown?</jadex:description>
