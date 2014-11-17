@@ -35,6 +35,7 @@ import jadex.javaparser.SJavaParser;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBreakpoint;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
@@ -756,6 +757,10 @@ public class MicroClassReader
 					AgentService ser = getAnnotation(fields[i], AgentService.class, cl);
 					String name = ser.name().length()>0? ser.name(): fields[i].getName();
 					micromodel.addServiceInjection(name, new FieldInfo(fields[i]));
+				}
+				else if(isAnnotationPresent(fields[i], AgentFeature.class, cl))
+				{
+					micromodel.addFeatureInjection(fields[i].getName(), new FieldInfo(fields[i]));
 				}
 				else
 				{
