@@ -292,8 +292,8 @@ public class StandaloneRelay
 					}
 					catch(Exception e)
 					{
-						RelayHandler.getLogger().warning("Unexpected exception: "+e);
-						e.printStackTrace();
+						RelayHandler.getLogger().warning(e.toString());
+//						e.printStackTrace();
 					}
 				}
 			}).start();

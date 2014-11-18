@@ -498,8 +498,11 @@ task buildDist(type: Zip, dependsOn: [srcZip, buildExampleProject]) {
 }
 
 task buildDistPro(type: Zip, dependsOn: srcZipPro) {
+	archiveName = 'jadex-pro-'+version+'.zip' //baseName
 	buildDistribution(buildDistPro, proexcl, null)
 	from(srcZipPro.archivePath)
+	from('docs/jadex-relay.bat')
+	from('docs/jadex-relay.sh')
 	from('jadex-platform-extension-management/win') { into('win') }
 }
 
