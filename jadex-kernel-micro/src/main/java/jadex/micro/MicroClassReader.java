@@ -34,10 +34,15 @@ import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentBreakpoint;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
+import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -810,6 +815,12 @@ public class MicroClassReader
 					}
 					micromodel.addServiceInjection(name, new MethodInfo(methods[i]));
 				}
+
+//				AgentStreamArrived AgentMessageArrived AgentKilled AgentCreated AgentBody AgentBreakpoint 
+//				if(isAnnotationPresent(methods[i], AgentBody.class, cl))
+//				{
+//					micromodel.addServiceInjection(name, new MethodInfo(methods[i]));
+//				}
 			}
 
 			cma = cma.getSuperclass();
