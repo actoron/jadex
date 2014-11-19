@@ -105,7 +105,7 @@ public class AgentCreationAgent
 //			System.out.println("Args: "+num+" "+args);
 
 			IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			cms.createComponent(createPeerName(num+1, agent.getComponentIdentifier()), AgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
+			cms.createComponent(createPeerName(num+1, agent.getComponentIdentifier()), AgentCreationAgent.this.getClass().getName()+".class",
 				new CreationInfo(null, args, nested ? agent.getComponentIdentifier() : null, null, null, null, null, null, null, null, null, null, agent.getComponentDescription().getResourceIdentifier()), null);
 		}
 		else

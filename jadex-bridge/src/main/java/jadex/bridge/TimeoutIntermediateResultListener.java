@@ -21,7 +21,7 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 	/**
 	 *  Create a new listener.
 	 */
-	public TimeoutIntermediateResultListener(final long timeout, IExternalAccess exta, final boolean realtime, String message, final IIntermediateResultListener<E> listener)
+	public TimeoutIntermediateResultListener(final long timeout, IExternalAccess exta, final boolean realtime, Object message, final IIntermediateResultListener<E> listener)
 	{
 		super(timeout, exta, realtime, message, listener);
 	}

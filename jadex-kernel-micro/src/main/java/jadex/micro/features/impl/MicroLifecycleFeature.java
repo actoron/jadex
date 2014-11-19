@@ -3,17 +3,16 @@ package jadex.micro.features.impl;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
@@ -22,7 +21,6 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.features.IMicroLifecycleFeature;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -84,16 +82,26 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 	 */
 	public IFuture<Void> init()
 	{
-		final Future<Void> ret = new Future<Void>();
-		invokeMethod(AgentCreated.class, null).addResultListener(
-			createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+		MicroModel	model = (MicroModel)component.getModel().getRawModel();
+		MethodInfo	mi	= model.getAgentMethod(AgentCreated.class);
+		if(mi!=null)
 		{
-			public void customResultAvailable(Tuple2<Method, Object> result)
+			final Future<Void> ret = new Future<Void>();
+			Method	m	= mi.getMethod(component.getClassLoader());
+			invokeMethod(m)
+				.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 			{
-				ret.setResult(null);
-			}
-		}));
-		return ret;
+				public void customResultAvailable(Object result)
+				{
+					ret.setResult(null);
+				}
+			});
+			return ret;
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
 	}
 	
 	/**
@@ -102,45 +110,49 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 	 */
 	public IFuture<Void> body()
 	{
-		final Future<Void> ret = new Future<Void>();
-		
-		invokeMethod(AgentBody.class, null)
-			.addResultListener(createResultListener(
-				new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+		MicroModel	model = (MicroModel)component.getModel().getRawModel();
+		MethodInfo	mi	= model.getAgentMethod(AgentBody.class);
+		if(mi!=null)
 		{
-			public void customResultAvailable(Tuple2<Method, Object> res)
+			final Future<Void> ret = new Future<Void>();
+			final Method	m	= mi.getMethod(component.getClassLoader());
+			invokeMethod(m)
+				.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 			{
-				// Only end body if future or void and kill is true 
-				boolean kill = false;
-				
-				Method method = res!=null? res.getFirstEntity(): null;
-				
-				if(method!=null)
+				public void customResultAvailable(Object result)
 				{
-					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+					// Only end body if future or void and kill is true 
+					boolean kill = false;
+					if(SReflect.isSupertype(IFuture.class, m.getReturnType()))
 					{
 						kill = true;
 					}
-					else if(void.class.equals(method.getReturnType()))
+					else if(void.class.equals(m.getReturnType()))
 					{
-						AgentBody ab = method.getAnnotation(AgentBody.class);
+						AgentBody ab = m.getAnnotation(AgentBody.class);
 						kill = !ab.keepalive();
 					}
+					
+					if(kill)
+					{
+						ret.setResult(null);
+					}
 				}
-				else
-				{
-					Agent ag = getPojoAgent().getClass().getAnnotation(Agent.class);
-					kill = !ag.keepalive();
-				}
-				
-				if(kill)
-				{
-					ret.setResult(null);
-				}
+			});
+			return ret;
+		}
+		else
+		{
+			Agent ag = getPojoAgent().getClass().getAnnotation(Agent.class);
+			if(!ag.keepalive())
+			{
+				return IFuture.DONE;
 			}
-		}));
-		
-		return ret;
+			else
+			{
+				return new Future<Void>();
+			}
+		}
 	}
 
 	/**
@@ -149,117 +161,69 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 	 */
 	public IFuture<Void> shutdown()
 	{
-		final Future<Void> ret = new Future<Void>();
-
-		invokeMethod(AgentKilled.class, null).addResultListener(
-			createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+		MicroModel	model = (MicroModel)component.getModel().getRawModel();
+		MethodInfo	mi	= model.getAgentMethod(AgentKilled.class);
+		if(mi!=null)
 		{
-			public void customResultAvailable(Tuple2<Method, Object> result)
+			final Future<Void> ret = new Future<Void>();
+			Method	m	= mi.getMethod(component.getClassLoader());
+			invokeMethod(m)
+				.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 			{
-				ret.setResult(null);
-			}
-		}));
-		return ret;
+				public void customResultAvailable(Object result)
+				{
+					ret.setResult(null);
+				}
+			});
+			return ret;
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
 	}
 	
 	/**
-	 *  Invoke double methods.
-	 *  The boolean 'firstorig' determines if basicservice method is called first.
+	 *  Invoke an agent method by injecting required arguments.
 	 */
-	protected IFuture<Tuple2<Method, Object>> invokeMethod(Class<? extends Annotation> annotation, Object[] args)
+	protected IFuture<Object> invokeMethod(Method method)
 	{
-		final Future<Tuple2<Method, Object>> ret = new Future<Tuple2<Method, Object>>();
+		final Future<Object> ret = new Future<Object>();
 		
-		Method[] methods = getPojoAgent().getClass().getMethods();
-		boolean found = false;
-		
-		for(int i=0; i<methods.length && !found; i++)
+		// Try to guess parameters as internal or external access.
+		// Todo: other injections...
+		Object[]	args	= new Object[method.getParameterTypes().length];
+		for(int i=0; i<method.getParameterTypes().length; i++)
 		{
-			final Method method = methods[i];
-			if(method.isAnnotationPresent(annotation))
+			Class<?>	clazz	= method.getParameterTypes()[i];
+			if(SReflect.isSupertype(clazz, IInternalAccess.class))
 			{
-				found = true;
-				
-				// Try to guess additional parameters as internal or external access.
-				if(args==null || method.getParameterTypes().length>args.length)
-				{
-					Object[]	tmp	= new Object[method.getParameterTypes().length];
-					if(args!=null)
-					{
-						System.arraycopy(args, 0, tmp, 0, args.length);
-					}
-					for(int j=args==null?0:args.length; j<method.getParameterTypes().length; j++)
-					{
-						Class<?>	clazz	= method.getParameterTypes()[j];
-						if(SReflect.isSupertype(clazz, IInternalAccess.class))
-						{
-							tmp[j]= getComponent();
-						}
-						else if(SReflect.isSupertype(clazz, IExternalAccess.class))
-						{
-							tmp[j]= getComponent().getExternalAccess();
-						}
-					}
-					args	= tmp;
-				}
-				
-				try
-				{
-					Object res = method.invoke(getPojoAgent(), args);
-					if(res instanceof IFuture)
-					{
-						((IFuture)res).addResultListener(createResultListener(
-							new ExceptionDelegationResultListener<Object, Tuple2<Method, Object>>(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-								ret.setResult(new Tuple2<Method, Object>(method, result));
-							}
-						}
-						));
-					}
-					else
-					{
-						ret.setResult(new Tuple2<Method, Object>(method, res));
-					}
-				}
-				catch(Exception e)
-				{
-					e = (Exception)(e instanceof InvocationTargetException && ((InvocationTargetException)e)
-						.getTargetException() instanceof Exception? ((InvocationTargetException)e).getTargetException(): e);
-					ret.setException(e);
-					break;
-				}
+				args[i]	= getComponent();
+			}
+			else if(SReflect.isSupertype(clazz, IExternalAccess.class))
+			{
+				args[i]	= getComponent().getExternalAccess();
 			}
 		}
 		
-		if(!found)
+		try
 		{
-			// Check if annotation is present and complain that method is not public.
-			
-			Class<?> clazz = getPojoAgent().getClass();
-			
-			while(!Object.class.equals(clazz) && !found)
+			Object res = method.invoke(getPojoAgent(), args);
+			if(res instanceof IFuture)
 			{
-				methods = clazz.getDeclaredMethods();
-				
-				for(int i=0; i<methods.length && !found; i++)
-				{
-					if(methods[i].isAnnotationPresent(annotation))
-					{
-						found = true;
-						ret.setException(new RuntimeException("Method must be declared public: "+methods[i]));
-						break;
-					}
-				}
-				
-				clazz = clazz.getSuperclass();
+				((IFuture<Object>)res).addResultListener(createResultListener(
+					new DelegationResultListener<Object>(ret)));
 			}
-			
-			if(!found)
+			else
 			{
-				ret.setResult(null);
+				ret.setResult(res);
 			}
+		}
+		catch(Exception e)
+		{
+			e = (Exception)(e instanceof InvocationTargetException && ((InvocationTargetException)e)
+				.getTargetException() instanceof Exception? ((InvocationTargetException)e).getTargetException(): e);
+			ret.setException(e);
 		}
 		
 		return ret;

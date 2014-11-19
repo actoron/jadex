@@ -44,7 +44,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 	protected boolean realtime;
 	
 	/** The timeout message. */
-	protected String message;
+	protected Object message;
 	
 	/** Flag if undone methods should be used. */
 	protected boolean undone;
@@ -62,7 +62,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 	/**
 	 *  Create a new listener.
 	 */
-	public TimeoutResultListener(final long timeout, IExternalAccess exta, final boolean realtime, String message, final IResultListener<E> listener)
+	public TimeoutResultListener(final long timeout, IExternalAccess exta, final boolean realtime, Object message, final IResultListener<E> listener)
 	{
 		if(listener==null)
 			throw new IllegalArgumentException("Listener must not null.");

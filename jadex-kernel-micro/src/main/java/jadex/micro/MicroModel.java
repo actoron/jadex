@@ -10,6 +10,7 @@ import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.kernelbase.CacheableKernelModel;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,6 +45,9 @@ public class MicroModel extends CacheableKernelModel
 	
 	/** The class loader. */
 	protected ClassLoader classloader;
+	
+	/** The agent methods for given annotations (if any). */
+	protected Map<Class<? extends Annotation>, MethodInfo>	agentmethods;
 	
 	/**
 	 *  Create a new model.
@@ -257,5 +261,30 @@ public class MicroModel extends CacheableKernelModel
 	public void setClassloader(ClassLoader classloader)
 	{
 		this.classloader = classloader;
+	}
+
+	/**
+	 *  Set an agent method.
+	 */
+	public void setAgentMethod(Class<? extends Annotation> ann, MethodInfo mi)
+	{
+		if(agentmethods==null)
+		{
+			agentmethods = new HashMap<Class<? extends Annotation>, MethodInfo>();
+		}
+		
+		MethodInfo	prev	= agentmethods.put(ann, mi);
+		if(prev!=null)
+		{
+			throw new RuntimeException("Only one @"+ann.getSimpleName()+" method allowed.");
+		}
+	}
+	
+	/**
+	 *  Get an agent method.
+	 */
+	public MethodInfo	getAgentMethod(Class<? extends Annotation> ann)
+	{
+		return agentmethods!=null ? agentmethods.get(ann) : null;
 	}
 }

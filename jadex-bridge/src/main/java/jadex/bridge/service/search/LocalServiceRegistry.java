@@ -860,6 +860,7 @@ public class LocalServiceRegistry
 	 */
 	public static String getDotName(IComponentIdentifier cid)
 	{
-		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
+		return cid.getName().replace('@', '.');
+//		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
 	}
 }

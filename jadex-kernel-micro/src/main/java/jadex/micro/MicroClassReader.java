@@ -816,11 +816,30 @@ public class MicroClassReader
 					micromodel.addServiceInjection(name, new MethodInfo(methods[i]));
 				}
 
-//				AgentStreamArrived AgentMessageArrived AgentKilled AgentCreated AgentBody AgentBreakpoint 
-//				if(isAnnotationPresent(methods[i], AgentBody.class, cl))
-//				{
-//					micromodel.addServiceInjection(name, new MethodInfo(methods[i]));
-//				}
+				if(isAnnotationPresent(methods[i], AgentCreated.class, cl))
+				{
+					micromodel.setAgentMethod(AgentCreated.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], AgentBody.class, cl))
+				{
+					micromodel.setAgentMethod(AgentBody.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], AgentKilled.class, cl))
+				{
+					micromodel.setAgentMethod(AgentKilled.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], AgentBreakpoint.class, cl))
+				{
+					micromodel.setAgentMethod(AgentBreakpoint.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], AgentStreamArrived.class, cl))
+				{
+					micromodel.setAgentMethod(AgentStreamArrived.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], AgentMessageArrived.class, cl))
+				{
+					micromodel.setAgentMethod(AgentMessageArrived.class, new MethodInfo(methods[i]));
+				}
 			}
 
 			cma = cma.getSuperclass();

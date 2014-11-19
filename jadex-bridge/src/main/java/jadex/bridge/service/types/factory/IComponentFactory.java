@@ -82,5 +82,5 @@ public interface IComponentFactory
 	 *  @return The component features.
 	 */
 	@Excluded
-	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model);
+	public @Reference(remote=false) IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model);
 }

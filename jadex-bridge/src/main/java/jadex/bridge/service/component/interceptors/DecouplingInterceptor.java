@@ -548,7 +548,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					{
 						if(fut instanceof IIntermediateFuture)
 						{
-							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod().toString(), new IIntermediateFutureCommandResultListener()
+							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod(), new IIntermediateFutureCommandResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -592,7 +592,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						else
 						{
 //							SIC.set(sic);
-							fut.addResultListener(new TimeoutResultListener(timeout, ea, realtime, sic.getMethod().toString(), new IFutureCommandResultListener()
+							fut.addResultListener(new TimeoutResultListener(timeout, ea, realtime, sic.getMethod(), new IFutureCommandResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
