@@ -117,7 +117,7 @@
 		<!-- Address(es) for relay transport (one or more addresses separated by commas). -->
 		<argument name="relayaddress" class="String">jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS</argument>
 		<!-- Flag if relay should use HTTPS for receiving messages. -->
-		<argument name="relaysecurity" class="boolean">false</argument>
+		<argument name="relaysecurity" class="boolean">$args.relayaddress.indexOf("https://")==-1 ? false : true</argument>
 		<!-- Flag if ssltcp transport should enabled (requires Jadex Pro add-on). -->
 		<argument name="ssltcptransport" class="boolean">false</argument>
 		<!-- Port for SSL TCP transport. -->
