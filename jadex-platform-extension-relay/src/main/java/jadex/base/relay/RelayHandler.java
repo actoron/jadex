@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,14 +52,22 @@ public class RelayHandler
 	static
 	{
 		File dir;
-		String	home	= System.getenv("RELAY_HOME");	// System.getProperty() does not return environment variables, but just server VM properties.
+		// System.getProperty() does not return environment variables, but just server VM properties.
+		String	home	= System.getenv("RELAY_HOME");
 		if(home!=null)
 		{
 			dir	= new File(home);
 		}
 		else
 		{
-			dir	= new File(System.getProperty("user.home"), ".relaystats");
+			if("true".equals(System.getProperty("relay.standalone")))
+			{				
+				dir	= new File(".", ".relaystats");
+			}
+			else
+			{
+				dir	= new File(System.getProperty("user.home"), ".relaystats");
+			}
 		}
 		
 		if(!dir.exists())

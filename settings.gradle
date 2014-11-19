@@ -44,6 +44,7 @@ include 'jadex-applications-bdi',
 'jadex-rules-applications',
 'jadex-platform-relay-web', 
 'jadex-platform-extension-relay',
+'jadex-platform-extension-relay-standalone',
 'jadex-platform-extension-webservice',
 'jadex-platform-extension-webservice-desktop'
 // android-specific modules:

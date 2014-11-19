@@ -1,7 +1,11 @@
 package jadex.base.relay;
 
+import jadex.bridge.VersionInfo;
+import jadex.platform.service.security.SSecurity;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +17,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.security.KeyStore;
+import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.X509KeyManager;
 
 /**
  *  Relay as a simple java application.
@@ -24,17 +37,136 @@ public class StandaloneRelay
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		int	port	= 80;
+		// Hack!!! Let relay know we are running standalone.
+		System.setProperty("relay.standalone", "true");
+		
+		int	port	= -1;
+		boolean	ssl	= false;
+		String	keystore	= new File(RelayHandler.SYSTEMDIR, "keystore.jks").getAbsolutePath();
+		String	storepass	= "jadexrelay";
+		String	keyalias		= "jadexrelaykey";
+		String	keypass		= "jadexrelaypass";
+		
 		for(int i=0; args!=null && i<args.length; i++)
 		{
 			if("-port".equals(args[i]) && i+1<args.length)
 			{
 				port	= Integer.parseInt(args[i+1]);
 			}
+			else if("-ssl".equals(args[i]) && i+1<args.length)
+			{
+				ssl	= Boolean.parseBoolean(args[i+1]);
+			}
+			else if("-keystore".equals(args[i]) && i+1<args.length)
+			{
+				keystore	= args[i+1];
+			}
+			else if("-storepass".equals(args[i]) && i+1<args.length)
+			{
+				storepass	= args[i+1];
+			}
+			else if("-keyalias".equals(args[i]) && i+1<args.length)
+			{
+				keyalias	= args[i+1];
+			}
+			else if("-keypass".equals(args[i]) && i+1<args.length)
+			{
+				keypass	= args[i+1];
+			}
+			else if("-help".equals(args[i]))
+			{
+				System.out.println("Jadex Standalone Relay Server Version "+VersionInfo.getInstance().getVersion()+" ("+VersionInfo.getInstance().getTextDateString()+")");
+				System.out.println("Supported args:");
+				System.out.println("-port <portnumber>\t(default 80 or 443 when ssl=true)");
+				System.out.println("-ssl <flag>\t\t(true or false, default false)");
+				System.out.println("-keystore <filename>\t(keystore for ssl certificate, default $RELAY_HOME/keystore.jks, will be generated, if not found)");
+				System.out.println("-storepass <password>\t(keystore password)");
+				System.out.println("-keyalias <alias name>\t(name of the certificate)");
+				System.out.println("-keypass <password>\t(password for the key)");
+				return;
+			}
+		}
+		
+		// Set default port if not specified in args.
+		if(port==-1)
+		{
+			port	= ssl ? 443 : 80;
+		}
+		
+		ServerSocket	server;
+		
+		if(ssl)
+		{
+			final KeyStore	ks	= SSecurity.getKeystore(keystore, storepass, keypass, keyalias);
+			
+	    	final String	alias	= keyalias;
+	    	final String	pass	= keypass;
+			SSLContext	sc	= SSLContext.getInstance("TLS");
+			sc.init(new X509KeyManager[]
+			{ 
+			    new X509KeyManager()
+			    {
+			    	public String[] getServerAliases(String arg0, Principal[] arg1)
+			    	{
+			    		return new String[]{alias};
+			    	}
+			    	
+			    	public String chooseServerAlias(String arg0, Principal[] arg1, Socket arg2)
+			    	{
+			    		return alias;
+			    	}
+			    	
+			    	public X509Certificate[] getCertificateChain(String arg0)
+			    	{
+		    			X509Certificate[]	ret	= null;
+			    		try
+			    		{
+							Certificate[] certs = ks.getCertificateChain(alias);
+							if(certs!=null && certs.length>=0)
+							{
+								ret = new X509Certificate[certs.length];
+								System.arraycopy(certs, 0, ret, 0, certs.length);
+							}
+						}
+						catch(Exception e)
+						{
+						}
+			    		
+			    		return ret;
+			    	}
+			    	
+			    	public PrivateKey getPrivateKey(String arg0)
+			    	{
+						try
+						{
+							return (PrivateKey)ks.getKey(alias, pass.toCharArray());
+						}
+						catch(Exception e)
+						{
+							return null;
+						}
+			    	}
+			    	
+			    	public String[] getClientAliases(String arg0, Principal[] arg1)
+			    	{
+			    		throw new UnsupportedOperationException();
+			    	}
+			    	public String chooseClientAlias(String[] arg0, Principal[] arg1, Socket arg2)
+			    	{
+			    		throw new UnsupportedOperationException();
+			    	}
+			    }
+			}, null, null);
+			
+			SSLServerSocketFactory	ssf	= sc.getServerSocketFactory();
+			server	= ssf.createServerSocket(port);
+		}
+		else
+		{
+			server	= new ServerSocket(port);			
 		}
 		
 		final RelayHandler	handler	= new RelayHandler();
-		ServerSocket	server	= new ServerSocket(port);
 		RelayHandler.getLogger().info("Jadex Relay listening on port "+port);
 		while(true)
 		{
@@ -144,10 +276,23 @@ public class StandaloneRelay
 								client.close();								
 							}
 						}
+						else
+						{
+							// Default page
+							String	html	= getStatusPage(handler);
+							
+							PrintWriter	pw	= new PrintWriter(new OutputStreamWriter(client.getOutputStream(), Charset.forName("UTF-8")));
+							pw.print("HTTP/1.0 200 OK\r\n");
+							pw.print("Content-type: text/html\r\n");
+							pw.println("\r\n");
+							pw.println(html);
+							pw.flush();
+							client.close();
+						}
 					}
 					catch(Exception e)
 					{
-						RelayHandler.getLogger().warning("Unexpected exception: "+e);
+						RelayHandler.getLogger().warning(e.toString());
 //						e.printStackTrace();
 					}
 				}
@@ -156,6 +301,46 @@ public class StandaloneRelay
 	}
 	
 	//-------- helper methods --------
+	
+	/**
+	 *  Create a status page.
+	 */
+	protected static String	getStatusPage(RelayHandler handler)
+	{
+		PeerEntry[]	peers	= handler.getCurrentPeers();
+		PlatformInfo[]	platforms	= handler.getCurrentPlatforms();
+		
+		StringBuffer	buf	= new StringBuffer();
+		buf.append("<html><head><title>Jadex Relay Status Page</title></head><body>\n");
+		buf.append("<h1>Jadex Relay</h1>\n");
+		if(peers!=null && peers.length>0)
+		{
+			buf.append("<h2>Connected Peers</h2>\n<ul>\n");
+			for(PeerEntry pe: peers)
+			{
+				buf.append("<li><a href=\"");
+				buf.append(pe.getUrl());
+				buf.append("\">");
+				buf.append(pe.getUrl());
+				buf.append("</a></li>");
+			}
+			buf.append("</ul>\n");
+		}
+		if(platforms!=null && platforms.length>0)
+		{
+			buf.append("<h2>Connected Platforms</h2>\n<ul>\n");
+			for(PlatformInfo pi: platforms)
+			{
+				buf.append("<li>");
+				buf.append(pi.getId());
+				buf.append("</li>");
+			}
+			buf.append("</ul>\n");
+		}
+		buf.append("</body></html>");
+		
+		return buf.toString();
+	}
 	
 	/**
 	 *  Read a line from an input stream.
