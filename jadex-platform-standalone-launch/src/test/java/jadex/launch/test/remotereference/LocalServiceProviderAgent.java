@@ -12,7 +12,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Imports("jadex.micro.*")
-@ProvidedServices(@ProvidedService(type=ILocalService.class, implementation=@Implementation(expression="((IPojoMicroAgent)$component).getPojoAgent()")))
+@ProvidedServices(@ProvidedService(type=ILocalService.class, implementation=@Implementation(expression="$pojoagent")))
 @Service
 public class LocalServiceProviderAgent implements ILocalService
 {

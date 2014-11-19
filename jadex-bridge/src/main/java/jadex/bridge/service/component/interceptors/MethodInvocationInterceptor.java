@@ -159,7 +159,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			else
 			{
 //				e.printStackTrace();
-				throw re instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+				throw re instanceof RuntimeException ? (RuntimeException)re : new RuntimeException(re);
 //				{
 //					public void printStackTrace()
 //					{

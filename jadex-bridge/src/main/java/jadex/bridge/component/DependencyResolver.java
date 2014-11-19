@@ -97,6 +97,8 @@ public class DependencyResolver<T>
 			nodes.remove(node);
 		}
 		
+//		System.out.println("Resolved: "+ret);
+		
 		return ret;
 	}
 	

@@ -4,6 +4,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -21,6 +23,7 @@ import jadex.commons.future.TerminableIntermediateFuture;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -47,15 +50,90 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		super(component, cinfo);
 	}
-	
-	//-------- IComponentFeature interface / instance level --------
+
+	/**
+	 *  Init the required services
+	 */
+	public IFuture<Void> init()
+	{
+		IModelInfo	model	= getComponent().getModel();
+		ClassLoader	cl	= getComponent().getClassLoader();
+		String	config	= getComponent().getConfiguration();
 		
+		// Required services. (Todo: prefix for capabilities)
+		RequiredServiceInfo[] ms = model.getRequiredServices();
+		
+		Map<String, RequiredServiceInfo>	sermap = new LinkedHashMap<String, RequiredServiceInfo>();
+		for(int i=0; i<ms.length; i++)
+		{
+			ms[i]	= new RequiredServiceInfo(/*getServicePrefix()+*/ms[i].getName(), ms[i].getType().getType(cl, model.getAllImports()), ms[i].isMultiple(), 
+				ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(cl, model.getAllImports()), ms[i].getDefaultBinding(), ms[i].getNFRProperties());
+			sermap.put(ms[i].getName(), ms[i]);
+		}
+
+		if(config!=null)
+		{
+			ConfigurationInfo cinfo = model.getConfiguration(config);
+			RequiredServiceInfo[] cs = cinfo.getRequiredServices();
+			for(int i=0; i<cs.length; i++)
+			{
+				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(/*getServicePrefix()+*/cs[i].getName());
+				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
+					ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(cl, model.getAllImports()), new RequiredServiceBinding(cs[i].getDefaultBinding()), ms[i].getNFRProperties());
+				sermap.put(rsi.getName(), newrsi);
+			}
+		}
+		
+		// Todo: Bindings from outside
+//		RequiredServiceBinding[]	bindings	= getBindings();
+//		if(bindings!=null)
+//		{
+//			for(int i=0; i<bindings.length; i++)
+//			{
+//				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(bindings[i].getName());
+//				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
+//					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(cl, model.getAllImports()), new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties());
+//				sermap.put(rsi.getName(), newrsi);
+//			}
+//		}
+		
+		RequiredServiceInfo[]	rservices	= (RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]);
+		addRequiredServiceInfos(rservices);
+		
+		// Todo: Create place holder required service properties		
+//		for(RequiredServiceInfo rsi: rservices)
+//		{
+//			List<NFRPropertyInfo> nfprops = rsi.getNFRProperties();
+//			if(nfprops!=null)
+//			{
+//				INFMixedPropertyProvider nfpp = getRequiredServicePropertyProvider(null); // null for unbound
+//				
+//				for(NFRPropertyInfo nfprop: nfprops)
+//				{
+//					MethodInfo mi = nfprop.getMethodInfo();
+//					Class<?> clazz = nfprop.getClazz().getType(cl, model.getAllImports());
+//					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getComponent(), null, nfprop.getMethodInfo());
+//					if(mi==null)
+//					{
+//						nfpp.addNFProperty(nfp);
+//					}
+//					else
+//					{
+//						nfpp.addMethodNFProperty(mi, nfp);
+//					}
+//				}
+//			}
+//		}
+					
+		return IFuture.DONE;
+	}
+	
 	/**
 	 *  Add required services for a given prefix.
 	 *  @param prefix The name prefix to use.
 	 *  @param required services The required services to set.
 	 */
-	public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
+	protected void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
 	{
 //		if(shutdowned)
 //			throw new ComponentTerminatedException(id);
@@ -70,6 +148,8 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			}
 		}
 	}
+	
+	//-------- IComponentFeature interface / instance level --------
 	
 	/**
 	 *  Get a required service info.
@@ -420,8 +500,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //			throw new ComponentTerminatedException(id);
 //		}
 
-		throw new UnsupportedOperationException();
-//		return new DefaultServiceFetcher(this, getComponent(), cinfo.isRealtime());
+		return new DefaultServiceFetcher(getComponent(), cinfo.isRealtime());
 	}
 	
 //	/**

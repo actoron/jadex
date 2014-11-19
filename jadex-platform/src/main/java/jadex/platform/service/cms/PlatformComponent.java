@@ -689,4 +689,12 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get a string representation.
+	 */
+	public String	toString()
+	{
+		return getComponentIdentifier().getName();
+	}
 }

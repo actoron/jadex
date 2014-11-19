@@ -16,11 +16,11 @@ public abstract class AbstractModelLoader
 	/** The supported file extensions (if any). */
 	protected String[]	extensions;
 	
-	/** The model cache (filename -> loaded model). */
-	protected LRU modelcache;
+	/** The model cache (filename/imports -> loaded model). */
+	protected LRU<Tuple, ICacheableModel> modelcache;
 	
 	/** The registered models (filename -> loaded model). */
-	protected Map registered;
+	protected Map<String, ICacheableModel> registered;
 	
 	//-------- constructors --------
 	
@@ -40,8 +40,8 @@ public abstract class AbstractModelLoader
 	public AbstractModelLoader(String[] extensions, int cachesize)
 	{
 		this.extensions	= extensions.clone();
-		this.modelcache	= new LRU(cachesize);
-		this.registered	= new LinkedHashMap();
+		this.modelcache	= new LRU<Tuple, ICacheableModel>(cachesize);
+		this.registered	= new LinkedHashMap<String, ICacheableModel>();
 	}
 
 	//-------- helper methods --------
@@ -215,22 +215,26 @@ public abstract class AbstractModelLoader
 	{
 //		System.out.println("filename: "+name);
 		
-		// Lookup cache by name/extension/imports
 		ICacheableModel cached = null;
-		Object[] keys	= imports!=null? new Object[imports.length+3]: new Object[3];
-		keys[0]	= name;
-		keys[1]	= extension;
-		keys[2] = classloader;
-		if(imports!=null)
-			System.arraycopy(imports, 0, keys, 3, imports.length);
-		Tuple	keytuple	= new Tuple(keys);
-		
-		ResourceInfo	info	= null;
-		//		synchronized(modelcache)
-//		{
-			cached	= getCachedModel(keytuple);
+		if(registered.containsKey(name))
+		{
+			cached = registered.get(name);
+		}
+		else
+		{
+			// Lookup cache by name/extension/imports
+			Object[] keys	= imports!=null? new Object[imports.length+3]: new Object[3];
+			keys[0]	= name;
+			keys[1]	= extension;
+			keys[2] = classloader;
+			if(imports!=null)
+				System.arraycopy(imports, 0, keys, 3, imports.length);
+			Tuple	keytuple	= new Tuple(keys);
+			
+			ResourceInfo	info	= null;
+			cached	= modelcache.get(keytuple);
 //			System.out.println("hit: "+name+" "+cached);
-			// If model is in cache, check at most every second if file on disc is newer.
+			// If model is in cache, check at most every three seconds if file on disc is newer.
 			if(cached!=null && cached.getLastChecked()+3000<System.currentTimeMillis())
 			{
 				info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
@@ -244,15 +248,12 @@ public abstract class AbstractModelLoader
 					info.cleanup();
 				}
 			}
-//		}
-
-		if(cached==null && info==null)
-		{
-			// Lookup cache by resolved filename.
-//			synchronized(modelcache)
-//			{
+	
+			if(cached==null && info==null)
+			{
+				// Lookup cache by resolved filename.
 				info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
-				cached	= getCachedModel(info.getFilename());
+				cached	= modelcache.get(new Tuple(new Object[]{info.getFilename()}));
 				if(cached!=null)
 				{
 					if(cached.getLastModified()<info.getLastModified())
@@ -262,48 +263,43 @@ public abstract class AbstractModelLoader
 					else
 					{
 						cached.setLastChecked(System.currentTimeMillis());
+						info.cleanup();
 					}
-
+	
 					// Associate cached model to new key (name/extension/imports).
 					modelcache.put(keytuple, cached);
 				}
-//			}
-		}
-			
-		// Not found: load from disc and store in cache.
-		if(cached==null)
-		{
-			try
+			}
+				
+			// Not found: load from disc and store in cache.
+			if(cached==null)
 			{
-				cached = (ICacheableModel)registered.get(name);
-				if(cached==null)
+				try
 				{
 					cached	= doLoadModel(name, imports, info, classloader, context);
 				}
+				catch(Exception e)
+				{
+					cached	= new BrokenModel(e, info);
+				}
+				finally
+				{
+					info.cleanup();
+				}
 				
 				// Store by filename also, to avoid reloading with different imports.
-//				modelcache.put(info.getFilename(), cached);
-				modelcache.put(cached.getFilename(), cached);
-//				System.out.println("cached: "+info.getFilename()+" "+cached.getFilename()+" "+classloader);
-//				System.out.println("cached: "+cached.getFilename()+" "+classloader);
+				modelcache.put(new Tuple(new Object[]{info.getFilename()}), cached);
 				
 				// Associate cached model to new key (name/extension/imports).
 				modelcache.put(keytuple, cached);
 			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-			finally
-			{
-				info.cleanup();
-			}
 		}
-		else if(info!=null)
+		
+		if(cached instanceof BrokenModel)
 		{
-			info.cleanup();
+			throw ((BrokenModel)cached).getException();
 		}
-
+		
 		return cached;
 	}
 	
@@ -347,7 +343,7 @@ public abstract class AbstractModelLoader
 	/**
 	 *  Register a model.
 	 */
-	public void	registerModel(Object key, ICacheableModel model)
+	public void	registerModel(String key, ICacheableModel model)
 	{
 		registered.put(key, model);
 	}
@@ -355,7 +351,7 @@ public abstract class AbstractModelLoader
 	/**
 	 *  Deregister a model.
 	 */
-	public void	deregisterModel(Object key)
+	public void	deregisterModel(String key)
 	{
 		registered.remove(key);
 	}
@@ -368,20 +364,85 @@ public abstract class AbstractModelLoader
 		modelcache.clear();
 	}
 	
+	//-------- helper classes --------
+	
 	/**
-	 *  Get a model from cache (if any).
+	 *  Store an exception during loading in cache. 
 	 */
-	protected ICacheableModel	getCachedModel(Object key)
+	public class BrokenModel	implements ICacheableModel
 	{
-		ICacheableModel	ret	= null;
-		if(modelcache.containsKey(key))
+		//-------- attributes --------
+		
+		/** Time of last check. */
+		protected long	lastcheck;
+		
+		/** The exception. */
+		protected Exception	exception;
+		
+		/** The filename. */
+		protected String	filename;
+		
+		/** The file modification time. */
+		protected long	lastmod;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a broken model.
+		 */
+		public BrokenModel(Exception e, ResourceInfo info)
 		{
-			ret	= (ICacheableModel)modelcache.get(key);
+			this.lastcheck	= System.currentTimeMillis();
+			this.exception	= e;
+			this.filename	= info.getFilename();
+			this.lastmod	= info.getLastModified();
 		}
-		else if(registered.containsKey(key))
+		
+		//-------- methods --------
+		
+		/**
+		 *  Get the last check time of the model.
+		 *  @return The last check time of the model.
+		 */
+		public long	getLastChecked()
 		{
-			ret	= (ICacheableModel)registered.get(key);
+			return lastcheck;
 		}
-		return ret;
+
+		/**
+		 *  Set the last check time of the model.
+		 *  @param time	The last check time of the model.
+		 */
+		public void	setLastChecked(long time)
+		{
+			this.lastcheck	= time;
+		}
+
+		/**
+		 *  Get the last modification time of the model.
+		 *  @return The last modification time of the model.
+		 */
+		public long getLastModified()
+		{
+			return lastmod;
+		}
+		
+		/**
+		 *  Get the filename.
+		 *  @return The filename.
+		 */
+		public String getFilename()
+		{
+			return filename;
+		}
+
+		/**
+		 *  Get the exception.
+		 *  @return The exception.
+		 */
+		public Exception getException()
+		{
+			return exception;
+		}
 	}
 }

@@ -26,18 +26,18 @@ public interface IRequiredServicesFeature
 	 */
 	public RequiredServiceInfo getRequiredServiceInfo(String name);
 	
-	/**
-	 *  Set the required services.
-	 *  @param required services The required services to set.
-	 */
-	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices);
-	
-	/**
-	 *  Add required services for a given prefix.
-	 *  @param prefix The name prefix to use.
-	 *  @param required services The required services to set.
-	 */
-	public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices);
+//	/**
+//	 *  Set the required services.
+//	 *  @param required services The required services to set.
+//	 */
+//	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices);
+//	
+//	/**
+//	 *  Add required services for a given prefix.
+//	 *  @param prefix The name prefix to use.
+//	 *  @param required services The required services to set.
+//	 */
+//	public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices);
 	
 //	/**
 //	 *  Get the required service property provider for a service.

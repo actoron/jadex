@@ -7,6 +7,7 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -32,7 +33,8 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 	//-------- constants --------
 	
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMicroLifecycleFeature.class, MicroLifecycleFeature.class);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMicroLifecycleFeature.class, MicroLifecycleFeature.class,
+		new Class<?>[]{IRequiredServicesFeature.class}, null);
 	
 	//-------- attributes --------
 	
@@ -67,14 +69,14 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 		return pojoagent;
 	}
 
-	/**
-	 *  The pojoagent to set.
-	 *  @param pojoagent The pojoagent to set
-	 */
-	public void setPojoAgent(Object pojoagent)
-	{
-		this.pojoagent = pojoagent;
-	}
+//	/**
+//	 *  The pojoagent to set.
+//	 *  @param pojoagent The pojoagent to set
+//	 */
+//	public void setPojoAgent(Object pojoagent)
+//	{
+//		this.pojoagent = pojoagent;
+//	}
 	
 	/**
 	 *  Initialize the feature.
@@ -238,4 +240,18 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 		return getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
+	/**
+	 *  Add $pojoagent to fetcher.
+	 */
+	public Object fetchValue(String name)
+	{
+		if("$pojoagent".equals(name))
+		{
+			return getPojoAgent();
+		}
+		else
+		{
+			return super.fetchValue(name);
+		}
+	}
 }

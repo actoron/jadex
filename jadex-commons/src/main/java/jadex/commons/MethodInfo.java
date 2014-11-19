@@ -207,6 +207,14 @@ public class MethodInfo
 	}
 	
 	/**
+	 *  Gets the class name for retrieving the method.
+	 */
+	public String	getClassName()
+	{
+		return classname;
+	}
+	
+	/**
 	 * 
 	 */
 	public Method getMethod(ClassLoader cl)

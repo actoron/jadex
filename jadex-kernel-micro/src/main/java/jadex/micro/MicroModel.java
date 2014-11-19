@@ -273,10 +273,17 @@ public class MicroModel extends CacheableKernelModel
 			agentmethods = new HashMap<Class<? extends Annotation>, MethodInfo>();
 		}
 		
-		MethodInfo	prev	= agentmethods.put(ann, mi);
-		if(prev!=null)
+		if(!agentmethods.containsKey(ann))
 		{
-			throw new RuntimeException("Only one @"+ann.getSimpleName()+" method allowed.");
+			agentmethods.put(ann, mi);
+		}
+		else
+		{
+			MethodInfo	prev	= agentmethods.get(ann);
+			if(SUtil.equals(mi.getClassName(), prev.getClassName()))
+			{
+				throw new RuntimeException("Only one @"+ann.getSimpleName()+" method allowed in "+mi.getClassName());
+			}
 		}
 	}
 	

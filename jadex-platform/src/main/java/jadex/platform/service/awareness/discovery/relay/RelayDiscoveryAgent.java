@@ -40,7 +40,7 @@ import java.util.Map;
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=IRelayAwarenessService.class,
-	implementation=@Implementation(expression="$component.getPojoAgent()")))
+	implementation=@Implementation(expression="$pojoagent")))
 @Service
 @Properties(@NameValue(name="system", value="true"))
 public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarenessService

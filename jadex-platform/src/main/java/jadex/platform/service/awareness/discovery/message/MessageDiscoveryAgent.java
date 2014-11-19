@@ -50,7 +50,7 @@ import java.util.Map;
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=IMessageAwarenessService.class,
-	implementation=@Implementation(expression="$component.getPojoAgent()")))
+	implementation=@Implementation(expression="$pojoagent")))
 @RequiredServices(@RequiredService(name="awa", type=IAwarenessManagementService.class))
 @Service
 @Properties(@NameValue(name="system", value="true"))

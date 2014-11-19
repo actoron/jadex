@@ -38,6 +38,9 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -105,7 +108,7 @@ import java.util.TimerTask;
 })*/
 @Properties({@NameValue(name="system", value="true"), @NameValue(name="componentviewer.viewerclass", value="new String[]{\"jadex.tools.awareness.AwarenessAgentPanel\", \"jadex.android.controlcenter.settings.AwarenessSettings\"}")})
 @ProvidedServices(
-	@ProvidedService(type=IAwarenessManagementService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.micro.features.IMicroLifecycleFeature.class).getPojoAgent()"))
+	@ProvidedService(type=IAwarenessManagementService.class, implementation=@Implementation(expression="$pojoagent"))
 )
 @RequiredServices(
 {
@@ -168,6 +171,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	/**
 	 *  Called once after agent creation.
 	 */
+	@AgentCreated
 	public IFuture<Void>	agentCreated()
 	{
 //		String[] test = new String[]{"test", "test2"};
@@ -280,6 +284,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		root = agent.getComponentIdentifier().getRoot();
@@ -291,6 +296,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
 	 */
+	@AgentKilled
 	public IFuture<Void>	agentKilled()
 	{
 		final Future<Void>	ret	= new Future<Void>();

@@ -20,7 +20,7 @@ import jadex.micro.annotation.RequiredServices;
 @Agent
 @Imports("jadex.micro.*")
 @RequiredServices(@RequiredService(name="local", type=ILocalService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)))
-@ProvidedServices(@ProvidedService(type=ISearchService.class, implementation=@Implementation(expression="((IPojoMicroAgent)$component).getPojoAgent()")))
+@ProvidedServices(@ProvidedService(type=ISearchService.class, implementation=@Implementation(expression="$pojoagent")))
 @Service
 public class SearchServiceProviderAgent implements ISearchService
 {
