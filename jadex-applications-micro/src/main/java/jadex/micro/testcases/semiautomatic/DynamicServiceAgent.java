@@ -16,7 +16,7 @@ import jadex.micro.annotation.AgentBody;
  *  An agent that dynamically adds services at runtime.
  */
 @Agent
-public class DynamicServiceAgent //extends MicroAgent
+public class DynamicServiceAgent
 {
 	/** The internal access. */
 	@Agent

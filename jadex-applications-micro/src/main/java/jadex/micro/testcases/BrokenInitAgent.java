@@ -10,7 +10,7 @@ import jadex.micro.annotation.Description;
  */
 @Description("Agent that produces an exception during init.")
 @Agent
-public class BrokenInitAgent //extends MicroAgent
+public class BrokenInitAgent 
 {
 	/**
 	 *  Init the agent.

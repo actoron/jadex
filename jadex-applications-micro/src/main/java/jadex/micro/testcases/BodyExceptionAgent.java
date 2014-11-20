@@ -8,7 +8,7 @@ import jadex.micro.annotation.AgentBody;
  *  Test what happens if an exception is thrown in body.
  */
 @Agent
-public class BodyExceptionAgent //extends MicroAgent
+public class BodyExceptionAgent
 {
 	/**
 	 *  The agent body.

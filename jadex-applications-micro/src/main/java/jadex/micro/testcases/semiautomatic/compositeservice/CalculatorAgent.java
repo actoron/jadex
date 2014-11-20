@@ -16,6 +16,6 @@ import jadex.micro.annotation.ProvidedServices;
 	@ProvidedService(type=ISubService.class, implementation=@Implementation(expression="new SubService($component)"))
 })
 @Agent
-public class CalculatorAgent //extends MicroAgent
+public class CalculatorAgent
 {
 }

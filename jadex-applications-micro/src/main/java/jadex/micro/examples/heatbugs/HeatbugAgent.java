@@ -13,6 +13,7 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Int;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.Set;
  *  The heatbug agent.
  */
 @Agent
-public class HeatbugAgent //extends MicroAgent
+public class HeatbugAgent
 {
 	//-------- attributes --------
 	
@@ -49,6 +50,7 @@ public class HeatbugAgent //extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		getParentAccess().getExtension("mygc2dspace").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()

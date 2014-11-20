@@ -27,7 +27,7 @@ import jadex.micro.annotation.RequiredServices;
 //	})
 //})
 @Agent
-public class CompositeCalculatorAgent //extends MicroAgent
+public class CompositeCalculatorAgent
 {
 	@Agent 
 	protected IInternalAccess agent; 

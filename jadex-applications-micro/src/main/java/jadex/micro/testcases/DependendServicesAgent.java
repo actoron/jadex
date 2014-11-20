@@ -21,6 +21,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -55,7 +57,7 @@ import java.util.Map;
     @Component(type="b")
 }))
 @Agent
-public class DependendServicesAgent //extends MicroAgent
+public class DependendServicesAgent
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -63,6 +65,7 @@ public class DependendServicesAgent //extends MicroAgent
     /**
      *  Init code.
      */
+	@AgentCreated
     public IFuture<Void> agentCreated()
     {
         final Future<Void> ret = new Future<Void>();
@@ -125,6 +128,7 @@ public class DependendServicesAgent //extends MicroAgent
     /**
      *  The agent body.
      */
+	@AgentBody
     public IFuture<Void> executeBody()
     {
         getChildrenAccesses().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()

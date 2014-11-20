@@ -15,6 +15,7 @@ import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.Map;
  *  Simple agent participating in hunter prey.
  */
 @Agent
-public class MicroPreyAgent //extends MicroAgent
+public class MicroPreyAgent
 {
 	//-------- attributes --------
 	
@@ -51,6 +52,7 @@ public class MicroPreyAgent //extends MicroAgent
 	/**
 	 *  Execute a step.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		getParentAccess().getExtension("my2dspace").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()

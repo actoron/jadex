@@ -6,6 +6,8 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentBreakpoint;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
 
@@ -20,7 +22,7 @@ import java.util.Set;
 @Description("A simple agent showing how to use breakpoints in the micro kernel.")
 @Breakpoints(value={"2", "5", "odd", "even", "every tenth"})
 @Agent
-public class CountingAgent //extends MicroAgent
+public class CountingAgent
 {
 	/** The counter. */
 	protected int	cnt;
@@ -32,6 +34,7 @@ public class CountingAgent //extends MicroAgent
 	/**
 	 *  Execute a series of steps.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		cnt	= 1;
@@ -74,6 +77,7 @@ public class CountingAgent //extends MicroAgent
 	/**
 	 *  Return true, when a breakpoint was hit.
 	 */
+	@AgentBreakpoint
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
 		boolean	isatbreakpoint	= false;

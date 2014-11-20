@@ -158,7 +158,18 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		IFuture<Void>	fut	= IFuture.DONE;
 		while(fut.isDone() && features.hasNext())
 		{
-			fut	= features.next().init();
+			try
+			{
+				IComponentFeature	cf	= features.next();
+				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
+				fut	= cf.init();
+			}
+			catch(RuntimeException e)
+			{
+				Thread.dumpStack();
+				e.printStackTrace();
+				fut	= new Future<Void>(e);
+			}
 		}
 		
 		if(!fut.isDone())

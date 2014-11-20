@@ -16,6 +16,7 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Int;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import java.util.Set;
  *  The firefly agent.
  */
 @Agent
-public class FireflyAgent //extends MicroAgent
+public class FireflyAgent
 {
 	/** The agent. */
 	@Agent
@@ -46,6 +47,7 @@ public class FireflyAgent //extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		IExternalAccess	paexta = (IExternalAccess)getParentAccess();

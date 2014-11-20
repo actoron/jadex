@@ -12,6 +12,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -38,7 +39,7 @@ import javax.swing.SwingUtilities;
 @ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=@Implementation(HelplineService.class)))
 @GuiClass(HelplineViewerPanel.class)
 @Agent
-public class HelplineAgent //extends MicroAgent
+public class HelplineAgent
 {
 	//-------- attributes --------
 	
@@ -54,7 +55,8 @@ public class HelplineAgent //extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public IFuture	agentCreated()
+	@AgentCreated
+	public IFuture<Void>	agentCreated()
 	{
 //		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
 		this.infos = new MultiCollection();

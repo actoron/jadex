@@ -10,6 +10,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
  *  Just for starting the scenario.
  */
 @Agent
-public class ScenarioAgent //extends MicroAgent
+public class ScenarioAgent
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -25,6 +26,7 @@ public class ScenarioAgent //extends MicroAgent
 	/**
 	 *  Execute the body.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class).addResultListener(new DefaultResultListener()

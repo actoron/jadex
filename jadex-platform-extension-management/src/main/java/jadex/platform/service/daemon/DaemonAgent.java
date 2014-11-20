@@ -30,7 +30,7 @@ import java.util.Map;
 @RequiredServices(@RequiredService(name = "libservice", type = ILibraryService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)))
 @ProvidedServices(@ProvidedService(type = IDaemonService.class, implementation = @Implementation(DaemonService.class)))
 @Agent
-public class DaemonAgent //extends MicroAgent
+public class DaemonAgent
 {
 	//-------- attributes --------
 	/** The agent. */

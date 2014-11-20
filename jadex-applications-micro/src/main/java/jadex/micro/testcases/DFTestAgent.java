@@ -24,6 +24,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -40,7 +43,7 @@ import java.util.Map;
 @Description("Test DF usage from micro agent.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
-public class DFTestAgent //extends MicroAgent
+public class DFTestAgent
 {
 	//-------- attributes --------
 	
@@ -55,6 +58,7 @@ public class DFTestAgent //extends MicroAgent
 	/**
 	 *  At startup register the agent at the DF.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		this.reports	= new ArrayList();
@@ -64,6 +68,7 @@ public class DFTestAgent //extends MicroAgent
 	/**
 	 *  Called when agent finishes.
 	 */
+	@AgentKilled
 	public IFuture<Void>	agentKilled()
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -216,6 +221,7 @@ public class DFTestAgent //extends MicroAgent
 	}
 	
 	// todo: set body future?!
+	@AgentMessageArrived
 	public void messageArrived(Map msg, MessageType mt)
 	{
 		TestReport	tr	= (TestReport)reports.get(reports.size()-1);

@@ -8,6 +8,8 @@ import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Configuration;
@@ -32,7 +34,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@Configuration(name="long lived", arguments={@NameValue(name="delay", value="-1")})
 })
 @Agent(synchronous=Boolean3.FALSE)
-public class CalculateAgent //extends MicroAgent
+public class CalculateAgent
 {
 	//-------- attributes --------
 
@@ -54,6 +56,7 @@ public class CalculateAgent //extends MicroAgent
 	/**
 	 *  Execute the body.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();

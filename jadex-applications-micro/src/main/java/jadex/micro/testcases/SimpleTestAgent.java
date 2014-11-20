@@ -16,7 +16,7 @@ import jadex.micro.annotation.Results;
 @Description("A simple test showing how the test center works with micro agents.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
-public class SimpleTestAgent //extends MicroAgent
+public class SimpleTestAgent
 {
 	@Agent
 	protected IInternalAccess agent;

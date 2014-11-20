@@ -15,6 +15,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -31,7 +32,7 @@ import java.util.Map;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 @Agent
-public class ComponentResultTestAgent //extends MicroAgent
+public class ComponentResultTestAgent
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -39,6 +40,7 @@ public class ComponentResultTestAgent //extends MicroAgent
 	/**
 	 *  Perform the tests
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();

@@ -11,7 +11,7 @@ import jadex.micro.annotation.AgentCreated;
  *  Simple agent that offers the math service.
  */
 @Agent
-public class MathAgent //extends MicroAgent
+public class MathAgent
 {
 	@Agent
 	protected IInternalAccess agent;

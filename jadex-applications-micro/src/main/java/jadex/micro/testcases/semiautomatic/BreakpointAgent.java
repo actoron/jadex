@@ -6,6 +6,8 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentBreakpoint;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
 
@@ -18,7 +20,7 @@ import java.util.HashSet;
 @Description("A simple agent showing how to use breakpoints in the micro kernel.")
 @Breakpoints(value={"hop", "step", "jump"})
 @Agent
-public class BreakpointAgent //extends MicroAgent
+public class BreakpointAgent
 {
 	/** The current step. */
 	protected String	step;
@@ -30,6 +32,7 @@ public class BreakpointAgent //extends MicroAgent
 	/**
 	 *  Execute a series of steps.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		step	= "hop";	// first step
@@ -76,6 +79,7 @@ public class BreakpointAgent //extends MicroAgent
 	/**
 	 *  Return true, when a breakpoint was hit.
 	 */
+	@AgentBreakpoint
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
 		return new HashSet(Arrays.asList(breakpoints)).contains(step);

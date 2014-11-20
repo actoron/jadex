@@ -25,6 +25,6 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="generateservice", type=IGenerateService.class)
 })
 @Agent
-public class GenerateAgent //extends MicroAgent
+public class GenerateAgent
 {
 }

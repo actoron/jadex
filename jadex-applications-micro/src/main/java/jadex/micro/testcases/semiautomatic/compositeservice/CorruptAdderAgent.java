@@ -11,6 +11,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -25,7 +26,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@ProvidedService(type=ISubService.class, implementation=@Implementation(expression="new SubService($component)"))}
 )
 @Agent
-public class CorruptAdderAgent //extends MicroAgent
+public class CorruptAdderAgent
 {
 	protected int calls;
 	
@@ -35,7 +36,8 @@ public class CorruptAdderAgent //extends MicroAgent
 	/**
 	 * 
 	 */
-	public IFuture agentCreated()
+	@AgentCreated
+	public IFuture<Void> agentCreated()
 	{
 		IService addser = (IService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(IAddService.class)[0];
 		

@@ -23,7 +23,7 @@ import javax.swing.SwingUtilities;
  *  step on the selected component.
  */
 @Agent
-public class ExternalAccessInvokerAgent //extends MicroAgent
+public class ExternalAccessInvokerAgent
 {
 	@Agent
 	protected IInternalAccess agent;

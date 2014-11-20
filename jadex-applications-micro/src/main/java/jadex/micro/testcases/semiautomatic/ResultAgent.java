@@ -12,6 +12,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -22,7 +23,7 @@ import jadex.micro.annotation.Results;
 @Description("This agent starts a subagent and fetches its result.")
 @Results(@Result(name="result", clazz=String.class, defaultvalue="0", description="Result value."))
 @Agent
-public class ResultAgent //extends MicroAgent
+public class ResultAgent
 {
 	/** The agent. */
 	@Agent
@@ -33,6 +34,7 @@ public class ResultAgent //extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();

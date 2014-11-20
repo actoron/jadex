@@ -9,6 +9,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Description("<h1>Tree Stress Test</h1>Creates a complex tree structure of sub components.")
 @Arguments(@Argument(name="depth", clazz=int.class, defaultvalue="5", description="Depth of the tree."))
 @Agent
-public class TreeStressTestAgent //extends MicroAgent
+public class TreeStressTestAgent
 {
 	/** The agent. */
 	@Agent
@@ -31,6 +32,7 @@ public class TreeStressTestAgent //extends MicroAgent
 	/**
 	 *  Execute the agent.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class)

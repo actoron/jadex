@@ -15,6 +15,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -38,7 +39,7 @@ import java.util.List;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Service(ICService.class)
 @Agent
-public class CAgent implements ICService //extends MicroAgent
+public class CAgent implements ICService
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -46,6 +47,7 @@ public class CAgent implements ICService //extends MicroAgent
 	/**
 	 *  Test if copy parameters work.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();

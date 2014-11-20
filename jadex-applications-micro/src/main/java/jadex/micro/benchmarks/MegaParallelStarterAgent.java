@@ -16,6 +16,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 
@@ -29,7 +30,7 @@ import java.util.Map;
 	@Argument(name="max", defaultvalue="20000", clazz=int.class)
 })
 @Agent(synchronous=Boolean3.FALSE)
-public class MegaParallelStarterAgent //extends MicroAgent 
+public class MegaParallelStarterAgent
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -52,6 +53,7 @@ public class MegaParallelStarterAgent //extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		Map arguments = agent.getComponentFeature(IArgumentsFeature.class).getArguments();	

@@ -24,7 +24,7 @@ import java.util.List;
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IAService.class)
 @Agent
-public class AAgent implements IAService //extends MicroAgent
+public class AAgent implements IAService 
 {
 	@Agent
 	protected IInternalAccess agent; 

@@ -14,12 +14,13 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 
 /**
  *  Agent that invokes methods on a remote service.
  */
 @Agent
-public class UserAgent //extends MicroAgent
+public class UserAgent
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -28,6 +29,7 @@ public class UserAgent //extends MicroAgent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future ret = new Future<Void>();

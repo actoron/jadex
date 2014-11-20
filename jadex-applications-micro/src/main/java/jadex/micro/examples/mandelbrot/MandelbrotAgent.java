@@ -20,6 +20,6 @@ import jadex.micro.annotation.Configurations;
 	})
 )
 @Agent
-public class MandelbrotAgent //extends MicroAgent
+public class MandelbrotAgent
 {
 }

@@ -27,7 +27,7 @@ import jadex.micro.annotation.Results;
 })
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
 @Agent(keepalive=false)
-public class RequiredServiceConfigurationsAgent //extends MicroAgent
+public class RequiredServiceConfigurationsAgent
 {
 	@Agent
 	protected IInternalAccess agent;

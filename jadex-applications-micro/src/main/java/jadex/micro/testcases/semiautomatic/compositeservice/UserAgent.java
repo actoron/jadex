@@ -7,6 +7,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.RequiredServices;
 @Description("This agent uses an add service.")
 @RequiredServices(@RequiredService(name="addservice", type=IAddService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 @Agent
-public class UserAgent //extends MicroAgent
+public class UserAgent
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -27,6 +28,7 @@ public class UserAgent //extends MicroAgent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("addservice").addResultListener(new DefaultResultListener()

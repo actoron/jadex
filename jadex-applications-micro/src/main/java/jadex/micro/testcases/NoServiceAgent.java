@@ -10,6 +10,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -22,11 +23,12 @@ import java.util.Collections;
 @Description("Test searching for services that don't exist.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
-public class NoServiceAgent //extends MicroAgent
+public class NoServiceAgent
 {
 	@Agent
 	protected IInternalAccess agent;
 	
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();

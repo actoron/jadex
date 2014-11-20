@@ -10,6 +10,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
@@ -31,7 +32,7 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
 @Service(IAService.class)
 @Agent
-public class ProvidedServiceConfigurationsAgent implements IAService //extends MicroAgent
+public class ProvidedServiceConfigurationsAgent implements IAService
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -68,6 +69,7 @@ public class ProvidedServiceConfigurationsAgent implements IAService //extends M
 	/**
 	 *  The body.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		return IFuture.DONE;

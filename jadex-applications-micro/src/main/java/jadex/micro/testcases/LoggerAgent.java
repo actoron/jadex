@@ -48,7 +48,7 @@ import java.util.logging.LogRecord;
 //	@NameValue(name="logging.handlers", value="new LoggerAgent$TestLogHandler()")
 })
 @Agent
-public class LoggerAgent //extends MicroAgent
+public class LoggerAgent
 {
 	@Agent
 	protected IInternalAccess agent;

@@ -15,6 +15,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -48,7 +49,7 @@ import javax.swing.JTextPane;
 	@RequiredService(name="mandelservice", type=IMandelbrotService.class)
 })
 @Agent
-public class DisplayAgent //extends MicroAgent
+public class DisplayAgent
 {
 	//-------- attributes --------
 	
@@ -64,6 +65,7 @@ public class DisplayAgent //extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
+	@AgentCreated
 	public IFuture<Void>	agentCreated()
 	{
 		final Future<Void>	ret	= new Future<Void>();
