@@ -82,31 +82,7 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 		{
 			public void customResultAvailable(Tuple2<Method, Object> res)
 			{
-				// Only end body if future or void and kill is true 
-				Boolean found = null;
-				
-				Method method = res!=null? res.getFirstEntity(): null;
-				
-				if(method!=null)
-				{
-					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
-					{
-						found = Boolean.TRUE;
-					}
-					else if(void.class.equals(method.getReturnType()))
-					{
-						AgentBody ab = method.getAnnotation(AgentBody.class);
-						found = ab.keepalive()? Boolean.FALSE: Boolean.TRUE;
-					}
-				}
-				else
-				{
-					Agent ag = agent.getClass().getAnnotation(Agent.class);
-					found = ag.keepalive()? Boolean.FALSE: Boolean.TRUE;
-				}
-				
-				if(found!=null && found.booleanValue())
-					ret.setResult(null);
+				ret.setResult(null);
 			}
 		}));
 		

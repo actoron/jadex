@@ -7,6 +7,7 @@ import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -21,7 +22,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test threaded component execution.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Service
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @ProvidedServices(@ProvidedService(type=IBlockService.class))
@@ -35,7 +36,7 @@ public class ReqServiceBlockAgent implements IBlockService
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
 		TestReport[] trs = new TestReport[2];

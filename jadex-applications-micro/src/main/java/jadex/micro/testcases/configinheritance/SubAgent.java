@@ -8,6 +8,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -27,7 +28,7 @@ import java.util.Arrays;
  *  Agent that tests if a configuration can be inherited and
  *  the super class configuration parts are still available.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @ComponentTypes(
 {	
 	@ComponentType(name="emptyc", clazz=EmptyCAgent.class),
@@ -52,7 +53,7 @@ public class SubAgent extends MainAgent
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
 		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();

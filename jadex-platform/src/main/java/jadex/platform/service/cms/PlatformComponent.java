@@ -220,6 +220,15 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		else
 		{
+			if(fut.getException()==null)
+			{
+				Boolean	keepalive	= getModel().getKeepalive(getConfiguration());
+				if(keepalive==null || !keepalive.booleanValue())
+				{
+					killComponent();
+				}
+			}
+			
 			return fut;
 		}
 	}

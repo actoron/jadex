@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -13,14 +14,14 @@ import jadex.micro.annotation.Results;
 /**
  *  Test threaded component execution.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class SimpleBlockingTestAgent
 {
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();

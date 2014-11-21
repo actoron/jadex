@@ -33,8 +33,8 @@ public class PojoInjectionAgent implements IAService
 	@ServiceComponent
 	protected PojoInjectionAgent pojo;
 	
-	@AgentBody(keepalive=false)
-	public void body()
+	@AgentBody
+	public IFuture<Void> body()
 	{
 //		System.out.println("pojo is: "+pojo);
 		TestReport	tr	= new TestReport("#1", "Test if a pojo agent can be injected into a service as servicecomponent.");
@@ -47,6 +47,8 @@ public class PojoInjectionAgent implements IAService
 			tr.setFailed("Service component not set: "+pojo);
 		}
 		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		
+		return IFuture.DONE;
 	}
 	
 	/**

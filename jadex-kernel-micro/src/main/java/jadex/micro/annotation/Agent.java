@@ -21,7 +21,7 @@ public @interface Agent
 	 *  or no body at all this flag can be used to 
 	 *  determine if the agent should be kept alive.
 	 */
-	public boolean keepalive() default true;
+	public Boolean3 keepalive() default Boolean3.NULL;
 	
 	/**
 	 *  Specify if the component should be suspened on creation.

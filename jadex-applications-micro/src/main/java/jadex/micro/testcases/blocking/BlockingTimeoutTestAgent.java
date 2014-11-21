@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.Boolean3;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -20,14 +21,14 @@ import java.util.List;
 /**
  *  Test timeouts in threaded component execution.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class BlockingTimeoutTestAgent
 {
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody
 	public void	execute(IInternalAccess agent)
 	{
 		List<TestReport>	tests	= new ArrayList<TestReport>();

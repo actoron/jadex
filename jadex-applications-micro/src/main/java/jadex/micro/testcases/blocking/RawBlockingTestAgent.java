@@ -7,6 +7,7 @@ import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -15,14 +16,14 @@ import jadex.micro.annotation.Results;
 /**
  *  Test threaded access to raw services.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class RawBlockingTestAgent
 {
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
 		IComponentManagementService	cms	= SServiceProvider.getService(agent,

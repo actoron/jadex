@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -24,7 +25,7 @@ import java.util.List;
 /**
  *  Calls the step service and waits for the intermediate results twice.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @ComponentTypes({
 	@ComponentType(name="block", filename="jadex/micro/testcases/blocking/BlockAgent.class"),
@@ -39,7 +40,7 @@ public class SubscriptionBlockingTestAgent
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
 		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IStepService.class).get();

@@ -764,7 +764,7 @@ public class ComponentManagementService implements IComponentManagementService
 																						// or the parent is already running
 																						if(cinfo.getParent()==null || initinfos.get(cinfo.getParent())==null)
 																						{
-			//																				System.out.println("start: "+cid);
+																							System.out.println("start: "+cid);
 																							resumeComponent(cid, true);//.addResultListener(listener)
 																						}
 																					}

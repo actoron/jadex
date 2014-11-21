@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -26,7 +27,7 @@ import jadex.micro.annotation.Results;
 	@Configuration(name="b")
 })
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
-@Agent(keepalive=false)
+@Agent(keepalive=Boolean3.FALSE)
 public class RequiredServiceConfigurationsAgent
 {
 	@Agent

@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -27,7 +28,7 @@ import java.util.List;
  *  Intermediate results of the step service calls should come interleaved despite
  *  the step component being blocked.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @ComponentTypes({
 	@ComponentType(name="block", filename="jadex/micro/testcases/blocking/BlockAgent.class"),
@@ -42,7 +43,7 @@ public class ComplexBlockingTestAgent
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
 		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IStepService.class).get();

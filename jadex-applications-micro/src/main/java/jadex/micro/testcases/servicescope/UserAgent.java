@@ -9,6 +9,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Boolean3;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -22,7 +23,7 @@ import jadex.micro.annotation.Results;
 
 import java.util.Map;
 
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @RequiredServices(
 {
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
@@ -38,7 +39,7 @@ public class UserAgent
 	/**
 	 * 
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody
 	public void body()
 	{
 		final Testcase tc = new Testcase();
