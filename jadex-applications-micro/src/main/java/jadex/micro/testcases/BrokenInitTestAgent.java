@@ -25,6 +25,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Testing broken init.
  */
+@Agent
 @Description("Testing broken init.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))

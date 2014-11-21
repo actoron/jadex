@@ -223,7 +223,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			if(fut.getException()==null)
 			{
 				Boolean	keepalive	= getModel().getKeepalive(getConfiguration());
-				if(keepalive==null || !keepalive.booleanValue())
+				if(keepalive!=null && !keepalive.booleanValue())
 				{
 					killComponent();
 				}
