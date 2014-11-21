@@ -831,8 +831,7 @@ public class ComponentManagementService implements IComponentManagementService
 																					}
 																					else
 																					{
-																						// Todo: use some logger for user error?
-																						exception.printStackTrace();
+																						logger.info("Starting component failed: "+cid+", "+exception);
 																					}																					
 																				}
 																			}));								

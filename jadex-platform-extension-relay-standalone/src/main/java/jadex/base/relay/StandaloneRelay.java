@@ -46,6 +46,7 @@ public class StandaloneRelay
 		String	storepass	= "jadexrelay";
 		String	keyalias		= "jadexrelaykey";
 		String	keypass		= "jadexrelaypass";
+		boolean	status	= true;
 		
 		for(int i=0; args!=null && i<args.length; i++)
 		{
@@ -73,16 +74,21 @@ public class StandaloneRelay
 			{
 				keypass	= args[i+1];
 			}
+			else if("-status".equals(args[i]) && i+1<args.length)
+			{
+				status	= Boolean.parseBoolean(args[i+1]);
+			}
 			else if("-help".equals(args[i]))
 			{
 				System.out.println("Jadex Standalone Relay Server Version "+VersionInfo.getInstance().getVersion()+" ("+VersionInfo.getInstance().getTextDateString()+")");
 				System.out.println("Supported args:");
 				System.out.println("-port <portnumber>\t(default 80 or 443 when ssl=true)");
-				System.out.println("-ssl <flag>\t\t(true or false, default false)");
+				System.out.println("-ssl <flag>\t\t(enable https, default false)");
 				System.out.println("-keystore <filename>\t(keystore for ssl certificate, default $RELAY_HOME/keystore.jks, will be generated, if not found)");
 				System.out.println("-storepass <password>\t(keystore password)");
 				System.out.println("-keyalias <alias name>\t(name of the certificate)");
 				System.out.println("-keypass <password>\t(password for the key)");
+				System.out.println("-status <flag>\t\t(show status page on web access, default true)");
 				return;
 			}
 		}
@@ -171,6 +177,7 @@ public class StandaloneRelay
 		while(true)
 		{
 			final Socket	client	= server.accept();
+			final boolean	fstatus	= status;
 			new Thread(new Runnable()
 			{
 				public void run()
@@ -279,14 +286,8 @@ public class StandaloneRelay
 						else
 						{
 							// Default page
-							String	html	= getStatusPage(handler);
-							
 							PrintWriter	pw	= new PrintWriter(new OutputStreamWriter(client.getOutputStream(), Charset.forName("UTF-8")));
-							pw.print("HTTP/1.0 200 OK\r\n");
-							pw.print("Content-type: text/html\r\n");
-							pw.println("\r\n");
-							pw.println(html);
-							pw.flush();
+							handleStatusPage(handler, pw, fstatus);
 							client.close();
 						}
 					}
@@ -305,41 +306,50 @@ public class StandaloneRelay
 	/**
 	 *  Create a status page.
 	 */
-	protected static String	getStatusPage(RelayHandler handler)
+	protected static void	handleStatusPage(RelayHandler handler, PrintWriter pw, boolean status)
 	{
-		PeerEntry[]	peers	= handler.getCurrentPeers();
-		PlatformInfo[]	platforms	= handler.getCurrentPlatforms();
+		pw.print("HTTP/1.0 200 OK\r\n");
+		pw.print("Content-type: text/html\r\n");
+		pw.println("\r\n");
 		
-		StringBuffer	buf	= new StringBuffer();
-		buf.append("<html><head><title>Jadex Relay Status Page</title></head><body>\n");
-		buf.append("<h1>Jadex Relay</h1>\n");
-		if(peers!=null && peers.length>0)
+		if(status)
 		{
-			buf.append("<h2>Connected Peers</h2>\n<ul>\n");
-			for(PeerEntry pe: peers)
+			PeerEntry[]	peers	= handler.getCurrentPeers();
+			PlatformInfo[]	platforms	= handler.getCurrentPlatforms();
+			
+			StringBuffer	buf	= new StringBuffer();
+			buf.append("<html><head><title>Jadex Relay Status Page</title></head><body>\n");
+			buf.append("<h1>Jadex Relay</h1>\n");
+			if(peers!=null && peers.length>0)
 			{
-				buf.append("<li><a href=\"");
-				buf.append(pe.getUrl());
-				buf.append("\">");
-				buf.append(pe.getUrl());
-				buf.append("</a></li>");
+				buf.append("<h2>Connected Peers</h2>\n<ul>\n");
+				for(PeerEntry pe: peers)
+				{
+					buf.append("<li><a href=\"");
+					buf.append(pe.getUrl());
+					buf.append("\">");
+					buf.append(pe.getUrl());
+					buf.append("</a></li>");
+				}
+				buf.append("</ul>\n");
 			}
-			buf.append("</ul>\n");
-		}
-		if(platforms!=null && platforms.length>0)
-		{
-			buf.append("<h2>Connected Platforms</h2>\n<ul>\n");
-			for(PlatformInfo pi: platforms)
+			if(platforms!=null && platforms.length>0)
 			{
-				buf.append("<li>");
-				buf.append(pi.getId());
-				buf.append("</li>");
+				buf.append("<h2>Connected Platforms</h2>\n<ul>\n");
+				for(PlatformInfo pi: platforms)
+				{
+					buf.append("<li>");
+					buf.append(pi.getId());
+					buf.append("</li>");
+				}
+				buf.append("</ul>\n");
 			}
-			buf.append("</ul>\n");
+			buf.append("</body></html>");
+			
+			pw.println(buf.toString());
 		}
-		buf.append("</body></html>");
 		
-		return buf.toString();
+		pw.flush();
 	}
 	
 	/**
