@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=IEchoService.class,
-	implementation=@Implementation(expression="$component")))
+	implementation=@Implementation(expression="$pojoagent")))
 @Service
 public class EchoAgent implements IEchoService
 {

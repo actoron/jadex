@@ -25,6 +25,7 @@ import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -179,26 +180,42 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
-	 *  Recursively body the features.
+	 *  Execute feature bodies in parallel.
 	 */
 	protected IFuture<Void>	executeBodyOnFeatures(final Iterator<IComponentFeature> features)
 	{
+		List<IFuture<Void>>	undones	= new ArrayList<IFuture<Void>>();
 		IFuture<Void>	fut	= IFuture.DONE;
-		while(fut.isDone() && fut.getException()==null && features.hasNext())
+		while(fut.getException()==null && features.hasNext())
 		{
 			fut	= features.next().body();
+			if(!fut.isDone())
+			{
+				undones.add(fut);
+			}
 		}
 		
-		if(!fut.isDone())
+		if(fut.getException()==null && !undones.isEmpty())
 		{
 			final Future<Void>	ret	= new Future<Void>();
-			fut.addResultListener(new DelegationResultListener<Void>(ret)
+			IResultListener<Void>	crl	= new CounterResultListener<Void>(undones.size(), new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
-					executeInitOnFeatures(features).addResultListener(new DelegationResultListener<Void>(ret));
+					Boolean	keepalive	= getModel().getKeepalive(getConfiguration());
+					if(keepalive==null || !keepalive.booleanValue())
+					{
+						killComponent();
+					}
+					ret.setResult(null);
 				}
 			});
+			
+			for(IFuture<Void> undone: undones)
+			{
+				undone.addResultListener(crl);
+			}
+			
 			return ret;
 		}
 		else
@@ -208,7 +225,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
-	 *  Recursively shutdown the features.
+	 *  Recursively shutdown the features in inverse order.
 	 */
 	protected IFuture<Void>	executeShutdownOnFeatures(final List<IComponentFeature> features, int cnt)
 	{

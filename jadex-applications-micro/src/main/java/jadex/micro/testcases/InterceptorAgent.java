@@ -35,7 +35,7 @@ import java.util.List;
 @Description("Testing if required services can be equipped with interceptors.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @ProvidedServices(@ProvidedService(name="aservice", type=IAService.class, implementation=
-	@Implementation(expression="$component", interceptors=@Value("$component.provinter"))))
+	@Implementation(expression="$pojoagent", interceptors=@Value("$pojoagent.provinter"))))
 @RequiredServices(@RequiredService(name="aservice", type=IAService.class, 
 	binding=@Binding(scope="local", interceptors=@Value("$component.reqinter"))))
 @Service(IAService.class)

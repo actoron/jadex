@@ -1582,7 +1582,7 @@ public class ComponentManagementService implements IComponentManagementService
 									{
 										public void resultAvailable(Void result)
 										{
-											// Todo: keepalive.
+											// Nop. keepalive is handled by component internally
 										}
 										
 										public void exceptionOccurred(Exception exception)

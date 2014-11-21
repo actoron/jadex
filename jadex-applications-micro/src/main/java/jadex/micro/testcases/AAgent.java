@@ -20,7 +20,7 @@ import java.util.List;
 /**
  *  Simple test agent with one service.
  */
-@ProvidedServices(@ProvidedService(type=IAService.class, implementation=@Implementation(expression="$component")))
+@ProvidedServices(@ProvidedService(type=IAService.class, implementation=@Implementation(expression="$pojoagent")))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IAService.class)
 @Agent

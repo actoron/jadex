@@ -11,17 +11,16 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroModel;
-import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.features.IMicroLifecycleFeature;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -69,41 +68,13 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 		return pojoagent;
 	}
 
-//	/**
-//	 *  The pojoagent to set.
-//	 *  @param pojoagent The pojoagent to set
-//	 */
-//	public void setPojoAgent(Object pojoagent)
-//	{
-//		this.pojoagent = pojoagent;
-//	}
-	
 	/**
 	 *  Initialize the feature.
 	 *  Empty implementation that can be overridden.
 	 */
 	public IFuture<Void> init()
 	{
-		MicroModel	model = (MicroModel)component.getModel().getRawModel();
-		MethodInfo	mi	= model.getAgentMethod(AgentCreated.class);
-		if(mi!=null)
-		{
-			final Future<Void> ret = new Future<Void>();
-			Method	m	= mi.getMethod(component.getClassLoader());
-			invokeMethod(m)
-				.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					ret.setResult(null);
-				}
-			});
-			return ret;
-		}
-		else
-		{
-			return IFuture.DONE;
-		}
+		return invokeMethod(AgentCreated.class);
 	}
 	
 	/**
@@ -112,49 +83,7 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 	 */
 	public IFuture<Void> body()
 	{
-		MicroModel	model = (MicroModel)component.getModel().getRawModel();
-		MethodInfo	mi	= model.getAgentMethod(AgentBody.class);
-		if(mi!=null)
-		{
-			final Future<Void> ret = new Future<Void>();
-			final Method	m	= mi.getMethod(component.getClassLoader());
-			invokeMethod(m)
-				.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					// Only end body if future or void and kill is true 
-					boolean kill = false;
-					if(SReflect.isSupertype(IFuture.class, m.getReturnType()))
-					{
-						kill = true;
-					}
-					else if(void.class.equals(m.getReturnType()))
-					{
-						AgentBody ab = m.getAnnotation(AgentBody.class);
-						kill = !ab.keepalive();
-					}
-					
-					if(kill)
-					{
-						ret.setResult(null);
-					}
-				}
-			});
-			return ret;
-		}
-		else
-		{
-			Agent ag = getPojoAgent().getClass().getAnnotation(Agent.class);
-			if(!ag.keepalive())
-			{
-				return IFuture.DONE;
-			}
-			else
-			{
-				return new Future<Void>();
-			}
-		}
+		return invokeMethod(AgentBody.class);
 	}
 
 	/**
@@ -163,72 +92,62 @@ public class MicroLifecycleFeature extends	AbstractComponentFeature implements I
 	 */
 	public IFuture<Void> shutdown()
 	{
+		return invokeMethod(AgentKilled.class);
+	}
+	
+	/**
+	 *  Invoke an agent method by injecting required arguments.
+	 */
+	protected IFuture<Void> invokeMethod(Class<? extends Annotation> ann)
+	{
 		MicroModel	model = (MicroModel)component.getModel().getRawModel();
-		MethodInfo	mi	= model.getAgentMethod(AgentKilled.class);
+		MethodInfo	mi	= model.getAgentMethod(ann);
 		if(mi!=null)
 		{
 			final Future<Void> ret = new Future<Void>();
-			Method	m	= mi.getMethod(component.getClassLoader());
-			invokeMethod(m)
-				.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+			Method	method	= mi.getMethod(component.getClassLoader());
+			
+			// Try to guess parameters as internal or external access.
+			// Todo: other injections...
+			Object[]	args	= new Object[method.getParameterTypes().length];
+			for(int i=0; i<method.getParameterTypes().length; i++)
 			{
-				public void customResultAvailable(Object result)
+				Class<?>	clazz	= method.getParameterTypes()[i];
+				if(SReflect.isSupertype(clazz, IInternalAccess.class))
+				{
+					args[i]	= getComponent();
+				}
+				else if(SReflect.isSupertype(clazz, IExternalAccess.class))
+				{
+					args[i]	= getComponent().getExternalAccess();
+				}
+			}
+			
+			try
+			{
+				Object res = method.invoke(getPojoAgent(), args);
+				if(res instanceof IFuture)
+				{
+					((IFuture<Void>)res).addResultListener(createResultListener(
+						new DelegationResultListener<Void>(ret)));
+				}
+				else
 				{
 					ret.setResult(null);
 				}
-			});
+			}
+			catch(Exception e)
+			{
+				e = (Exception)(e instanceof InvocationTargetException && ((InvocationTargetException)e)
+					.getTargetException() instanceof Exception? ((InvocationTargetException)e).getTargetException(): e);
+				ret.setException(e);
+			}
 			return ret;
 		}
 		else
 		{
 			return IFuture.DONE;
 		}
-	}
-	
-	/**
-	 *  Invoke an agent method by injecting required arguments.
-	 */
-	protected IFuture<Object> invokeMethod(Method method)
-	{
-		final Future<Object> ret = new Future<Object>();
-		
-		// Try to guess parameters as internal or external access.
-		// Todo: other injections...
-		Object[]	args	= new Object[method.getParameterTypes().length];
-		for(int i=0; i<method.getParameterTypes().length; i++)
-		{
-			Class<?>	clazz	= method.getParameterTypes()[i];
-			if(SReflect.isSupertype(clazz, IInternalAccess.class))
-			{
-				args[i]	= getComponent();
-			}
-			else if(SReflect.isSupertype(clazz, IExternalAccess.class))
-			{
-				args[i]	= getComponent().getExternalAccess();
-			}
-		}
-		
-		try
-		{
-			Object res = method.invoke(getPojoAgent(), args);
-			if(res instanceof IFuture)
-			{
-				((IFuture<Object>)res).addResultListener(createResultListener(
-					new DelegationResultListener<Object>(ret)));
-			}
-			else
-			{
-				ret.setResult(res);
-			}
-		}
-		catch(Exception e)
-		{
-			e = (Exception)(e instanceof InvocationTargetException && ((InvocationTargetException)e)
-				.getTargetException() instanceof Exception? ((InvocationTargetException)e).getTargetException(): e);
-			ret.setException(e);
-		}
-		
-		return ret;
 	}
 	
 	/**

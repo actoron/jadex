@@ -209,17 +209,24 @@ public interface IModelInfo
 
 	/**
 	 *  Get the synchronous flag.
-	 *  @param synchronous The synchronous.
+	 *  @param configname The configname.
 	 *  @return The synchronous flag value.
 	 */
 	public Boolean getSynchronous(String configname);
 	
 	/**
 	 *  Get the persistable flag.
-	 *  @param persistable The persistable.
+	 *  @param configname The configname.
 	 *  @return The persistable flag value.
 	 */
 	public Boolean getPersistable(String configname);
+	
+	/**
+	 *  Get the keepalive flag.
+	 *  @param configname The configname.
+	 *  @return The keepalive flag value.
+	 */
+	public Boolean getKeepalive(String configname);
 	
 	/**
 	 *  Get the monitoring flag.

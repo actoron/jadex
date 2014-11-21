@@ -15,6 +15,9 @@ public class Startable
 	/** The suspend flag. */
 	private Boolean suspend;
 	
+	/** The keepalive flag. */
+	private Boolean keepalive;
+	
 	/** The master flag. */
 	private Boolean master;
 	
@@ -123,6 +126,24 @@ public class Startable
 	public void setSuspend(Boolean suspend)
 	{
 		this.suspend = suspend;
+	}
+	
+	/**
+	 *  Get the keepalive.
+	 *  @return the keepalive.
+	 */
+	public Boolean getKeepalive()
+	{
+		return keepalive;
+	}
+
+	/**
+	 *  Set the keepalive.
+	 *  @param keepalive The keepalive to set.
+	 */
+	public void setKeepalive(Boolean keepalive)
+	{
+		this.keepalive = keepalive;
 	}
 	
 	/**

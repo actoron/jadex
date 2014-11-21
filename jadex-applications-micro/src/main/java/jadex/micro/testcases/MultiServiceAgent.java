@@ -26,8 +26,8 @@ import jadex.micro.testcases.semiautomatic.compositeservice.ISubService;
  *  Test implementation of multiple services in a single agent.
  */
 @ProvidedServices({
-	@ProvidedService(type=IAddService.class, implementation=@Implementation(expression="$component")),
-	@ProvidedService(type=ISubService.class, implementation=@Implementation(expression="$component"))
+	@ProvidedService(type=IAddService.class, implementation=@Implementation(expression="$pojoagent")),
+	@ProvidedService(type=ISubService.class, implementation=@Implementation(expression="$pojoagent"))
 })
 @RequiredServices({
 	@RequiredService(name="add", type=IAddService.class),

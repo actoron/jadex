@@ -12,6 +12,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -24,11 +25,12 @@ import java.util.List;
 /**
  *  Simple test agent with one service.
  */
-@ProvidedServices(@ProvidedService(type=IBService.class, implementation=@Implementation(expression="$component")))
+@ProvidedServices(@ProvidedService(type=IBService.class, implementation=@Implementation(expression="$pojoagent")))
 //@Results(@Result(name="exception", typename="Exception"))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IBService.class)
-public class BAgent implements IBService // extends MicroAgent
+@Agent
+public class BAgent implements IBService
 {
 	@ServiceComponent
 	protected IInternalAccess agent;

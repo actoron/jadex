@@ -824,6 +824,22 @@ public class ModelInfo extends Startable implements IModelInfo
 //		return suspend==null? null: (Boolean)suspend.getValue(configname);
 	}
 	
+	/**
+	 *  Get the keepalive flag.
+	 *  @param configname The configname.
+	 *  @return The keepalive flag value.
+	 */
+	public Boolean getKeepalive(String configname)
+	{
+		Boolean ret = null;
+		ConfigurationInfo config = getConfiguration(configname);
+		if(config!=null)
+			ret = config.getKeepalive();
+		if(ret==null)
+			ret = super.getKeepalive();
+		return ret;
+	}
+
 //	/**
 //	 *  Get the monitoring flag.
 //	 *  @param configname The configname.

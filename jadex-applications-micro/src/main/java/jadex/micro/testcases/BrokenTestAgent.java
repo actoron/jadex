@@ -108,7 +108,6 @@ public class BrokenTestAgent
 							protected void next()
 							{
 								agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
-//								killAgent();
 								ret.setResult(null);
 							}
 						}));
@@ -156,12 +155,12 @@ public class BrokenTestAgent
 				});
 				
 				cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), lis)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
 					}
-				}));
+				});
 			}
 		});
 		return ret;
