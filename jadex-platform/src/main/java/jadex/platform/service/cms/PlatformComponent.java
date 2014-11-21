@@ -34,6 +34,8 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.kernelbase.ExternalAccess;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -53,12 +55,6 @@ import java.util.logging.SimpleFormatter;
  */
 public class PlatformComponent implements IPlatformComponentAccess, IInternalAccess
 {
-//	//-------- constants -------- 
-//	
-//	/** The currently executing component (if any). */
-//	// Provided for fast caller/callee context-switching avoiding to use cms.
-//	public static final ThreadLocal<IInternalAccess>	LOCAL	= new ThreadLocal<IInternalAccess>();
-//	
 	//-------- attributes --------
 	
 	/** The creation info. */
@@ -156,20 +152,12 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	protected IFuture<Void>	executeInitOnFeatures(final Iterator<IComponentFeature> features)
 	{
 		IFuture<Void>	fut	= IFuture.DONE;
-		while(fut.isDone() && features.hasNext())
+		while(fut.isDone() && fut.getException()==null && features.hasNext())
 		{
-			try
-			{
-				IComponentFeature	cf	= features.next();
-				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
-				fut	= cf.init();
-			}
-			catch(RuntimeException e)
-			{
-				Thread.dumpStack();
-				e.printStackTrace();
-				fut	= new Future<Void>(e);
-			}
+			IComponentFeature	cf	= features.next();
+//			if(getComponentIdentifier().getName().indexOf("kernels")!=-1)
+//				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
+			fut	= cf.init();
 		}
 		
 		if(!fut.isDone())
@@ -186,7 +174,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		else
 		{
-			return IFuture.DONE;
+			return fut;
 		}
 	}
 	
@@ -196,7 +184,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	protected IFuture<Void>	executeBodyOnFeatures(final Iterator<IComponentFeature> features)
 	{
 		IFuture<Void>	fut	= IFuture.DONE;
-		while(fut.isDone() && features.hasNext())
+		while(fut.isDone() && fut.getException()==null && features.hasNext())
 		{
 			fut	= features.next().body();
 		}
@@ -215,7 +203,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		else
 		{
-			return IFuture.DONE;
+			return fut;
 		}
 	}
 	
@@ -227,6 +215,13 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		IFuture<Void>	fut	= IFuture.DONE;
 		while(fut.isDone() && cnt<features.size())
 		{
+			if(fut.getException()!=null)
+			{
+				StringWriter	sw	= new StringWriter();
+				fut.getException().printStackTrace(new PrintWriter(sw));
+				getLogger().warning("Exception during component cleanup of "+getComponentIdentifier()+": "+fut.getException());
+				getLogger().info(sw.toString());
+			}
 			fut	= features.get(features.size()-cnt-1).shutdown();
 			cnt++;
 		}
@@ -235,10 +230,20 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			final int	fcnt	= cnt;
 			final Future<Void>	ret	= new Future<Void>();
-			fut.addResultListener(new DelegationResultListener<Void>(ret)
+			fut.addResultListener(new IResultListener<Void>()
 			{
-				public void customResultAvailable(Void result)
+				public void resultAvailable(Void result)
 				{
+					executeShutdownOnFeatures(features, fcnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					StringWriter	sw	= new StringWriter();
+					exception.printStackTrace(new PrintWriter(sw));
+					getLogger().warning("Exception during component cleanup of "+getComponentIdentifier()+": "+exception);
+					getLogger().info(sw.toString());
+					
 					executeShutdownOnFeatures(features, fcnt+1).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});

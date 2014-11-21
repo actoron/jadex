@@ -75,6 +75,32 @@ public interface IRequiredServicesFeature
 	 */
 	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind);
 	
+//	/**
+//	 *  Get a required service of a given name.
+//	 *  @param name The service name.
+//	 *  @return The service.
+//	 */
+//	public <T> T getLocalRequiredService(String name);
+//	
+//	/**
+//	 *  Get a required services of a given name.
+//	 *  @param name The services name.
+//	 *  @return Each service as an intermediate result and a collection of services as final result.
+//	 */
+//	public <T> T getLocalRequiredServices(String name);
+//	
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public <T> T getLocalRequiredService(String name, boolean rebind);
+//	
+//	/**
+//	 *  Get a required services.
+//	 *  @return Each service as an intermediate result and a collection of services as final result.
+//	 */
+//	public <T> T getLocalRequiredServices(String name, boolean rebind);
+	
 	/**
 	 *  Get a required service.
 	 *  @return The service.

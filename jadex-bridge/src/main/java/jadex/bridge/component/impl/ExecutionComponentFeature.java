@@ -3,6 +3,7 @@ package jadex.bridge.component.impl;
 import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IntermediateComponentResultListener;
@@ -11,11 +12,14 @@ import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.ComponentSuspendable;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
@@ -23,9 +27,11 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISuspendable;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -36,7 +42,7 @@ import java.util.logging.Logger;
 /**
  *  This feature provides component step execution.
  */
-public class ExecutionComponentFeature	extends	AbstractComponentFeature implements IExecutionFeature, IExecutable
+public class ExecutionComponentFeature	extends	AbstractComponentFeature implements IExecutionFeature, IInternalExecutionFeature, IExecutable
 {
 	//-------- attributes --------
 	
@@ -51,6 +57,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/** Retained listener notifications when switching threads due to blocking. */
 	protected List<Tuple2<Future<?>, IResultListener<?>>>	notifications;
+	
+	/** Flag for testing double execution. */
+	protected volatile boolean executing;
+	
+	/** The thread currently executing the component (null for none). */
+	protected Thread componentthread;
 	
 	//-------- constructors --------
 	
@@ -336,8 +348,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public boolean isComponentThread()
 	{
-		// Todo
-		return true;
+		return Thread.currentThread()==componentthread || 
+			IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState())
+				&& Starter.isRescueThread(getComponent().getComponentIdentifier());
 	}
 	
 	/**
@@ -366,6 +379,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public void	block(final Object monitor, long timeout)
 	{
+		throw new UnsupportedOperationException();
 		// todo...
 		
 //		if(!isComponentThread())
@@ -505,6 +519,148 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public boolean execute()
 	{
+		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(getComponent()));
+		
+		synchronized(this)
+		{
+			if(executing)
+			{
+				System.err.println(getComponent().getComponentIdentifier()+": double execution"+" "+Thread.currentThread()+" "+componentthread);
+				new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
+			}
+			executing	= true;
+		}
+
+		// Todo: termination and exception!?
+//		// Note: wakeup() can be called from arbitrary threads (even when the
+//		// component itself is currently running. I.e. it cannot be ensured easily
+//		// that an execution task is enqueued and the component has terminated
+//		// meanwhile.
+//		if(!IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()))
+//		{
+//			if(exception!=null)
+//			{
+//				this.executing	= false;
+//				return false;	// Component already failed: tell executor not to call again. (can happen during failed init)
+//			}
+	
+			// Remember execution thread.
+			this.componentthread	= Thread.currentThread();
+			IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
+			IInternalExecutionFeature.LOCAL.set(getComponent());
+			ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(component.getClassLoader());
+			
+			// Process listener notifications from old component thread.
+			boolean notifexecuted	= false;
+			if(notifications!=null)
+			{
+				FutureHelper.addStackedListeners(notifications);
+				notifications	= null;
+				
+				// Todo: termination and exception!?
+//				try
+				{
+					FutureHelper.notifyStackedListeners();
+					notifexecuted	= true;
+				}
+//				catch(Exception e)
+//				{
+//					fatalError(e);
+//				}
+//				catch(StepAborted sa)
+//				{
+//				}
+//				catch(Throwable t)
+//				{
+//					fatalError(new RuntimeException(t));
+//				}
+
+			}
+	
+			// Todo: breakpoints
+//			// Suspend when breakpoint is triggered.
+//			// Necessary because component wakeup could be called anytime even if is at breakpoint..
+//			boolean	breakpoint_triggered	= false;
+//			if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+//			{
+//				if(component.isAtBreakpoint(desc.getBreakpoints()))
+//				{
+//					breakpoint_triggered	= true;
+//					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>(logger)
+//					{
+//						public void resultAvailable(IComponentManagementService cms)
+//						{
+//							cms.suspendComponent(desc.getName());
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							if(!(exception instanceof ComponentTerminatedException))
+//							{
+//								super.exceptionOccurred(exception);
+//							}
+//						}
+//					});
+//				}
+//			}
+//			
+//			boolean	again	= false;
+//			if(!breakpoint_triggered && !extexecuted  && !notifexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
+//			{
+//				try
+//				{
+////					if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+////						System.out.println("Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
+//					again	= component.executeStep();
+////					if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+////						System.out.println("Not Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
+//				}
+//				catch(Exception e)
+//				{
+//					fatalError(e);
+//				}
+//				catch(StepAborted sa)
+//				{
+//				}
+//				catch(Throwable t)
+//				{
+//					fatalError(new RuntimeException(t));
+//				}
+//				if(dostep)
+//				{
+//					dostep	= false;
+//					if(stepfuture!=null)
+//					{
+//						stepfuture.setResult(null);
+//					}
+//				}
+//				
+//				// Suspend when breakpoint is triggered.
+//				if(!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+//				{
+//					if(component.isAtBreakpoint(desc.getBreakpoints()))
+//					{
+//						breakpoint_triggered	= true;
+//						getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>(logger)
+//						{
+//							public void resultAvailable(IComponentManagementService cms)
+//							{
+//								cms.suspendComponent(desc.getName());
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								if(!(exception instanceof ComponentTerminatedException))
+//								{
+//									super.exceptionOccurred(exception);
+//								}
+//							}
+//						});
+//					}
+//				}
+//			}
+			
 		Tuple2<IComponentStep<?>, Future<?>>	step	= null;
 		synchronized(this)
 		{
@@ -542,6 +698,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			again	= false;
 		}
+		
+		// Reset execution state.
+		IComponentIdentifier.LOCAL.set(null);
+		IInternalExecutionFeature.LOCAL.set(null);
+		// Must reset service call settings when thread retreats from components
+		CallAccess.resetCurrentInvocation();
+		CallAccess.resetNextInvocation();
+		Thread.currentThread().setContextClassLoader(cl);
+		this.componentthread = null;
+		executing	= false;
+		ISuspendable.SUSPENDABLE.set(null);
+
 		
 		return again;
 	}

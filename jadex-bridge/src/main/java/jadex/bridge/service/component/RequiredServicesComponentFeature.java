@@ -227,6 +227,52 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		return getRequiredServices(name, rebind, null);
 	}
 	
+//	/**
+//	 *  Get a required service of a given name.
+//	 *  @param name The service name.
+//	 *  @return The service.
+//	 */
+//	public <T> T getLocalRequiredService(String name)
+//	{
+//		return getLocalRequiredService(name, false);
+//	}
+//	
+//	/**
+//	 *  Get a required services of a given name.
+//	 *  @param name The services name.
+//	 *  @return Each service as an intermediate result and a collection of services as final result.
+//	 */
+//	public <T> T getLocalRequiredServices(String name)
+//	{
+//		return getLocalRequiredServices(name, false);
+//	}
+//	
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public <T> T getLocalRequiredService(String name, boolean rebind)
+//	{
+//		RequiredServiceInfo info = getRequiredServiceInfo(name);
+//		if(info==null)
+//		{
+//			throw new ServiceNotFoundException(name);
+//		}
+//	}
+//	
+//	/**
+//	 *  Get a required services.
+//	 *  @return Each service as an intermediate result and a collection of services as final result.
+//	 */
+//	public <T> T getLocalRequiredServices(String name, boolean rebind)
+//	{
+//		RequiredServiceInfo info = getRequiredServiceInfo(name);
+//		if(info==null)
+//		{
+//			throw new ServiceNotFoundException(name);
+//		}
+//	}
+
 	/**
 	 *  Get a required services.
 	 *  @return The services.
@@ -261,29 +307,29 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			new MultiServiceInvocationHandler(getComponent(), reqname, multitype));
 	}
 	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
-	{
-		return getRequiredService(info, binding, false, (IAsyncFilter)null);
-	}
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
+//	{
+//		return getRequiredService(info, binding, false, (IAsyncFilter)null);
+//	}
+	
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+//	{
+//		return getRequiredService(info, binding, rebind, null);
+//	}
 	
 	/**
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
-	{
-		return getRequiredService(info, binding, rebind, null);
-	}
-	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
+	protected <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
 	{
 //		if(shutdowned)
 //		{
@@ -311,29 +357,29 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
 	}
 	
-	/**
-	 *  Get required services.
-	 *  @return The services.
-	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
-	{
-		return getRequiredServices(info, binding, false, (IAsyncFilter)null);
-	}
+//	/**
+//	 *  Get required services.
+//	 *  @return The services.
+//	 */
+//	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
+//	{
+//		return getRequiredServices(info, binding, false, (IAsyncFilter)null);
+//	}
+	
+//	/**
+//	 *  Get required services.
+//	 *  @return The services.
+//	 */
+//	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+//	{
+//		return getRequiredServices(info, binding, rebind, null);
+//	}
 	
 	/**
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
-	{
-		return getRequiredServices(info, binding, rebind, null);
-	}
-	
-	/**
-	 *  Get required services.
-	 *  @return The services.
-	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
+	protected <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
 	{
 //		if(shutdowned)
 //		{
@@ -353,25 +399,25 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		return (ITerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
 	}
 	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, IAsyncFilter<T> filter)
-	{
-		IFuture<T> ret = getRequiredService(info, binding, false, filter);
-		return ret;
-//		return getRequiredService(info, binding, false, filter);
-	}
+//	/**
+//	 *  Get a required service.
+//	 *  @return The service.
+//	 */
+//	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, IAsyncFilter<T> filter)
+//	{
+//		IFuture<T> ret = getRequiredService(info, binding, false, filter);
+//		return ret;
+////		return getRequiredService(info, binding, false, filter);
+//	}
 	
-	/**
-	 *  Get required services.
-	 *  @return The services.
-	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, IAsyncFilter<T> filter)
-	{
-		return getRequiredServices(info, binding, false, filter);
-	}
+//	/**
+//	 *  Get required services.
+//	 *  @return The services.
+//	 */
+//	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, IAsyncFilter<T> filter)
+//	{
+//		return getRequiredServices(info, binding, false, filter);
+//	}
 	
 	/**
 	 *  Get a required service.

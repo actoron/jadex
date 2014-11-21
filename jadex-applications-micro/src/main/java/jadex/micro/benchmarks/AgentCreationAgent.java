@@ -248,7 +248,14 @@ public class AgentCreationAgent
 	public static void main(String[] args)
 	{
 		ThreadSuspendable sus = new ThreadSuspendable();
-		IExternalAccess ea = Starter.createPlatform(new String[]{"-gui", "false", "-extensions", "null", "-cli", "false"}).get(sus);
+		IExternalAccess ea = Starter.createPlatform(new String[]
+		{
+//			"-logging", "true",
+			"-gui", "false",
+			"-extensions", "null",
+			"-cli", "false",
+//			"-awareness", "false"
+		}).get(sus);
 		IComponentManagementService cms = SServiceProvider.getService(ea, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
 		cms.createComponent(AgentCreationAgent.class.getName()+".class", null).get(sus);
 	}

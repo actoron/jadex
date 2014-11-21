@@ -444,49 +444,6 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 		{
 			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
 		}
-		else if(!ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
-		{
-//			try
-//			{
-//				adapter.invokeLater(new Runnable() 
-//				{
-//					public void run() 
-//					{
-//						// Hack!!! Should not be called after termination.
-//						if(!valid)
-//						{
-//							ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-//						}
-//						else
-//						{
-//							IFuture<T>	fut	= ia.scheduleStep(step);
-//							FutureFunctionality.connectDelegationFuture(ret, fut);
-//						}
-//							
-//					}
-//				});
-//			}
-//			catch(final Exception e)
-//			{
-//				// Allow executing steps on platform during (and after?) shutdown.
-//				if(cid.getParent()==null)
-//				{
-//					Starter.scheduleRescueStep(cid, new Runnable()
-//					{
-//						public void run()
-//						{
-//							IFuture<T>	fut	= step.execute(ia.getInternalAccess());
-//							FutureFunctionality.connectDelegationFuture(ret, fut);
-//						}
-//					});					
-//				}
-//				
-//				else
-//				{
-//					ret.setException(e);
-//				}
-//			}
-		}
 		else
 		{
 			IFuture<T>	fut	= ia.getComponentFeature(IExecutionFeature.class).scheduleStep(step);

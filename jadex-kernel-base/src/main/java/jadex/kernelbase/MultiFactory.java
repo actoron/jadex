@@ -6,7 +6,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -218,201 +217,142 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 		};
 		
-		SServiceProvider.getService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+		libservice	= SServiceProvider.getLocalService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		
+		final IExternalAccess exta = ia.getExternalAccess();
+		liblistener = new ILibraryServiceListener()
+		{
+			public IFuture resourceIdentifierRemoved(IResourceIdentifier parid, final IResourceIdentifier rid)
+			{
+				exta.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						URI uri = rid.getLocalIdentifier().getUri();
+						Collection affectedkernels = (Collection)kerneluris.remove(uri);
+						if (affectedkernels != null)
+						{
+							String[] keys = (String[]) kernellocationcache.keySet().toArray(new String[0]);
+							for(int i = 0; i < keys.length; ++i)
+							{
+								for(Iterator it = affectedkernels.iterator(); it.hasNext(); )
+								{
+//											System.out.println("rid removed: "+uri+", "+keys[i]);
+									kernellocationcache.removeObject(keys[i], it.next());
+								}
+							}
+						}
+						potentialuris.remove(uri);
+						validuris.remove(uri);
+						return IFuture.DONE;
+					}
+				});
+				return IFuture.DONE;
+			}
+			
+			public IFuture resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
+			{
+				final URI uri = rid.getLocalIdentifier().getUri();
+				String regex = (String) ia.getComponentFeature(IArgumentsFeature.class).getArguments().get("kerneluriregex");
+				if (Pattern.matches(regex!=null ? regex : "", uri.toString()))
+				{
+					exta.scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+//									extensionblacklist = new HashSet(baseextensionblacklist);
+							validuris.add(uri);
+							potentialuris.add(uri);
+							return IFuture.DONE;
+						}
+					});
+				}
+				return IFuture.DONE;
+			}
+		};
+		
+		libservice.addLibraryServiceListener(liblistener);
+		
+		libservice.getAllURLs().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				libservice = (ILibraryService)result;
-				final IExternalAccess exta = ia.getExternalAccess();
-				liblistener = new ILibraryServiceListener()
-				{
-					public IFuture resourceIdentifierRemoved(IResourceIdentifier parid, final IResourceIdentifier rid)
-					{
-						exta.scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								URI uri = rid.getLocalIdentifier().getUri();
-								Collection affectedkernels = (Collection)kerneluris.remove(uri);
-								if (affectedkernels != null)
-								{
-									String[] keys = (String[]) kernellocationcache.keySet().toArray(new String[0]);
-									for(int i = 0; i < keys.length; ++i)
-									{
-										for(Iterator it = affectedkernels.iterator(); it.hasNext(); )
-										{
-//											System.out.println("rid removed: "+uri+", "+keys[i]);
-											kernellocationcache.removeObject(keys[i], it.next());
-										}
-									}
-								}
-								potentialuris.remove(uri);
-								validuris.remove(uri);
-								return IFuture.DONE;
-							}
-						});
-						return IFuture.DONE;
-					}
-					
-					public IFuture resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
-					{
-						final URI uri = rid.getLocalIdentifier().getUri();
-						String regex = (String) ia.getComponentFeature(IArgumentsFeature.class).getArguments().get("kerneluriregex");
-						if (Pattern.matches(regex!=null ? regex : "", uri.toString()))
-						{
-							exta.scheduleStep(new IComponentStep<Void>()
-							{
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-//									extensionblacklist = new HashSet(baseextensionblacklist);
-									validuris.add(uri);
-									potentialuris.add(uri);
-									return IFuture.DONE;
-								}
-							});
-						}
-						return IFuture.DONE;
-					}
-				};
+				String regexstr = (String) ia.getComponentFeature(IArgumentsFeature.class).getArguments().get("kerneluriregex");
+				Pattern regex = Pattern.compile(regexstr!=null ? regexstr : "");
 				
-				libservice.addLibraryServiceListener(liblistener);
-				
-				libservice.getAllURLs().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						String regexstr = (String) ia.getComponentFeature(IArgumentsFeature.class).getArguments().get("kerneluriregex");
-						Pattern regex = Pattern.compile(regexstr!=null ? regexstr : "");
-						
 //						potentialurls.addAll();
 //						validurls.addAll((Collection) result);
-						
-						if (result != null)
+				
+				if (result != null)
+				{
+					for (URL url : ((Collection<URL>) result))
+					{
+						try
 						{
-							for (URL url : ((Collection<URL>) result))
+							URI uri = url.toURI();
+							if (regex.matcher(uri.toString()).matches())
 							{
-								try
-								{
-									URI uri = url.toURI();
-									if (regex.matcher(uri.toString()).matches())
-									{
-										potentialuris.add(uri);
-										validuris.add(uri);
-									}
-								}
-								catch (URISyntaxException e)
-								{
-								}
-								
+								potentialuris.add(uri);
+								validuris.add(uri);
 							}
 						}
+						catch (URISyntaxException e)
+						{
+						}
 						
-						// Sort uris (for repeatability during debugging)
+					}
+				}
+				
+				// Sort uris (for repeatability during debugging)
 //						List	tmp	= new ArrayList(potentialuris);
 //						Collections.sort(tmp);
 //						potentialuris.clear();
 //						potentialuris.addAll(tmp);
-						
-						if(kerneldefaultlocations.isEmpty())
-							ret.setResult(null);
-						else
-						{
-							// Initialize default locations
+				
+				if(kerneldefaultlocations.isEmpty())
+					ret.setResult(null);
+				else
+				{
+					// Initialize default locations
 //							String[] dl = (String[])kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
-							String[] dl = kerneldefaultlocations.get(null) == null? new String[0] : (String[]) ((Collection) kerneldefaultlocations.get(null)).toArray(new String[kerneldefaultlocations.size()]);
-							kerneldefaultlocations.clear();
-							IResultListener loccounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-								new CounterResultListener(dl.length, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+					String[] dl = kerneldefaultlocations.get(null) == null? new String[0] : (String[]) ((Collection) kerneldefaultlocations.get(null)).toArray(new String[kerneldefaultlocations.size()]);
+					kerneldefaultlocations.clear();
+					IResultListener loccounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
+						new CounterResultListener(dl.length, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							ret.setResult(null);
+						}
+					}))
+					{
+						public void intermediateResultAvailable(Object result)
+						{
+							final IModelInfo kernel = (IModelInfo) result;
+							libservice.getClassLoader(kernel.getResourceIdentifier())
+								.addResultListener(new IResultListener<ClassLoader>()
 							{
-								public void customResultAvailable(Object result)
+								public void resultAvailable(ClassLoader result)
 								{
-									ret.setResult(null);
+									String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS, result);
+									if (exts != null)
+										for (int i = 0; i < exts.length; ++i)
+											kerneldefaultlocations.put(exts[i], kernel.getFilename());
 								}
-							}))
-							{
-								public void intermediateResultAvailable(Object result)
+								public void exceptionOccurred(Exception exception)
 								{
-									final IModelInfo kernel = (IModelInfo) result;
-									libservice.getClassLoader(kernel.getResourceIdentifier())
-										.addResultListener(new IResultListener<ClassLoader>()
-									{
-										public void resultAvailable(ClassLoader result)
-										{
-											String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS, result);
-											if (exts != null)
-												for (int i = 0; i < exts.length; ++i)
-													kerneldefaultlocations.put(exts[i], kernel.getFilename());
-										}
-										public void exceptionOccurred(Exception exception)
-										{
-											// Todo: log warning!?
-										}
-									});
+									// Todo: log warning!?
 								}
 							});
-							
-							for(int i = 0; i < dl.length; ++i)
-								loadModel(dl[i], null, null).addResultListener(loccounter);
 						}
-					}
-				}));
-				
-//				libservice.getAllResourceIdentifiers().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						List col = new ArrayList();
-//						for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
-//						{
-//							col.add(((IResourceIdentifier)it.next()).getLocalIdentifier().getSecondEntity());
-//						}
-//						potentialurls.addAll(col);
-//						validurls.addAll(col);
-//						
-//						if(kerneldefaultlocations.isEmpty())
-//							ret.setResult(null);
-//						else
-//						{
-//							// Initialize default locations
-//							String[] dl = (String[])kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
-//							kerneldefaultlocations.clear();
-//							IResultListener loccounter = ia.createResultListener(new CounterResultListener(dl.length, ia.createResultListener(new DelegationResultListener(ret)
-//							{
-//								public void customResultAvailable(Object result)
-//								{
-//									ret.setResult(null);
-//								}
-//							}))
-//							{
-//								public void intermediateResultAvailable(Object result)
-//								{
-//									final IModelInfo kernel = (IModelInfo) result;
-//									libservice.getClassLoader(kernel.getResourceIdentifier())
-//										.addResultListener(new IResultListener<ClassLoader>()
-//									{
-//										public void resultAvailable(ClassLoader result)
-//										{
-//											String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS, result);
-//											if (exts != null)
-//												for (int i = 0; i < exts.length; ++i)
-//													kerneldefaultlocations.put(exts[i], kernel.getFilename());
-//										}
-//										public void exceptionOccurred(Exception exception)
-//										{
-//											// Todo: log warning!?
-//										}
-//									});
-//								}
-//							});
-//							
-//							for(int i = 0; i < dl.length; ++i)
-//								loadModel(dl[i], null, null).addResultListener(loccounter);
-//						}
-//					}
-//				}));
+					});
+					
+					for(int i = 0; i < dl.length; ++i)
+						loadModel(dl[i], null, null).addResultListener(loccounter);
+				}
 			}
 		}));
+				
 		
 		return ret;
 	}
