@@ -10,6 +10,7 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.wrappers.MapWrapper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -103,7 +104,23 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		
 		// Hack?! add component identifier to result as long as we don't have better future type for results
 		// could one somehow use the CallLocal for that purpose instead?
-		this.results	= new LinkedHashMap<String, Object>();
+		this.results	= new MapWrapper<String, Object>(new LinkedHashMap<String, Object>())
+		{
+			protected void entryAdded(String key, Object value)
+			{
+				postEvent(key, value);
+			}
+
+			protected void entryRemoved(String key, Object value)
+			{
+				postEvent(key, null);
+			}
+
+			protected void entryChanged(String key, Object oldvalue, Object newvalue)
+			{
+				postEvent(key, newvalue);
+			}
+		};
 		results.put(IComponentIdentifier.RESULTCID, getComponent().getComponentIdentifier());
 		
 		if(ci!=null)
@@ -173,7 +190,7 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	 */
 	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
 	{
-		if(resfuts!=null)
+		if(resfuts==null)
 		{
 			resfuts	= new LinkedHashSet<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();
 		}
@@ -201,5 +218,22 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 			}
 		});
 		return ret;
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Post an event to subscribed listeners.
+	 */
+	protected void	postEvent(String result, Object value)
+	{
+		if(resfuts!=null)
+		{
+			Tuple2<String, Object>	event	= new Tuple2<String, Object>(result, value);
+			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)
+			{
+				fut.addIntermediateResultIfUndone(event);
+			}
+		}
 	}
 }

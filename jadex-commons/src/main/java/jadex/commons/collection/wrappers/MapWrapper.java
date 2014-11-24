@@ -1,71 +1,30 @@
-package jadex.bdiv3.runtime.wrappers;
-
-import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.commons.IResultCommand;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.rules.eca.ChangeInfo;
-import jadex.rules.eca.Event;
-import jadex.rules.eca.EventType;
-import jadex.rules.eca.IEvent;
-import jadex.rules.eca.RuleSystem;
+package jadex.commons.collection.wrappers;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ * 	Wrap a map and call template methods on modification.
  */
-public class MapWrapper<T, E> implements Map<T, E>
+public abstract class MapWrapper<T, E> implements Map<T, E>
 {
+	//-------- attributes --------
+	
 	/** The delegate map. */
 	protected Map<T, E> delegate;
 	
-	/** The interpreter. */
-	protected BDIAgentInterpreter interpreter;
-	
-	/** The add event name. */
-	protected EventType addevent;
-	
-	/** The remove event name. */
-	protected EventType remevent;
-	
-	/** The change event name. */
-	protected EventType changeevent;
-
-	/** The belief model. */
-	protected MBelief mbel;
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new collection wrapper.
 	 */
-	public MapWrapper(Map<T, E> delegate, BDIAgentInterpreter interpreter, 
-		String addevent, String remevent, String changeevent, MBelief mbel)
-	{
-		this(delegate, interpreter, new EventType(addevent), new EventType(remevent), new EventType(changeevent), mbel);
-	}
-	
-	/**
-	 *  Create a new collection wrapper.
-	 */
-	public MapWrapper(Map<T, E> delegate, BDIAgentInterpreter interpreter, 
-		EventType addevent, EventType remevent, EventType changeevent, MBelief mbel)
+	public MapWrapper(Map<T, E> delegate)
 	{
 		this.delegate = delegate;
-		this.interpreter = interpreter;
-		this.addevent = addevent;
-		this.remevent = remevent;
-		this.changeevent = changeevent;
-		this.mbel = mbel;
 	}
+	
+	//-------- Map interface --------
 	
 	/** 
 	 * 
@@ -112,22 +71,15 @@ public class MapWrapper<T, E> implements Map<T, E>
 	 */
 	public E put(final T key, final E value)
 	{
+		boolean	contained	= delegate.containsKey(key);
 		E ret = delegate.put(key, value);
-		unobserveValue(ret);
-		observeValue(value);
-		if(ret==null)
+		if(contained)
 		{
-			getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<E>(value, null, key)));
-//			getRuleSystem().addEvent(new Event(addevent, new MapEntry<T, E>(key, value, null)));
-//			getRuleSystem().addEvent(new Event(addevent, new Tuple3<T, E, E>(key, value, ret)));
-			publishToolBeliefEvent();
+			entryChanged(key, ret, value);
 		}
 		else
 		{
-//			getRuleSystem().addEvent(new Event(changeevent, new Tuple3<T, E, E>(key, value, ret)));
-//			getRuleSystem().addEvent(new Event(changeevent, new MapEntry<T, E>(key, value, ret)));
-			getRuleSystem().addEvent(new Event(changeevent, new ChangeInfo<E>(value, ret, key)));
-			publishToolBeliefEvent();
+			entryAdded(key, value);
 		}
 		return ret;
 	}
@@ -137,12 +89,12 @@ public class MapWrapper<T, E> implements Map<T, E>
 	 */
 	public E remove(Object key)
 	{
+		boolean	contained	= delegate.containsKey(key);
 		E ret = delegate.remove(key);
-		unobserveValue(ret);
-//		getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>((T)key, ret)));
-//		getRuleSystem().addEvent(new Event(remevent, new MapEntry<T, E>((T)key, ret, null)));
-		getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<E>(null, ret, key)));
-		publishToolBeliefEvent();
+		if(contained)
+		{
+			entryRemoved((T)key, ret);
+		}
 		return ret;
 	}
 
@@ -151,11 +103,8 @@ public class MapWrapper<T, E> implements Map<T, E>
 	 */
 	public void putAll(Map<? extends T, ? extends E> m)
 	{
-		for(Map.Entry<? extends T, ? extends E> e : m.entrySet())
-		{
-			observeValue(e.getValue());
-            put(e.getKey(), e.getValue());
-		}
+		delegate.putAll(m);
+		entriesAdded(((Map<T, E>)m).entrySet());
 	}
 
 	/** 
@@ -165,13 +114,7 @@ public class MapWrapper<T, E> implements Map<T, E>
 	{
 		Set<java.util.Map.Entry<T, E>> s = entrySet();
 		delegate.clear();
-		for(Map.Entry<? extends T, ? extends E> e : s)
-		{
-			unobserveValue(e.getValue());
-//			getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>(e.getKey(), e.getValue())));
-			getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<E>(e.getValue(), null, e.getKey())));
-			publishToolBeliefEvent();
-		}
+		entriesRemoved(s);
 	}
 
 	/** 
@@ -217,7 +160,7 @@ public class MapWrapper<T, E> implements Map<T, E>
 		boolean ret = false;
 		if(obj instanceof MapWrapper)
 		{
-			ret = delegate.equals(((MapWrapper)obj).delegate);
+			ret = delegate.equals(((MapWrapper<?, ?>)obj).delegate);
 		}
 		else if(obj instanceof Map)
 		{
@@ -234,148 +177,43 @@ public class MapWrapper<T, E> implements Map<T, E>
 	{
 		return delegate.toString();
 	}
+
+	//-------- template methods --------
 	
 	/**
-	 *  Get the interpreter.
-	 *  @return The interpreter.
+	 *  An entry was added to the map.
 	 */
-	public BDIAgentInterpreter getInterpreter()
-	{
-		return interpreter;
-	}
+	protected abstract void	entryAdded(T key, E value);
 	
 	/**
-	 *  Get the rule system.
-	 *  @return The rule system.
+	 *  An entry was removed from the map.
 	 */
-	public RuleSystem getRuleSystem()
-	{
-		return interpreter.getRuleSystem();
-	}
+	protected abstract void	entryRemoved(T key, E value);
+	
+	/**
+	 *  An entry was changed in the map.
+	 */
+	protected abstract void	entryChanged(T key, E oldvalue, E newvalue);
 
 	/**
-	 * 
+	 *  Entries were added to the map.
 	 */
-	public void observeValue(final Object val)
+	protected void	entriesAdded(Set<Map.Entry<T, E>> entries)
 	{
-		if(val!=null)
+		for(Map.Entry<T, E> entry: entries)
 		{
-			getRuleSystem().observeObject(val, true, false, new IResultCommand<IFuture<Void>, PropertyChangeEvent>()
-			{
-				public IFuture<Void> execute(final PropertyChangeEvent event)
-				{
-					final Future<Void> ret = new Future<Void>();
-					try
-					{
-						IFuture<Void> fut = getInterpreter().scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								publishToolBeliefEvent();
-								Event ev = new Event(changeevent, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
-								getRuleSystem().addEvent(ev);
-								return IFuture.DONE;
-//								return new Future<IEvent>(ev);
-							}
-						});
-						fut.addResultListener(new DelegationResultListener<Void>(ret)
-						{
-							public void exceptionOccurred(Exception exception)
-							{
-								if(exception instanceof ComponentTerminatedException)
-								{
-//									System.out.println("Ex in observe: "+exception.getMessage());
-									getRuleSystem().unobserveObject(val);
-									ret.setResult(null);
-								}
-								else
-								{
-									super.exceptionOccurred(exception);
-								}
-							}
-						});
-					}
-					catch(Exception e)
-					{
-						if(!(e instanceof ComponentTerminatedException))
-							System.out.println("Ex in observe: "+e.getMessage());
-						getRuleSystem().unobserveObject(val);
-						ret.setResult(null);
-					}
-					return ret;
-				}
-			});
+			entryAdded(entry.getKey(), entry.getValue());
 		}
 	}
 	
 	/**
-	 * 
+	 *  Entries were removed from the map.
 	 */
-	public void unobserveValue(Object val)
+	protected void	entriesRemoved(Set<Map.Entry<T, E>> entries)
 	{
-		getRuleSystem().unobserveObject(val);
+		for(Map.Entry<T, E> entry: entries)
+		{
+			entryRemoved(entry.getKey(), entry.getValue());
+		}		
 	}
-
-	/**
-	 * 
-	 */
-	public void publishToolBeliefEvent()//String evtype)
-	{
-		((BDIAgent)getInterpreter().getAgent()).publishToolBeliefEvent(getInterpreter(), mbel);//, evtype);
-	}
-	
-//	/**
-//	 * 
-//	 */
-//	public static class MapEntry<T, E> implements Map.Entry<T, E>
-//	{
-//		protected T key;
-//		protected E value;
-//		protected E oldvalue;
-//		
-//		/**
-//		 *  Create a new MapEntry.
-//		 */
-//		public MapEntry(T key, E value, E oldvalue)
-//		{
-//			this.key = key;
-//			this.value = value;
-//			this.oldvalue = oldvalue;
-//		}
-//		
-//		/**
-//		 *  Get the key.
-//		 *  @return The key.
-//		 */
-//		public T getKey()
-//		{
-//			return key;
-//		}
-//
-//		/**
-//		 *  Get the value.
-//		 *  @return The value.
-//		 */
-//		public E getValue()
-//		{
-//			return value;
-//		}
-//
-//		/**
-//		 *  Get the oldvalue.
-//		 *  @return The oldvalue.
-//		 */
-//		public E getOldValue()
-//		{
-//			return oldvalue;
-//		}
-//
-//		/**
-//		 * 
-//		 */
-//		public E setValue(E value)
-//		{
-//			throw new UnsupportedOperationException();
-//		}
-//	}
 }
