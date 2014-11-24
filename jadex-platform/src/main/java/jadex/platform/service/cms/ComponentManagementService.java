@@ -665,7 +665,10 @@ public class ComponentManagementService implements IComponentManagementService
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																	final IPlatformComponentAccess	component	= new PlatformComponent();
 																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, access.getServiceRegistry(), cinfo.getProvidedServiceInfos(), realtime, copy);
-																	component.create(cci, features);																	
+																	component.create(cci, features);
+																	IArgumentsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsFeature.class);
+																	af.subscribeToResults().addResultListener(reslis);
+																	
 																	initinfos.put(cid, new InitInfo(component, cinfo, resfut));
 																	
 																	logger.info("Starting component: "+cid.getName());

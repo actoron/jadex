@@ -26,7 +26,5 @@ public abstract class TerminationCommand implements ITerminationCommand
 	 *  (i.e. is not called when the future was already finished).
 	 *  @param reason The reason supplied for termination.
 	 */
-	public void	terminated(Exception reason)
-	{
-	}
+	public abstract void	terminated(Exception reason);
 }

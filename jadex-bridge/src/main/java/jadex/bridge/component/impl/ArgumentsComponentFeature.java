@@ -1,24 +1,27 @@
 package jadex.bridge.component.impl;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
-import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.Tuple2;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.javaparser.SJavaParser;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  This feature provides arguments.
@@ -32,6 +35,9 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	
 	/** The results. */
 	protected Map<String, Object>	results;
+	
+	/** The result subscription, if any. */
+	protected Set<SubscriptionIntermediateFuture<Tuple2<String, Object>>>	resfuts;
 	
 	//-------- constructors --------
 	
@@ -97,7 +103,6 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		
 		// Hack?! add component identifier to result as long as we don't have better future type for results
 		// could one somehow use the CallLocal for that purpose instead?
-		// Todo: generate event.
 		this.results	= new LinkedHashMap<String, Object>();
 		results.put(IComponentIdentifier.RESULTCID, getComponent().getComponentIdentifier());
 		
@@ -168,6 +173,33 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	 */
 	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
 	{
-		throw new UnsupportedOperationException("todo");
+		if(resfuts!=null)
+		{
+			resfuts	= new LinkedHashSet<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();
+		}
+		final SubscriptionIntermediateFuture<Tuple2<String, Object>>	ret	= new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
+		resfuts.add(ret);
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				if(getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread())
+				{
+					resfuts.remove(ret);
+				}
+				else
+				{
+					getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							resfuts.remove(ret);
+							return IFuture.DONE;
+						}
+					});
+				}
+			}
+		});
+		return ret;
 	}
 }
