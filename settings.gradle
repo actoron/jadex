@@ -44,8 +44,13 @@ include 'jadex-applications-bdi',
 'jadex-rules-applications',
 'jadex-platform-relay-web', 
 'jadex-platform-extension-relay',
+'jadex-platform-extension-relay-standalone',
 'jadex-platform-extension-webservice',
-'jadex-platform-extension-webservice-desktop'
+'jadex-platform-extension-webservice-desktop',
+'jadex-platform-extension-securetransport',
+'jadex-platform-extension-management',
+'jadex-platform-extension-maven',
+'jadex-editor-gpmn'
 // android-specific modules:
 if (androidSdkExists()) {
     include 'jadex-android-antlr',

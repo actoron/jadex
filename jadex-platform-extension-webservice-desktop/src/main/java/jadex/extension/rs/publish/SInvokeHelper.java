@@ -1,6 +1,8 @@
 package jadex.extension.rs.publish;
 
+import jadex.bridge.service.BasicService;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
@@ -341,6 +343,7 @@ public class SInvokeHelper
 								{
 									if(greq.getContentType()!=null && greq.getContentType().startsWith("multipart/form-data"))
 									{
+										System.out.println("parsing multipart/form-data");
 										// Todo: why doesn't work out of the box any more!?
 										final Map<String, String>	map	= extractCallerValues(greq);//new LinkedHashMap<String, Object>();
 										targetparams[0]	= map;
@@ -430,6 +433,11 @@ public class SInvokeHelper
 										{
 											greq.getRequest().setContentType(Constants.FORM_POST_CONTENT_TYPE);
 										}
+										// Hack!!! IE doesn't send char set in ajax request by default!?
+										if(greq.getCharacterEncoding()==null)
+										{
+											greq.getRequest().setCharacterEncoding("UTF-8");
+										}
 										
 										targetparams[0] = SInvokeHelper.convertMultiMap(greq.getParameterMap());
 										((Map<String, String>)targetparams[0]).putAll(extractCallerValues(greq));
@@ -453,13 +461,14 @@ public class SInvokeHelper
 	
 //			System.out.println("method: "+method.getName()+" "+method.getDeclaringClass().getName());
 //			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
-//			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
+			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
 //			
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)
 			{
-				ret = ((IFuture<?>)ret).get(new ThreadSuspendable());
+				ret = ((IFuture<?>)ret).get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
 			}
+			System.out.println("call finished: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
 			
 			if(method.isAnnotationPresent(ResultMapper.class))
 			{

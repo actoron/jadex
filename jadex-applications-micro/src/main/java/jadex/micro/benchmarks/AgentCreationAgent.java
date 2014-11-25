@@ -1,11 +1,13 @@
 package jadex.micro.benchmarks;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -14,6 +16,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
@@ -344,4 +347,15 @@ public class AgentCreationAgent extends MicroAgent
 ////			new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_UPWARDS)},
 //		null);
 //	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		ThreadSuspendable sus = new ThreadSuspendable();
+		IExternalAccess ea = Starter.createPlatform(new String[]{"-gui", "false", "-extensions", "null", "-cli", "false"}).get(sus);
+		IComponentManagementService cms = SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+		cms.createComponent(AgentCreationAgent.class.getName()+".class", null).get(sus);
+	}
 }

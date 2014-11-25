@@ -441,7 +441,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	/** 
 	 * Gets the maximum distance for selecting objects.
 	 * 
-	 * @returns selections distance
+	 * @return selections distance
 	 */
 	public synchronized IVector1 getSelectorDistance()
 	{
