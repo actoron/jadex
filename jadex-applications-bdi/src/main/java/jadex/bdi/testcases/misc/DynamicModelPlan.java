@@ -46,7 +46,7 @@ public class DynamicModelPlan extends Plan
 		IComponentManagementService cms	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
 
 		Future	finished	= new Future();
-		IComponentIdentifier hwc = cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener(finished)).get(this);
+		IComponentIdentifier hwc = (IComponentIdentifier)cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener(finished)).get(this);
 
 		finished.get(this);
 		

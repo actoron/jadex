@@ -461,7 +461,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					&& !(Proxy.isProxyClass(service.getClass())
 					&& Proxy.getInvocationHandler(service).getClass().isAnnotationPresent(Service.class)))
 				{
-					throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
+					//throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
+					ia.getLogger().warning("Pojo service should declare @Service annotation: "+service.getClass());
+//					throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
 				}
 				addPojoServiceProxy(service, ret);
 			}

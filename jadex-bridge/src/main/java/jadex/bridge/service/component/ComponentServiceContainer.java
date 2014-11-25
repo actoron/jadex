@@ -761,7 +761,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			}
 			catch(Exception e)
 			{
-//				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			
 			getPublishService(instance, pi.getPublishType(), (Iterator<IPublishService>)null)

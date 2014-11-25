@@ -1,7 +1,11 @@
-if(file('gradle.properties').exists())
-{
-	apply from: "gradle.properties"
-}
+apply plugin: 'signing'
+apply plugin: 'java-library-distribution'
+apply plugin: 'maven-publish' // PublishToMavenLocal
+
+//if(file('gradle.properties').exists())
+//{
+	//apply from: "gradle.properties"
+//}
 
 //if(gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload"))
 //{
@@ -41,9 +45,6 @@ def androidIncl = ['jadex-android-commons',
                 'jadex-android-maven-plugin',
                 'jadex-android-platformapp',
                 'jadex-applications-android-demos']
-
-apply plugin: 'java-library-distribution'
-apply plugin: 'maven-publish' // PublishToMavenLocal
 
 buildscript {
     repositories
@@ -129,16 +130,23 @@ subprojects
 
     apply plugin: 'maven'
     //apply plugin: 'maven-publish'
-    apply plugin: 'signing'
+   
 
     sourceCompatibility = 1.6
+
+	task myJavadocs(type: Javadoc) {    
+    	//source = sourceSets.main.allJava
+    	classpath = configurations.compile
+    	destinationDir = file("./doc/")
+    	options.addStringOption('Xdoclint:none', '-quiet')
+  	}
 
     task sourcesJar(type: Jar, dependsOn: 'classes') {
         classifier 'sources'
         from allSource
     }
 
-    task javadocJar(type: Jar, dependsOn: 'javadoc') {
+    task javadocJar(type: Jar, dependsOn: 'myJavadocs') {
         classifier = 'javadoc'
         from new File(projectDir, 'build/docs')
     }
@@ -146,7 +154,7 @@ subprojects
     javadocJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload") }
 
 	//sourcesJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload") }
-
+	
     artifacts
     {
         archives sourcesJar
@@ -195,14 +203,20 @@ subprojects
         	}
         	
             configuration = configurations.deployerJars
-            
-            snapshotRepository(url: "http://www2.activecomponents.org/nexus/content/repositories/snapshots/")
+
+			//println("repouser: "+repouser+" pass: "+repopassword)
+			            
+            snapshotRepository(url: "http://localhost/nexus/content/repositories/snapshots")
             {
-                authentication(userName: "deployment", password: "laxlax")
+            	//<id>jadex-public-snapshots</id>
+                authentication(userName: repouser, password: repopassword)
+                //authentication(userName: "deployment", password: "laxlax")
             }
-            repository(url: "http://www2.activecomponents.org/nexus/content/repositories/releases/")
+            repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
             {
-                authentication(userName: "deployment", password: "laxlax")
+            	//<id>sonatype-nexus-staging</id>
+            	authentication(userName: repouser, password: repopassword)
+                //authentication(userName: "deployment", password: "laxlax")
             }
         }
     }
@@ -306,7 +320,7 @@ subprojects
         }
 
         task javadoc(type:Javadoc) {
-
+			 options.addStringOption('Xdoclint:none', '-quiet')
         }
 
         task classes(dependsOn: 'compileDebugSources') {
@@ -381,6 +395,7 @@ task docs(type: Javadoc) {
     classpath = files(subprojects.collect {project -> getCompileClassPath(project)})
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")
+    options.addStringOption('Xdoclint:none', '-quiet')
 }
 
 task srcAndroidZip(type: Zip) {

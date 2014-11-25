@@ -1,5 +1,6 @@
 package jadex.micro.annotation;
 
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.Boolean3;
 
 import java.lang.annotation.ElementType;
@@ -45,6 +46,11 @@ public @interface Configuration
 	 *  The provided service implementations.
 	 */
 	public RequiredService[] requiredservices() default {};
+	
+	/**
+	 *  The scope flag.
+	 */
+	public String scope() default RequiredServiceInfo.SCOPE_GLOBAL;
 	
 	/**
 	 *  The master flag.
