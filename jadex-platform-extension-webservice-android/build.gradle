@@ -1,16 +1,27 @@
-dependencies 
+
+configurations
+{
+    // exclude android spring framework in testCompile, because we use the desktop variant for junit
+    testCompile.exclude group: "org.springframework.android", module: "spring-android-rest-template"
+    testCompile.exclude group: "org.springframework.android", module: "spring-android-rest-core"
+}
+
+dependencies
 {
     ext.spring_android_version = '1.0.0.RELEASE'
     ext.jersey_version = '1.11'
 
-    androidTestCompile 'org.springframework:spring-web:3.1.2.RELEASE'
+    testCompile 'org.springframework:spring-web:3.1.2.RELEASE'
     compile project(':jadex-platform-extension-webservice')
     compile 'org.springframework.android:spring-android-rest-template:' + spring_android_version
     compile 'org.springframework.android:spring-android-core:' + spring_android_version
-    androidTestCompile project(':jadex-platform')
-    androidTestCompile project(':jadex-kernel-component')
-    androidTestCompile project(':jadex-platform-android')
-    androidTestCompile 'com.sun.jersey:jersey-grizzly2:' + jersey_version
-    androidTestCompile 'com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly2:' + jersey_version
-    androidTestCompile 'com.sun.jersey:jersey-bundle:' + jersey_version
+    testCompile project(':jadex-platform')
+    testCompile project(':jadex-kernel-component')
+    testCompile project(':jadex-platform-android')
+    testCompile 'com.sun.jersey:jersey-grizzly2:' + jersey_version
+    testCompile 'com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly2:' + jersey_version
+    testCompile 'com.sun.jersey:jersey-bundle:' + jersey_version
+    //testCompile libraries.android
+    testCompile libraries.robolectric
+    testCompile libraries.robotium
 }

@@ -1,6 +1,7 @@
-dependencies 
+dependencies
 {
     compile project(':jadex-platform')
     compile project(':jadex-android-commons')
-    androidTestCompile 'com.jayway.android.robotium:robotium-solo:3.3'
+    testCompile libraries.robotium
+    testCompile libraries.robolectric
 }

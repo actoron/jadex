@@ -23,7 +23,7 @@
 
 	<dependencies>
 		<dependency>
-			<!-- needs to be first dependency -->
+			<!-- needs to be first dependency to overwrite spring android in tests-->
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-web</artifactId>
 		    <version>3.1.2.RELEASE</version>

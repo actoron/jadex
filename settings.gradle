@@ -59,19 +59,24 @@ if (androidSdkExists()) {
 //    'jadex-android-bluetooth',
 //    'jadex-android-integration-test',
     'jadex-android-maven-plugin',
-    'jadex-android-platformapp',
     'jadex-android-platformclient',
 //    'jadex-android-testlauncher',
-//    'jadex-applications-android',
     'jadex-applications-android-demos',
     'jadex-kernel-bdiv3-android',
     'jadex-platform-android',
     'jadex-platform-extension-webservice-android',
-    'jadex-runtimetools-android'
+    'jadex-runtimetools-android',
+    'jadex-android-platformapp',
+    'jadex-applications-android-demos',
+    'jadex-applications-android:jadex-applications-android-chat',
+    'jadex-applications-android:jadex-applications-android-puzzle'
+    
 } else {
     logger.warn('Cannot compile android projects: No Android SDK found.\n' +
             'To include android projects in build, set ANDROID_HOME to your android sdk root.')
 }
+
+include 'jadex-test'
 
 def androidSdkExists() {
     def androidHome = System.env.'ANDROID_HOME'
