@@ -2346,6 +2346,44 @@ public class SUtil
 	}
 	
 	/**
+	 *  Converts a number of bytes
+	 *  into a human-friendly binary prefix unit string
+	 *  (kiB, MiB, GiB, ...).
+	 *  
+	 *  @param bytes Number of bytes.
+	 */
+	public static String formatByteSize(long bytes)
+	{
+		String ret = "";
+		if (bytes >= 10995116277760L)
+		{
+			double tmpbyte = (double) bytes / 1099511627776.0;
+			ret = Math.round(tmpbyte) + "TiB";
+		}
+		else if (bytes >= 10737418240L)
+		{
+			double tmpbytes = (double) bytes / 1073741824.0;
+			ret = Math.round(tmpbytes) + "GiB";
+		}
+		else if (bytes >= 10485760L)
+		{
+			double tmpbytes = (double) bytes / 1048576.0;
+			ret = Math.round(tmpbytes) + "MiB";
+		}
+		else if (bytes >= 10240L)
+		{
+			double tmpbytes = (double) bytes / 1024.0;
+			ret = Math.round(tmpbytes) + "KiB";
+		}
+		else
+		{
+			ret = bytes + "B";
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Convert bytes to a short.
 	 */
 	public static short bytesToShort(byte[] buffer)
