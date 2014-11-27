@@ -318,9 +318,28 @@ subprojects
 
         }
 
-        task javadoc(type:Javadoc) {
-			 options.addStringOption('Xdoclint:none', '-quiet')
+        android.applicationVariants.all {variant ->
+            task("generate${variant.name}JavaDoc", type:Javadoc) {
+                source = variant.javaCompile.source
+                ext.androidJar =
+                        "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+                classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+                options.links("http://docs.oracle.com/javase/7/docs/api/");
+                options.links("http://d.android.com/reference/");
+                exclude '**/BuildConfig.java'
+                exclude '**/R.java'
+
+                // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
+                def javaVersion = JavaVersion.current()
+                if (javaVersion >= JavaVersion.VERSION_1_8) {
+                    options.addStringOption('Xdoclint:none', '-quiet')
+                } else {
+                    options.addStringOption('-quiet')
+                }
+            }
         }
+
+        myJavadocs.enabled = false
 
         task classes(dependsOn: 'compileDebugSources') {
 
@@ -391,10 +410,18 @@ def getCompileClassPath(project) {
 
 task docs(type: Javadoc) {
     source subprojects.collect {project -> getSourceDir(project)}
-    classpath = files(subprojects.collect {project -> getCompileClassPath(project)})
+    // this is needed to avoid (failing) javadoc generation for xmls in android-projects:
+    exclude('**/*.xml','**/*.bpmn*','**/*.txt','**/*.bpmn')
+    classpath = files(subprojects.collect {project -> project.getCompileClassPath(project)})
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")
-    options.addStringOption('Xdoclint:none', '-quiet')
+    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
+    def javaVersion = JavaVersion.current()
+    if (javaVersion >= JavaVersion.VERSION_1_8) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    } else {
+        options.addStringOption('-quiet')
+    }
 }
 
 task srcAndroidZip(type: Zip) {
