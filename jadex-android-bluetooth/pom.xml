@@ -71,7 +71,7 @@
 					<attachJar>true</attachJar>
 					<sdk>
 						<path>${env.ANDROID_HOME}</path>
-						<platform>2.2</platform>
+						<platform>8</platform>
 					</sdk>
 					<dex>
 						<jvmArguments>

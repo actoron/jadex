@@ -20,6 +20,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.Writer;
+import static junit.framework.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,7 @@ import org.junit.runner.RunWith;
 import android.os.RemoteException;
 
 @RunWith(CustomTestRunner.class)
-public class BTTransportTest extends TestCase {
+public class BTTransportTest {
 
 	private BTTransport btTransport;
 	private MessageEnvelope message;

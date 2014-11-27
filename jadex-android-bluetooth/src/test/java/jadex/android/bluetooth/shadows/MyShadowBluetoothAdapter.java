@@ -1,18 +1,19 @@
 package jadex.android.bluetooth.shadows;
 
-import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 import jadex.android.bluetooth.TestConstants;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.robolectric.Robolectric;
+import org.robolectric.annotation.Implementation;
+import org.robolectric.annotation.Implements;
+import org.robolectric.shadows.ShadowApplication;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
-import com.xtremelabs.robolectric.Robolectric;
-import com.xtremelabs.robolectric.internal.Implementation;
-import com.xtremelabs.robolectric.internal.Implements;
 
 @Implements(BluetoothAdapter.class)
 public class MyShadowBluetoothAdapter {
@@ -27,7 +28,7 @@ public class MyShadowBluetoothAdapter {
 
     @Implementation
     public static BluetoothAdapter getDefaultAdapter() {
-        return (BluetoothAdapter) shadowOf(Robolectric.application).getBluetoothAdapter();
+        return (BluetoothAdapter) ((ShadowApplication) Robolectric.shadowOf_(Robolectric.application)).getBluetoothAdapter();
     }
 
     @Implementation
