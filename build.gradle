@@ -127,6 +127,16 @@ subprojects
         {
             testCompile junit
         }
+
+        configurations {
+            provided {
+                dependencies.all { dep ->
+                    configurations.default.exclude group: dep.group, module: dep.name
+                }
+            }
+            compile.extendsFrom provided
+        }
+
     }
 
     apply plugin: 'maven'
@@ -287,7 +297,7 @@ subprojects
 //                }
             }
 
-//            compile.extendsFrom provided
+            compile.extendsFrom provided
 //            debugProvided.extendsFrom provided
 //            releaseProvided.extendsFrom provided
 
@@ -318,23 +328,25 @@ subprojects
 
         }
 
-        android.applicationVariants.all {variant ->
-            task("generate${variant.name}JavaDoc", type:Javadoc) {
-                source = variant.javaCompile.source
-                ext.androidJar =
-                        "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-                classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-                options.links("http://docs.oracle.com/javase/7/docs/api/");
-                options.links("http://d.android.com/reference/");
-                exclude '**/BuildConfig.java'
-                exclude '**/R.java'
+        if (!isAndroidLibraryProject(project)) {
+            android.applicationVariants.all {variant ->
+                task("generate${variant.name}JavaDoc", type:Javadoc) {
+                    source = variant.javaCompile.source
+                    ext.androidJar =
+                            "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+                    classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+                    options.links("http://docs.oracle.com/javase/7/docs/api/");
+                    options.links("http://d.android.com/reference/");
+                    exclude '**/BuildConfig.java'
+                    exclude '**/R.java'
 
-                // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
-                def javaVersion = JavaVersion.current()
-                if (javaVersion >= JavaVersion.VERSION_1_8) {
-                    options.addStringOption('Xdoclint:none', '-quiet')
-                } else {
-                    options.addStringOption('-quiet')
+                    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
+                    def javaVersion = JavaVersion.current()
+                    if (javaVersion >= JavaVersion.VERSION_1_8) {
+                        options.addStringOption('Xdoclint:none', '-quiet')
+                    } else {
+                        options.addStringOption('-quiet')
+                    }
                 }
             }
         }

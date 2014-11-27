@@ -353,6 +353,8 @@ public class AndroidChatService extends JadexPlatformService
 	{
 		final IntermediateFuture<ChatUser> fut = new IntermediateFuture<ChatUser>();
 		List<ChatUser> result;
+		
+		final Handler handler = new Handler();
 
 		chatgui.findUsers().addResultListener(new IntermediateDefaultResultListener<IChatService>()
 		{
@@ -365,20 +367,26 @@ public class AndroidChatService extends JadexPlatformService
 			{
 				waitCount++;
 				System.out.println("getting name for: " + chatService);
-				chatService.getNickName().addResultListener(new DefaultResultListener<String>()
-				{
 
+				handler.post(new Runnable() {
+					
 					@Override
-					public void resultAvailable(String nickName)
-					{
-						IServiceIdentifier sid = ((IService) chatService).getServiceIdentifier();
-						ChatUser chatUser = new ChatUser(nickName, sid);
-						fut.addIntermediateResult(chatUser);
-						waitCount--;
-						if (finished && (waitCount < 1))
+					public void run() {
+						chatService.getNickName().addResultListener(new DefaultResultListener<String>()
 						{
-							finished();
-						}
+							@Override
+							public void resultAvailable(String nickName)
+							{
+								IServiceIdentifier sid = ((IService) chatService).getServiceIdentifier();
+								ChatUser chatUser = new ChatUser(nickName, sid);
+								fut.addIntermediateResult(chatUser);
+								waitCount--;
+								if (finished && (waitCount < 1))
+								{
+									finished();
+								}
+							}
+						});
 					}
 				});
 			}

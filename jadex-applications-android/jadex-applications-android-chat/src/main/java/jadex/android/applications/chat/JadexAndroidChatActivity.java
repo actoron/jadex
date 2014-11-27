@@ -1,5 +1,7 @@
 package jadex.android.applications.chat;
 
+import java.util.Collection;
+
 import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
 import jadex.android.applications.chat.filetransfer.TransferActivity;
 import jadex.android.standalone.clientapp.ClientAppFragment;
@@ -78,6 +80,8 @@ public class JadexAndroidChatActivity extends ClientAppFragment implements Servi
 		chatEventAdapter = new ChatEventArrayAdapter(getActivity());
 		listView.setAdapter(chatEventAdapter);
 		
+		setHasOptionsMenu(true);
+		
 		return view;
 	}
 	
@@ -105,6 +109,7 @@ public class JadexAndroidChatActivity extends ClientAppFragment implements Servi
 	{
 		menu.add(Menu.NONE,0,Menu.NONE,"Shutdown Chat").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		menu.add(Menu.NONE,1,Menu.NONE,"Show Transfers").setIcon(android.R.drawable.ic_menu_share);
+		menu.add(Menu.NONE,2,Menu.NONE,"Refresh Users").setIcon(android.R.drawable.ic_menu_rotate);
 	}
 	
 	@Override
@@ -118,6 +123,15 @@ public class JadexAndroidChatActivity extends ClientAppFragment implements Servi
 			break;
 		case 1:
 			startActivity(new Intent(getActivity(), TransferActivity.class));
+			break;
+		case 2:
+			service.getUsers().addResultListener(new DefaultResultListener<Collection<ChatUser>>() {
+
+				@Override
+				public void resultAvailable(Collection<ChatUser> result) {
+					System.out.println(result);
+				}
+			});
 			break;
 		default:
 			break;
