@@ -4444,5 +4444,26 @@ public class SUtil
 		return null;
 	}
 	
-	
+	/**
+	 *  Test if a string contains a digit.
+	 *  @param s The string.
+	 *  @return True, if the string contains a digit.
+	 */
+	public static boolean containsDigit(String s)
+	{  
+	    boolean ret = false;
+
+	    if(s != null && s.length()>0)
+	    {
+	        for(char c : s.toCharArray())
+	        {
+	            if(ret = Character.isDigit(c))
+	            {
+	                break;
+	            }
+	        }
+	    }
+
+	    return ret;
+	}
 }

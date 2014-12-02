@@ -7,7 +7,7 @@ apply plugin: 'maven-publish' // PublishToMavenLocal
 	//apply from: "gradle.properties"
 //}
 
-//if(gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload"))
+//if(gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("uploadArchives"))
 //{
 //	println("upload detected")
 //}
@@ -162,9 +162,9 @@ subprojects
         from new File(projectDir, 'build/docs')
     }
 
-    javadocJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload") }
+    javadocJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("uploadArchives") }
 
-	//sourcesJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("upload") }
+	//sourcesJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("uploadArchives") }
 	
     artifacts
     {

@@ -203,7 +203,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		//System.out.println("start publish: "+pi.getPublishId());
+		System.out.println("start publish: "+pi.getPublishId());
 		ret.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
