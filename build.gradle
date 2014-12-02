@@ -50,6 +50,7 @@ def androidIncl = ['jadex-android-commons',
 ]
 
 buildscript {
+    apply from: 'util.gradle'
     repositories
     {
         mavenCentral()
@@ -368,58 +369,6 @@ subprojects
     }
 }
 
-def isAndroidProject(project) {
-    project.hasProperty("androidProject") && project.property("androidProject") == 'true'
-}
-
-def isAndroidLibraryProject(project) {
-    project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
-}
-
-def getReleaseVariant(project) {
-    if (isAndroidLibraryProject(project)) {
-        project.android.libraryVariants.each {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
-                return variant
-            }
-        }
-    } else {
-        project.android.applicationVariants.each {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
-                return variant
-            }
-        }
-    }
-}
-
-def getSourceDir(project) {
-    if (isAndroidProject(project)) {
-        project.android.sourceSets.main.java.srcDirs
-    } else {
-        project.sourceSets.main.allJava
-    }
-}
-
-def getResourcesDir(project) {
-    if (isAndroidProject(project)) {
-        project.android.sourceSets.main.res.srcDirs
-    } else {
-        project.sourceSets.main.resources
-    }
-}
-
-def getCompileClassPath(project) {
-    if (isAndroidProject(project)) {
-        if (isAndroidLibraryProject(project)) {
-            project.android.libraryVariants.javaCompile.classpath
-        } else {
-            project.android.applicationVariants.javaCompile.classpath
-        }
-    } else {
-        project.sourceSets.main.compileClasspath
-    }
-}
-
 task docs(type: Javadoc) {
     source subprojects.collect {project -> getSourceDir(project)}
     // this is needed to avoid (failing) javadoc generation for xmls in android-projects:
@@ -437,7 +386,7 @@ task docs(type: Javadoc) {
 }
 
 task srcAndroidZip(type: Zip) {
-    buildDistributionSource(srcAndroidZip, null, androidIncl, null, false)
+    buildDistributionSource(srcAndroidZip, null, androidIncl, "sourcesAndroid.zip", false)
 }
 
 task srcZip(type: Zip) {
@@ -494,7 +443,7 @@ def buildDistributionSource(task, excl, incl, name, opengl) {
     
     subprojects.each {subproject ->
         if ((excl != null && !isExcluded(excl, subproject.name))
-                || (incl != null && isExcluded(incl, subproject.name)))
+                || (incl != null && incl.contains(subproject.name)))
         {
         	//println('including: '+task.name+" "+subproject.projectDir.name)
 			task.from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
@@ -515,6 +464,23 @@ task buildExampleProject(type: Zip) {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	archiveName = 'jadex-example-project.zip'
 	from('docs/jadex-example-project')
+}
+
+task buildAndroidExampleProject(type: Zip) {
+    destinationDir = new File(project.distsDir, "standard-version")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveName = 'jadex-android-example-projects.zip'
+    from('docs/android/jadex-android-example-project-maven') {into ('jadex-android-example-project-maven')}
+    // non-maven example project:
+    from('docs/android/jadex-android-example-project') {into ('jadex-android-example-project')}
+    // Copy sources from maven example project to non-maven example project
+    from('docs/android/jadex-android-example-project-maven/src/main/java') {into ('jadex-android-example-project/src')}
+    // Copy resources from maven example project to non-maven example project
+    from('docs/android/jadex-android-example-project-maven/res') {into ('jadex-android-example-project/res')}
+    // Copy Manifest from maven example project to non-maven example project
+    from('docs/android/jadex-android-example-project-maven/AndroidManifest.xml') {into ('jadex-android-example-project/')}
+
+    from('docs/android/jadex-android-clientapp-example-maven') {into ('jadex-android-clientapp-example-maven')}
 }
 
 def buildDistribution(task, excl, incl) {
@@ -564,10 +530,12 @@ def buildDistribution(task, excl, incl) {
     //println("distend")
 }
 
-task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip]) {
-    archiveName = project.name + "-android-" + project.version + ".zip"
+task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip, buildAndroidExampleProject]) {
+    archiveName = 'jadex-android-' + project.version + '.zip'
+    destinationDir = new File(project.distsDir, "standard-version")
     buildDistribution(buildDistAndroid, null, androidIncl)
     from(srcAndroidZip.archivePath)
+    from(buildAndroidExampleProject.archivePath)
 }
 
 task copyArchives(type: Copy) {
@@ -687,19 +655,4 @@ task buildDistGpmnEditor(type: Zip, dependsOn: srcZipGpmnEditor) {
 	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING')
 }
 
-def isExcluded(excl, name)
-{
-	boolean ret = false;
-	if(excl!=null)
-	{
-		for(ex in excl)
-		{
-			if(name.indexOf(ex)!=-1)
-			{
-				ret = true;
-				break;
-			}
-		}
-	}
-	return ret;
-}
+
