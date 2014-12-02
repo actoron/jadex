@@ -9,6 +9,7 @@ import jadex.android.standalone.JadexClientLauncherActivity;
 import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.android.standalone.clientservice.UniversalClientService;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
+import jadex.bridge.IComponentIdentifier;
 
 import java.io.File;
 import java.util.HashMap;
@@ -124,7 +125,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	@Override
 	protected void onResume()
 	{
-		Logger.d("Resuming JadexApplicationLoader");
+		Logger.d("Resuming JadexMiddlewareActivity");
 		Intent intent = getIntent();
 		if (clientAppInfo != null) {
 			Logger.d("setting ClassLoader for " + clientAppInfo.sourceDir);
@@ -270,7 +271,13 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		}
 		catch (ClassNotFoundException e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
+			Logger.e("Class not found: " + className 
+					+ "\nPlease make sure it exists.");
+		}
+		
+		if (act == null) {
+			throw new JadexAndroidError("Could not launch application!");
 		}
 		
 		act.setApplicationInfo(appInfo);

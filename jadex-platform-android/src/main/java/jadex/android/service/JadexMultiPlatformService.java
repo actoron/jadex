@@ -177,9 +177,15 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		}
 		fut.addResultListener(new DefaultResultListener<IExternalAccess>()
 		{
-			public void resultAvailable(IExternalAccess result)
+			public void resultAvailable(final IExternalAccess result)
 			{
-				JadexMultiPlatformService.this.onPlatformStarted(result);
+				// new thread to reset IComponentIdentifier.LOCAL which is set to the platform now
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						JadexMultiPlatformService.this.onPlatformStarted(result);
+					}
+				}).start();
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -257,8 +263,14 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>() {
 
 					@Override
-					public void firstResultAvailable(IComponentIdentifier result) {
-						ret.setResult(result);
+					public void firstResultAvailable(final IComponentIdentifier result) {
+						// new thread to reset IComponentIdentifier.LOCAL which is set to the platform now
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								ret.setResult(result);
+							}
+						}).start();
 					}
 
 					@Override

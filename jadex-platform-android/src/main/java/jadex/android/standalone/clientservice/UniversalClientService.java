@@ -157,7 +157,26 @@ public class UniversalClientService extends Service
 						clientService.onCreate();
 						serviceInstances.put(clientServiceClassName, clientService);
 					} else {
-						Logger.d("Service instance found: " + clientServiceClassName);
+						ClassLoader rightCl = JadexPlatformManager.getInstance().getClassLoader(appInfo.sourceDir);
+						try {
+							Class<?> loadClass = rightCl.loadClass(clientServiceClassName);
+							rightCl = loadClass.getClassLoader();
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						}
+						ClassLoader actualCl = clientService.getClass().getClassLoader();
+						if (!actualCl.equals(rightCl)) {
+							Logger.d("Service instance found, but classloaders differ: " + rightCl + "\n" + actualCl);
+							Logger.d("Application must have been updated. Terminating previous service instance.");
+							clientService.stopSelf();
+							serviceInstances.remove(clientServiceClassName);
+							Logger.d("Creating new Service instance: " + clientServiceClassName);
+							clientService = createClientService(clientServiceClassName, appInfo);
+							clientService.onCreate();
+							serviceInstances.put(clientServiceClassName, clientService);
+						} else {
+							Logger.d("Service instance found: " + clientServiceClassName);
+						}
 					}
 
 					// has the service already been bound with the given connection?
