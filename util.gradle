@@ -1,0 +1,108 @@
+buildscript {
+    repositories
+    {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.14.4'
+    }
+}
+
+def isAndroidProject(project) {
+    project.hasProperty("androidProject") && project.property("androidProject") == 'true'
+}
+
+def isAndroidLibraryProject(project) {
+    project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
+}
+
+def getReleaseVariant(project) {
+    if (isAndroidLibraryProject(project)) {
+        project.android.libraryVariants.each {variant ->
+            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+                return variant
+            }
+        }
+    } else {
+        project.android.applicationVariants.each {variant ->
+            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+                return variant
+            }
+        }
+    }
+}
+
+def getSourceDir(project) {
+    if (isAndroidProject(project)) {
+        project.android.sourceSets.main.java.srcDirs
+    } else {
+        project.sourceSets.main.allJava
+    }
+}
+
+def getResourcesDir(project) {
+    if (isAndroidProject(project)) {
+        project.android.sourceSets.main.res.srcDirs
+    } else {
+        project.sourceSets.main.resources
+    }
+}
+
+def getCompileClassPath(project) {
+    if (isAndroidProject(project)) {
+        if (isAndroidLibraryProject(project)) {
+            project.android.libraryVariants.javaCompile.classpath
+        } else {
+            project.android.applicationVariants.javaCompile.classpath
+        }
+    } else {
+        project.sourceSets.main.compileClasspath
+    }
+}
+
+def isExcluded(excl, name)
+{
+    boolean ret = false;
+    if(excl!=null)
+    {
+        for(ex in excl)
+        {
+            if(name.indexOf(ex)!=-1)
+            {
+                ret = true;
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
+//def isIncluded(incl, name)
+//{
+//    boolean ret = false;
+//    if(incl!=null)
+//    {
+//        for(ex in incl)
+//        {
+//            if(name.equals(ex))
+//            {
+//                ret = true;
+//                break;
+//            }
+//        }
+//    }
+//    return ret;
+//}
+
+// make functions externally visible
+
+ext {
+    isAndroidProject = this.&isAndroidProject
+    isAndroidLibraryProject = this.&isAndroidLibraryProject
+    getReleaseVariant = this.&getReleaseVariant
+    getSourceDir = this.&getSourceDir
+    getResourcesDir = this.&getResourcesDir
+    getCompileClassPath = this.&getCompileClassPath
+    isExcluded = this.&isExcluded
+//    isIncluded = this.&isIncluded
+}
