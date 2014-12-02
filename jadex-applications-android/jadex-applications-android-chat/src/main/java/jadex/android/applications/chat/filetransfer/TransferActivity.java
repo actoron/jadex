@@ -1,9 +1,9 @@
 package jadex.android.applications.chat.filetransfer;
 
-import jadex.android.applications.chat.AndroidChatService;
-import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
-import jadex.android.applications.chat.IAndroidChatService;
-import jadex.android.applications.chat.JadexAndroidChatActivity;
+import jadex.android.applications.chat.fragments.ChatFragment;
+import jadex.android.applications.chat.service.AndroidChatService;
+import jadex.android.applications.chat.service.IAndroidChatService;
+import jadex.android.applications.chat.service.AndroidChatService.ChatEventListener;
 import jadex.android.applications.chat.R;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.TransferInfo;

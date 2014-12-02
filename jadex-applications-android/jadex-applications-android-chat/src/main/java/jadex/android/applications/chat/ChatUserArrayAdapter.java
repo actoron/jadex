@@ -37,7 +37,7 @@ public class ChatUserArrayAdapter extends ArrayAdapter<ChatUser>
 
 		ChatUser user = getItem(position);
 		viewHolder.txtNickName.setText(user.getNickName());
-		viewHolder.txtPlatformName.setText(user.getSid().getProviderId().getPlatformName());
+		viewHolder.txtPlatformName.setText(user.getCid().getPlatformName());
 
 		return convertView;
 	}

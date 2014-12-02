@@ -1,5 +1,7 @@
-package jadex.android.applications.chat;
+package jadex.android.applications.chat.service;
 
+import jadex.android.applications.chat.ChatUser;
+import jadex.android.applications.chat.NotificationHelper;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.exception.JadexAndroidError;
 import jadex.android.exception.JadexAndroidException;
@@ -16,6 +18,7 @@ import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,6 +29,7 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Binding;
+import jadex.platform.service.cms.IntermediateResultListener;
 
 import java.io.File;
 import java.util.Collection;
@@ -94,6 +98,7 @@ public class AndroidChatService extends JadexPlatformService
 		setPlatformOptions(
 			"-awareness true " +
 			"-chat true " +
+			"-log false " +
 			"-niotcptransport false " +
 			"-networkname jadexnetwork " +
 			"-networkpass laxlax");
@@ -206,6 +211,16 @@ public class AndroidChatService extends JadexPlatformService
 				AndroidChatService.this.stopPlatforms();
 				stopSelf();
 			}
+
+			@Override
+			public IFuture<String> getNickname() {
+				return chatgui.getNickName();
+			}
+
+			@Override
+			public void setNickname(String name) {
+				chatgui.setNickName(name);
+			}
 		};
 	}
 
@@ -223,7 +238,9 @@ public class AndroidChatService extends JadexPlatformService
 		{
 			subscription.terminate();
 		}
+//		if (notificationHelper != null) {
 		notificationHelper.discardAll();
+//		}
 	}
 
 	private IFuture<Void> subscribe()
@@ -244,7 +261,7 @@ public class AndroidChatService extends JadexPlatformService
 								{
 									public void intermediateResultAvailable(ChatEvent ce)
 									{
-										System.out.println("event: " + ce);
+//										System.out.println("event: " + ce);
 										informChatEvent(ce);
 									}
 
@@ -277,7 +294,13 @@ public class AndroidChatService extends JadexPlatformService
 			@Override
 			public void resultAvailable(Void result)
 			{
-				informChatConnected();
+				uiHandler.post(new Runnable() {
+					
+					@Override
+					public void run() {
+						informChatConnected();
+					}
+				});
 			}
 		});
 
@@ -348,43 +371,60 @@ public class AndroidChatService extends JadexPlatformService
 				});
 		return fut;
 	}
-
+	
 	private IIntermediateFuture<ChatUser> getUsers()
 	{
 		final IntermediateFuture<ChatUser> fut = new IntermediateFuture<ChatUser>();
 		List<ChatUser> result;
 		
-		final Handler handler = new Handler();
-
+		
 		chatgui.findUsers().addResultListener(new IntermediateDefaultResultListener<IChatService>()
 		{
-
 			private int waitCount = 0;
 			private boolean finished = false;
 
 			@Override
 			public void intermediateResultAvailable(final IChatService chatService)
 			{
-				waitCount++;
-				System.out.println("getting name for: " + chatService);
-
-				handler.post(new Runnable() {
+				uiHandler.post(new Runnable() {
 					
 					@Override
 					public void run() {
+						waitCount+=2;
+						final ChatUser chatUser = new ChatUser("", null);
+						
+						final CounterResultListener<Void> resLis = new CounterResultListener<Void>(2, new DefaultResultListener<Void>() {
+
+							@Override
+							public void resultAvailable(Void result) {
+								fut.addIntermediateResult(chatUser);									
+								if (finished && (waitCount < 1))
+								{
+									finished();
+								}
+							}
+						});
+						
 						chatService.getNickName().addResultListener(new DefaultResultListener<String>()
 						{
 							@Override
 							public void resultAvailable(String nickName)
 							{
 								IServiceIdentifier sid = ((IService) chatService).getServiceIdentifier();
-								ChatUser chatUser = new ChatUser(nickName, sid);
-								fut.addIntermediateResult(chatUser);
+								chatUser.setNickName(nickName);
+								chatUser.setCid(sid.getProviderId());
+								resLis.resultAvailable(null);
 								waitCount--;
-								if (finished && (waitCount < 1))
-								{
-									finished();
-								}
+							}
+						});
+						
+						chatService.getStatus().addResultListener(new DefaultResultListener<String>() 
+						{
+							@Override
+							public void resultAvailable(String result) {
+								chatUser.setStatus(result);
+								resLis.resultAvailable(null);
+								waitCount--;
 							}
 						});
 					}
@@ -434,7 +474,7 @@ public class AndroidChatService extends JadexPlatformService
 
 	private IFuture<Void> sendFile(String path, ChatUser user)
 	{
-		return chatgui.sendFile(path, user.getSid().getProviderId());
+		return chatgui.sendFile(path, user.getCid());
 	}
 
 	private IFuture<Void> acceptFileTransfer(TransferInfo ti)

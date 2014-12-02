@@ -1,6 +1,7 @@
 package jadex.android.applications.chat;
 
 import jadex.android.applications.chat.filetransfer.TransferActivity;
+import jadex.android.applications.chat.fragments.ChatFragment;
 import jadex.android.commons.Logger;
 import jadex.bridge.service.types.chat.TransferInfo;
 
@@ -146,7 +147,7 @@ public class NotificationHelper
 
 	private PendingIntent createChatActivityPendingIntent()
 	{
-		Intent notifyIntent = new Intent(context, JadexAndroidChatActivity.class);
+		Intent notifyIntent = new Intent(context, ChatFragment.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}

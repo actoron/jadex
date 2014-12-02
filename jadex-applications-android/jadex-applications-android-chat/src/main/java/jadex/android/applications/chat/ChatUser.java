@@ -1,36 +1,25 @@
 package jadex.android.applications.chat;
 
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.types.chat.IChatService;
-import jadex.commons.future.DefaultResultListener;
-import jadex.platform.service.chat.ChatService;
+import jadex.bridge.IComponentIdentifier;
 
 public class ChatUser
 {
 
 	private String nickName;
-	private IServiceIdentifier sid;
+	private IComponentIdentifier cid;
+	private String status = DEFAULT_STATUS;
 	
-	private static final String DEFAULT_NICK="<loading nickname>";
+	private static final String DEFAULT_STATUS="<loading status>";
 	
-//	public ChatUser(IChatService chatService, IServiceIdentifier sid) {
-//		this.nickName = DEFAULT_NICK;
-//		this.sid = sid;
-//		chatService.getNickName().addResultListener(new DefaultResultListener<String>()
-//		{
-//
-//			@Override
-//			public void resultAvailable(String result)
-//			{
-//				nickName= result;
-//			}
-//		});
-//	}
-
-	public ChatUser(String nickName, IServiceIdentifier sid)
+	public ChatUser(String nickName, IComponentIdentifier cid)
 	{
+		this(nickName, null, cid);
+	}
+	
+	public ChatUser(String nickName, String status, IComponentIdentifier cid) {
 		this.nickName = nickName;
-		this.sid = sid;
+		this.cid = cid;
+		this.status = status;
 	}
 
 	public String getNickName()
@@ -43,19 +32,27 @@ public class ChatUser
 		this.nickName = nickName;
 	}
 
-	public IServiceIdentifier getSid()
+	public IComponentIdentifier getCid()
 	{
-		return sid;
+		return cid;
 	}
 
-	public void setSid(IServiceIdentifier sid)
+	public void setCid(IComponentIdentifier cid)
 	{
-		this.sid = sid;
+		this.cid = cid;
 	}
 
 	@Override
 	public String toString()
 	{
-		return nickName + "[" + sid + "]";
+		return nickName + "[" + cid + "]";
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }
