@@ -1,7 +1,6 @@
 package jadex.android.applications.chat.fragments;
 
 import jadex.android.applications.chat.R;
-import jadex.android.applications.chat.fragments.ChatFragment.ChatServiceProvider;
 import jadex.android.applications.chat.model.ITypedObserver;
 import jadex.android.applications.chat.model.TypedObservable;
 import jadex.android.applications.chat.service.AndroidChatService;
@@ -94,7 +93,7 @@ public class MainFragment extends ClientAppMainFragment implements ServiceConnec
 			}
 		});
 		connectedObservable.setChanged();
-		connectedObservable.notifyObservers(true);
+		connectedObservable.notifyObservers(b);
 		this.connected = b;
 	}
 	

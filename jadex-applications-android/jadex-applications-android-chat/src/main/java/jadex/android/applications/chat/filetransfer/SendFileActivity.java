@@ -1,5 +1,7 @@
 package jadex.android.applications.chat.filetransfer;
 
+import java.util.Collection;
+
 import jadex.android.applications.chat.service.AndroidChatService;
 import jadex.android.applications.chat.service.IAndroidChatService;
 import jadex.android.applications.chat.service.AndroidChatService.ChatEventListener;
@@ -293,43 +295,32 @@ public class SendFileActivity extends ClientAppMainFragment implements ServiceCo
 						adapter.clear();
 					}
 				});
-				service.getUsers().addResultListener(new IntermediateDefaultResultListener<ChatUser>()
-				{
+				Collection<ChatUser> users = service.getUserModel().getUsers();
+				
+				for (ChatUser chatUser : users) {
+					adapter.add(chatUser);
+				}
+//				service.getUsers().addResultListener(new IntermediateDefaultResultListener<ChatUser>()
+//				{
+//
+//					@Override
+//					public void intermediateResultAvailable(final ChatUser chatUser)
+//					{
+//						uiHandler.post(new Runnable()
+//						{
+//
+//							@Override
+//							public void run()
+//							{
+//								adapter.add(chatUser);
+//							}
+//						});
+//					}
 
-					@Override
-					public void intermediateResultAvailable(final ChatUser chatUser)
-					{
-						uiHandler.post(new Runnable()
-						{
-
-							@Override
-							public void run()
-							{
-								adapter.add(chatUser);
-							}
-						});
-					}
-
-					@Override
-					public void finished()
-					{
-						super.finished();
-						uiHandler.post(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								setProgressBarIndeterminateVisibility(false);
-								statusTextView.setText(R.string.sendFile_chooseReceiver);
-								refreshButton.setEnabled(true);
-							}
-						});
-					}
-
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						super.exceptionOccurred(exception);
+//					@Override
+//					public void finished()
+//					{
+//						super.finished();
 						uiHandler.post(new Runnable()
 						{
 							@Override
@@ -340,8 +331,24 @@ public class SendFileActivity extends ClientAppMainFragment implements ServiceCo
 								refreshButton.setEnabled(true);
 							}
 						});
-					}
-				});
+//					}
+
+//					@Override
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						super.exceptionOccurred(exception);
+//						uiHandler.post(new Runnable()
+//						{
+//							@Override
+//							public void run()
+//							{
+//								setProgressBarIndeterminateVisibility(false);
+//								statusTextView.setText(R.string.sendFile_chooseReceiver);
+//								refreshButton.setEnabled(true);
+//							}
+//						});
+//					}
+//				});
 			}
 		}).start();
 	}

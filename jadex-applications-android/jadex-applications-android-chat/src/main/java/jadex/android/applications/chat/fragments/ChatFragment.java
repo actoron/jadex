@@ -44,12 +44,6 @@ import android.widget.ListView;
 public class ChatFragment extends Fragment implements ClientAppFragment, ChatEventListener, ITypedObserver<Boolean>
 {
 	
-	public interface ChatServiceProvider extends ITypedObservable<Boolean> {
-		public boolean isConnected();
-		
-		public IAndroidChatService getChatService();
-	}
-	
 	// -------- attributes --------
 
 	/** The text view for showing results. */
@@ -65,6 +59,16 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 
 	// -------- methods --------
 	
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+	}
+	
+	@Override
+	public void onAttachMainFragment(ClientAppMainFragment mainFragment) {
+		this.chatServiceProvider = (ChatServiceProvider) mainFragment;
+		chatServiceProvider.addObserver(this);
+	};
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -84,6 +88,7 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 		
 		setHasOptionsMenu(true);
 		
+		update(chatServiceProvider, chatServiceProvider.isConnected());
 		return view;
 	}
 	
@@ -103,22 +108,10 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 	}
 	
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-	}
-	
-	@Override
-	public void onAttachMainFragment(ClientAppMainFragment mainFragment) {
-		this.chatServiceProvider = (ChatServiceProvider) mainFragment;
-		chatServiceProvider.addObserver(this);
-	};
-	
-	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		menu.add(Menu.NONE,0,Menu.NONE,"Shutdown Chat").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		menu.add(Menu.NONE,1,Menu.NONE,"Show Transfers").setIcon(android.R.drawable.ic_menu_share);
-		menu.add(Menu.NONE,2,Menu.NONE,"Refresh Users").setIcon(android.R.drawable.ic_menu_rotate);
 	}
 	
 	@Override
@@ -132,9 +125,6 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 			break;
 		case 1:
 			startActivity(new Intent(getActivity(), TransferActivity.class));
-			break;
-		case 2:
-			refreshUsers();
 			break;
 		default:
 			break;
@@ -188,8 +178,6 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 
 	private ChatEventArrayAdapter chatEventAdapter;
 
-	private UserModel userModel;
-
 	@Override
 	public boolean eventReceived(final ChatEvent event)
 	{
@@ -207,16 +195,15 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 				}
 			});
 		} else if (eventType.equals(ChatEvent.TYPE_STATECHANGE)) {
-			processed = true;
-			getActivity().runOnUiThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					chatEventAdapter.add(event);
-				}
-			});
-			IComponentIdentifier cid = event.getComponentIdentifier();
-			userModel.refreshUser(cid, event);
+//			processed = true;
+//			getActivity().runOnUiThread(new Runnable() {
+//				
+//				@Override
+//				public void run() {
+//					chatEventAdapter.add(event);
+//				}
+//			});
+//			IComponentIdentifier cid = event.getComponentIdentifier();
 		}
 		return processed;
 	}
@@ -224,9 +211,13 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 	@Override
 	public void chatConnected()
 	{
-		System.out.println("chat connected: " + IComponentIdentifier.LOCAL.get());
-		sendButton.setEnabled(true);
-		messageEditText.setEnabled(true);
+		getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				sendButton.setEnabled(true);
+				messageEditText.setEnabled(true);
+			}
+		});
 		this.service.getNickname().addResultListener(new DefaultResultListener<String>() {
 
 			@Override
@@ -252,12 +243,11 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 	}
 
 	private void refreshUsers() {
-		this.userModel = new UserModel();
-		this.service.getUsers().addResultListener(new IntermediateDefaultResultListener<ChatUser>() {
-
-			@Override
-			public void intermediateResultAvailable(ChatUser result) {
-				userModel.refreshUser(result);
+//		this.service.getUsers().addResultListener(new IntermediateDefaultResultListener<ChatUser>() {
+//
+//			@Override
+//			public void intermediateResultAvailable(ChatUser result) {
+//				userModel.refreshUser(result);
 				
 //				final ChatEvent chatEvent = new ChatEvent();
 //				chatEvent.setType(ChatEvent.TYPE_STATECHANGE);
@@ -270,18 +260,18 @@ public class ChatFragment extends Fragment implements ClientAppFragment, ChatEve
 //						chatEventAdapter.add(chatEvent);		
 //					}
 //				});
-			}
-		});
+//			}
+//		});
 	}
 
 	@Override
-	public void update(ITypedObservable<Boolean> paramObservable,
-			Boolean paramObject, int notificationType) {
-		update(paramObservable, paramObject);
+	public void update(ITypedObservable<Boolean> observable,
+			Boolean param, int notificationType) {
+		update(observable, param);
 	}
 
 	@Override
-	public void update(ITypedObservable<Boolean> paramObservable,
+	public void update(ITypedObservable<Boolean> observable,
 			Boolean connected) {
 		if (connected) {
 			// service connected, wait for chat connected

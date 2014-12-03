@@ -29,6 +29,7 @@ public class ChatUserArrayAdapter extends ArrayAdapter<ChatUser>
 			viewHolder = new UserViewHolder();
 			viewHolder.txtNickName = (TextView) convertView.findViewById(R.id.chatuseritem_txtnickname);
 			viewHolder.txtPlatformName = (TextView) convertView.findViewById(R.id.chatuseritem_txtplatform);
+			viewHolder.txtStatus = (TextView) convertView.findViewById(R.id.chatuseritem_txtstatus);
 			convertView.setTag(viewHolder);
 		} else
 		{
@@ -38,6 +39,7 @@ public class ChatUserArrayAdapter extends ArrayAdapter<ChatUser>
 		ChatUser user = getItem(position);
 		viewHolder.txtNickName.setText(user.getNickName());
 		viewHolder.txtPlatformName.setText(user.getCid().getPlatformName());
+		viewHolder.txtStatus.setText(user.getStatus());
 
 		return convertView;
 	}
@@ -45,6 +47,7 @@ public class ChatUserArrayAdapter extends ArrayAdapter<ChatUser>
 	private static class UserViewHolder
 	{
 		TextView txtNickName;
+		TextView txtStatus;
 		TextView txtPlatformName;
 	}
 
