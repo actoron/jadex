@@ -3,6 +3,7 @@ package jadex.micro.testcases.terminate;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -54,10 +55,10 @@ public class TerminableProviderAgent implements ITerminableService
 //				System.out.println(agent.getComponentIdentifier()+": getResult2 "+termfut);
 				if(termfut!=null)
 				{
-					if(agent.getAgentAdapter().isExternalThread())
+					if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
 					{
-						System.err.println("adapter0: "+agent.getAgentAdapter().getComponentIdentifier());
-						System.err.println("adapter0a: "+IComponentAdapter.LOCAL.get());
+						System.err.println("adapter0: "+agent.getComponentIdentifier());
+						System.err.println("adapter0a: "+IInternalExecutionFeature.LOCAL.get());
 						Thread.dumpStack();
 						termfut.setException(new RuntimeException("Terminate called on wrong thread."));
 					}
@@ -99,10 +100,10 @@ public class TerminableProviderAgent implements ITerminableService
 //				System.out.println("termination command called2: "+termfut);
 				if(termfut!=null)
 				{
-					if(agent.getAgentAdapter().isExternalThread())
+					if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
 					{
-						System.err.println("adapter1: "+agent.getAgentAdapter().getComponentIdentifier());
-						System.err.println("adapter1a: "+IComponentAdapter.LOCAL.get());
+						System.err.println("adapter1: "+agent.getComponentIdentifier());
+						System.err.println("adapter1a: "+IInternalExecutionFeature.LOCAL.get());
 						Thread.dumpStack();
 						termfut.setException(new RuntimeException("Terminate called on wrong thread."));
 					}

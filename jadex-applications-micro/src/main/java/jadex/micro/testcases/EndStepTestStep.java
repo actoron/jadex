@@ -7,7 +7,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
-import jadex.component.ComponentInterpreter;
 
 /**
  *  Behavior of the component result test.
@@ -23,7 +22,7 @@ public class EndStepTestStep implements IComponentStep<Void>
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				((ComponentInterpreter)ia).getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
+				ia.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
 					new TestReport[]{new TestReport("#1", "Test if end step is executed", true, null)}));
 				return IFuture.DONE;
 			}

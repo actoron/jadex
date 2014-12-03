@@ -15,7 +15,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.component.ComponentInterpreter;
 
 import java.util.Map;
 
@@ -65,7 +64,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 					
 					protected void next()
 					{
-						((ComponentInterpreter)ia).getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+						ia.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 						ia.killComponent();
 					}
 				}));

@@ -16,6 +16,7 @@ import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.component.impl.ComponentLifecycleFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
@@ -70,6 +71,7 @@ public class SComponentFactory
 		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(INFPropertyComponentFeature.class, NFPropertyComponentFeature.class));
+		def_features.add(ComponentLifecycleFeature.FACTORY);
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
 	

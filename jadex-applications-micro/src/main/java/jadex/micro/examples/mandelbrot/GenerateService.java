@@ -158,7 +158,7 @@ public class GenerateService implements IGenerateService
 							delay = Long.valueOf(5000);
 						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
 							new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
-							agent.getParentAccess().getComponentIdentifier()), null)
+							agent.getComponentIdentifier().getParent()), null)
 							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 						{
 							// Component created, now get the calculation service.
