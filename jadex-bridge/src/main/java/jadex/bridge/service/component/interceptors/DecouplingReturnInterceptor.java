@@ -76,64 +76,68 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							}
 							else
 							{
-//								try
+								caller.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 								{
-									caller.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										public IFuture<Void> execute(IInternalAccess ia)
+										CallAccess.setCurrentInvocation(sic.getLastServiceCall());
+										CallAccess.setLastInvocation(sic.getServiceCall());
+										
+										if(isUndone() && listener instanceof IUndoneResultListener)
 										{
-											CallAccess.setCurrentInvocation(sic.getLastServiceCall());
-											CallAccess.setLastInvocation(sic.getServiceCall());
-											
-											if(isUndone() && listener instanceof IUndoneResultListener)
-											{
-												((IUndoneResultListener)listener).resultAvailableIfUndone(null);
-											}
-											else
-											{
-												listener.resultAvailable(null);
-											}
-											return IFuture.DONE;
+											((IUndoneResultListener)listener).resultAvailableIfUndone(null);
 										}
-									});
-								}
-//								catch(ComponentTerminatedException e)
-//								{
-//									// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
-//									if(sic.getMethod().getName().equals("destroyComponent")
-//										&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
-//									{
-//										Runnable run = new Runnable()
+										else
+										{
+											listener.resultAvailable(null);
+										}
+										return IFuture.DONE;
+									}
+								}).addResultListener(new IResultListener<Void>()
+								{
+									public void resultAvailable(Void result) {}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+//										catch(ComponentTerminatedException e)
 //										{
-//											public void run() 
+//											// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
+//											if(sic.getMethod().getName().equals("destroyComponent")
+//												&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
 //											{
-//												if(isUndone() && listener instanceof IUndoneResultListener)
+//												Runnable run = new Runnable()
 //												{
-//													((IUndoneResultListener)listener).resultAvailableIfUndone(null);
+//													public void run() 
+//													{
+//														if(isUndone() && listener instanceof IUndoneResultListener)
+//														{
+//															((IUndoneResultListener)listener).resultAvailableIfUndone(null);
+//														}
+//														else
+//														{
+//															listener.resultAvailable(null);
+//														}
+//													}
+//												};
+//												
+//												if(caller.getParent()==null)
+//												{
+//													// If destroy of platform, run directly as rescue thread already shut down.
+//													run.run();
 //												}
 //												else
 //												{
-//													listener.resultAvailable(null);
+//													Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
 //												}
 //											}
-//										};
-//										
-//										if(caller.getParent()==null)
-//										{
-//											// If destroy of platform, run directly as rescue thread already shut down.
-//											run.run();
-//										}
-//										else
-//										{
-//											Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
-//										}
-//									}
-//									else
-//									{
-//										// pass exception back to result provider as receiver is already dead.
-//										throw e;
-//									}
-//								}
+//											else
+//											{
+//												// pass exception back to result provider as receiver is already dead.
+//												throw e;
+//											}
+//										}										
+									}
+								});
 							}
 						}
 						

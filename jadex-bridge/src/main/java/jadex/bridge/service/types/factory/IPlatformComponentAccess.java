@@ -2,7 +2,6 @@ package jadex.bridge.service.types.factory;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.commons.future.IFuture;
@@ -54,6 +53,13 @@ public interface IPlatformComponentAccess
 	 *  @return An internal access exposing user operations of the component.
 	 */
 	public IInternalAccess	getInternalAccess();
+	
+	/**
+	 *  Get the exception, if any.
+	 *  
+	 *  @return The failure reason for use during cleanup, if any.
+	 */
+	public Exception	getException();
 	
 	/**
 	 *  Get the local platform service registry.

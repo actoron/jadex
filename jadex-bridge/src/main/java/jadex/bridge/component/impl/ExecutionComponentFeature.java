@@ -33,6 +33,8 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -661,7 +663,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				}
 //			}
 			
-		Tuple2<IComponentStep<?>, Future<?>>	step	= null;
+		final Tuple2<IComponentStep<?>, Future<?>>	step;
 		synchronized(this)
 		{
 			if(isteps!=null)
@@ -680,14 +682,54 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					steps	= null;
 				}
 			}
+			else
+			{
+				step	= null;
+			}
 		}
 		
 		boolean	again;
 		
 		if(step!=null)
 		{
-			step.getFirstEntity().execute(component)
-				.addResultListener(new DelegationResultListener(step.getSecondEntity()));
+			try
+			{
+				step.getFirstEntity().execute(component)
+					.addResultListener(new DelegationResultListener(step.getSecondEntity()));
+
+				if(!step.getSecondEntity().hasResultListener())
+				{
+					((Future<Object>)step.getSecondEntity()).addResultListener(new IResultListener<Object>()
+					{
+						public void resultAvailable(Object result)
+						{
+							getComponent().getLogger().warning("No listener for component step: "+step.getFirstEntity());
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							StringWriter	sw	= new StringWriter();
+							exception.printStackTrace(new PrintWriter(sw));
+							getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+						}
+					});
+				}
+			}
+			catch(Exception e)
+			{
+				// Todo: fail fast vs robust components.
+				
+				if(!step.getSecondEntity().hasResultListener())
+				{
+					StringWriter	sw	= new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+				}
+				else
+				{
+					step.getSecondEntity().setException(e);
+				}
+			}
 			
 			synchronized(this)
 			{

@@ -67,8 +67,14 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/** The feature instances as list (for reverse execution, cached for speed). */
 	protected List<IComponentFeature>	lfeatures;
 	
+	/** The inited feature instances as list (for shutdown after failed init). */
+	protected List<IComponentFeature>	ifeatures;
+	
 	/** The logger. */
 	protected Logger	logger;
+	
+	/** The failure reason (if any). */
+	protected Exception	exception;
 	
 	//-------- IPlatformComponentAccess interface --------
 	
@@ -108,6 +114,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				ifeatures	= new ArrayList<IComponentFeature>();
 				return executeInitOnFeatures(lfeatures.iterator());
 			}
 		});
@@ -142,7 +149,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				return executeShutdownOnFeatures(lfeatures, 0);
+				return executeShutdownOnFeatures(ifeatures!=null ? ifeatures : lfeatures, 0);
 			}
 		});
 	}
@@ -158,6 +165,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			IComponentFeature	cf	= features.next();
 //			if(getComponentIdentifier().getName().indexOf("kernels")!=-1)
 //				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
+			ifeatures.add(cf);
 			fut	= cf.init();
 		}
 		
@@ -175,6 +183,17 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		else
 		{
+			if(fut.getException()!=null)
+			{
+				// Init failed: remove failed feature.
+				ifeatures.remove(ifeatures.size()-1);
+			}
+			else
+			{
+				// Init succeeded: list no longer needed.
+				ifeatures	= null;
+			}
+			
 			return fut;
 		}
 	}
@@ -292,6 +311,16 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
+	 *  Get the exception, if any.
+	 *  
+	 *  @return The failure reason for use during cleanup, if any.
+	 */
+	public Exception	getException()
+	{
+		return exception;
+	}
+	
+	/**
 	 *  Get the local platform service registry.
 	 *  
 	 *  @return The local platform service registry.
@@ -380,8 +409,22 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
+		return killComponent(null);
+	}
+	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(Exception e)
+	{
+		// Only remember first exception.
+		if(exception==null)
+		{
+			this.exception	= e;
+		}
 		IComponentManagementService cms = SServiceProvider.getLocalService(this, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		return cms.destroyComponent(getComponentIdentifier());
+		return cms.destroyComponent(getComponentIdentifier());		
 	}
 	
 	/**

@@ -681,4 +681,12 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 			fcommands.remove(command);
 		}
 	}
+	
+	/**
+	 *  Check, if the future has at least one listener.
+	 */
+	public boolean	hasResultListener()
+	{
+		return listener!=null;
+	}
 }

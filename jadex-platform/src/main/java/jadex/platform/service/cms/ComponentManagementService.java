@@ -1551,7 +1551,7 @@ public class ComponentManagementService implements IComponentManagementService
 				{
 					public void resultAvailable(Void result)
 					{
-						IPlatformComponentAccess adapter = components.get(cid);
+						final IPlatformComponentAccess adapter = components.get(cid);
 						boolean	changed	= false;
 						if(adapter==null && !initresume)	// Might be killed after init but before init resume
 						{
@@ -1590,8 +1590,7 @@ public class ComponentManagementService implements IComponentManagementService
 										
 										public void exceptionOccurred(Exception exception)
 										{
-											// Todo: exception.
-											destroyComponent(cid);
+											adapter.getInternalAccess().killComponent(exception);
 										}
 									});
 								}
@@ -1947,33 +1946,27 @@ public class ComponentManagementService implements IComponentManagementService
 			notifyListenersRemoved(cid, desc, results);
 			
 			// Use adapter exception before cleanup exception as it probably happened first.
-//			Exception	ex	= adapter.getException()!=null ? adapter.getException() : exception;
-//			if(exceptions!=null && exceptions.containsKey(cid))
-//			{
-//				ex	= (Exception)exceptions.get(cid);
-//				exceptions.remove(cid);
-//			}
+			Exception	ex	= comp.getException()!=null ? comp.getException() : exception;
 			IntermediateResultListener reslis = resultlisteners.remove(cid);
 //			System.out.println("kill lis: "+cid+" "+reslis+" "+results+" "+ex);
 			if(reslis!=null)	// null for platform.
 			{
-//				if(ex!=null)
-//				{
-//					reslis.exceptionOccurred(ex);
-//				}
-//				else
+				if(ex!=null)
+				{
+					reslis.exceptionOccurred(ex);
+				}
+				else
 				{
 					reslis.finished();
-	//					reslis.resultAvailable(results);
 				}
 			
-//				if(ex!=null && !reslis.isInitial())
-//				{
-//					// Unhandled component exception
-//					// Todo: delegate printing to parent component (if any).
-//					adapter.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-//					ex.printStackTrace();
-//				}
+				if(ex!=null && !reslis.isInitial())
+				{
+					// Unhandled component exception
+					// Todo: delegate printing to parent component (if any).
+					comp.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+					ex.printStackTrace();
+				}
 			}
 			
 //			System.out.println("CleanupCommand end.");

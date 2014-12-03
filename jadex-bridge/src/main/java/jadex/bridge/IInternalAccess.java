@@ -64,6 +64,12 @@ public interface IInternalAccess
 	 */
 	public IFuture<Map<String, Object>> killComponent();
 	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(Exception e);
+	
 //	/**
 //	 *  Create a result listener that is executed on the
 //	 *  component thread.
