@@ -373,7 +373,6 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
 	{
-		// Todo: kernel-specific features.
 		return new Future<Collection<IComponentFeatureFactory>>(features);
 	}
 
