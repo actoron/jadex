@@ -3,15 +3,15 @@ package jadex.android.applications.chat.model;
 import java.util.Observer;
 import java.util.Vector;
 
-public class TypedObservable<T> {
+public class TypedObservable<T> implements ITypedObservable<T> {
 
 	 private boolean changed = false;
-	    private Vector<TypedObserver<T>> obs;
+	    private Vector<ITypedObserver<T>> obs;
 
 	    /** Construct an Observable with zero Observers. */
 
 	    public TypedObservable() {
-	        obs = new Vector<TypedObserver<T>>();
+	        obs = new Vector<ITypedObserver<T>>();
 	    }
 
 	    /**
@@ -23,7 +23,8 @@ public class TypedObservable<T> {
 	     * @param   o   an observer to be added.
 	     * @throws NullPointerException   if the parameter o is null.
 	     */
-	    public synchronized void addObserver(TypedObserver<T> o) {
+	    @Override
+		public synchronized void addObserver(ITypedObserver<T> o) {
 	        if (o == null)
 	            throw new NullPointerException();
 	        if (!obs.contains(o)) {
@@ -36,7 +37,8 @@ public class TypedObservable<T> {
 	     * Passing <CODE>null</CODE> to this method will have no effect.
 	     * @param   o   the observer to be deleted.
 	     */
-	    public synchronized void deleteObserver(Observer o) {
+	    @Override
+		public synchronized void deleteObserver(Observer o) {
 	        obs.removeElement(o);
 	    }
 
@@ -57,6 +59,10 @@ public class TypedObservable<T> {
 	        notifyObservers(null, TypedObserver.NOTIFICATION_TYPE_NONE);
 	    }
 
+	    public void notifyObservers(T arg) {
+	    	notifyObservers(arg, TypedObserver.NOTIFICATION_TYPE_NONE);
+	    }
+	    
 	    /**
 	     * If this object has changed, as indicated by the
 	     * <code>hasChanged</code> method, then notify all of its observers
@@ -73,7 +79,7 @@ public class TypedObservable<T> {
 	         * a temporary array buffer, used as a snapshot of the state of
 	         * current Observers.
 	         */
-	    	TypedObserver<T>[] arrLocal;
+	    	ITypedObserver<T>[] arrLocal;
 
 	        synchronized (this) {
 	            /* We don't want the Observer doing callbacks into
@@ -90,7 +96,7 @@ public class TypedObservable<T> {
 	             */
 	            if (!changed)
 	                return;
-	            arrLocal = obs.toArray(new TypedObserver[obs.size()]);
+	            arrLocal = obs.toArray(new ITypedObserver[obs.size()]);
 	            clearChanged();
 	        }
 
@@ -101,7 +107,8 @@ public class TypedObservable<T> {
 	    /**
 	     * Clears the observer list so that this object no longer has any observers.
 	     */
-	    public synchronized void deleteObservers() {
+	    @Override
+		public synchronized void deleteObservers() {
 	        obs.removeAllElements();
 	    }
 
@@ -109,7 +116,7 @@ public class TypedObservable<T> {
 	     * Marks this <tt>Observable</tt> object as having been changed; the
 	     * <tt>hasChanged</tt> method will now return <tt>true</tt>.
 	     */
-	    protected synchronized void setChanged() {
+	    public synchronized void setChanged() {
 	        changed = true;
 	    }
 
@@ -135,7 +142,8 @@ public class TypedObservable<T> {
 	     *          <code>clearChanged</code> method on this object;
 	     *          <code>false</code> otherwise.
 	     */
-	    public synchronized boolean hasChanged() {
+	    @Override
+		public synchronized boolean hasChanged() {
 	        return changed;
 	    }
 
@@ -144,7 +152,7 @@ public class TypedObservable<T> {
 	     *
 	     * @return  the number of observers of this object.
 	     */
-	    public synchronized int countObservers() {
+		public synchronized int countObservers() {
 	        return obs.size();
 	    }
 

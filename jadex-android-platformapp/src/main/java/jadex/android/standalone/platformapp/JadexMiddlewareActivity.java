@@ -7,6 +7,7 @@ import jadex.android.platformapp.R;
 import jadex.android.service.JadexPlatformManager;
 import jadex.android.standalone.JadexClientLauncherActivity;
 import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.android.standalone.clientapp.ClientAppMainFragment;
 import jadex.android.standalone.clientservice.UniversalClientService;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
 import jadex.bridge.IComponentIdentifier;
@@ -41,7 +42,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	private static String defaultEntryActivityName = "jadex.android.platformapp.DefaultApplication";
 	private LayoutInflater clientAppInflater;
 	private Context clientAppContext;
-	private ClientAppFragment clientFragment;
+	private ClientAppMainFragment clientFragment;
 	private UniversalClientServiceBinder universalService;
 	private Resources resources;
 	
@@ -92,7 +93,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 			{
 				setCurrentCl(getClassLoaderForExternalDex(getClass().getClassLoader(), appPath));
 				JadexPlatformManager.getInstance().setAppClassLoader(appPath, currentCl);
-				ClientAppFragment act = createClientAppFragment(currentCl, className, intent, clientAppInfo);
+				ClientAppMainFragment act = createClientAppFragment(currentCl, className, intent, clientAppInfo);
 		
 				this.clientFragment = act;
 			}
@@ -237,23 +238,23 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	}
 
 	/**
-	 * Instantiates a {@link ClientAppFragment} and starts its lifecycle.
+	 * Instantiates a {@link ClientAppMainFragment} and starts its lifecycle.
 	 * @param cl The classloader that is used to instanciate the Fragment
 	 * @param className Classname of the ClientAppFragment
 	 * @param intent The Intent to pass to the Fragment.
 	 * @param appInfo
 	 * @return The new ClientAppFragment
 	 */
-	private ClientAppFragment createClientAppFragment(ClassLoader cl, String className, Intent intent, ApplicationInfo appInfo)
+	private ClientAppMainFragment createClientAppFragment(ClassLoader cl, String className, Intent intent, ApplicationInfo appInfo)
 	{
-		ClientAppFragment act = null;
+		ClientAppMainFragment act = null;
 		try
 		{
 			@SuppressWarnings("unchecked")
-			Class<?> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
+			Class<?> actClass = (Class<ClientAppMainFragment>) cl.loadClass(className);
 			Object newInstance = actClass.newInstance();
-			if (newInstance instanceof ClientAppFragment) {
-				act = (ClientAppFragment) newInstance;
+			if (newInstance instanceof ClientAppMainFragment) {
+				act = (ClientAppMainFragment) newInstance;
 			} else {
 				throw new JadexAndroidError("Could not start Fragment: <" + className
 						+ "> of type: <" 
@@ -288,7 +289,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	
 	private static int fragmentContainerId = 4000;
 	
-	private void activateClientAppFragment(ClientAppFragment newFragment, boolean addToBackStack)
+	private void activateClientAppFragment(ClientAppMainFragment newFragment, boolean addToBackStack)
 	{
 		clientFragment = newFragment;
 		newFragment.setUniversalClientService(universalService);
@@ -338,11 +339,21 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 			super.startActivityFromFragment(fragment, intent, requestCode);
 		} else {
 			String className = intent.getComponent().getClassName();
-			boolean backstack = intent.getBooleanExtra(ClientAppFragment.EXTRA_KEY_BACKSTACK, true);
-			ApplicationInfo appInfo = ((ClientAppFragment) fragment).getApplicationInfo();
-			ClientAppFragment newFragment = createClientAppFragment(currentCl, className, intent, appInfo);
+			boolean backstack = intent.getBooleanExtra(ClientAppMainFragment.EXTRA_KEY_BACKSTACK, true);
+			ApplicationInfo appInfo = ((ClientAppMainFragment) fragment).getApplicationInfo();
+			ClientAppMainFragment newFragment = createClientAppFragment(currentCl, className, intent, appInfo);
 			Logger.d("Activating ClientAppFragment: " + className);
 			activateClientAppFragment(newFragment, backstack);
+		}
+	}
+	
+	
+
+	@Override
+	public void onAttachFragment(Fragment fragment) {
+		super.onAttachFragment(fragment);
+		if (fragment instanceof ClientAppFragment) {
+			((ClientAppFragment) fragment).onAttachMainFragment(clientFragment);
 		}
 	}
 

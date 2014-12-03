@@ -2,7 +2,7 @@ package jadex.android.clientappdemo;
 
 import jadex.android.clientappdemo.PlatformService.PlatformBinder;
 import jadex.android.clientappdemo.PlatformService.PlatformListener;
-import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.android.standalone.clientapp.ClientAppMainFragment;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.DefaultResultListener;
 import android.content.ComponentName;
@@ -23,7 +23,7 @@ import android.widget.Toast;
  * 
  * It connects to a Service which provides access to a jadex platform.
  */
-public class DefaultFragment extends ClientAppFragment implements ServiceConnection, PlatformListener
+public class DefaultFragment extends ClientAppMainFragment implements ServiceConnection, PlatformListener
 {
 	private TextView statusTextView;
 

@@ -6,7 +6,7 @@ import jadex.android.applications.chat.service.AndroidChatService.ChatEventListe
 import jadex.android.applications.chat.ChatUser;
 import jadex.android.applications.chat.ChatUserArrayAdapter;
 import jadex.android.applications.chat.R;
-import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.android.standalone.clientapp.ClientAppMainFragment;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.future.IResultListener;
@@ -39,7 +39,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SendFileActivity extends ClientAppFragment implements ServiceConnection, ChatEventListener
+public class SendFileActivity extends ClientAppMainFragment implements ServiceConnection, ChatEventListener
 {
 	// --- UI Widgets ---
 	private IAndroidChatService service;

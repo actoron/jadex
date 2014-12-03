@@ -33,7 +33,7 @@ import android.os.IBinder;
  * 
  * @author Julian Kalinowski
  */
-public class PlatformProvidingClientAppFragment extends ClientAppFragment implements ServiceConnection, JadexPlatformOptions
+public class PlatformProvidingClientAppFragment extends ClientAppMainFragment implements ServiceConnection, JadexPlatformOptions
 {
 
 	private Intent serviceIntent;

@@ -3,7 +3,7 @@ package jadex.android.puzzle;
 import jadex.android.puzzle.SokratesService.PlatformBinder;
 import jadex.android.puzzle.SokratesService.SokratesListener;
 import jadex.android.puzzle.ui.SokratesView;
-import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.android.standalone.clientapp.ClientAppMainFragment;
 import jadex.bdiv3.examples.puzzle.IBoard;
 import jadex.bdiv3.examples.puzzle.Move;
 import jadex.commons.beans.PropertyChangeEvent;
@@ -18,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SokratesFragment extends ClientAppFragment implements ServiceConnection
+public class SokratesFragment extends ClientAppMainFragment implements ServiceConnection
 {
 	protected static final String BDI = "BDI";
 	protected static final String BDIBenchmark = "BDIBenchmark";

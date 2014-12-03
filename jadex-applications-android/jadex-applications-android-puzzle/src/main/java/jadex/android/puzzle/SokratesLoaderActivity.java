@@ -3,7 +3,7 @@ package jadex.android.puzzle;
 import jadex.android.puzzle.R;
 import jadex.android.puzzle.SokratesService.PlatformBinder;
 import jadex.android.puzzle.SokratesService.PlatformListener;
-import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.android.standalone.clientapp.ClientAppMainFragment;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class SokratesLoaderActivity extends ClientAppFragment implements ServiceConnection, PlatformListener
+public class SokratesLoaderActivity extends ClientAppMainFragment implements ServiceConnection, PlatformListener
 {
 	private TextView statusTextView;
 

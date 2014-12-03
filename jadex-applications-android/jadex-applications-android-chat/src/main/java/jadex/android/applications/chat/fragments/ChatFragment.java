@@ -6,11 +6,14 @@ import jadex.android.applications.chat.R;
 import jadex.android.applications.chat.R.id;
 import jadex.android.applications.chat.R.layout;
 import jadex.android.applications.chat.filetransfer.TransferActivity;
+import jadex.android.applications.chat.model.ITypedObservable;
+import jadex.android.applications.chat.model.ITypedObserver;
 import jadex.android.applications.chat.model.UserModel;
 import jadex.android.applications.chat.service.AndroidChatService;
 import jadex.android.applications.chat.service.IAndroidChatService;
 import jadex.android.applications.chat.service.AndroidChatService.ChatEventListener;
 import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.android.standalone.clientapp.ClientAppMainFragment;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.commons.future.DefaultResultListener;
@@ -22,6 +25,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,8 +41,15 @@ import android.widget.ListView;
 /**
  * Fragment for the jadex android chat app.
  */
-public class ChatFragment extends ClientAppFragment implements ServiceConnection, ChatEventListener
+public class ChatFragment extends Fragment implements ClientAppFragment, ChatEventListener, ITypedObserver<Boolean>
 {
+	
+	public interface ChatServiceProvider extends ITypedObservable<Boolean> {
+		public boolean isConnected();
+		
+		public IAndroidChatService getChatService();
+	}
+	
 	// -------- attributes --------
 
 	/** The text view for showing results. */
@@ -50,29 +61,11 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 
 	private IAndroidChatService service;
 
-	private boolean connected;
+	private ChatServiceProvider chatServiceProvider;
 
 	// -------- methods --------
 	
-	@Override
-	public void onPrepare(Activity mainActivity)
-	{
-		super.onPrepare(mainActivity);
-		mainActivity.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		
-	}
 
-	/**
-	 * Called when the activity is first created.
-	 */
-	public void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		startService(new Intent(getActivity(), AndroidChatService.class));
-		setTitle("Jadex Chat");
-		System.out.println("activity create: " + IComponentIdentifier.LOCAL.get());
-	}
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -98,9 +91,6 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 	public void onResume()
 	{
 		super.onResume();
-		System.out.println("activity resume: " + IComponentIdentifier.LOCAL.get());
-		setProgressBarIndeterminateVisibility(true);
-		bindService(new Intent(getActivity(), AndroidChatService.class), this, BIND_AUTO_CREATE);
 	}
 
 	@Override
@@ -109,10 +99,19 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 		super.onPause();
 		if (service != null) {
 			service.removeMessageListener(this);
-			service.setStatus(ChatService.STATE_AWAY, null, null);
-			unbindService(this);
 		}
 	}
+	
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+	}
+	
+	@Override
+	public void onAttachMainFragment(ClientAppMainFragment mainFragment) {
+		this.chatServiceProvider = (ChatServiceProvider) mainFragment;
+		chatServiceProvider.addObserver(this);
+	};
 	
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
@@ -129,7 +128,7 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 		{
 		case 0:
 			service.shutdown();
-			finish();	
+			getActivity().finish();	
 			break;
 		case 1:
 			startActivity(new Intent(getActivity(), TransferActivity.class));
@@ -150,19 +149,19 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 		{
 			sendButton.setEnabled(false);
 			messageEditText.setEnabled(false);
-			setProgressBarIndeterminateVisibility(true);
+			getActivity().setProgressBarIndeterminateVisibility(true);
 			service.sendMessage(messageEditText.getText().toString()).addResultListener(new DefaultResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
-					runOnUiThread(new Runnable()
+					getActivity().runOnUiThread(new Runnable()
 					{
 						public void run()
 						{
 							messageEditText.setText("");
 							sendButton.setEnabled(true);
 							messageEditText.setEnabled(true);
-							setProgressBarIndeterminateVisibility(false);
+							getActivity().setProgressBarIndeterminateVisibility(false);
 						}
 					});
 				}
@@ -172,13 +171,13 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 				{
 					System.out.println("Chat message problem: " + exception);
 					exception.printStackTrace();
-					runOnUiThread(new Runnable()
+					getActivity().runOnUiThread(new Runnable()
 					{
 						public void run()
 						{
 							messageEditText.setEnabled(true);
 							sendButton.setEnabled(true);
-							setProgressBarIndeterminateVisibility(false);
+							getActivity().setProgressBarIndeterminateVisibility(false);
 						}
 					});
 				}
@@ -191,35 +190,6 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 
 	private UserModel userModel;
 
-	public void onServiceConnected(ComponentName comp, IBinder binder)
-	{
-		System.out.println("service connected: " + IComponentIdentifier.LOCAL.get());
-		this.service = (IAndroidChatService) binder;
-		this.service.addChatEventListener(this);
-	}
-
-	private void setConnected(final boolean b)
-	{
-		runOnUiThread(new Runnable()
-		{
-
-			@Override
-			public void run()
-			{
-				setProgressBarIndeterminateVisibility(false);
-				sendButton.setEnabled(b);
-				messageEditText.setEnabled(b);
-			}
-		});
-		this.connected = b;
-	}
-
-	public void onServiceDisconnected(ComponentName name)
-	{
-		this.service = null;
-		setConnected(false);
-	}
-
 	@Override
 	public boolean eventReceived(final ChatEvent event)
 	{
@@ -228,7 +198,7 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 		if (eventType.equals(ChatEvent.TYPE_MESSAGE))
 		{
 			processed = true;
-			runOnUiThread(new Runnable()
+			getActivity().runOnUiThread(new Runnable()
 			{
 				@Override
 				public void run()
@@ -238,7 +208,7 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 			});
 		} else if (eventType.equals(ChatEvent.TYPE_STATECHANGE)) {
 			processed = true;
-			runOnUiThread(new Runnable() {
+			getActivity().runOnUiThread(new Runnable() {
 				
 				@Override
 				public void run() {
@@ -255,7 +225,8 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 	public void chatConnected()
 	{
 		System.out.println("chat connected: " + IComponentIdentifier.LOCAL.get());
-		setConnected(true);
+		sendButton.setEnabled(true);
+		messageEditText.setEnabled(true);
 		this.service.getNickname().addResultListener(new DefaultResultListener<String>() {
 
 			@Override
@@ -266,7 +237,7 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 				chatEvent.setNick("System");
 				chatEvent.setPrivateMessage(true);
 				chatEvent.setValue("You are now connected as " + nick);
-				runOnUiThread(new Runnable() {
+				getActivity().runOnUiThread(new Runnable() {
 					
 					@Override
 					public void run() {
@@ -301,6 +272,26 @@ public class ChatFragment extends ClientAppFragment implements ServiceConnection
 //				});
 			}
 		});
+	}
+
+	@Override
+	public void update(ITypedObservable<Boolean> paramObservable,
+			Boolean paramObject, int notificationType) {
+		update(paramObservable, paramObject);
+	}
+
+	@Override
+	public void update(ITypedObservable<Boolean> paramObservable,
+			Boolean connected) {
+		if (connected) {
+			// service connected, wait for chat connected
+			service = chatServiceProvider.getChatService();
+			service.addChatEventListener(this);
+		} else {
+			// service disconnected
+			sendButton.setEnabled(connected);
+			messageEditText.setEnabled(connected);
+		}
 	}
 
 	// -------- helper methods --------
