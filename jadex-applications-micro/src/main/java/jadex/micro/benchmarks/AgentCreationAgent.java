@@ -19,12 +19,12 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.component.features.IComponentLifecycleFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -153,7 +153,7 @@ public class AgentCreationAgent
 							public IFuture<Void> execute(final IInternalAccess ia)
 							{
 								IClockService clock = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-								((AgentCreationAgent)ia.getComponentFeature(IComponentLifecycleFeature.class).getPojoAgent()).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
+								((AgentCreationAgent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent()).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
 								return IFuture.DONE;
 							}
 						});
