@@ -52,6 +52,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	private ApplicationInfo clientAppInfo;
 	
 	private ClientAppLayoutFactory layoutFactory;
+	private boolean clientAppContextReady;
 	
 	private static Map<String,ClassLoader> clCache = new HashMap<String, ClassLoader>();
 	
@@ -67,12 +68,13 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		currentCl = this.getClassLoader();
 		layoutFactory = new ClientAppLayoutFactory();
 		
-		super.onCreate(savedInstanceState);
-
 		Intent intent = getIntent();
 		if (intent != null && JadexClientLauncherActivity.INTENT_ACTION_LOADAPP.equals(intent.getAction()))
 		{
 			clientAppInfo = intent.getParcelableExtra(JadexClientLauncherActivity.EXTRA_KEY_APPLICATIONINFO);
+			clientAppContext = createClientAppContext(clientAppInfo);
+			setTheme(clientAppInfo.theme);
+			super.onCreate(savedInstanceState);
 			String appPath = clientAppInfo.sourceDir;
 			String className = intent.getStringExtra(JadexClientLauncherActivity.EXTRA_KEY_ACTIVITYCLASS);
 			String originalAction = intent.getStringExtra(JadexClientLauncherActivity.EXTRA_KEY_ORIGINALACTION);
@@ -115,6 +117,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		else
 		{
 			Logger.e("Please start this application with action net.sourceforge.jadex.LOAD_APPLICATION");
+			super.onCreate(savedInstanceState);
 			finish();
 			return;
 		}
@@ -167,35 +170,37 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 
 	private void initUserAppContext(String userApplicationPackage)
 	{
-		try
-		{
-			Context clientContext = createPackageContext(userApplicationPackage, 0);
-			clientAppContext = new ClientAppContextWrapper(clientContext, getOriginalApplicationContext());
-			// This LayoutInflater will make sure User Layouts are found
-			clientAppInflater = LayoutInflater.from(clientAppContext);
-			// This Factory will load custom Widget Classes, while android widgets
-			// are loaded by the ClassLoader inside the LayoutInflater.
-			clientAppInflater.setFactory(layoutFactory);
-			// Enable the use of R.id.<layoutId> or R.string.<stringId> inside the user app
-			resources = new ResourceSet(getResources(), clientAppContext.getResources());
-		}
-		catch (NameNotFoundException e)
-		{
+		clientAppContextReady = true;
+		// This LayoutInflater will make sure User Layouts are found
+		clientAppInflater = LayoutInflater.from(clientAppContext);
+		// This Factory will load custom Widget Classes, while android widgets
+		// are loaded by the ClassLoader inside the LayoutInflater.
+		clientAppInflater.setFactory(layoutFactory);
+		// Enable the use of R.id.<layoutId> or R.string.<stringId> inside the user app
+		resources = new ResourceSet(getResources(), clientAppContext.getResources());
+		
+	}
+
+	private ClientAppContextWrapper createClientAppContext(ApplicationInfo appInfo){
+		Context clientContext = null;
+		try {
+			clientContext = createPackageContext(appInfo.packageName, 0);
+		} catch (NameNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+		return new ClientAppContextWrapper(clientContext, getOriginalApplicationContext());
 	}
 
 	@Override
 	public Context getApplicationContext()
 	{
-		if (clientAppContext == null)
+		if (clientAppContextReady)
 		{
-			return super.getApplicationContext();
+			return clientAppContext;
 		}
 		else
 		{
-			return clientAppContext;
+			return super.getApplicationContext();
 		}
 	}
 	

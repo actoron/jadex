@@ -11,6 +11,7 @@
 	<application 
 	    android:icon="@drawable/icon" 
 	    android:screenOrientation="portrait" 
+	    android:theme="@android:style/Theme.Light"
 	    android:label="@string/app_name" android:debuggable="true">
 		<activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter"/>
 		<service android:name="AndroidChatService" android:label="AndroidChatService"/>
