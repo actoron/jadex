@@ -26,11 +26,11 @@ import jadex.micro.annotation.Results;
 @Agent
 @Description("Base description")
 @Imports({"b1", "b2"})
-@Properties({@NameValue(name="a", value="ba"), @NameValue(name="b", value="bb")})
+@Properties({@NameValue(name="a", value="\"ba\""), @NameValue(name="b", value="\"bb\"")})
 @RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @ProvidedServices(@ProvidedService(name="myservice", type=IAService.class, implementation=@Implementation(Object.class)))
-@Arguments(@Argument(name="arg1", defaultvalue="bval", clazz=String.class))
-@Results(@Result(name="res1", defaultvalue="bres", clazz=String.class))
+@Arguments(@Argument(name="arg1", defaultvalue="\"bval\"", clazz=String.class))
+@Results(@Result(name="res1", defaultvalue="\"bres\"", clazz=String.class))
 @Configurations({@Configuration(name="config1"), @Configuration(name="config2")})
 public abstract class BaseAgent
 {

@@ -28,6 +28,8 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
+		final Future<Void>	ret	= new Future<Void>();
+		
 		final TestReport	tr1	= new TestReport("#1", "Default configuration.");
 		testComponentResult(null, "initial1", ia)
 			.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
@@ -65,13 +67,13 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 					protected void next()
 					{
 						ia.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
-						ia.killComponent();
+						ret.setResult(null);
 					}
 				}));
 			}
 		}));
 		
-		return IFuture.DONE;
+		return ret;
 	}
 
 	/**
@@ -80,6 +82,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 	protected IFuture testComponentResult(final String config, final String expected, final IInternalAccess ia)
 	{
 		final Future	fut	= new Future();
+
 		ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)

@@ -42,11 +42,13 @@ import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
-import jadex.xml.reader.IObjectReaderHandler;
-import jadex.xml.reader.AReader;
 import jadex.xml.reader.AReadContext;
-import jadex.xml.reader.Reader;
+import jadex.xml.reader.AReader;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.XMLReaderFactory;
+import jadex.xml.stax.ILocation;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.XMLReporter;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -57,10 +59,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import jadex.xml.stax.QName;
-import jadex.xml.stax.ILocation;
-import jadex.xml.stax.XMLReporter;
 
 
 /**
@@ -207,7 +205,7 @@ public class ComponentXMLReader
 		{
 			mi.setFilename(rinfo.getFilename());
 			mi.setType(ComponentComponentFactory.FILETYPE_COMPONENT);
-//			mi.setClassloader(classloader);
+			mi.setClassloader(classloader);
 			mi.setStartable(true);
 			if(rid==null)
 			{

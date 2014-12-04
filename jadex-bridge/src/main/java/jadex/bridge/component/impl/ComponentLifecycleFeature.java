@@ -42,7 +42,7 @@ public class ComponentLifecycleFeature extends	AbstractComponentFeature implemen
 	}
 
 	/**
-	 *  Execute the functional body of the agent.
+	 *  Execute the functional body of the component.
 	 *  Is only called once.
 	 */
 	public IFuture<Void> body()
@@ -107,12 +107,68 @@ public class ComponentLifecycleFeature extends	AbstractComponentFeature implemen
 		return ret;
 	}
 
-//	/**
-//	 *  Called just before the agent is removed from the platform.
-//	 *  @return The result of the component.
-//	 */
-//	public IFuture<Void> shutdown()
-//	{
-//		return invokeMethod(AgentKilled.class);
-//	}
+	/**
+	 *  Called just before the component is removed from the platform.
+	 */
+	public IFuture<Void> shutdown()
+	{
+		IFuture<Void>	ret	= IFuture.DONE;
+		
+		ConfigurationInfo	ci	= getComponent().getConfiguration()!=null
+			? getComponent().getModel().getConfiguration(getComponent().getConfiguration())
+			: getComponent().getModel().getConfigurations().length>0 ? getComponent().getModel().getConfigurations()[0] : null;
+		
+		if(ci!=null)
+		{
+			UnparsedExpression[]	upes	= ci.getEndSteps();
+			if(upes.length>0)
+			{
+				Future<Void>	fut	= new Future<Void>();
+				ret	= fut;
+				List<IComponentStep>	steps	= new ArrayList<IComponentStep>();
+				
+				for(int i=0; !fut.isDone() && i<upes.length; i++)
+				{
+					Object	step	= null;
+					if(upes[i].getValue()!=null)
+					{
+						step	= SJavaParser.getParsedValue(upes[i], getComponent().getModel().getAllImports(), getComponent().getFetcher(), getComponent().getClassLoader());
+					}
+					else
+					{
+						Class<?> clazz = upes[i].getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
+						try
+						{
+							step	= clazz.newInstance();
+						}
+						catch(Exception e)
+						{
+							fut.setException(e);
+						}
+					}
+					
+					if(step instanceof IComponentStep)
+					{
+						steps.add((IComponentStep)step);
+					}
+					else if(step!=null)
+					{
+						fut.setException(new RuntimeException("Unsupported component end step, class="+upes[i].getClazz()+", value="+upes[i].getValue()));
+					}
+				}
+				
+				if(!fut.isDone())
+				{
+					IResultListener	crl	= new CounterResultListener(steps.size(), new DelegationResultListener<Void>(fut));
+					for(IComponentStep step: steps)
+					{
+						getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(step)
+							.addResultListener(crl);
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
 }

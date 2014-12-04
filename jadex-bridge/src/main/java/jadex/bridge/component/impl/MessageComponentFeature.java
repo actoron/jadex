@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl;
 
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -193,6 +194,17 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	}
 	
 	/**
+	 *  Inform the component that a stream has arrived.
+	 *  @param con The stream that arrived.
+	 */
+	public void streamArrived(IConnection con)
+	{
+		throw new UnsupportedOperationException();
+//		getComponent().getComponentFeature(IExecutionFeature.class)
+//			.scheduleStep(new HandleStreamStep(con));		
+	}
+	
+	/**
 	 *  Step to handle a message.
 	 */
 	public class HandleMessageStep	implements IComponentStep<Void>
@@ -206,6 +218,17 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 
 		public IFuture<Void> execute(IInternalAccess ia)
 		{
+			invokeHandlers(message);
+			return IFuture.DONE;
+		}
+
+		/**
+		 *  Extracted to allow overriding behaviour.
+		 *  @return true, when at least one matching handler was found.
+		 */
+		protected boolean invokeHandlers(IMessageAdapter message)
+		{
+			boolean	ret	= false;
 			if(messagehandlers!=null)
 			{
 				for(int i=0; i<messagehandlers.size(); i++)
@@ -213,6 +236,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					IMessageHandler mh = (IMessageHandler)messagehandlers.get(i);
 					if(mh.getFilter().filter(message))
 					{
+						ret	= true;
 						mh.handleMessage(message.getParameterMap(), message.getMessageType());
 						if(mh.isRemove())
 						{
@@ -221,7 +245,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					}
 				}
 			}
-			return IFuture.DONE;
+			return ret;
 		}
 
 		public String toString()

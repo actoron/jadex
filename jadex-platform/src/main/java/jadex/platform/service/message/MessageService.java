@@ -14,10 +14,8 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ServiceTerminatedException;
-import jadex.bridge.component.ICommunicationFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
-import jadex.bridge.component.impl.IInternalCommunicationFeature;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -2403,7 +2401,7 @@ public class MessageService extends BasicService implements IMessageService
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									IInternalCommunicationFeature	com	= (IInternalCommunicationFeature)ia.getComponentFeature(ICommunicationFeature.class);
+									IInternalMessageFeature	com	= (IInternalMessageFeature)ia.getComponentFeature(IMessageFeature.class);
 									if(com!=null)
 									{
 										com.streamArrived(fcon);
@@ -2478,7 +2476,7 @@ public class MessageService extends BasicService implements IMessageService
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									IInternalCommunicationFeature	com	= (IInternalCommunicationFeature)ia.getComponentFeature(ICommunicationFeature.class);
+									IInternalMessageFeature	com	= (IInternalMessageFeature)ia.getComponentFeature(IMessageFeature.class);
 									if(com!=null)
 									{
 										com.streamArrived(fcon);

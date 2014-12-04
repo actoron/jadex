@@ -165,7 +165,7 @@ public class DFTestAgent
 							// Set test success and continue test.
 							tr.setSucceeded(true);
 							IComponentIdentifier receiver = agentDesc[0].getName();
-							sendMessageToReceiver(receiver);
+							sendMessageToReceiver(receiver).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 						else
 						{
@@ -192,8 +192,6 @@ public class DFTestAgent
 	
 	private IFuture<Void> sendMessageToReceiver(IComponentIdentifier cid)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
 		final TestReport	tr	= new TestReport("#3", "Test sending message to service (i.e. myself).");
 		reports.add(tr);
 
@@ -205,19 +203,15 @@ public class DFTestAgent
 		
 		agent.getComponentFeature(IMessageFeature.class).sendMessage(hlefMessage, SFipa.FIPA_MESSAGE_TYPE);
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+		return agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Set test failure and kill agent.
 				tr.setFailed("No message received.");
-//				killAgent();
-				ret.setResult(null);
 				return IFuture.DONE;
 			}
 		});
-		
-		return ret;
 	}
 	
 	// todo: set body future?!

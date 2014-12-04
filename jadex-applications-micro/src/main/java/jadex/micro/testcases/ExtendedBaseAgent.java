@@ -43,11 +43,11 @@ import java.util.Set;
 @Agent
 @Description("Extended base description")
 @Imports({"eb1", "eb2"})
-@Properties({@NameValue(name="a", value="eba"), @NameValue(name="b", value="ebb")})
+@Properties({@NameValue(name="a", value="\"eba\""), @NameValue(name="b", value="\"ebb\"")})
 @RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL)))
 @ProvidedServices(@ProvidedService(name="myservice", type=IAService.class, implementation=@Implementation(MyAService.class)))
-@Arguments(@Argument(name="arg1", defaultvalue="ebval", clazz=String.class))
-@Results({@Result(name="res1", defaultvalue="ebres", clazz=String.class), @Result(name="testresults", clazz=Testcase.class)})
+@Arguments(@Argument(name="arg1", defaultvalue="\"ebval\"", clazz=String.class))
+@Results({@Result(name="res1", defaultvalue="\"ebres\"", clazz=String.class), @Result(name="testresults", clazz=Testcase.class)})
 @Configurations(replace=true, value=@Configuration(name="ebconfig1"))
 public class ExtendedBaseAgent extends BaseAgent
 {
@@ -93,8 +93,8 @@ public class ExtendedBaseAgent extends BaseAgent
 		tr = new TestReport("#3", "Test properties");
 		Map<String, Object> props = agent.getModel().getProperties();
 //		System.out.println("props: "+props);
-		if(((UnparsedExpression)props.get("a")).getValue().equals("eba") 
-			&& ((UnparsedExpression)props.get("b")).getValue().equals("ebb"))
+		if(((UnparsedExpression)props.get("a")).getValue().equals("\"eba\"") 
+			&& ((UnparsedExpression)props.get("b")).getValue().equals("\"ebb\""))
 		{
 			tr.setSucceeded(true);
 		}
@@ -133,7 +133,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		tr = new TestReport("#6", "Arguments");
 		IArgument[] args = agent.getModel().getArguments();
 //		System.out.println("args: "+SUtil.arrayToString(args));
-		if(((UnparsedExpression)args[0].getDefaultValue()).getValue().equals("ebval"))
+		if(((UnparsedExpression)args[0].getDefaultValue()).getValue().equals("\"ebval\""))
 		{
 			tr.setSucceeded(true);
 		}
@@ -146,7 +146,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		tr = new TestReport("#7", "Results");
 		IArgument[] res = agent.getModel().getResults();
 //		System.out.println("res: "+SUtil.arrayToString(res));
-		if(((UnparsedExpression)res[0].getDefaultValue()).getValue().equals("ebres"))
+		if(((UnparsedExpression)res[0].getDefaultValue()).getValue().equals("\"ebres\""))
 		{
 			tr.setSucceeded(true);
 		}

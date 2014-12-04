@@ -98,23 +98,27 @@ public class SComponentFactory
 			IComponentFeatureFactory last = null;
 			for(IComponentFeatureFactory fac: facs)
 			{
-				dr.addNode(fac);
-				if(last!=null)
+				// Only use the last feature of a given type (allows overriding features)
+				if(facsmap.get(fac.getType())==fac)
 				{
-					dr.addDependency(fac, last);
+					dr.addNode(fac);
+					if(last!=null)
+					{
+						dr.addDependency(fac, last);
+					}
+					
+					Set<Class<?>> sucs = fac.getSuccessors();
+					for(Class<?> suc: sucs)
+					{
+						dr.addDependency(facsmap.get(suc), facsmap.get(fac.getType()));
+					}
+					Set<Class<?>> pres = fac.getPredecessors();
+					for(Class<?> pre: pres)
+					{
+						dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
+					}
+					last = fac;
 				}
-				
-				Set<Class<?>> sucs = fac.getSuccessors();
-				for(Class<?> suc: sucs)
-				{
-					dr.addDependency(facsmap.get(suc), facsmap.get(fac.getType()));
-				}
-				Set<Class<?>> pres = fac.getPredecessors();
-				for(Class<?> pre: pres)
-				{
-					dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
-				}
-				last = fac;
 			}
 		}
 

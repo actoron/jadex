@@ -20,7 +20,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
-import jadex.micro.features.impl.MicroLifecycleFeature;
+import jadex.micro.features.impl.MicroLifecycleComponentFeature;
+import jadex.micro.features.impl.MicroMessageComponentFeature;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -52,7 +53,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public static final Collection<IComponentFeatureFactory>	MICRO_FEATURES	= Collections.unmodifiableCollection(
 		Arrays.asList(
 			MicroInjectionComponentFeature.FACTORY,
-			MicroLifecycleFeature.FACTORY
+			MicroLifecycleComponentFeature.FACTORY,
+			MicroMessageComponentFeature.FACTORY
 		));
 
 	//-------- attributes --------
