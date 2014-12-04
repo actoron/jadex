@@ -120,6 +120,7 @@
 <!-- 				<aaptExtraArgs> -->
 <!-- 					<aaptExtraArg>-x</aaptExtraArg> -->
 <!-- 				</aaptExtraArgs> -->
+					<apkDebug>true</apkDebug>
 				</configuration>
 			</plugin>
 
