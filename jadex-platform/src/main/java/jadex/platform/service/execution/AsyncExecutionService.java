@@ -1,6 +1,7 @@
 package jadex.platform.service.execution;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -135,7 +136,20 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					{
 						idf.setResult(null);
 					}
-				}					
+				}
+
+				// Hack!!! Skip shutdown of platform executor for "boot unstrapping" -> executor will finish after no more steps
+				public IFuture<Void> shutdown()
+				{
+					if(task instanceof AbstractComponentFeature && ((AbstractComponentFeature)task).getComponent().getComponentIdentifier().equals(getServiceIdentifier().getProviderId()))
+					{
+						return IFuture.DONE;
+					}
+					else
+					{
+						return super.shutdown();
+					}
+				}
 			};
 			executors.put(task, exe);
 		}
@@ -300,6 +314,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 //								{
 //									System.out.println("shutdown 4b: "+AsyncExecutionService.this+", "+exe);
 //								}
+								
 								exe.shutdown().addResultListener(lis);
 							}
 							else

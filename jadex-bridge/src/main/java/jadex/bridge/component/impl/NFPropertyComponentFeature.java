@@ -311,7 +311,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		{
 			if(sclazz.isAnnotationPresent(NFProperties.class))
 			{
-				addNFProperties(sclazz.getAnnotation(NFProperties.class), null, null).addResultListener(lis);
+				addNFProperties(sclazz.getAnnotation(NFProperties.class), ser).addResultListener(lis);
 				cnt++;
 			}
 			
@@ -331,7 +331,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		
 		for(MethodInfo key: meths.keySet())
 		{
-			addNFProperties(meths.get(key).getAnnotation(NFProperties.class), ser, key).addResultListener(lis);
+			addNFMethodProperties(meths.get(key).getAnnotation(NFProperties.class), ser, key).addResultListener(lis);
 			cnt++;
 		}
 		
@@ -344,7 +344,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	/**
 	 *  Add nf properties from a type.
 	 */
-	public IFuture<Void> addNFProperties(NFProperties nfprops, IService ser, MethodInfo mi)
+	public IFuture<Void> addNFProperties(NFProperties nfprops, IService ser)
 	{
 		Future<Void> ret = new Future<Void>();
 		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getServiceIdentifier());

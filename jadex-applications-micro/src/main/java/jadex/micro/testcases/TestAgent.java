@@ -205,7 +205,7 @@ public abstract class TestAgent
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
 		String[] defargs = new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-//			"-logging", "true",
+			"-logging", "true",
 //			"-relaytransport", "false",
 			"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
 			"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp

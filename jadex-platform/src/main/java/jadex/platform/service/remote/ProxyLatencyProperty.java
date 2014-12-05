@@ -8,6 +8,7 @@ import jadex.bridge.nonfunctional.NFRootProperty;
 import jadex.bridge.sensor.unit.TimeUnit;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 /**
  *  The latency of a remote platform.
@@ -32,7 +33,7 @@ public class ProxyLatencyProperty extends NFRootProperty<Long, TimeUnit>
 	 */
 	public Long measureValue()
 	{
-		ProxyAgent pa = (ProxyAgent)getComponent();
+		ProxyAgent pa = (ProxyAgent)getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 		pa.getCurrentLatency().addResultListener(new IResultListener<Long>()
 		{
 			public void resultAvailable(Long result)
