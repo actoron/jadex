@@ -163,7 +163,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		while(fut.isDone() && fut.getException()==null && features.hasNext())
 		{
 			IComponentFeature	cf	= features.next();
-//			if(getComponentIdentifier().getName().indexOf("kernels")!=-1)
+//			if(getComponentIdentifier().getName().indexOf("Interceptor")!=-1)
 //				System.out.println("Initing "+cf+" of "+getComponentIdentifier());
 			ifeatures.add(cf);
 			fut	= cf.init();
@@ -185,11 +185,15 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			if(fut.getException()!=null)
 			{
+//				System.out.println("Initing of "+getComponentIdentifier()+" failed due to "+fut.getException());
+				
 				// Init failed: remove failed feature.
 				ifeatures.remove(ifeatures.size()-1);
 			}
 			else
 			{
+//				System.out.println("Initing of "+getComponentIdentifier()+" done.");
+				
 				// Init succeeded: list no longer needed.
 				ifeatures	= null;
 			}
@@ -207,7 +211,11 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		IFuture<Void>	fut	= IFuture.DONE;
 		while(fut.getException()==null && features.hasNext())
 		{
-			fut	= features.next().body();
+			IComponentFeature	cf	= features.next();
+//			if(getComponentIdentifier().getName().indexOf("Interceptor")!=-1)
+//				System.out.println("Starting "+cf+" of "+getComponentIdentifier());
+			fut	= cf.body();
+			
 			if(!fut.isDone())
 			{
 				undones.add(fut);
@@ -222,7 +230,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				public void customResultAvailable(Void result)
 				{
 					Boolean	keepalive	= getModel().getKeepalive(getConfiguration());
-					if(keepalive==null || !keepalive.booleanValue())
+					if(keepalive!=null && !keepalive.booleanValue())
 					{
 						killComponent();
 					}

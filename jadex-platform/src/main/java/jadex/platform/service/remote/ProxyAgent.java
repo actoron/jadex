@@ -19,7 +19,9 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -38,7 +40,7 @@ import java.util.Map;
 @ProvidedServices(@ProvidedService(type=IProxyAgentService.class))
 @NFProperties(@NFProperty(ProxyLatencyProperty.class))
 @Service
-
+@Agent
 //@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, multiple=true,
 //	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true),
 //	nfprops=@NFRProperty(value=LatencyProperty.class, methodname="getConnectionState")))
@@ -47,6 +49,7 @@ public class ProxyAgent	implements IProxyAgentService
 	//-------- attributes --------
 	
 	/** The agent. */
+	@Agent
 	protected IInternalAccess agent;
 	
 	/**  The remote component identifier. */
@@ -64,6 +67,7 @@ public class ProxyAgent	implements IProxyAgentService
 	/**
 	 *  The agent created method.
 	 */
+	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, rcid.getRoot())

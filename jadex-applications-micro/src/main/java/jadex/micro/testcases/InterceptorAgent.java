@@ -16,6 +16,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -37,7 +38,7 @@ import java.util.List;
 @ProvidedServices(@ProvidedService(name="aservice", type=IAService.class, implementation=
 	@Implementation(expression="$pojoagent", interceptors=@Value("$pojoagent.provinter"))))
 @RequiredServices(@RequiredService(name="aservice", type=IAService.class, 
-	binding=@Binding(scope="local", interceptors=@Value("$component.reqinter"))))
+	binding=@Binding(scope="local", interceptors=@Value("$pojoagent.reqinter"))))
 @Service(IAService.class)
 @Agent
 public class InterceptorAgent implements IAService
@@ -51,18 +52,19 @@ public class InterceptorAgent implements IAService
 	/**
 	 *  Just finish the test by setting the result and killing the agent.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final List testresults = new ArrayList();
-		performProvidedServiceTest(testresults).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+		final List<TestReport> testresults = new ArrayList<TestReport>();
+		performProvidedServiceTest(testresults).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				performRequiredServiceTest(testresults).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				performRequiredServiceTest(testresults).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
 //						System.out.println("testresults: "+testresults);
 						TestReport[] tr = (TestReport[])testresults.toArray(new TestReport[testresults.size()]);
@@ -80,13 +82,13 @@ public class InterceptorAgent implements IAService
 	/**
 	 *  Perform test for provided service.
 	 */
-	public IFuture performProvidedServiceTest(final List testresults)
+	public IFuture<Void> performProvidedServiceTest(final List<TestReport> testresults)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		IAService ser = (IAService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService("aservice");
-		ser.test().addResultListener(new DelegationResultListener(ret)
+		ser.test().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				TestReport tr = new TestReport("#1", "Provided service test.");
 				if(provinter.getCnt()==1)
@@ -107,17 +109,17 @@ public class InterceptorAgent implements IAService
 	/**
 	 *  Perform test for required service.
 	 */
-	public IFuture performRequiredServiceTest(final List testresults)
+	public IFuture<Void> performRequiredServiceTest(final List<TestReport> testresults)
 	{
-		final Future ret = new Future();
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("aservice").addResultListener(new DefaultResultListener()
+		final Future<Void> ret = new Future<Void>();
+		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("aservice").addResultListener(new DefaultResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
 			{
 				IAService ser = (IAService)result;
-				ser.test().addResultListener(new DefaultResultListener()
+				ser.test().addResultListener(new DefaultResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
 						TestReport tr = new TestReport("#2", "Required service test.");
 						if(reqinter.getCnt()==1)

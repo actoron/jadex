@@ -1,11 +1,10 @@
 package jadex.micro.features.impl;
 
-import jadex.bridge.IConnection;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
@@ -34,24 +33,12 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 	//-------- IInternalMessageFeature interface --------
 	
 	/**
-	 *  Inform the component that a message has arrived.
-	 *  @param message The message that arrived.
+	 *  Helper method to override message handling.
+	 *  May be called from external threads.
 	 */
-	public void messageArrived(IMessageAdapter message)
+	protected IComponentStep<Void> createHandleMessageStep(IMessageAdapter message)
 	{
-		getComponent().getComponentFeature(IExecutionFeature.class)
-			.scheduleStep(new HandleMicroMessageStep(message));
-	}
-	
-	/**
-	 *  Inform the component that a stream has arrived.
-	 *  @param con The stream that arrived.
-	 */
-	public void streamArrived(IConnection con)
-	{
-		throw new UnsupportedOperationException();
-//		getComponent().getComponentFeature(IExecutionFeature.class)
-//			.scheduleStep(new HandleStreamStep(con));		
+		return new HandleMicroMessageStep(message);
 	}
 	
 	/**

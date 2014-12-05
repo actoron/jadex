@@ -12,6 +12,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -46,6 +47,7 @@ public class MultiServiceAgent	implements IAddService, ISubService
 	/**
 	 *  Search for the two services and check if they work as expected.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void>	ret	= new Future<Void>();

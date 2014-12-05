@@ -53,13 +53,5 @@ public class RequiredServiceConfigurationsAgent
 		}
 		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		return IFuture.DONE;
-	}
-	
-//	/**
-//	 *  The body.
-//	 */
-//	public void executeBody()
-//	{
-//		killAgent();
-//	}
+	}	
 }

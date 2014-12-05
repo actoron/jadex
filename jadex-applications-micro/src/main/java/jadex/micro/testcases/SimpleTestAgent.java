@@ -30,16 +30,7 @@ public class SimpleTestAgent
 		TestReport	tr	= new TestReport("#1", "Simple micro test.");
 		tr.setSucceeded(true);
 		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-//		killAgent();
-//		return IFuture.DONE;
+		agent.killComponent();
 	}
-	
-//	/**
-//	 *  Add the 'testresults' marking this agent as a testcase. 
-//	 */
-//	public static Object getMetaInfo()
-//	{
-//		return new MicroAgentMetaInfo("A simple test showing how the test center works with micro agents.", 
-//			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")});
-//	}
+
 }

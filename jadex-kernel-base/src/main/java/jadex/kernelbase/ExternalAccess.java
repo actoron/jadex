@@ -27,6 +27,7 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -35,6 +36,7 @@ import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -610,6 +612,12 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 						fut.addResultListener(lis);
 						return IFuture.DONE;
+					}
+				}).addResultListener(new ExceptionDelegationResultListener<Void, Collection<IMonitoringEvent>>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						// Nop. only forward exception.
 					}
 				});
 			}

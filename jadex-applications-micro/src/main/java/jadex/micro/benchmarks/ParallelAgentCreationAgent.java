@@ -18,6 +18,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -46,7 +47,7 @@ public class ParallelAgentCreationAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	@AgentCreated
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		Map arguments = agent.getComponentFeature(IArgumentsFeature.class).getArguments();			

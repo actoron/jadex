@@ -708,6 +708,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						
 						public void exceptionOccurred(Exception exception)
 						{
+							// Todo: fail fast vs robust components.
+							
 							StringWriter	sw	= new StringWriter();
 							exception.printStackTrace(new PrintWriter(sw));
 							getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
@@ -725,10 +727,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					e.printStackTrace(new PrintWriter(sw));
 					getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
 				}
-				else
-				{
-					step.getSecondEntity().setException(e);
-				}
+				
+				step.getSecondEntity().setException(e);
 			}
 			
 			synchronized(this)

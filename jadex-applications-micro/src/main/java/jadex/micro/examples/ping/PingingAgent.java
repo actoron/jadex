@@ -13,6 +13,8 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -55,6 +57,7 @@ public class PingingAgent
 	/**
 	 *  Execute the body.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -119,6 +122,7 @@ public class PingingAgent
 	/**
 	 *  Called when a message arrives.
 	 */
+	@AgentMessageArrived
 	public void messageArrived(Map msg, MessageType mt)
 	{
 		if(mt.equals(SFipa.FIPA_MESSAGE_TYPE))

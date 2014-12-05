@@ -834,9 +834,20 @@ public class ModelInfo extends Startable implements IModelInfo
 		Boolean ret = null;
 		ConfigurationInfo config = getConfiguration(configname);
 		if(config!=null)
+		{
 			ret = config.getKeepalive();
+		}
 		if(ret==null)
+		{
 			ret = super.getKeepalive();
+		}
+		
+		// Auto terminate on default, when there are initial steps.
+		if(ret==null && config!=null && config.getInitialSteps().length>0)
+		{
+			ret	= Boolean.FALSE;
+		}
+		
 		return ret;
 	}
 

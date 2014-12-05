@@ -116,11 +116,12 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public static IFuture<Void> invokeMethod(IInternalAccess component, Class<? extends Annotation> ann, Object[] args)
 	{
+		IFuture<Void> ret;
+		
 		MicroModel	model = (MicroModel)component.getModel().getRawModel();
 		MethodInfo	mi	= model.getAgentMethod(ann);
 		if(mi!=null)
 		{
-			final Future<Void> ret = new Future<Void>();
 			Method	method	= mi.getMethod(component.getClassLoader());
 			
 			// Try to guess parameters from given args or component internals.
@@ -154,25 +155,25 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 				Object res = method.invoke(component.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent(), iargs);
 				if(res instanceof IFuture)
 				{
-					((IFuture<Void>)res).addResultListener(component.getComponentFeature(IExecutionFeature.class)
-						.createResultListener(new DelegationResultListener<Void>(ret)));
+					ret	= (IFuture<Void>)res;
 				}
 				else
 				{
-					ret.setResult(null);
+					ret	= IFuture.DONE;
 				}
 			}
 			catch(Exception e)
 			{
 				e = (Exception)(e instanceof InvocationTargetException && ((InvocationTargetException)e)
 					.getTargetException() instanceof Exception? ((InvocationTargetException)e).getTargetException(): e);
-				ret.setException(e);
+				ret	= new Future<Void>(e);
 			}
-			return ret;
 		}
 		else
 		{
-			return IFuture.DONE;
+			ret	= IFuture.DONE;
 		}
+		
+		return ret;
 	}
 }

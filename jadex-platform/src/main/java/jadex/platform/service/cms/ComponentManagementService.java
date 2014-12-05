@@ -753,10 +753,7 @@ public class ComponentManagementService implements IComponentManagementService
 																								}
 																							}
 																						}
-																					}
-																					
-																					if(killfut!=null)
-																					{
+																						
 																						// Kill component if destroy called during init.
 																						destroyComponent(cid, killfut);
 																					}

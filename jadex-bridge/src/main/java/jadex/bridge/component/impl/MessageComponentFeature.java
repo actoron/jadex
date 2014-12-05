@@ -19,7 +19,10 @@ import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -190,9 +193,33 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public void messageArrived(IMessageAdapter message)
 	{
 		getComponent().getComponentFeature(IExecutionFeature.class)
-			.scheduleStep(new HandleMessageStep(message));
+			.scheduleStep(createHandleMessageStep(message))
+			.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				// NOP
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// Todo: fail fast components?
+				StringWriter	sw	= new StringWriter();
+				exception.printStackTrace(new PrintWriter(sw));
+				getComponent().getLogger().severe("Exception during message processing\n"+sw);
+			}
+		});
 	}
 	
+	/**
+	 *  Helper method to override message handling.
+	 *  May be called from external threads.
+	 */
+	protected IComponentStep<Void>	createHandleMessageStep(IMessageAdapter message)
+	{
+		return new HandleMessageStep(message);
+	}
+
 	/**
 	 *  Inform the component that a stream has arrived.
 	 *  @param con The stream that arrived.

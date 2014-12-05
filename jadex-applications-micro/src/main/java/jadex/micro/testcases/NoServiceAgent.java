@@ -15,7 +15,7 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
-import java.util.Collections;
+import java.util.Collection;
 
 /**
  *  Test searching for services that don't exist. 
@@ -35,20 +35,19 @@ public class NoServiceAgent
 		
 		final TestReport	tr	= new TestReport("#1", "Searching for services.");
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(INoService.class).addResultListener(new IResultListener()
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(INoService.class).addResultListener(new IResultListener<Collection<INoService>>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Collection<INoService> result)
 			{
-				if(Collections.EMPTY_LIST.equals(result))
+				if(result.isEmpty())
 				{
 					tr.setSucceeded(true);
 				}
 				else
 				{
-					tr.setFailed("Expected empty list but was: "+result);
+					tr.setFailed("Expected empty collection but was: "+result);
 				}
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-//				killAgent();
 				ret.setResult(null);
 			}
 			
@@ -56,7 +55,6 @@ public class NoServiceAgent
 			{
 				tr.setFailed("Exception during test: "+exception);
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-//				killAgent();
 				ret.setResult(null);
 			}
 		});
@@ -66,13 +64,4 @@ public class NoServiceAgent
 	
 	/** Test service interface. */
 	public static interface	INoService	extends IService {}
-	
-//	/**
-//	 *  Add the 'testresults' marking this agent as a testcase. 
-//	 */
-//	public static Object getMetaInfo()
-//	{
-//		return new MicroAgentMetaInfo("Test searching for services that don't exist.", 
-//			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")});
-//	}
 }

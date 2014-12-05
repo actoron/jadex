@@ -19,7 +19,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -69,14 +68,14 @@ public class DependendServicesAgent
     public IFuture<Void> agentCreated()
     {
         final Future<Void> ret = new Future<Void>();
-        getChildrenAccesses().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
+        getChildrenAccesses().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
         {
-            public void resultAvailable(Collection<IExternalAccess> result)
+            public void customResultAvailable(Collection<IExternalAccess> result)
             {
             	IExternalAccess[] childs = (IExternalAccess[])result.toArray(new IExternalAccess[0]);
 //   			System.out.println("childs: "+SUtil.arrayToString(childs));
                 final CollectionResultListener<Collection<TestReport>> lis = new CollectionResultListener<Collection<TestReport>>(childs.length, true, 
-                	agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<Collection<TestReport>>>()
+                	agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Collection<TestReport>>>()
                 {
                     public void resultAvailable(Collection<Collection<TestReport>> result)
                     {
@@ -92,13 +91,18 @@ public class DependendServicesAgent
 						
 						agent.killComponent();
                     }
+                    
+                    public void exceptionOccurred(Exception exception)
+                    {
+						agent.killComponent(exception);
+                    }
                 }));
 
                 for(int i=0; i<childs.length; i++)
                 {
                     final IExternalAccess child = childs[i];
                     child.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
-						.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
+						.addResultListener(new IntermediateDefaultResultListener<IMonitoringEvent>()
 					{
 						public void intermediateResultAvailable(IMonitoringEvent result)
 						{
@@ -117,9 +121,15 @@ public class DependendServicesAgent
                                 }
                             }));
 						}
-					}));
+						
+						public void exceptionOccurred(Exception exception)
+						{
+                        	lis.exceptionOccurred(exception);
+						}
+					});
                 }
-                ret.setException(null);
+//                ret.setException(null);	// ???
+                ret.setResult(null);
             }
         }));
         return ret;

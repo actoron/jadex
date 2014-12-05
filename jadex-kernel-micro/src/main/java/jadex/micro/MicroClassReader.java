@@ -31,6 +31,7 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -74,7 +75,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -113,7 +116,7 @@ public class MicroClassReader
 		clname = clname.replace('\\', '.');
 		clname = clname.replace('/', '.');
 		
-		Class cma = getMicroAgentClass(clname, imports, classloader);
+		Class<?> cma = getMicroAgentClass(clname, imports, classloader);
 		
 		return read(model, cma, classloader, rid, root);
 	}
@@ -274,33 +277,40 @@ public class MicroClassReader
 				Boolean	mast	= val.master().toBoolean();
 				Boolean	daem	= val.daemon().toBoolean();
 				Boolean	auto	= val.autoshutdown().toBoolean();
-				PublishEventLevel moni = val.monitoring();
 				Boolean	sync	= val.synchronous().toBoolean();
 				Boolean	persist	= val.persistable().toBoolean();
-				if(susp!=null)
+				Boolean	keep	= val.keepalive().toBoolean();
+
+				if(susp!=null && modelinfo.getSuspend()==null)
 				{
 					modelinfo.setSuspend(susp);
 				}
-				if(mast!=null)
+				if(mast!=null && modelinfo.getMaster()==null)
 				{
 					modelinfo.setMaster(mast);
 				}
-				if(daem!=null)
+				if(daem!=null && modelinfo.getDaemon()==null)
 				{
 					modelinfo.setDaemon(daem);
 				}
-				if(auto!=null)
+				if(auto!=null && modelinfo.getAutoShutdown()==null)
 				{
 					modelinfo.setAutoShutdown(auto);
 				}
-				if(sync!=null)
+				if(sync!=null && modelinfo.getSynchronous()==null)
 				{
 					modelinfo.setSynchronous(sync);
 				}
-				if(persist!=null)
+				if(persist!=null && modelinfo.getPersistable()==null)
 				{
 					modelinfo.setPersistable(persist);
 				}
+				if(keep!=null && modelinfo.getKeepalive()==null)
+				{
+					modelinfo.setKeepalive(keep);
+				}
+				
+				PublishEventLevel moni = val.monitoring();
 				if(!PublishEventLevel.NULL.equals(moni))
 				{
 					modelinfo.setMonitoring(moni);
@@ -818,26 +828,50 @@ public class MicroClassReader
 
 				if(isAnnotationPresent(methods[i], AgentCreated.class, cl))
 				{
+					checkMethodReturnType(AgentCreated.class, methods[i]);
 					micromodel.setAgentMethod(AgentCreated.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentBody.class, cl))
 				{
+					checkMethodReturnType(AgentBody.class, methods[i]);
+					
+					// Set default keepalive to false, when not plain void body (i.e., future return value).
+					boolean	isvoid	= methods[i].getReturnType().equals(void.class);
+					if(!isvoid)
+					{
+						if(modelinfo.getKeepalive()==null)
+						{
+							modelinfo.setKeepalive(Boolean.FALSE);
+						}
+						for(ConfigurationInfo ci: modelinfo.getConfigurations())
+						{
+							if(ci.getKeepalive()==null)
+							{
+								ci.setKeepalive(Boolean.FALSE);								
+							}
+						}
+					}
+					
 					micromodel.setAgentMethod(AgentBody.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentKilled.class, cl))
 				{
+					checkMethodReturnType(AgentKilled.class, methods[i]);
 					micromodel.setAgentMethod(AgentKilled.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentBreakpoint.class, cl))
 				{
+					// todo: check boolean return type.
 					micromodel.setAgentMethod(AgentBreakpoint.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentStreamArrived.class, cl))
 				{
+					checkMethodReturnType(AgentStreamArrived.class, methods[i]);
 					micromodel.setAgentMethod(AgentStreamArrived.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentMessageArrived.class, cl))
 				{
+					checkMethodReturnType(AgentMessageArrived.class, methods[i]);
 					micromodel.setAgentMethod(AgentMessageArrived.class, new MethodInfo(methods[i]));
 				}
 			}
@@ -916,6 +950,32 @@ public class MicroClassReader
 				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, iface, impl, null, null, null);
 				modelinfo.addProvidedService(psi);
 			}
+		}
+	}
+	
+	/**
+	 *  Check, if the return type of the agent method is acceptable.
+	 */
+	protected void checkMethodReturnType(Class<? extends Annotation> ann, Method m)
+	{
+		// Todo: allow other return types than void 
+		boolean	isvoid	= m.getReturnType().equals(void.class);
+		boolean isfuture	= !isvoid && SReflect.isSupertype(IFuture.class, m.getReturnType());
+		if(isfuture)
+		{
+			Type	t	= m.getGenericReturnType();
+			isvoid	= !(t instanceof ParameterizedType);	// Assume void when no future type given.
+			if(!isvoid)
+			{
+				ParameterizedType	p	= (ParameterizedType)t;
+				Type[]	ts	= p.getActualTypeArguments();
+				isvoid	= ts.length==1 && ts[0].equals(Void.class);
+			}
+		}
+		
+		if(!isvoid)
+		{
+			throw new RuntimeException("@"+ann.getSimpleName()+" method requires return type 'void' or 'IFuture<Void>': "+m);
 		}
 	}
 	
