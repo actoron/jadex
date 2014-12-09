@@ -48,7 +48,7 @@ public class RSHelloTest //extends TestCase
 		publishService.get(sus);
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false", "-deftimeout", "-1",
+		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
 //				"-componentfactory", "jadex.component.ComponentComponentFactory",
 //				"-conf", "jadex/platform/Platform.component.xml",
 				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
