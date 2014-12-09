@@ -3,6 +3,7 @@ package jadex.base.test.impl;
 
 import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
+import jadex.base.test.Testcase;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -52,6 +53,9 @@ public class ComponentStartTest extends	TestCase
 	/** The component full name. */
 	protected String	fullname;
 	
+	/** The timeout. */
+	protected long	timeout;
+
 	/** The test suite. */
 	protected ComponentTestSuite	suite;
 	
@@ -70,6 +74,15 @@ public class ComponentStartTest extends	TestCase
 		this.filename	= comp.getFilename();
 		this.rid	= comp.getResourceIdentifier();
 		this.fullname	= comp.getFullName();
+		Object	to	= comp.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, suite.getClassLoader());
+		if(to!=null)
+		{
+			this.timeout	= ((Number)to).longValue();
+		}
+		else
+		{
+			this.timeout	= BasicService.getLocalDefaultTimeout();
+		}
 		this.suite	= suite;
 	}
 	
@@ -104,9 +117,9 @@ public class ComponentStartTest extends	TestCase
 		{
 			public void run()
 			{
-				finished.setExceptionIfUndone(new TimeoutException(this+" did not finish in "+BasicService.getLocalDefaultTimeout()+" ms."));
+				finished.setExceptionIfUndone(new TimeoutException(ComponentStartTest.this+" did not finish in "+timeout+" ms."));
 			}
-		}, BasicService.getLocalDefaultTimeout());
+		}, timeout);
 		final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
 			new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
 		System.out.println("started: "+this);

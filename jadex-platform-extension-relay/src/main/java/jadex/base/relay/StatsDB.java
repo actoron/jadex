@@ -171,16 +171,13 @@ public class StatsDB
 	/**
 	 *  Create a derby db connection.
 	 */
-	protected Connection	openHsqlDB()	throws Exception
+	protected Connection	openH2DB()	throws Exception
 	{
-		// Set up derby and create a database connection
-		System.setProperty("derby.system.home", RelayHandler.SYSTEMDIR.getAbsolutePath());		
-		// New instance required in case derby is reloaded in same VM (e.g. servlet container).
-		Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
-		Connection	con	= DriverManager.getConnection("jdbc:derby:mydb;create=true");
+		Class.forName("org.h2.Driver");
+		Connection	con	= DriverManager.getConnection("jdbc:h2:"+RelayHandler.SYSTEMDIR.getAbsolutePath()+"/h2db");
 
 		// Create the platform info table, if it doesn't exist.
-//			con.createStatement().execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
+//		con.createStatement().execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
 		DatabaseMetaData	meta	= con.getMetaData();
 		ResultSet	rs	= meta.getTables(null, "RELAY", "PLATFORMINFO", null);
 		if(!rs.next())

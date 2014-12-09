@@ -112,7 +112,7 @@ public class ComponentTest extends TestCase
 		{
 			public void run()
 			{
-				finished.setExceptionIfUndone(new TimeoutException(this+" did not finish in "+timeout+" ms."));
+				finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
 			}
 		}, timeout);
 
