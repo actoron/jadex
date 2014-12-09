@@ -110,8 +110,6 @@ public final class PlatformInfo
 	public PlatformInfo(String id, String hostip, String hostname, String protocol)
 	{
 		this(null, id, hostip, hostname, protocol, new Date(), null, 0, 0, 0);
-		
-		StatsDB.getDB().save(this);
 	}
 	
 	/**
@@ -363,8 +361,6 @@ public final class PlatformInfo
 		msg_cnt++;
 		bytes_received	+= bytes;
 		total_transmission_time	+= time / 1000000.0;
-		
-//		StatsDB.getDB().save(this);
 	}
 	
 	/**
@@ -381,8 +377,6 @@ public final class PlatformInfo
 //		this.connect_time	= new Date();
 		
 		setAwarenessInfo(null);
-		
-//		StatsDB.getDB().save(this);
 	}
 	
 	/**
@@ -391,9 +385,6 @@ public final class PlatformInfo
 	public void	disconnect()
 	{
 		this.disconnect_time	= new Date();
-//		System.out.println("disco1: "+getId()+", "+disconnect_time);
-		
-		StatsDB.getDB().save(this);
 	}
 	
 	/**
@@ -405,10 +396,6 @@ public final class PlatformInfo
 		if(awainfo!=null)
 		{
 			setProperties(awainfo.getProperties());
-			if(dbid==null || dbid.intValue()!=-1)
-			{
-				StatsDB.getDB().save(this);
-			}
 		}
 	}
 	
@@ -495,6 +482,7 @@ public final class PlatformInfo
 
 	/**
 	 *  Get the properties.
+	 *  Properies are copied from awareness info, if any, to save properties to db, while awareness info isn't saved.
 	 *  @return The properties, if any.
 	 */
 	public Map<String, String>	getProperties()
@@ -504,6 +492,7 @@ public final class PlatformInfo
 	
 	/**
 	 *  Set the properties.
+	 *  Properies are copied from awareness info, if any, to save properties to db, while awareness info isn't saved.
 	 *  @param props The properties.
 	 */
 	public void	setProperties(Map<String, String> props)

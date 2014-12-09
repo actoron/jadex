@@ -272,7 +272,7 @@ public class ComponentTestSuite extends TestSuite
 				public void run()
 				{
 					aborted	= true;
-//					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
+					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
 					if (!SReflect.isAndroid()) {
 						runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
 					} else {

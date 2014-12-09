@@ -7,14 +7,22 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.future.TupleResult;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,15 +90,33 @@ public class ComponentTest extends TestCase
 			return;
 		}
 		
+		System.out.println("starting: "+filename);
+		
 		// Start the component.
-//			Map	args	= new HashMap();
-//			args.put("timeout", new Long(3000000));
-//			CreationInfo	ci	= new CreationInfo(args);
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
+		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
+		Timer	t	= new Timer(true);
+		t.schedule(new TimerTask()
+		{
+			public void run()
+			{
+				finished.setExceptionIfUndone(new TimeoutException(this+" did not finish in "+BasicService.getLocalDefaultTimeout()+" ms."));
+			}
+		}, BasicService.getLocalDefaultTimeout());
+
+		final ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
+		fut.addResultListener(new ExceptionDelegationResultListener<Collection<TupleResult>, Map<String, Object>>(finished)
+		{
+			public void customResultAvailable(Collection<TupleResult> result)
+			{
+				finished.setResult(fut.getSecondResult());
+			}
+		});
 
 		// Evaluate the results.
-		Map<String, Object>	res	= fut.getSecondResult();
+		Map<String, Object>	res	= finished.get();
+		t.cancel();
+		System.out.println("finished: "+filename);
 		Testcase	tc	= null;
 		for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )
 		{

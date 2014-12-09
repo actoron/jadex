@@ -15,6 +15,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -25,6 +26,8 @@ import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.util.Collection;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,21 +95,24 @@ public class ComponentStartTest extends	TestCase
 			return;
 		}
 		
-		
 		// Start the component.
+		System.out.println("starting: "+this);
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-//			System.out.println("starting: "+comp.getFilename());
-		Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
+		final Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
+		Timer	t	= new Timer(true);
+		t.schedule(new TimerTask()
+		{
+			public void run()
+			{
+				finished.setExceptionIfUndone(new TimeoutException(this+" did not finish in "+BasicService.getLocalDefaultTimeout()+" ms."));
+			}
+		}, BasicService.getLocalDefaultTimeout());
 		final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
 			new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
+		System.out.println("started: "+this);
+		
 		try
 		{
-//				if(comp.getFilename().indexOf("Heatbugs")!=-1)
-//				{
-//					System.out.println("killing: "+comp.getFilename());
-//					SyncExecutionService.DEBUG	= true;
-//				}
-			
 			// Wait some time (simulation and real time) and kill the component afterwards.
 			final IResultListener<Void>	lis	= new CounterResultListener<Void>(2, new DefaultResultListener<Void>()
 			{
@@ -119,7 +125,8 @@ public class ComponentStartTest extends	TestCase
 					}
 				}
 			});
-			IExternalAccess	ea	= cms.getExternalAccess(cid.getRoot()).get();
+			
+			IExternalAccess	ea	= cms.getExternalAccess(cms.getRootIdentifier().get()).get();
 			ea.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
@@ -135,8 +142,9 @@ public class ComponentStartTest extends	TestCase
 				}
 			}).addResultListener(lis);
 			
-			finished.get(BasicService.getLocalDefaultTimeout());
-//				System.out.println("killed: "+comp.getFilename());
+			finished.get();
+			t.cancel();
+			System.out.println("killed: "+this);
 		}
 		catch(ComponentTerminatedException cte)
 		{				

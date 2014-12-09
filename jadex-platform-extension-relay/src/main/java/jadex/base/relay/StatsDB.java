@@ -26,20 +26,6 @@ import java.util.NoSuchElementException;
  */
 public class StatsDB
 {
-	//-------- static part --------
-
-	/** The singleton db object. */
-	protected static final StatsDB	singleton	= new StatsDB();
-	
-	/**
-	 *  Get the db instance.
-	 *  @return The db instance.
-	 */
-	public static StatsDB	getDB()
-	{
-		return singleton;
-	}
-	
 	//-------- attributes --------
 	
 	/** The db connection (if any). */
@@ -495,7 +481,7 @@ public class StatsDB
 				}
 			}
 			System.out.println("Executing: "+sql);
-			StatsDB	db	= getDB();
+			StatsDB	db	= new StatsDB();
 			Statement	stmt	= db.con.createStatement();
 			boolean query	= stmt.execute(sql);
 			if(query)
@@ -510,7 +496,7 @@ public class StatsDB
 		}
 		else
 		{
-			StatsDB	db	= getDB();
+			StatsDB	db	= new StatsDB();
 			Map<String, String>	props	= new HashMap<String, String>();
 			props.put("a", "b");
 			props.put("a1", "b2");

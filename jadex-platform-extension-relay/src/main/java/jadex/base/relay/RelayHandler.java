@@ -101,7 +101,10 @@ public class RelayHandler
 	protected ICodec[]	defcodecs;
 	
 	/** The peer list. */
-	protected PeerList	peers;	
+	protected PeerList	peers;
+	
+	/** The statistics database (if any). */
+	protected StatsDB	statsdb;
 	
 	//-------- constructors --------
 
@@ -115,6 +118,7 @@ public class RelayHandler
 		CodecFactory	cfac	= new CodecFactory();
 		this.codecs	= cfac.getAllCodecs();
 		this.defcodecs	= cfac.getDefaultCodecs();
+		this.statsdb	= new StatsDB();
 		this.peers	= new PeerList();
 		
 		// Register communication classes with aliases
@@ -174,14 +178,25 @@ public class RelayHandler
 				}
 			}
 		}
+		
 		if(platforms!=null && !platforms.isEmpty())
 		{
 			for(Iterator<PlatformInfo> it=platforms.values().iterator(); it.hasNext(); )
 			{
-				it.next().disconnect();	// Writes end time in DB.
+				PlatformInfo	pi	= it.next();
+				pi.disconnect();
+				if(statsdb!=null)
+				{
+					statsdb.save(pi);
+				}
 			}
 		}
-		StatsDB.getDB().shutdown();
+		
+		if(statsdb!=null)
+		{
+			this.statsdb.shutdown();
+		}
+		
 		this.peers.dispose();
 	}
 	
@@ -212,7 +227,12 @@ public class RelayHandler
 		{
 			info.reconnect(hostip, hostname);
 		}
-				
+		
+		if(statsdb!=null)
+		{
+			statsdb.save(info);
+		}
+		
 		IBlockingQueue<Message>	queue	= map.get(id);
 		if(queue!=null)
 		{
@@ -310,7 +330,13 @@ public class RelayHandler
 			map.remove(id);
 			PlatformInfo	platform	= platforms.remove(id);
 			if(platform!=null)
+			{
 				platform.disconnect();
+				if(statsdb!=null)
+				{
+					statsdb.save(platform);
+				}
+			}
 			AwarenessInfo	awainfo	= platform!=null ? platform.getAwarenessInfo() : null;
 			if(awainfo!=null)
 			{
@@ -415,7 +441,21 @@ public class RelayHandler
 		{
 			info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), null, null, getClass().getClassLoader(), null);
 		}
-				
+		
+		// Update platform awareness info.
+		String	id	= info.getSender().getPlatformName();
+		PlatformInfo	platform	= platforms.get(id);
+		if(platform!=null)
+		{
+			platform.setAwarenessInfo(info);
+			platform.setPreferredCodecs(pcodecs);
+			
+			if(statsdb!=null)
+			{
+				statsdb.save(platform);
+			}				
+		}
+		
 		sendAwarenessInfos(info, pcodecs, true);
 	}
 	
@@ -444,7 +484,13 @@ public class RelayHandler
 		{
 			PlatformInfo	platform	= platforms.remove(id);
 			if(platform!=null)
+			{
 				platform.disconnect();
+				if(statsdb!=null)
+				{
+					statsdb.save(platform);
+				}
+			}
 			
 			AwarenessInfo	awainfo	= platform!=null ? platform.getAwarenessInfo() : null;
 			if(awainfo!=null)
@@ -557,6 +603,14 @@ public class RelayHandler
 	}
 	
 	/**
+	 *  Get the statistics database (if any).
+	 */
+	public StatsDB	getStatisticsDB()
+	{
+		return this.statsdb;
+	}
+	
+	/**
 	 *  Get the current peers.
 	 */
 	public PeerEntry[]	getCurrentPeers()
@@ -649,7 +703,7 @@ public class RelayHandler
 	protected void	sendAwarenessInfos(AwarenessInfo awainfo, ICodec[] pcodecs, boolean local)
 	{
 //		System.out.println("sending awareness infos: "+awainfo.getSender().getPlatformName()+", "+platforms.size());
-		// Update platform awareness info.
+		
 		String	id	= awainfo.getSender().getPlatformName();
 		PlatformInfo	platform	= platforms.get(id);
 		
@@ -659,11 +713,6 @@ public class RelayHandler
 		if(platform==null || local)
 		{
 			boolean	initial	= local && platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(awainfo.getState());
-			if(platform!=null)
-			{
-				platform.setAwarenessInfo(awainfo);
-				platform.setPreferredCodecs(pcodecs);
-			}
 			
 			byte[]	propinfo	= null;
 			byte[]	nopropinfo	= null;
@@ -733,7 +782,7 @@ public class RelayHandler
 							awainfo2.setProperties(null);
 						}
 						
-						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader(), null);
+						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, pcodecs, getClass().getClassLoader(), null);
 						byte[]	info2	= new byte[data2.length+4];
 						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
 						System.arraycopy(data2, 0, info2, 4, data2.length);
@@ -793,12 +842,11 @@ public class RelayHandler
 				}
 			}
 	
-			// Distribute platform info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
+			// Distribute platform info to peer relay servers, if locally disconnected platform. (todo: send asynchronously?)
 			if(local)
 			{
 				if(platform==null)
 				{
-//					System.out.println("noplatform: "+awainfo.getState()+", "+awainfo.getSender());
 					platform	= new PlatformInfo();
 					platform.setId(awainfo.getSender().getName());
 					platform.setDisconnectDate(new Date());	// set disconnected date to indicate removed platform.

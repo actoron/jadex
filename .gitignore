@@ -21,3 +21,4 @@ jadex-platform-standalone-launch/highscore.dmp
 /jadex-platform-standalone-launch/.repoindices/Maven Central
 /docs/keys/random_seed
 /.gradle
+/jadex-platform-extension-relay-standalone/.relaystats
