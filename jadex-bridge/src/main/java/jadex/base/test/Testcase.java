@@ -7,6 +7,9 @@ import jadex.commons.SUtil;
  */
 public class Testcase
 {
+	/** The name of the property for defining a test timeout. */
+	public static final String	PROPERTY_TEST_TIMEOUT	= "test.timeout";
+	
 	//-------- attributes --------
 
 	/** The number of tests to be performed. */

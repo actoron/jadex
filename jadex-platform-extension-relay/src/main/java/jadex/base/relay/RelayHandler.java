@@ -118,7 +118,7 @@ public class RelayHandler
 		CodecFactory	cfac	= new CodecFactory();
 		this.codecs	= cfac.getAllCodecs();
 		this.defcodecs	= cfac.getDefaultCodecs();
-		this.statsdb	= new StatsDB();
+		this.statsdb	= StatsDB.createDB();
 		this.peers	= new PeerList();
 		
 		// Register communication classes with aliases

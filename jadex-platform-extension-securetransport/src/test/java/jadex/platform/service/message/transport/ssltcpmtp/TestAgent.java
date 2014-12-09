@@ -25,8 +25,6 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -54,10 +52,6 @@ import java.util.Set;
 //@ComponentTypes(
 //	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/ReceiverAgent.class")
 //)
-@Arguments(
-{
-	@Argument(name="testcnt", clazz=int.class, defaultvalue="2")
-})
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public abstract class TestAgent
 {
@@ -102,7 +96,7 @@ public abstract class TestAgent
 		final Future<Void> ret = new Future<Void>();
 		
 		final Testcase tc = new Testcase();
-		tc.setTestCount(((Integer)agent.getArgument("testcnt")).intValue());
+		tc.setTestCount(getTestCount());
 		
 		performTests(tc).addResultListener(agent.createResultListener(new IResultListener<Void>()
 		{
@@ -134,6 +128,14 @@ public abstract class TestAgent
 	 * 
 	 */
 	protected abstract IFuture<Void> performTests(Testcase tc);
+	
+	/**
+	 *  The test count.
+	 */
+	protected int	getTestCount()
+	{
+		return 2;
+	}
 	
 	/**
 	 * 

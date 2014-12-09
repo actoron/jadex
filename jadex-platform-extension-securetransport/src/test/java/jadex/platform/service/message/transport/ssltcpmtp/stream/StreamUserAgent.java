@@ -17,8 +17,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -32,9 +30,16 @@ import java.util.Map;
 @Agent
 @RequiredServices(@RequiredService(name="ss", type=IStreamService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)))
-@Arguments(@Argument(name="testcnt", clazz=int.class, defaultvalue="12"))
 public class StreamUserAgent extends TestAgent
 {
+	/**
+	 *  The test count.
+	 */
+	protected int	getTestCount()
+	{
+		return 12;
+	}
+	
 	/**
 	 * 
 	 */

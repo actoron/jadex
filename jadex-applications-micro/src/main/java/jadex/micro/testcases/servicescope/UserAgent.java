@@ -1,7 +1,5 @@
 package jadex.micro.testcases.servicescope;
 
-import java.util.Map;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -12,13 +10,13 @@ import jadex.commons.future.ITuple2Future;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+
+import java.util.Map;
 
 @Agent
 @RequiredServices(
@@ -26,7 +24,6 @@ import jadex.micro.annotation.Results;
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-@Arguments(@Argument(name="testcnt", clazz=int.class, defaultvalue="2"))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UserAgent 
 {

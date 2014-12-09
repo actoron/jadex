@@ -24,7 +24,6 @@ import jadex.micro.annotation.Results;
 @Agent
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
-@Arguments(@Argument(name="testcnt", clazz=int.class, defaultvalue="2"))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UserAgent
 {

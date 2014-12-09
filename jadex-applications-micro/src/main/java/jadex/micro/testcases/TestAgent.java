@@ -6,7 +6,6 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
@@ -15,8 +14,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
-import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
@@ -30,8 +27,6 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -57,10 +52,6 @@ import java.util.Set;
 //@ComponentTypes(
 //	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/ReceiverAgent.class")
 //)
-@Arguments(
-{
-	@Argument(name="testcnt", clazz=int.class, defaultvalue="2")
-})
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public abstract class TestAgent
 {
@@ -99,7 +90,7 @@ public abstract class TestAgent
 		final Future<Void> ret = new Future<Void>();
 		
 		final Testcase tc = new Testcase();
-		tc.setTestCount(((Integer)agent.getArgument("testcnt")).intValue());
+		tc.setTestCount(getTestCount());
 		
 		performTests(tc).addResultListener(agent.createResultListener(new IResultListener<Void>()
 		{
@@ -179,6 +170,14 @@ public abstract class TestAgent
 		return ret;
 	}
 	
+	/**
+	 *  The test count.
+	 */
+	protected int	getTestCount()
+	{
+		return 2;
+	}
+
 	/**
 	 *  Create a proxy for the remote platform.
 	 */

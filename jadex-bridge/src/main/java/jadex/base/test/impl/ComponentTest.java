@@ -48,6 +48,9 @@ public class ComponentTest extends TestCase
 	/** The component full name. */
 	protected String	fullname;
 	
+	/** The timeout. */
+	protected long	timeout;
+	
 	/** The test suite. */
 	protected ComponentTestSuite	suite;
 	
@@ -66,6 +69,15 @@ public class ComponentTest extends TestCase
 		this.filename	= comp.getFilename();
 		this.rid	= comp.getResourceIdentifier();
 		this.fullname	= comp.getFullName();
+		Object	to	= comp.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, suite.getClassLoader());
+		if(to!=null)
+		{
+			this.timeout	= ((Number)to).longValue();
+		}
+		else
+		{
+			this.timeout	= BasicService.getLocalDefaultTimeout();
+		}
 		this.suite	= suite;
 	}
 	
@@ -100,9 +112,9 @@ public class ComponentTest extends TestCase
 		{
 			public void run()
 			{
-				finished.setExceptionIfUndone(new TimeoutException(this+" did not finish in "+BasicService.getLocalDefaultTimeout()+" ms."));
+				finished.setExceptionIfUndone(new TimeoutException(this+" did not finish in "+timeout+" ms."));
 			}
-		}, BasicService.getLocalDefaultTimeout());
+		}, timeout);
 
 		final ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
 		fut.addResultListener(new ExceptionDelegationResultListener<Collection<TupleResult>, Map<String, Object>>(finished)

@@ -55,6 +55,9 @@ public class ComponentTestSuite extends TestSuite
 	/** The platform. */
 	protected IExternalAccess	platform;
 	
+	/** The class loader. */
+	protected ClassLoader	classloader;
+	
 	/** The timeout (if any). */
 	protected long	timeout;
 	
@@ -153,6 +156,8 @@ public class ComponentTestSuite extends TestSuite
 		{
 			throw new RuntimeException(e);
 		}
+		
+		this.classloader	= libsrv.getClassLoader(null).get(ts);
 		
 		// Scan for test cases.
 		Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + path);
@@ -432,5 +437,13 @@ public class ComponentTestSuite extends TestSuite
 		{
 			SNonAndroid.clearAWT();
 		}
+	}
+
+	/**
+	 *  Get the class loader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
 	}
 }

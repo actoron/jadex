@@ -18,10 +18,17 @@ import jadex.micro.testcases.TestAgent;
  *  Test threaded access to raw services.
  */
 @Agent
-@Arguments(@Argument(name="testcnt", clazz=int.class, defaultvalue="1"))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class RemoteBlockingTestAgent	extends TestAgent
 {
+	/**
+	 *  The test count.
+	 */
+	protected int	getTestCount()
+	{
+		return 1;
+	}
+
 	protected IFuture<Void> performTests(Testcase tc)
 	{
 		IExternalAccess	exta	= createPlatform(null).get();
