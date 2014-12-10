@@ -29,6 +29,7 @@ import java.util.Map;
 
 /**
  *  Feature to send messages and receive messages via handlers.
+ *  Also implements reacting to incoming stream connections (only exposed in micro agents for now).
  */
 public class MessageComponentFeature extends AbstractComponentFeature implements IMessageFeature, IInternalMessageFeature
 {
@@ -212,12 +213,12 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	}
 	
 	/**
-	 *  Helper method to override message handling.
+	 *  Helper method to override stream handling.
 	 *  May be called from external threads.
 	 */
-	protected IComponentStep<Void>	createHandleMessageStep(IMessageAdapter message)
+	protected IComponentStep<Void>	createHandleStreamStep(IConnection con)
 	{
-		return new HandleMessageStep(message);
+		return new HandleStreamStep(con);
 	}
 
 	/**
@@ -226,9 +227,32 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void streamArrived(IConnection con)
 	{
-		throw new UnsupportedOperationException();
-//		getComponent().getComponentFeature(IExecutionFeature.class)
-//			.scheduleStep(new HandleStreamStep(con));		
+		getComponent().getComponentFeature(IExecutionFeature.class)
+			.scheduleStep(createHandleStreamStep(con))
+			.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				// NOP
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// Todo: fail fast components?
+				StringWriter	sw	= new StringWriter();
+				exception.printStackTrace(new PrintWriter(sw));
+				getComponent().getLogger().severe("Exception during stream processing\n"+sw);
+			}
+		});
+	}
+	
+	/**
+	 *  Helper method to override message handling.
+	 *  May be called from external threads.
+	 */
+	protected IComponentStep<Void>	createHandleMessageStep(IMessageAdapter message)
+	{
+		return new HandleMessageStep(message);
 	}
 	
 	/**
@@ -272,6 +296,57 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					}
 				}
 			}
+			return ret;
+		}
+
+		public String toString()
+		{
+			return "messageArrived()_#"+this.hashCode();
+		}
+	}
+
+	/**
+	 *  Step to handle a stream.
+	 */
+	public class HandleStreamStep	implements IComponentStep<Void>
+	{
+		private final IConnection con;
+
+		public HandleStreamStep(IConnection con)
+		{
+			this.con = con;
+		}
+
+		public IFuture<Void> execute(IInternalAccess ia)
+		{
+			invokeHandlers(con);
+			return IFuture.DONE;
+		}
+
+		/**
+		 *  Extracted to allow overriding behaviour.
+		 *  @return true, when at least one matching handler was found.
+		 */
+		protected boolean invokeHandlers(IConnection con)
+		{
+			boolean	ret	= false;
+			// Todo: Stream handlers?
+//			if(messagehandlers!=null)
+//			{
+//				for(int i=0; i<messagehandlers.size(); i++)
+//				{
+//					IMessageHandler mh = (IMessageHandler)messagehandlers.get(i);
+//					if(mh.getFilter().filter(message))
+//					{
+//						ret	= true;
+//						mh.handleMessage(message.getParameterMap(), message.getMessageType());
+//						if(mh.isRemove())
+//						{
+//							messagehandlers.remove(i);
+//						}
+//					}
+//				}
+//			}
 			return ret;
 		}
 
