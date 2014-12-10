@@ -86,7 +86,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 	{
 		if (item.getItemId() == 0)
 		{
-			if (isJadexPlatformRunning())
+			if (isPlatformRunning())
 			{
 				Intent i = new Intent(this, JadexAndroidControlCenter.class);
 				i.putExtra("platformId", (ComponentIdentifier) platformId);
@@ -113,7 +113,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 	 */
 	private void refreshButtons()
 	{
-		if (isJadexPlatformRunning())
+		if (isPlatformRunning())
 		{
 			textView.setText(R.string.started);
 			textView.append(platformId.toString());
@@ -136,7 +136,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 		{
 			if (view == startPlatformButton)
 			{
-				if (isJadexPlatformRunning())
+				if (isPlatformRunning())
 				{
 					startPlatformButton.setEnabled(false);
 					Thread thread = new Thread() {

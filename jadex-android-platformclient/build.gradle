@@ -1,0 +1,5 @@
+dependencies 
+{
+    compile libraries.android
+    compile libraries.android_support
+}

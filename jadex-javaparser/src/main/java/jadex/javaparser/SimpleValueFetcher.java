@@ -59,6 +59,10 @@ public class SimpleValueFetcher implements IValueFetcher
 		{
 			ret	= parent.fetchValue(name);
 		}
+//		else
+//		{
+//			throw new RuntimeException("Unknown parameter: "+name);
+//		}
 		
 		return ret;
 	}

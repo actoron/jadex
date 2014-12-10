@@ -258,6 +258,5 @@ public class AgentCreationAgent
 		}).get(sus);
 		IComponentManagementService cms = SServiceProvider.getService(ea, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
 		cms.createComponent(AgentCreationAgent.class.getName()+".class", null).get(sus);
-	}
-	
+	}	
 }

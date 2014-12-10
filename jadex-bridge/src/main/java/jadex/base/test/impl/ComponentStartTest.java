@@ -3,6 +3,7 @@ package jadex.base.test.impl;
 
 import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
+import jadex.base.test.Testcase;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -16,6 +17,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -26,9 +28,12 @@ import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.util.Collection;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
-import junit.framework.TestResult;
 
 /**
  *  Test if a component can be started.
@@ -49,10 +54,17 @@ public class ComponentStartTest extends	TestCase
 	/** The component full name. */
 	protected String	fullname;
 	
+	/** The timeout. */
+	protected long	timeout;
+
 	/** The test suite. */
 	protected ComponentTestSuite	suite;
 	
 	//-------- constructors --------
+	
+	public ComponentStartTest() {
+		Logger.getLogger("ComponentStartTest").log(Level.SEVERE, "ComponentSTartTest empty constructor called");
+	}
 	
 	/**
 	 *  Create a component test.
@@ -63,6 +75,15 @@ public class ComponentStartTest extends	TestCase
 		this.filename	= comp.getFilename();
 		this.rid	= comp.getResourceIdentifier();
 		this.fullname	= comp.getFullName();
+		Object	to	= comp.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, suite.getClassLoader());
+		if(to!=null)
+		{
+			this.timeout	= ((Number)to).longValue();
+		}
+		else
+		{
+			this.timeout	= BasicService.getLocalDefaultTimeout();
+		}
 		this.suite	= suite;
 	}
 	
@@ -76,94 +97,83 @@ public class ComponentStartTest extends	TestCase
 		return 1;
 	}
 	
+	
+	
 	/**
 	 *  Test the component.
 	 */
-	public void run(TestResult result)
+	public void runBare()
 	{
 		if(suite.isAborted())
 		{
 			return;
 		}
 		
-		try
-		{
-			result.startTest(this);
-		}
-		catch(IllegalStateException e)
-		{
-			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
-			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
-		}
-		
 		// Start the component.
+		System.out.println("starting: "+this);
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+		final Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
+		Timer	t	= new Timer(true);
+		t.schedule(new TimerTask()
+		{
+			public void run()
+			{
+				finished.setExceptionIfUndone(new TimeoutException(ComponentStartTest.this+" did not finish in "+timeout+" ms."));
+			}
+		}, timeout);
+		final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
+			new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
+		System.out.println("started: "+this);
+		
 		try
 		{
-//			System.out.println("starting: "+comp.getFilename());
-			Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
-			final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
-				new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
-			try
+			// Wait some time (simulation and real time) and kill the component afterwards.
+			final IResultListener<Void>	lis	= new CounterResultListener<Void>(2, new DefaultResultListener<Void>()
 			{
-//				if(comp.getFilename().indexOf("Heatbugs")!=-1)
-//				{
-//					System.out.println("killing: "+comp.getFilename());
-//					SyncExecutionService.DEBUG	= true;
-//				}
-				
-				// Wait some time (simulation and real time) and kill the component afterwards.
-				final IResultListener<Void>	lis	= new CounterResultListener<Void>(2, new DefaultResultListener<Void>()
+				public synchronized void resultAvailable(Void result)
 				{
-					public synchronized void resultAvailable(Void result)
+					IComponentManagementService	mycms	= cms;
+					if(mycms!=null)
 					{
-						IComponentManagementService	mycms	= cms;
-						if(mycms!=null)
-						{
-							mycms.destroyComponent(cid);
-						}
+						mycms.destroyComponent(cid);
 					}
-				});
-				IExternalAccess	ea	= cms.getExternalAccess(cid.getRoot()).get();
-				ea.scheduleStep(new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(500, false);
-					}
-				}).addResultListener(lis);
-				ea.scheduleStep(new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true);
-					}
-				}).addResultListener(lis);
-				
-				finished.get(BasicService.getLocalDefaultTimeout());
-//				System.out.println("killed: "+comp.getFilename());
-			}
-			catch(ComponentTerminatedException cte)
-			{				
-				// Ignore if component already terminated.
-			}
-			catch(RuntimeException e)
-			{
-				// Ignore if component already terminated.
-				if(!(e.getCause() instanceof ComponentTerminatedException))
-				{
-					throw e;
 				}
-			}
+			});
+			
+			IExternalAccess	ea	= cms.getExternalAccess(cms.getRootIdentifier().get()).get();
+			ea.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(500, false);
+				}
+			}).addResultListener(lis);
+			ea.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true);
+				}
+			}).addResultListener(lis);
+			
+			finished.get();
+			t.cancel();
+			System.out.println("killed: "+this);
 		}
-		catch(Exception e)
+		catch(ComponentTerminatedException cte)
+		{				
+			// Ignore if component already terminated.
+		}
+		catch(RuntimeException e)
 		{
-			result.addError(this, e);
+			// Ignore if component already terminated.
+			if(!(e.getCause() instanceof ComponentTerminatedException))
+			{
+				throw e;
+			}
 		}
 		ISuspendable.SUSPENDABLE.set(null);
 		
-		result.endTest(this);
-
 		// Remove references to Jadex resources to aid GC cleanup.
 		cms	= null;
 		suite	= null;

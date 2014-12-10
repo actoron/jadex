@@ -91,6 +91,20 @@ public class PublishInfo
 		}
 	}
 	
+	/**
+	 *  Create a new publish info.
+	 */
+	public PublishInfo(PublishInfo info)
+	{
+		this.pid = info.getPublishId();
+		this.publishtype = info.getPublishType();
+		this.mapping = info.getMapping();
+		if(info.getProperties()!=null)
+		{
+			this.properties = new ArrayList<UnparsedExpression>(info.getProperties());
+		}
+	}
+	
 	//-------- methods --------
 
 	/**

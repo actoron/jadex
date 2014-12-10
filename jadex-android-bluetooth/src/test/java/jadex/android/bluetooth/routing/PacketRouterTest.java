@@ -1,12 +1,12 @@
 package jadex.android.bluetooth.routing;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import jadex.android.bluetooth.CustomTestRunner;
 import jadex.android.bluetooth.TestConstants;
-import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.exceptions.MessageConvertException;
 import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.message.MessageProtos;
@@ -15,10 +15,8 @@ import jadex.android.bluetooth.message.MessageProtos.RoutingInformation.Builder;
 import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
 import jadex.android.bluetooth.message.MessageProtos.RoutingType;
 import jadex.android.bluetooth.routing.IPacketRouter.RoutingEntriesChangeListener;
-import jadex.commons.collection.ArrayBlockingQueue;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +31,6 @@ import org.junit.runner.RunWith;
 import android.bluetooth.BluetoothAdapter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.xtremelabs.robolectric.Robolectric;
-import com.xtremelabs.robolectric.RobolectricTestRunner;
 
 @RunWith(CustomTestRunner.class)
 public abstract class PacketRouterTest {

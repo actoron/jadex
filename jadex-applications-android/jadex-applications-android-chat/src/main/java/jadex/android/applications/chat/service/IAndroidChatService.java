@@ -1,6 +1,8 @@
-package jadex.android.applications.chat;
+package jadex.android.applications.chat.service;
 
-import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
+import jadex.android.applications.chat.ChatUser;
+import jadex.android.applications.chat.model.UserModel;
+import jadex.android.applications.chat.service.AndroidChatService.ChatEventListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
@@ -22,7 +24,7 @@ public interface IAndroidChatService
 
 	void removeMessageListener(ChatEventListener l);
 	
-	IIntermediateFuture<ChatUser> getUsers();
+//	IIntermediateFuture<ChatUser> getUsers();
 
 	IFuture<Void> sendFile(String path, ChatUser user);
 	
@@ -37,5 +39,11 @@ public interface IAndroidChatService
 	void shutdown();
 
 	IIntermediateFuture<IChatService> setStatus(String status, byte[] image, IComponentIdentifier[] receivers);
+	
+	IFuture<String> getNickname();
+	
+	void setNickname(String name);
+	
+	UserModel getUserModel();
 	
 }

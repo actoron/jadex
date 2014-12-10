@@ -153,17 +153,23 @@ public class HttpRelayTransport implements ITransport
 	public HttpRelayTransport(IInternalAccess component, String defaddresses, boolean secure)
 	{
 		this.component	= component;
-		this.defaddresses	= defaddresses;
 		this.secure	= secure;
 		this.addresses	= Collections.synchronizedMap(new HashMap<String, Long>());	// Todo: cleanup unused addresses!?
 		this.workers	= new HashMap<String, Integer>();
 		this.readyqueue	= new HashMap<String, Collection<ISendTask>>();
 		this.sendqueue	= new HashMap<String, List<Tuple2<ISendTask, Future<Void>>>>();
 		
+		StringBuffer	defs	= new StringBuffer();
 		StringTokenizer	stok	= new StringTokenizer(defaddresses, ",");
 		while(stok.hasMoreTokens())
 		{
 			String	adr	= RelayConnectionManager.relayAddress(stok.nextToken().trim());
+			if(defs.length()>0)
+			{
+				defs.append(", ");
+			}
+			defs.append(secure ? RelayConnectionManager.secureAddress(adr) : adr);
+				
 			boolean	found	= false;
 			for(int i=0; !found && i<getServiceSchemas().length; i++)
 			{
@@ -174,6 +180,8 @@ public class HttpRelayTransport implements ITransport
 				throw new RuntimeException("Address does not match supported service schemes: "+adr+", "+SUtil.arrayToString(getServiceSchemas()));
 			}
 		}
+		
+		this.defaddresses	= defs.toString();
 	}
 	
 	//-------- accessors --------

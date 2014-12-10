@@ -1,4 +1,5 @@
 package jadex.webservice.examples.rs.hello;
+import static org.junit.Assert.assertEquals;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
@@ -10,9 +11,10 @@ import jadex.commons.future.ThreadSuspendable;
 
 import java.net.BindException;
 
-import junit.framework.TestCase;
-
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
@@ -25,7 +27,7 @@ import com.sun.jersey.api.core.ResourceConfig;
  * a Jadex Service.
  *
  */
-public class RSHelloTest extends TestCase
+public class RSHelloTest
 {
 
 	private static final String BASE_URI = "http://localhost";
@@ -54,6 +56,7 @@ public class RSHelloTest extends TestCase
 //		extAcc = fut.get(sus);
 //	}
 
+    @Before
 	public void setUp() throws Exception
 	{
 		SReflectSub sReflectSub = new SReflectSub();
@@ -89,12 +92,14 @@ public class RSHelloTest extends TestCase
 		extAcc = fut.get(sus);
 	}
 
+    @After
 	public void tearDown() throws Exception
 	{
 //		pservice.unpublishService(sid);
 		httpServer.stop();
 	}
 
+    @Test
 	public void testAccessRestService() throws InterruptedException
 	{
 		ThreadSuspendable sus = new ThreadSuspendable();

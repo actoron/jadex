@@ -7,19 +7,20 @@ import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.service.IBTP2PMessageCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
-import jadex.base.service.message.transport.MessageEnvelope;
+import jadex.platform.service.message.transport.MessageEnvelope;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.search.IResultSelector;
-import jadex.bridge.service.search.ISearchManager;
-import jadex.bridge.service.search.IVisitDecider;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.Writer;
+import static junit.framework.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,7 @@ import org.junit.runner.RunWith;
 import android.os.RemoteException;
 
 @RunWith(CustomTestRunner.class)
-public class BTTransportTest extends TestCase {
+public class BTTransportTest {
 
 	private BTTransport btTransport;
 	private MessageEnvelope message;
@@ -332,21 +333,27 @@ public class BTTransportTest extends TestCase {
 		return new IServiceProvider() {
 
 			@Override
-			public String getType() {
+			public ITerminableIntermediateFuture<IService> getServices(
+					ClassInfo type, String scope, IRemoteFilter<IService> filter) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
-			public IIntermediateFuture<IService> getServices(
-					ISearchManager manager, IVisitDecider decider,
-					IResultSelector selector) {
+			public IFuture<IService> getService(ClassInfo type, String scope,
+					IRemoteFilter<IService> filter) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
-			public IFuture<IServiceProvider> getParent() {
+			public IFuture<IService> getService(IServiceIdentifier sid) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public IFuture<Collection<IService>> getDeclaredServices() {
 				// TODO Auto-generated method stub
 				return null;
 			}
@@ -358,10 +365,11 @@ public class BTTransportTest extends TestCase {
 			}
 
 			@Override
-			public IFuture<Collection<IServiceProvider>> getChildren() {
+			public String getType() {
 				// TODO Auto-generated method stub
 				return null;
 			}
+
 		};
 	}
 }

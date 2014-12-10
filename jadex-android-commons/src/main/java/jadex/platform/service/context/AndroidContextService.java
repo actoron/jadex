@@ -27,6 +27,7 @@ import android.content.pm.PackageManager;
 import android.net.DhcpInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Environment;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -114,7 +115,24 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	public IFuture<File> getFile(String name)
 	{
 		checkContext();
-		return new Future<File>(context.getFileStreamPath(name));
+		File filesDir = context.getFilesDir();
+		if (filesDir == null) {
+			// we ran into this bug: https://code.google.com/p/android/issues/detail?id=8886
+			// workaround: try once more :(
+			filesDir = context.getFilesDir();
+		}
+		if (filesDir == null) {
+			// still null, so create directory
+			Logger.e("Context.getFilesDir() returned null. This is a known bug, trying to use custom path instead...");
+			filesDir = new File(context.getApplicationInfo().dataDir, "files");
+			if (!filesDir.exists()) {
+				filesDir.mkdirs();
+			}
+			File dataDir = new File(filesDir, name);
+			return new Future<File>(dataDir);
+		} else {
+			return new Future<File>(context.getFileStreamPath(name));
+		}
 	}
 
 	/**

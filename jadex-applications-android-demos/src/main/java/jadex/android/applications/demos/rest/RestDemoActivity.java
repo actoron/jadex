@@ -7,6 +7,7 @@ import jadex.android.applications.demos.rest.view.RestImageActivity;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
@@ -152,7 +153,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 					}
 				});
 				final Future<byte[]> fut = new Future<byte[]>();
-				SServiceProvider.getService(getPlatformAccess().getServiceProvider(), IChartService.class).addResultListener(
+				SServiceProvider.getService(getPlatformAccess().getServiceProvider(), IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 						new DefaultResultListener<IChartService>()
 						{
 

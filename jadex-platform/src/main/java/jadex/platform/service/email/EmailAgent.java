@@ -155,8 +155,6 @@ public class EmailAgent implements IEmailService
 		Properties props = new Properties();
 		props.put("mail.smtp.host", account.getSmtpHost());
 		props.put("mail.from", email.getSender());
-		props.put("mail.smtp.auth", "true");
-		props.setProperty("mail.smtps.auth", "true");
 		
 		props.put("mail.debug", "true");
 		
@@ -173,13 +171,26 @@ public class EmailAgent implements IEmailService
 			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		}
 		
-		Session sess = Session.getInstance(props, new Authenticator()
+		Session sess;
+		
+//		System.out.println("account: auth? "+account.isNoAuthentication());
+		
+		if(account.isNoAuthentication())
 		{
-			protected PasswordAuthentication getPasswordAuthentication()
+			sess = Session.getInstance(props);
+		}
+		else
+		{
+			props.put("mail.smtp.auth", "true");
+			props.setProperty("mail.smtps.auth", "true");
+			sess = Session.getInstance(props, new Authenticator()
 			{
-				return new PasswordAuthentication(account.getUser(), account.getPassword());
-			}
-		});
+				protected PasswordAuthentication getPasswordAuthentication()
+				{
+					return new PasswordAuthentication(account.getUser(), account.getPassword());
+				}
+			});
+		}
 		
 //		Properties props = new Properties();
 //		props.setProperty("mail.smtp.auth", "true");
@@ -240,15 +251,23 @@ public class EmailAgent implements IEmailService
 				tr	= sess.getTransport("smtp");
 			}
 			
-			if(account.getSmtpPort()!=null)
+			if(account.isNoAuthentication())
 			{
-//				System.out.println("connect: "+account.getSmtpHost()+" "+account.getSmtpPort()+" "+account.getUser()+" "+account.getPassword());
-				tr.connect(account.getSmtpHost(), account.getSmtpPort().intValue(), account.getUser(), account.getPassword());
+//				System.out.println("connect0: "+account.getSmtpHost()+" "+account.getSmtpPort()+" "+account.getUser()+" "+account.getPassword());
+				tr.connect();
 			}
 			else
 			{
-//				System.out.println("connect: "+account.getSmtpHost()+" "+account.getUser()+" "+account.getPassword());
-				tr.connect(account.getSmtpHost(), account.getUser(), account.getPassword());
+				if(account.getSmtpPort()!=null)
+				{
+//					System.out.println("connect1: "+account.getSmtpHost()+" "+account.getSmtpPort()+" "+account.getUser()+" "+account.getPassword());
+					tr.connect(account.getSmtpHost(), account.getSmtpPort().intValue(), account.getUser(), account.getPassword());
+				}
+				else
+				{
+//					System.out.println("connect2: "+account.getSmtpHost()+" "+account.getUser()+" "+account.getPassword());
+					tr.connect(account.getSmtpHost(), account.getUser(), account.getPassword());
+				}
 			}
 			
 			message.saveChanges();

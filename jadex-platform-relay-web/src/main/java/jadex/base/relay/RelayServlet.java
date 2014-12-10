@@ -92,7 +92,7 @@ public class RelayServlet extends HttpServlet
 			{
 				String	view;
 				// todo: add request property
-				if("/history".equals(request.getServletPath()))
+				if("/history".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
 					int	cnt	= 20;
 					int	startid	= -1;
@@ -118,17 +118,17 @@ public class RelayServlet extends HttpServlet
 					catch(RuntimeException e)
 					{
 					}
-					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos(cnt, startid, endid));
+					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(cnt, startid, endid));
 					view	= "/WEB-INF/jsp/history.jsp";
 				}
-				else if("/history_all".equals(request.getServletPath()))
+				else if("/history_all".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
-					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos(-1, -1, -1));
+					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(-1, -1, -1));
 					view	= "/WEB-INF/jsp/history.jsp";
 				}
-				else if("/export".equals(request.getServletPath()))
+				else if("/export".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
-					request.setAttribute("platforms", StatsDB.getDB().getAllPlatformInfos());
+					request.setAttribute("platforms", handler.getStatisticsDB().getAllPlatformInfos());
 					view	= "/WEB-INF/jsp/csv.jsp";
 				}
 				else if("/servers".equals(request.getServletPath()))

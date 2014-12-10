@@ -24,9 +24,9 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -44,22 +44,22 @@ import java.util.List;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Arguments(
-{
-	@Argument(name="testcnt", clazz=int.class, defaultvalue="12")
-})
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.bridge.service.BasicService.getScaledLocalDefaultTimeout(1.5)")})
 public class InitiatorAgent extends TestAgent
 {
+	/**
+	 *  The test count.
+	 */
+	protected int	getTestCount()
+	{
+		return SReflect.isAndroid() ? 6 : 12;
+	}
+	
 	/**
 	 *  Perform the tests.
 	 */
 	protected IFuture<Void> performTests(final Testcase tc)
 	{
-		if(SReflect.isAndroid()) 
-		{
-			tc.setTestCount(6);
-		}
-		
 		final Future<Void> ret = new Future<Void>();
 		
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)

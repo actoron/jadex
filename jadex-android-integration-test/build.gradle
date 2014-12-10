@@ -1,0 +1,9 @@
+
+//build.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("test") }
+dependencies
+{
+    provided libraries.android_test
+    provided libraries.junit
+    androidTestCompile (project(':jadex-android-testlauncher'))
+    androidTestCompile (project(':jadex-platform-android'))
+}

@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.11</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -93,6 +93,67 @@
 		</testResources>
 
 		<plugins>
+		
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<source>
+								<![CDATA[
+								println "Copying tests ..."
+								def dir = project.basedir.absolutePath.replace('\\','/');
+								def ln = System.getProperty('line.separator')
+
+								def path = dir + "/../jadex-platform-standalone-launch/src/test/java/"
+								def f = new File(path);
+								println "checking " + path + "... ";
+
+								def target = new File(dir + "/target/generated-sources/tests/");
+								if (!target.exists()) {
+									target.mkdirs()
+								}
+ 								if (f.exists() && f.isDirectory()) { 
+ 									new AntBuilder().copy(todir: target.path) {
+ 									    fileset(dir: f.path) {
+ 									    	exclude(name:"**/JCCTest.java")
+ 									    }
+									}
+									println "done.";
+ 								} else {
+									println "no directory";
+ 								}
+								]]>
+							</source>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>target/generated-sources/tests</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -148,25 +209,6 @@
 					</manifest>
 				</configuration>
 
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>startemulator</id> -->
-<!-- 						bound to the 'initialize' phase -->
-<!-- 						<phase>initialize</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>emulator-start</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-
-<!-- 					<execution> -->
-<!-- 						<id>stopemulator</id> -->
-<!-- 						bound to the 'install' phase -->
-<!-- 						<phase>install</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>emulator-stop</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
 			</plugin>
 
 			<plugin>
@@ -192,34 +234,18 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											com.jayway.maven.plugins.android.generation2
-										</groupId>
-										<artifactId>
-											android-maven-plugin
-										</artifactId>
-										<versionRange>
-											[3.1.1,)
-										</versionRange>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>groovy-maven-plugin</artifactId>
+										<versionRange>[1.4,)</versionRange>
 										<goals>
-											<goal>emulator-start</goal>
+											<goal>execute</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>net.sourceforge.jadex</groupId>
-										<artifactId>jadex-android-maven-plugin</artifactId>
-										<versionRange>{$project.version}</versionRange>
-										<goals>
-											<goal>generateBDI</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
+										<execute>
+											<runOnConfiguration>true</runOnConfiguration>
+											<runOnIncremental>false</runOnIncremental>
+										</execute>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

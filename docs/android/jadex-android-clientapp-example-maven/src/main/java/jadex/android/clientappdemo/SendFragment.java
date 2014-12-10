@@ -10,12 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.android.standalone.clientapp.ClientAppMainFragment;
 
 /**
  * This activity demonstrates how to work with intents in a ClientAppFragment.
  */
-public class SendFragment extends ClientAppFragment
+public class SendFragment extends ClientAppMainFragment
 {
 
 	private String path;

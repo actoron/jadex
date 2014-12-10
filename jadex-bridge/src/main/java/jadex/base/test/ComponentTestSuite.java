@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -48,11 +49,14 @@ public class ComponentTestSuite extends TestSuite
 {
 	//-------- attributes --------
 	
-	/** Indicate when the suite is aborted due to excessibe run time. */
+	/** Indicate when the suite is aborted due to excessive run time. */
 	public boolean	aborted;
 	
 	/** The platform. */
 	protected IExternalAccess	platform;
+	
+	/** The class loader. */
+	protected ClassLoader	classloader;
 	
 	/** The timeout (if any). */
 	protected long	timeout;
@@ -70,7 +74,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.getScaledLocalDefaultTimeout(10), true, false);
+		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.getScaledLocalDefaultTimeout(10), true, true, false);
 	}
 	
 	/**
@@ -79,10 +83,11 @@ public class ComponentTestSuite extends TestSuite
 	 * @param root	The classpath root corresponding to the path.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted). 
-	 * @param broken	Include broken components.
+	 * @param test	Run test components.
+	 * @param broken	Include broken components (will cause test failure if any).
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(File path, File root, String[] excludes, long timeout, boolean broken, boolean start) throws Exception
+	public ComponentTestSuite(File path, File root, String[] excludes, long timeout, boolean test, boolean broken, boolean start) throws Exception
 	{
 		this(new String[]
 		{
@@ -91,7 +96,8 @@ public class ComponentTestSuite extends TestSuite
 			"-simulation", "true",
 			"-asyncexecution", "true",
 //			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-//			"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
+//			"-logging", "true",
+//			"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
 			"-logging_level", "java.util.logging.Level.WARNING",
 //			"-debugfutures", "true",
 //			"-nostackcompaction", "true",
@@ -109,7 +115,7 @@ public class ComponentTestSuite extends TestSuite
 			"-printpass", "false",
 			// Hack!!! include ssl transport if available
 			"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
-		}, path, root, excludes, timeout, broken, start);
+		}, path, root, excludes, timeout, test, broken, start);
 	}
 	
 	/**
@@ -118,10 +124,11 @@ public class ComponentTestSuite extends TestSuite
 	 * @param path	The path to look for test cases in.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted).
-	 * @param broken	Include broken components.
+	 * @param runtests	Run test components.
+	 * @param broken	Include broken components (will cause test failure if any).
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout, final boolean broken, final boolean start) throws Exception
+	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout, final boolean runtests, final boolean broken, final boolean start) throws Exception
 	{
 		super(path.toString());
 		this.timeout	= timeout;				
@@ -150,8 +157,10 @@ public class ComponentTestSuite extends TestSuite
 			throw new RuntimeException(e);
 		}
 		
+		this.classloader	= libsrv.getClassLoader(null).get(ts);
+		
 		// Scan for test cases.
-		System.out.println("Scanning for testcases: "+path);
+		Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + path);
 		List<String> scanForTestCases = scanForTestCases(root, path);
 		for (String abspath : scanForTestCases)
 		{	
@@ -193,9 +202,12 @@ public class ComponentTestSuite extends TestSuite
 							if(istest)
 							{
 //								System.out.println("Test: "+abspath);
-								ComponentTest test = new ComponentTest(cms, model, this);
-								test.setName(abspath);
-								addTest(test);
+								if(runtests)
+								{
+									ComponentTest test = new ComponentTest(cms, model, this);
+									test.setName(abspath);
+									addTest(test);
+								}
 							}
 							else if(model.getReport()!=null)
 							{
@@ -265,7 +277,7 @@ public class ComponentTestSuite extends TestSuite
 				public void run()
 				{
 					aborted	= true;
-//					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
+					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
 					if (!SReflect.isAndroid()) {
 						runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
 					} else {
@@ -425,5 +437,13 @@ public class ComponentTestSuite extends TestSuite
 		{
 			SNonAndroid.clearAWT();
 		}
+	}
+
+	/**
+	 *  Get the class loader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
 	}
 }

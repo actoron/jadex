@@ -22,8 +22,8 @@
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>org.kohsuke</groupId>
-					<artifactId>asm4</artifactId>
+					<groupId>org.ow2.asm</groupId>
+					<artifactId>asm-all</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>javassist</groupId>
@@ -69,11 +69,6 @@
 			<version>1.0-1</version>
 		</dependency>
  -->
-		<dependency>
-			<groupId>com.google.android.tools</groupId>
-			<artifactId>dx</artifactId>
-			<version>1.7</version>
-		</dependency>
 
 	</dependencies>
 

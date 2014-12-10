@@ -231,7 +231,7 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 //		BasicResultSelector<IService> selector = new BasicResultSelector<IService>(ViewableFilter.VIEWABLE_FILTER, false);
 //		IIntermediateFuture<IService> services = sp.getServices(manager, decider, selector);
 
-		IIntermediateFuture<IService> services = SServiceProvider.getServices(sp, null, Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
+		IIntermediateFuture<IService> services = SServiceProvider.getServices(sp, IService.class, Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
 		
 		services.addResultListener(new IntermediateDefaultResultListener<IService>()
 		{

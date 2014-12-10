@@ -1,19 +1,4 @@
-apply plugin: 'java'
-
-sourceCompatibility = 1.6
-version = '2.5-SNAPSHOT'
-group = 'net.sourceforge.jadex'
-
-//def localMavenRepo = 'file://D:/mavenrepo'
-
-repositories 
-{
-	mavenCentral()
-	//maven { url= localMavenRepo }
-}
- 
 dependencies 
 {
-	compile 'bouncycastle:bcprov-jdk15:140'
-	testCompile 'junit:junit:4.11'
+	compile project(':jadex-kernel-bpmn')
 }

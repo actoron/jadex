@@ -365,14 +365,7 @@ public class SettingsService implements ISettingsService
 		{
 			public void customResultAvailable(Object result)
 			{
-				try
-				{
-					writePropertiesToStore(props);
-				}
-				catch(Exception e)
-				{
-					System.out.println("Warning: Could not save settings: "+e);
-				}
+				writePropertiesToStore(props);
 				ret.setResult(null);
 			}
 
@@ -435,6 +428,7 @@ public class SettingsService implements ISettingsService
 				}
 				catch(Exception e)
 				{
+					System.out.println("Warning: Could not save settings: "+e);
 				}
 				finally
 				{

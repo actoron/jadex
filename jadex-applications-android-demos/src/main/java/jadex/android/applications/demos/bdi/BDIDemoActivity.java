@@ -5,6 +5,8 @@ import jadex.android.applications.demos.R;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
@@ -22,11 +24,15 @@ public class BDIDemoActivity extends JadexAndroidActivity
 {
 	/** The Button to send a message to the agent **/
 	private Button btnCallAgent;
+	
+	/** Only for testing purposes, see event demo for a better way. **/
+	public static BDIDemoActivity INSTANCE;
 
 	/** Constructor */
 	public BDIDemoActivity()
 	{
 		super();
+		INSTANCE = this;
 		setPlatformAutostart(true);
 		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BDI);
 		setPlatformName("bdiDemoPlatform");
@@ -73,7 +79,9 @@ public class BDIDemoActivity extends JadexAndroidActivity
 		public void onClick(View arg0)
 		{
 			// Get DisplayService
-			SServiceProvider.getService(getPlatformAccess().getServiceProvider(), IDisplayTextService.class)
+			IExternalAccess platformAccess = getPlatformAccess();
+			IServiceProvider serviceProvider = platformAccess.getServiceProvider();
+			SServiceProvider.getService(serviceProvider, IDisplayTextService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(
 					new DefaultResultListener<IDisplayTextService>()
 					{

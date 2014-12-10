@@ -2,7 +2,9 @@ package jadex.commons.transformation.binaryserializer;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *  Abstract encoding context that provides base functionality.
@@ -24,6 +26,12 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 	
 	/** Flag indicating class names should not be written (can be temporarily disabled for one write). */
 	protected boolean ignorewriteclass;
+	
+	/** The cache for non-inner classes. */
+	protected Set<Class> nonanonclasscache = new HashSet<Class>();
+	
+	/** The bytes written to the output. */
+	protected long writtenbytes;
 	
 	public AbstractEncodingContext(Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
 	{
@@ -62,12 +70,31 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 	}
 	
 	/**
+	 *  Returns the number of bytes written.
+	 *  
+	 *  @return The number of bytes written.
+	 */
+	public long getWrittenBytes()
+	{
+		return writtenbytes;
+	}
+	
+	/**
 	 *  Returns the user context.
 	 *  @return The user context.
 	 */
 	public Object getUserContext()
 	{
 		return usercontext;
+	}
+	
+	/**
+	 *  Returns the non-inner class cache.
+	 *  @return The non-inner class cache.
+	 */
+	public Set<Class> getNonInnerClassCache()
+	{
+		return nonanonclasscache;
 	}
 	
 	/**

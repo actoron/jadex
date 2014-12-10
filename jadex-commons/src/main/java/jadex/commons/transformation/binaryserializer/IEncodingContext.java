@@ -3,6 +3,7 @@ package jadex.commons.transformation.binaryserializer;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  *  Encoding context interface.
@@ -33,6 +34,12 @@ public interface IEncodingContext
 	 *  @return The user context.
 	 */
 	public Object getUserContext();
+	
+	/**
+	 *  Returns the non-inner class cache.
+	 *  @return The non-inner class cache.
+	 */
+	public Set<Class> getNonInnerClassCache();
 	
 	/**
 	 *  Puts the context in a state where the next call to
@@ -95,4 +102,11 @@ public interface IEncodingContext
 	 *  @param name The name of the class.
 	 */
 	public int writeClassname(String name);
+	
+	/**
+	 *  Returns the number of bytes written.
+	 *  
+	 *  @return The number of bytes written.
+	 */
+	public long getWrittenBytes();
 }

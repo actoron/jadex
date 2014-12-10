@@ -1,8 +1,7 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
-import jadex.android.JadexAndroidContext;
-import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
-import jadex.android.bluetooth.JadexBluetoothActivity;
+import jadex.android.AndroidContextManager;
+import jadex.android.AndroidContextManager.AndroidContextChangeListener;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.message.DataPacket;
@@ -10,10 +9,6 @@ import jadex.android.bluetooth.service.ConnectionService;
 import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.android.bluetooth.util.Helper;
-import jadex.base.service.awareness.discovery.DiscoveryAgent;
-import jadex.base.service.awareness.discovery.DiscoveryService;
-import jadex.base.service.awareness.discovery.ReceiveHandler;
-import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
@@ -30,6 +25,10 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.platform.service.awareness.discovery.DiscoveryAgent;
+import jadex.platform.service.awareness.discovery.DiscoveryService;
+import jadex.platform.service.awareness.discovery.ReceiveHandler;
+import jadex.platform.service.awareness.discovery.SendHandler;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -78,7 +77,7 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements Androi
 	public BluetoothP2PDiscoveryAgent() {
 		intent = new Intent();
 		_knownDevices = new IBluetoothDevice[0];
-		JadexAndroidContext.getInstance().addContextChangeListener(this);
+		AndroidContextManager.getInstance().addContextChangeListener(this);
 		//intent.setClassName("jadex.android.bluetooth.service", "jadex.android.bluetooth.service.ConnectionService");
 	}
 

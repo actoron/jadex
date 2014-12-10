@@ -7,6 +7,7 @@ import java.util.Calendar;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ public class ChatEventArrayAdapter extends ArrayAdapter<ChatEvent>
 	private Context context;
 	private DateFormat timeFormatter;
 	private Calendar cal;
+	private String myNick;
 
 	public ChatEventArrayAdapter(Context context)
 	{
@@ -49,13 +51,32 @@ public class ChatEventArrayAdapter extends ArrayAdapter<ChatEvent>
 		}
 		
 		ChatEvent item = getItem(position);
-		viewHolder.userTextView.setText(item.getNick());
-		viewHolder.messageTextView.setText(item.getValue().toString());
 		viewHolder.dateTextView.setText(timeFormatter.format(cal.getTime()));
-		if (item.isPrivateMessage()) {
-			viewHolder.userTextView.setTextColor(Color.RED);
+		if (myNick != null && item.getNick().equals(myNick)) {
+//			viewHolder.userTextView.setTextColor(0xFF222e3b);
+			viewHolder.userTextView.setTextColor(0xFF0099CC);
 		} else {
-			viewHolder.userTextView.setTextColor(Color.WHITE);
+			if (item.isPrivateMessage()) {
+//				viewHolder.userTextView.setTextColor(0xFFa82f2f);
+				viewHolder.userTextView.setTextColor(0xFFCC0000);
+			} else {
+				viewHolder.userTextView.setTextColor(Color.WHITE);
+			}
+		}
+		
+		if (item.getType().equals(ChatEvent.TYPE_MESSAGE)) {
+			viewHolder.userTextView.setVisibility(View.VISIBLE);
+			viewHolder.userTextView.setText(item.getNick());
+			viewHolder.messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+			viewHolder.messageTextView.setText(item.getValue().toString());
+		} else if (item.getType().equals(ChatEvent.TYPE_STATECHANGE)) {
+			viewHolder.userTextView.setVisibility(View.GONE);
+			viewHolder.messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+			if (item.getValue() == null) {
+				viewHolder.messageTextView.setText(item.getNick() + " changed his nick. ");
+			} else {
+				viewHolder.messageTextView.setText(item.getNick() + "'s status is now: " + item.getValue().toString());
+			}
 		}
 		
 		return convertView;
@@ -65,7 +86,10 @@ public class ChatEventArrayAdapter extends ArrayAdapter<ChatEvent>
 		TextView userTextView;
 		TextView messageTextView;
 		TextView dateTextView;
-		
+	}
+
+	public void setOwnNick(String nick) {
+		this.myNick = nick;
 	}
 
 }

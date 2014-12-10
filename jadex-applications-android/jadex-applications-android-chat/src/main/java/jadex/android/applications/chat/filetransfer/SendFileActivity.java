@@ -1,12 +1,14 @@
 package jadex.android.applications.chat.filetransfer;
 
-import jadex.android.applications.chat.AndroidChatService;
-import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
+import java.util.Collection;
+
+import jadex.android.applications.chat.service.AndroidChatService;
+import jadex.android.applications.chat.service.IAndroidChatService;
+import jadex.android.applications.chat.service.AndroidChatService.ChatEventListener;
 import jadex.android.applications.chat.ChatUser;
 import jadex.android.applications.chat.ChatUserArrayAdapter;
-import jadex.android.applications.chat.IAndroidChatService;
 import jadex.android.applications.chat.R;
-import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.android.standalone.clientapp.ClientAppMainFragment;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.future.IResultListener;
@@ -39,7 +41,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SendFileActivity extends ClientAppFragment implements ServiceConnection, ChatEventListener
+public class SendFileActivity extends ClientAppMainFragment implements ServiceConnection, ChatEventListener
 {
 	// --- UI Widgets ---
 	private IAndroidChatService service;
@@ -293,43 +295,32 @@ public class SendFileActivity extends ClientAppFragment implements ServiceConnec
 						adapter.clear();
 					}
 				});
-				service.getUsers().addResultListener(new IntermediateDefaultResultListener<ChatUser>()
-				{
+				Collection<ChatUser> users = service.getUserModel().getUsers();
+				
+				for (ChatUser chatUser : users) {
+					adapter.add(chatUser);
+				}
+//				service.getUsers().addResultListener(new IntermediateDefaultResultListener<ChatUser>()
+//				{
+//
+//					@Override
+//					public void intermediateResultAvailable(final ChatUser chatUser)
+//					{
+//						uiHandler.post(new Runnable()
+//						{
+//
+//							@Override
+//							public void run()
+//							{
+//								adapter.add(chatUser);
+//							}
+//						});
+//					}
 
-					@Override
-					public void intermediateResultAvailable(final ChatUser chatUser)
-					{
-						uiHandler.post(new Runnable()
-						{
-
-							@Override
-							public void run()
-							{
-								adapter.add(chatUser);
-							}
-						});
-					}
-
-					@Override
-					public void finished()
-					{
-						super.finished();
-						uiHandler.post(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								setProgressBarIndeterminateVisibility(false);
-								statusTextView.setText(R.string.sendFile_chooseReceiver);
-								refreshButton.setEnabled(true);
-							}
-						});
-					}
-
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						super.exceptionOccurred(exception);
+//					@Override
+//					public void finished()
+//					{
+//						super.finished();
 						uiHandler.post(new Runnable()
 						{
 							@Override
@@ -340,8 +331,24 @@ public class SendFileActivity extends ClientAppFragment implements ServiceConnec
 								refreshButton.setEnabled(true);
 							}
 						});
-					}
-				});
+//					}
+
+//					@Override
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						super.exceptionOccurred(exception);
+//						uiHandler.post(new Runnable()
+//						{
+//							@Override
+//							public void run()
+//							{
+//								setProgressBarIndeterminateVisibility(false);
+//								statusTextView.setText(R.string.sendFile_chooseReceiver);
+//								refreshButton.setEnabled(true);
+//							}
+//						});
+//					}
+//				});
 			}
 		}).start();
 	}

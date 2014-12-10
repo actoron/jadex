@@ -1,9 +1,6 @@
 package jadex.android.standalone.platformapp;
 
-import java.io.IOException;
 import java.io.InputStream;
-
-import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.res.AssetFileDescriptor;
 import android.content.res.ColorStateList;
@@ -11,10 +8,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
-import android.content.res.Resources.NotFoundException;
 import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;

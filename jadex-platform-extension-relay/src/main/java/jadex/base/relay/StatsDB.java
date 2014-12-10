@@ -26,20 +26,6 @@ import java.util.NoSuchElementException;
  */
 public class StatsDB
 {
-	//-------- static part --------
-
-	/** The singleton db object. */
-	protected static final StatsDB	singleton	= new StatsDB();
-	
-	/**
-	 *  Get the db instance.
-	 *  @return The db instance.
-	 */
-	public static StatsDB	getDB()
-	{
-		return singleton;
-	}
-	
 	//-------- attributes --------
 	
 	/** The db connection (if any). */
@@ -61,106 +47,220 @@ public class StatsDB
 	
 	/**
 	 *  Create the db object.
+	 *  @return null, if creation fails.
 	 */
-	public StatsDB()
+	public static StatsDB	createDB()
 	{
+		StatsDB	ret	= null;
 		try
 		{
-			// Set up derby and create a database connection
-			System.setProperty("derby.system.home", RelayHandler.SYSTEMDIR.getAbsolutePath());		
-			// New instance required in case derby is reloaded in same VM (e.g. servlet container).
-			Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
-			con	= DriverManager.getConnection("jdbc:derby:mydb;create=true");
-
-			// Create the platform info table, if it doesn't exist.
-//			con.createStatement().execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
-			DatabaseMetaData	meta	= con.getMetaData();
-			ResultSet	rs	= meta.getTables(null, "RELAY", "PLATFORMINFO", null);
-			if(!rs.next())
-			{
-				rs.close();
-				Statement	stmt	= con.createStatement();
-				stmt.execute("CREATE TABLE RELAY.PLATFORMINFO ("
-					+ "ID	INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
-					+ "PLATFORM	VARCHAR(60)," 
-					+ "HOSTIP	VARCHAR(32),"
-					+ "HOSTNAME	VARCHAR(60),"
-		    		+ "SCHEME	VARCHAR(10),"
-		    		+ "CONTIME	TIMESTAMP,"
-					+ "DISTIME	TIMESTAMP,"
-					+ "MSGS	INTEGER,"
-					+ "BYTES	DOUBLE,"
-					+ "TRANSTIME	DOUBLE,"
-					+ "PREFIX	VARCHAR(60))");
-				stmt.close();
-			}
-			else
-			{
-				rs.close();
-				// Add platform prefix column, if it doesn't exist.
-				rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
-				if(!rs.next())
-				{
-					Statement	stmt	= con.createStatement();
-					stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
-					update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
-					
-					rs	= stmt.executeQuery("select ID, PLATFORM from relay.platforminfo");
-					while(rs.next())
-					{
-						int	param	= 1;
-						update.setString(param++, ComponentIdentifier.getPlatformPrefix(rs.getString("PLATFORM")));
-						update.setInt(param++, rs.getInt("ID"));
-						update.executeUpdate();
-					}
-					rs.close();
-					stmt.close();
-				}
-				
-				// Update platform entries where disconnection was missed.
-				Statement	stmt	= con.createStatement();
-				stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
-				
-				// Update platform entries where hostname is same as ip.
-				stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
-				stmt.close();
-				
-				// Replace android platform names and-xxx to and_xxx
-				PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
-				rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
-				while(rs.next())
-				{
-					int	param	= 1;
-					String	name	= "and_"+rs.getString("PLATFORM").substring(4);
-					update.setString(param++, name);
-					update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
-					update.setInt(param++, rs.getInt("ID"));
-					update.executeUpdate();
-				}
-				rs.close();
-				update.close();
-			}
-
-			// Create the properties table, if it doesn't exist.
-//			con.createStatement().execute("drop table RELAY.PROPERTIES");	// uncomment to create a fresh table.
-			meta	= con.getMetaData();
-			rs	= meta.getTables(null, "RELAY", "PROPERTIES", null);
-			if(!rs.next())
-			{
-				con.createStatement().execute("CREATE TABLE RELAY.PROPERTIES ("
-					+ "ID	INTEGER CONSTRAINT PLATFORM_KEY REFERENCES RELAY.PLATFORMINFO(ID),"
-					+ "NAME	VARCHAR(30)," 
-					+ "VALUE	VARCHAR(60))");
-			}
-			rs.close();
+			ret	= new StatsDB();
 		}
 		catch(Exception e)
 		{
 			// Ignore errors and let relay work without stats.
 			RelayHandler.getLogger().warning("Warning: Could not connect to relay stats DB: "+ e);
 		}
+		return ret;
 	}
 	
+	/**
+	 *  Create the db object.
+	 */
+	protected StatsDB()	throws Exception
+	{
+		con	= openDerbyDB();
+	}
+	
+	/**
+	 *  Create a derby db connection.
+	 */
+	protected Connection	openDerbyDB()	throws Exception
+	{
+		// Set up derby and create a database connection
+		System.setProperty("derby.system.home", RelayHandler.SYSTEMDIR.getAbsolutePath());		
+		// New instance required in case derby is reloaded in same VM (e.g. servlet container).
+		Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
+		Connection	con	= DriverManager.getConnection("jdbc:derby:mydb;create=true");
+
+		// Create the platform info table, if it doesn't exist.
+//			con.createStatement().execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
+		DatabaseMetaData	meta	= con.getMetaData();
+		ResultSet	rs	= meta.getTables(null, "RELAY", "PLATFORMINFO", null);
+		if(!rs.next())
+		{
+			rs.close();
+			Statement	stmt	= con.createStatement();
+			stmt.execute("CREATE TABLE RELAY.PLATFORMINFO ("
+				+ "ID	INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
+				+ "PLATFORM	VARCHAR(60)," 
+				+ "HOSTIP	VARCHAR(32),"
+				+ "HOSTNAME	VARCHAR(60),"
+	    		+ "SCHEME	VARCHAR(10),"
+	    		+ "CONTIME	TIMESTAMP,"
+				+ "DISTIME	TIMESTAMP,"
+				+ "MSGS	INTEGER,"
+				+ "BYTES	DOUBLE,"
+				+ "TRANSTIME	DOUBLE,"
+				+ "PREFIX	VARCHAR(60))");
+			stmt.close();
+		}
+		else
+		{
+			rs.close();
+			// Add platform prefix column, if it doesn't exist.
+			rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
+			if(!rs.next())
+			{
+				Statement	stmt	= con.createStatement();
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
+				update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
+				
+				rs	= stmt.executeQuery("select ID, PLATFORM from relay.platforminfo");
+				while(rs.next())
+				{
+					int	param	= 1;
+					update.setString(param++, ComponentIdentifier.getPlatformPrefix(rs.getString("PLATFORM")));
+					update.setInt(param++, rs.getInt("ID"));
+					update.executeUpdate();
+				}
+				rs.close();
+				stmt.close();
+			}
+			
+			// Update platform entries where disconnection was missed.
+			Statement	stmt	= con.createStatement();
+			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
+			
+			// Update platform entries where hostname is same as ip.
+			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
+			stmt.close();
+			
+			// Replace android platform names and-xxx to and_xxx
+			PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
+			rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
+			while(rs.next())
+			{
+				int	param	= 1;
+				String	name	= "and_"+rs.getString("PLATFORM").substring(4);
+				update.setString(param++, name);
+				update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+				update.setInt(param++, rs.getInt("ID"));
+				update.executeUpdate();
+			}
+			rs.close();
+			update.close();
+		}
+
+		// Create the properties table, if it doesn't exist.
+//			con.createStatement().execute("drop table RELAY.PROPERTIES");	// uncomment to create a fresh table.
+		meta	= con.getMetaData();
+		rs	= meta.getTables(null, "RELAY", "PROPERTIES", null);
+		if(!rs.next())
+		{
+			con.createStatement().execute("CREATE TABLE RELAY.PROPERTIES ("
+				+ "ID	INTEGER CONSTRAINT PLATFORM_KEY REFERENCES RELAY.PLATFORMINFO(ID),"
+				+ "NAME	VARCHAR(30)," 
+				+ "VALUE	VARCHAR(60))");
+		}
+		rs.close();
+		
+		return con;
+	}
+	
+	/**
+	 *  Create a derby db connection.
+	 */
+	protected Connection	openH2DB()	throws Exception
+	{
+		Class.forName("org.h2.Driver");
+		Connection	con	= DriverManager.getConnection("jdbc:h2:"+RelayHandler.SYSTEMDIR.getAbsolutePath()+"/h2db");
+
+		// Create the platform info table, if it doesn't exist.
+//		con.createStatement().execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
+		DatabaseMetaData	meta	= con.getMetaData();
+		ResultSet	rs	= meta.getTables(null, "RELAY", "PLATFORMINFO", null);
+		if(!rs.next())
+		{
+			rs.close();
+			Statement	stmt	= con.createStatement();
+			stmt.execute("CREATE TABLE RELAY.PLATFORMINFO ("
+				+ "ID	INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
+				+ "PLATFORM	VARCHAR(60)," 
+				+ "HOSTIP	VARCHAR(32),"
+				+ "HOSTNAME	VARCHAR(60),"
+	    		+ "SCHEME	VARCHAR(10),"
+	    		+ "CONTIME	TIMESTAMP,"
+				+ "DISTIME	TIMESTAMP,"
+				+ "MSGS	INTEGER,"
+				+ "BYTES	DOUBLE,"
+				+ "TRANSTIME	DOUBLE,"
+				+ "PREFIX	VARCHAR(60))");
+			stmt.close();
+		}
+		else
+		{
+			rs.close();
+			// Add platform prefix column, if it doesn't exist.
+			rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
+			if(!rs.next())
+			{
+				Statement	stmt	= con.createStatement();
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
+				update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
+				
+				rs	= stmt.executeQuery("select ID, PLATFORM from relay.platforminfo");
+				while(rs.next())
+				{
+					int	param	= 1;
+					update.setString(param++, ComponentIdentifier.getPlatformPrefix(rs.getString("PLATFORM")));
+					update.setInt(param++, rs.getInt("ID"));
+					update.executeUpdate();
+				}
+				rs.close();
+				stmt.close();
+			}
+			
+			// Update platform entries where disconnection was missed.
+			Statement	stmt	= con.createStatement();
+			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
+			
+			// Update platform entries where hostname is same as ip.
+			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
+			stmt.close();
+			
+			// Replace android platform names and-xxx to and_xxx
+			PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
+			rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
+			while(rs.next())
+			{
+				int	param	= 1;
+				String	name	= "and_"+rs.getString("PLATFORM").substring(4);
+				update.setString(param++, name);
+				update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+				update.setInt(param++, rs.getInt("ID"));
+				update.executeUpdate();
+			}
+			rs.close();
+			update.close();
+		}
+
+		// Create the properties table, if it doesn't exist.
+//			con.createStatement().execute("drop table RELAY.PROPERTIES");	// uncomment to create a fresh table.
+		meta	= con.getMetaData();
+		rs	= meta.getTables(null, "RELAY", "PROPERTIES", null);
+		if(!rs.next())
+		{
+			con.createStatement().execute("CREATE TABLE RELAY.PROPERTIES ("
+				+ "ID	INTEGER CONSTRAINT PLATFORM_KEY REFERENCES RELAY.PLATFORMINFO(ID),"
+				+ "NAME	VARCHAR(30)," 
+				+ "VALUE	VARCHAR(60))");
+		}
+		rs.close();
+		
+		return con;
+	}
+
 	//-------- methods --------
 	
 	/**
@@ -495,7 +595,7 @@ public class StatsDB
 				}
 			}
 			System.out.println("Executing: "+sql);
-			StatsDB	db	= getDB();
+			StatsDB	db	= new StatsDB();
 			Statement	stmt	= db.con.createStatement();
 			boolean query	= stmt.execute(sql);
 			if(query)
@@ -510,7 +610,7 @@ public class StatsDB
 		}
 		else
 		{
-			StatsDB	db	= getDB();
+			StatsDB	db	= new StatsDB();
 			Map<String, String>	props	= new HashMap<String, String>();
 			props.put("a", "b");
 			props.put("a1", "b2");

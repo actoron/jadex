@@ -1,6 +1,7 @@
 include 'jadex-applications-bdi', 
 'jadex-applications-bdiv3',
 'jadex-applications-bdibpmn',
+'jadex-applications-bpmn',
 'jadex-applications-gpmn',
 'jadex-applications-micro',
 'jadex-applications-mixed',
@@ -35,6 +36,7 @@ include 'jadex-applications-bdi',
 'jadex-kernel-extension-agr', 
 'jadex-kernel-extension-envsupport', 
 'jadex-kernel-extension-envsupport-opengl',
+'jadex-kernel-extension-envsupport-jmonkey',
 'jadex-tools-base-swing', 
 'jadex-tools-base', 
 'jadex-servletfilter', 
@@ -42,5 +44,45 @@ include 'jadex-applications-bdi',
 'jadex-rules-applications',
 'jadex-platform-relay-web', 
 'jadex-platform-extension-relay',
+'jadex-platform-extension-relay-standalone',
 'jadex-platform-extension-webservice',
-'jadex-platform-extension-webservice-desktop'
+'jadex-platform-extension-webservice-desktop',
+'jadex-platform-extension-securetransport',
+'jadex-platform-extension-management',
+'jadex-platform-extension-maven',
+'jadex-editor-gpmn'
+// android-specific modules:
+if (androidSdkExists()) {
+    include 'jadex-android-antlr',
+    'jadex-android-commons',
+    'jadex-android-xmlpull',
+//    'jadex-android-bluetooth',
+//    'jadex-android-integration-test',
+    'jadex-android-maven-plugin',
+    'jadex-android-platformclient',
+//    'jadex-android-testlauncher',
+    'jadex-applications-android-demos',
+    'jadex-kernel-bdiv3-android',
+    'jadex-platform-android',
+    'jadex-platform-extension-webservice-android',
+    'jadex-runtimetools-android',
+    'jadex-android-platformapp',
+    'jadex-applications-android-demos',
+    'jadex-applications-android:jadex-applications-android-chat',
+    'jadex-applications-android:jadex-applications-android-puzzle'
+    
+} else {
+    logger.warn('Cannot compile android projects: No Android SDK found.\n' +
+            'To include android projects in build, set ANDROID_HOME to your android sdk root.')
+}
+
+include 'jadex-test'
+
+def androidSdkExists() {
+    def androidHome = System.env.'ANDROID_HOME'
+    if (androidHome != null && !androidHome.isEmpty()) {
+        def adb = new File(androidHome + "/platform-tools/adb")
+        return adb.exists();
+    }
+    return false;
+}

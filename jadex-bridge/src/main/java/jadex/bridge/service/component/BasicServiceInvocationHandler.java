@@ -458,7 +458,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					&& !(Proxy.isProxyClass(service.getClass())
 					&& Proxy.getInvocationHandler(service).getClass().isAnnotationPresent(Service.class)))
 				{
-					throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
+					//throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
+					ia.getLogger().warning("Pojo service should declare @Service annotation: "+service.getClass());
+//					throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
 				}
 				addPojoServiceProxy(service, ret);
 			}
@@ -499,6 +501,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			if (service instanceof BasicService)
 			{
+				serprops.putAll(((BasicService) service).getPropertyMap());
 				((BasicService) service).setPropertyMap(serprops);
 			}
 			
@@ -539,6 +542,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 
 			BasicService mgmntservice = new BasicService(ia.getComponentIdentifier(), type, serclass, null);
 			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope);
+			serprops.putAll(mgmntservice.getPropertyMap());
 			mgmntservice.setPropertyMap(serprops);
 			
 			// Do not try to call isAnnotationPresent for Proxy on Android

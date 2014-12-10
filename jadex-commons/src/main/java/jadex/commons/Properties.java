@@ -315,7 +315,7 @@ public class Properties
 	/**
 	 *  Get a boolean property.
 	 *  @param type The type.
-	 *  @returns Returns false if the property is not set.
+	 *  @return Returns false if the property is not set.
 	 */
 	public boolean	getBooleanProperty(String type)
 	{
@@ -327,7 +327,7 @@ public class Properties
 	/**
 	 *  Get a long property.
 	 *  @param type The type.
-	 *  @returns Returns the parsed long value, 0 if not set.
+	 *  @return Returns the parsed long value, 0 if not set.
 	 */
 	public long getLongProperty(String type)
 	{
@@ -338,7 +338,7 @@ public class Properties
 	/**
 	 *  Get an int  property.
 	 *  @param type The type.
-	 *  @returns Returns the parsed int value, 0 if not set.
+	 *  @return Returns the parsed int value, 0 if not set.
 	 */
 	public int getIntProperty(String type)
 	{
@@ -349,7 +349,7 @@ public class Properties
 	/**
 	 *  Get a double  property.
 	 *  @param type The type.
-	 *  @returns Returns the parsed double value, 0 if not set.
+	 *  @return Returns the parsed double value, 0 if not set.
 	 */
 	public double getDoubleProperty(String type)
 	{
@@ -360,7 +360,7 @@ public class Properties
 	/**
 	 *  Get a string  property.
 	 *  @param type The type.
-	 *  @returns Returns the string value or null if not set.
+	 *  @return Returns the string value or null if not set.
 	 */
 	public String getStringProperty(String type)
 	{
@@ -399,7 +399,7 @@ public class Properties
 	/**
 	 *  Get a boolean property.
 	 *  @param type The type.
-	 *  @returns Returns false if the property is not set.
+	 *  @return Returns false if the property is not set.
 	 */
 	public static boolean getBooleanProperty(Properties[] props, String type)
 	{
@@ -410,7 +410,7 @@ public class Properties
 	/**
 	 *  Get a long property.
 	 *  @param type The type.
-	 *  @returns Returns the parsed long value, 0 if not set.
+	 *  @return Returns the parsed long value, 0 if not set.
 	 */
 	public static long getLongProperty(Properties[] props, String type)
 	{
@@ -421,7 +421,7 @@ public class Properties
 	/**
 	 *  Get an int  property.
 	 *  @param type The type.
-	 *  @returns Returns the parsed int value, 0 if not set.
+	 *  @return Returns the parsed int value, 0 if not set.
 	 */
 	public static int getIntProperty(Properties[] props, String type)
 	{
@@ -432,7 +432,7 @@ public class Properties
 	/**
 	 *  Get a string  property.
 	 *  @param type The type.
-	 *  @returns Returns the string value or null if not set.
+	 *  @return Returns the string value or null if not set.
 	 */
 	public static String getStringProperty(Properties[] props, String type)
 	{

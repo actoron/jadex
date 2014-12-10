@@ -20,7 +20,7 @@ public abstract class AbstractParameterPanel extends JPanel
 	/**
 	 * Returns whether the current value is valid for the given parameter.
 	 * Calling this operation may cause the panel to mark errors for the user.
-	 * @returns true if the value is valid, false otherwise
+	 * @return true if the value is valid, false otherwise
 	 */
 	public abstract boolean isParameterValueValid();
 	

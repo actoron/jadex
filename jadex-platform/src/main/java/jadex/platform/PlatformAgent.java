@@ -106,7 +106,7 @@ import java.util.logging.Level;
 	@Argument(name="niotcpport", clazz=int.class, defaultvalue="8765"),
 	@Argument(name="relaytransport", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="relayaddress", clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
-	@Argument(name="relaysecurity", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="relaysecurity", clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
 	@Argument(name="ssltcptransport", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="ssltcpport", clazz=int.class, defaultvalue="44334"),
 

@@ -1,14 +1,15 @@
 package jadex.android.standalone.clientapp;
 
+import java.util.Map;
+
 import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
+import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
@@ -17,10 +18,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -36,7 +33,7 @@ import android.os.IBinder;
  * 
  * @author Julian Kalinowski
  */
-public class PlatformProvidingClientAppFragment extends ClientAppFragment implements ServiceConnection, JadexPlatformOptions
+public class PlatformProvidingClientAppFragment extends ClientAppMainFragment implements ServiceConnection, JadexPlatformOptions
 {
 
 	private Intent serviceIntent;
@@ -57,7 +54,6 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 		platformAutostart = false;
 		platformKernels = JadexPlatformOptions.DEFAULT_KERNELS;
 		platformOptions = "";
-//		platformName = JadexPlatformManager.getInstance().getRandomPlatformID();
 	}
 
 	@Override
@@ -83,7 +79,7 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	 */
 	protected void setPlatformAutostart(boolean autostart)
 	{
-		if (!isJadexPlatformRunning())
+		if (!isPlatformRunning())
 		{
 			this.platformAutostart = autostart;
 		}
@@ -113,7 +109,7 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	{
 		this.platformOptions = options;
 	}
-
+	
 	/**
 	 * Sets the name of the platform that is started by this activity.
 	 * 
@@ -124,7 +120,7 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 		this.platformName = name;
 	}
 
-	protected boolean isJadexPlatformRunning()
+	protected boolean isPlatformRunning()
 	{
 		if (platformService != null)
 		{
@@ -135,14 +131,22 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 			return false;
 		}
 	}
-
+	
 	protected IExternalAccess getPlatformAccess()
 	{
 		checkIfJadexIsRunning("getPlatformAccess()");
 		return platformService.getExternalPlatformAccess(platformId);
 	}
+	
+	/**
+	 * Gets the platform service.
+	 * @return PlatformService binder
+	 */
+	protected IJadexPlatformBinder getPlatformService() {
+		return platformService;
+	}
 
-	protected boolean isJadexPlatformRunning(IComponentIdentifier platformId)
+	protected boolean isPlatformRunning(IComponentIdentifier platformId)
 	{
 		if (platformService != null)
 		{
@@ -153,74 +157,34 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 			return false;
 		}
 	}
-
-	/**
-	 * Starts a Micro Agent.
-	 * 
-	 * @param name
-	 *            Name of the Micro Agent created
-	 * @param clazz
-	 *            Class which defines the Micro Agent
-	 * @return IFuture<IComponentIdentifier>
-	 */
-	protected IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz)
-	{
-		checkIfJadexIsRunning("startMicroAgent()");
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		platformService.getCMS(platformId).addResultListener(new DefaultResultListener<IComponentManagementService>()
-		{
-
-			public void resultAvailable(IComponentManagementService cms)
-			{
-				HashMap<String, Object> args = new HashMap<String, Object>();
-
-				cms.createComponent(name, clazz.getName().replaceAll("\\.", "/") + ".class", new CreationInfo(args), null)
-						.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-			}
-		});
-
-		return ret;
-	}
-
+	
 	/**
 	 * Starts a Component.
 	 * 
 	 * @param name
 	 *            Name of the Component created
 	 * @param modelPath
-	 *            Path to the Component XML definition file
+	 *            Path to the Component
 	 * @return IFuture<IComponentIdentifier>
 	 */
 	protected IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath)
 	{
 		checkIfJadexIsRunning("startComponent()");
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		platformService.getCMS(platformId).addResultListener(new DefaultResultListener<IComponentManagementService>()
-		{
-
-			public void resultAvailable(IComponentManagementService cms)
-			{
-				HashMap<String, Object> args = new HashMap<String, Object>();
-
-				args.put("androidContext", PlatformProvidingClientAppFragment.this);
-				cms.createComponent(name, modelPath, new CreationInfo(args), null).addResultListener(
-						new DelegationResultListener<IComponentIdentifier>(ret));
-			}
-		});
-
-		return ret;
+		return platformService.startComponent(name, modelPath);
 	}
-
+	
 	protected void registerEventReceiver(IEventReceiver<?> rec)
 	{
+		checkIfJadexIsRunning("registerEventReceiver");
 		platformService.registerEventReceiver(rec);
 	}
 
 	protected void unregisterEventReceiver(IEventReceiver<?> rec)
 	{
+		checkIfJadexIsRunning("unregisterEventReceiver");
 		platformService.unregisterEventReceiver(rec);
 	}
-
+	
 	/**
 	 * Sends a FIPA Message to the specified receiver. The Sender is
 	 * automatically set to the Platform.
@@ -250,7 +214,7 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 
 		final Future<Void> ret = new Future<Void>();
 
-		getMS().addResultListener(new DefaultResultListener<IMessageService>()
+		platformService.getMS().addResultListener(new DefaultResultListener<IMessageService>()
 		{
 			public void resultAvailable(IMessageService ms)
 			{
@@ -260,23 +224,13 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 
 		return ret;
 	}
-
+	
 	private void checkIfJadexIsRunning(String caller)
 	{
 		if (!platformService.isPlatformRunning(platformId))
 		{
 			throw new JadexAndroidPlatformNotStartedError(caller);
 		}
-	}
-
-	protected IFuture<IMessageService> getMS()
-	{
-		return platformService.getMS(platformId);
-	}
-
-	protected IFuture<IComponentManagementService> getCMS()
-	{
-		return platformService.getCMS(platformId);
 	}
 
 	public void onServiceConnected(ComponentName name, IBinder service)
@@ -292,18 +246,7 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	{
 		platformService = null;
 	}
-
-	/**
-	 * Terminates a given Jadex platform.
-	 * 
-	 * @param platformID
-	 *            Identifier of the platform to terminate
-	 */
-	public void shutdownJadexPlatform(IComponentIdentifier platformID)
-	{
-		platformService.shutdownJadexPlatform(platformID);
-	}
-
+	
 	/**
 	 * Called right before the platform startup.
 	 */
@@ -372,7 +315,20 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	 */
 	protected void stopPlatforms()
 	{
+		checkIfJadexIsRunning("stopPlatforms()");
 		platformService.shutdownJadexPlatforms();
+	}
+	
+	/**
+	 * Terminates a given Jadex platform.
+	 * 
+	 * @param platformID
+	 *            Identifier of the platform to terminate
+	 */
+	public void shutdownJadexPlatform(IComponentIdentifier platformID)
+	{
+		checkIfJadexIsRunning("shutdownJadexPlatform()");
+		platformService.shutdownJadexPlatform(platformID);
 	}
 
 }

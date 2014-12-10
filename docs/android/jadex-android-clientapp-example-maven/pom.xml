@@ -174,26 +174,6 @@
 										<ignore></ignore>
 									</action>
 								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											com.jayway.maven.plugins.android.generation2
-										</groupId>
-										<artifactId>
-											android-maven-plugin
-										</artifactId>
-										<versionRange>
-											[3.8.1,)
-										</versionRange>
-										<goals>
-											<goal>generate-sources</goal>
-											<goal>proguard</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute></execute>
-									</action>
-								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>

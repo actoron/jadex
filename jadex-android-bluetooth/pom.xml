@@ -16,6 +16,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-bridge</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -65,7 +71,7 @@
 					<attachJar>true</attachJar>
 					<sdk>
 						<path>${env.ANDROID_HOME}</path>
-						<platform>2.2</platform>
+						<platform>8</platform>
 					</sdk>
 					<dex>
 						<jvmArguments>

@@ -91,7 +91,7 @@ public class BasicService extends ExternalFeatureProvider implements IInternalSe
 	public static void	setRemoteDefaultTimeout(long timeout)
 	{
 		DEFAULT_REMOTE	= timeout;
-//		System.err.println("Setting Jadex default timeout: "+DEFAULT_REMOTE);
+//		System.err.println("Setting Jadex default remote timeout: "+DEFAULT_REMOTE);
 //		Thread.dumpStack();
 	}
 
@@ -101,7 +101,7 @@ public class BasicService extends ExternalFeatureProvider implements IInternalSe
 	public static void	setLocalDefaultTimeout(long timeout)
 	{
 		DEFAULT_LOCAL	= timeout;
-//		System.err.println("Setting Jadex default timeout: "+DEFAULT_LOCAL);
+//		System.err.println("Setting Jadex default local timeout: "+DEFAULT_LOCAL);
 //		Thread.dumpStack();
 	}
 

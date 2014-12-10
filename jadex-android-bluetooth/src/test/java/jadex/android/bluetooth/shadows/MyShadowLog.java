@@ -1,9 +1,9 @@
 package jadex.android.bluetooth.shadows;
 
-import android.util.Log;
+import org.robolectric.annotation.Implementation;
+import org.robolectric.annotation.Implements;
 
-import com.xtremelabs.robolectric.internal.Implementation;
-import com.xtremelabs.robolectric.internal.Implements;
+import android.util.Log;
 
 @Implements(Log.class)
 public class MyShadowLog {

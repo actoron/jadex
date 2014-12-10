@@ -4,7 +4,6 @@ import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -43,7 +42,6 @@ public class BDIV3CreationTest //extends TestCase
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 //			"-componentfactory", "jadex.component.ComponentComponentFactory",
 //			"-conf", "jadex.standalone.Platform.component.xml",
-			"-deftimeout", "-1",
 			"-printpass", "false"}).get(sus, timeout);
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get(sus, timeout);
 		

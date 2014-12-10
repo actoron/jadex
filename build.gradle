@@ -1,38 +1,658 @@
-allprojects
-{
-	version = '2.5-SNAPSHOT'
-	group = 'net.sourceforge.jadex'
-	
-    //configurations 
-    //{
-    //    all*.exclude group: "commons-logging", module: "commons-logging"
-    //}
- 
-    repositories 
+apply plugin: 'signing'
+apply plugin: 'java-library-distribution'
+apply plugin: 'maven-publish' // PublishToMavenLocal
+
+//if(file('gradle.properties').exists())
+//{
+	//apply from: "gradle.properties"
+//}
+
+//if(gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("uploadArchives"))
+//{
+//	println("upload detected")
+//}
+
+def stdexcl = ['-backup', '-management', '-maven', '-servletfilter-', '-jmonkey', 
+	'-launch', '-web', '-distribution-', '-webservice', '-securetransport', '-relay', '-android'] //*:*-relay-standalone
+
+def proexcl = ['-jmonkey', '-launch', '-web', '-distribution-', '-backup', '-android']
+
+def androidIncl = ['jadex-android-commons',
+                'jadex-android-antlr',
+                'jadex-android-xmlpull',
+                'jadex-android-platformclient',
+                'jadex-platform-android',
+                'jadex-runtimetools-android',
+                'jadex-platform-extension-webservice-android',
+                'jadex-commons',
+                'jadex-tools-base',
+                'jadex-bridge',
+                'jadex-javaparser',
+                'jadex-xml',
+                'jadex-rules',
+                'jadex-rules-eca',
+                'jadex-kernel-base',
+                'jadex-kernel-micro',
+                'jadex-kernel-component',
+                'jadex-kernel-bdi',
+                'jadex-kernel-bdiv3',
+                'jadex-kernel-bdiv3-android',
+                'jadex-kernel-bpmn',
+                'jadex-model-bpmn',
+                'jadex-kernel-bdibpmn',
+                'jadex-platform',
+                'jadex-platform-extension-webservice',
+                'jadex-android-maven-plugin',
+                'jadex-android-platformapp',
+                'jadex-applications-android-demos',
+                'jadex-applications-android:jadex-applications-android:chat',
+                'jadex-applications-android:jadex-applications-android:puzzle'
+]
+
+buildscript {
+    apply from: 'util.gradle'
+    repositories
     {
         mavenCentral()
-		//maven 
-		//{
-		//	url 'http://www0.activecomponents.org/nexus/content/repositories/snapshots/'
-		// 	credentials 
-		// 	{
-	    //        username 'Lars'
-	    //        password 'larsop37'
-	    //    }
-	    //}
+    }
+    dependencies
+    {
+        classpath 'com.android.tools.build:gradle:0.14.4'
     }
 }
 
-subprojects 
+allprojects
 {
-	apply plugin: 'java'
-	
-	sourceCompatibility = 1.6
-	sourceSets.main.resources.srcDirs	'src/main/java'
-	sourceSets.test.resources.srcDirs	'src/test/java'
-	
-    dependencies 
+    version = '2.5-SNAPSHOT'
+    group = 'net.sourceforge.jadex'
+    
+    configurations
     {
-        testCompile 'junit:junit:4.11'
+        deployerJars
+    }
+
+    dependencies
+    {
+        deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
+    }
+
+    repositories
+    {
+        mavenCentral()
+        //maven
+        //{
+        //    name 'www1'
+        //    url 'http://www1.activecomponents.org/nexus/content/repositories/snapshots/'
+        //    credentials
+        //    {
+        //        username 'deployment'
+        //        password 'laxlax'
+        //    }
+        //}
     }
 }
+
+configurations
+{
+	excludeset
+}
+
+subprojects
+{
+    def mainSrcDir  = 'src/main/java'
+    def testSrcDir  = 'src/test/java'
+    def junit       = 'junit:junit:4.11'
+    def allSource   = ''
+
+    if(isAndroidProject(project))
+    {
+        if (isAndroidLibraryProject(project)) {
+            apply plugin: 'android-library'
+        } else {
+            apply plugin: 'com.android.application'
+        }
+        allSource   = android.sourceSets.main.java.srcDirs
+        dependencies
+        {
+            androidTestCompile junit
+        }
+    } 
+    else 
+    {
+        apply plugin: 'java'
+        apply plugin: 'java-library-distribution'
+        allSource   = sourceSets.main.allSource
+        sourceSets.main.resources.srcDirs    mainSrcDir
+        sourceSets.test.resources.srcDirs    testSrcDir
+        dependencies
+        {
+            testCompile junit
+        }
+
+        configurations {
+            provided {
+                dependencies.all { dep ->
+                    configurations.default.exclude group: dep.group, module: dep.name
+                }
+            }
+            compile.extendsFrom provided
+        }
+
+    }
+
+    apply plugin: 'maven'
+    //apply plugin: 'maven-publish'
+   
+
+    sourceCompatibility = 1.6
+
+	task myJavadocs(type: Javadoc) {    
+    	//source = sourceSets.main.allJava
+    	classpath = configurations.compile
+    	destinationDir = file("./doc/")
+    	options.addStringOption('Xdoclint:none', '-quiet')
+  	}
+
+    task sourcesJar(type: Jar, dependsOn: 'classes') {
+        classifier 'sources'
+        from allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: 'myJavadocs') {
+        classifier = 'javadoc'
+        from new File(projectDir, 'build/docs')
+    }
+
+    javadocJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("uploadArchives") }
+
+	//sourcesJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("uploadArchives") }
+	
+    artifacts
+    {
+        archives sourcesJar
+        archives javadocJar
+    }
+
+	signing
+	{
+		if(project.hasProperty("ext.signing.keyId"))
+		{
+	    	sign configurations.archives
+		}
+	}
+
+	// cannot sign with maven-publish :-( http://stackoverflow.com/questions/16560235/how-to-sign-maven-publications-with-gradle
+    // publishing
+    // {
+    //    publications
+    //    {
+    //        mavenJava(MavenPublication)
+    //        {
+    //			from components.java
+    //		
+    //			artifact sourceJar {
+    //            	classifier "sources"
+    //        	}
+    //		}
+    //	}
+   	//}
+
+    //uploadArchives
+    //{
+    //    repositories
+    //    {
+    //        add project.repositories.www1
+    //    }
+    //}
+
+    uploadArchives
+    {
+        repositories.mavenDeployer
+        {
+        	beforeDeployment
+        	{
+        		MavenDeployment deployment -> signing.signPom(deployment)
+        	}
+        	
+            configuration = configurations.deployerJars
+
+			//println("repouser: "+repouser+" pass: "+repopassword)
+			            
+            snapshotRepository(url: "http://localhost/nexus/content/repositories/snapshots")
+            {
+            	//<id>jadex-public-snapshots</id>
+                authentication(userName: repouser, password: repopassword)
+                //authentication(userName: "deployment", password: "laxlax")
+            }
+            repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            {
+            	//<id>sonatype-nexus-staging</id>
+            	authentication(userName: repouser, password: repopassword)
+                //authentication(userName: "deployment", password: "laxlax")
+            }
+        }
+    }
+}
+
+// additional android config
+subprojects 
+{
+    // library definitions to be used in subprojects
+    ext.libraries = [
+            android_support: "com.google.android:support-v4:r7",
+            android_compat: "com.android.support:appcompat-v7:19.0.1",
+            android: 'com.google.android:android:2.2.1',
+            android_test: "com.google.android:android-test:2.2.1",
+            protobuf: "com.google.protobuf:protobuf-java:2.4.1",
+            junit: 'junit:junit:4.11',
+            robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
+//            robolectric: 'com.pivotallabs:robolectric:1.0'
+            robolectric: 'org.robolectric:robolectric:2.2'
+    ]
+
+    if(isAndroidProject(project))
+    {
+        android {
+            compileSdkVersion 21
+            buildToolsVersion "21.1.0"
+
+            defaultConfig {
+                minSdkVersion 8
+                targetSdkVersion 21
+                versionCode 1
+                versionName project.version
+            }
+
+            sourceSets {
+                main {
+                    manifest.srcFile 'AndroidManifest.xml'
+                    resources.srcDirs = ['src/main/java']
+                    aidl.srcDirs = ['src/main/java']
+                    res.srcDirs = ['res']
+                }
+            }
+
+            buildTypes {
+                release {
+                    // runProguard true
+                    // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+                }
+            }
+
+            packagingOptions {
+                exclude 'LICENSE.txt'
+                exclude 'META-INF/license.txt'
+                exclude 'META-INF/notice.txt'
+            }
+
+            lintOptions {
+                abortOnError false
+            }
+        }
+
+        configurations {
+            // add new configuration to define provided deps, see http://www.sinking.in/blog/provided-scope-in-gradle/
+            provided {
+//                dependencies.all { dep ->
+//                    configurations.default.exclude group: dep.group, module: dep.name
+//                }
+            }
+
+            compile.extendsFrom provided
+//            debugProvided.extendsFrom provided
+//            releaseProvided.extendsFrom provided
+
+
+
+            // exclude transitive deps that are not supported on android
+            all*.exclude group:'org.javassist', module:'javassist'
+            all*.exclude group:'javax.mail', module:'mail'
+            all*.exclude group:'org.antlr', module:'antlr-runtime'
+            all*.exclude group:'bouncycastle', module:'bcprov-jdk15'
+            all*.exclude group:'org.ow2.asm', module:'asm-all'
+            runtime.exclude module:'junit' // no junit in runtime classpath
+        }
+
+        // general dependencies for all android modules
+        dependencies 
+        {
+            compile libraries.android
+            androidTestCompile 'com.pivotallabs:robolectric:1.0'
+//            releaseProvided 'org.javassist:javassist:3.14.0-GA'
+//            releaseProvided 'javax.mail:mail:1.4.5'
+//            releaseProvided 'org.antlr:antlr-runtime:3.1.3'
+//            releaseProvided 'bouncycastle:bcprov-jdk15:140'
+        }
+
+        // dummy tasks to allow dependencies on tasks that are missing in android-plugin
+        task jar(type:Jar) {
+
+        }
+
+        if (!isAndroidLibraryProject(project)) {
+            android.applicationVariants.all {variant ->
+                task("generate${variant.name}JavaDoc", type:Javadoc) {
+                    source = variant.javaCompile.source
+                    ext.androidJar =
+                            "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+                    classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+                    options.links("http://docs.oracle.com/javase/7/docs/api/");
+                    options.links("http://d.android.com/reference/");
+                    exclude '**/BuildConfig.java'
+                    exclude '**/R.java'
+
+                    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
+                    def javaVersion = JavaVersion.current()
+                    if (javaVersion >= JavaVersion.VERSION_1_8) {
+                        options.addStringOption('Xdoclint:none', '-quiet')
+                    } else {
+                        options.addStringOption('-quiet')
+                    }
+                }
+            }
+        }
+
+        myJavadocs.enabled = false
+
+        task classes(dependsOn: 'compileDebugSources') {
+
+        }
+
+        if (isAndroidLibraryProject(project)) {
+            afterEvaluate {
+                def variant = getReleaseVariant(project)
+                jar.from(variant.javaCompile.destinationDir)
+                jar.dependsOn variant.javaCompile
+            }
+        }
+
+    }
+}
+
+task docs(type: Javadoc) {
+    source subprojects.collect {project -> getSourceDir(project)}
+    // this is needed to avoid (failing) javadoc generation for xmls in android-projects:
+    exclude('**/*.xml','**/*.bpmn*','**/*.txt','**/*.bpmn')
+    classpath = files(subprojects.collect {project -> project.getCompileClassPath(project)})
+    destinationDir = new File(projectDir, 'build/docs')
+    options.links("http://docs.oracle.com/javase/7/docs/api/")
+    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
+    def javaVersion = JavaVersion.current()
+    if (javaVersion >= JavaVersion.VERSION_1_8) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    } else {
+        options.addStringOption('-quiet')
+    }
+}
+
+task srcAndroidZip(type: Zip) {
+    buildDistributionSource(srcAndroidZip, null, androidIncl, "sourcesAndroid.zip", false)
+}
+
+task srcZip(type: Zip) {
+	buildDistributionSource(srcZip, stdexcl, null, null, true)
+}
+
+task srcZipPro(type: Zip) {
+	buildDistributionSource(srcZipPro, proexcl, null, null, false)
+}
+
+task srcZip3d(type: Zip) {
+    buildDistributionSource(srcZip3d, null, ['jadex-kernel-extension-envsupport-jmonkey'], 'sources3d.zip', true)
+}
+
+task srcZipWebservice(type: Zip) {
+    buildDistributionSource(srcZipWebservice, null, ['jadex-applications-webservice', 'jadex-platform-extension-webservice', 'jadex-platform-extension-webservice-desktop'], 'sourcesws.zip', false)
+}
+
+task srcZipRelay(type: Zip) {
+    buildDistributionSource(srcZipRelay, null, ['jadex-platform-extension-relay-standalone'], 'sources-relay.zip', false)
+}
+
+task srcZipSecureTransport(type: Zip) {
+    buildDistributionSource(srcZipSecureTransport, null, ['jadex-platform-extension-securetransport'], 'sources-securetransport.zip', false)
+}
+
+task srcZipManagement(type: Zip) {
+    buildDistributionSource(srcZipSecureTransport, null, ['jadex-platform-extension-management'], 'sources-management.zip', false)
+}
+
+task srcZipMaven(type: Zip) {
+    buildDistributionSource(srcZipSecureTransport, null, ['jadex-platform-extension-maven'], 'sources-maven.zip', false)
+}
+
+task srcZipBpmnEditor(type: Zip) {
+    buildDistributionSource(srcZipBpmnEditor, null, ['jadex-editor-bpmn'], 'sources-bpmneditor.zip', false)
+}
+
+task srcZipGpmnEditor(type: Zip) {
+    buildDistributionSource(srcZipBpmnEditor, null, ['jadex-editor-gpmn'], 'sources-gpmneditor.zip', false)
+}
+
+
+def buildDistributionSource(task, excl, incl, name, opengl) {
+	task.archiveName = name!=null? name: 'sources.zip'
+    task.classifier = 'src'
+    task.destinationDir = new File(project.distsDir, "sources")
+    
+    //from(sourceSets.main.allSource){}
+    //from sourceSets*.allSource.srcDirs*.collect { relativePath(it) }.flatten()
+    
+    task.from('build.gradle'){ into('sources') }
+    task.from('settings.gradle'){ into('sources') }
+    
+    subprojects.each {subproject ->
+        if ((excl != null && !isExcluded(excl, subproject.name))
+                || (incl != null && incl.contains(subproject.name)))
+        {
+        	//println('including: '+task.name+" "+subproject.projectDir.name)
+			task.from(subproject.projectDir.name) { include 'build.gradle' into 'sources/'+subproject.projectDir.name }
+			task.from(getSourceDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/java' }
+			task.from(getResourcesDir(subproject)) { into 'sources/'+subproject.projectDir.name+'/src/main/resources' }
+		}
+	} 
+	
+	if(opengl)
+	{
+		task.from('jadex-kernel-extension-envsupport-opengl/lib/gluegen-rt.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+		task.from('jadex-kernel-extension-envsupport-opengl/lib/jogl.jar') { into('sources/jadex-kernel-extension-envsupport-opengl/lib') }
+	}
+}
+
+task buildExampleProject(type: Zip) {
+	destinationDir = new File(project.distsDir, "standard-version")
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveName = 'jadex-example-project.zip'
+	from('docs/jadex-example-project')
+}
+
+task buildAndroidExampleProject(type: Zip) {
+    destinationDir = new File(project.distsDir, "standard-version")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveName = 'jadex-android-example-projects.zip'
+    from('docs/android/jadex-android-example-project-maven') {into ('jadex-android-example-project-maven')}
+    // non-maven example project:
+    from('docs/android/jadex-android-example-project') {into ('jadex-android-example-project')}
+    // Copy sources from maven example project to non-maven example project
+    from('docs/android/jadex-android-example-project-maven/src/main/java') {into ('jadex-android-example-project/src')}
+    // Copy resources from maven example project to non-maven example project
+    from('docs/android/jadex-android-example-project-maven/res') {into ('jadex-android-example-project/res')}
+    // Copy Manifest from maven example project to non-maven example project
+    from('docs/android/jadex-android-example-project-maven/AndroidManifest.xml') {into ('jadex-android-example-project/')}
+
+    from('docs/android/jadex-android-clientapp-example-maven') {into ('jadex-android-clientapp-example-maven')}
+}
+
+def buildDistribution(task, excl, incl) {
+	//println("diststart:" + task.name + " excludes: " + excl + " includes: " + incl)
+
+	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	subprojects.each {subproject ->
+		if ((excl != null && !isExcluded(excl, subproject.name))
+            || (incl != null && incl.contains(subproject.name)))
+		{
+			task.from(subproject.configurations.runtime) { into('lib') }
+			task.from(subproject.jar) { into('lib') }
+            if (isAndroidProject(subproject) && !isAndroidLibraryProject(subproject)) {
+                subproject.afterEvaluate {
+                    def releaseApkVariant = getReleaseVariant(subproject).outputs.find({o -> o.name.contains('release')})
+                    task.from(releaseApkVariant.outputFile) {into('apk')}
+                }
+            }
+		}
+		else
+		{
+//			println("Excluded: "+subproject.name)
+		}
+	}
+	 	
+    //from(subprojects.configurations.runtime){ into('lib') }
+    //from('subprojects.jar'){ into('lib') }
+    //from('sourceSets.main.allSource') { into('src') }
+    task.from('docs/junit-3.8.1.jar'){ into('lib') }
+    
+    task.from('docs/junit-3.8.1.jar'){ into('lib') }
+    task.from(project(":jadex-platform-standalone-launch").jar) { into('lib') }
+    task.from('build/jadex-example-project.zip')
+    task.from('docs/readme.txt')
+    task.from('docs/license.txt')
+    task.from('docs/api-changes.txt')
+    task.from('docs/jcc.settings.xml') 
+    task.from('docs/default.settings.xml')
+    task.from('docs/jadex.bat')
+    task.from('docs/jadex_no_awareness.bat') 
+    task.from('docs/jadex.sh')
+    task.from('docs/jadex_no_awareness.sh')
+    task.from('docs/bpmn_editor.bat')
+    task.from('docs/bpmn_editor.sh')
+    task.from('docs/howtostart.txt')
+    //println("distend")
+}
+
+task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip, buildAndroidExampleProject]) {
+    archiveName = 'jadex-android-' + project.version + '.zip'
+    destinationDir = new File(project.distsDir, "standard-version")
+    buildDistribution(buildDistAndroid, null, androidIncl)
+    from(srcAndroidZip.archivePath)
+    from(buildAndroidExampleProject.archivePath)
+}
+
+task copyArchives(type: Copy) {
+	destinationDir = project.distsDir
+	// from war { into 'wars'}
+    // from('.') { include '**/*.war' into 'wars' }
+    //from(project(":jadex-platform-relay-web").jar) { into 'build/distributions/wars' }
+    //from(project(":jadex-servletfilter-web").jar) { into 'build/distributions/wars' }
+    //from(project(":jadex-applications-web").jar) { into 'build/distributions/wars' }
+	//from fileTree(".").files include '*.war' into 'wars'
+	
+	from(new File(project(":jadex-platform-relay-web").buildDir, "libs")) { include '*.war' into 'pro-version' }
+	from(new File(project(":jadex-servletfilter-web").buildDir, "libs")) { include '*.war' into 'pro-version' }
+	from(new File(project(":jadex-applications-web").buildDir, "libs")) { include '*.war' into 'standard-version' }
+	
+	//from(new File(project(":jadex-editor-bpmn").buildDir, "libs")) { include '*.jar' into 'standard-version' }
+	//from(new File(project(":jadex-editor-gpmn").buildDir, "libs")) { include '*.jar' into 'standard-version' }
+}
+
+task buildDist(type: Zip, dependsOn: [srcZip, buildExampleProject, copyArchives]) {
+	archiveName = 'jadex-'+version+'.zip' //baseName
+	destinationDir = new File(project.distsDir, "standard-version")
+	buildDistribution(buildDist, stdexcl, null)
+	from(srcZip.archivePath)
+	from(buildExampleProject.archivePath)
+}
+
+task buildDistPro(type: Zip, dependsOn: [srcZipPro, copyArchives]) {
+	archiveName = 'jadex-pro-'+version+'.zip' //baseName
+	destinationDir = new File(project.distsDir, "pro-version")
+	buildDistribution(buildDistPro, proexcl, null)
+	from(srcZipPro.archivePath)
+	from('docs/jadex-relay.bat')
+	from('docs/jadex-relay.sh')
+	from('jadex-platform-extension-management/win') { into('win') }
+}
+
+task buildDist3d(type: Zip, dependsOn: srcZip3d) {
+	archiveName = 'jadex-3d-addon-'+version+'.zip' //baseName
+	destinationDir = new File(project.distsDir, "standard-version")
+	from(project(":jadex-kernel-extension-envsupport-jmonkey").jar) { into('lib') }
+	from(project(":jadex-kernel-extension-envsupport-jmonkey").configurations.runtime) { into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(srcZip3d.archivePath)
+	from('docs/readme-3d.txt')
+}
+
+task buildDistWebservice(type: Zip, dependsOn: srcZipWebservice) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveName = ' jadex-webservice-addon-'+version+'.zip' 
+	destinationDir = new File(project.distsDir, "standard-version")
+	from(project(":jadex-applications-webservice").jar) { into('lib') }
+	from(project(":jadex-applications-webservice").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(project(":jadex-platform-extension-webservice").jar) { into('lib') }
+	from(project(":jadex-platform-extension-webservice").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(project(":jadex-platform-extension-webservice-desktop").jar) { into('lib') }
+	from(project(":jadex-platform-extension-webservice-desktop").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(srcZipWebservice.archivePath)
+}
+
+task buildDistRelay(type: Zip, dependsOn: srcZipRelay) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveName = 'jadex-relay-standalone-'+version+'.zip' 
+	destinationDir = new File(project.distsDir, "pro-version")
+	from(project(":jadex-platform-extension-relay-standalone").jar) { into('lib') }
+	from(project(":jadex-platform-extension-relay-standalone").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(srcZipRelay.archivePath)
+	from('docs/jadex-relay.bat')
+	from('docs/jadex-relay.sh')
+}
+
+task buildDistSecureTransport(type: Zip, dependsOn: srcZipSecureTransport) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveName = 'jadex-securetransport-addon-'+version+'.zip' 
+	destinationDir = new File(project.distsDir, "pro-version")
+	from(project(":jadex-platform-extension-securetransport").jar) { into('lib') }
+	from(project(":jadex-platform-extension-securetransport").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(srcZipSecureTransport.archivePath)
+}
+
+task buildDistManagement(type: Zip, dependsOn: srcZipManagement) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveName = 'jadex-management-addon-'+version+'.zip' 
+	destinationDir = new File(project.distsDir, "pro-version")
+	from(project(":jadex-platform-extension-management").jar) { into('lib') }
+	from(project(":jadex-platform-extension-management").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(srcZipManagement.archivePath)
+}
+
+task buildDistMaven(type: Zip, dependsOn: srcZipMaven) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveName = 'jadex-mavendependencies-addon-'+version+'.zip' 
+	destinationDir = new File(project.distsDir, "pro-version")
+	from(project(":jadex-platform-extension-maven").jar) { into('lib') }
+	from(project(":jadex-platform-extension-maven").configurations.runtime){ into('lib') exclude("*jadex*") } // exclude jadex dependencies
+	from(srcZipMaven.archivePath)
+}
+
+task buildDistBpmnEditor(type: Zip, dependsOn: srcZipBpmnEditor) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveName = 'jadex-editor-bpmn-'+version+'.zip' 
+	destinationDir = new File(project.distsDir, "standard-version")
+	from(project(":jadex-editor-bpmn").jar) { into('lib') }
+	from(project(":jadex-editor-bpmn").configurations.runtime){ into('lib') exclude("*jadex*") }
+	from(srcZipBpmnEditor.archivePath)
+	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/gpl-3.0.txt')
+	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING')
+}
+
+task buildDistGpmnEditor(type: Zip, dependsOn: srcZipGpmnEditor) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveName = 'jadex-editor-gpmn-'+version+'.zip' 
+	destinationDir = new File(project.distsDir, "standard-version")
+	from(project(":jadex-editor-gpmn").jar) { into('lib') }
+	from(project(":jadex-editor-gpmn").configurations.runtime){ into('lib') exclude("*jadex*") }
+	from(srcZipGpmnEditor.archivePath)
+	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/gpl-3.0.txt')
+	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING')
+}
+
+

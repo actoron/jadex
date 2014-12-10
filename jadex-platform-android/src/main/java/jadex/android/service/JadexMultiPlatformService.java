@@ -7,16 +7,23 @@ import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.platform.IJadexMultiPlatformBinder;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.ITuple2ResultListener;
+import jadex.commons.future.TupleResult;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +37,8 @@ import android.util.Log;
 /**
  * Android Service to start/stop Jadex Platforms. Platforms are terminated on
  * destroy.
+ * 
+ * Every ClientApp has access to it's own instance of this Service.
  */
 public class JadexMultiPlatformService extends Service implements IJadexMultiPlatformBinder, JadexPlatformOptions
 {
@@ -168,9 +177,15 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		}
 		fut.addResultListener(new DefaultResultListener<IExternalAccess>()
 		{
-			public void resultAvailable(IExternalAccess result)
+			public void resultAvailable(final IExternalAccess result)
 			{
-				JadexMultiPlatformService.this.onPlatformStarted(result);
+				// new thread to reset IComponentIdentifier.LOCAL which is set to the platform now
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						JadexMultiPlatformService.this.onPlatformStarted(result);
+					}
+				}).start();
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -214,17 +229,18 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	{
 		return startComponent(platformId, name, modelPath, new CreationInfo());
 	}
+	
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath, final CreationInfo creationInfo) {
+		return startComponent(platformId, name, modelPath, creationInfo, null);
+	}
 
-	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath, final CreationInfo creationInfo)
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath, final CreationInfo creationInfo, final IResultListener<Map<String,Object>> terminationListener)
 	{
 		checkIfPlatformIsRunning(platformId, "startComponent()");
 		Map<String, Object> arguments = creationInfo.getArguments();
 		if (arguments == null) {
 			arguments = new HashMap<String, Object>();
 			creationInfo.setArguments(arguments);
-		}
-		if (!arguments.containsKey("androidContext")) {
-			arguments.put("androidContext", this);
 		}
 		
 		// Add RID to show jadex the class location
@@ -242,12 +258,43 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(name, modelPath, creationInfo, null)
-					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+				ITuple2Future<IComponentIdentifier,Map<String,Object>> fut = cms.createComponent(name, modelPath, creationInfo);
+				
+				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>() {
+
+					@Override
+					public void firstResultAvailable(final IComponentIdentifier result) {
+						// new thread to reset IComponentIdentifier.LOCAL which is set to the platform now
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								ret.setResult(result);
+							}
+						}).start();
+					}
+
+					@Override
+					public void secondResultAvailable(Map<String, Object> result) {
+						// occurs when execution is terminated.
+						if (terminationListener != null) {
+							terminationListener.resultAvailable(result);
+						}
+					}
+
+					@Override
+					public void exceptionOccurred(Exception exception) {
+						ret.setException(exception);
+					}
+				});
 			}
 		});
 
 		return ret;
+	}
+	
+	@Override
+	public IResourceIdentifier getResourceIdentifier() {
+		return jadexPlatformManager.getRID(appInfo.sourceDir);
 	}
 	
 	

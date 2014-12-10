@@ -35,6 +35,12 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bpmn</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcprov-jdk15</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -106,9 +112,15 @@
 				<artifactId>android-maven-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-				<aaptExtraArgs>
-					<aaptExtraArg>-x</aaptExtraArg>
-				</aaptExtraArgs>
+				<!-- -x configures aapt to use different Ressource IDs to assure unique IDs. 
+				However, with Android Build-tools 21.0.0,
+				this doesn't seem to work anymore (xml attribute not found error), 
+				so instead we avoid xml layouts in the platformapp.
+				 -->
+<!-- 				<aaptExtraArgs> -->
+<!-- 					<aaptExtraArg>-x</aaptExtraArg> -->
+<!-- 				</aaptExtraArgs> -->
+					<apkDebug>true</apkDebug>
 				</configuration>
 			</plugin>
 

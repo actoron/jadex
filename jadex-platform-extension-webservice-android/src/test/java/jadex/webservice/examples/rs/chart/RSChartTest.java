@@ -1,5 +1,6 @@
 package jadex.webservice.examples.rs.chart;
 
+import static org.junit.Assert.assertNotNull;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -7,14 +8,18 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
-import junit.framework.TestCase;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import android.graphics.Color;
 
-public class RSChartTest extends TestCase
+public class RSChartTest
 {
 	private IExternalAccess extAcc;
 	
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		new SReflectSub().setIsAndroid(false);
 		ThreadSuspendable sus = new ThreadSuspendable();
@@ -32,6 +37,7 @@ public class RSChartTest extends TestCase
 		extAcc = fut.get(sus);
 	}
 	
+	@Test
 	public void testAccessRestService() throws InterruptedException
 	{
 		ThreadSuspendable sus = new ThreadSuspendable();

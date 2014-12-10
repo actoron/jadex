@@ -18,7 +18,7 @@ public class JadexChatApplication extends JadexClientLauncherActivity
 		}
 		else
 		{
-			result = "jadex.android.applications.chat.JadexAndroidChatActivity";
+			result = "jadex.android.applications.chat.fragments.MainFragment";
 		}
 		return result;
 	}

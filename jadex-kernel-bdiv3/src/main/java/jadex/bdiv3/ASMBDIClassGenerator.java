@@ -1104,7 +1104,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException("BDI agent class was not bytecode enhanced. This may happen if the class is accessed directly in application code before loadModel() was called.");
+			throw new RuntimeException("BDI agent class was not bytecode enhanced: " + clazz.getName() + " This may happen if the class is accessed directly in application code before loadModel() was called.");
 		}
 	}
 

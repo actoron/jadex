@@ -4,6 +4,8 @@ import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,6 +45,7 @@ public class SBinarySerializer2
 		ENCODER_HANDLERS.add(new CollectionCodec());
 		ENCODER_HANDLERS.add(new EnumerationCodec());
 		ENCODER_HANDLERS.add(new MultiCollectionCodec());
+		ENCODER_HANDLERS.add(new LRUCodec());
 		ENCODER_HANDLERS.add(new MapCodec());
 		if(!SReflect.isAndroid())
 		{
@@ -85,11 +88,11 @@ public class SBinarySerializer2
 	 *  @param preprocessors List of processors called before the object is encoded, may be null.
 	 *  @param usercontext A user context, may be null.
 	 *  @param classloader The class loader used.
-	 *  @return Encoded byte array.
+	 *  @return Bytes written.
 	 */
-	public static void writeObjectToStream(OutputStream os, Object val, ClassLoader classloader)
+	public static long writeObjectToStream(OutputStream os, Object val, ClassLoader classloader)
 	{
-		writeObjectToStream(os, val, null, null, classloader);
+		return writeObjectToStream(os, val, null, null, classloader);
 	}
 	
 	/**
@@ -99,11 +102,11 @@ public class SBinarySerializer2
 	 *  @param preprocessors List of processors called before the object is encoded, may be null.
 	 *  @param usercontext A user context, may be null.
 	 *  @param classloader The class loader used.
-	 *  @return Encoded byte array.
+	 *  @return Bytes written.
 	 */
-	public static void writeObjectToStream(OutputStream os, Object val, List<ITraverseProcessor> preprocessors, Object usercontext, ClassLoader classloader)
+	public static long writeObjectToStream(OutputStream os, Object val, List<ITraverseProcessor> preprocessors, Object usercontext, ClassLoader classloader)
 	{
-		writeObjectToStream(os, val, preprocessors, null, usercontext, classloader);
+		return writeObjectToStream(os, val, preprocessors, null, usercontext, classloader);
 	}
 	
 	/**
@@ -113,9 +116,9 @@ public class SBinarySerializer2
 	 *  @param preprocessors List of processors called before the object is encoded, may be null.
 	 *  @param usercontext A user context, may be null.
 	 *  @param classloader The class loader used.
-	 *  @return Encoded byte array.
+	 *  @return Bytes written.
 	 */
-	public static void writeObjectToStream(OutputStream os, Object val, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> encoderhandlers, Object usercontext, ClassLoader classloader)
+	public static long writeObjectToStream(OutputStream os, Object val, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> encoderhandlers, Object usercontext, ClassLoader classloader)
 	{
 		try
 		{
@@ -154,6 +157,87 @@ public class SBinarySerializer2
 		};
 		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
 		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), encoderhandlers, false, null, context);
+		return context.getWrittenBytes();
+	}
+	
+	/**
+	 *  Convert an object to an encoded byte array.
+	 *  
+	 *  @param val The object being encoded.
+	 *  @param preprocessors List of processors called before the object is encoded, may be null.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader used.
+	 *  @return Bytes written.
+	 */
+	public static long writeObjectToDataOutput(DataOutput dato, Object val, ClassLoader classloader)
+	{
+		return writeObjectToDataOutput(dato, val, null, null, classloader);
+	}
+	
+	/**
+	 *  Convert an object to an encoded byte array.
+	 *  
+	 *  @param val The object being encoded.
+	 *  @param preprocessors List of processors called before the object is encoded, may be null.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader used.
+	 *  @return Bytes written.
+	 */
+	public static long writeObjectToDataOutput(DataOutput dato, Object val, List<ITraverseProcessor> preprocessors, Object usercontext, ClassLoader classloader)
+	{
+		return writeObjectToDataOutput(dato, val, preprocessors, null, usercontext, classloader);
+	}
+	
+	/**
+	 *  Convert an object to an encoded byte array.
+	 *  
+	 *  @param val The object being encoded.
+	 *  @param preprocessors List of processors called before the object is encoded, may be null.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader used.
+	 *  @return Bytes written.
+	 */
+	public static long writeObjectToDataOutput(DataOutput dato, Object val, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> encoderhandlers, Object usercontext, ClassLoader classloader)
+	{
+		try
+		{
+			dato.writeByte(MAGIC_BYTE);
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		encoderhandlers = encoderhandlers == null? ENCODER_HANDLERS : encoderhandlers;
+		IEncodingContext context = new DataOutputEncodingContext(dato, val, usercontext, preprocessors, classloader);
+		context.writeVarInt(VERSION);
+		
+		Traverser traverser = new Traverser()
+		{
+			public void handleDuplicate(Object object, Class<?> clazz, Object match,
+				List<ITraverseProcessor> processors, boolean clone, Object context)
+			{
+				IEncodingContext ec = (IEncodingContext)context;
+				int ref = ((Integer)match).intValue();
+				ec.writeClassname(REFERENCE_MARKER);
+				ec.writeVarInt(ref);
+			}
+			
+			/**
+			 *  Special handling for null objects.
+			 */
+			public Object handleNull(Class<?> clazz,
+				List<ITraverseProcessor> processors, boolean clone, Object context)
+			{
+				IEncodingContext ec = (IEncodingContext)context;
+				ec.writeClassname(NULL_MARKER);
+				return null;
+			}
+		};
+		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
+		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), encoderhandlers, false, null, context);
+		
+		return context.getWrittenBytes();
 	}
 	
 	/**
@@ -185,6 +269,44 @@ public class SBinarySerializer2
 			errorreporter = new DefaultErrorReporter();
 		}
 		IDecodingContext context = new DecodingContext2(is, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter);
+		int streamver = (int) context.readVarInt();
+		if (streamver != VERSION)
+		{
+			throw new RuntimeException("Version mismatch, stream reported version " + streamver + " should be " + VERSION);
+		}
+		
+		return BinarySerializer.decodeObject(context);
+	}
+	
+	/**
+	 *  Convert a byte array to an object.
+	 *  @param val The byte array.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader.
+	 *  @param errorreporter The error reporter, may be null in which case the default reporter is used.
+	 *  @return The decoded object.
+	 */
+	public static Object readObjectFromDataInput(DataInput di, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
+	{
+		try
+		{
+			byte mbyte = (byte) di.readByte();
+			if (mbyte != MAGIC_BYTE)
+			{
+				throw new RuntimeException("Decoding failed, magic byte not found., found: " + mbyte);
+			}
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		
+		if (errorreporter == null)
+		{
+			errorreporter = new DefaultErrorReporter();
+		}
+		IDecodingContext context = new DataInputDecodingContext(di, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter);
 		int streamver = (int) context.readVarInt();
 		if (streamver != VERSION)
 		{

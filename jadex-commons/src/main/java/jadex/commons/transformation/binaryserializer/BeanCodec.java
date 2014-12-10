@@ -174,15 +174,13 @@ public class BeanCodec extends AbstractCodec
 		return object != null;
 	}
 	
-	protected Set<Class> nonanonclasscache = new HashSet<Class>();
-	
 	/**
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
-		if (!nonanonclasscache.contains(clazz))
+		if (!ec.getNonInnerClassCache().contains(clazz))
 		{
 			if (clazz != null && clazz.isAnonymousClass())
 			{
@@ -201,7 +199,7 @@ public class BeanCodec extends AbstractCodec
 			else
 			{
 				ec.writeBoolean(false);
-				nonanonclasscache.add(clazz);
+				ec.getNonInnerClassCache().add(clazz);
 			}
 		}
 		else

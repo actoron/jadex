@@ -61,7 +61,7 @@ public class ChangeInfo<T>
 	}
 
 	/**
-	 *  Get the info.
+	 *  Get the info, e.g. index or key.
 	 *  @return The info.
 	 */
 	public Object getInfo()
@@ -70,7 +70,7 @@ public class ChangeInfo<T>
 	}
 
 	/**
-	 *  Set the info.
+	 *  Set the info, e.g. index or key.
 	 *  @param info The info to set.
 	 */
 	public void setInfo(Object info)

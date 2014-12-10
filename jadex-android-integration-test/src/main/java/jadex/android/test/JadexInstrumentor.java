@@ -5,6 +5,10 @@ import jadex.android.service.JadexPlatformManager;
 import jadex.base.test.impl.BrokenComponentTest;
 import jadex.bridge.ErrorReport;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -16,6 +20,7 @@ import android.test.AndroidTestRunner;
 import android.test.InstrumentationTestRunner;
 import android.test.suitebuilder.TestSuiteBuilder;
 import android.util.Log;
+import dalvik.system.VMRuntime;
 
 public class JadexInstrumentor extends InstrumentationTestRunner
 {
@@ -26,20 +31,81 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 
 	private String	sourceDir;
 
+	private String testClassesArg;
+
+	private boolean logOnly;
+
+	private static final String ARGUMENT_TEST_CLASS = "class";
+    private static final String ARGUMENT_LOG_ONLY = "log";
+    
+    /**
+     * Defines which TestSuites are included in the instrumentation run.
+     * Make sure that the corresponding dependencies are defined in pom.xml,
+     * especially the jadex-applications-xyz modules.
+     */
+    private static final String[] ACTIVATED_TESTS = new String[]{
+    	"jadex.launch.test.MicroTest",
+//    	"jadex.launch.test.BDITest",
+//    	"jadex.launch.test.BPMNTest",
+//    	"jadex.launch.test.BDIBPMNTest",
+//    	"jadex.launch.test.GPMNTest",
+    	"jadex.launch.test.BDIV3Test"
+    };
+	
 	@Override
 	public void onCreate(Bundle arguments)
 	{
-		Context targetContext = getTargetContext();
-		sourceDir = targetContext.getApplicationInfo().sourceDir;
+		Log.i(LOG_TAG, "JadexInstrumentor created...");
+		
 		jadexCl = this.getClass().getClassLoader();
 		
+//		try {
+//			Thread.sleep(10000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		long maxHeapKilos = Runtime.getRuntime().maxMemory() / 1024;
+		Log.i(LOG_TAG, "Got " + maxHeapKilos + "kB max allowed heap size.");
+		if (maxHeapKilos < 32768) {
+			Log.i(LOG_TAG, "Max Heap size smaller than 32MB. Trying to increase minimum heapsize...");
+			VMRuntime.getRuntime().setMinimumHeapSize(32*1024*1024);
+			maxHeapKilos = Runtime.getRuntime().maxMemory() / 1024;
+			if (maxHeapKilos < 32768) {
+				Log.e(LOG_TAG, "Couldn't increase Heap size."
+						+ "Test execution will likely fail with a max heapsize of less than 32MB!"
+						+ "\nNote: It seems to be impossible to increase heapsize on x86 images.");
+				
+			}
+		}
+		
+		Context targetContext = getTargetContext();
+		sourceDir = targetContext.getApplicationInfo().sourceDir;
+
 		// Set Context:
 		AndroidContextManager.getInstance().setAndroidContext(targetContext);
+		
 		// Set Classloader for app:
 		JadexPlatformManager.getInstance().setAppClassLoader(sourceDir, jadexCl);
 		
+		String testClassesArg = arguments.getString(ARGUMENT_TEST_CLASS);
+		if (testClassesArg != null) {
+			// super.onCreate would now try to instanciate a single TestCase, but without passing the needed arguments.
+			// so we handle this in getTestSuite instead and clear the argument here.
+			this.testClassesArg = testClassesArg;
+			arguments.remove(ARGUMENT_TEST_CLASS);
+		}
+		
+		logOnly = getBooleanArgument(arguments, ARGUMENT_LOG_ONLY);
+		
 		super.onCreate(arguments);
 	}
+	
+    private boolean getBooleanArgument(Bundle arguments, String tag) {
+        String tagString = arguments.getString(tag);
+        return tagString != null && Boolean.parseBoolean(tagString);
+    }
 	
 	@Override
 	public TestSuite getTestSuite()
@@ -49,26 +115,22 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		
 		try
 		{
-			Thread.sleep(10000);
+//			Thread.sleep(10000);
 			
 			// To execute a single test:
 //			Test singleTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases.stream.InitiatorAgent", sourceDir);
 //			suite.addTest(singleTest);
 			
-			// Make sure that also the dependencies are placed in pom.
-			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
-			Test bdiTest = createTest("jadex.launch.test.BDITest", "jadex.bdi.testcases", sourceDir);
-			Test bpmnTest = createTest("jadex.launch.test.BPMNTest", "jadex.bpmn.testcases", sourceDir);
-			Test bdibpmnTest = createTest("jadex.launch.test.BDIBPMNTest", "jadex.bdibpmn.testcases", sourceDir);
-			Test gpmnTest = createTest("jadex.launch.test.GPMNTest", "jadex.gpmn.testcases", sourceDir);
-			Test bdiv3Test = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", sourceDir);
-
-			suite.addTest(microTest);
-			suite.addTest(bdiTest);
-			suite.addTest(bpmnTest);
-			suite.addTest(bdibpmnTest);
-			suite.addTest(gpmnTest);
-			suite.addTest(bdiv3Test);
+			Log.i(LOG_TAG, "JadexInstrumentor creating JUnit ComponentTest classes...");
+			
+			if (testClassesArg != null) {
+				Test requestedTest = createTest(testClassesArg, sourceDir, jadexCl);
+				suite.addTest(requestedTest);
+			} else {
+				for (String testSuiteName : ACTIVATED_TESTS) {
+					suite.addTest(createTest(testSuiteName, sourceDir, jadexCl));
+				}
+			}
 			
 		}
 		catch (Exception e)
@@ -91,23 +153,31 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	}
 
 
-	private Test createTest(String testClassName, String testsPackage, String classRoot) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+	public static Test createTest(String testClassName, String classRoot, ClassLoader loader) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
 			InvocationTargetException
 	{
-		Class<?> test = jadexCl.loadClass(testClassName);
-		Constructor<?> constructor = test.getConstructor(String.class, String.class);
+		Class<?> test= loader.loadClass(testClassName);
+		Constructor<?> constructor = test.getConstructor(String.class);
 		Object testCase = null;
 		try {
-			testCase = constructor.newInstance(testsPackage, classRoot);
+			testCase = constructor.newInstance(classRoot);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			ErrorReport errorReport = new ErrorReport();
-			errorReport.setErrorText(t.getMessage());
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			t.printStackTrace(new PrintStream(baos));
+			try {
+				errorReport.setErrorText("Error constructing testcase: \n" + baos.toString("UTF8"));
+			} catch (UnsupportedEncodingException e) {
+				errorReport.setErrorText("Error constructing testcase: \n" + t.getMessage());
+			}
 			BrokenComponentTest error = new BrokenComponentTest(testClassName, errorReport);
 			testCase = error;
 		}
-		return (Test) testCase;
+		Test testCase2 = (Test) testCase;
+		return testCase2;
 	}
+
 
 	@Override
 	public ClassLoader getLoader()
@@ -120,7 +190,10 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	@Override
 	protected AndroidTestRunner getAndroidTestRunner()
 	{
-		AndroidTestRunner jadexTestRunner = new JadexTestRunner();
+		AndroidTestRunner jadexTestRunner = new JadexTestRunner(logOnly);
 		return jadexTestRunner;
 	}
+	
+	
+	
 }

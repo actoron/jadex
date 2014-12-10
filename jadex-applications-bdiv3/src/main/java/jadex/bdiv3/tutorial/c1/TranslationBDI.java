@@ -4,9 +4,11 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
+import jadex.rules.eca.ChangeInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,16 +49,26 @@ public class TranslationBDI
 		wordtable.put("bugger", "Flegel");
 	}
 	
+//	/**
+//	 *  Add a new word pair to the dictionary.
+//	 */
+//	@Plan(trigger=@Trigger(factaddeds="wordtable"))
+//	public void checkWordPairPlan(Map.Entry<String, String> wordpair)
+//	{
+//		if(wordpair.getKey().equals("bugger"))
+//			System.out.println("Warning, a colloquial word pair has been added: "+wordpair.getKey()+" "+wordpair.getValue());
+//	}
+	
 	/**
 	 *  Add a new word pair to the dictionary.
 	 */
 	@Plan(trigger=@Trigger(factaddeds="wordtable"))
-	public void checkWordPairPlan(Map.Entry<String, String> wordpair)
-//	public void checkWordPairPlan(ChangeEvent event)
+	public void checkWordPairPlan(ChangeEvent event)
 	{
-//		Map.Entry<String, String> wordpair = (Map.Entry<String, String>)event.getValue();
-		if(wordpair.getKey().equals("bugger"))
-			System.out.println("Warning, a colloquial word pair has been added: "+wordpair.getKey()+" "+wordpair.getValue());
+		ChangeInfo<String>	change	= ((ChangeInfo<String>)event.getValue());
+		
+		if(change.getInfo().equals("bugger"))
+			System.out.println("Warning, a colloquial word pair has been added: "+change.getInfo()+" "+change.getValue());
 	}
 }
 

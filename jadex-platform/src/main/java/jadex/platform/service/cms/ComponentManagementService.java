@@ -440,7 +440,8 @@ public class ComponentManagementService implements IComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
 
-//		System.out.println("create compo: "+modelname+" "+info);
+		if(name!=null && name.indexOf("abc")!=-1)
+			System.out.println("create compo: "+modelname+" "+info);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
@@ -782,8 +783,7 @@ public class ComponentManagementService implements IComponentManagementService
 																					}
 																					else
 																					{
-																						// Todo: use some logger for user error?
-																						exception.printStackTrace();
+																						logger.info("Starting component failed: "+cid+", "+exception);
 																					}																					
 																				}
 																			}));								

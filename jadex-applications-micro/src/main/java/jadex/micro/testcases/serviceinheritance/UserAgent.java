@@ -37,7 +37,6 @@ import jadex.micro.annotation.Results;
 @Agent
 @ComponentTypes(@ComponentType(name="provider", filename="jadex.micro.testcases.serviceinheritance.ProviderAgent.class"))
 @Configurations(@Configuration(name="def", components=@Component(type="provider")))
-@Arguments(@Argument(name="testcnt", clazz=int.class, defaultvalue="2"))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UserAgent
 {

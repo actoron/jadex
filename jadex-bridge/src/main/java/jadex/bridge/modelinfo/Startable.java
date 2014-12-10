@@ -36,6 +36,9 @@ public class Startable
 	/** The persistable flag. */
 	private Boolean persistable;
 	
+	/** The scope. */
+	private String scope;
+	
 	//-------- methods --------
 	
 	/**
@@ -198,5 +201,23 @@ public class Startable
 	public void setMonitoring(PublishEventLevel monitoring)
 	{
 		this.monitoring = monitoring;
+	}
+
+	/**
+	 *  Get the scope.
+	 *  @return The scope
+	 */
+	public String getScope()
+	{
+		return scope;
+	}
+
+	/**
+	 *  Set the scope.
+	 *  @param scope The scope to set
+	 */
+	public void setScope(String scope)
+	{
+		this.scope = scope;
 	}
 }

@@ -7,18 +7,27 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.future.TupleResult;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import junit.framework.TestResult;
 
 /**
  *  Test a component.
@@ -39,10 +48,17 @@ public class ComponentTest extends TestCase
 	/** The component full name. */
 	protected String	fullname;
 	
+	/** The timeout. */
+	protected long	timeout;
+	
 	/** The test suite. */
 	protected ComponentTestSuite	suite;
 	
 	//-------- constructors --------
+	
+	public ComponentTest() {
+		Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty ComponentTest Constructor called");
+	}
 	
 	/**
 	 *  Create a component test.
@@ -53,6 +69,15 @@ public class ComponentTest extends TestCase
 		this.filename	= comp.getFilename();
 		this.rid	= comp.getResourceIdentifier();
 		this.fullname	= comp.getFullName();
+		Object	to	= comp.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, suite.getClassLoader());
+		if(to!=null)
+		{
+			this.timeout	= ((Number)to).longValue();
+		}
+		else
+		{
+			this.timeout	= BasicService.getLocalDefaultTimeout();
+		}
 		this.suite	= suite;
 	}
 	
@@ -69,7 +94,7 @@ public class ComponentTest extends TestCase
 	/**
 	 *  Test the component.
 	 */
-	public void run(TestResult result)
+	public void runBare()
 	{
 		
 		if(suite.isAborted())
@@ -77,64 +102,63 @@ public class ComponentTest extends TestCase
 			return;
 		}
 		
-		try
+		System.out.println("starting: "+filename);
+		
+		// Start the component.
+		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
+		Timer	t	= new Timer(true);
+		t.schedule(new TimerTask()
 		{
-			result.startTest(this);
-		}
-		catch(IllegalStateException e)
+			public void run()
+			{
+				finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
+			}
+		}, timeout);
+
+		final ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
+		fut.addResultListener(new ExceptionDelegationResultListener<Collection<TupleResult>, Map<String, Object>>(finished)
 		{
-			// Hack: Android test runner tries to do getClass().getMethod(...) for test name, grrr.
-			// See: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.2.1_r1/android/test/InstrumentationTestRunner.java#767
+			public void customResultAvailable(Collection<TupleResult> result)
+			{
+				finished.setResult(fut.getSecondResult());
+			}
+		});
+
+		// Evaluate the results.
+		Map<String, Object>	res	= finished.get();
+		t.cancel();
+		System.out.println("finished: "+filename);
+		Testcase	tc	= null;
+		for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )
+		{
+			Map.Entry<String, Object> tup = it.next();
+			if(tup.getKey().equals("testresults"))
+			{
+				tc = (Testcase)tup.getValue();
+				break;
+			}
 		}
 		
-		try
+		if(tc!=null && tc.getReports()!=null)
 		{
-			// Start the component.
-//			Map	args	= new HashMap();
-//			args.put("timeout", new Long(3000000));
-//			CreationInfo	ci	= new CreationInfo(args);
-			ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
-
-			// Evaluate the results.
-			Map<String, Object>	res	= fut.getSecondResult();
-			Testcase	tc	= null;
-			for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )
+			TestReport[]	reports	= tc.getReports();
+			if(tc.getTestCount()!=reports.length)
 			{
-				Map.Entry<String, Object> tup = it.next();
-				if(tup.getKey().equals("testresults"))
-				{
-					tc = (Testcase)tup.getValue();
-					break;
-				}
+				throw new AssertionFailedError("Number of testcases do not match. Expected "+tc.getTestCount()+" but was "+reports.length+".");			
 			}
-			
-			if(tc!=null && tc.getReports()!=null)
+			for(int i=0; i<reports.length; i++)
 			{
-				TestReport[]	reports	= tc.getReports();
-				if(tc.getTestCount()!=reports.length)
+				if(!reports[i].isSucceeded())
 				{
-					result.addFailure(this, new AssertionFailedError("Number of testcases do not match. Expected "+tc.getTestCount()+" but was "+reports.length+"."));			
+					throw new AssertionFailedError(reports[i].getDescription()+" Failed with reason: "+reports[i].getReason());
 				}
-				for(int i=0; i<reports.length; i++)
-				{
-					if(!reports[i].isSucceeded())
-					{
-						result.addFailure(this, new AssertionFailedError(reports[i].getDescription()+" Failed with reason: "+reports[i].getReason()));
-					}
-				}
-			}
-			else
-			{
-				result.addFailure(this,  new AssertionFailedError("No test results provided by component: "+res));
 			}
 		}
-		catch(Exception e)
+		else
 		{
-			result.addError(this, e);
+			throw new AssertionFailedError("No test results provided by component: "+res);
 		}
-
-		result.endTest(this);
 
 		// Remove references to Jadex resources to aid GC cleanup.
 		cms	= null;

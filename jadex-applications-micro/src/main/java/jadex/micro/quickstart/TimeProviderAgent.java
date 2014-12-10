@@ -134,8 +134,9 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 			ret	= scanner.match().group(1) + ", " + ret;	// City
 			scanner.close();
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{
+			e.printStackTrace();
 		}
 		
 		return ret;

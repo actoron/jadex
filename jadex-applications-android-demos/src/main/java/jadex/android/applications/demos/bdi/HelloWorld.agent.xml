@@ -13,6 +13,7 @@
 
 	<imports>
 		<import>jadex.bridge.service.types.cms.*</import>
+		<import>jadex.bridge.service.types.context.*</import>
 	</imports>
 <!--
  	<capabilities>
@@ -34,8 +35,6 @@
 		<belief name="HelloMessage" class="String" exported="true">
 			<fact>"Hello, this is a BDI Agent speaking."</fact>
 		</belief>
-		<belief name="androidContext" class="android.app.Activity" exported="true" argument="true">
-		</belief>
 	</beliefs>
 	
 	<plans>
@@ -49,6 +48,9 @@
 			<implementation class="DisplayTextServiceImpl"/>
 		</providedservice>
 		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
+		<requiredservice name="context" class="IContextService">
 			<binding scope="platform"/>
 		</requiredservice>
 	</services>

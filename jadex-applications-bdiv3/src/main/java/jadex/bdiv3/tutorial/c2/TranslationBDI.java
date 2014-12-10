@@ -3,10 +3,12 @@ package jadex.bdiv3.tutorial.c2;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
+import jadex.rules.eca.ChangeInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +26,7 @@ public class TranslationBDI
 	protected Map<String, String> wordtable = new HashMap<String, String>();
 
 	@Belief(dynamic=true)
-	protected boolean alarm = wordtable.containsKey("burgler");
+	protected boolean alarm = wordtable.containsKey("bugger");
 	
 	//-------- methods --------
 
@@ -44,8 +46,13 @@ public class TranslationBDI
 	 *  Initiate an alarm.
 	 */
 	@Plan(trigger=@Trigger(factchangeds="alarm"))
-	public void checkWordPairPlan()
+	public void checkWordPairPlan(ChangeEvent event)
 	{
-		System.out.println("Warning, a colloquial word pair has been added.");
+		ChangeInfo<Boolean>	change	= (ChangeInfo<Boolean>)event.getValue();
+		// Print warning when value changes from false to true.
+		if(Boolean.FALSE.equals(change.getOldValue()) && Boolean.TRUE.equals(change.getValue()))
+		{
+			System.out.println("Warning, a colloquial word pair has been added.");
+		}
 	}
 }
