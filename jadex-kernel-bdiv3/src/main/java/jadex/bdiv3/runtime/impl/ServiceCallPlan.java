@@ -1,13 +1,13 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -61,7 +61,8 @@ public class ServiceCallPlan
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		IIntermediateFuture<Object> services = agent.getServiceContainer().getRequiredServices(service);
+//		IIntermediateFuture<Object> services = agent.getServiceContainer().getRequiredServices(service);
+		IIntermediateFuture<Object> services = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(service);
 		
 		services.addResultListener(new IIntermediateResultListener<Object>()
 		{
@@ -77,7 +78,7 @@ public class ServiceCallPlan
 					Method tmp;
 					if(method==null)
 					{
-						RequiredServiceInfo rsi = agent.getServiceContainer().getRequiredServiceInfo(service);
+						RequiredServiceInfo rsi = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfo(service);
 						Class<?> cl = rsi.getType().getType(agent.getClassLoader());
 						tmp = cl.getDeclaredMethods()[0];
 					}
@@ -91,7 +92,7 @@ public class ServiceCallPlan
 					
 					List<Object> ar = new ArrayList<Object>();
 					ar.add(myargs);
-					Object[] meargs = ((BDIAgentInterpreter)((BDIAgent)agent).getInterpreter())
+					Object[] meargs = agent.getComponentFeature(IBDIAgentFeature.class)
 						.getInjectionValues(m.getParameterTypes(), null, null, null, rplan, null, ar);
 					
 					Object	res	= m.invoke(proxy, meargs);

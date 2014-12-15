@@ -1,6 +1,5 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
@@ -185,7 +184,7 @@ public class ClassPlanBody extends AbstractPlanBody
 						Class<?> ft = f.getType();
 						if(ft.equals(ICapability.class))
 						{
-							f.set(plan, new CapabilityWrapper((BDIAgent)ia, agent, null));
+							f.set(plan, new CapabilityWrapper(ia, agent, null));
 						}
 						else
 						{

@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.model.MBelief;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
@@ -115,7 +116,7 @@ public class BeliefInfo	extends AbstractBDIInfo
 	/**
 	 *  Create an info object for a belief.
 	 */
-	public static BeliefInfo	createBeliefInfo(BDIAgentInterpreter agent, MBelief mbel, ClassLoader cl)
+	public static BeliefInfo	createBeliefInfo(IInternalAccess agent, MBelief mbel, ClassLoader cl)
 	{
 		String id = mbel.getName();
 //		String	id	= belief.toString();

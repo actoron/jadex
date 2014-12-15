@@ -1,8 +1,10 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MServiceCall;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -19,7 +21,7 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected BDIAgentInterpreter agent;
+	protected IInternalAccess agent;
 	
 	/** The annotated service interface. */
 	protected Class<?> iface;
@@ -30,7 +32,7 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 	 *  Create a new service wrapper invocation handler.
 	 *  @param agent The internal access of the agent.
 	 */
-	public BDIServiceInvocationHandler(BDIAgentInterpreter agent, Class<?> iface)
+	public BDIServiceInvocationHandler(IInternalAccess agent, Class<?> iface)
 	{
 		if(agent==null)
 			throw new IllegalArgumentException("Agent must not null.");
@@ -54,7 +56,7 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 		
 		// Find fitting MServiceCall
 		String mn = method.toString();
-		MServiceCall msc = agent.getBDIModel().getCapability().getService(mn);
+		MServiceCall msc = agent.getComponentFeature(IBDIAgentFeature.class).getBDIModel().getCapability().getService(mn);
 		final RServiceCall sc = new RServiceCall(msc, new InvocationInfo(args));
 		sc.addListener(new ExceptionDelegationResultListener<Void, Object>(ret)
 		{
@@ -65,7 +67,7 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 			}
 		});
 		FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(sc);
-		agent.scheduleStep(fac);
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
 		
 		return ret;
 	}

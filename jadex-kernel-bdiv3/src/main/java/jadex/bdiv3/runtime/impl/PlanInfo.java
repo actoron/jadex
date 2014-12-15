@@ -81,7 +81,7 @@ public class PlanInfo	extends AbstractBDIInfo
 		
 		MPlan mplan	= (MPlan)plan.getModelElement();
 //		String type	= mplan.getName();
-		String type	= BDIAgentInterpreter.getBeautifiedName(mplan.getName());
+		String type	= RCapability.getBeautifiedName(mplan.getName());
 //		if(scope!=null)
 //		{
 //			BDIInterpreter interpreter	= BDIInterpreter.getInterpreter(state);

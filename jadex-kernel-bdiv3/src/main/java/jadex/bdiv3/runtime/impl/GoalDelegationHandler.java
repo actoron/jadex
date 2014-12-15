@@ -1,8 +1,9 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -28,7 +29,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The goal name. */
 	protected Map<String, String> goalnames;
@@ -39,7 +40,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 	 *  Create a new service wrapper invocation handler.
 	 *  @param agent The internal access of the agent.
 	 */
-	public GoalDelegationHandler(BDIAgent agent, Map<String, String> goalnames)
+	public GoalDelegationHandler(IInternalAccess agent, Map<String, String> goalnames)
 	{
 		if(agent==null)
 			throw new IllegalArgumentException("Agent must not null.");
@@ -65,8 +66,8 @@ public class GoalDelegationHandler  implements InvocationHandler
 		if(goalname==null)
 			throw new RuntimeException("No method-goal mapping found: "+method.getName()+" "+goalnames);
 		
-		final BDIAgentInterpreter	ip	= (BDIAgentInterpreter)agent.getInterpreter();
-		MCapability mcapa = (MCapability)ip.getCapability().getModelElement();
+		final IBDIAgentFeature	bdif	= agent.getComponentFeature(IBDIAgentFeature.class);
+		MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
 		final MGoal mgoal = mcapa.getGoal(goalname);
 		
 		Class<?> goalcl = mgoal.getTargetClass(agent.getClassLoader());
@@ -100,12 +101,12 @@ public class GoalDelegationHandler  implements InvocationHandler
 			public void terminate(Exception reason, IResultListener<Void> terminate)
 			{
 //				System.out.println("terminated call: "+fgoal);
-				ip.dropGoal(fgoal);
+				bdif.dropGoal(fgoal);
 				super.terminate(reason, terminate);
 			}
 		});
 		
-		ip.dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
+		bdif.dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{

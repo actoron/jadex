@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bridge.IInternalAccess;
@@ -455,5 +456,51 @@ public class RCapability extends RElement
 				determineValid(pp, orig, buf);
 			}
 		}
+	}
+	
+	/**
+	 *  Get the capability part of a complex element name.
+	 */
+	public static String getCapabilityPart(String name)
+	{
+		String ret = null;
+		int	idx = name.lastIndexOf(MElement.CAPABILITY_SEPARATOR);
+		if(idx!=-1)
+		{
+			ret = name.substring(0, idx);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the name part of a complex element name.
+	 */
+	public static String getNamePart(String name)
+	{
+		String ret = name;
+		int	idx = name.lastIndexOf("$");
+		if(idx==-1)
+		{
+			idx = name.lastIndexOf(".");
+		}
+		if(idx==-1)
+		{	
+			idx = name.lastIndexOf(MElement.CAPABILITY_SEPARATOR);
+		}
+		if(idx!=-1)
+		{	
+			ret = name.substring(idx+1);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get beautified element name.
+	 */
+	public static String getBeautifiedName(String name)
+	{
+		String capa = getCapabilityPart(name);
+		String pname = getNamePart(name);
+		return capa!=null? capa.replace(MElement.CAPABILITY_SEPARATOR, ".")+"."+pname: pname;
 	}
 }

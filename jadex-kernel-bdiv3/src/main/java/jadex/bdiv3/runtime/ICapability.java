@@ -1,10 +1,6 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bridge.service.IServiceContainer;
-
-import java.util.Collection;
+import jadex.bridge.IInternalAccess;
 
 /**
  * 
@@ -30,17 +26,17 @@ public interface ICapability
 	/**
 	 *  Get the agent.
 	 */
-	public BDIAgent	getAgent();
+	public IInternalAccess	getAgent();
 	
 	/**
 	 *  Get the pojo capability object.
 	 */
 	public Object getPojoCapability();
 	
-	/**
-	 *  Get the service container of the capability.
-	 */
-	public IServiceContainer getServiceContainer();
+//	/**
+//	 *  Get the service container of the capability.
+//	 */
+//	public IServiceContainer getServiceContainer();
 
 	
 //	/**

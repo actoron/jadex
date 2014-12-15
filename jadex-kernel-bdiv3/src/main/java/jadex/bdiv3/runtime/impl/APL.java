@@ -1,8 +1,8 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.GoalAPLBuild;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
@@ -257,7 +257,8 @@ public class APL
 	{
 		final Future<List<Object>> ret = new Future<List<Object>>();
 		
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		IBDIAgentFeature bdif = ia.getComponentFeature(IBDIAgentFeature.class);
 		
 //		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		
@@ -265,7 +266,7 @@ public class APL
 		if(precandidates==null)
 		{
 			precandidates = new ArrayList<MPlan>();
-			List<MPlan> mplans = ((MCapability)ip.getCapability().getModelElement()).getPlans();
+			List<MPlan> mplans = ((MCapability)bdif.getCapability().getModelElement()).getPlans();
 			if(mplans!=null)
 			{
 				for(int i=0; i<mplans.size(); i++)
@@ -298,8 +299,8 @@ public class APL
 		if(goalprecandidates==null)
 		{
 			goalprecandidates = new ArrayList<MGoal>();
-			MCapability mcapa = (MCapability)ip.getCapability().getModelElement();
-			List<MGoal> mgoals = ((MCapability)ip.getCapability().getModelElement()).getGoals();
+			MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
+			List<MGoal> mgoals = ((MCapability)bdif.getCapability().getModelElement()).getGoals();
 			if(mgoals!=null)
 			{
 				for(int i=0; i<mgoals.size(); i++)
@@ -356,7 +357,7 @@ public class APL
 				{
 					m.setAccessible(true);
 					
-					Object[] params = ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
+					Object[] params = ia.getComponentFeature(IBDIAgentFeature.class)
 						.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element);
 					if(params==null)
 						System.out.println("Invalid parameter assignment");

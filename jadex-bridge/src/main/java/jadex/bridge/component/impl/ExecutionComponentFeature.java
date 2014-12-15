@@ -241,6 +241,33 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		return ret;
 	}
 	
+//	/**
+//	 *  Wait for some time.
+//	 */
+//	public IFuture<ITimer> waitForDelayWithTimer(final long delay, final IComponentStep<?> step)
+//	{
+//		final Future<ITimer> ret = new Future<ITimer>();
+//		
+//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		ITimedObject	to	=  	new ITimedObject()
+//		{
+//			public void timeEventOccurred(long currenttime)
+//			{
+//				scheduleStep(step);
+//			}
+//			
+//			public String toString()
+//			{
+//				return "waitForDelay("+getComponent().getComponentIdentifier()+")";
+//			}
+//		};
+//		
+//		ITimer timer = cs.createTimer(delay, to);
+//		ret.setResult(timer);
+//		
+//		return ret;
+//	}
+	
 	/**
 	 *  Wait for the next tick.
 	 *  @param time The time.

@@ -1,13 +1,10 @@
 package jadex.bdiv3.runtime.impl;
 
-import java.util.Collection;
-
-import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
-import jadex.bdiv3.runtime.IGoal;
-import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.IInternalAccess;
 
 /**
  *  Wrapper providing BDI methods to the user.
@@ -17,7 +14,7 @@ public class CapabilityWrapper implements ICapability
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected BDIAgent	agent;
+	protected IInternalAccess	agent;
 	
 	/** The pojo capability object. */
 	protected Object	pojo;
@@ -30,7 +27,7 @@ public class CapabilityWrapper implements ICapability
 	/**
 	 *  Create a capability wrapper.
 	 */
-	public CapabilityWrapper(BDIAgent agent, Object pojo, String capa)
+	public CapabilityWrapper(IInternalAccess agent, Object pojo, String capa)
 	{
 		this.agent	= agent;
 		this.pojo	= pojo;
@@ -46,7 +43,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public void addBeliefListener(final String name, final IBeliefListener listener)
 	{
-		agent.addBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, listener);
+		agent.getComponentFeature(IBDIAgentFeature.class).addBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, listener);
 	}
 	
 	/**
@@ -56,25 +53,24 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
-		agent.removeBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, listener);
+		agent.getComponentFeature(IBDIAgentFeature.class).removeBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, listener);
 	}
 
 	/**
 	 *  Get the agent.
 	 */
-	public BDIAgent	getAgent()
+	public IInternalAccess	getAgent()
 	{
 		return agent;
 	}
 	
-	/**
-	 *  Get the service container of the capability.
-	 */
-	public IServiceContainer	getServiceContainer()
-	{
-		return new ServiceContainerProxy(getInterpreter(), capa);
-		
-	}
+//	/**
+//	 *  Get the service container of the capability.
+//	 */
+//	public IServiceContainer	getServiceContainer()
+//	{
+//		return new ServiceContainerProxy(getInterpreter(), capa);
+//	}
 
 	/**
 	 *  Get the pojo capability object.
@@ -93,11 +89,11 @@ public class CapabilityWrapper implements ICapability
 //		return (Collection<IGoal>)getInterpreter().getCapability().getGoals();
 //	}
 	
-	/**
-	 *  Get the interpreter.
-	 */
-	protected BDIAgentInterpreter getInterpreter()
-	{
-		return (BDIAgentInterpreter)agent.getInterpreter();
-	}
+//	/**
+//	 *  Get the interpreter.
+//	 */
+//	protected BDIAgentInterpreter getInterpreter()
+//	{
+//		return (BDIAgentInterpreter)agent.getInterpreter();
+//	}
 }

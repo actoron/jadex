@@ -3,6 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
@@ -53,11 +54,12 @@ public class ComponentPlanBody implements IPlanBody
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService cms)
-			{
+		IComponentManagementService cms = SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//		{
+//			public void customResultAvailable(IComponentManagementService cms)
+//			{
 				cms.createComponent(null, component, new CreationInfo(ia.getComponentIdentifier()),
 					new ExceptionDelegationResultListener<Collection<Tuple2<String,Object>>, Void>(ret)
 				{
@@ -70,11 +72,10 @@ public class ComponentPlanBody implements IPlanBody
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
-						
 					}
 				});
-			}
-		});
+//			}
+//		});
 		
 		return ret;
 	}

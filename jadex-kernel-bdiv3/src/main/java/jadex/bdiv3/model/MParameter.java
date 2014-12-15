@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
-import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -68,11 +69,11 @@ public class MParameter extends MElement
 	/**
 	 *  Get the value of the belief.
 	 */
-	public Object getValue(BDIAgentInterpreter bai)
+	public Object getValue(IInternalAccess agent)
 	{
 		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		return getValue(bai.getCapabilityObject(capaname), bai.getClassLoader());
+		return getValue(agent.getComponentFeature(IBDIAgentFeature.class).getCapabilityObject(capaname), agent.getClassLoader());
 	}
 
 	/**

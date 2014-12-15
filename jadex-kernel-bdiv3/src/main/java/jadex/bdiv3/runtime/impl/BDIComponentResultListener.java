@@ -1,16 +1,15 @@
 package jadex.bdiv3.runtime.impl;
 
-import java.util.Collection;
-import java.util.logging.Logger;
-
 import jadex.base.Starter;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
-import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
+
+import java.util.logging.Logger;
 
 /**
  * 
@@ -21,7 +20,8 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	protected IResultListener<E> listener;
 	
 	/** The interpreter. */
-	protected BDIAgentInterpreter interpreter;
+//	protected BDIAgentInterpreter interpreter;
+	protected IInternalAccess agent;
 	
 	/** The plan. */
 	protected RPlan rplan;
@@ -36,12 +36,12 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	 *  @param listener The listener.
 	 *  @param adapter The adapter.
 	 */
-	public BDIComponentResultListener(IResultListener<E> listener, BDIAgentInterpreter interpreter)
+	public BDIComponentResultListener(IResultListener<E> listener, IInternalAccess agent)
 	{
 //		System.out.println("creating: "+this+" "+Thread.currentThread());
 //		Thread.dumpStack();
 		this.listener = listener;
-		this.interpreter = interpreter;
+		this.agent = agent;
 		this.rplan = ExecutePlanStepAction.RPLANS.get();
 //		if(rplan==null)
 //			System.out.println("ash");

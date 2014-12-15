@@ -1,14 +1,12 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.Collection;
 
 /**
  *  Abstract base class for plan body implementations.
@@ -55,7 +53,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		String	pname	= rplan.getModelElement().getName();
 		String	capaname	= pname.indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 			? null : pname.substring(0, pname.lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		final Object agent	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).getCapabilityObject(capaname);
+		final Object agent	= ia.getComponentFeature(IBDIAgentFeature.class).getCapabilityObject(capaname);
 
 		internalInvokePart(agent, 0).addResultListener(new IResultListener<Object>()
 		{
@@ -102,7 +100,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 //								try
 //								{
 //									Method m = (Method)wa;
-//									BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+//									BDIAgentInterpreter	bai	= agent.getComponentFeature(IBDIAgentFeature.class);
 //									Object[] params = bai.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), rplan.getModelElement(), null, rplan, null);
 //									m.invoke(rgoal.getPojoElement(), params);
 //								}
@@ -303,7 +301,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		if(ptypes==null)
 			return null;
 		
-		return ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
+		return ia.getComponentFeature(IBDIAgentFeature.class)
 			.getInjectionValues(ptypes, null, rplan.getModelElement(), null, rplan, null, null);
 	}
 

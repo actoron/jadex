@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
-import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -269,11 +270,11 @@ public class MBelief extends MElement
 	/**
 	 *  Get the value of the belief.
 	 */
-	public Object getValue(BDIAgentInterpreter bai)
+	public Object getValue(IInternalAccess agent)
 	{
 		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		return getValue(bai.getCapabilityObject(capaname), bai.getClassLoader());
+		return getValue(agent.getComponentFeature(IBDIAgentFeature.class).getCapabilityObject(capaname), agent.getClassLoader());
 	}
 
 	/**
@@ -317,11 +318,11 @@ public class MBelief extends MElement
 	/**
 	 *  Set the value of the belief.
 	 */
-	public boolean setValue(BDIAgentInterpreter bai, Object value)
+	public boolean setValue(IInternalAccess agent, Object value)
 	{
 		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		return setValue(bai.getCapabilityObject(capaname), value, bai.getClassLoader());
+		return setValue(agent.getComponentFeature(IBDIAgentFeature.class).getCapabilityObject(capaname), value, agent.getClassLoader());
 	}
 
 	/**

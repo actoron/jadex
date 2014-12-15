@@ -125,7 +125,7 @@ public class GoalInfo	extends AbstractBDIInfo
 //		kind	= kind.substring(1, kind.length()-4); // 'm<xyz>goal'
 		String kind = "unknown";
 //		String type	= mgoal.getName();
-		String type	= BDIAgentInterpreter.getBeautifiedName(mgoal.getName());
+		String type	= RCapability.getBeautifiedName(mgoal.getName());
 //		if(scope!=null)
 //		{
 //			BDIInterpreter interpreter	= BDIInterpreter.getInterpreter(state);

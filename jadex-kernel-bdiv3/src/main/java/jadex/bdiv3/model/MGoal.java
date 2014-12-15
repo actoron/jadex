@@ -1,9 +1,10 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3.annotation.GoalResult;
-import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
 
 import java.lang.reflect.Constructor;
@@ -340,7 +341,7 @@ public class MGoal extends MClassBasedElement
 	/**
 	 *  Create a pojo goal instance.
 	 */
-	public Object createPojoInstance(BDIAgentInterpreter ip, RGoal parent)
+	public Object createPojoInstance(IInternalAccess ip, RGoal parent)
 	{
 		Object ret = null;
 		ClassLoader cl = ip.getClassLoader();
@@ -368,7 +369,7 @@ public class MGoal extends MClassBasedElement
 				{
 					try
 					{
-						Object[] pvals = ip.getInjectionValues(sc.getParameterTypes(), null, this, null, null, parent);
+						Object[] pvals = ip.getComponentFeature(IBDIAgentFeature.class).getInjectionValues(sc.getParameterTypes(), null, this, null, null, parent);
 						ret = sc.newInstance(pvals);
 					}
 					catch(Exception ex)

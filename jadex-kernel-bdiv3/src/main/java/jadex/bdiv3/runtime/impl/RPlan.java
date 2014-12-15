@@ -1,9 +1,9 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MGoal;
@@ -17,7 +17,12 @@ import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentSuspendable;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -182,8 +187,8 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 				}
 				else
 				{
-					final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-					mapper = new DefaultAnnotationMapper(mbody.getServiceName(), ip);
+//					final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+					mapper = new DefaultAnnotationMapper(mbody.getServiceName(), ia);
 				}
 				Object plan = new ServiceCallPlan(ia, mbody.getServiceName(), mbody.getServiceMethodName(), mapper, rplan);
 				body = new ClassPlanBody(ia, rplan, plan);
@@ -233,7 +238,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 			
 			if(!events.isEmpty())
 			{
-				final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//				final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				final String rulename = rplan.getId()+"_waitqueue";
 				Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
@@ -245,7 +250,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 					}
 				});
 				rule.setEvents(events);
-				ip.getRuleSystem().getRulebase().addRule(rule);
+				ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
 			}
 		}
 		
@@ -343,14 +348,14 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 		
 		if(PlanLifecycleState.BODY.equals(lifecyclestate))
 		{
-			getInterpreter().getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANADOPTED, getModelElement().getName()}), this));
+			ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANADOPTED, getModelElement().getName()}), this));
 			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_CREATION);
 		}
 		else if(PlanLifecycleState.PASSED.equals(lifecyclestate) 
 			|| PlanLifecycleState.FAILED.equals(lifecyclestate) 
 			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
 		{
-			getInterpreter().getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANFINISHED, getModelElement().getName()}), this));
+			ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANFINISHED, getModelElement().getName()}), this));
 			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL);
 		}
 		else
@@ -801,7 +806,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 //		setResumeCommand(rescom);
 		addResumeCommand(rescom);
 
-		ia.waitForDelay(delay, new IComponentStep<Void>()
+		ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -838,11 +843,11 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	 */
 	public <T, E> IFuture<E> dispatchSubgoal(final T goal, long timeout)
 	{
-		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 
 		final Future<E> ret = new BDIFuture<E>();
 		
-		BDIModel bdim = ip.getBDIModel();
+		BDIModel bdim = ia.getComponentFeature(IBDIAgentFeature.class).getBDIModel();
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
@@ -854,7 +859,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 		
 		final	PlanLifecycleState lcs	= getLifecycleState();
 		
-		IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
+		IFuture<ITimer> cont = createTimer(timeout, ia, rescom);
 		cont.addResultListener(new DefaultResultListener<ITimer>()
 		{
 			public void resultAvailable(final ITimer timer)
@@ -913,7 +918,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	
 					addSubgoal(rgoal);
 					
-					ip.scheduleStep(new AdoptGoalAction(rgoal));
+					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal));
 				}
 			}
 		});
@@ -976,7 +981,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	{
 		Future<ChangeInfo<?>> ret = new Future<ChangeInfo<?>>();
 		
-		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				
 		// Also set waitabstraction to know what the plan is waiting for
 		final List<EventType> ets = new ArrayList<EventType>();
@@ -1004,7 +1009,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 //			setResumeCommand(rescom);
 			addResumeCommand(rescom);
 			
-			IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
+			IFuture<ITimer> cont = createTimer(timeout, ia, rescom);
 			cont.addResultListener(new DefaultResultListener<ITimer>()
 			{
 				public void resultAvailable(final ITimer timer)
@@ -1033,7 +1038,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 					
 //					rule.addEvent(et);
 					rule.setEvents(ets);
-					ip.getRuleSystem().getRulebase().addRule(rule);
+					ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
 				}
 			});
 		}
@@ -1168,7 +1173,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	{
 		Future<Void> ret = new BDIFuture<Void>();
 
-		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		
 		final String rulename = getRuleName();
 		
@@ -1176,7 +1181,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 //			setResumeCommand(rescom);
 		addResumeCommand(rescom);
 		
-		IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
+		IFuture<ITimer> cont = createTimer(timeout, ia, rescom);
 		cont.addResultListener(new DefaultResultListener<ITimer>()
 		{
 			public void resultAvailable(final ITimer timer)
@@ -1200,7 +1205,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 				{
 					rule.addEvent(new EventType(ev));
 				}
-				ip.getRuleSystem().getRulebase().addRule(rule);
+				ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
 			}
 		});
 		return ret;
@@ -1211,30 +1216,59 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	/**
 	 * 
 	 */
-	protected IFuture<ITimer> createTimer(long timeout, final BDIAgentInterpreter ip, final ICommand<Boolean> rescom)
+	protected IFuture<ITimer> createTimer(long timeout, final IInternalAccess ia, final ICommand<Boolean> rescom)
 	{
 		final Future<ITimer> ret = new Future<ITimer>();
 		if(timeout>-1)
 		{
-			IFuture<ITimer> tfut = ((BDIAgent)ia).waitFor(timeout, new IComponentStep<Void>()
+			IClockService cs = SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			ITimedObject to	= new ITimedObject()
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				public void timeEventOccurred(long currenttime)
 				{
 //					if(rescom.equals(getResumeCommand()))
 					{
 						setException(new TimeoutException());
 						RPlan.executePlan(RPlan.this, ia, rescom);
 					}
-					return IFuture.DONE;
 				}
-			});
-			tfut.addResultListener(new DefaultResultListener<ITimer>()
-			{
-				public void resultAvailable(ITimer result)
-				{
-					ret.setResult(result);
-				}
-			});
+			};
+			
+			ITimer timer = cs.createTimer(timeout, to);
+			ret.setResult(timer);
+			
+//			IFuture<ITimer> tfut = ia.getComponentFeature(IExecutionFeature.class).waitForDelay(timeout, new IComponentStep<Void>()
+//			{
+//				public IFuture<Void> execute(IInternalAccess ia)
+//				{
+////					if(rescom.equals(getResumeCommand()))
+//					{
+//						setException(new TimeoutException());
+//						RPlan.executePlan(RPlan.this, ia, rescom);
+//					}
+//					return IFuture.DONE;
+//				}
+//			});
+			
+//			IFuture<ITimer> tfut = ((BDIAgent)ia).waitFor(timeout, new IComponentStep<Void>()
+//			{
+//				public IFuture<Void> execute(IInternalAccess ia)
+//				{
+////					if(rescom.equals(getResumeCommand()))
+//					{
+//						setException(new TimeoutException());
+//						RPlan.executePlan(RPlan.this, ia, rescom);
+//					}
+//					return IFuture.DONE;
+//				}
+//			});
+//			tfut.addResultListener(new DefaultResultListener<ITimer>()
+//			{
+//				public void resultAvailable(ITimer result)
+//				{
+//					ret.setResult(result);
+//				}
+//			});
 		}
 		else
 		{
@@ -1242,6 +1276,33 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 		}
 		return ret;
 	}
+	
+//	/**
+//	 *  Wait for some time.
+//	 */
+//	public IFuture<ITimer> waitForDelayWithTimer(final long delay, final IComponentStep<?> step)
+//	{
+//		final Future<ITimer> ret = new Future<ITimer>();
+//		
+//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		ITimedObject	to	=  	new ITimedObject()
+//		{
+//			public void timeEventOccurred(long currenttime)
+//			{
+//				scheduleStep(step);
+//			}
+//			
+//			public String toString()
+//			{
+//				return "waitForDelay("+getComponent().getComponentIdentifier()+")";
+//			}
+//		};
+//		
+//		ITimer timer = cs.createTimer(delay, to);
+//		ret.setResult(timer);
+//		
+//		return ret;
+//	}
 	
 	/**
 	 * 
@@ -1254,7 +1315,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 //		setResumeCommand(rescom);
 		addResumeCommand(rescom);
 		
-		command.execute(null).addResultListener(ia.createResultListener(new IResultListener<T>()
+		command.execute(null).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<T>()
 		{
 			public void resultAvailable(T result)
 			{
@@ -1330,8 +1391,8 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 			if(rulename!=null)
 			{
 //				System.out.println("rem rule: "+rulename);
-				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-				ip.getRuleSystem().getRulebase().removeRule(rulename);
+//				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+				ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().getRulebase().removeRule(rulename);
 			}
 			if(timer!=null)
 			{
@@ -1456,11 +1517,11 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	 */
 	public void publishToolPlanEvent(String evtype)
 	{
-		if(getInterpreter().hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
+		if(ia.hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
-			mev.setSourceIdentifier(getInterpreter().getComponentIdentifier());
+			mev.setSourceIdentifier(ia.getComponentIdentifier());
 			mev.setTime(time);
 			
 			PlanInfo info = PlanInfo.createPlanInfo(this);
@@ -1470,17 +1531,17 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			getInterpreter().publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
+			ia.publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	public BDIAgentInterpreter getInterpreter()
-	{
-		return (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-	}
+//	/**
+//	 * 
+//	 */
+//	public BDIAgentInterpreter getInterpreter()
+//	{
+//		return (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//	}
 	
 //	/**
 //	 * 
@@ -1523,7 +1584,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 		 */
 		public void addResultListener(IResultListener<E> listener) 
 		{
-			super.addResultListener(new BDIComponentResultListener<E>(listener, (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()));
+			super.addResultListener(new BDIComponentResultListener<E>(listener, ia));
 		}
 	}
 }

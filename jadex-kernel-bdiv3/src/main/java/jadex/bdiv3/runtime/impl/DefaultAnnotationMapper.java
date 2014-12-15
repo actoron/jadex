@@ -1,8 +1,10 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
 
 import java.lang.reflect.Method;
@@ -16,8 +18,8 @@ import java.util.List;
  */
 public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 {
-	/** The interpreter. */
-	protected BDIAgentInterpreter interpreter;
+	/** The agent. */
+	protected IInternalAccess agent;
 	
 	/** The service name. */
 	protected String sername;
@@ -25,10 +27,10 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 	/**
 	 * 
 	 */
-	public DefaultAnnotationMapper(String sername, BDIAgentInterpreter interpreter)
+	public DefaultAnnotationMapper(String sername, IInternalAccess agent)
 	{
 		this.sername = sername;
-		this.interpreter = interpreter;
+		this.agent = agent;
 	}
 	
 	/**
@@ -41,7 +43,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 	{
 		Object[] ret = null;
 		
-		BDIModel model = interpreter.getBDIModel();
+		BDIModel model = agent.getComponentFeature(IBDIAgentFeature.class).getBDIModel();
 		final MGoal mgoal = model.getCapability().getGoal(goal.getClass().getName());
 		MethodInfo mi = mgoal.getServiceParameterMapping(sername==null? "": sername);
 		
@@ -91,7 +93,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 	 */
 	public void handleServiceResult(T goal, Method m, Object result)
 	{
-		RGoal rgoal = interpreter.getCapability().getRGoal(goal);
+		RGoal rgoal = agent.getComponentFeature(IBDIAgentFeature.class).getCapability().getRGoal(goal);
 		final MGoal mgoal = rgoal.getMGoal();
 		MethodInfo mi = mgoal.getServiceParameterMapping(sername==null? "": sername);
 		
@@ -99,7 +101,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 		{
 			try
 			{
-				Method me = mi.getMethod(interpreter.getClassLoader());
+				Method me = mi.getMethod(agent.getClassLoader());
 				me.invoke(goal, new Object[]{m, result});
 			}
 			catch(RuntimeException e)
@@ -114,7 +116,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 		// Try using goal result if nothing is specified
 		else
 		{
-			rgoal.setGoalResult(result, interpreter.getClassLoader());
+			rgoal.setGoalResult(result, agent.getClassLoader());
 		}
 	}
 }

@@ -25,6 +25,7 @@ import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.ServiceTrigger;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.ConstructorInfo;
 import jadex.bdiv3.model.MBelief;
@@ -41,11 +42,11 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.GoalDelegationHandler;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
@@ -65,7 +66,6 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.micro.MicroAgent;
 import jadex.micro.MicroClassReader;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
@@ -212,7 +212,7 @@ public class BDIClassReader extends MicroClassReader
 		Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs = new HashMap<ClassInfo, List<Tuple2<MGoal, String>>>();
 		
 		List<Class<?>> agtcls = new ArrayList<Class<?>>();
-		while(cma!=null && !cma.equals(Object.class) && !cma.equals(getClass(BDIAgent.class, cl)))
+		while(cma!=null && !cma.equals(Object.class))// && !cma.equals(getClass(BDIAgent.class, cl)))
 		{
 			if(isAnnotationPresent(cma, Agent.class, cl)
 				|| isAnnotationPresent(cma, Capability.class, cl))
@@ -362,7 +362,7 @@ public class BDIClassReader extends MicroClassReader
 						RawEvent[] rawevs = bel.rawevents();
 						for(RawEvent rawev: rawevs)
 						{
-							rawevents.add(BDIAgentInterpreter.createEventType(rawev)); 
+							rawevents.add(BDIAgentFeature.createEventType(rawev)); 
 						}
 					}
 
@@ -441,7 +441,7 @@ public class BDIClassReader extends MicroClassReader
 							RawEvent[] rawevs = bel.rawevents();
 							for(RawEvent rawev: rawevs)
 							{
-								rawevents.add(BDIAgentInterpreter.createEventType(rawev)); 
+								rawevents.add(BDIAgentFeature.createEventType(rawev)); 
 							}
 						}
 						
@@ -946,7 +946,7 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 *  Create a wrapper service implementation based on a published goal.
 	 */
-	public static Object createServiceImplementation(BDIAgent agent, Class<?> type, String[] methodnames, String[] goalnames)
+	public static Object createServiceImplementation(IInternalAccess agent, Class<?> type, String[] methodnames, String[] goalnames)
 	{
 //		if(methodnames==null || methodnames.length==0)
 //			throw new IllegalArgumentException("At least one method-goal mapping must be given.");
@@ -1109,7 +1109,7 @@ public class BDIClassReader extends MicroClassReader
 				}
 				for(RawEvent rawev: rawevs)
 				{
-					events.add(BDIAgentInterpreter.createEventType(rawev)); 
+					events.add(BDIAgentFeature.createEventType(rawev)); 
 				}
 				for(String pev: paramevs)
 				{
@@ -1178,7 +1178,7 @@ public class BDIClassReader extends MicroClassReader
 		}
 		for(RawEvent rawev: rawevs)
 		{
-			events.add(BDIAgentInterpreter.createEventType(rawev)); 
+			events.add(BDIAgentFeature.createEventType(rawev)); 
 		}
 		for(String pev: paramevs)
 		{
@@ -1297,7 +1297,7 @@ public class BDIClassReader extends MicroClassReader
 		{
 			throw new RuntimeException("BDI agent class not found: " + clname);
 		}
-		else if(!MicroAgent.class.isAssignableFrom(ret))
+		else //if(!MicroAgent.class.isAssignableFrom(ret))
 		{
 			boolean	found	= false;
 			Class	cma	= ret;
@@ -1317,4 +1317,15 @@ public class BDIClassReader extends MicroClassReader
 		return ret;
 	}
 
+//	/**
+//	 * 
+//	 */
+//	public static EventType createEventType(RawEvent rawev)
+//	{
+//		String[] p = new String[2];
+//		p[0] = rawev.value();
+//		p[1] = Object.class.equals(rawev.secondc())? rawev.second(): rawev.secondc().getName();
+////		System.out.println("eveve: "+p[0]+" "+p[1]);
+//		return new EventType(p);
+//	}
 }
