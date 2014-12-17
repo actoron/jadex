@@ -1,11 +1,9 @@
 package jadex.bdiv3.actions;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
 import jadex.bdiv3.annotation.GoalParent;
-import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
@@ -63,7 +61,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 		Future<Void> ret = new Future<Void>();
 		try
 		{
-			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			// todo: observe class and goal itself!
 //			goal.observeGoal(ia);
 			
@@ -111,7 +109,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 				cl = cl.getSuperclass();
 			}
 			
-			ip.getCapability().addGoal(goal);
+			ia.getComponentFeature(IBDIAgentFeature.class).getCapability().addGoal(goal);
 			goal.setLifecycleState(ia, RGoal.GoalLifecycleState.ADOPTED);
 			ret.setResult(null);
 		}

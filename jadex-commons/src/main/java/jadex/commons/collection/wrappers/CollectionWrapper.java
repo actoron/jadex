@@ -15,8 +15,8 @@ import java.util.Iterator;
  */
 public abstract class CollectionWrapper <T> implements Collection<T>
 {
-//	/** The delegate list. */
-//	protected Collection<T> delegate;
+	/** The delegate list. */
+	protected Collection<T> delegate;
 //	
 //	/** The agent interpreter. */
 //	protected BDIAgentInterpreter interpreter;
@@ -56,190 +56,205 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 //		this.mbel = mbel;
 //	}
 //
-//	/**
-//	 *  Get the size.
-//	 */
-//	public int size()
-//	{
-//		return delegate.size();
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public boolean isEmpty()
-//	{
-//		return delegate.isEmpty();
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public boolean contains(Object o)
-//	{
-//		return delegate.contains(o);
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public Iterator<T> iterator()
-//	{
-//		return delegate.iterator();
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public Object[] toArray()
-//	{
-//		return delegate.toArray();
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public <T> T[] toArray(T[] a)
-//	{
-//		return delegate.toArray(a);
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public boolean add(T e)
-//	{
-//		boolean ret = delegate.add(e);
-//		if(ret)
-//		{
+	
+	/**
+	 *  Create a new wrapper.
+	 *  @param delegate The delegate.
+	 */
+	public CollectionWrapper(Collection<T> delegate)
+	{
+		this.delegate = delegate;
+	}
+	
+	/**
+	 *  Get the size.
+	 */
+	public int size()
+	{
+		return delegate.size();
+	}
+
+	/**
+	 *  
+	 */
+	public boolean isEmpty()
+	{
+		return delegate.isEmpty();
+	}
+
+	/**
+	 *  
+	 */
+	public boolean contains(Object o)
+	{
+		return delegate.contains(o);
+	}
+
+	/**
+	 *  
+	 */
+	public Iterator<T> iterator()
+	{
+		return delegate.iterator();
+	}
+
+	/**
+	 *  
+	 */
+	public Object[] toArray()
+	{
+		return delegate.toArray();
+	}
+
+	/**
+	 *  
+	 */
+	public <T> T[] toArray(T[] a)
+	{
+		return delegate.toArray(a);
+	}
+
+	/**
+	 *  
+	 */
+	public boolean add(T e)
+	{
+		boolean ret = delegate.add(e);
+		if(ret)
+		{
+			entryAdded(e);
 //			observeValue(e);
 //			getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<T>(e, null, delegate.size())));
-////			getRuleSystem().addEvent(new Event(addevent, new CollectionEntry<T>(e, null, delegate.size())));
+//			getRuleSystem().addEvent(new Event(addevent, new CollectionEntry<T>(e, null, delegate.size())));
 //			publishToolBeliefEvent();
-//		}
-//		return ret;
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public boolean remove(Object o)
-//	{
-//		boolean ret = delegate.remove(o);
-//		if(ret)
-//		{
+		}
+		return ret;
+	}
+
+	/**
+	 *  
+	 */
+	public boolean remove(Object o)
+	{
+		boolean ret = delegate.remove(o);
+		if(ret)
+		{
+			entryRemoved((T)o);
 //			unobserveValue(o);
 //			getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<T>(null, (T)o, null)));
 //			publishToolBeliefEvent();
-//		}
-//		return ret;
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public boolean containsAll(Collection<?> c)
-//	{
-//		return delegate.containsAll(c);
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public boolean addAll(Collection<? extends T> c)
-//	{
-//		boolean ret = delegate.addAll(c);
-//		if(ret)
-//		{
-//			for(T t: c)
-//			{
+		}
+		return ret;
+	}
+
+	/**
+	 *  
+	 */
+	public boolean containsAll(Collection<?> c)
+	{
+		return delegate.containsAll(c);
+	}
+
+	/**
+	 *  
+	 */
+	public boolean addAll(Collection<? extends T> c)
+	{
+		boolean ret = delegate.addAll(c);
+		if(ret)
+		{
+			for(T t: c)
+			{
+				entryAdded(t);
 //				observeValue(t);
 //				getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<T>(t, null, null)));
 //				publishToolBeliefEvent();
-//			}
-//		}	
-//		return ret;
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public boolean removeAll(Collection<?> c)
-//	{
-//		boolean ret = delegate.removeAll(c);
-//		if(ret)
-//		{
-//			for(Object t: c)
-//			{
+			}
+		}	
+		return ret;
+	}
+
+	/**
+	 *  
+	 */
+	public boolean removeAll(Collection<?> c)
+	{
+		boolean ret = delegate.removeAll(c);
+		if(ret)
+		{
+			for(Object t: c)
+			{
+				entryRemoved((T)t);
 //				unobserveValue(t);
 //				getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<T>((T)t, null, null)));
 //				publishToolBeliefEvent();
-//			}
-//		}	
-//		return ret;
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public boolean retainAll(Collection< ? > c)
-//	{
-//		// todo:
-//		return delegate.retainAll(c);
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public void clear()
-//	{
-//		T[] clone = delegate.toArray((T[])new Object[delegate.size()]);
-//		delegate.clear();
-//		for(Object t: clone)
-//		{
+			}
+		}	
+		return ret;
+	}
+
+	/**
+	 *  
+	 */
+	public boolean retainAll(Collection< ? > c)
+	{
+		// todo:
+		return delegate.retainAll(c);
+	}
+
+	/**
+	 *  
+	 */
+	public void clear()
+	{
+		T[] clone = delegate.toArray((T[])new Object[delegate.size()]);
+		delegate.clear();
+		for(Object t: clone)
+		{
+			entryRemoved((T)t);
 //			unobserveValue(t);
 //			getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<Object>(null, t, null)));
 //			publishToolBeliefEvent();
-//		}
-//	}
-//	
-//	/** 
-//	 *  Get the hashcode of the object.
-//	 *  @return The hashcode.
-//	 */
-//	public int hashCode()
-//	{
-//		return delegate.hashCode();
-//	}
-//
-//	/** 
-//	 *  Test if this object equals another.
-//	 *  @param obj The other object.
-//	 *  @return True, if equal.
-//	 */
-//	public boolean equals(Object obj)
-//	{
-//		boolean ret = false;
-//		if(obj instanceof CollectionWrapper)
-//		{
-//			ret = delegate.equals(((CollectionWrapper)obj).delegate);
-//		}
-//		else if(obj instanceof Collection)
-//		{
-//			ret = delegate.equals(obj);
-//		}
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Get the string representation.
-//	 *  @return The string representation.
-//	 */
-//	public String toString()
-//	{
-//		return delegate.toString();
-//	}
-//	
+		}
+	}
+	
+	/** 
+	 *  Get the hashcode of the object.
+	 *  @return The hashcode.
+	 */
+	public int hashCode()
+	{
+		return delegate.hashCode();
+	}
+
+	/** 
+	 *  Test if this object equals another.
+	 *  @param obj The other object.
+	 *  @return True, if equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof CollectionWrapper)
+		{
+			ret = delegate.equals(((CollectionWrapper)obj).delegate);
+		}
+		else if(obj instanceof Collection)
+		{
+			ret = delegate.equals(obj);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return delegate.toString();
+	}
+	
 //	/**
 //	 *  Get the interpreter.
 //	 *  @return The interpreter.
@@ -257,7 +272,7 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 //	{
 //		return interpreter.getRuleSystem();
 //	}
-//	
+	
 //	/**
 //	 * 
 //	 */
@@ -312,7 +327,7 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 //			});
 //		}
 //	}
-//	
+	
 //	/**
 //	 * 
 //	 */
@@ -329,4 +344,18 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 //		((BDIAgent)getInterpreter().getAgent()).publishToolBeliefEvent(getInterpreter(), mbel);//, evtype);
 //	}
 
+	/**
+	 *  An entry was added to the collection.
+	 */
+	protected abstract void	entryAdded(T value);
+	
+	/**
+	 *  An entry was removed from the collection.
+	 */
+	protected abstract void	entryRemoved(T value);
+	
+	/**
+	 *  An entry was changed in the collection.
+	 */
+	protected abstract void	entryChanged(T oldvalue, T newvalue);
 }

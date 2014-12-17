@@ -1,6 +1,5 @@
 package jadex.bdiv3.features;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.ChangeEvent;

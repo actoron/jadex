@@ -5,6 +5,7 @@ import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -59,7 +60,7 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 		
 //		System.out.println("find applicable candidates 1: "+element);
 		final APL apl = element.getApplicablePlanList();
-		apl.build(ia).addResultListener(ia.createResultListener(new DelegationResultListener<Void>(ret)
+		apl.build(ia).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{

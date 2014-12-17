@@ -1,6 +1,6 @@
 package jadex.bdiv3;
 
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 
 import java.util.Map;
@@ -78,6 +78,6 @@ public abstract class BDIClassGeneratorFactory
 	 * Create a new, platform-specific BDIAgentFactory object.
 	 * @return {@link BDIAgentFactory}
 	 */
-	public abstract BDIAgentFactory createBDIAgentFactory(IServiceProvider provider, Map properties);
+	public abstract BDIAgentFactory createBDIAgentFactory(IInternalAccess provider, Map properties);
 
 }

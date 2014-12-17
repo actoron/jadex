@@ -1,5 +1,6 @@
 package jadex.commons.collection.wrappers;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,4 +25,13 @@ public abstract class SetWrapper <T> extends CollectionWrapper<T> implements Set
 //	{
 //		super(delegate, interpreter, addevent, remevent, changeevent, mbel);
 //	}
+	
+	/**
+	 *  Create a new wrapper.
+	 *  @param delegate The delegate.
+	 */
+	public SetWrapper(Set<T> delegate)
+	{
+		super(delegate);
+	}
 }

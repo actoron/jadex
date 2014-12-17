@@ -1,10 +1,12 @@
 package jadex.bdiv3;
 
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
@@ -17,6 +19,7 @@ import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
@@ -28,9 +31,16 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.kernelbase.IBootstrapFactory;
+import jadex.micro.MicroAgentFactory;
+import jadex.micro.features.impl.MicroInjectionComponentFeature;
+import jadex.micro.features.impl.MicroLifecycleComponentFeature;
+import jadex.micro.features.impl.MicroMessageComponentFeature;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -51,13 +61,17 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	/** The image icon. */
 	protected static final LazyResource ICON = new LazyResource(BDIAgentFactory.class, "/jadex/bdiv3/images/bdi_agent.png");
 
+	/** The specific component features for micro agents. */
+	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = Collections.unmodifiableCollection(
+		Arrays.asList(BDIAgentFeature.FACTORY));
+	
 	//-------- attributes --------
 	
 	/** The application model loader. */
 	protected BDIModelLoader loader;
 	
 	/** The platform. */
-	protected IServiceProvider provider;
+	protected IInternalAccess provider;
 	
 //	/** The properties. */
 //	protected Map<String, Object> properties;
@@ -68,12 +82,15 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
 	
+	/** The standard + micro component features. */
+	protected Collection<IComponentFeatureFactory>	features;
+
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new agent factory.
 	 */
-	public BDIAgentFactory(IServiceProvider provider)//, Map properties)
+	public BDIAgentFactory(IInternalAccess provider)//, Map properties)
 	{
 		this(provider, null);
 	}
@@ -81,9 +98,9 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	/**
 	 *  Create a new agent factory.
 	 */
-	public BDIAgentFactory(IServiceProvider provider, Map<String, Object> properties)
+	public BDIAgentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getId(), IComponentFactory.class, properties);
+		super(provider.getComponentIdentifier(), IComponentFactory.class, properties);
 
 		this.provider = provider;
 //		this.properties = properties;
@@ -103,6 +120,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 				return IFuture.DONE;
 			}
 		};
+		
+		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MicroAgentFactory.MICRO_FEATURES, BDI_FEATURES));
 	}
 	
 	/**
@@ -121,8 +140,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
-		this.provider = (IServiceProvider)component.getServiceContainer();
-		this.providerid = provider.getId();
+		this.provider = component;
+		this.providerid = component.getComponentIdentifier();
 		createServiceIdentifier("Bootstrap Factory", IComponentFactory.class, rid, IComponentFactory.class, null);
 		return startService();
 	}
@@ -164,6 +183,16 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		});
 			
 		return ret;
+	}
+	
+	/**
+	 *  Get the component features for a model.
+	 *  @param model The component model.
+	 *  @return The component features.
+	 */
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
+	{
+		return new Future<Collection<IComponentFeatureFactory>>(features);
 	}
 	
 	//-------- IAgentFactory interface --------
@@ -320,76 +349,76 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		return new Future<String>(model.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3) ? FILETYPE_BDIAGENT: null);
 	}
 	
-	/**
-	 * Create a component instance.
-	 * @param desc	The component description.
-	 * @param factory The component adapter factory.
-	 * @param model The component model.
-	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the component as name/value pairs.
-	 * @param parent The parent component (if any).
-	 * @param bindings	Optional bindings to override bindings from model.
-	 * @param pinfos	Optional provided service infos to override settings from model.
-	 * @param copy	Global flag for parameter copying.
-	 * @param realtime	Global flag for real time timeouts.
-	 * @param persist	Global flag for persistence support.
-	 * @param resultlistener	Optional listener to be notified when the component finishes.
-	 * @param init	Future to be notified when init of the component is completed.
-	 * @return An instance of a component and the corresponding adapter.
-	 */
-	@Excluded
-	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference final IComponentDescription desc, 
-		final IComponentAdapterFactory factory, final IModelInfo model, final String config, final Map<String, Object> arguments, 
-		final IExternalAccess parent, @Reference final RequiredServiceBinding[] bindings, @Reference final ProvidedServiceInfo[] pinfos, final boolean copy, final boolean realtime, final boolean persist,
-		final IPersistInfo persistinfo, 
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, @Reference final LocalServiceRegistry registry)
-	{
-		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
-		
-		if(libservice!=null)
-		{
-			// todo: is model info ok also in remote case?
-	//		ClassLoader cl = libservice.getClassLoader(model.getResourceIdentifier());
-			libservice.getClassLoader(model.getResourceIdentifier())
-				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(res)
-			{
-				public void customResultAvailable(ClassLoader cl)
-				{
-					try
-					{
-						BDIModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
-						BDIAgentInterpreter mai = new BDIAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST, 
-							null, cl), arguments, config, parent, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, init, registry);
-						res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
-					}
-					catch(Exception e)
-					{
-						res.setException(e);
-					}
-				}
-			});
-		}
-		
-		// For platform bootstrapping
-		else
-		{
-			try
-			{
-				ClassLoader	cl	= getClass().getClassLoader();
-				BDIModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
-				BDIAgentInterpreter mai = new BDIAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST, 
-					null, cl), arguments, config, parent, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, init, registry);
-				res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
-			}
-			catch(Exception e)
-			{
-				res.setException(e);
-			}
-		}
-
-		return res;
-//		return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getAgentAdapter()));
-	}
+//	/**
+//	 * Create a component instance.
+//	 * @param desc	The component description.
+//	 * @param factory The component adapter factory.
+//	 * @param model The component model.
+//	 * @param config The name of the configuration (or null for default configuration) 
+//	 * @param arguments The arguments for the component as name/value pairs.
+//	 * @param parent The parent component (if any).
+//	 * @param bindings	Optional bindings to override bindings from model.
+//	 * @param pinfos	Optional provided service infos to override settings from model.
+//	 * @param copy	Global flag for parameter copying.
+//	 * @param realtime	Global flag for real time timeouts.
+//	 * @param persist	Global flag for persistence support.
+//	 * @param resultlistener	Optional listener to be notified when the component finishes.
+//	 * @param init	Future to be notified when init of the component is completed.
+//	 * @return An instance of a component and the corresponding adapter.
+//	 */
+//	@Excluded
+//	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference final IComponentDescription desc, 
+//		final IComponentAdapterFactory factory, final IModelInfo model, final String config, final Map<String, Object> arguments, 
+//		final IExternalAccess parent, @Reference final RequiredServiceBinding[] bindings, @Reference final ProvidedServiceInfo[] pinfos, final boolean copy, final boolean realtime, final boolean persist,
+//		final IPersistInfo persistinfo, 
+//		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, @Reference final LocalServiceRegistry registry)
+//	{
+//		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+//		
+//		if(libservice!=null)
+//		{
+//			// todo: is model info ok also in remote case?
+//	//		ClassLoader cl = libservice.getClassLoader(model.getResourceIdentifier());
+//			libservice.getClassLoader(model.getResourceIdentifier())
+//				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(res)
+//			{
+//				public void customResultAvailable(ClassLoader cl)
+//				{
+//					try
+//					{
+//						BDIModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
+//						BDIAgentInterpreter mai = new BDIAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST, 
+//							null, cl), arguments, config, parent, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, init, registry);
+//						res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
+//					}
+//					catch(Exception e)
+//					{
+//						res.setException(e);
+//					}
+//				}
+//			});
+//		}
+//		
+//		// For platform bootstrapping
+//		else
+//		{
+//			try
+//			{
+//				ClassLoader	cl	= getClass().getClassLoader();
+//				BDIModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
+//				BDIAgentInterpreter mai = new BDIAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST, 
+//					null, cl), arguments, config, parent, bindings, pinfos, copy, realtime, persist, persistinfo, resultlistener, init, registry);
+//				res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
+//			}
+//			catch(Exception e)
+//			{
+//				res.setException(e);
+//			}
+//		}
+//
+//		return res;
+////		return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getAgentAdapter()));
+//	}
 	
 	/**
 	 *  Get the element type.

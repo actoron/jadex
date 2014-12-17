@@ -4,7 +4,10 @@ import jadex.base.Starter;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
@@ -55,15 +58,16 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	 */
 	public void resultAvailable(final E result)
 	{
-		if(getAdapter().isExternalThread())
+		if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
-				getAdapter().invokeLater(new Runnable()
+				agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run()
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						doNotify(null, result);
+						return IFuture.DONE;
 					}
 					
 					public String toString()
@@ -74,7 +78,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(getAdapter().getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(agent.getComponentIdentifier(), new Runnable()
 				{
 					public void run()
 					{
@@ -102,15 +106,16 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	 */
 	public void exceptionOccurred(final Exception exception)
 	{
-		if(getAdapter().isExternalThread() && !Starter.isRescueThread(getAdapter().getComponentIdentifier()))
+		if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread() && !Starter.isRescueThread(agent.getComponentIdentifier()))
 		{
 			try
 			{
-				getAdapter().invokeLater(new Runnable()
+				agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run()
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						doNotify(exception, null);
+						return IFuture.DONE;
 					}
 					
 					public String toString()
@@ -153,13 +158,13 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	protected IComponentAdapter getAdapter()
-	{
-		return interpreter.getAgentAdapter();
-	}
+//	/**
+//	 * 
+//	 */
+//	protected IComponentAdapter getAdapter()
+//	{
+//		return interpreter.getAgentAdapter();
+//	}
 	
 	/**
 	 * 

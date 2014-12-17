@@ -1,9 +1,7 @@
 package jadex.bdiv3.actions;
 
-import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -42,9 +40,9 @@ public class DropGoalAction implements IConditionalComponentStep<Void>
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
 		Future<Void> ret = new Future<Void>();
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 //		goal.unobserveGoal(ia);
-		ip.getCapability().removeGoal(goal);
+		ia.getComponentFeature(IBDIAgentFeature.class).getCapability().removeGoal(goal);
 		goal.setLifecycleState(ia, RGoal.GoalLifecycleState.DROPPED);
 		ret.setResult(null);
 		return ret;

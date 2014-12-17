@@ -1,11 +1,10 @@
 package jadex.bdiv3.actions;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
@@ -66,8 +65,8 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		
 		Future<Void> ret = new Future<Void>();
 
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		MCapability	mcapa = (MCapability)ip.getCapability().getModelElement();
+//		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		MCapability	mcapa = (MCapability)ia.getComponentFeature(IBDIAgentFeature.class).getCapability().getModelElement();
 
 		List<Object> cands = element.getApplicablePlanList().selectCandidates(mcapa);
 		if(cands!=null && !cands.isEmpty())
@@ -87,7 +86,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				{
 					final RGoal pagoal = (RGoal)element;
 					final MGoal mgoal = (MGoal)cand;
-					final Object pgoal = mgoal.createPojoInstance(ip, pagoal);
+					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
 					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal);
 					
 					rgoal.addListener(new IResultListener<Void>()

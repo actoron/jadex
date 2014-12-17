@@ -28,105 +28,117 @@ public abstract class ListWrapper<T> extends CollectionWrapper<T> implements Lis
 //		super(delegate, interpreter, addevent, remevent, changeevent, mbel);
 //	}
 //
-//	/**
-//	 * 
-//	 */
-//	public List<T> getList()
-//	{
-//		return (List<T>)delegate;
-//	}
-//	
-//	/**
-//	 *  
-//	 */
-//	public boolean addAll(int index, Collection<? extends T> c)
-//	{
-//		// todo? or calls internally add?
-//		return getList().addAll(index, c);
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public T get(int index)
-//	{
-//		return getList().get(index);
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public T set(int index, T element)
-//	{
-//		T ret = getList().set(index, element);
+	/**
+	 *  Create a new wrapper.
+	 *  @param delegate The delegate.
+	 */
+	public ListWrapper(List<T> delegate)
+	{
+		super(delegate);
+	}
+	
+	/**
+	 * 
+	 */
+	public List<T> getList()
+	{
+		return (List<T>)delegate;
+	}
+	
+	/**
+	 *  
+	 */
+	public boolean addAll(int index, Collection<? extends T> c)
+	{
+		// todo? or calls internally add?
+		return getList().addAll(index, c);
+	}
+
+	/**
+	 *  
+	 */
+	public T get(int index)
+	{
+		return getList().get(index);
+	}
+
+	/**
+	 *  
+	 */
+	public T set(int index, T element)
+	{
+		T ret = getList().set(index, element);
+		entryChanged(ret, element);
 //		unobserveValue(ret);
 //		observeValue(element);
 //		getRuleSystem().addEvent(new Event(changeevent, new ChangeInfo<T>(element, ret, index)));
 ////				new Object[]{ret, element, Integer.valueOf(index)}));
 //		publishToolBeliefEvent();
-//		return ret;
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public void add(int index, T element)
-//	{
-//		getList().add(index, element);
+		return ret;
+	}
+
+	/**
+	 *  
+	 */
+	public void add(int index, T element)
+	{
+		getList().add(index, element);
+		entryAdded(element);
 //		observeValue(element);
 //		getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<T>(element, null, index)));
 //		publishToolBeliefEvent();
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public T remove(int index)
-//	{
-//		T ret = getList().remove(index);
+	}
+
+	/**
+	 *  
+	 */
+	public T remove(int index)
+	{
+		T ret = getList().remove(index);
+		entryRemoved(ret);
 //		unobserveValue(ret);
 //		getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<T>(null, ret, index)));
 //		publishToolBeliefEvent();
-//		return ret;
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public int indexOf(Object o)
-//	{
-//		return getList().indexOf(o);
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public int lastIndexOf(Object o)
-//	{
-//		return getList().lastIndexOf(o);
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public ListIterator<T> listIterator()
-//	{
-//		return getList().listIterator();
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public ListIterator<T> listIterator(int index)
-//	{
-//		return getList().listIterator(index);
-//	}
-//
-//	/**
-//	 *  
-//	 */
-//	public List<T> subList(int fromIndex, int toIndex)
-//	{
-//		return getList().subList(fromIndex, toIndex);
-//	}
+		return ret;
+	}
+
+	/**
+	 *  
+	 */
+	public int indexOf(Object o)
+	{
+		return getList().indexOf(o);
+	}
+
+	/**
+	 *  
+	 */
+	public int lastIndexOf(Object o)
+	{
+		return getList().lastIndexOf(o);
+	}
+
+	/**
+	 *  
+	 */
+	public ListIterator<T> listIterator()
+	{
+		return getList().listIterator();
+	}
+
+	/**
+	 *  
+	 */
+	public ListIterator<T> listIterator(int index)
+	{
+		return getList().listIterator(index);
+	}
+
+	/**
+	 *  
+	 */
+	public List<T> subList(int fromIndex, int toIndex)
+	{
+		return getList().subList(fromIndex, toIndex);
+	}
 }
