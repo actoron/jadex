@@ -85,7 +85,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						Type ret = Type.getReturnType(mnode.desc);
 						InsnList nl = new InsnList();
 						nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-						nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bdiv3/BDIAgent;"));
+						nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bridge/IInternalAccess;"));
 						Class<?>[] ptypes = m.getParameterTypes();
 						int cnt = 1;
 						for(int i=0; i<ptypes.length; i++)
@@ -112,7 +112,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 							}
 //							nl.add(new InsnNode(Opcodes.SWAP));
 						}						
-						nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", mnode.name, mnode.desc));
+						nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bridge/IInternalAccess", mnode.name, mnode.desc));
 						Class<?> rett = m.getReturnType();
 						if(ret!=null && !rett.equals(void.class) && !rett.equals(Void.class))
 						{

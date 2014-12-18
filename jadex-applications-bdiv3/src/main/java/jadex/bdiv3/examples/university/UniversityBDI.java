@@ -1,19 +1,20 @@
 package jadex.bdiv3.examples.university;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  *  Go to university example taken from  
@@ -32,7 +33,7 @@ public class UniversityBDI
 	
 	/** The bdi agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Belief
 	protected boolean raining = agent.getConfiguration().equals("rainy");
@@ -68,7 +69,7 @@ public class UniversityBDI
 //			raining = true;
 		try
 		{
-			agent.dispatchTopLevelGoal(new ComeToUniGoal()).get();
+			agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new ComeToUniGoal()).get();
 		}
 		catch(Exception e)
 		{

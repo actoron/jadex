@@ -1,17 +1,17 @@
 package jadex.bdiv3.examples.helloworld;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Imports;
-import jadex.rules.eca.annotations.Event;
 
 /**
  *  Hello World with goal driven print out.
@@ -29,7 +29,7 @@ public class HelloWorldGoalBDI
 {
 	/** The bdi agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Simple hello world goal.
@@ -54,10 +54,10 @@ public class HelloWorldGoalBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody//(keepalive=false)
 	public void body()
 	{
-		agent.dispatchTopLevelGoal(new HelloGoal("Hello BDI agent V3.")).get();
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new HelloGoal("Hello BDI agent V3.")).get();
 //		System.out.println("body end: "+getClass().getName());
 	}
 	

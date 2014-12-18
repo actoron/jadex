@@ -399,7 +399,7 @@ public class SUtil
 			return res;
 		}
 	}
-
+	
 	/**
 	 * Joins any arrays of (possibly) different type. todo: Does not support
 	 * basic types yet. Problem basic type array and object arrays cannot be

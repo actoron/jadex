@@ -1,6 +1,5 @@
 package jadex.commons.collection.wrappers;
 
-import java.awt.Event;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
@@ -10,24 +9,6 @@ import java.util.ListIterator;
  */
 public abstract class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 {
-//	/**
-//	 *  Create a new list wrapper.
-//	 */
-//	public ListWrapper(List<T> delegate, BDIAgentInterpreter interpreter, 
-//		String addevent, String remevent, String changeevent, MBelief mbel)
-//	{
-//		super(delegate, interpreter, addevent, remevent, changeevent, mbel);
-//	}
-//	
-//	/**
-//	 *  Create a new list wrapper.
-//	 */
-//	public ListWrapper(List<T> delegate, BDIAgentInterpreter interpreter, 
-//		EventType addevent, EventType remevent, EventType changeevent, MBelief mbel)
-//	{
-//		super(delegate, interpreter, addevent, remevent, changeevent, mbel);
-//	}
-//
 	/**
 	 *  Create a new wrapper.
 	 *  @param delegate The delegate.
@@ -68,7 +49,7 @@ public abstract class ListWrapper<T> extends CollectionWrapper<T> implements Lis
 	public T set(int index, T element)
 	{
 		T ret = getList().set(index, element);
-		entryChanged(ret, element);
+		entryChanged(ret, element, index);
 //		unobserveValue(ret);
 //		observeValue(element);
 //		getRuleSystem().addEvent(new Event(changeevent, new ChangeInfo<T>(element, ret, index)));
@@ -83,7 +64,7 @@ public abstract class ListWrapper<T> extends CollectionWrapper<T> implements Lis
 	public void add(int index, T element)
 	{
 		getList().add(index, element);
-		entryAdded(element);
+		entryAdded(element, index);
 //		observeValue(element);
 //		getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<T>(element, null, index)));
 //		publishToolBeliefEvent();
@@ -95,7 +76,7 @@ public abstract class ListWrapper<T> extends CollectionWrapper<T> implements Lis
 	public T remove(int index)
 	{
 		T ret = getList().remove(index);
-		entryRemoved(ret);
+		entryRemoved(ret, index);
 //		unobserveValue(ret);
 //		getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<T>(null, ret, index)));
 //		publishToolBeliefEvent();

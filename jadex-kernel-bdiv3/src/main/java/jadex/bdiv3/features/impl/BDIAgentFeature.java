@@ -1,7 +1,6 @@
 package jadex.bdiv3.features.impl;
 
 import jadex.bdiv3.IBDIClassGenerator;
-import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.RawEvent;
@@ -18,9 +17,11 @@ import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
-import jadex.bdiv3.runtime.impl.BDIServiceInvocationHandler;
+import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.BodyAborted;
 import jadex.bdiv3.runtime.impl.CapabilityWrapper;
@@ -32,24 +33,21 @@ import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
-import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.bdiv3.runtime.wrappers.ListWrapper;
+import jadex.bdiv3.runtime.wrappers.MapWrapper;
+import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
-import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.ProvidedServiceImplementation;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckNotNull;
-import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -59,28 +57,22 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.FieldInfo;
 import jadex.commons.IResultCommand;
-import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.collection.wrappers.ListWrapper;
-import jadex.commons.collection.wrappers.MapWrapper;
-import jadex.commons.collection.wrappers.SetWrapper;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
 import jadex.micro.features.IMicroLifecycleFeature;
-import jadex.micro.features.impl.MicroMessageComponentFeature;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
@@ -97,9 +89,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -114,9 +104,9 @@ import java.util.StringTokenizer;
 /**
  * 
  */
-public class BDIAgentFeature extends AbstractComponentFeature
+public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAgentFeature
 {
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBDIAgentFeature.class, BDIAgentFeature.class);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBDIAgentFeature.class, BDIAgentFeature.class, new Class[]{IMicroLifecycleFeature.class}, null);
 	
 	/** The bdi model. */
 	protected BDIModel bdimodel;
@@ -138,15 +128,23 @@ public class BDIAgentFeature extends AbstractComponentFeature
 	public BDIAgentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
+		
+		Object pojo = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		this.bdimodel = (BDIModel)getComponent().getModel().getRawModel();
+		this.capa = new RCapability(bdimodel.getCapability());
+		this.rulesystem = new RuleSystem(pojo);
+		injectAgent(getComponent(), pojo, bdimodel, null);
 	}
 
-//	/**
-//	 *  Initialize the feature.
-//	 *  Empty implementation that can be overridden.
-//	 */
-//	public IFuture<Void> init()
-//	{
-//	}
+	/**
+	 *  Initialize the feature.
+	 *  Empty implementation that can be overridden.
+	 */
+	public IFuture<Void> init()
+	{
+		startBehavior();
+		return IFuture.DONE;
+	}
 	
 	//-------- internal method used for rewriting field access -------- 
 	
@@ -341,7 +339,7 @@ public class BDIAgentFeature extends AbstractComponentFeature
 	 */
 	public static void writeField(Object val, String fieldname, Object obj, IInternalAccess agent)
 	{
-//			System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
+		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
 		
 		// This is the case in inner classes
 		if(agent==null)
@@ -373,17 +371,17 @@ public class BDIAgentFeature extends AbstractComponentFeature
 			String addev = ChangeEvent.FACTADDED+"."+belname;
 			String remev = ChangeEvent.FACTREMOVED+"."+belname;
 			String chev = ChangeEvent.FACTCHANGED+"."+belname;
-			if(val instanceof List && !(val instanceof ListWrapper))
+			if(val instanceof List && !(val instanceof jadex.commons.collection.wrappers.ListWrapper))
 			{
-				val = new ListWrapper((List<?>)val, ip, addev, remev, chev, mbel);
+				val = new ListWrapper((List<?>)val, agent, addev, remev, chev, mbel);
 			}
-			else if(val instanceof Set && !(val instanceof SetWrapper))
+			else if(val instanceof Set && !(val instanceof jadex.commons.collection.wrappers.SetWrapper))
 			{
-				val = new SetWrapper((Set<?>)val, ip, addev, remev, chev, mbel);
+				val = new SetWrapper((Set<?>)val, agent, addev, remev, chev, mbel);
 			}
-			else if(val instanceof Map && !(val instanceof MapWrapper))
+			else if(val instanceof Map && !(val instanceof jadex.commons.collection.wrappers.MapWrapper))
 			{
-				val = new MapWrapper((Map<?,?>)val, ip, addev, remev, chev, mbel);
+				val = new MapWrapper((Map<?,?>)val, agent, addev, remev, chev, mbel);
 			}
 		}
 		
@@ -434,8 +432,8 @@ public class BDIAgentFeature extends AbstractComponentFeature
 			{
 				for(Object[] write: writes)
 				{
-//						System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
-//						agent.writeField(write[0], (String)write[1], write[2]);
+					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
+//					agent.writeField(write[0], (String)write[1], write[2]);
 //					BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 					RuleSystem rs = agent.getComponentFeature(IBDIAgentFeature.class).getRuleSystem();
 					final String belname = (String)write[1];
@@ -1424,17 +1422,17 @@ public class BDIAgentFeature extends AbstractComponentFeature
 				if(val instanceof List)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getComponent(), new ListWrapper((List<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getComponent(), new ListWrapper((List<?>)val, getComponent(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getComponent(), new SetWrapper((Set<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getComponent(), new SetWrapper((Set<?>)val, getComponent(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getComponent(), new MapWrapper((Map<?,?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getComponent(), new MapWrapper((Map<?,?>)val, getComponent(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 			}
 			catch(RuntimeException e)
@@ -1449,7 +1447,44 @@ public class BDIAgentFeature extends AbstractComponentFeature
 	}
 		
 	/**
-	 *  Dispatch a goal wait for its result.
+	 *  Get the goals of a given type as pojos.
+	 *  @param clazz The pojo goal class.
+	 *  @return The currently instantiated goals of that type.
+	 */
+	public <T> Collection<T> getGoals(Class<T> clazz)
+	{
+		Collection<RGoal>	rgoals	= getCapability().getGoals(clazz);
+		List<T>	ret	= new ArrayList<T>();
+		for(RProcessableElement rgoal: rgoals)
+		{
+			ret.add((T)rgoal.getPojoElement());
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the current goals as api representation.
+	 *  @return All currently instantiated goals.
+	 */
+	public Collection<IGoal> getGoals()
+	{
+		return (Collection)getCapability().getGoals();
+	}
+	
+	/**
+	 *  Get the goal api representation for a pojo goal.
+	 *  @param goal The pojo goal.
+	 *  @return The api goal.
+	 */
+	public IGoal getGoal(Object goal)
+	{
+		return getCapability().getRGoal(goal);
+	}
+
+	/**
+	 *  Dispatch a pojo goal wait for its result.
+	 *  @param goal The pojo goal.
+	 *  @return The goal result.
 	 */
 	public <T, E> IFuture<E> dispatchTopLevelGoal(final T goal)
 	{
@@ -1468,14 +1503,15 @@ public class BDIAgentFeature extends AbstractComponentFeature
 			}
 		});
 
-//			System.out.println("adopt goal");
+//		System.out.println("adopt goal");
 		RGoal.adoptGoal(rgoal, getComponent());
 		
 		return ret;
 	}
-		
+	
 	/**
 	 *  Drop a pojo goal.
+	 *  @param goal The pojo goal.
 	 */
 	public void dropGoal(Object goal)
 	{
@@ -1489,11 +1525,118 @@ public class BDIAgentFeature extends AbstractComponentFeature
 	}
 
 	/**
+	 *  Dispatch a pojo plan and wait for its result.
+	 *  @param plan The pojo plan or plan name.
+	 *  @return The plan result.
+	 */
+	public <T, E> IFuture<E> adoptPlan(T plan)
+	{
+		return adoptPlan(plan, null);
+	}
+	
+	/**
+	 *  Dispatch a goal wait for its result.
+	 *  @param plan The pojo plan or plan name.
+	 *  @param args The plan arguments.
+	 *  @return The plan result.
+	 */
+	public <T, E> IFuture<E> adoptPlan(T plan, Object[] args)
+	{
+		final Future<E> ret = new Future<E>();
+		MPlan mplan = bdimodel.getCapability().getPlan(plan instanceof String? (String)plan: plan.getClass().getName());
+		if(mplan==null)
+			throw new RuntimeException("Plan model not found for: "+plan);
+		
+		final RPlan rplan = RPlan.createRPlan(mplan, plan, null, getComponent());
+		rplan.addPlanListener(new IPlanListener<E>()
+		{
+			public void planFinished(E result)
+			{
+				if(rplan.getException()!=null)
+				{
+					ret.setException(rplan.getException());
+				}
+				else
+				{
+					ret.setResult(result);
+				}
+			}
+		});
+		rplan.setReason(new ChangeEvent(null, null, args, null));
+		RPlan.executePlan(rplan, getComponent(), null);
+		return ret;
+	}
+	
+	/**
+	 *  Add a belief listener.
+	 *  @param name The belief name.
+	 *  @param listener The belief listener.
+	 */
+	public void addBeliefListener(String name, final IBeliefListener listener)
+	{
+		String fname = bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
+		
+		List<EventType> events = new ArrayList<EventType>();
+		addBeliefEvents(getComponent(), events, fname);
+
+		final boolean multi = ((MCapability)getCapability().getModelElement())
+			.getBelief(fname).isMulti(bdimodel.getClassloader());
+		
+		String rulename = fname+"_belief_listener_"+System.identityHashCode(listener);
+		Rule<Void> rule = new Rule<Void>(rulename, 
+			ICondition.TRUE_CONDITION, new IAction<Void>()
+		{
+			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+			{
+				if(!multi)
+				{
+					listener.beliefChanged((ChangeInfo)event.getContent());
+				}
+				else
+				{
+					if(ChangeEvent.FACTADDED.equals(event.getType().getType(0)))
+					{
+						listener.factAdded((ChangeInfo)event.getContent());
+					}
+					else if(ChangeEvent.FACTREMOVED.equals(event.getType().getType(0)))
+					{
+						listener.factAdded((ChangeInfo)event.getContent());
+					}
+					else if(ChangeEvent.FACTCHANGED.equals(event.getType().getType(0)))
+					{
+//						Object[] vals = (Object[])event.getContent();
+						listener.factChanged((ChangeInfo)event.getContent());
+					}
+					else if(ChangeEvent.BELIEFCHANGED.equals(event.getType().getType(0)))
+					{
+						listener.beliefChanged((ChangeInfo)event.getContent());
+					}
+				}
+				return IFuture.DONE;
+			}
+		});
+		rule.setEvents(events);
+		getRuleSystem().getRulebase().addRule(rule);
+	}
+	
+	/**
+	 *  Remove a belief listener.
+	 *  @param name The belief name.
+	 *  @param listener The belief listener.
+	 */
+	public void removeBeliefListener(String name, IBeliefListener listener)
+	{
+		name	= bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
+		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
+		getRuleSystem().getRulebase().removeRule(rulename);
+	}
+
+	/**
 	 *  Start the component behavior.
 	 */
 	public void startBehavior()
 	{
-		super.startBehavior();
+//		super.startBehavior();
 		
 //		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
 		final Object agent = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
@@ -2760,7 +2903,7 @@ public class BDIAgentFeature extends AbstractComponentFeature
 	 *  Get parameter values for injection into method and constructor calls.
 	 *  @return A valid assigment or null if no assignment could be found.
 	 */
-	protected Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs)
+	public Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs)
 	{
 		Collection<Object> vals = new LinkedHashSet<Object>();
 		if(vs!=null)

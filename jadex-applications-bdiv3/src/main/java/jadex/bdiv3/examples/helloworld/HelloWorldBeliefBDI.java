@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.helloworld;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
@@ -8,6 +7,7 @@ import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
@@ -25,7 +25,7 @@ public class HelloWorldBeliefBDI
 {
 	/** The bdi agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The text that is printed. */
 	@Belief
@@ -70,6 +70,6 @@ public class HelloWorldBeliefBDI
 		System.out.println(text);
 		plan.waitFor(1000).get();
 		System.out.println("Good bye.");
-		agent.killAgent();
+		agent.killComponent();
 	}
 }

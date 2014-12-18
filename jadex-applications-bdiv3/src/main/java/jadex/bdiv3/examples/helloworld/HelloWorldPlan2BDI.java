@@ -14,7 +14,7 @@ public abstract class HelloWorldPlan2BDI implements IBDIAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody//(keepalive=false)
 	public void body()
 	{
 		adoptPlan("printHello").get();

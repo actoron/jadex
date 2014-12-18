@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.factory;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentIdentifier;
@@ -122,7 +123,8 @@ public class SComponentFactory
 			}
 		}
 
-		return dr.resolveDependencies();
+		Collection<IComponentFeatureFactory> ret = dr.resolveDependencies();
+		return ret;
 	}
 
 	//-------- methods --------

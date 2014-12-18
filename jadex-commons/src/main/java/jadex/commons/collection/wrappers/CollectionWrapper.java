@@ -1,12 +1,5 @@
 package jadex.commons.collection.wrappers;
 
-import jadex.commons.IResultCommand;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
-import java.awt.Event;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -122,7 +115,7 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 		boolean ret = delegate.add(e);
 		if(ret)
 		{
-			entryAdded(e);
+			entryAdded(e, -1);
 //			observeValue(e);
 //			getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<T>(e, null, delegate.size())));
 //			getRuleSystem().addEvent(new Event(addevent, new CollectionEntry<T>(e, null, delegate.size())));
@@ -139,7 +132,7 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 		boolean ret = delegate.remove(o);
 		if(ret)
 		{
-			entryRemoved((T)o);
+			entryRemoved((T)o, -1);
 //			unobserveValue(o);
 //			getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<T>(null, (T)o, null)));
 //			publishToolBeliefEvent();
@@ -165,7 +158,7 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 		{
 			for(T t: c)
 			{
-				entryAdded(t);
+				entryAdded(t, -1);
 //				observeValue(t);
 //				getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<T>(t, null, null)));
 //				publishToolBeliefEvent();
@@ -184,7 +177,7 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 		{
 			for(Object t: c)
 			{
-				entryRemoved((T)t);
+				entryRemoved((T)t, -1);
 //				unobserveValue(t);
 //				getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<T>((T)t, null, null)));
 //				publishToolBeliefEvent();
@@ -211,7 +204,7 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 		delegate.clear();
 		for(Object t: clone)
 		{
-			entryRemoved((T)t);
+			entryRemoved((T)t, -1);
 //			unobserveValue(t);
 //			getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<Object>(null, t, null)));
 //			publishToolBeliefEvent();
@@ -347,15 +340,15 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 	/**
 	 *  An entry was added to the collection.
 	 */
-	protected abstract void	entryAdded(T value);
+	protected abstract void	entryAdded(T value, int index);
 	
 	/**
 	 *  An entry was removed from the collection.
 	 */
-	protected abstract void	entryRemoved(T value);
+	protected abstract void	entryRemoved(T value, int index);
 	
 	/**
 	 *  An entry was changed in the collection.
 	 */
-	protected abstract void	entryChanged(T oldvalue, T newvalue);
+	protected abstract void	entryChanged(T oldvalue, T newvalue, int index);
 }

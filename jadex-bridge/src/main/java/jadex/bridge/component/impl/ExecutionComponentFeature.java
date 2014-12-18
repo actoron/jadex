@@ -779,7 +779,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		executing	= false;
 		ISuspendable.SUSPENDABLE.set(null);
 
-		
 		return again;
 	}
 	

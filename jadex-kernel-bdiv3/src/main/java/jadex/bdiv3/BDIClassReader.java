@@ -148,6 +148,7 @@ public class BDIClassReader extends MicroClassReader
 		ModelInfo modelinfo = new ModelInfo();
 		BDIModel ret = new BDIModel(modelinfo, new MCapability(cma.getName()));
 		modelinfo.internalSetRawModel(ret);
+		ret.setPojoClass(new ClassInfo(cma.getName()));
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
 		if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))

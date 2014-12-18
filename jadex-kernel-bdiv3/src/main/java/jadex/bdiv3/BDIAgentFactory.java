@@ -1,12 +1,16 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
@@ -63,7 +67,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 
 	/** The specific component features for micro agents. */
 	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = Collections.unmodifiableCollection(
-		Arrays.asList(BDIAgentFeature.FACTORY));
+		Arrays.asList(BDIAgentFeature.FACTORY, new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class)));
 	
 	//-------- attributes --------
 	

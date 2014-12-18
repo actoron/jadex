@@ -1,8 +1,9 @@
 package jadex.bdiv3.examples.helloworld;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
@@ -19,15 +20,15 @@ public class HelloWorldPlanBDI
 {
 	/** The bdi agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody//(keepalive=false)
 	public void body()
 	{
-		agent.adoptPlan("printHello").get();
+		agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan("printHello").get();
 	}
 	
 	/**

@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.helloworld;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
@@ -16,6 +15,7 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -41,7 +41,7 @@ public class HelloWorld2BDI
 {
 	/** The bdi agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The text that is printed. */
 	@Belief
@@ -117,7 +117,7 @@ public class HelloWorld2BDI
 		{
 			System.out.println("1: "+goal.getText());
 			
-			agent.waitForDelay(3000, new IComponentStep<Void>()
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
