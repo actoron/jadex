@@ -10,6 +10,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.marsworld.BaseBDI;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.WalkAround;
 import jadex.bdiv3.examples.marsworld.sentry.ITargetAnnouncementService;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -76,7 +77,7 @@ public class CarryBDI extends BaseBDI implements ICarryService
 	 */
 	public IFuture<Void> doCarry(@Reference ISpaceObject target)
 	{
-		agent.dispatchTopLevelGoal(new CarryOre(target));
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new CarryOre(target));
 		return IFuture.DONE;
 	}
 }

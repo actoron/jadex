@@ -2,7 +2,6 @@ package jadex.bdiv3.testcases.plans;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
@@ -10,6 +9,8 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -36,7 +37,7 @@ import java.util.List;
 public class WaitBDI
 {
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Belief
 	protected List<String> names = new ArrayList<String>();
@@ -52,25 +53,25 @@ public class WaitBDI
 		tr[0] = new TestReport("#1", "Test waitForFactAdded");
 		tr[1] = new TestReport("#2", "Test waitForFactRemoved");
 		
-		agent.waitFor(1000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				System.out.println("Adding");
 				addName("a");
 				
-				agent.waitFor(1000, new IComponentStep<Void>()
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						System.out.println("Removing");
 						removeName("a");
 						
-						agent.waitFor(1000, new IComponentStep<Void>()
+						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								agent.killAgent();
+								agent.killComponent();
 								return IFuture.DONE;
 							}
 						});
@@ -87,14 +88,14 @@ public class WaitBDI
 	 *  Called when agent is killed.
 	 */
 	@AgentKilled
-	public void	destroy(BDIAgent agent)
+	public void	destroy(IInternalAccess agent)
 	{
 		for(TestReport ter: tr)
 		{
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.setResultValue("testresults", new Testcase(tr.length, tr));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	/**
@@ -126,7 +127,7 @@ public class WaitBDI
 		
 		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
 		
-		rplan.waitForFactAdded("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
+		rplan.waitForFactAdded("names").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
 		{
 			public void customResultAvailable(ChangeInfo<?> result)
 			{
@@ -136,7 +137,7 @@ public class WaitBDI
 			}
 		}));
 		
-		rplan.waitForFactRemoved("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
+		rplan.waitForFactRemoved("names").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
 		{
 			public void customResultAvailable(ChangeInfo<?> result)
 			{

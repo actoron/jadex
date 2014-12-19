@@ -2,12 +2,14 @@ package jadex.bdiv3.testcases.plans;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanAbortedException;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -27,7 +29,7 @@ import jadex.micro.annotation.Results;
 public class ExternalWaitBDI
 {
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	protected TestReport tr = new TestReport("#1", "Test if external wait with invokeInterruptable works.");
 	
@@ -43,7 +45,7 @@ public class ExternalWaitBDI
 			public IFuture<Void> execute(Void args)
 			{
 				System.out.println("start waiting...");
-				return agent.waitForDelay(3000);
+				return agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000);
 			}
 		}).addResultListener(new IResultListener<Void>()
 		{
@@ -51,7 +53,7 @@ public class ExternalWaitBDI
 			{
 				System.out.println("ended waiting normally");
 				tr.setFailed("ended waiting normally");
-				agent.killAgent();
+				agent.killComponent();
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -61,7 +63,7 @@ public class ExternalWaitBDI
 				{
 					tr.setSucceeded(true);
 				}
-				agent.killAgent();
+				agent.killComponent();
 			}
 		});
 		
@@ -74,10 +76,10 @@ public class ExternalWaitBDI
 	 *  Called when agent is killed.
 	 */
 	@AgentKilled
-	public void	destroy(BDIAgent agent)
+	public void	destroy(IInternalAccess agent)
 	{
 		if(!tr.isFinished())
 				tr.setFailed("Plan not activated");
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

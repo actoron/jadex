@@ -1,12 +1,12 @@
 package jadex.bdiv3.examples.cleanerworld.environment;
 
-import javax.swing.SwingUtilities;
-
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.examples.cleanerworld.world.Environment;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
+
+import javax.swing.SwingUtilities;
 
 /**
  * 
@@ -20,7 +20,7 @@ public class EnvironmentLocalBDI
 //	}
 	
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	protected Environment environment = Environment.getInstance();
 	

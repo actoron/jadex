@@ -2,7 +2,6 @@ package jadex.bdiv3.testcases.goals;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goal.ExcludeMode;
@@ -10,16 +9,15 @@ import jadex.bdiv3.annotation.GoalRecurCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
@@ -27,17 +25,8 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.rules.eca.annotations.Event;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 /**
  *  Agent that has a goal for buying an amount of items.
@@ -49,7 +38,7 @@ public class RecurBDI
 {
 	/** The bdi agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The list of items. */
 	@Belief
@@ -134,20 +123,20 @@ public class RecurBDI
 	
 		BuyItemsGoal goal = new BuyItemsGoal(5);
 		
-		IFuture<BuyItemsGoal> fut = agent.dispatchTopLevelGoal(goal);
+		IFuture<BuyItemsGoal> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
 		fut.addResultListener(new IResultListener<RecurBDI.BuyItemsGoal>()
 		{
 			public void resultAvailable(BuyItemsGoal result)
 			{
 				System.out.println("succ: "+result);
 				tr.setSucceeded(true);
-				agent.killAgent();
+				agent.killComponent();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
-				agent.killAgent();
+				agent.killComponent();
 			}
 		});
 		
@@ -159,7 +148,7 @@ public class RecurBDI
 //			}
 //		});
 		
-		agent.waitFor(2000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -213,11 +202,11 @@ public class RecurBDI
 	 *  Called when agent is killed.
 	 */
 	@AgentKilled
-	public void	destroy(BDIAgent agent)
+	public void	destroy(IInternalAccess agent)
 	{
 		if(!tr.isFinished())
 			tr.setFailed("Recur did not occur");
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	/**

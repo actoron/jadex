@@ -7,6 +7,7 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ConfigureGoal;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SUtil;
 
@@ -130,7 +131,7 @@ public class BenchmarkPlan
 		deviation	= Math.sqrt(deviation/runs);
 		System.out.println("Standard deviation of runs (millis): "+Math.round(deviation));
 
-//		killAgent();
+//		killComponent();
 	}
 	
 	/**
@@ -138,7 +139,7 @@ public class BenchmarkPlan
 	 */
 	protected long getTime()
 	{
-		IClockService cs = (IClockService)capa.getAgent().getRequiredService("clock").get();
+		IClockService cs = (IClockService)capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clock").get();
 		return cs.getTime();
 	}
 }

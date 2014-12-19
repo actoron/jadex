@@ -1,6 +1,5 @@
 package jadex.bdiv3.tutorial.c1;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -25,8 +24,8 @@ public class TranslationBDI
 {
 	//-------- attributes --------
 
-	@Agent
-	protected BDIAgent agent;
+//	@Agent
+//	protected BDIAgent agent;
 	
 	/** The wordtable. */
 	@Belief

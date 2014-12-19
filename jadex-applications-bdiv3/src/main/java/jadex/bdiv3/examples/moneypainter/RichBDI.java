@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.moneypainter;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
@@ -10,7 +9,9 @@ import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.moneypainter.RichBDI.GetOneEuro;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
@@ -30,7 +31,7 @@ import jadex.micro.annotation.RequiredServices;
 public class RichBDI
 {
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The target amount of money. */
 	@Belief
@@ -43,7 +44,7 @@ public class RichBDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchTopLevelGoal(new BecomeRich()).get();
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BecomeRich()).get();
 		if(money==target)
 		{
 			System.out.println("Now I am rich as I have made "+money+" euros.");
@@ -119,7 +120,7 @@ public class RichBDI
 	@Plan(trigger=@Trigger(goalfinisheds=BecomeRich.class))
 	public void printRich(BecomeRich goal)
 	{
-		if(agent.getGoal(goal).isSucceeded())
+		if(agent.getComponentFeature(IBDIAgentFeature.class).getGoal(goal).isSucceeded())
 		{
 			System.out.println("Now I am rich as I have made "+money+" euros.");
 		}

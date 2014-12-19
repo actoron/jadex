@@ -1,6 +1,5 @@
 package jadex.bdiv3.tutorial.d5;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
@@ -8,9 +7,11 @@ import jadex.bdiv3.annotation.GoalRecurCondition;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -33,7 +34,7 @@ public class TranslationBDI
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The current time. */
 	@Belief
@@ -93,17 +94,17 @@ public class TranslationBDI
 	public void body()
 	{
 		// Add a new wordpair after a few seconds
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				wordtable.put("bugger", "Flegel");
 				return IFuture.DONE;
 			}
-		}, 3000);
+		});
 		
 		String eword = "bugger";
-		String gword = (String)agent.dispatchTopLevelGoal(new Translate(eword)).get();
+		String gword = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Translate(eword)).get();
 		System.out.println("Translated: "+eword+" "+gword);
 	}
 	

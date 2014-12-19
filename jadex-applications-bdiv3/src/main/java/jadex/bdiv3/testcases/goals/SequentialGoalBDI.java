@@ -2,15 +2,17 @@ package jadex.bdiv3.testcases.goals;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -30,7 +32,7 @@ public class SequentialGoalBDI
 {
 	/** The bdi agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 		
 	/**
 	 *  Procedural goal (no target condition) with
@@ -83,25 +85,25 @@ public class SequentialGoalBDI
 	{
 		final TestReport tr = new TestReport("#1", "Test if a goal with AND success for plans work.");
 		
-		agent.waitForDelay(2000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setFailed("Goal did return");
-					agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				
-				agent.killAgent();
+				agent.killComponent();
 				return IFuture.DONE;
 			}
 		});
 		
-		Object res = agent.dispatchTopLevelGoal(new TestGoal()).get();
+		Object res = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal()).get();
 		System.out.println("Goal success: "+res);
 		tr.setSucceeded(true);
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-		agent.killAgent();
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.killComponent();
 	}
 }

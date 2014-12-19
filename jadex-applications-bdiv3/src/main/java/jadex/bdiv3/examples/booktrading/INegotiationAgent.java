@@ -1,8 +1,8 @@
 package jadex.bdiv3.examples.booktrading;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.examples.booktrading.common.NegotiationReport;
 import jadex.bdiv3.examples.booktrading.common.Order;
+import jadex.bridge.IInternalAccess;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +16,7 @@ public interface INegotiationAgent
 	 *  Get the agent.
 	 *  @return The agent.
 	 */
-	public BDIAgent getAgent();
+	public IInternalAccess getAgent();
 	
 	/**
 	 *  Create a purchase or sell oder.

@@ -10,6 +10,7 @@ import jadex.bdiv3.examples.marsworld.producer.IProduceService;
 import jadex.bdiv3.examples.marsworld.sentry.SentryBDI.AnalyzeTarget;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -90,7 +91,7 @@ public class AnalyzeTargetPlan
 
 		try
 		{
-			IFuture<Collection<IProduceService>> fut = sentry.getAgent().getServiceContainer().getRequiredServices("produceser");
+			IFuture<Collection<IProduceService>> fut = sentry.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("produceser");
 			Collection<IProduceService> ansers = fut.get();
 			
 			for(IProduceService anser: ansers)

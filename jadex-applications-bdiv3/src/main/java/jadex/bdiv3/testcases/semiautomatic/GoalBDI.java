@@ -1,16 +1,15 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.annotation.Goal.ExcludeMode;
-import jadex.bdiv3.model.MGoal;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.NameValue;
@@ -110,7 +109,7 @@ public class GoalBDI
 	
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The counter belief. */
 	@Belief

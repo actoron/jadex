@@ -1,6 +1,5 @@
 package jadex.bdiv3.tutorial.f3;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goals;
@@ -8,8 +7,10 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
@@ -44,7 +45,7 @@ public class UserBDI
 	//-------- attributes --------
 
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The gui. */
 	protected JFrame	f;
@@ -72,13 +73,13 @@ public class UserBDI
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						agent.scheduleStep(new IComponentStep<Void>()
+						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								try
 								{
-									final String gword = (String)agent.dispatchTopLevelGoal(new TranslationGoal(tfe.getText())).get();
+									final String gword = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TranslationGoal(tfe.getText())).get();
 									SwingUtilities.invokeLater(new Runnable()
 									{
 										public void run()
@@ -102,7 +103,7 @@ public class UserBDI
 							}
 						});
 						
-//						IFuture<String> fut = agent.dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
+//						IFuture<String> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
 //						fut.addResultListener(new IResultListener<String>()
 //						{
 //							public void resultAvailable(String res) 

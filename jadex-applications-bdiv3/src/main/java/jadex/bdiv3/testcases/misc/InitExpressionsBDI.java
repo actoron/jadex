@@ -1,18 +1,20 @@
 package jadex.bdiv3.testcases.misc;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  *  Test using injected values in init expressions or constructors.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class InitExpressionsBDI
 {
@@ -23,10 +25,10 @@ public class InitExpressionsBDI
 
 	/** The agent. */
 	@Agent
-	protected BDIAgent	agent;
+	protected IInternalAccess	agent;
 	
 	/** The agent name. */
-	protected String	name1	= agent.getAgentName();
+	protected String	name1	= agent.getComponentIdentifier().getName();
 	
 	/** The agent name. */
 	protected String	name2;
@@ -38,7 +40,7 @@ public class InitExpressionsBDI
 	 */
 	public InitExpressionsBDI()
 	{
-		this.name2	= agent.getAgentName();
+		this.name2	= agent.getComponentIdentifier().getName();
 	}
 	 
 	
@@ -47,29 +49,29 @@ public class InitExpressionsBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody//(keepalive=false)
 	public void	body()
 	{
 		TestReport	tr1	= new TestReport("#1", "Test if field expression works.");
-		if(agent.getAgentName().equals(name1))
+		if(agent.getComponentIdentifier().getName().equals(name1))
 		{			
 			tr1.setSucceeded(true);
 		}
 		else
 		{
-			tr1.setReason("Values do not match: "+agent.getAgentName()+", "+name1);
+			tr1.setReason("Values do not match: "+agent.getComponentIdentifier().getName()+", "+name1);
 		}
 		
 		TestReport	tr2	= new TestReport("#2", "Test if field expression works.");
-		if(agent.getAgentName().equals(name2))
+		if(agent.getComponentIdentifier().getName().equals(name2))
 		{			
 			tr2.setSucceeded(true);
 		}
 		else
 		{
-			tr2.setReason("Values do not match: "+agent.getAgentName()+", "+name2);
+			tr2.setReason("Values do not match: "+agent.getComponentIdentifier().getName()+", "+name2);
 		}
 
-		agent.setResultValue("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 	}
 }

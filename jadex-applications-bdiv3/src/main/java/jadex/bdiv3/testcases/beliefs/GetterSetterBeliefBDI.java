@@ -2,12 +2,13 @@ package jadex.bdiv3.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -24,7 +25,7 @@ public class GetterSetterBeliefBDI
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The number field. */
 	protected int number;
@@ -59,11 +60,11 @@ public class GetterSetterBeliefBDI
 	{
 		setNumber(22);
 		
-		agent.waitFor(3000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				agent.killAgent();
+				agent.killComponent();
 				return IFuture.DONE;
 			}
 		});
@@ -73,9 +74,9 @@ public class GetterSetterBeliefBDI
 	 *  Called when agent is killed.
 	 */
 	@AgentKilled
-	public void	destroy(BDIAgent agent)
+	public void	destroy(IInternalAccess agent)
 	{
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	/**
@@ -86,7 +87,7 @@ public class GetterSetterBeliefBDI
 	{
 		System.out.println("plan: "+getNumber());
 		tr.setSucceeded(true);
-		agent.killAgent();
+		agent.killComponent();
 	}
 	
 }

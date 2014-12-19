@@ -1,9 +1,10 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -23,7 +24,7 @@ public class CountBDI
 	
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The counter belief. */
 	@Belief
@@ -35,7 +36,7 @@ public class CountBDI
 	@AgentBody
 	public void body()
 	{
-		IFuture<CountGoal> fut = agent.dispatchTopLevelGoal(new CountGoal(10, 5));
+		IFuture<CountGoal> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new CountGoal(10, 5));
 		fut.addResultListener(new A());
 		
 //		agent.dispatchGoalAndWait(new CountGoal(10, 5))

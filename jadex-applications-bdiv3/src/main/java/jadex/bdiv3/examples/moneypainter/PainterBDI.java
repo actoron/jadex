@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.moneypainter;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
@@ -12,6 +11,7 @@ import jadex.bdiv3.annotation.Publish;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 
 /**
@@ -23,7 +23,7 @@ import jadex.micro.annotation.Agent;
 public class PainterBDI
 {
 	@Agent 
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Belief
 	protected Object painter;

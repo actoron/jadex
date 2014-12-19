@@ -1,11 +1,12 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalTargetCondition;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -22,7 +23,7 @@ public class ABDI extends AABDI
 //	}
 	
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Belief
 	protected int num2;
@@ -50,7 +51,7 @@ public class ABDI extends AABDI
 	@AgentBody
 	public IFuture<Void> body()
 	{
-		IFuture<Cnt1Goal> fut1 = agent.dispatchTopLevelGoal(new Cnt1Goal());
+		IFuture<Cnt1Goal> fut1 = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Cnt1Goal());
 		fut1.addResultListener(new IResultListener<ABDI.Cnt1Goal>()
 		{
 			public void resultAvailable(Cnt1Goal result)
@@ -64,7 +65,7 @@ public class ABDI extends AABDI
 			}
 		});
 		
-		IFuture<Cnt2Goal> fut2 = agent.dispatchTopLevelGoal(new Cnt2Goal());
+		IFuture<Cnt2Goal> fut2 = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Cnt2Goal());
 		fut2.addResultListener(new IResultListener<ABDI.Cnt2Goal>()
 		{
 			public void resultAvailable(Cnt2Goal result)
@@ -85,13 +86,13 @@ public class ABDI extends AABDI
 				incNum1();
 				incNum2();
 				
-				agent.waitForDelay(1000, this);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
 				
 				return IFuture.DONE;
 			}
 		};
 		
-		agent.waitForDelay(1000, step);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
 		
 		return new Future<Void>();
 	}

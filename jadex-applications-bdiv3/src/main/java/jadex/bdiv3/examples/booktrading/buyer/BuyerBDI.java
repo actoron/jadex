@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.booktrading.buyer;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalDropCondition;
@@ -15,10 +14,14 @@ import jadex.bdiv3.examples.booktrading.INegotiationGoal;
 import jadex.bdiv3.examples.booktrading.common.Gui;
 import jadex.bdiv3.examples.booktrading.common.NegotiationReport;
 import jadex.bdiv3.examples.booktrading.common.Order;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
@@ -56,7 +59,7 @@ import javax.swing.SwingUtilities;
 public class BuyerBDI implements INegotiationAgent
 {
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Belief
 	protected List<NegotiationReport> reports = new ArrayList<NegotiationReport>();
@@ -69,7 +72,7 @@ public class BuyerBDI implements INegotiationAgent
 	@AgentBody
 	public void body()
 	{
-		Order[] ios = (Order[])agent.getArgument("initial_orders");
+		Order[] ios = (Order[])agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("initial_orders");
 		if(ios!=null)
 		{
 			for(Order o: ios)
@@ -150,7 +153,7 @@ public class BuyerBDI implements INegotiationAgent
 	{
 //		System.out.println("getOrders belief called");
 		List<Order> ret = new ArrayList<Order>();
-		Collection<PurchaseBook> goals = agent.getGoals(PurchaseBook.class);
+		Collection<PurchaseBook> goals = agent.getComponentFeature(IBDIAgentFeature.class).getGoals(PurchaseBook.class);
 		for(PurchaseBook goal: goals)
 		{
 			ret.add(goal.getOrder());
@@ -163,7 +166,7 @@ public class BuyerBDI implements INegotiationAgent
 	 */
 	protected long getTime()
 	{
-		IClockService cs = (IClockService)agent.getServiceContainer().getRequiredService("clockser").get();
+		IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser").get();
 		return cs.getTime();
 	}
 	
@@ -181,7 +184,7 @@ public class BuyerBDI implements INegotiationAgent
 			+ order.getStartPrice();
 
 		// Find available seller agents.
-		IBuyBookService[]	services = agent.getServiceContainer().getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
+		IBuyBookService[]	services = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
 		if(services.length == 0)
 		{
 //			System.out.println("No seller found, purchase failed.");
@@ -268,7 +271,7 @@ public class BuyerBDI implements INegotiationAgent
 	 *  Get the agent.
 	 *  @return The agent.
 	 */
-	public BDIAgent getAgent()
+	public IInternalAccess getAgent()
 	{
 		return agent;
 	}
@@ -279,7 +282,7 @@ public class BuyerBDI implements INegotiationAgent
 	public void createGoal(Order order)
 	{
 		PurchaseBook goal = new PurchaseBook(order);
-		agent.dispatchTopLevelGoal(goal);
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
 	}
 	
 	/**
@@ -287,7 +290,7 @@ public class BuyerBDI implements INegotiationAgent
 	 */
 	public Collection<INegotiationGoal> getGoals()
 	{
-		return (Collection)agent.getGoals(PurchaseBook.class);
+		return (Collection)agent.getComponentFeature(IBDIAgentFeature.class).getGoals(PurchaseBook.class);
 	}
 	
 	/**

@@ -2,11 +2,14 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.testcases.misc.TestCapability.TestGoal;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -15,13 +18,13 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if plans within a capability get executed on goal dispatch.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalsWithCapabilityBDI
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent	agent;
+	protected IInternalAccess	agent;
 	
 	@Capability
 	protected TestCapability testcap = new TestCapability();
@@ -29,13 +32,13 @@ public class GoalsWithCapabilityBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody(keepalive=false)
-	public void	body(final BDIAgent agent)
+	@AgentBody//(keepalive=false)
+	public void	body(final IInternalAccess agent)
 	{
 		final TestReport tr	= new TestReport("#1", "Test if capability goals work.");
 		
 		TestGoal goal = testcap.new TestGoal();
-		agent.dispatchTopLevelGoal(goal).get(3000);
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal).get(3000);
 		
 		if(goal.getCnt()==2)
 		{
@@ -46,7 +49,7 @@ public class GoalsWithCapabilityBDI
 			tr.setReason("Wrong number of plans executed: "+goal.getCnt());
 		}
 		
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	/**

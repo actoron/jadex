@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.puzzle;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
@@ -12,7 +11,9 @@ import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
@@ -60,8 +61,8 @@ public class BlockingSokratesBDI
 	/**
 	 *  Setup the gui and start playing.
 	 */
-	@AgentBody(keepalive=false)
-	public void	body(BDIAgent agent)
+	@AgentBody//(keepalive=false)
+	public void	body(IInternalAccess agent)
 	{
 		strategy = agent.getConfiguration();
 		createGui(agent);
@@ -71,7 +72,7 @@ public class BlockingSokratesBDI
 			System.out.println("Now puzzling:");
 			final long	start	= System.currentTimeMillis();
 			
-			agent.dispatchTopLevelGoal(new MoveGoal()).get();
+			agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MoveGoal()).get();
 			
 			long end = System.currentTimeMillis();
 			System.out.println("Needed: "+(end-start)+" millis.");
@@ -85,7 +86,7 @@ public class BlockingSokratesBDI
 	/**
 	 *  Create the GUI (if any).
 	 */
-	protected void	createGui(final BDIAgent agent)
+	protected void	createGui(final IInternalAccess agent)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{

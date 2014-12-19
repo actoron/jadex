@@ -1,10 +1,12 @@
 package jadex.bdiv3.examples.shop;
 
 import jadex.bdiv3.examples.shop.CustomerCapability.BuyItem;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -111,12 +113,12 @@ public class CustomerPanel extends JPanel
 						Future<Collection<IShopService>> ret = new Future<Collection<IShopService>>();
 						if(remote.isSelected())
 						{
-							IFuture<Collection<IShopService>> fut = capa.getServiceContainer().getRequiredServices("remoteshopservices");
+							IFuture<Collection<IShopService>> fut = capa.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("remoteshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						else
 						{
-							IFuture<Collection<IShopService>> fut = capa.getServiceContainer().getRequiredServices("localshopservices");
+							IFuture<Collection<IShopService>> fut = capa.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("localshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						return ret;
@@ -315,7 +317,7 @@ public class CustomerPanel extends JPanel
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							BuyItem	big	= new BuyItem(name, shop, price.doubleValue());
-							IFuture<BuyItem>	ret	= capa.getAgent().dispatchTopLevelGoal(big);
+							IFuture<BuyItem>	ret	= capa.getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(big);
 							ret.addResultListener(new SwingResultListener<BuyItem>(new IResultListener<BuyItem>()
 							{
 								public void resultAvailable(BuyItem result)
@@ -381,7 +383,7 @@ public class CustomerPanel extends JPanel
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				agent.killAgent();
+				agent.killComponent();
 			}
 		});
 		agent.addAgentListener(new IAgentListener() 

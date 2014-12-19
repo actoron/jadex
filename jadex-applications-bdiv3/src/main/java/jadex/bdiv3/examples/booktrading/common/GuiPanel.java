@@ -2,13 +2,12 @@ package jadex.bdiv3.examples.booktrading.common;
 
 import jadex.bdiv3.examples.booktrading.INegotiationAgent;
 import jadex.bdiv3.examples.booktrading.INegotiationGoal;
-import jadex.bdiv3.examples.booktrading.buyer.BuyerBDI.PurchaseBook;
-import jadex.bdiv3.examples.booktrading.seller.SellerBDI.SellBook;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IBeliefListener;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -267,7 +266,7 @@ public class GuiPanel extends JPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INegotiationAgent ag = (INegotiationAgent)((IPojoMicroAgent)ia).getPojoAgent();
-				ag.getAgent().addBeliefListener("orders", new IBeliefListener<Object>()
+				ag.getAgent().getComponentFeature(IBDIAgentFeature.class).addBeliefListener("orders", new IBeliefListener<Object>()
 				{
 					public void factRemoved(ChangeInfo<Object> info)
 					{
@@ -319,7 +318,7 @@ public class GuiPanel extends JPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INegotiationAgent ag = (INegotiationAgent)((IPojoMicroAgent)ia).getPojoAgent();
-				ag.getAgent().addBeliefListener("reports", new IBeliefListener<Object>()
+				ag.getAgent().getComponentFeature(IBDIAgentFeature.class).addBeliefListener("reports", new IBeliefListener<Object>()
 				{
 					public void factRemoved(ChangeInfo<Object> info)
 					{
@@ -382,7 +381,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -414,7 +413,7 @@ public class GuiPanel extends JPanel
 	//										{
 	//											IEAGoal purchase = (IEAGoal)result;
 	//											purchase.setParameterValue("order", order);
-	//											agent.dispatchTopLevelGoal(purchase);
+	//											agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(purchase);
 	//										}
 	//									});
 										orders.add(order);
@@ -474,7 +473,7 @@ public class GuiPanel extends JPanel
 								if(order.equals(or))
 								{
 									or.setState(Order.FAILED);
-									ag.getAgent().dropGoal(g);
+									ag.getAgent().getComponentFeature(IBDIAgentFeature.class).dropGoal(g);
 									break;
 								}
 							}
@@ -518,7 +517,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -560,7 +559,7 @@ public class GuiPanel extends JPanel
 													{
 														if(goal.getOrder().equals(order))
 														{
-															ag.getAgent().dropGoal(goal);
+															ag.getAgent().getComponentFeature(IBDIAgentFeature.class).dropGoal(goal);
 														}
 													}
 													
@@ -582,7 +581,7 @@ public class GuiPanel extends JPanel
 	//											{
 	//												IEAGoal goal = (IEAGoal)result;
 	//												goal.setParameterValue("order", order);
-	//												agent.dispatchTopLevelGoal(goal);
+	//												agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
 	//											}
 	//										});
 											break;
@@ -793,7 +792,7 @@ public class GuiPanel extends JPanel
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
 						.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 					{
 						public void resultAvailable(IClockService clock)

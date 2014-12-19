@@ -38,10 +38,10 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 		if(bdif.isInited() && bdif.getRuleSystem()!=null)
 			bdif.getRuleSystem().processAllEvents();
 		
-//		if(steps!=null && steps.size()>0)
-//		{
-//			System.out.println(getComponentIdentifier()+" steps: "+steps.size()+" "+steps.get(0).getStep().getClass());
-//		}
+		if(steps!=null && steps.size()>0)
+		{
+			System.out.println(getComponent().getComponentIdentifier()+" steps: "+steps.size()+" "+steps.get(0));
+		}
 		boolean ret = super.execute();
 		
 //		System.out.println(getComponentIdentifier()+" after step");

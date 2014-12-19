@@ -1,7 +1,6 @@
 package jadex.bdiv3.testcases.beliefs;
 
 import jadex.base.test.TestReport;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
@@ -10,6 +9,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 
@@ -92,7 +92,7 @@ public class AbstractBeliefsCapability
 	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 	
 	@Agent
-	protected BDIAgent	agent;
+	protected IInternalAccess	agent;
 	
 	public AbstractBeliefsCapability()
 	{
@@ -109,7 +109,7 @@ public class AbstractBeliefsCapability
 		results.put("array", new TestReport("#10", "Test abstract array belief."));
 		
 		// todo: agentCreated
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -124,7 +124,7 @@ public class AbstractBeliefsCapability
 				setString("hello");
 				setArray(new String[]{"hello", "world"});
 				
-				agent.waitForDelay(300, new IComponentStep<Void>()
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(300, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -135,7 +135,7 @@ public class AbstractBeliefsCapability
 								tr.setFailed("Plan was not triggered.");
 							}
 						}
-						agent.killAgent();
+						agent.killComponent();
 						return IFuture.DONE;
 					}
 				});

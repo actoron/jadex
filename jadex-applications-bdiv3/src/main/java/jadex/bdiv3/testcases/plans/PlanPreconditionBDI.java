@@ -2,13 +2,15 @@ package jadex.bdiv3.testcases.plans;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -22,7 +24,7 @@ public class PlanPreconditionBDI
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 
 	protected String res = "";
 	
@@ -38,7 +40,7 @@ public class PlanPreconditionBDI
 	public void body()
 	{
 		TestReport tr = new TestReport("#1", "Test if plan precondition works.");
-		agent.dispatchTopLevelGoal(new SomeGoal()).get();
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new SomeGoal()).get();
 		if("ABD".equals(res))
 		{
 			tr.setSucceeded(true);
@@ -47,8 +49,8 @@ public class PlanPreconditionBDI
 		{
 			tr.setFailed("Wrong plans executed: "+res);
 		}
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-		agent.killAgent();
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.killComponent();
 	}
 	
 	@Plan(trigger=@Trigger(goals=SomeGoal.class))

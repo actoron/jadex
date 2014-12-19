@@ -1,6 +1,5 @@
 package jadex.bdiv3.tutorial.d6;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goal.ExcludeMode;
@@ -8,8 +7,10 @@ import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -27,7 +28,7 @@ public class TranslationBDI
 {
 	/** The injected agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The map of words. */
 	@Belief
@@ -75,7 +76,7 @@ public class TranslationBDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchTopLevelGoal(new MaintainStorageGoal());
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MaintainStorageGoal());
 
 		egwords.put("milk", "Milch");
 		egwords.put("cow", "Kuh");
@@ -91,12 +92,12 @@ public class TranslationBDI
 //				System.out.println("added: "+rand);
 				System.out.println("egwords: "+egwords);
 //				context = false;
-				agent.waitFor(2000, this);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, this);
 				return IFuture.DONE;
 			}
 		};
 		
-		agent.waitFor(2000, step);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, step);
 		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{

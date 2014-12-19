@@ -1,6 +1,7 @@
 package jadex.bdiv3.examples.blocksworld;
 
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ConfigureGoal;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -232,7 +233,7 @@ public class BlocksworldGui	extends JFrame
 										
 										Set<Block> bls = SUtil.arrayToSet(newtable.getAllBlocks());
 										ConfigureGoal conf = pag.new ConfigureGoal(newtable, bls);
-										pag.getAgent().dispatchTopLevelGoal(conf);
+										pag.getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(conf);
 //										IGoal achieve = bia.getGoalbase().createGoal("configure");
 //										achieve.getParameter("configuration").setValue(newtable);
 //										// Hack!!! Blocks must be in state directly.

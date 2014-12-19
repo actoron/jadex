@@ -1,6 +1,5 @@
 package jadex.bdiv3.tutorial.f3.old;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goals;
@@ -8,7 +7,9 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.tutorial.f3.TranslationGoal;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -44,7 +45,7 @@ public class UserBDI
 	//-------- attributes --------
 
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The gui. */
 	protected JFrame	f;
@@ -77,7 +78,7 @@ public class UserBDI
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						IFuture<String> fut = agent.dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
+						IFuture<String> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
 						fut.addResultListener(new IResultListener<String>()
 						{
 							public void resultAvailable(String res) 

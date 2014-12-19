@@ -1,16 +1,17 @@
 package jadex.bdiv3.tutorial.b2;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  The translation agent B2.
@@ -22,9 +23,13 @@ import jadex.micro.annotation.Description;
 @Plans(@Plan(body=@Body(TranslationBDI.TranslationPlan.class)))
 public class TranslationBDI
 {
-	/** The agent. */
-	@Agent
-	protected BDIAgent agent;
+//	/** The agent. */
+//	@Agent
+//	protected BDIAgent agent;
+	
+	/** The bdi api. */
+	@AgentFeature
+	protected IBDIAgentFeature bdi;
 	
 	/**
 	 *  The agent body.
@@ -32,7 +37,7 @@ public class TranslationBDI
 	@AgentBody
 	public void body()
 	{
-		agent.adoptPlan(new TranslationPlan());
+		bdi.adoptPlan(new TranslationPlan());
 	}
 	
 	/**

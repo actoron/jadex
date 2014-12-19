@@ -1,6 +1,7 @@
 package jadex.bdiv3.examples.shop;
 
 import jadex.bdiv3.examples.shop.ShopCapa.SellGoal;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -53,7 +54,7 @@ public class ShopService implements IShopService
 	{
 		ShopCapa shop = (ShopCapa)capa.getPojoCapability();
 		SellGoal sell = shop.new SellGoal(item, price);
-		return capa.getAgent().dispatchTopLevelGoal(sell);
+		return capa.getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(sell);
 	}
 	
 	/**

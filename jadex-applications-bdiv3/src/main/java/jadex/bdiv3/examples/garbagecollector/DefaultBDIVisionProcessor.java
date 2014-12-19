@@ -1,8 +1,7 @@
 package jadex.bdiv3.examples.garbagecollector;
 
-import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -96,7 +95,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		if(invoke)
 		{
 			// HACK!!! todo
-			SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(space.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener<IComponentManagementService>()
 			{
 				public void resultAvailable(IComponentManagementService cms)
@@ -135,9 +134,9 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("add")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= bai.getBDIModel().getCapability().getBelief(name);
-											Collection<?>	facts	= (Collection<?>)mbel.getValue(bai);
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+											Collection<?>	facts	= (Collection<?>)mbel.getValue(ia);
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
 											
@@ -157,9 +156,9 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("remove")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= bai.getBDIModel().getCapability().getBelief(name);
-											Collection<?>	facts	= (Collection<?>)mbel.getValue(bai);
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+											Collection<?>	facts	= (Collection<?>)mbel.getValue(ia);
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
 											
@@ -179,15 +178,15 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("set")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= bai.getBDIModel().getCapability().getBelief(name);
-											Object	fact	= mbel.getValue(bai);
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+											Object	fact	= mbel.getValue(ia);
 											if(cond!=null)
 												fetcher.setValue("$fact", fact);
 											
 											if(cond==null || evaluate(cond, fetcher))
 											{
-												mbel.setValue(bai, percept);
+												mbel.setValue(ia, percept);
 //												System.out.println(agent.getName()+": set "+percept+" on: "+name);
 											}
 											return IFuture.DONE;
@@ -201,15 +200,15 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("unset")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= bai.getBDIModel().getCapability().getBelief(name);
-											Object	fact	= mbel.getValue(bai);
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+											Object	fact	= mbel.getValue(ia);
 											if(cond!=null)
 												fetcher.setValue("$fact", fact);
 											
 											if(cond==null || evaluate(cond, fetcher))
 											{
-												mbel.setValue(bai, null);
+												mbel.setValue(ia, null);
 //												System.out.println(agent.getName()+": unset "+percept+" on: "+name);
 											}
 											return IFuture.DONE;
@@ -223,9 +222,9 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("removeoutdated")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= bai.getBDIModel().getCapability().getBelief(name);
-											Collection<?>	facts	= (Collection<?>)mbel.getValue(bai);
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+											Collection<?>	facts	= (Collection<?>)mbel.getValue(ia);
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
 											

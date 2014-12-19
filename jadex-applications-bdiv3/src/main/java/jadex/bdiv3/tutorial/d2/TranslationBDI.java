@@ -1,16 +1,17 @@
 package jadex.bdiv3.tutorial.d2;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bridge.service.annotation.Service;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
 
 import java.util.HashMap;
@@ -27,7 +28,11 @@ public class TranslationBDI
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
+	
+	/** The bdi api. */
+	@AgentFeature
+	protected IBDIAgentFeature bdi;
 	
 	/** The current time. */
 	@Belief
@@ -75,7 +80,7 @@ public class TranslationBDI
 	public void body()
 	{
 		String eword = "cat";
-		String gword = (String)agent.dispatchTopLevelGoal(new Translate(eword)).get();
+		String gword = (String)bdi.dispatchTopLevelGoal(new Translate(eword)).get();
 		System.out.println("Translated: "+eword+" "+gword);
 	}
 	

@@ -11,6 +11,7 @@ import jadex.bdiv3.examples.marsworld.movement.MovementCapability.Move;
 import jadex.bdiv3.examples.marsworld.producer.ProducerBDI.ProduceOre;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -82,7 +83,7 @@ public class ProduceOrePlan
 
 		try
 		{
-			IFuture<Collection<ICarryService>> fut = producer.getAgent().getServiceContainer().getRequiredServices("carryser");
+			IFuture<Collection<ICarryService>> fut = producer.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("carryser");
 			Collection<ICarryService> ansers = fut.get();
 			
 			for(ICarryService anser: ansers)

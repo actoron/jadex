@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.blocksworld;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
@@ -8,6 +7,8 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -73,7 +74,7 @@ public class BlocksworldBDI
 	
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Goal
 	public class ClearGoal
@@ -238,17 +239,17 @@ public class BlocksworldBDI
 		else if("benchmark(runs=10/goals=10)".equals(agent.getConfiguration()))
 		{
 			quiet = true;
-			agent.adoptPlan(new BenchmarkPlan(10, 10));
+			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan(new BenchmarkPlan(10, 10));
 		}
 		else if("benchmark(runs=10/goals=50)".equals(agent.getConfiguration()))
 		{
 			quiet = true;
-			agent.adoptPlan(new BenchmarkPlan(10, 50));
+			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan(new BenchmarkPlan(10, 50));
 		}
 		else if("benchmark(runs=10/goals=500)".equals(agent.getConfiguration()))
 		{
 			quiet = true;
-			agent.adoptPlan(new BenchmarkPlan(10, 500));
+			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan(new BenchmarkPlan(10, 500));
 		}
 	}
 	
@@ -310,7 +311,7 @@ public class BlocksworldBDI
 	 *  Get the agent.
 	 *  @return The agent.
 	 */
-	public BDIAgent getAgent()
+	public IInternalAccess getAgent()
 	{
 		return agent;
 	}

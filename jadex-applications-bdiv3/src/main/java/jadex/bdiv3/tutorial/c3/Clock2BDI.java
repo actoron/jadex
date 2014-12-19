@@ -1,9 +1,10 @@
 package jadex.bdiv3.tutorial.c3;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
@@ -25,7 +26,7 @@ public class Clock2BDI
 
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  The agent body.
@@ -37,7 +38,7 @@ public class Clock2BDI
 		
 	    for(int i=0; i<5; i++) 
 	    {
-	    	agent.waitForDelay(1000).get();
+	    	agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
 	        setTime(System.currentTimeMillis());
 	    }
 	}

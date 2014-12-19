@@ -2,12 +2,15 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -16,7 +19,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test using injected values in init expressions or constructors.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class PlanParameterMappingBDI
 {
@@ -24,7 +27,7 @@ public class PlanParameterMappingBDI
 	
 	/** The agent. */
 	@Agent
-	protected BDIAgent	agent;
+	protected IInternalAccess	agent;
 
 	@Goal
 	public class AGoal
@@ -74,10 +77,10 @@ public class PlanParameterMappingBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody//(keepalive=false)
 	public void	body()
 	{
-		String res = (String)agent.dispatchTopLevelGoal(new AGoal("hello")).get();
+		String res = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AGoal("hello")).get();
 		System.out.println("res: "+res);
 		
 		TestReport tr = new TestReport("#1", "Test if goal plan parameter mappings work.");
@@ -89,6 +92,6 @@ public class PlanParameterMappingBDI
 		{
 			tr.setReason("Wrong mapping, "+res);
 		}
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

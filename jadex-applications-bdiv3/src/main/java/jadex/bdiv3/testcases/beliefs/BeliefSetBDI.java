@@ -2,7 +2,6 @@ package jadex.bdiv3.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -10,6 +9,8 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -28,7 +29,7 @@ import java.util.Set;
 public class BeliefSetBDI
 {
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Belief
 	protected Set<String> names = new HashSet<String>();
@@ -48,11 +49,11 @@ public class BeliefSetBDI
 		names.add("a");
 		names.remove("a");
 		
-		agent.waitFor(3000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				agent.killAgent();
+				agent.killComponent();
 				return IFuture.DONE;
 			}
 		});
@@ -62,14 +63,14 @@ public class BeliefSetBDI
 	 *  Called when agent is killed.
 	 */
 	@AgentKilled
-	public void	destroy(BDIAgent agent)
+	public void	destroy(IInternalAccess agent)
 	{
 		for(TestReport ter: tr)
 		{
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.setResultValue("testresults", new Testcase(2, tr));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, tr));
 	}
 	
 	// todo: plan creation condition?!
@@ -85,6 +86,6 @@ public class BeliefSetBDI
 	{
 		System.out.println("fact removed: "+event.getValue()+" "+event.getSource()+" "+rplan);
 		tr[1].setSucceeded(true);
-		agent.killAgent();
+		agent.killComponent();
 	}
 }

@@ -493,7 +493,7 @@ public class EnvironmentGui	extends JFrame
 //											IComponentIdentifier aid = ((IAMS)agent.getPlatform().getService(IAMS.class))
 //												.createAgentIdentifier(cleaners[i].getName(), true);
 //											kill.getParameter("componentidentifier").setValue(aid);
-//											agent.dispatchTopLevelGoalAndWait(kill);
+//											agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoalAndWait(kill);
 //										}
 ////										catch(GoalFailureException gfe) {}
 //										catch(Exception ex) 
@@ -503,7 +503,7 @@ public class EnvironmentGui	extends JFrame
 //											//ex.printStackTrace();
 //										}
 //									}
-//									agent.killAgent();
+//									agent.killComponent();
 //								}
 							}
 						});

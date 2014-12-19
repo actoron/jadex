@@ -3,9 +3,8 @@ package jadex.bdiv3.examples.alarmclock;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingResultListener;
@@ -23,6 +22,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -87,7 +88,7 @@ public class AlarmsGui extends JFrame
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-				IFuture<IClockService>	fut	= ia.getServiceContainer().getRequiredService("clockservice");
+				IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
 				fut.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService cs)
@@ -102,7 +103,7 @@ public class AlarmsGui extends JFrame
 								if(!isRowSelected(row))
 								{
 									Alarm alarm = (Alarm)tadata.getObjectForRow(row);
-	//								IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
+	//								IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getService(IClockService.class);
 									if(alarm.getAlarmtime(cs.getTime())<cs.getTime())
 									{
 										c.setBackground(new Color(255, 211, 156));

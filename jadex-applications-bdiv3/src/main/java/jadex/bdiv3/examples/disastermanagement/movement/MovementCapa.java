@@ -113,7 +113,7 @@ public class MovementCapa implements IEnvAccess
 //	protected long getTime()
 //	{
 //		// todo:
-//		IClockService cs =  (IClockService)capa.getServiceContainer().getRequiredService("clockser").get();
+//		IClockService cs =  (IClockService)capa.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser").get();
 //		return cs.getTime();
 //	}
 	

@@ -1,11 +1,12 @@
 package jadex.bdiv3.tutorial.b1;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
 
 /**
@@ -19,8 +20,13 @@ import jadex.micro.annotation.Description;
 public class TranslationBDI
 {
 	/** The agent. */
-	@Agent
-	protected BDIAgent agent;
+//	@Agent
+//	protected IInternalAccess agent;
+	
+	/** The bdi api. */
+	@AgentFeature
+	protected IBDIAgentFeature bdi;
+
 	
 	/**
 	 *  The agent body.
@@ -28,7 +34,7 @@ public class TranslationBDI
 	@AgentBody
 	public void body()
 	{
-		agent.adoptPlan(new TranslationPlan());
+		bdi.adoptPlan(new TranslationPlan());
 	}
 }
 

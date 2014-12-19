@@ -7,6 +7,7 @@ import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.examples.cleanerworld.world.MapPoint;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
@@ -231,7 +232,7 @@ class CleanerPanel extends JPanel
 			drawdata.my_chargestate = cleaner.getMyChargestate();
 			drawdata.my_location = cleaner.getMyLocation();
 			drawdata.my_waste = cleaner.getCarriedWaste()!=null;
-			Collection<CleanerBDI.AchieveMoveTo> goals = cleaner.getAgent().getGoals(CleanerBDI.AchieveMoveTo.class);
+			Collection<CleanerBDI.AchieveMoveTo> goals = cleaner.getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(CleanerBDI.AchieveMoveTo.class);
 			drawdata.dests = new Location[goals.size()];
 			Iterator<CleanerBDI.AchieveMoveTo>	goalit	= goals.iterator();
 			for(int i=0; i<goals.size(); i++)

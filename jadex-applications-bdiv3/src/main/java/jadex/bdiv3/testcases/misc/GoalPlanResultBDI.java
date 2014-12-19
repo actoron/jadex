@@ -2,11 +2,15 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -16,13 +20,13 @@ import jadex.micro.annotation.Results;
  *  Agent that has a plan that return a value form the body.
  *  The value is then used as result value of the goal when the goal uses the @GoalResult.
  */
-@Agent
+@Agent(keepalive=Boolean3.TRUE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalPlanResultBDI
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Goal
 	public class AGoal
@@ -60,10 +64,10 @@ public class GoalPlanResultBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody//(keepalive=false)
 	public void body()
 	{
-		String res1 = (String)agent.dispatchTopLevelGoal(new AGoal()).get();
+		String res1 = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AGoal()).get();
 		TestReport	tr1	= new TestReport("#1", "Test if goal result set/get works with field.");
 		if("result".equals(res1))
 		{			
@@ -73,7 +77,7 @@ public class GoalPlanResultBDI
 		{
 			tr1.setReason("Result not received "+res1);
 		}
-		String res2 = (String)agent.dispatchTopLevelGoal(new BGoal()).get();
+		String res2 = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BGoal()).get();
 		
 		
 		TestReport	tr2	= new TestReport("#1", "Test if goal result set/get works with method.");
@@ -87,7 +91,7 @@ public class GoalPlanResultBDI
 		}
 		
 		System.out.println(res1+" "+res2);
-		agent.setResultValue("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 	}
 	
 	/**

@@ -1,20 +1,15 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3.runtime.impl.PlanFailureException;
-import jadex.commons.future.Future;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Imports;
-import jadex.micro.annotation.NameValue;
-import jadex.micro.annotation.Properties;
 import jadex.rules.eca.annotations.Event;
 
 /**
@@ -30,7 +25,7 @@ public class HelloWorld3BDI
 {
 	/** The bdi agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The text that is printed. */
 	@Belief
@@ -104,7 +99,7 @@ public class HelloWorld3BDI
 	protected IFuture<Void> printHello2(HelloGoal goal)
 	{
 		System.out.println("Plan body: "+goal.getText());
-		agent.killAgent();
+		agent.killComponent();
 		return IFuture.DONE;
 	}
 }

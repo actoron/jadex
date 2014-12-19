@@ -1,6 +1,5 @@
 package jadex.bdiv3.tutorial.d4;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
@@ -8,6 +7,7 @@ import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -31,7 +31,7 @@ public class TranslationBDI
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The current time. */
 	@Belief

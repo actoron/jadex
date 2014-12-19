@@ -830,12 +830,12 @@ public class MicroClassReader
 
 				if(isAnnotationPresent(methods[i], AgentCreated.class, cl))
 				{
-					checkMethodReturnType(AgentCreated.class, methods[i]);
+					checkMethodReturnType(AgentCreated.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentCreated.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentBody.class, cl))
 				{
-					checkMethodReturnType(AgentBody.class, methods[i]);
+					checkMethodReturnType(AgentBody.class, methods[i], cl);
 					
 					// Set default keepalive to false, when not plain void body (i.e., future return value).
 					boolean	isvoid	= methods[i].getReturnType().equals(void.class);
@@ -858,7 +858,7 @@ public class MicroClassReader
 				}
 				if(isAnnotationPresent(methods[i], AgentKilled.class, cl))
 				{
-					checkMethodReturnType(AgentKilled.class, methods[i]);
+					checkMethodReturnType(AgentKilled.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentKilled.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentBreakpoint.class, cl))
@@ -868,12 +868,12 @@ public class MicroClassReader
 				}
 				if(isAnnotationPresent(methods[i], AgentStreamArrived.class, cl))
 				{
-					checkMethodReturnType(AgentStreamArrived.class, methods[i]);
+					checkMethodReturnType(AgentStreamArrived.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentStreamArrived.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentMessageArrived.class, cl))
 				{
-					checkMethodReturnType(AgentMessageArrived.class, methods[i]);
+					checkMethodReturnType(AgentMessageArrived.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentMessageArrived.class, new MethodInfo(methods[i]));
 				}
 			}
@@ -958,11 +958,11 @@ public class MicroClassReader
 	/**
 	 *  Check, if the return type of the agent method is acceptable.
 	 */
-	protected void checkMethodReturnType(Class<? extends Annotation> ann, Method m)
+	protected void checkMethodReturnType(Class<? extends Annotation> ann, Method m, ClassLoader cl)
 	{
 		// Todo: allow other return types than void 
 		boolean	isvoid	= m.getReturnType().equals(void.class);
-		boolean isfuture	= !isvoid && SReflect.isSupertype(IFuture.class, m.getReturnType());
+		boolean isfuture	= !isvoid && SReflect.isSupertype(getClass(IFuture.class, cl), m.getReturnType());
 		if(isfuture)
 		{
 			Type	t	= m.getGenericReturnType();

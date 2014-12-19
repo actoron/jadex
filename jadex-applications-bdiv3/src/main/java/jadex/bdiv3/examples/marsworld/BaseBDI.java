@@ -1,8 +1,9 @@
 package jadex.bdiv3.examples.marsworld;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
@@ -13,7 +14,7 @@ import jadex.micro.annotation.AgentBody;
 public abstract class BaseBDI 
 {
 	@Agent 
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The customer capability. */
 	@Capability
@@ -34,14 +35,14 @@ public abstract class BaseBDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchTopLevelGoal(movecapa.new WalkAround());
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(movecapa.new WalkAround());
 	}
 
 	/**
 	 *  Get the agent.
 	 *  @return The agent.
 	 */
-	public BDIAgent getAgent()
+	public IInternalAccess getAgent()
 	{
 		return agent;
 	}

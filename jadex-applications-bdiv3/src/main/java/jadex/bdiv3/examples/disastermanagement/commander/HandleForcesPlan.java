@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.SendRescueForce;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -44,7 +45,7 @@ public abstract class HandleForcesPlan
 		while(true)
 		{
 			final ISpaceObject disaster = goal.getDisaster();
-			IIntermediateFuture<IService> fut = capa.getAgent().getRequiredServices(servicename);
+			IIntermediateFuture<IService> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(servicename);
 			Collection<IService> forces = (Collection<IService>)fut.get();
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			

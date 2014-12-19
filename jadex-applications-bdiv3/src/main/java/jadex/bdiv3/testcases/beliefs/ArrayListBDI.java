@@ -1,12 +1,13 @@
 package jadex.bdiv3.testcases.beliefs;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public class ArrayListBDI 
 {
     @Agent
-    BDIAgent agent;
+    IInternalAccess agent;
 
     @Belief
     List<int[]> testArrayList = new ArrayList<int[]>();
@@ -27,7 +28,7 @@ public class ArrayListBDI
     public void body()
     {
         System.out.println("BDI Agent started");
-        agent.dispatchTopLevelGoal(new TestGoal());
+        agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal());
     }
 
     @Goal

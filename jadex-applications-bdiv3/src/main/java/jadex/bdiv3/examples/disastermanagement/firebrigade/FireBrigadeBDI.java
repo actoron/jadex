@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.disastermanagement.firebrigade;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Deliberation;
@@ -21,9 +20,11 @@ import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
 import jadex.bdiv3.examples.disastermanagement.movement.IEnvAccess;
 import jadex.bdiv3.examples.disastermanagement.movement.MoveToLocationPlan;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
@@ -58,7 +59,7 @@ public class FireBrigadeBDI implements IEnvAccess
 	
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 
@@ -68,7 +69,7 @@ public class FireBrigadeBDI implements IEnvAccess
 	{
 		if("default".equals(agent.getConfiguration()))
 		{
-			agent.adoptPlan(new FireBrigadePlan());
+			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan(new FireBrigadePlan());
 		}
 	}
 	
@@ -98,7 +99,7 @@ public class FireBrigadeBDI implements IEnvAccess
 			MovementCapa capa = ag.getMoveCapa();
 //			System.out.println("check create go home: "+capa.getCapability().getAgent().getGoals().size()+" "+capa.getCapability().getAgent().getAgentName());
 			
-			if(capa.getCapability().getAgent().getGoals().size()==0 && capa.getHomePosition()!=null && capa.getPosition()!=null
+			if(capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals().size()==0 && capa.getHomePosition()!=null && capa.getPosition()!=null
 				&& capa.getEnvironment().getDistance(capa.getHomePosition(), capa.getPosition()).getAsDouble()>0.001)
 			{
 				return new GoHome(capa.getHomePosition());
@@ -116,7 +117,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		public boolean checkDrop(FireBrigadeBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
-			boolean ret = capa.getCapability().getAgent().getGoals().size()>1;
+			boolean ret = capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals().size()>1;
 //			System.out.println("check drop fire brigade: "+this+" "+capa.getCapability().getAgent().getGoals());
 			return ret;
 		}
@@ -167,7 +168,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
-				capa.getCapability().getAgent().getGoals(TreatVictims.class).size()>1;
+				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(TreatVictims.class).size()>1;
 //			if(ret)
 //				System.out.println("dropping ext fire: "+disaster);
 			return ret;
@@ -219,7 +220,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
-				capa.getCapability().getAgent().getGoals(TreatVictims.class).size()>1;
+				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(TreatVictims.class).size()>1;
 //			if(ret)
 //				System.out.println("dropping clear chemicals: "+disaster);
 			return ret;
@@ -248,7 +249,7 @@ public class FireBrigadeBDI implements IEnvAccess
 	 *  Get the agent.
 	 *  @return The agent.
 	 */
-	public BDIAgent getAgent()
+	public IInternalAccess getAgent()
 	{
 		return agent;
 	}

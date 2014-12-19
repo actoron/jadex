@@ -1,11 +1,12 @@
 package jadex.bdiv3.quickstart;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 
@@ -61,8 +62,8 @@ public class QuickstartBDI
 	 *  On startup, the agent should adopt an instance of the goal.
 	 */
 	@AgentCreated
-	public void start(BDIAgent self)
+	public void start(IInternalAccess self)
 	{
-		self.dispatchTopLevelGoal(new InUpperLeftCorner());
+		self.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new InUpperLeftCorner());
 	}
 }

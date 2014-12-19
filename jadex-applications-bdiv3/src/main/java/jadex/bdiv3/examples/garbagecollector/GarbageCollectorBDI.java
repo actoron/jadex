@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
@@ -136,7 +137,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchTopLevelGoal(new Check());
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Check());
 	}
 	
 	/**

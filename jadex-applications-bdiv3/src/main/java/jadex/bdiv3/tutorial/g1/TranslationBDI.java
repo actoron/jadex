@@ -1,12 +1,13 @@
 package jadex.bdiv3.tutorial.g1;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
@@ -38,7 +39,7 @@ public class TranslationBDI
 	//-------- attributes --------
 
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The wordtable. */
 	protected Map<String, String> wordtable;
@@ -127,12 +128,12 @@ public class TranslationBDI
 					while(true)
 					{
 						final Socket client	= server.accept();
-						agent.scheduleStep(new IComponentStep<Void>()
+						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 						{
 							@Classname("translate")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								agent.dispatchTopLevelGoal(new Translate(client));
+								agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Translate(client));
 								return IFuture.DONE;
 							}
 						});

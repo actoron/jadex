@@ -12,6 +12,7 @@ import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -165,7 +166,7 @@ public class MovementCapability
 	protected long getTime()
 	{
 		// todo:
-		IClockService cs =  (IClockService)capa.getServiceContainer().getRequiredService("clockser").get();
+		IClockService cs =  (IClockService)capa.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser").get();
 		return cs.getTime();
 	}
 	

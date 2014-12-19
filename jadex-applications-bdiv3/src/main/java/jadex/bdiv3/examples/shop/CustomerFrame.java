@@ -3,6 +3,7 @@ package jadex.bdiv3.examples.shop;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.IFuture;
@@ -37,7 +38,7 @@ public class CustomerFrame extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-//				agent.killAgent();
+//				agent.killComponent();
 				capa.getAgent().getExternalAccess().killComponent();
 			}
 		});
@@ -52,7 +53,7 @@ public class CustomerFrame extends JFrame
 			{
 			}
 		};
-		capa.getAgent().scheduleStep(new IComponentStep<Void>()
+		capa.getAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)

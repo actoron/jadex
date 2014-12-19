@@ -2,7 +2,9 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -11,7 +13,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test using injected values in init expressions or constructors.
  */
-@Agent
+@Agent(keepalive=Boolean3.TRUE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ConstructorsBDI	extends ConstructorsSuper
 {
@@ -19,7 +21,7 @@ public class ConstructorsBDI	extends ConstructorsSuper
 	
 	/** The agent. */
 	@Agent
-	protected BDIAgent	agent;
+	protected IInternalAccess	agent;
 	
 	//-------- constructors --------
 	
@@ -46,7 +48,7 @@ public class ConstructorsBDI	extends ConstructorsSuper
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody//(keepalive=false)
 	public void	body()
 	{
 		TestReport	tr	= new TestReport("#1", "Test if constructor calls work.");
@@ -58,6 +60,6 @@ public class ConstructorsBDI	extends ConstructorsSuper
 		{
 			tr.setReason("Calls do not match: [A, B, C, D], "+calls.toString());
 		}
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

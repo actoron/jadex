@@ -1,9 +1,10 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.beans.PropertyChangeSupport;
 import jadex.micro.annotation.Agent;
@@ -19,7 +20,7 @@ import jadex.micro.annotation.Configurations;
 public class ObjectConditionBDI
 {
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Belief 
 	protected Bean mybean = bean;
@@ -31,11 +32,11 @@ public class ObjectConditionBDI
 		
 		if("1".equals(agent.getConfiguration()))
 		{
-			agent.adoptPlan("wait");
+			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan("wait");
 		}
 		else if ("2".equals(agent.getConfiguration()))
 		{
-			agent.adoptPlan("notify");
+			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan("notify");
 		}
 	}
 	

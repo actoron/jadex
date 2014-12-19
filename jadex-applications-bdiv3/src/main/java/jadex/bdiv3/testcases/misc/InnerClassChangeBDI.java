@@ -2,7 +2,6 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
@@ -12,6 +11,8 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -21,7 +22,6 @@ import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.rules.eca.annotations.Event;
 
 /**
  *  Goal driven print out.
@@ -39,7 +39,7 @@ public class InnerClassChangeBDI
 {
 	/** The bdi agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The text that is printed. */
 	@Belief
@@ -98,11 +98,11 @@ public class InnerClassChangeBDI
 	@AgentBody
 	public void body()
 	{
-		agent.waitFor(3000, new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				agent.killAgent();
+				agent.killComponent();
 				return IFuture.DONE;
 			}
 		});
@@ -112,14 +112,14 @@ public class InnerClassChangeBDI
 	 *  Called when agent is killed.
 	 */
 	@AgentKilled
-	public void	destroy(BDIAgent agent)
+	public void	destroy(IInternalAccess agent)
 	{
 		for(TestReport ter: tr)
 		{
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.setResultValue("testresults", new Testcase(tr.length, tr));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	/**
@@ -136,7 +136,7 @@ public class InnerClassChangeBDI
 		else
 		{
 			tr[1].setSucceeded(true);
-			agent.killAgent();
+			agent.killComponent();
 		}
 		return IFuture.DONE;
 	}

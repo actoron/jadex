@@ -1,11 +1,12 @@
 package jadex.bdiv3.tutorial.e2;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -25,7 +26,7 @@ public class TranslationBDI
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	@Capability(beliefmapping=@Mapping(value="wordtable"))
 	protected TranslationCapability capa = new TranslationCapability();
@@ -58,10 +59,10 @@ public class TranslationBDI
 	public void body()
 	{
 		String eword = "dog";
-		String gword = (String)agent.dispatchTopLevelGoal(capa.new Translate(eword)).get();
+		String gword = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(capa.new Translate(eword)).get();
 		System.out.println("Translated: "+eword+" "+gword);
 
-		List<String> syns = (List<String>)agent.adoptPlan("findSynonyms", new Object[]{eword}).get();
+		List<String> syns = (List<String>)agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan("findSynonyms", new Object[]{eword}).get();
 		System.out.println("Found synonyms: "+eword+" "+syns);
 	}
 	

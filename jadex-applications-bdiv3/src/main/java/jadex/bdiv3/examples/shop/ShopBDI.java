@@ -1,9 +1,10 @@
 package jadex.bdiv3.examples.shop;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -27,7 +28,7 @@ public class ShopBDI
 
 	@Agent
 	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
-	protected BDIAgent	agent;
+	protected IInternalAccess agent;
 	
 	// Principles: 
 	// - each belief should only be represented as one field! (no assignments)
@@ -37,8 +38,8 @@ public class ShopBDI
 	
 	/** The customer capability. */
 	@Capability(beliefmapping=@Mapping("money"))
-	protected ShopCapa shopcap	= new ShopCapa((String)agent.getArgument("shopname"), 
-		(List<ItemInfo>)agent.getArgument("catalog"));
+	protected ShopCapa shopcap	= new ShopCapa((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("shopname"), 
+		(List<ItemInfo>)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("catalog"));
 	
 	/** The money. */
 	@Belief

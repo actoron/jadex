@@ -3,6 +3,7 @@ package jadex.bdiv3.examples.alarmclock;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -229,7 +230,7 @@ public class ClockFrame extends JFrame
 				
 				ClockFrame.this.agent.killComponent(); // Use -autoshutdown to kill standalone platform as well
 				//IGoal kp = agent.createGoal("cms_shutdown_platform");
-				//agent.dispatchTopLevelGoal(kp);
+				//agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(kp);
 			}
 		};
 		
@@ -379,7 +380,7 @@ public class ClockFrame extends JFrame
 				{
 					AlarmclockBDI agent = (AlarmclockBDI)((IPojoMicroAgent)ia).getPojoAgent();
 					final Settings sets = agent.getSettings();
-					IFuture<IClockService>	fut	= ia.getServiceContainer().getRequiredService("clockservice");
+					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
 					fut.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 					{
 						public void resultAvailable(IClockService cs)

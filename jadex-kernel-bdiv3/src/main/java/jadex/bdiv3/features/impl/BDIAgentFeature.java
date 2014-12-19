@@ -1,5 +1,6 @@
 package jadex.bdiv3.features.impl;
 
+import jadex.bdiv3.ASMBDIClassGenerator;
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.PlanContextCondition;
@@ -73,6 +74,7 @@ import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
 import jadex.micro.features.IMicroLifecycleFeature;
+import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
@@ -89,6 +91,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -130,10 +133,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		super(component, cinfo);
 		
 		Object pojo = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		ASMBDIClassGenerator.checkEnhanced(pojo.getClass());
 		this.bdimodel = (BDIModel)getComponent().getModel().getRawModel();
 		this.capa = new RCapability(bdimodel.getCapability());
 		this.rulesystem = new RuleSystem(pojo);
-		injectAgent(getComponent(), pojo, bdimodel, null);
 	}
 
 	/**
@@ -142,6 +145,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public IFuture<Void> init()
 	{
+		Object pojo = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		injectAgent(getComponent(), pojo, bdimodel, null);
+		invokeInitCalls(pojo);
+		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
 		startBehavior();
 		return IFuture.DONE;
 	}
@@ -432,7 +439,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			{
 				for(Object[] write: writes)
 				{
-					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
+//					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
 //					agent.writeField(write[0], (String)write[1], write[2]);
 //					BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 					RuleSystem rs = agent.getComponentFeature(IBDIAgentFeature.class).getRuleSystem();
@@ -537,7 +544,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public static void unobserveValue(IInternalAccess agent, final String belname)
 	{
-//			System.out.println("unobserve: "+agent+" "+belname);
+//		System.out.println("unobserve: "+agent+" "+belname);
 		
 		try
 		{
@@ -1304,65 +1311,111 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //		return ret;
 //	}
 		
-//	/**
-//	 *  Init the capability pojo objects.
-//	 */
-//	protected IFuture<Void>	initCapabilities(final Object agent, final Tuple2<FieldInfo, BDIModel>[] caps, final int i)
-//	{
-//		final Future<Void>	ret	= new Future<Void>();
-//		
-//		if(i<caps.length)
-//		{
-//			try
-//			{
-//				Field	f	= caps[i].getFirstEntity().getField(getComponent().getClassLoader());
-//				f.setAccessible(true);
-//				final Object	capa	= f.get(agent);
-//				
-//				String globalname;
-//				try
-//				{
-//					Field	g	= agent.getClass().getDeclaredField("__globalname");
-//					g.setAccessible(true);
-//					globalname	= (String)g.get(agent);
-//					globalname	= globalname==null ? f.getName() : globalname+MElement.CAPABILITY_SEPARATOR+f.getName();
-//				}
-//				catch(Exception e)
-//				{
-//					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
-//				}
-//				
-//				injectAgent((BDIAgent)microagent, capa, caps[i].getSecondEntity(), globalname);
-//				
-//				injectServices(capa, caps[i].getSecondEntity())
-//					.addResultListener(new DelegationResultListener<Void>(ret)
-//				{
-//					public void customResultAvailable(Void result)
-//					{
+	/**
+	 *  Init the capability pojo objects.
+	 */
+	protected IFuture<Void>	initCapabilities(final Object agent, final Tuple2<FieldInfo, BDIModel>[] caps, final int i)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		if(i<caps.length)
+		{
+			try
+			{
+				Field	f	= caps[i].getFirstEntity().getField(getComponent().getClassLoader());
+				f.setAccessible(true);
+				final Object	capa	= f.get(agent);
+				
+				String globalname;
+				try
+				{
+					Field	g	= agent.getClass().getDeclaredField("__globalname");
+					g.setAccessible(true);
+					globalname	= (String)g.get(agent);
+					globalname	= globalname==null ? f.getName() : globalname+MElement.CAPABILITY_SEPARATOR+f.getName();
+				}
+				catch(Exception e)
+				{
+					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+				}
+				
+				injectAgent(getComponent(), capa, caps[i].getSecondEntity(), globalname);
+				
+				MicroInjectionComponentFeature.injectServices(capa, caps[i].getSecondEntity(), getComponent())
+					.addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
 //						injectParent(capa, caps[i].getSecondEntity())
 //							.addResultListener(new DelegationResultListener<Void>(ret)
 //						{
 //							public void customResultAvailable(Void result)
 //							{
-//								initCapabilities(agent, caps, i+1)
-//									.addResultListener(new DelegationResultListener<Void>(ret));
+								invokeInitCalls(capa);
+						
+								initCapabilities(agent, caps, i+1)
+									.addResultListener(new DelegationResultListener<Void>(ret));
 //							}
 //						});
-//					}
-//				});				
-//			}
-//			catch(Exception e)
-//			{
-//				ret.setException(e);
-//			}
-//		}
-//		else
-//		{
-//			ret.setResult(null);
-//		}
-//		
-//		return ret;
-//	}
+					}
+				});				
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void invokeInitCalls(Object pojo)
+	{
+		// Find classes with generated init methods.
+		List<Class<?>>	inits	= new ArrayList<Class<?>>();
+		inits.add(pojo.getClass());
+		for(int i=0; i<inits.size(); i++)
+		{
+			Class<?>	clazz	= inits.get(i);
+			if(clazz.getSuperclass().isAnnotationPresent(Agent.class)
+				|| clazz.getSuperclass().isAnnotationPresent(Capability.class))
+			{
+				inits.add(clazz.getSuperclass());
+			}
+		}
+		
+		// Call init methods of superclasses first.
+		for(int i=inits.size()-1; i>=0; i--)
+		{
+			Class<?>	clazz	= inits.get(i);
+			List<Tuple2<Class<?>[], Object[]>>	initcalls	= getInitCalls(pojo, clazz);
+			for(Tuple2<Class<?>[], Object[]> initcall: initcalls)
+			{					
+				try
+				{
+					String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+clazz.getName().replace("/", "_").replace(".", "_");
+					Method um = pojo.getClass().getMethod(name, initcall.getFirstEntity());
+//						System.out.println("Init: "+um);
+					um.invoke(pojo, initcall.getSecondEntity());
+				}
+				catch(InvocationTargetException e)
+				{
+					e.getTargetException().printStackTrace();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 		
 //		/**
 //		 *  Add extra init code after components.

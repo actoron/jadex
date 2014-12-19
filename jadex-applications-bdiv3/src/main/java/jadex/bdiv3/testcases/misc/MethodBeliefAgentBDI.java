@@ -2,9 +2,12 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -50,33 +53,33 @@ public class MethodBeliefAgentBDI
 	 *  Agent body.
 	 */
 	@AgentBody
-	public void	body(final BDIAgent agent)
+	public void	body(final IInternalAccess agent)
 	{
 		final TestReport	tr	= new TestReport("#1", "Test if method beliefs work.");
-		agent.addBeliefListener("value", new BeliefAdapter<String>()
+		agent.getComponentFeature(IBDIAgentFeature.class).addBeliefListener("value", new BeliefAdapter<String>()
 		{
 			public void beliefChanged(ChangeInfo<String> value)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setSucceeded(true);
-					agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-					agent.killAgent();
+					agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.killComponent();
 				}
 			}
 		});
 		
 		setValue("hello");
 		
-		agent.waitForDelay(500).addResultListener(new DefaultResultListener<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).addResultListener(new DefaultResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setFailed("No event occurred.");
-					agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-					agent.killAgent();
+					agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.killComponent();
 				}
 			}
 		});

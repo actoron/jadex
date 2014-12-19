@@ -7,6 +7,7 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.marsworld.sentry.ITargetAnnouncementService;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -39,7 +40,7 @@ public class InformNewTargetPlan
 	{
 		try
 		{
-			IFuture<Collection<ITargetAnnouncementService>> fut = producer.getAgent().getServiceContainer().getRequiredServices("targetser");
+			IFuture<Collection<ITargetAnnouncementService>> fut = producer.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("targetser");
 			Collection<ITargetAnnouncementService> ansers = fut.get();
 			
 			for(ITargetAnnouncementService anser: ansers)

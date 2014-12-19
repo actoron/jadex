@@ -1,6 +1,5 @@
 package jadex.bdiv3.tutorial.b5;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
@@ -9,10 +8,14 @@ import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
 
 import java.util.HashMap;
@@ -31,7 +34,11 @@ public class TranslationBDI
 
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
+	
+	/** The bdi api. */
+	@AgentFeature
+	protected IBDIAgentFeature bdi;
 	
 	/** The wordtable. */
 	protected Map<String, String> wordtable;
@@ -63,8 +70,8 @@ public class TranslationBDI
 	@AgentBody
 	public void body()
 	{
-		agent.adoptPlan(new TranslatePlan("dog"));
-		agent.waitForDelay(1000).get();
+		bdi.adoptPlan(new TranslatePlan("dog"));
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
 		context = false;
 		System.out.println("context set to false");
 	}

@@ -9,6 +9,8 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -34,16 +36,16 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 	public void body()
 	{
 		items.add(2);
-		getAgent().scheduleStep(new IComponentStep<Void>()
+		getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				tr.setReason("Plan not triggered.");
-				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+				getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				killComponent();
 				return IFuture.DONE;
 			}
-		}, 2000);
+		});
 	}
 	
 	@Plan(trigger=@Trigger(factaddeds="items"))
@@ -58,7 +60,7 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 		{
 			tr.setFailed("Expected event vs. "+event+" and 2 vs. "+value);
 		}
-		setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		killComponent();
 	}
 }

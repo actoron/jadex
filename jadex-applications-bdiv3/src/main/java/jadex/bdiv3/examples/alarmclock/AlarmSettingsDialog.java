@@ -1,10 +1,13 @@
 package jadex.bdiv3.examples.alarmclock;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.PlaySongGoal;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
@@ -185,16 +188,11 @@ public class AlarmSettingsDialog extends JDialog
 					@Classname("setTime")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						BDIAgent bia = (BDIAgent)ia;
-						bia.getTime().addResultListener(new SwingDefaultResultListener<Long>()
-						{
-							public void customResultAvailable(Long result)
-							{
-								final Date now = new Date(result.longValue());
-								date.setDate(now);
-								time.setValue(now);								
-							}
-						});
+//						BDIAgent bia = (BDIAgent)ia;
+						long cur = SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+						Date now = new Date(cur);
+						date.setDate(now);
+						time.setValue(now);								
 						return IFuture.DONE;
 					}
 				});
@@ -234,9 +232,9 @@ public class AlarmSettingsDialog extends JDialog
 							@Classname("play")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								BDIAgent bia = (BDIAgent)ia;
+//								BDIAgent bia = (BDIAgent)ia;
 								playing = new PlaySongGoal(song);
-								bia.dispatchTopLevelGoal(playing)
+								ia.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(playing)
 									.addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
@@ -351,20 +349,9 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					((BDIAgent)ia).getTime()
-						.addResultListener(new SwingResultListener<Long>(new IResultListener<Long>()
-					{
-						public void resultAvailable(Long time)
-						{
-							al.setTime(new Time(new Date(time.longValue())));
-							setAlarm(al);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// Ignore when component already terminated.
-						}
-					}));
+					long cur = SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+					al.setTime(new Time(new Date(cur)));
+					setAlarm(al);
 					return IFuture.DONE;
 				}
 			});
@@ -415,7 +402,7 @@ public class AlarmSettingsDialog extends JDialog
 		if(alarm==null)
 		{
 			this.alarm = new Alarm();
-//			alarm.setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
+//			alarm.setClock((IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getService(IClockService.class));
 		}
 
 		alarm.setMode((String)mode.getSelectedItem());
@@ -491,8 +478,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				if(playing!=null)
 				{
-					BDIAgent	bia	= (BDIAgent)ia;
-					bia.dropGoal(playing);
+					ia.getComponentFeature(IBDIAgentFeature.class).dropGoal(playing);
 				}
 				playing = null;
 				return IFuture.DONE;

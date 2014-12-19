@@ -1,7 +1,7 @@
 package jadex.bdiv3.examples.garbagecollector;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bridge.IInternalAccess;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -23,7 +23,7 @@ public abstract class BaseAgentBDI
 	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The environment. */
 	protected Grid2D env = (Grid2D)agent.getParentAccess().getExtension("mygc2dspace").get();
@@ -67,7 +67,7 @@ public abstract class BaseAgentBDI
 	 *  Get the agent.
 	 *  @return The agent.
 	 */
-	public BDIAgent getAgent()
+	public IInternalAccess getAgent()
 	{
 		return agent;
 	}

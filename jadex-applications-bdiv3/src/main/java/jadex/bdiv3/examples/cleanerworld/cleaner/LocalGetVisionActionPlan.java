@@ -34,7 +34,7 @@ public class LocalGetVisionActionPlan
 	{
 		IEnvironment environment = capa.getEnvironment();
 		Cleaner cl = new Cleaner(capa.getMyLocation(),
-			capa.getAgent().getAgentName(), capa.getCarriedWaste(),
+			capa.getAgent().getComponentIdentifier().getName(), capa.getCarriedWaste(),
 			capa.getMyVision(), capa.getMyChargestate());
 
 		Vision	vision	= (Vision)environment.getVision(cl).clone();

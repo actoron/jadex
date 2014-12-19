@@ -11,6 +11,7 @@ import jadex.bdiv3.examples.marsworld.BaseBDI;
 import jadex.bdiv3.examples.marsworld.carry.ICarryService;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.WalkAround;
 import jadex.bdiv3.examples.marsworld.sentry.ITargetAnnouncementService;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -81,7 +82,7 @@ public class ProducerBDI extends BaseBDI implements IProduceService
 	public IFuture<Void> doProduce(@Reference ISpaceObject target)
 	{
 //		System.out.println("producer received produce command: "+target);
-		agent.dispatchTopLevelGoal(new ProduceOre(target));
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new ProduceOre(target));
 		return IFuture.DONE;
 	}
 }

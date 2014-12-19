@@ -1,7 +1,5 @@
 package jadex.bdiv3.benchmarks;
 
-import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.PojoBDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
@@ -11,6 +9,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -25,6 +26,8 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.NameValue;
+import jadex.micro.features.IMicroInjectionFeature;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +53,7 @@ public class CreationBDI
 	
 	/** The component. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** Maximum number of agents to create. */
 	@AgentArgument
@@ -148,7 +151,7 @@ public class CreationBDI
 			args.put("startmem", Long.valueOf(startmem));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.getServiceContainer().searchServiceUpwards(IComponentManagementService.class)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DefaultResultListener<IComponentManagementService>()
 			{
 				public void resultAvailable(IComponentManagementService result)
@@ -199,7 +202,8 @@ public class CreationBDI
 										@Classname("deletePeers")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
+//											final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
+											final CreationBDI cbdi = (CreationBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 											cbdi.getClock().addResultListener(new IResultListener<IClockService>()
 											{
 												public void resultAvailable(IClockService clock)
@@ -286,9 +290,9 @@ public class CreationBDI
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				agent.setResultValue("microcreationtime", new Tuple(""+pera, "s"));
-				agent.setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
-				agent.setResultValue("micromem", new Tuple(""+upera, "kb"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 				agent.killComponent();
 			}
 		});
@@ -299,7 +303,7 @@ public class CreationBDI
 	 */
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getServiceContainer().searchServiceUpwards(IClockService.class);
+		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 
 	/**
@@ -307,7 +311,7 @@ public class CreationBDI
 	 */
 	protected IFuture<IComponentManagementService>	getCMS()
 	{
-		return agent.getServiceContainer().searchServiceUpwards(IComponentManagementService.class);
+		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 
 	

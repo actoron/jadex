@@ -1,12 +1,12 @@
 package jadex.bdiv3.tutorial.f3.old;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Publish;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.tutorial.f3.TranslationGoal;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -28,7 +28,7 @@ public class TranslationBDI
 	//-------- attributes --------
 
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The wordtable. */
 	protected Map<String, String> wordtable;

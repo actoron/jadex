@@ -2,10 +2,12 @@ package jadex.bdiv3.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
@@ -29,7 +31,7 @@ public class UpdaterateBDI
 	
 	/** The agent. */
 	@Agent
-	protected BDIAgent	agent;
+	protected IInternalAccess	agent;
 	
 	//-------- beliefs --------
 	
@@ -42,9 +44,9 @@ public class UpdaterateBDI
 	 *  The agent body.
 	 */
 	@AgentBody
-	public void	body(BDIAgent agent)
+	public void	body(IInternalAccess agent)
 	{
-		agent.waitForDelay(1000).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
 		tr.setFailed("Plan was not triggered.");
 		agent.killComponent();
 	}
@@ -53,9 +55,9 @@ public class UpdaterateBDI
 	 *  Called when agent is killed.
 	 */
 	@AgentKilled
-	public void	destroy(BDIAgent agent)
+	public void	destroy(IInternalAccess agent)
 	{
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	//-------- plans --------

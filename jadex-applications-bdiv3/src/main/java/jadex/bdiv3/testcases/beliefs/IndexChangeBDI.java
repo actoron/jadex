@@ -1,7 +1,5 @@
 package jadex.bdiv3.testcases.beliefs;
 
-import java.util.Arrays;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.IBDIAgent;
@@ -12,13 +10,14 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IFilter;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.rules.eca.ChangeInfo;
+
+import java.util.Arrays;
 
 /**
  *  Agent that tests if waiting for a specific index change in a collection works.
@@ -39,7 +38,7 @@ public abstract class IndexChangeBDI implements IBDIAgent
 		final TestReport tr = new TestReport("#1", "Test if waiting for an specific index works.");
 
 		final int[] cnt = new int[1];
-		getAgent().getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -47,7 +46,7 @@ public abstract class IndexChangeBDI implements IBDIAgent
 				System.out.println("now is: "+Arrays.toString(guards));
 				if(++cnt[0]<guards.length)
 				{
-					getAgent().getExternalAccess().scheduleStep(this, 1000);
+					getExternalAccess().scheduleStep(this, 1000);
 				}
 				return IFuture.DONE;
 			}
@@ -76,7 +75,7 @@ public abstract class IndexChangeBDI implements IBDIAgent
 			tr.setReason("Exception occurred: "+e.getMessage());
 		}
 		
-		setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		
 		killComponent();
 		

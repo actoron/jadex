@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.disastermanagement.commander;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
@@ -23,13 +22,14 @@ import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.SendRescue
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.TreatVictims;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.rules.eca.EventType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,7 +58,7 @@ public class CommanderBDI
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The capa. */
 	@Capability
@@ -81,7 +81,7 @@ public class CommanderBDI
 	{
 		while(true)
 		{
-			agent.waitForDelay(1000).get();
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
 			ISpaceObject[] dis = movecapa.getEnvironment().getSpaceObjectsByType("disaster");
 			for(ISpaceObject di: dis)
 			{
@@ -386,7 +386,7 @@ public class CommanderBDI
 	 *  Get the agent.
 	 *  @return The agent.
 	 */
-	public BDIAgent getAgent()
+	public IInternalAccess getAgent()
 	{
 		return agent;
 	}

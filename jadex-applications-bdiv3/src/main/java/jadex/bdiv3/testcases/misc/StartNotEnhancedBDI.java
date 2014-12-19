@@ -2,13 +2,15 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
@@ -17,22 +19,22 @@ import jadex.micro.annotation.Results;
 /**
  *  Test using injected values in init expressions or constructors.
  */
-@Agent
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class StartNotEnhancedBDI	extends ConstructorsSuper
 {
 	/** The agent. */
 	@Agent
-	protected BDIAgent	agent;
+	protected IInternalAccess	agent;
 	
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody(keepalive=false)
+	@AgentBody//(keepalive=false)
 	public void	body()
 	{
 		TestReport	tr	= new TestReport("#1", "Test if constructor calls work.");
-		IComponentManagementService cms = SServiceProvider.getLocalService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		try
 		{
 			Class<?> cl = NotEnhancedBDI.class;
@@ -55,6 +57,6 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 	//			e.printStackTrace();
 			}
 		}
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

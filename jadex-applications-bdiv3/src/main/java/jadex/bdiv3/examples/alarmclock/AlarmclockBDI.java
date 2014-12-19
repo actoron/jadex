@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.alarmclock;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
@@ -12,6 +11,7 @@ import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.AlarmGoal;
 import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.NotifyGoal;
 import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.PlaySongGoal;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
@@ -182,7 +182,7 @@ public class AlarmclockBDI
 	 *  Start the agent
 	 */
 	@AgentCreated
-	public IFuture<Void>	body(BDIAgent agent)
+	public IFuture<Void>	body(IInternalAccess agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		final IExternalAccess	exta	= agent.getExternalAccess();

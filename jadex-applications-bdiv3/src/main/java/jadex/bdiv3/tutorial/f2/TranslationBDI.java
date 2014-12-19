@@ -1,12 +1,12 @@
 package jadex.bdiv3.tutorial.f2;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.ServiceTrigger;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+// todo: service
 /**
  *  The translation agent F2.
  *  
@@ -32,13 +33,14 @@ import java.util.Map;
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(name="transser", type=ITranslationService.class, 
-	implementation=@Implementation(BDIAgent.class)))
+	implementation=@Implementation(IInternalAccess.class)))
+//	implementation=@Implementation(BDIAgent.class)))
 public class TranslationBDI
 {
 	//-------- attributes --------
 
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The wordtable. */
 	protected Map<String, String> wordtable;

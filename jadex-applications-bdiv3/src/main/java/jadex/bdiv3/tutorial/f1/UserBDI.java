@@ -1,6 +1,6 @@
 package jadex.bdiv3.tutorial.f1;
 
-import jadex.bdiv3.BDIAgent;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IResultListener;
@@ -33,7 +33,7 @@ public class UserBDI
 	//-------- attributes --------
 
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The gui. */
 	protected JFrame	f;
@@ -67,7 +67,7 @@ public class UserBDI
 					public void actionPerformed(ActionEvent e)
 					{
 						// Search a translation service
-						SServiceProvider.getServices(agent.getServiceProvider(), ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getServices(agent, ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new IntermediateDefaultResultListener<ITranslationService>()
 						{
 							public void intermediateResultAvailable(ITranslationService ts)

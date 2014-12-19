@@ -2,14 +2,13 @@ package jadex.bdiv3.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.Future;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -26,7 +25,7 @@ public class DynamicBeliefBDI
 {
 	/** The agent (injected). */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The belief num1. */
 	@Belief
@@ -47,8 +46,8 @@ public class DynamicBeliefBDI
 	{
 		System.out.println("plan activated: num2 changed to "+num);
 		tr.setSucceeded(true);
-		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-		agent.killAgent();
+		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.killComponent();
 	}
 
 	/**
@@ -59,16 +58,16 @@ public class DynamicBeliefBDI
 	{
 		num1++;
 //		num1++;
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
 					tr.setFailed("Plan was not activated due to belief change.");
-				agent.killAgent();
+				agent.killComponent();
 				return IFuture.DONE;
 			}
-		}, 3000);
+		});
 	}
 }
 

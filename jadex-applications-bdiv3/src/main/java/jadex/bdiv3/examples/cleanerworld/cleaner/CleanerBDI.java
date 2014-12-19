@@ -1,10 +1,10 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
@@ -13,9 +13,7 @@ import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
-import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.examples.cleanerworld.world.Cleaner;
 import jadex.bdiv3.examples.cleanerworld.world.Environment;
@@ -26,10 +24,8 @@ import jadex.bdiv3.examples.cleanerworld.world.MapPoint;
 import jadex.bdiv3.examples.cleanerworld.world.Vision;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
-import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.commons.SUtil;
@@ -48,7 +44,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.CheckForNull;
 import javax.swing.SwingUtilities;
 
 @Agent
@@ -71,7 +66,7 @@ public class CleanerBDI
 {
 	/** The bdi agent. Automatically injected */
 	@Agent
-	protected BDIAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The virtual environment of the cleaner. */
 	@Belief
@@ -833,12 +828,12 @@ public class CleanerBDI
 		patrolpoints.add(new Location(0.9, 0.1));
 		patrolpoints.add(new Location(0.9, 0.9));
 		
-		agent.dispatchTopLevelGoal(new PerformLookForWaste());
-		agent.dispatchTopLevelGoal(new PerformPatrol());
-		agent.dispatchTopLevelGoal(new MaintainBatteryLoaded());
-		agent.dispatchTopLevelGoal(new PerformMemorizePositions());
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new PerformLookForWaste());
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new PerformPatrol());
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MaintainBatteryLoaded());
+		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new PerformMemorizePositions());
 		
-//		agent.waitFor(100, new IComponentStep<Void>()
+//		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(100, new IComponentStep<Void>()
 //		{
 //			public IFuture<Void> execute(IInternalAccess ia)
 //			{
@@ -1015,7 +1010,7 @@ public class CleanerBDI
 	 *  Get the agent.
 	 *  @return The agent.
 	 */
-	public BDIAgent getAgent()
+	public IInternalAccess getAgent()
 	{
 		return agent;
 	}
