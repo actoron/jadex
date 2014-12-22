@@ -1,7 +1,6 @@
 package jadex.micro.features.impl;
 
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
@@ -12,9 +11,7 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -22,7 +19,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -30,7 +26,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.features.IMicroInjectionFeature;
@@ -54,7 +49,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(
 		IMicroInjectionFeature.class, MicroInjectionComponentFeature.class,
-		new Class<?>[]{IArgumentsFeature.class}, new Class<?>[]{IProvidedServicesFeature.class, IRequiredServicesFeature.class});
+		new Class<?>[]{IArgumentsFeature.class, IRequiredServicesFeature.class}, new Class<?>[]{IProvidedServicesFeature.class});
 
 	//-------- constructors --------
 	

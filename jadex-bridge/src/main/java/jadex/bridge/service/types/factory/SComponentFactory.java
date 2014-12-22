@@ -69,8 +69,8 @@ public class SComponentFactory
 		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class, ExecutionComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IArgumentsFeature.class, ArgumentsComponentFeature.class));
 		def_features.add(PropertiesComponentFeature.FACTORY);	// After args for logging
-		def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(INFPropertyComponentFeature.class, NFPropertyComponentFeature.class));

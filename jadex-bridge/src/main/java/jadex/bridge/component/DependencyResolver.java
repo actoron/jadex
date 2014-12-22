@@ -233,5 +233,13 @@ public class DependencyResolver<T>
 		{
 			this.otherdeps = otherdeps;
 		}
+		
+		/**
+		 *  Get a string representation.
+		 */
+		public String toString()
+		{
+			return "pre: "+getMyDeps()+", post: "+getOtherDeps();
+		}
 	}
 }

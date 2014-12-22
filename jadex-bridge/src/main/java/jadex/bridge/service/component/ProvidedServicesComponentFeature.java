@@ -29,6 +29,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -514,8 +515,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}			
 		}
 		
-//		T[] ret	= (T[])Array.newInstance(clazz, coll!=null ? coll.size(): 0);
-		return coll==null ? (T[])new Object[0] : coll.toArray((T[])new Object[coll.size()]);
+		T[] ret	= (T[])Array.newInstance(clazz, coll!=null ? coll.size(): 0);
+		return coll==null ? ret : coll.toArray(ret);
 	}
 	
 	/**
