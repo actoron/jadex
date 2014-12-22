@@ -4,13 +4,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroModel;
@@ -26,7 +25,7 @@ import java.lang.reflect.Method;
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
  */
-public class MicroLifecycleComponentFeature extends	AbstractComponentFeature implements IMicroLifecycleFeature
+public class MicroLifecycleComponentFeature extends	AbstractComponentFeature implements IMicroLifecycleFeature, IValueFetcher
 {
 	//-------- constants --------
 	
@@ -95,6 +94,16 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	}
 	
 	/**
+	 *  The feature can inject parameters for expression evaluation
+	 *  by providing an optional value fetcher. The fetch order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
+	 */
+	public IValueFetcher	getValueFetcher()
+	{
+		return this;
+	}
+
+	/**
 	 *  Add $pojoagent to fetcher.
 	 */
 	public Object fetchValue(String name)
@@ -105,7 +114,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		}
 		else
 		{
-			return super.fetchValue(name);
+			throw new RuntimeException("Value not found: "+name);
 		}
 	}
 

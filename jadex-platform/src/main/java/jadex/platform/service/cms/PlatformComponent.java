@@ -1,12 +1,9 @@
 package jadex.platform.service.cms;
 
-import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.SFuture;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -16,23 +13,14 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.CallAccess;
-import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
-import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.IFilter;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -40,9 +28,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminationCommand;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.kernelbase.ExternalAccess;
 
 import java.io.IOException;
@@ -87,6 +72,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/** The failure reason (if any). */
 	protected Exception	exception;
 	
+	/** The combined value fetcher (cached for speed). */
+	protected IValueFetcher	fetcher;
 	
 	//-------- IPlatformComponentAccess interface --------
 	
@@ -608,46 +595,55 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IValueFetcher getFetcher()
 	{
-		// Return a fetcher that tries features first.
-		// Todo: better (faster) way than throwing exceptions?
-		return new IValueFetcher()
+		if(fetcher==null)
 		{
-			public Object fetchValue(String name)
+			// Return a fetcher that tries features in reverse order first.
+			return new IValueFetcher()
 			{
-				Object	ret	= null;
-				boolean	found	= false;
-				
-				for(int i=lfeatures.size()-1; !found && i>=0; i--)
+				public Object fetchValue(String name)
 				{
-					try
+					Object	ret	= null;
+					boolean	found	= false;
+					
+					for(int i=lfeatures.size()-1; !found && i>=0; i--)
 					{
-//						ret	= lfeatures.get(i).fetchValue(name);
+						IValueFetcher	vf	= lfeatures.get(i).getValueFetcher();
+						if(vf!=null)
+						{
+							try
+							{
+								// Todo: better (faster) way than throwing exceptions?
+								ret	= vf.fetchValue(name);
+								found	= true;
+							}
+							catch(Exception e)
+							{
+							}
+						}
+					}
+					
+					if(ret==null && "$component".equals(name))
+					{
+						ret	= getInternalAccess();
 						found	= true;
 					}
-					catch(Exception e)
+					else if(ret==null && "$config".equals(name))
 					{
+						ret	= getConfiguration();
+						found	= true;
 					}
+					
+					if(!found)
+					{
+						throw new RuntimeException("Value not found: "+name);
+					}
+					
+					return ret;
 				}
-				
-				if(ret==null && "$component".equals(name))
-				{
-					ret	= getInternalAccess();
-					found	= true;
-				}
-				else if(ret==null && "$config".equals(name))
-				{
-					ret	= getConfiguration();
-					found	= true;
-				}
-				
-				if(!found)
-				{
-					throw new UnsupportedOperationException("Value not found: "+name);
-				}
-				
-				return ret;
-			}
-		};
+			};
+		}
+		
+		return fetcher;
 	}
 	
 	/**
