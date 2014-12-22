@@ -2,7 +2,6 @@ package jadex.bridge.service.search;
 
 import jadex.bridge.service.IService;
 import jadex.commons.IAsyncFilter;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -57,7 +56,7 @@ public class ServiceIdFilter implements IAsyncFilter
 	 */
 	public IFuture<Boolean> filter(Object obj)
 	{
-		return new Future<Boolean>(obj instanceof IService && ((IService)obj).getServiceIdentifier().equals(sid));
+		return obj instanceof IService && ((IService)obj).getServiceIdentifier().equals(sid) ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**

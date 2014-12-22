@@ -173,7 +173,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	 */
 	public IFuture<Boolean> isSupported(String publishtype)
 	{
-		return new Future<Boolean>(IPublishService.PUBLISH_RS.equals(publishtype));
+		return IPublishService.PUBLISH_RS.equals(publishtype) ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**

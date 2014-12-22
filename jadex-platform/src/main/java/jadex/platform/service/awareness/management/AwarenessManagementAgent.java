@@ -479,7 +479,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			}
 		}
 		
-		return new Future<Boolean>(ret? Boolean.TRUE: Boolean.FALSE);
+		return ret ? IFuture.TRUE: IFuture.FALSE;
 	}
 	
 	/**

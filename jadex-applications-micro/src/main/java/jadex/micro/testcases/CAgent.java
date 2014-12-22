@@ -98,7 +98,7 @@ public class CAgent implements ICService
 	public IFuture<Boolean> testArgumentReference(Object arg, int hash)
 	{
 //		System.out.println("called service");
-		return new Future<Boolean>(arg.hashCode()==hash? Boolean.TRUE: Boolean.FALSE);
+		return arg.hashCode()==hash ? IFuture.TRUE: IFuture.FALSE;
 	}
 	
 	/**
@@ -106,7 +106,7 @@ public class CAgent implements ICService
 	 */
 	public IFuture<Boolean> testArgumentCopy(Object arg, int hash)
 	{
-		return new Future<Boolean>(arg.hashCode()!=hash? Boolean.TRUE: Boolean.FALSE);
+		return arg.hashCode()!=hash ? IFuture.TRUE: IFuture.FALSE;
 	}
 	
 	/**

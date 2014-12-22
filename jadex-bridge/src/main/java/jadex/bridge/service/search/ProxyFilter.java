@@ -1,7 +1,6 @@
 package jadex.bridge.service.search;
 
 import jadex.commons.IAsyncFilter;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Proxy;
@@ -28,7 +27,7 @@ public class ProxyFilter implements IAsyncFilter
 		boolean ret = Proxy.isProxyClass(obj.getClass()) && Proxy.getInvocationHandler(obj).getClass()
 			.getName().indexOf("RemoteMethodInvocationHandler")!=-1;
 //		System.out.println("obj: "+obj==null? "null": obj.getClass()+" "+!ret);
-		return new Future<Boolean>(!ret);
+		return !ret ? IFuture.TRUE : IFuture.FALSE;
 		}
 		catch(Exception e)
 		{

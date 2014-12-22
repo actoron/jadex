@@ -17,6 +17,16 @@ public interface IFuture<E>
 	 */
 	public static final IFuture<Void>	DONE	= new Future<Void>((Void)null);
 	
+	/**
+	 *  A future representing a true result.
+	 */
+	public static final IFuture<Boolean>	TRUE	= new Future<Boolean>(Boolean.TRUE);
+	
+	/**
+	 *  A future representing a false result.
+	 */
+	public static final IFuture<Boolean>	FALSE	= new Future<Boolean>(Boolean.FALSE);
+	
 	// -------- methods --------
 
 	/**

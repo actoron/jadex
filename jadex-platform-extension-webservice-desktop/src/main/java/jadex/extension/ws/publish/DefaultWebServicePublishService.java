@@ -48,7 +48,7 @@ public class DefaultWebServicePublishService implements IPublishService
 	 */
 	public IFuture<Boolean> isSupported(String publishtype)
 	{
-		return new Future<Boolean>(IPublishService.PUBLISH_WS.equals(publishtype));
+		return IPublishService.PUBLISH_WS.equals(publishtype) ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**

@@ -1,6 +1,6 @@
 package jadex.bridge.nonfunctional.search;
 
-import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.util.Collection;
 
@@ -24,8 +24,8 @@ public class CountThresholdSearchTerminationDecider<S> implements IRankingSearch
 	/**
 	 *  Decides if the search should start ranking.
 	 */
-	public Future<Boolean> isStartRanking(Collection<S> currentresults, IServiceEvaluator evaluator)
+	public IFuture<Boolean> isStartRanking(Collection<S> currentresults, IServiceEvaluator evaluator)
 	{
-		return new Future<Boolean>(currentresults.size() >= threshold);
+		return currentresults.size()>=threshold ? IFuture.TRUE : IFuture.FALSE;
 	}
 }
