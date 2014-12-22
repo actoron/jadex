@@ -1,6 +1,5 @@
 package jadex.micro.features.impl;
 
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -10,7 +9,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -23,6 +21,7 @@ import jadex.micro.features.IMicroLifecycleFeature;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -156,29 +155,11 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 			Method	method	= mi.getMethod(component.getClassLoader());
 			
 			// Try to guess parameters from given args or component internals.
+			IParameterGuesser	guesser	= args!=null ? new SimpleParameterGuesser(component.getParameterGuesser(), Arrays.asList(args)) : component.getParameterGuesser();
 			Object[]	iargs	= new Object[method.getParameterTypes().length];
 			for(int i=0; i<method.getParameterTypes().length; i++)
 			{
-				Class<?>	clazz	= method.getParameterTypes()[i];
-				boolean found	= false;
-				for(int j=0; !found && args!=null && j<args.length; j++)
-				{
-					if(args[j]!=null && SReflect.isSupertype(clazz, args[j].getClass()))
-					{
-						iargs[i]	= args[j];
-						found	= true;
-					}
-				}
-				
-				// Todo: other injections...				
-				if(!found && SReflect.isSupertype(clazz, IInternalAccess.class))
-				{
-					iargs[i]	= component;
-				}
-				else if(!found && SReflect.isSupertype(clazz, IExternalAccess.class))
-				{
-					iargs[i]	= component.getExternalAccess();
-				}
+				iargs[i]	= guesser.guessParameter(method.getParameterTypes()[i], false);
 			}
 			
 			try

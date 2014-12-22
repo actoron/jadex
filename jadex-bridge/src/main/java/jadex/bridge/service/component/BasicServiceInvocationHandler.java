@@ -1,7 +1,6 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.Cause;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -580,31 +579,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 						
 						if(fields[i].isAnnotationPresent(ServiceComponent.class))
 						{
-							// Todo: component fetcher?
-							Object val = /*componentfetcher!=null ? componentfetcher.execute(fields[i].getType()) :*/ null;
-							if(val==null && SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
+							Object val	= ia.getParameterGuesser().guessParameter(fields[i].getType(), false);
+							try
 							{
-								val = ia;
+								fields[i].setAccessible(true);
+								fields[i].set(service, val);
 							}
-							else if(val==null && SReflect.isSupertype(IExternalAccess.class, fields[i].getType()))
+							catch(Exception e)
 							{
-								val = ia.getExternalAccess();
-							}
-							else if(val==null)
-							{
-								throw new RuntimeException("Field cannot store component: "+fields[i].getName()+" "+fields[i].getType());
-							}
-							if(val!=null)
-							{
-								try
-								{
-									fields[i].setAccessible(true);
-									fields[i].set(service, val);
-								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-								}
+								throw new RuntimeException(e);
 							}
 						}
 					}
