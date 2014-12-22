@@ -622,12 +622,12 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 						}
 					}
 					
-					if(ret==null && "$component".equals(name))
+					if(!found && "$component".equals(name))
 					{
 						ret	= getInternalAccess();
 						found	= true;
 					}
-					else if(ret==null && "$config".equals(name))
+					else if(!found && "$config".equals(name))
 					{
 						ret	= getConfiguration();
 						found	= true;
@@ -687,6 +687,19 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					catch(Exception e)
 					{
 					}
+				}
+				
+				if(!found && ((exact && IInternalAccess.class.equals(type))
+					|| (!exact && SReflect.isSupertype(IInternalAccess.class, type))))
+				{
+					ret	= getInternalAccess();
+					found	= true;
+				}
+				else if(!found && ((exact && IExternalAccess.class.equals(type))
+					|| (!exact && SReflect.isSupertype(IExternalAccess.class, type))))
+				{
+					ret	= getExternalAccess();
+					found	= true;
 				}
 				
 				if(!found)
