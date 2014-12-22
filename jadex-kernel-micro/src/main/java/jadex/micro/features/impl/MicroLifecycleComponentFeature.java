@@ -7,9 +7,11 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroModel;
@@ -21,6 +23,7 @@ import jadex.micro.features.IMicroLifecycleFeature;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
@@ -37,6 +40,11 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	
 	/** The pojo agent. */
 	protected Object pojoagent;
+	
+	/** The parameter guesser (cached for speed). */
+	protected IParameterGuesser	guesser; 
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Factory method constructor for instance level.
@@ -117,7 +125,21 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 			throw new RuntimeException("Value not found: "+name);
 		}
 	}
-
+	
+	/**
+	 *  The feature can add objects for field or method injections
+	 *  by providing an optional parameter guesser. The selection order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
+	 */
+	public IParameterGuesser	getParameterGuesser()
+	{
+		if(guesser==null)
+		{
+			guesser	= new SimpleParameterGuesser(Collections.singleton(pojoagent));
+		}
+		return guesser;
+	}
+	
 	//-------- helper methods --------
 	
 	/**
