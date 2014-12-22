@@ -63,7 +63,7 @@ public class TesterAgent implements ITestService
 		else
 		{	
 //			IMonitoringService mons = SServiceProvider.getService(agent.getServiceProvider(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-//			mons.subscribeToEvents(new IFilter<IMonitoringEvent>()
+//			mons.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(new IFilter<IMonitoringEvent>()
 //			{
 //				public boolean filter(IMonitoringEvent obj)
 //				{

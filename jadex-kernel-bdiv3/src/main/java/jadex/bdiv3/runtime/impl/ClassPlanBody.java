@@ -11,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 import jadex.rules.eca.ChangeInfo;
 
 import java.lang.reflect.Constructor;
@@ -84,7 +85,7 @@ public class ClassPlanBody extends AbstractPlanBody
 			abortedmethod = mi.getMethod(ia.getClassLoader());
 		
 		if(plan!=null)
-			injectElements(((IPojoMicroAgent)ia).getPojoAgent());
+			injectElements(ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent());
 	}
 	
 	//-------- methods --------

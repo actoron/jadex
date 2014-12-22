@@ -594,7 +594,7 @@ public class ShadowAccess //implements IExternalAccess
 //	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(final IFilter<IMonitoringEvent> filter, final boolean initial, final PublishEventLevel elm)
 //	{
 //		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent>	ret	= new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
-//		ISubscriptionIntermediateFuture<IMonitoringEvent> fut = access.subscribeToEvents(filter, initial, elm);
+//		ISubscriptionIntermediateFuture<IMonitoringEvent> fut = access.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 //		fut.addResultListener(new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut)
 //		{
 //			public void exceptionOccurred(Exception exception)
@@ -605,7 +605,7 @@ public class ShadowAccess //implements IExternalAccess
 //					{
 //						public void customResultAvailable(Void result)
 //						{
-//							ISubscriptionIntermediateFuture<IMonitoringEvent> fut = access.subscribeToEvents(filter, initial, elm);
+//							ISubscriptionIntermediateFuture<IMonitoringEvent> fut = access.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 //							TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 //							fut.addResultListener(lis);
 //						}

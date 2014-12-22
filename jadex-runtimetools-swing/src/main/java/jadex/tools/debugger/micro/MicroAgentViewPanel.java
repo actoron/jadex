@@ -2,6 +2,7 @@ package jadex.tools.debugger.micro;
 
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;

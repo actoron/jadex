@@ -9,6 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
@@ -587,6 +588,7 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 		return ret;
 	}
 
+	// todo: move to external feature!?
 	/**
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
@@ -608,7 +610,7 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.subscribeToEvents(filter, initial, elm);
+						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 						fut.addResultListener(lis);
 						return IFuture.DONE;
@@ -634,7 +636,7 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.subscribeToEvents(filter, initial, elm);
+			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 			TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 			fut.addResultListener(lis);
 		}
@@ -642,6 +644,7 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 		return ret;
 	}
 	
+	// todo: move to external feature!?
 	/**
 	 *  Subscribe to receive results.
 	 */

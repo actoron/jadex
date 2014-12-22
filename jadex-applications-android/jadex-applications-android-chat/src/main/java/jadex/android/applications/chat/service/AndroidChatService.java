@@ -257,7 +257,7 @@ public class AndroidChatService extends JadexPlatformService
 					public void resultAvailable(IChatGuiService service)
 					{
 						chatgui = service;
-						subscription = chatgui.subscribeToEvents();
+						subscription = chatgui.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents();
 						subscription.addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
 						{
 							public void intermediateResultAvailable(ChatEvent ce)

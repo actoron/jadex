@@ -44,6 +44,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -346,7 +347,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public static void writeField(Object val, String fieldname, Object obj, IInternalAccess agent)
 	{
-		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
+//		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
 		
 		// This is the case in inner classes
 		if(agent==null)
@@ -725,7 +726,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public static void publishToolBeliefEvent(IInternalAccess ia, MBelief mbel)//, String evtype)
 	{
-		if(mbel!=null && ia.hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
+		if(mbel!=null && ia.getComponentFeature(IMonitoringComponentFeature.class)!=null && 
+			ia.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
@@ -740,7 +742,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			ia.publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
+			ia.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	

@@ -183,24 +183,24 @@ public interface IInternalAccess
 //	 */
 //	public boolean isComponentThread();
 	
-	/**
-	 *  Subscribe to component events.
-	 *  @param filter An optional filter.
-	 *  @param initial True, for receiving the current state.
-	 */
-//	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm);
-
-	/**
-	 *  Publish a monitoring event. This event is automatically send
-	 *  to the monitoring service of the platform (if any). 
-	 */
-	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt);
-	
-	/**
-	 *  Check if event targets exist.
-	 */
-	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi);
+//	/**
+//	 *  Subscribe to component events.
+//	 *  @param filter An optional filter.
+//	 *  @param initial True, for receiving the current state.
+//	 */
+////	@Timeout(Timeout.NONE)
+//	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm);
+//
+//	/**
+//	 *  Publish a monitoring event. This event is automatically send
+//	 *  to the monitoring service of the platform (if any). 
+//	 */
+//	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt);
+//	
+//	/**
+//	 *  Check if event targets exist.
+//	 */
+//	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi);
 
 	
 //	/**
