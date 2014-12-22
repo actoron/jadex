@@ -2912,7 +2912,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //					}
 //				});
 				
-				final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = ia.subscribeToEvents(new IFilter<IMonitoringEvent>()
+				final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(new IFilter<IMonitoringEvent>()
 				{
 					public boolean filter(IMonitoringEvent obj)
 					{

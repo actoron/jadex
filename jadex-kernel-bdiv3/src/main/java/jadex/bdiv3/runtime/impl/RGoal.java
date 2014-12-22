@@ -12,6 +12,7 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -1094,7 +1095,8 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 	 */
 	public void publishToolGoalEvent(String evtype)
 	{
-		if(ia.hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
+		if(ia.getComponentFeature(IMonitoringComponentFeature.class)!=null 
+			&& ia.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
@@ -1108,7 +1110,7 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			ia.publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
+			ia.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	

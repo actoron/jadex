@@ -1,5 +1,6 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
@@ -226,12 +227,12 @@ public abstract class NFMethodPropertyProvider extends NFPropertyProvider implem
 		}
 		nfmap.put(nfprop.getName(), nfprop);
 		
-		if(getInternalAccess().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+		if(getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 		{
 			MonitoringEvent me = new MonitoringEvent(getInternalAccess().getComponentIdentifier(), getInternalAccess().getComponentDescription().getCreationTime(), 
 				MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 			me.setProperty("propname", nfprop.getName());
-			getInternalAccess().publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+			getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
@@ -259,12 +260,12 @@ public abstract class NFMethodPropertyProvider extends NFPropertyProvider implem
 				{
 					public void customResultAvailable(Void result)
 					{
-						if(getInternalAccess().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+						if(getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 						{
 							MonitoringEvent me = new MonitoringEvent(getInternalAccess().getComponentIdentifier(), getInternalAccess().getComponentDescription().getCreationTime(), 
 								MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 							me.setProperty("propname", name);
-							getInternalAccess().publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+							getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 						else
 						{

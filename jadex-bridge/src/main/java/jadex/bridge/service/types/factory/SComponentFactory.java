@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.factory;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentIdentifier;
@@ -13,6 +12,7 @@ import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ArgumentsComponentFeature;
@@ -20,6 +20,7 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ComponentLifecycleFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.component.impl.MessageComponentFeature;
+import jadex.bridge.component.impl.MonitoringComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
 import jadex.bridge.component.impl.PropertiesComponentFeature;
 import jadex.bridge.component.impl.SubcomponentsComponentFeature;
@@ -64,6 +65,7 @@ public class SComponentFactory
 	static
 	{
 		Collection<IComponentFeatureFactory>	def_features	= new ArrayList<IComponentFeatureFactory>();
+		def_features.add(new ComponentFeatureFactory(IMonitoringComponentFeature.class, MonitoringComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class, ExecutionComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IArgumentsFeature.class, ArgumentsComponentFeature.class));
 		def_features.add(PropertiesComponentFeature.FACTORY);	// After args for logging

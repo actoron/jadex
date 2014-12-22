@@ -3,6 +3,7 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -87,7 +88,8 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(getComponent().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+		if(getComponent().getComponentFeature(IMonitoringComponentFeature.class)!=null 
+			&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 		{
 			// Hack, necessary because getService() is not a service call and the first contained
 			// service call (getChildren) will reset the call context afterwards :-(
@@ -191,7 +193,8 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 		 */
 		public void customResultAvailable(Void result)
 		{
-			if(getComponent().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+			if(getComponent().getComponentFeature(IMonitoringComponentFeature.class)!=null 
+				&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 			{
 				// Hack, necessary because getService() is not a service call and the first contained
 				// service call (getChildren) will reset the call context afterwards :-(

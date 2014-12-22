@@ -3,6 +3,7 @@ package jadex.micro.examples.mandelbrot;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -126,7 +127,7 @@ public class DisplayAgent
 //							}
 //						});
 						
-						ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+						ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 							.addResultListener(/*new SwingIntermediateResultListener<IMonitoringEvent>(*/new IntermediateDefaultResultListener<IMonitoringEvent>()
 						{
 							public void intermediateResultAvailable(IMonitoringEvent result)

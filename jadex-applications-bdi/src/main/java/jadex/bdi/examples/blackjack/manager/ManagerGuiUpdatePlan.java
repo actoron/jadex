@@ -54,7 +54,7 @@ public class ManagerGuiUpdatePlan extends Plan
 //		}
 //		);
 		
-		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+		getScope().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 			.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)

@@ -309,7 +309,7 @@ public class SecuritySettings extends AServiceSettings
 			}
 		});
 
-		subscribtion = secService.subscribeToEvents();
+		subscribtion = secService.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents();
 		subscribtion.addResultListener(refreshListener);
 		refresh();
 	}

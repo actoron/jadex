@@ -393,7 +393,7 @@ public class CallbackPlan extends Plan
 //		});
 		
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr16);
-		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+		getScope().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 			.addResultListener(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)

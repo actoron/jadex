@@ -2,43 +2,30 @@ package jadex.bdiv3;
 
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
-import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.features.impl.BDIMonitoringComponentFeature;
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
-import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Excluded;
-import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.kernelbase.IBootstrapFactory;
 import jadex.micro.MicroAgentFactory;
-import jadex.micro.features.impl.MicroInjectionComponentFeature;
-import jadex.micro.features.impl.MicroLifecycleComponentFeature;
-import jadex.micro.features.impl.MicroMessageComponentFeature;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,7 +54,11 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 
 	/** The specific component features for micro agents. */
 	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = Collections.unmodifiableCollection(
-		Arrays.asList(BDIAgentFeature.FACTORY, new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class)));
+		Arrays.asList(
+			BDIAgentFeature.FACTORY, 
+			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class),
+			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BDIMonitoringComponentFeature.class)
+		));
 	
 	//-------- attributes --------
 	

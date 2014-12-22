@@ -18,6 +18,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.search.SServiceProvider;
@@ -1517,7 +1518,8 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	 */
 	public void publishToolPlanEvent(String evtype)
 	{
-		if(ia.hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
+		if(ia.getComponentFeature(IMonitoringComponentFeature.class)!=null 
+			&& ia.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
@@ -1531,7 +1533,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			ia.publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
+			ia.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	

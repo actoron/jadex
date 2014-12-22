@@ -96,7 +96,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 //			}
 //		});
 		
-		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+		getScope().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 			.addResultListener(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)

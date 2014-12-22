@@ -1,9 +1,12 @@
 package jadex.platform.service.cms;
 
+import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -13,17 +16,22 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.CallAccess;
+import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -32,6 +40,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.kernelbase.ExternalAccess;
 
 import java.io.IOException;
@@ -75,6 +85,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	
 	/** The failure reason (if any). */
 	protected Exception	exception;
+	
 	
 	//-------- IPlatformComponentAccess interface --------
 	
@@ -669,36 +680,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public ClassLoader	getClassLoader()
 	{
 		return ((ModelInfo)getModel()).getClassLoader();
-	}
-	
-	/**
-	 *  Subscribe to component events.
-	 *  @param filter An optional filter.
-	 *  @param initial True, for receiving the current state.
-	 */
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-
-	/**
-	 *  Publish a monitoring event. This event is automatically send
-	 *  to the monitoring service of the platform (if any). 
-	 */
-	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 *  Check if event targets exist.
-	 */
-	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi)
-	{
-		// Todo!!!
-		return false;
-//		throw new UnsupportedOperationException();
 	}
 	
 	/**

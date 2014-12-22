@@ -10,6 +10,7 @@ import jadex.bpmn.model.task.annotation.Task;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
@@ -75,7 +76,7 @@ public class UserInteractionTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = instance.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.FINE);
+		final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = instance.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.FINE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)

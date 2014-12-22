@@ -663,7 +663,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 				{
 					public void run() 
 					{
-						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().subscribeToEvents(filter, initial, elm);
+						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 						fut.addResultListener(lis);
 					}
@@ -682,7 +682,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().subscribeToEvents(filter, initial, elm);
+			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 			TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 			fut.addResultListener(lis);
 		}
