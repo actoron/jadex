@@ -1,6 +1,10 @@
 dependencies 
 {
-    compile project(':jadex-platform-android')
+    provided libraries.android
+    compile(project(':jadex-platform-android')) {
+        exclude module: 'bcprov-jdk15'
+        exclude module: 'junit'
+    }
     compile project(':jadex-android-commons')
     compile project(':jadex-tools-base')
 }

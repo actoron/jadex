@@ -77,22 +77,10 @@ def isExcluded(excl, name)
     return ret;
 }
 
-//def isIncluded(incl, name)
-//{
-//    boolean ret = false;
-//    if(incl!=null)
-//    {
-//        for(ex in incl)
-//        {
-//            if(name.equals(ex))
-//            {
-//                ret = true;
-//                break;
-//            }
-//        }
-//    }
-//    return ret;
-//}
+def calledWithTask(fulltaskname)
+{
+    gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains(fulltaskname)
+}
 
 // make functions externally visible
 
@@ -104,5 +92,5 @@ ext {
     getResourcesDir = this.&getResourcesDir
     getCompileClassPath = this.&getCompileClassPath
     isExcluded = this.&isExcluded
-//    isIncluded = this.&isIncluded
+    calledWithTask = this.&calledWithTask
 }
