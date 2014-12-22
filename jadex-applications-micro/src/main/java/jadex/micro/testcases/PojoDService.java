@@ -113,6 +113,6 @@ public class PojoDService implements IDService
 	public IFuture<Boolean> testServiceArgument(IDService service) 
 	{
 //		System.out.println("service: "+service.getClass());
-		return new Future<Boolean>(Proxy.isProxyClass(service.getClass()));
+		return Proxy.isProxyClass(service.getClass()) ? IFuture.TRUE: IFuture.FALSE;
 	};
 }

@@ -45,7 +45,7 @@ public abstract class AbstractConstraintFilter<T> implements IAsyncFilter<T>
 	{
 		if (getValue() == null)
 		{
-			return new Future<Boolean>(true);
+			return IFuture.TRUE;
 		}
 		
 		final Future<Boolean> ret = new Future<Boolean>();

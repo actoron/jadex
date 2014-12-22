@@ -28,7 +28,7 @@ public class ConstantValueFilter extends AbstractConstraintFilter
 	 */
 	public IFuture<Boolean> doFilter(IService service, Object value)
 	{
-		return new Future<Boolean>(getValue().equals(value));
+		return getValue().equals(value) ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**

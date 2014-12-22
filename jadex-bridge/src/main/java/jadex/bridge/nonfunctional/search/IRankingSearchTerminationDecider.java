@@ -1,6 +1,6 @@
 package jadex.bridge.nonfunctional.search;
 
-import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.util.Collection;
 
@@ -17,5 +17,5 @@ public interface IRankingSearchTerminationDecider<S>
 	 *  
 	 *  @return True, to terminate the search and start ranking.
 	 */
-	public Future<Boolean> isStartRanking(Collection<S> currentresults, IServiceEvaluator evaluator);
+	public IFuture<Boolean> isStartRanking(Collection<S> currentresults, IServiceEvaluator evaluator);
 }

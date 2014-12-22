@@ -218,7 +218,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<Boolean>(model.endsWith(".gpmn")? Boolean.TRUE: Boolean.FALSE);
+		return model.endsWith(".gpmn") ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**
@@ -229,7 +229,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<Boolean>(model.endsWith(".gpmn")? Boolean.TRUE: Boolean.FALSE);
+		return model.endsWith(".gpmn") ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**

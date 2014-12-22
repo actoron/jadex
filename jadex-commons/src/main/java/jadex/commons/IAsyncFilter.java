@@ -1,6 +1,5 @@
 package jadex.commons;
 
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -18,7 +17,7 @@ public interface IAsyncFilter<T>
 	{
 		public IFuture<Boolean> filter(Object obj) 
 		{
-			return new Future<Boolean>(Boolean.TRUE);
+			return IFuture.TRUE;
 		}
 	}
 	
@@ -30,7 +29,7 @@ public interface IAsyncFilter<T>
 	{
 		public IFuture<Boolean> filter(Object obj) 
 		{
-			return new Future<Boolean>(Boolean.FALSE);
+			return IFuture.FALSE;
 		}
 	}
 

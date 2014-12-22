@@ -306,7 +306,7 @@ public class BasicService extends ExternalFeatureProvider implements IInternalSe
 	{
 //		if(getServiceIdentifier().getServiceName().indexOf("Decoupled")!=-1)
 //			System.out.println("isValid: "+getServiceIdentifier()+": "+(started && !shutdowned));
-		return new Future<Boolean>(started && !shutdowned? Boolean.TRUE: Boolean.FALSE);
+		return started && !shutdowned ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**

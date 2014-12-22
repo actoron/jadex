@@ -118,6 +118,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	{
 		this();
 		setResult(result);
+		
+//		if(result instanceof Boolean)
+//		{
+//			Thread.dumpStack();
+//		}
 	}
 	
 	/**

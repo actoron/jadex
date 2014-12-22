@@ -228,7 +228,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<Boolean>(model.endsWith(ComponentModelLoader.FILE_EXTENSION_COMPONENT));
+		return model.endsWith(ComponentModelLoader.FILE_EXTENSION_COMPONENT) ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**
@@ -239,7 +239,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<Boolean>(model.endsWith(ComponentModelLoader.FILE_EXTENSION_COMPONENT));
+		return model.endsWith(ComponentModelLoader.FILE_EXTENSION_COMPONENT) ? IFuture.TRUE : IFuture.FALSE;
 	}
 
 	/**

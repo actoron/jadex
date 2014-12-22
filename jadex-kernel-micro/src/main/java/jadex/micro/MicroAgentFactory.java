@@ -18,6 +18,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.kernelbase.IBootstrapFactory;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
@@ -243,7 +244,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
 //			System.out.println(clname+" "+cma+" "+ret);
 //		}
-		return new Future<Boolean>(ret? Boolean.TRUE: Boolean.FALSE);
+		return ret ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**
@@ -254,69 +255,65 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-		final Future<Boolean> ret = new Future<Boolean>();
+		IFuture<Boolean>	ret;
 		
-		isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
+		if(isLoadable(model, imports, rid).get(null).booleanValue())
 		{
-			public void customResultAvailable(Boolean result)
+			final Future<Boolean>	fut	= new Future<Boolean>();
+			ret	= fut;
+			loadModel(model, imports, rid).addResultListener(new IResultListener<IModelInfo>()
 			{
-				if(!result.booleanValue())
+				public void resultAvailable(final IModelInfo mi) 
 				{
-					ret.setResult(Boolean.FALSE);
-				}
-				else
-				{
-					loadModel(model, imports, rid).addResultListener(new ExceptionDelegationResultListener<IModelInfo, Boolean>(ret)
+					if(libservice!=null)
 					{
-						public void customResultAvailable(final IModelInfo mi) 
+						libservice.getClassLoader(rid)
+							.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(fut)
 						{
-							if(libservice!=null)
-							{
-								libservice.getClassLoader(rid)
-									.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
-								{
-									public void customResultAvailable(ClassLoader cl)
-									{
-										try
-										{
-											Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Agent", null, cl);
-											ret.setResult(!Modifier.isInterface(clazz.getModifiers()) && !Modifier.isAbstract(clazz.getModifiers()));
-										}
-										catch(Exception e)
-										{
-											ret.setResult(Boolean.FALSE);
-//											ret.setException(e);
-										}
-									}
-								});		
-							}
-							else
+							public void customResultAvailable(ClassLoader cl)
 							{
 								try
 								{
-									ClassLoader cl = getClass().getClassLoader();
 									Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Agent", null, cl);
-									ret.setResult(!Modifier.isAbstract(clazz.getModifiers()));
+									fut.setResult(!Modifier.isInterface(clazz.getModifiers()) && !Modifier.isAbstract(clazz.getModifiers()));
 								}
 								catch(Exception e)
 								{
-									ret.setResult(Boolean.FALSE);
-//									ret.setException(e);
+									fut.setResult(Boolean.FALSE);
+//											ret.setException(e);
 								}
 							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
+						});		
+					}
+					else
+					{
+						try
 						{
-//							exception.printStackTrace();
-							Logger.getLogger(MicroAgentFactory.class.toString()).warning(exception.toString());
-							ret.setResult(Boolean.FALSE);
-//							super.exceptionOccurred(exception);
+							ClassLoader cl = getClass().getClassLoader();
+							Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Agent", null, cl);
+							fut.setResult(!Modifier.isAbstract(clazz.getModifiers()));
 						}
-					});
+						catch(Exception e)
+						{
+							fut.setResult(Boolean.FALSE);
+//									ret.setException(e);
+						}
+					}
 				}
-			}
-		});
+				
+				public void exceptionOccurred(Exception exception)
+				{
+//							exception.printStackTrace();
+					Logger.getLogger(MicroAgentFactory.class.toString()).warning(exception.toString());
+					fut.setResult(Boolean.FALSE);
+//							super.exceptionOccurred(exception);
+				}
+			});
+		}
+		else
+		{
+			ret	= IFuture.FALSE;
+		}
 		
 		return ret;
 	}
