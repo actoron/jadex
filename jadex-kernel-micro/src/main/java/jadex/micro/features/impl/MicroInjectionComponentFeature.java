@@ -175,7 +175,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 		}
 		
 		// Inject required services
-		injectServices(getComponent(), model, getComponent()).addResultListener(new IResultListener<Void>()
+		injectServices(agent, model, getComponent()).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
