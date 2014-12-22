@@ -213,6 +213,8 @@
 
 				<!-- ready-to-run apps -->
 				<module>jadex-applications-android-demos</module>
+				<module>jadex-applications-android/jadex-applications-android-puzzle</module>
+				<module>jadex-applications-android/jadex-applications-android-chat</module>
 				<module>jadex-android-platformapp</module>
 			</modules>
 		</profile>
