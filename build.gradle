@@ -72,11 +72,13 @@ allprojects
         // see http://www.sinking.in/blog/provided-scope-in-gradle/
         provided {
             dependencies.all { dep ->
+                // New inheritance: testRuntime -> testCompile -> compile -> provided
+                // This has to be done here to assure the new inheritance before artifacts are excluded from runtime
+                testRuntime.extendsFrom = [testCompile]
                 configurations.runtime.exclude group: dep.group, module: dep.name
             }
         }
-        // default inheritance: default -> runtime -> compile
-        // provided deps are added to compile, but excluded from runtime (and default)
+        // new inheritance: default -> runtime -> compile -> provided
         compile.extendsFrom provided
 
         // configurations which includes artifacts to include in dist
