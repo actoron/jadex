@@ -515,7 +515,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}			
 		}
 		
-		T[] ret	= (T[])Array.newInstance(clazz, coll!=null ? coll.size(): 0);
+		T[] ret	= (T[])Array.newInstance(clazz==null? Object.class: clazz, coll!=null ? coll.size(): 0);
 		return coll==null ? ret : coll.toArray(ret);
 	}
 	
