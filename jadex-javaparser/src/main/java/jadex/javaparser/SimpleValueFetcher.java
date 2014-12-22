@@ -67,26 +67,26 @@ public class SimpleValueFetcher implements IValueFetcher
 		return ret;
 	}
 	
-	/**
-	 *  Fetch a value via its name from an object.
-	 *  @param name The name.
-	 *  @param object The object.
-	 *  @return The value.
-	 */
-	public Object fetchValue(String name, Object object)
-	{
-		Object	ret;
-		if(parent!=null)
-		{
-			ret	= parent.fetchValue(name, object);
-		}
-		else
-		{
-			throw new RuntimeException("Unkown object type: "+name);
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Fetch a value via its name from an object.
+//	 *  @param name The name.
+//	 *  @param object The object.
+//	 *  @return The value.
+//	 */
+//	public Object fetchValue(String name, Object object)
+//	{
+//		Object	ret;
+//		if(parent!=null)
+//		{
+//			ret	= parent.fetchValue(name, object);
+//		}
+//		else
+//		{
+//			throw new RuntimeException("Unkown object type: "+name);
+//		}
+//		
+//		return ret;
+//	}
 
 	//-------- additional methods --------
 	

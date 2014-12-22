@@ -1,17 +1,14 @@
 package jadex.bridge.component;
 
+import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 
 /**
  *  A component feature is a pluggable part of the state and behavior
- *  of a component. This interface represents the instance level of a feature.
- *  
- *  The feature can inject parameters for expression evaluation
- *  using the value fetcher super interface. The fetch order is the reverse
- *  init order, i.e., later features can override values from earlier features.
+ *  of a component. This interface represents the internal view of the instance level of a feature.
  */
-public interface IComponentFeature	extends IValueFetcher
+public interface IComponentFeature
 {
 	/**
 	 *  Initialize the feature.
@@ -40,4 +37,18 @@ public interface IComponentFeature	extends IValueFetcher
 //	 */
 ////	public <T> IFuture<Class<T>> getExternalFacadeType(Object context);
 //	public <T> Class<T> getExternalFacadeType(Object context);
+	
+	/**
+	 *  The feature can inject parameters for expression evaluation
+	 *  by providing an optional value fetcher. The fetch order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
+	 */
+	public IValueFetcher	getValueFetcher();
+	
+	/**
+	 *  The feature can add objects for field or method injections
+	 *  by providing an optional parameter guesser. The selection order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
+	 */
+	public IParameterGuesser	getParameterGuesser();
 }

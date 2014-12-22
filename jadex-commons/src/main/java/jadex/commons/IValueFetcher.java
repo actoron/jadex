@@ -17,11 +17,11 @@ public interface IValueFetcher
 	 */
 	public Object fetchValue(String name);
 	
-	/**
-	 *  Fetch a value via its name from an object.
-	 *  @param name The name.
-	 *  @param object The object.
-	 *  @return The value.
-	 */
-	public Object fetchValue(String name, Object object);
+//	/**
+//	 *  Fetch a value via its name from an object.
+//	 *  @param name The name.
+//	 *  @param object The object.
+//	 *  @return The value.
+//	 */
+//	public Object fetchValue(String name, Object object);
 }

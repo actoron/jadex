@@ -211,10 +211,10 @@ public class SelectNode	extends ExpressionNode
 				return ret;
 			}
 			
-			public Object fetchValue(String name, Object object)
-			{
-				return fetcher.fetchValue(name, object);
-			}
+//			public Object fetchValue(String name, Object object)
+//			{
+//				return fetcher.fetchValue(name, object);
+//			}
 		};
 
 		// The condition (where clause, if any).

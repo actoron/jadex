@@ -3,7 +3,8 @@ package jadex.bridge.component.impl;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
-import jadex.commons.future.Future;
+import jadex.commons.IParameterGuesser;
+import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 
 /**
@@ -89,29 +90,23 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 		return null;
 	}
 	
-	//-------- IValueFetcher interface --------
-	
 	/**
-	 *  Fetch a value via its name.
-	 *  Empty default method to be overridden by subclasses. 
-	 *  @param name The name.
-	 *  @return The value.
+	 *  The feature can inject parameters for expression evaluation
+	 *  by providing an optional value fetcher. The fetch order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
 	 */
-	public Object fetchValue(String name)
+	public IValueFetcher	getValueFetcher()
 	{
-		throw new UnsupportedOperationException();
+		return null;
 	}
 	
 	/**
-	 *  Fetch a value via its name from an object.
-	 *  Empty default method to be overridden by subclasses. 
-	 *  @param name The name.
-	 *  @param object The object.
-	 *  @return The value.
+	 *  The feature can add objects for field or method injections
+	 *  by providing an optional parameter guesser. The selection order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
 	 */
-	public Object fetchValue(String name, Object object)
+	public IParameterGuesser	getParameterGuesser()
 	{
-		throw new UnsupportedOperationException();
+		return null;
 	}
-
 }

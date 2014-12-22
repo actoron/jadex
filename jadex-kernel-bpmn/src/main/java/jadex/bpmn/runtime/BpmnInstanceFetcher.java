@@ -62,17 +62,17 @@ public class BpmnInstanceFetcher extends InterpreterFetcher
 		return ret;
 	}
 	
-	/**
-	 *  Fetch a value via its name from an object.
-	 *  @param name The name.
-	 *  @param object The object.
-	 *  @return The value.
-	 */
-	public Object fetchValue(String name, Object object)
-	{
-		if(fetcher!=null)
-			return fetcher.fetchValue(name, object);
-		else
-			throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Fetch a value via its name from an object.
+//	 *  @param name The name.
+//	 *  @param object The object.
+//	 *  @return The value.
+//	 */
+//	public Object fetchValue(String name, Object object)
+//	{
+//		if(fetcher!=null)
+//			return fetcher.fetchValue(name, object);
+//		else
+//			throw new UnsupportedOperationException();
+//	}
 }

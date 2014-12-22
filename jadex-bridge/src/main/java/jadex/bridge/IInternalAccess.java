@@ -6,6 +6,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
+import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -98,7 +99,15 @@ public interface IInternalAccess
 	 *  Get the fetcher.
 	 *  @return The fetcher.
 	 */
+	// Todo: move to IPlatformComponent?
 	public IValueFetcher getFetcher();
+		
+	/**
+	 *  Get the parameter guesser.
+	 *  @return The parameter guesser.
+	 */
+	// Todo: move to IPlatformComponent?
+	public IParameterGuesser getParameterGuesser();
 		
 //	/**
 //	 *  Get the arguments.

@@ -38,28 +38,28 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 	
 	//-------- methods --------
 
-	/**
-	 *  Fetch a named value from an object.
-	 *  @param name The name.
-	 *  @param object The object.
-	 *  @return The fetched value.
-	 */
-	public Object fetchValue(String name, Object object)
-	{
-		Object ret;
-		if(object instanceof Map && ((Map)object).containsKey(name))
-			ret = ((Map)object).get(name);
-		else if(object instanceof IMessageAdapter && ((IMessageAdapter)object).getParameterMap().containsKey(name))
-			ret = ((IMessageAdapter)object).getValue(name);
-		else if("$thread".equals(name))
-			ret = thread;
-		else if(fetcher!=null)
-			ret = fetcher.fetchValue(name, object);
-		else
-			throw new UnsupportedOperationException();
-	
-		return ret;
-	}
+//	/**
+//	 *  Fetch a named value from an object.
+//	 *  @param name The name.
+//	 *  @param object The object.
+//	 *  @return The fetched value.
+//	 */
+//	public Object fetchValue(String name, Object object)
+//	{
+//		Object ret;
+//		if(object instanceof Map && ((Map)object).containsKey(name))
+//			ret = ((Map)object).get(name);
+//		else if(object instanceof IMessageAdapter && ((IMessageAdapter)object).getParameterMap().containsKey(name))
+//			ret = ((IMessageAdapter)object).getValue(name);
+//		else if("$thread".equals(name))
+//			ret = thread;
+//		else if(fetcher!=null)
+//			ret = fetcher.fetchValue(name, object);
+//		else
+//			throw new UnsupportedOperationException();
+//	
+//		return ret;
+//	}
 	
 	/**
 	 *  Fetch a named value.

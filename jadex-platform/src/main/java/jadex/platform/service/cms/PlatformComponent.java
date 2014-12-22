@@ -22,6 +22,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
+import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -609,7 +610,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				{
 					try
 					{
-						ret	= lfeatures.get(i).fetchValue(name);
+//						ret	= lfeatures.get(i).fetchValue(name);
 						found	= true;
 					}
 					catch(Exception e)
@@ -635,34 +636,19 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				
 				return ret;
 			}
-			
-			public Object fetchValue(String name, Object object)
-			{
-				Object	ret	= null;
-				boolean	found	= false;
-				
-				for(int i=lfeatures.size()-1; !found && i>=0; i--)
-				{
-					try
-					{
-						ret	= lfeatures.get(i).fetchValue(name, object);
-						found	= true;
-					}
-					catch(Exception e)
-					{
-					}
-				}
-				
-				if(!found)
-				{
-					throw new UnsupportedOperationException("Value not found: "+name+", "+object);
-				}
-				
-				return ret;
-			}
 		};
 	}
-		
+	
+	/**
+	 *  Get the parameter guesser.
+	 *  @return The parameter guesser.
+	 */
+	// Todo: move to IPlatformComponent?
+	public IParameterGuesser getParameterGuesser()
+	{
+		return null;
+	}
+
 	/**
 	 *  Get the class loader of the component.
 	 */

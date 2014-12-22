@@ -9,7 +9,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -61,7 +61,7 @@ public class LoggerAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice").addResultListener(new DelegationResultListener(ret)
+		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -120,7 +120,6 @@ public class LoggerAgent
 				reports.add(tr2);
 				
 				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
-//				killAgent();
 				ret.setResult(null);
 			}
 		});

@@ -19,7 +19,6 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
@@ -136,38 +135,16 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		// Fetch marshal service first time.		
 		if(marshal==null)
 		{
-			SServiceProvider.getService(ea, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
+			marshal	= SServiceProvider.getLocalService(ia, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			filter = new IFilter()
 			{
-				public void customResultAvailable(IMarshalService result)
+				public boolean filter(Object object)
 				{
-					marshal = result;
-					filter = new IFilter()
-					{
-						public boolean filter(Object object)
-						{
-							return marshal.isLocalReference(object);
-						}
-					}; 
-					internalDoExecute(sic).addResultListener(new DelegationResultListener<Void>(ret));
+					return marshal.isLocalReference(object);
 				}
-			});
+			};
 		}
-		else
-		{
-			internalDoExecute(sic).addResultListener(new DelegationResultListener<Void>(ret));
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Internal do execute.
-	 */
-	public IFuture<Void> internalDoExecute(final ServiceInvocationContext sic)
-	{
-		final Future<Void> ret = new Future<Void>();
-		
+
 		// Perform argument copy
 		
 		// In case of remote call parameters are copied as part of marshalling.

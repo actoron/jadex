@@ -767,19 +767,19 @@ public class ReflectNode	extends ExpressionNode
 		boolean	fetched	= false;
 		Object val = null;
 		
-		// When nothing precomputed, try fetcher first.
-		if(field==null && accessor==null)
-		{
-			try
-			{
-				val	= fetcher.fetchValue(getText(), ref);
-				fetched	= true;
-			}
-			catch(Exception e)
-			{
-//				e.printStackTrace();
-			}
-		}
+//		// When nothing precomputed, try fetcher first.
+//		if(field==null && accessor==null)
+//		{
+//			try
+//			{
+//				val	= fetcher.fetchValue(getText(), ref);
+//				fetched	= true;
+//			}
+//			catch(Exception e)
+//			{
+////				e.printStackTrace();
+//			}
+//		}
 
 		// Find field if not precomputed.
 		Field	field0	= this.field;

@@ -4,6 +4,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IPropertiesFeature;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
@@ -41,52 +43,75 @@ public class PropertiesComponentFeature	extends	AbstractComponentFeature	impleme
 	 */
 	public IFuture<Void> init()
 	{
-		// Todo: runtime-supplied properties?
-//		if(cinfo.getArguments()!=null)
-//		{
-//			for(Iterator<Map.Entry<String, Object>> it=cinfo.getArguments().entrySet().iterator(); it.hasNext(); )
-//			{
-//				Map.Entry<String, Object> entry = it.next();
-//				if(arguments==null)
-//				{
-//					this.arguments	= new LinkedHashMap<String, Object>();
-//				}
-//				arguments.put(entry.getKey(), entry.getValue());
-//			}
-//		}
-		
-		// Todo: configuration properties?
-//		ConfigurationInfo	ci	= cinfo.getConfiguration()!=null ? component.getModel().getConfiguration(cinfo.getConfiguration()) : null;
-//		if(ci!=null)
-//		{
-//			UnparsedExpression[]	upes	= ci.getArguments();
-//			for(int i=0; i<upes.length; i++)
-//			{
-//				if(arguments==null || !arguments.containsKey(upes[i].getName()))
-//				{
-//					if(arguments==null)
-//					{
-//						this.arguments	= new LinkedHashMap<String, Object>();
-//					}
-//					arguments.put(upes[i].getName(), SJavaParser.getParsedValue(upes[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
-//				}
-//			}
-//		}
-		
-		
-		for(Map.Entry<String, Object> prop: getComponent().getModel().getProperties().entrySet())
+		try
 		{
-			if((properties==null || !properties.containsKey(prop.getKey())))
-			{
-				if(properties==null)
-				{
-					this.properties	= new LinkedHashMap<String, Object>();
-				}
-				properties.put(prop.getKey(), SJavaParser.getParsedValue(prop.getValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
-			}
-		}
 		
-		return IFuture.DONE;
+			// Todo: runtime-supplied properties?
+	//		if(cinfo.getArguments()!=null)
+	//		{
+	//			for(Iterator<Map.Entry<String, Object>> it=cinfo.getArguments().entrySet().iterator(); it.hasNext(); )
+	//			{
+	//				Map.Entry<String, Object> entry = it.next();
+	//				if(arguments==null)
+	//				{
+	//					this.arguments	= new LinkedHashMap<String, Object>();
+	//				}
+	//				arguments.put(entry.getKey(), entry.getValue());
+	//			}
+	//		}
+			
+			// Todo: configuration properties?
+	//		ConfigurationInfo	ci	= cinfo.getConfiguration()!=null ? component.getModel().getConfiguration(cinfo.getConfiguration()) : null;
+	//		if(ci!=null)
+	//		{
+	//			UnparsedExpression[]	upes	= ci.getArguments();
+	//			for(int i=0; i<upes.length; i++)
+	//			{
+	//				if(arguments==null || !arguments.containsKey(upes[i].getName()))
+	//				{
+	//					if(arguments==null)
+	//					{
+	//						this.arguments	= new LinkedHashMap<String, Object>();
+	//					}
+	//					arguments.put(upes[i].getName(), SJavaParser.getParsedValue(upes[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
+	//				}
+	//			}
+	//		}
+			
+			
+			for(Map.Entry<String, Object> prop: getComponent().getModel().getProperties().entrySet())
+			{
+				if((properties==null || !properties.containsKey(prop.getKey())))
+				{
+					if(properties==null)
+					{
+						this.properties	= new LinkedHashMap<String, Object>();
+					}
+					
+					Object tmp	= prop.getValue();
+					if(tmp instanceof UnparsedExpression)
+					{
+						final UnparsedExpression unexp = (UnparsedExpression)tmp;
+						Class<?> clazz = unexp.getClazz()!=null? unexp.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports()): null;
+						if(unexp.getValue()==null || unexp.getValue().length()==0 && clazz!=null)
+						{
+							tmp = clazz.newInstance();
+						}
+						else
+						{
+							tmp = SJavaParser.evaluateExpression(unexp.getValue(), getComponent().getModel().getAllImports(), getComponent().getFetcher(), getComponent().getClassLoader());
+						}
+					}
+					properties.put(prop.getKey(), tmp);
+				}
+			}
+			
+			return IFuture.DONE;
+		}
+		catch(Exception e)
+		{
+			return new Future<Void>(e);
+		}
 	}
 	
 	//-------- IArgumentsFeature interface --------
