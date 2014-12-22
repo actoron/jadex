@@ -221,7 +221,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	protected void	addService(IInternalService service, ProvidedServiceInfo info)
 	{
 		// Find service types
-		Class<?>	type	= info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+//		Class<?>	type	= info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+		Class<?>	type	= service.getServiceIdentifier().getServiceType().getType(component.getClassLoader(), component.getModel().getAllImports());
 		Set<Class<?>> types = new LinkedHashSet<Class<?>>();
 		types.add(type);
 		for(Class<?> sin: SReflect.getSuperInterfaces(new Class[]{type}))

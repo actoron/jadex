@@ -10,6 +10,8 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -17,6 +19,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -122,7 +125,7 @@ public class RemoteServiceManagementAgent
 								rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice);//, binarymode);
 								
 								// Todo:
-//								addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+								agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 								
 								ret.setResult(null);
 							}
