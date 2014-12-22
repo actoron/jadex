@@ -468,19 +468,26 @@ task buildExampleProject(type: Zip) {
 	from('docs/jadex-example-project')
 }
 
+/**
+ * Generates non-maven and gradle example projects
+ */
 task buildAndroidExampleProject(type: Zip) {
     destinationDir = new File(project.distsDir, "standard-version")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveName = 'jadex-android-example-projects.zip'
     from('docs/android/jadex-android-example-project-maven') {into ('jadex-android-example-project-maven')}
-    // non-maven example project:
+    // non-maven and gradle example project:
     from('docs/android/jadex-android-example-project') {into ('jadex-android-example-project')}
+    from('docs/android/jadex-android-example-project-gradle') {into ('jadex-android-example-project-gradle')}
     // Copy sources from maven example project to non-maven example project
     from('docs/android/jadex-android-example-project-maven/src/main/java') {into ('jadex-android-example-project/src')}
+    from('docs/android/jadex-android-example-project-maven/src/main/java') {into ('jadex-android-example-project-gradle/src/main/java')}
     // Copy resources from maven example project to non-maven example project
     from('docs/android/jadex-android-example-project-maven/res') {into ('jadex-android-example-project/res')}
+    from('docs/android/jadex-android-example-project-maven/res') {into ('jadex-android-example-project-gradle/src/main/res')}
     // Copy Manifest from maven example project to non-maven example project
     from('docs/android/jadex-android-example-project-maven/AndroidManifest.xml') {into ('jadex-android-example-project/')}
+    from('docs/android/jadex-android-example-project-maven/AndroidManifest.xml') {into ('jadex-android-example-project-gradle/src/main/')}
 
     from('docs/android/jadex-android-clientapp-example-maven') {into ('jadex-android-clientapp-example-maven')}
 }
