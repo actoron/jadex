@@ -63,6 +63,9 @@ public class SimpleParameterGuesser implements IParameterGuesser
 		if(!found && parent!=null)
 			ret = parent.guessParameter(type, exact);
 		
+		if(!found)
+			throw new RuntimeException("No parameter value found");
+		
 		return ret;
 	}
 	
