@@ -9,6 +9,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.wrappers.MapWrapper;
 import jadex.commons.future.IFuture;
@@ -27,7 +28,7 @@ import java.util.Set;
 /**
  *  This feature provides arguments.
  */
-public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsFeature
+public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsFeature, IValueFetcher
 {
 	//-------- attributes --------
 	
@@ -148,6 +149,16 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	//-------- IValueFetcher interface --------
 	
 	/**
+	 *  The feature can inject parameters for expression evaluation
+	 *  by providing an optional value fetcher. The fetch order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
+	 */
+	public IValueFetcher	getValueFetcher()
+	{
+		return this;
+	}
+	
+	/**
 	 *  Fetch the arguments.
 	 */
 	public Object fetchValue(String name)
@@ -159,7 +170,7 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		}
 		else
 		{
-			throw new UnsupportedOperationException();
+			throw new RuntimeException("Value not found: "+name);
 		}
 		
 		return ret;
