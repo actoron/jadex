@@ -1,7 +1,5 @@
 package jadex.micro.testcases;
 
-import jadex.base.test.TestReport;
-import jadex.base.test.Testcase;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
