@@ -640,50 +640,57 @@ public class LocalServiceRegistry
 		
 		if(services!=null)
 		{
-			Set<IService> sers = services.get(new ClassInfo(IProxyAgentService.class));
-			if(sers!=null && sers.size()>0)
+			final IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);
+			if(rms!=null)
 			{
-				final CounterResultListener<Void> clis = new CounterResultListener<Void>(sers.size(), new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
+				Set<IService> sers = services.get(new ClassInfo(IProxyAgentService.class));
+				if(sers!=null && sers.size()>0)
 				{
-					public void customResultAvailable(Void result)
+					final CounterResultListener<Void> clis = new CounterResultListener<Void>(sers.size(), new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
 					{
-						ret.setFinished();
-					}
-				});
-				
-				for(IService ser: sers)
-				{
-					IProxyAgentService ps = (IProxyAgentService)ser;
-					
-					ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
-					{
-						public void resultAvailable(IComponentIdentifier rcid)
+						public void customResultAvailable(Void result)
 						{
-							IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);	
-							IFuture<Collection<T>> rsers = rms.getServiceProxies(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
-							rsers.addResultListener(new IResultListener<Collection<T>>()
-							{
-								public void resultAvailable(Collection<T> result)
-								{
-									for(T t: result)
-									{
-										ret.addIntermediateResult(t);
-									}
-									clis.resultAvailable(null);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									clis.resultAvailable(null);
-								}
-							});
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							clis.resultAvailable(null);
+							ret.setFinished();
 						}
 					});
+					
+					for(IService ser: sers)
+					{
+						IProxyAgentService ps = (IProxyAgentService)ser;
+						
+						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
+						{
+							public void resultAvailable(IComponentIdentifier rcid)
+							{
+								IFuture<Collection<T>> rsers = rms.getServiceProxies(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+								rsers.addResultListener(new IResultListener<Collection<T>>()
+								{
+									public void resultAvailable(Collection<T> result)
+									{
+										for(T t: result)
+										{
+											ret.addIntermediateResult(t);
+										}
+										clis.resultAvailable(null);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										clis.resultAvailable(null);
+									}
+								});
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								clis.resultAvailable(null);
+							}
+						});
+					}
+				}
+				else
+				{
+					ret.setFinished();					
 				}
 			}
 			else
@@ -723,47 +730,54 @@ public class LocalServiceRegistry
 		
 		if(services!=null)
 		{
-			Set<IService> sers = getServices(IProxyAgentService.class);
-			if(sers!=null && sers.size()>0)
+			final IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);
+			if(rms!=null)
 			{
-				final CounterResultListener<Void> clis = new CounterResultListener<Void>(sers.size(), new ExceptionDelegationResultListener<Void, T>(ret)
+				Set<IService> sers = getServices(IProxyAgentService.class);
+				if(sers!=null && sers.size()>0)
 				{
-					public void customResultAvailable(Void result)
+					final CounterResultListener<Void> clis = new CounterResultListener<Void>(sers.size(), new ExceptionDelegationResultListener<Void, T>(ret)
 					{
-						ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
-					}
-				});
-				
-				for(IService ser: sers)
-				{
-					IProxyAgentService ps = (IProxyAgentService)ser;
-					
-					ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
-					{
-						public void resultAvailable(IComponentIdentifier rcid)
+						public void customResultAvailable(Void result)
 						{
-							IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);	
-							IFuture<T> rsers = rms.getServiceProxy(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
-							rsers.addResultListener(new IResultListener<T>()
-							{
-								public void resultAvailable(T result)
-								{
-									ret.setResultIfUndone(result);
-									clis.resultAvailable(null);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									clis.resultAvailable(null);
-								}
-							});
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							clis.resultAvailable(null);
+							ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
 						}
 					});
+					
+					for(IService ser: sers)
+					{
+						IProxyAgentService ps = (IProxyAgentService)ser;
+						
+						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
+						{
+							public void resultAvailable(IComponentIdentifier rcid)
+							{
+								IFuture<T> rsers = rms.getServiceProxy(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+								rsers.addResultListener(new IResultListener<T>()
+								{
+									public void resultAvailable(T result)
+									{
+										ret.setResultIfUndone(result);
+										clis.resultAvailable(null);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										clis.resultAvailable(null);
+									}
+								});
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								clis.resultAvailable(null);
+							}
+						});
+					}
+				}
+				else
+				{
+					ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
 				}
 			}
 			else

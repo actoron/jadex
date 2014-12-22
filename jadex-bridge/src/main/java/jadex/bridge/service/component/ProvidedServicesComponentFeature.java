@@ -218,7 +218,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param service	The service object.
 	 *  @param info	 The service info.
 	 */
-	public void	addService(IInternalService service, ProvidedServiceInfo info)
+	protected void	addService(IInternalService service, ProvidedServiceInfo info)
 	{
 		// Find service types
 		Class<?>	type	= info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
@@ -249,6 +249,31 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			
 			// Make all services available immediately, even before start (hack???).
 			((IPlatformComponentAccess)component).getServiceRegistry().addService(new ClassInfo(servicetype), service);
+		}
+	}
+	
+	/**
+	 *  Remove a service.
+	 *  @param service	The service object.
+	 *  @param info	 The service info.
+	 */
+	protected void	removeService(IInternalService service)
+	{
+		// Find service types
+		Class<?>	type	= service.getServiceIdentifier().getServiceType().getType(component.getClassLoader(), component.getModel().getAllImports());
+		Set<Class<?>> types = new LinkedHashSet<Class<?>>();
+		types.add(type);
+		for(Class<?> sin: SReflect.getSuperInterfaces(new Class[]{type}))
+		{
+			if(sin.isAnnotationPresent(Service.class))
+			{
+				types.add(sin);
+			}
+		}
+
+		for(Class<?> servicetype: types)
+		{
+			((IPlatformComponentAccess)component).getServiceRegistry().removeService(new ClassInfo(servicetype), service);
 		}
 	}
 	
@@ -362,6 +387,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		if(services.hasNext())
 		{
 			final IInternalService	is	= services.next();
+			// Remove service from registry before shutdown.
+			removeService(is);
+			
 			component.getLogger().info("Stopping service: "+is.getServiceIdentifier());
 			is.shutdownService().addResultListener(new IResultListener<Void>()
 			{
