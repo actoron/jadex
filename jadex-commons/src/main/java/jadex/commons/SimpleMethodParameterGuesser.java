@@ -34,7 +34,7 @@ public class SimpleMethodParameterGuesser implements IMethodParameterGuesser
 	/**
 	 *  Guess the parameters of a method call. 
 	 */
-	public Object[] guessParameters(Class<?>[] ptypes)
+	public Object[] guessParameters(Class<?>[] ptypes, IParameterGuesser parent)
 	{
 		Object[] ret = null;
 		
@@ -57,6 +57,14 @@ public class SimpleMethodParameterGuesser implements IMethodParameterGuesser
 				}
 				catch(Exception e)
 				{
+					if(parent!=null)
+					{
+						ret[i] = parent.guessParameter(ptypes[i], true);
+						if(ret[i]==null)
+						{
+							ret[i] = parent.guessParameter(ptypes[i], false);
+						}
+					}
 					e.printStackTrace();
 				}
 			}

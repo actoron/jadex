@@ -8,6 +8,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPropertiesFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
@@ -18,6 +19,10 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -148,7 +153,53 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				return executeShutdownOnFeatures(ifeatures!=null ? ifeatures : lfeatures, 0);
+				final Future<Void> ret = new Future<Void>();
+				
+				executeShutdownOnFeatures(ifeatures!=null ? ifeatures : lfeatures, 0)
+					.addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						proceed(null);
+					}
+
+					public void exceptionOccurred(Exception exception)
+					{
+						proceed(exception);
+					}
+					
+					public void proceed(final Exception ex)
+					{
+						if(getComponentFeature(IMonitoringComponentFeature.class)!=null 
+							&& getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+						{
+							MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
+								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
+							event.setProperty("details", getComponentDescription());
+							getComponentFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret)
+							{
+								public void customResultAvailable(Void result)
+								{
+									if(ex!=null)
+										ret.setException(ex);
+									else
+										ret.setResult(null);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									ret.setException(exception);
+								}
+							});
+						}
+						else
+						{
+							ret.setResult(null);
+						}
+					}
+				});
+				
+				return ret;
 			}
 		});
 	}

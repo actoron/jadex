@@ -7,11 +7,11 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -74,13 +74,13 @@ public class DependendServicesAgent
             public void customResultAvailable(Collection<IExternalAccess> result)
             {
             	IExternalAccess[] childs = (IExternalAccess[])result.toArray(new IExternalAccess[0]);
-//   			System.out.println("childs: "+SUtil.arrayToString(childs));
+            	System.out.println("childs: "+SUtil.arrayToString(childs));
                 final CollectionResultListener<Collection<TestReport>> lis = new CollectionResultListener<Collection<TestReport>>(childs.length, true, 
                 	agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Collection<TestReport>>>()
                 {
                     public void resultAvailable(Collection<Collection<TestReport>> result)
                     {
-//						System.out.println("fini: "+result);
+						System.out.println("fini: "+result);
 						List<TestReport> tests = new ArrayList<TestReport>();
 //						Collection<TestReport> col = (Collection<TestReport>)result;
 						for(Iterator<Collection<TestReport>> it=result.iterator(); it.hasNext(); )
@@ -111,7 +111,7 @@ public class DependendServicesAgent
                             {
                                 public void resultAvailable(Map<String, Object> res)
                                 {
-//                                  System.out.println("del: "+child.getComponentIdentifier()+" "+result);
+                                  System.out.println("del: "+child.getComponentIdentifier()+" "+res);
 //                                    Map res = (Map)result;
                                     List<TestReport> tests = (List<TestReport>)res.get("testcases");
                                     lis.resultAvailable(tests);

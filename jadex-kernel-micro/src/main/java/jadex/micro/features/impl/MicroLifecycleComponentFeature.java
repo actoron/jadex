@@ -3,6 +3,7 @@ package jadex.micro.features.impl;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -34,7 +35,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMicroLifecycleFeature.class, MicroLifecycleComponentFeature.class,
-		new Class<?>[]{IRequiredServicesFeature.class, IProvidedServicesFeature.class}, null);
+		new Class<?>[]{IRequiredServicesFeature.class, IProvidedServicesFeature.class, ISubcomponentsFeature.class}, null);
 	
 	//-------- attributes --------
 	

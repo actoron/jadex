@@ -14,15 +14,15 @@ public interface IParameterGuesser
 	 */
 	public Object guessParameter(Class<?> type, boolean exact);
 	
-	/**
-	 *  Get the parent guesser.
-	 *  @return The parent guesser.
-	 */
-	public IParameterGuesser getParent();
-	
-	/**
-	 *  Set the parent.
-	 *  @param parent The parent.
-	 */
-	public void setParent(IParameterGuesser parent);
+//	/**
+//	 *  Get the parent guesser.
+//	 *  @return The parent guesser.
+//	 */
+//	public IParameterGuesser getParent();
+//	
+//	/**
+//	 *  Set the parent.
+//	 *  @param parent The parent.
+//	 */
+//	public void setParent(IParameterGuesser parent);
 }

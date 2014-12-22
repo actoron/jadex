@@ -587,6 +587,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 							}
 							catch(Exception e)
 							{
+//								e.printStackTrace();
 								throw new RuntimeException(e);
 							}
 						}
