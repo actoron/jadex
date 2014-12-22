@@ -5,6 +5,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
@@ -33,7 +34,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMicroLifecycleFeature.class, MicroLifecycleComponentFeature.class,
-		new Class<?>[]{IRequiredServicesFeature.class}, null);
+		new Class<?>[]{IRequiredServicesFeature.class, IProvidedServicesFeature.class}, null);
 	
 	//-------- attributes --------
 	
