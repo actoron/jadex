@@ -166,6 +166,24 @@ public class ClassInfo
 		return geninfo!=null? geninfo: getTypeName();
 	}
 
+	/**
+	 *  Get the geninfo.
+	 *  @return The geninfo
+	 */
+	public String getGeninfo()
+	{
+		return geninfo;
+	}
+
+	/**
+	 *  The geninfo to set.
+	 *  @param geninfo The geninfo to set
+	 */
+	public void setGeninfo(String geninfo)
+	{
+		this.geninfo = geninfo;
+	}
+
 	/** 
 	 *  Get the hashcode.
 	 */

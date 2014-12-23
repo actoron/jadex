@@ -8,6 +8,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Replacement;
 import jadex.bridge.service.annotation.SecureTransmission;
@@ -438,18 +439,30 @@ public class RemoteReferenceModule
 		}
 		
 		// Add replacement for external component features (just provides a new fascade)
-//		if(target instanceof IExternalAccess)
-//		{
-//			Method getfeat = SReflect.getMethod(Object.class, "getExternalComponentFeature", new Class[]{Class.class});
-//			if(ret.getMethodReplacement(getfeat)==null)
-//			{
-//				MethodInfo[] mis = getMethodInfo(getfeat, targetclass, true);
-//				for(int i=0; i<mis.length; i++)
-//				{
-//					ret.addMethodReplacement(mis[i], new GetComponentFeatureMethodReplacement());
-//				}
-//			}
-//		}
+		if(target instanceof IExternalAccess)
+		{
+			Method getfeat = SReflect.getMethod(IExternalAccess.class, "getExternalComponentFeature", new Class[]{Class.class});
+			if(ret.getMethodReplacement(getfeat)==null)
+			{
+				MethodInfo[] mis = getMethodInfo(getfeat, targetclass, true);
+				for(int i=0; i<mis.length; i++)
+				{
+					ret.addMethodReplacement(mis[i], new GetComponentFeatureMethodReplacement());
+				}
+			}
+		}
+		else if(target instanceof IService)
+		{
+			Method getfeat = SReflect.getMethod(IService.class, "getExternalComponentFeature", new Class[]{Class.class});
+			if(ret.getMethodReplacement(getfeat)==null)
+			{
+				MethodInfo[] mis = getMethodInfo(getfeat, targetclass, true);
+				for(int i=0; i<mis.length; i++)
+				{
+					ret.addMethodReplacement(mis[i], new GetComponentFeatureMethodReplacement());
+				}
+			}
+		}
 		
 		// Add getClass as excluded. Otherwise the target class must be present on
 		// the computer which only uses the proxy.
@@ -738,15 +751,32 @@ public class RemoteReferenceModule
 			final IComponentIdentifier cid = (IComponentIdentifier)rr.getTargetIdentifier();
 			
 			// fetch component via target component id
-			SServiceProvider.getService(rsms.getComponent(), IComponentManagementService.class)
+//			rsms.getComponent().scheduleStep(new IComponentStep<IExternalAccess>()
+//			{
+//				public IFuture<IExternalAccess> execute(IInternalAccess ia)
+//				{
+//					final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+//					SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+//	//						.addResultListener(component.createResultListener(new IResultListener()
+//					{
+//						public void customResultAvailable(IComponentManagementService cms)
+//						{
+//	//						ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+//	//						next.setProperty("debugsource", "RemoteReferenceModule.getTargetObject()");
+//							
+//							// fetch target component via component identifier.
+//							cms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+//						}
+//					});
+//				}
+//			}).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret));
+			
+			SServiceProvider.getService(rsms.getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
-//					.addResultListener(component.createResultListener(new IResultListener()
 			{
-				public void customResultAvailable(IComponentManagementService cms)
+				public void customResultAvailable(IComponentManagementService cms) 
 				{
-//					ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-//					next.setProperty("debugsource", "RemoteReferenceModule.getTargetObject()");
-					
 					// fetch target component via component identifier.
 					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 					{

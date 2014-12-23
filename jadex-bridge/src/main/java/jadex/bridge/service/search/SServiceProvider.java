@@ -157,13 +157,15 @@ public class SServiceProvider
 				}
 				else
 				{
+					if(type.getName().indexOf("ICompo")!=-1)
+						System.out.println("sdfsdf");
 					ret.setException(new ServiceNotFoundException(type.getName()));
 				}
 			}
 			else
 			{
 				((IPlatformComponentAccess)provider).getServiceRegistry().searchService(type, provider.getComponentIdentifier(), scope, filter)
-				.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
+					.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 			}
 		}
 		else
@@ -375,6 +377,9 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)
 	{
+		if(scope==null && type.getName().indexOf("ICompo")!=-1)
+			System.out.println("gfdfgdfg");
+		
 		return provider.scheduleImmediate(new IComponentStep<T>()
 		{
 			public IFuture<T> execute(IInternalAccess ia)
