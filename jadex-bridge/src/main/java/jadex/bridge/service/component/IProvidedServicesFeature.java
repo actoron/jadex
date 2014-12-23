@@ -1,15 +1,13 @@
 package jadex.bridge.service.component;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-
 import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
+
+import java.lang.reflect.Method;
 
 /**
  *  Component feature for provided services.
@@ -24,7 +22,7 @@ public interface IProvidedServicesFeature
 	 *  @return A future that is done when the service has completed starting.  
 	 */
 //	public void addService(IInternalService service, ProvidedServiceInfo info);
-	public void addService(String name, Class<?> type, Object service);
+	public IFuture<Void> addService(String name, Class<?> type, Object service);
 
 	/**
 	 *  Add a service to the platform.
@@ -34,7 +32,7 @@ public interface IProvidedServicesFeature
 	 *  @param service The service.
 	 *  @param type The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public void	addService(String name, Class<?> type, Object service, String proxytype);
+	public IFuture<Void> addService(String name, Class<?> type, Object service, String proxytype);
 	
 	/**
 	 *  Add a service to the platform. 
@@ -43,7 +41,7 @@ public interface IProvidedServicesFeature
 	 *  @param type The public service interface.
 	 *  @param service The service.
 	 */
-	public void addService(String name, Class<?> type, Object service, PublishInfo pi);
+	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi);
 	
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).

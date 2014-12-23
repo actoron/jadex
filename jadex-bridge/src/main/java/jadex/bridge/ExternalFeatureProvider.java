@@ -2,10 +2,6 @@ package jadex.bridge;
 
 import jadex.bridge.component.IComponentFeature;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-
 /**
  * 
  */
