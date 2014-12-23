@@ -1,6 +1,8 @@
 package jadex.bdiv3.features.impl;
 
+import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
@@ -47,5 +49,29 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 //		System.out.println(getComponentIdentifier()+" after step");
 
 		return ret || (bdif.isInited() && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable());
+	}
+
+	/**
+	 *  Called before blocking the component thread.
+	 */
+	protected void	beforeBlock()
+	{
+		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
+		if(rplan!=null)
+		{
+			rplan.beforeBlock();
+		}
+	}
+	
+	/**
+	 *  Called after unblocking the component thread.
+	 */
+	protected void	afterBlock()
+	{
+		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
+		if(rplan!=null)
+		{
+			rplan.afterBlock();
+		}
 	}
 }

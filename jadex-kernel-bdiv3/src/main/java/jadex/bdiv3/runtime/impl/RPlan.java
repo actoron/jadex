@@ -1350,6 +1350,50 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	}
 	
 	/**
+	 *  Called before blocking the component thread.
+	 */
+	public void	beforeBlock()
+	{
+		testBodyAborted();
+		ComponentSuspendable sus = ComponentSuspendable.COMSUPS.get();
+		if(sus!=null && !RPlan.PlanProcessingState.WAITING.equals(getProcessingState()))
+		{
+			final ResumeCommand<Void> rescom = new ResumeCommand<Void>(sus, false);
+			setProcessingState(PlanProcessingState.WAITING);
+			resumecommand = rescom;
+		}
+	}
+	
+	/**
+	 *  Called after unblocking the component thread.
+	 */
+	public void	afterBlock()
+	{
+		testBodyAborted();
+		setProcessingState(PlanProcessingState.RUNNING);
+		if(resumecommand!=null)
+		{
+			// performs only cleanup without setting future
+			resumecommand.execute(Boolean.FALSE);
+			resumecommand = null;
+		}
+	}
+
+	/**
+	 *  Check if plan is already aborted.
+	 */
+	protected void testBodyAborted()
+	{
+		// Throw error to exit body method of aborted plan.
+		if(aborted && PlanLifecycleState.BODY.equals(getLifecycleState()))
+		{
+//			System.out.println("aborting after block: "+rplan);
+			throw new BodyAborted();
+		}
+	}
+
+	
+	/**
 	 * 
 	 */
 	class ResumeCommand<T> implements ICommand<Boolean>
