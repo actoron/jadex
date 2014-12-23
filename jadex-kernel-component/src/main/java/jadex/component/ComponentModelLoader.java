@@ -45,7 +45,7 @@ public class ComponentModelLoader extends AbstractModelLoader
 	public CacheableKernelModel loadComponentModel(String name, String[] imports, 
 		ClassLoader classloader, Object context) throws Exception
 	{
-		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_COMPONENT, imports, classloader, context);
+		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_COMPONENT, imports, classloader, classloader, context); // Todo: RID as clkey
 	}
 	
 	//-------- AbstractModelLoader methods --------

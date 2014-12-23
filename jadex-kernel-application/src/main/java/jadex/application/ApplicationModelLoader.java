@@ -42,9 +42,9 @@ public class ApplicationModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public CacheableKernelModel loadApplicationModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
+	public CacheableKernelModel loadApplicationModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_APPLICATION, imports, classloader, context);
+		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_APPLICATION, imports, clkey, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------

@@ -234,7 +234,7 @@ public class BDIClassReader extends MicroClassReader
 				{
 					try
 					{
-						BDIModel cap = loader.loadComponentModel(fields[i].getType().getName()+".class", null, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root});
+						BDIModel cap = loader.loadComponentModel(fields[i].getType().getName()+".class", null, rid, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root});
 //						System.out.println("found capability: "+fields[i].getName()+", "+cap);
 						capas.put(fields[i].getName(), cap);
 						

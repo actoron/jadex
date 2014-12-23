@@ -212,7 +212,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 				{
 					try
 					{
-						IModelInfo mi = loader.loadComponentModel(model, imports, cl, new Object[]{rid, getProviderId().getRoot()}).getModelInfo();
+						IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot()}).getModelInfo();
 						ret.setResult(mi);
 					}
 					catch(Exception e)
@@ -227,7 +227,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				IModelInfo mi = loader.loadComponentModel(model, imports, cl, new Object[]{rid, getProviderId().getRoot()}).getModelInfo();
+				IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot()}).getModelInfo();
 				ret.setResult(mi);
 			}
 			catch(Exception e)

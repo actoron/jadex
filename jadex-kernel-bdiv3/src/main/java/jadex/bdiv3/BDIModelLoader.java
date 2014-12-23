@@ -42,9 +42,9 @@ public class BDIModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public BDIModel loadComponentModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
+	public BDIModel loadComponentModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return (BDIModel)loadModel(name, FILE_EXTENSION_BDIV3, imports, classloader, context);
+		return (BDIModel)loadModel(name, FILE_EXTENSION_BDIV3, imports, clkey, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------

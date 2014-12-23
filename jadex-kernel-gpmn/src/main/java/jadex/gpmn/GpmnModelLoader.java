@@ -36,7 +36,7 @@ public class GpmnModelLoader extends AbstractModelLoader
 	 */
 	public IModelInfo	loadGpmnModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return ((MGpmnModel)loadModel(name, FILE_EXTENSION_GPMN, imports, classloader, context)).getModelInfo();
+		return ((MGpmnModel)loadModel(name, FILE_EXTENSION_GPMN, imports, classloader, classloader, context)).getModelInfo(); // Todo: RID as clkey.
 	}
 	
 	//-------- AbstractModelLoader methods --------

@@ -51,7 +51,7 @@ public class BpmnModelLoader extends AbstractModelLoader
 		{
 			ext = FILE_EXTENSION_BPMN2;
 		}
-		MBpmnModel	ret	= (MBpmnModel)loadModel(name, ext, imports, classloader, context);
+		MBpmnModel	ret	= (MBpmnModel)loadModel(name, ext, imports, classloader, classloader, context);	// Todo RID as clkey
 		ret.setClassLoader(classloader);
 		return ret;
 	}
