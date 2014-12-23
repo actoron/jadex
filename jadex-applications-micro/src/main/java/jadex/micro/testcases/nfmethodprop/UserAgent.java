@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Service;
@@ -66,8 +67,8 @@ public class UserAgent
 			TestReport tr1 = new TestReport("#1", "Test if wait time of method a is ok");
 			results.add(tr1);
 			Method ma = ser.getClass().getMethod("methodA", new Class[]{long.class});
-			INFMixedPropertyProvider prov = (INFMixedPropertyProvider)((IService)ser).getExternalComponentFeature(INFPropertyComponentFeature.class);
-			double w = ((Long)prov.getMethodNFPropertyValue(new MethodInfo(ma), ExecutionTimeProperty.NAME).get()).doubleValue();
+//			INFMixedPropertyProvider prov = (INFMixedPropertyProvider)((IService)ser).getExternalComponentFeature(INFPropertyComponentFeature.class);
+			double w = ((Long)SNFPropertyProvider.getMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ser).getServiceIdentifier(), new MethodInfo(ma), ExecutionTimeProperty.NAME).get()).doubleValue();
 //			double w = ((Long)((IService)ser).getMethodNFPropertyValue(new MethodInfo(ma), ExecutionTimeProperty.NAME).get()).doubleValue();
 			double d = Math.abs(w-wa)/wa;
 			if(d<0.15)
@@ -82,7 +83,7 @@ public class UserAgent
 			TestReport tr2 = new TestReport("#2", "Test if wait time of method b is ok");
 			results.add(tr2);
 			Method mb = ser.getClass().getMethod("methodB", new Class[]{long.class});
-			w = ((Long)prov.getMethodNFPropertyValue(new MethodInfo(mb), ExecutionTimeProperty.NAME).get()).doubleValue();
+			w = ((Long)SNFPropertyProvider.getMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ser).getServiceIdentifier(), new MethodInfo(mb), ExecutionTimeProperty.NAME).get()).doubleValue();
 //			w = ((Long)((IService)ser).getMethodNFPropertyValue(new MethodInfo(mb), ExecutionTimeProperty.NAME).get()).doubleValue();
 			d = Math.abs(w-wb)/wb;
 			if(d<0.15)
@@ -97,7 +98,7 @@ public class UserAgent
 			TestReport tr3 = new TestReport("#3", "Test if wait time ofservice is ok");
 			results.add(tr3);
 //			w = ((Long)((IService)ser).getNFPropertyValue(ExecutionTimeProperty.NAME).get()).doubleValue();
-			w = ((Long)prov.getNFPropertyValue(ExecutionTimeProperty.NAME).get()).doubleValue();
+			w = ((Long)SNFPropertyProvider.getNFPropertyValue(agent.getExternalAccess(), ((IService)ser).getServiceIdentifier(), ExecutionTimeProperty.NAME).get()).doubleValue();
 			long wab = (wa+wb)/2;
 			d = Math.abs(w-wab)/wab;
 			if(d<0.15)

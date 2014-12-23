@@ -40,12 +40,12 @@ public interface IService //extends INFMixedPropertyProvider //extends IRemotabl
 	 */
 	public Map<String, Object> getPropertyMap();
 
-	/**
-	 *  Get an external interface feature.
-	 *  @param type The interface type of the feature.
-	 *  @return The feature.
-	 */
-	public <T> T getExternalComponentFeature(Class<T> type);
+//	/**
+//	 *  Get an external interface feature.
+//	 *  @param type The interface type of the feature.
+//	 *  @return The feature.
+//	 */
+//	public <T> T getExternalComponentFeature(Class<T> type);
 	
 	// todo: ?! currently BasicService only has 
 //	/**

@@ -15,6 +15,7 @@ import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -257,11 +258,16 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 						{
 							if(mi!=null)
 							{
-								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeMethodNFProperty(mi, propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
+//								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeMethodNFProperty(mi, propmi.getName())
+//									.addResultListener(new DelegationResultListener<Void>(ret));
+								SNFPropertyProvider.removeMethodNFProperty(ea, ser.getServiceIdentifier(), mi, propmi.getName())
+									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
 							else
 							{
-								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
+//								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
+								SNFPropertyProvider.removeNFProperty(ea, ser.getServiceIdentifier(), propmi.getName())
+									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
 						}
 						
@@ -273,7 +279,9 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 			}
 			else
 			{
-				((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
+//				((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
+				SNFPropertyProvider.removeNFProperty(ea, propmi.getName())
+					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		}
 		else

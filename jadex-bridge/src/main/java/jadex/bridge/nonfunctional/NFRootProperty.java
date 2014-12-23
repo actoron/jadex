@@ -11,6 +11,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  * 
@@ -55,21 +56,16 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 			this.injected = true;
 			
 			// Add property to root component
-			SServiceProvider.getService(comp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			IComponentManagementService cms = SServiceProvider.getLocalService(comp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			cms.getExternalAccess(comp.getComponentIdentifier().getRoot()).addResultListener(new DefaultResultListener<IExternalAccess>()
 			{
-				public void customResultAvailable(IComponentManagementService cms)
+				public void resultAvailable(IExternalAccess root)
 				{
-					cms.getExternalAccess(comp.getComponentIdentifier().getRoot()).addResultListener(new DefaultResultListener<IExternalAccess>()
-					{
-						public void resultAvailable(IExternalAccess root)
-						{
-							NFRootProperty.this.root = root;
-							INFPropertyMetaInfo mi = getMetaInfo();
-							NFPropertyMetaInfo cmi = new NFPropertyMetaInfo(mi.getName(), mi.getType(), mi.getUnit(), mi.isDynamic(), mi.getUpdateRate(), mi.isRealtime(), Target.Root);
-							((INFPropertyProvider)root.getExternalComponentFeature(INFPropertyComponentFeature.class)).addNFProperty(new NFPropertyRef<T, U>((INFPropertyProvider)comp.getExternalAccess().getExternalComponentFeature(INFPropertyComponentFeature.class), root, cmi)).addResultListener(new DelegationResultListener<Void>(ret));
-						}
-					});
+					NFRootProperty.this.root = root;
+					INFPropertyMetaInfo mi = getMetaInfo();
+					NFPropertyMetaInfo cmi = new NFPropertyMetaInfo(mi.getName(), mi.getType(), mi.getUnit(), mi.isDynamic(), mi.getUpdateRate(), mi.isRealtime(), Target.Root);
+//					((INFPropertyProvider)root.getExternalComponentFeature(INFPropertyComponentFeature.class)).addNFProperty(new NFPropertyRef<T, U>((INFPropertyProvider)comp.getExternalAccess().getExternalComponentFeature(INFPropertyComponentFeature.class), root, cmi)).addResultListener(new DelegationResultListener<Void>(ret));
+					SNFPropertyProvider.addNFProperty(comp.getExternalAccess(), new NFPropertyRef<T, U>(comp.getComponentFeature(INFPropertyComponentFeature.class).getComponentPropertyProvider(), root, cmi));
 				}
 			});
 		}
@@ -86,11 +82,30 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 	 */
 	public IFuture<Void> dispose()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		if(root!=null && injected)
 		{
-			((INFPropertyProvider)root.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(getName());//.addResultListener(new DelegationResultListener<Void>(ret));
+//			((INFPropertyProvider)root.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(getName());//.addResultListener(new DelegationResultListener<Void>(ret));
+			SNFPropertyProvider.removeNFProperty(root, getName()).addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					NFRootProperty.super.dispose().addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					NFRootProperty.super.dispose().addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
 		}
-		return super.dispose();
+		else
+		{
+			return super.dispose();
+		}
+		
+		return ret;
 	}
 
 	/**

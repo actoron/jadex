@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -382,7 +383,9 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 							{
 	//							System.out.println("search childs: "+ea);
 								
-								((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyNames().addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
+								SNFPropertyProvider.getNFPropertyNames(ea)
+//								((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyNames()
+									.addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
 								{
 									public void resultAvailable(String[] names)
 									{
@@ -588,8 +591,9 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			NFPropertyNode nfpn	= (NFPropertyNode)getModel().getNode(id);
 			if(nfpn==null)
 			{
-				((INFPropertyProvider)provider.getExternalComponentFeature(INFPropertyComponentFeature.class))
-					.getNFPropertyMetaInfo(name).addResultListener(new SwingResultListener<INFPropertyMetaInfo>(new IResultListener<INFPropertyMetaInfo>()
+				SNFPropertyProvider.getNFPropertyMetaInfo(provider, name)
+//				((INFPropertyProvider)provider.getExternalComponentFeature(INFPropertyComponentFeature.class))
+					.addResultListener(new SwingResultListener<INFPropertyMetaInfo>(new IResultListener<INFPropertyMetaInfo>()
 				{
 					public void resultAvailable(INFPropertyMetaInfo pmi) 
 					{

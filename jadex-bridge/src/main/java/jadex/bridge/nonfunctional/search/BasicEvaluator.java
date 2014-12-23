@@ -3,6 +3,7 @@ package jadex.bridge.nonfunctional.search;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.ExceptionDelegationResultListener;

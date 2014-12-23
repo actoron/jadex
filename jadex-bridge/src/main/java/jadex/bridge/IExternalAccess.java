@@ -184,11 +184,11 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 //	 */
 //	public boolean	isValid();
 	
-	/**
-	 *  Get an external interface feature.
-	 *  @param type The interface type of the feature.
-	 *  @return The feature.
-	 */
-	public <T> T getExternalComponentFeature(Class<T> type);
+//	/**
+//	 *  Get an external interface feature.
+//	 *  @param type The interface type of the feature.
+//	 *  @return The feature.
+//	 */
+//	public <T> T getExternalComponentFeature(Class<T> type);
 
 }

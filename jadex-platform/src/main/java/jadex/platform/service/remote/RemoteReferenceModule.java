@@ -439,30 +439,30 @@ public class RemoteReferenceModule
 		}
 		
 		// Add replacement for external component features (just provides a new fascade)
-		if(target instanceof IExternalAccess)
-		{
-			Method getfeat = SReflect.getMethod(IExternalAccess.class, "getExternalComponentFeature", new Class[]{Class.class});
-			if(ret.getMethodReplacement(getfeat)==null)
-			{
-				MethodInfo[] mis = getMethodInfo(getfeat, targetclass, true);
-				for(int i=0; i<mis.length; i++)
-				{
-					ret.addMethodReplacement(mis[i], new GetComponentFeatureMethodReplacement());
-				}
-			}
-		}
-		else if(target instanceof IService)
-		{
-			Method getfeat = SReflect.getMethod(IService.class, "getExternalComponentFeature", new Class[]{Class.class});
-			if(ret.getMethodReplacement(getfeat)==null)
-			{
-				MethodInfo[] mis = getMethodInfo(getfeat, targetclass, true);
-				for(int i=0; i<mis.length; i++)
-				{
-					ret.addMethodReplacement(mis[i], new GetComponentFeatureMethodReplacement());
-				}
-			}
-		}
+//		if(target instanceof IExternalAccess)
+//		{
+//			Method getfeat = SReflect.getMethod(IExternalAccess.class, "getExternalComponentFeature", new Class[]{Class.class});
+//			if(ret.getMethodReplacement(getfeat)==null)
+//			{
+//				MethodInfo[] mis = getMethodInfo(getfeat, targetclass, true);
+//				for(int i=0; i<mis.length; i++)
+//				{
+//					ret.addMethodReplacement(mis[i], new GetComponentFeatureMethodReplacement());
+//				}
+//			}
+//		}
+//		else if(target instanceof IService)
+//		{
+//			Method getfeat = SReflect.getMethod(IService.class, "getExternalComponentFeature", new Class[]{Class.class});
+//			if(ret.getMethodReplacement(getfeat)==null)
+//			{
+//				MethodInfo[] mis = getMethodInfo(getfeat, targetclass, true);
+//				for(int i=0; i<mis.length; i++)
+//				{
+//					ret.addMethodReplacement(mis[i], new GetComponentFeatureMethodReplacement());
+//				}
+//			}
+//		}
 		
 		// Add getClass as excluded. Otherwise the target class must be present on
 		// the computer which only uses the proxy.
