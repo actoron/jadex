@@ -142,7 +142,8 @@ public class ServiceInvocationContext
 	protected Cause cause;
 	
 	protected IServiceIdentifier sid;
-	public Exception ex;
+
+//	public Exception ex;
 	
 	//-------- constructors --------
 	
@@ -396,7 +397,7 @@ public class ServiceInvocationContext
 	 */
 	public IFuture<Void> invoke(Object object, final Method method, List<Object> args)
 	{
-		final Future<Void> ret = new Future<Void>();
+		IFuture<Void> ret;
 		
 //		if(method.getName().equals("testResultReferences"))
 //			System.out.println("invoke: "+caller);
@@ -413,43 +414,54 @@ public class ServiceInvocationContext
 //			if(method.getName().equals("shutdownService") && sid.toString().indexOf("Context")!=-1 && sid.getProviderId().getParent()==null)
 //			if(sid.getProviderId().getParent()==null && method.getName().indexOf("getResults")!=-1)
 //				System.out.println("invoke before: "+method.getName()+" "+interceptor);
-			interceptor.execute(this).addResultListener(new IResultListener<Void>()
+			IFuture<Void>	fut	= interceptor.execute(this);
+			if(fut.isDone())
 			{
-				public void resultAvailable(Void result)
+				pop();
+				ret	= fut;
+			}
+			else
+			{
+				final Future<Void>	fret	= new Future<Void>();
+				ret	= fret;
+				fut.addResultListener(new IResultListener<Void>()
 				{
-//					if(sid.getProviderId().getParent()==null)// && method.getName().indexOf("getChildren")!=-1)
-//						System.out.println("invoke after: "+method.getName()+" "+interceptor);
-
-//					if(method.getName().indexOf("getResults")!=-1)
-//						System.out.println("invoke after: "+method.getName()+" "+interceptor+" "+getResult());
+					public void resultAvailable(Void result)
+					{
+	//					if(sid.getProviderId().getParent()==null)// && method.getName().indexOf("getChildren")!=-1)
+	//						System.out.println("invoke after: "+method.getName()+" "+interceptor);
+	
+	//					if(method.getName().indexOf("getResults")!=-1)
+	//						System.out.println("invoke after: "+method.getName()+" "+interceptor+" "+getResult());
+						
+						pop();
+						fret.setResult(null);
+					}
 					
-					pop();
-					ret.setResult(null);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-//					if(sid.getProviderId().getParent()==null)
-//						System.out.println("invoke after: "+method.getName()+" "+interceptor);
-
-//					if(method.getName().equals("isValid"))
-//						System.out.println("interceptor(ex): "+interceptor);
-
-					pop();
-					ret.setException(exception);
-				}
-				
-				public String toString()
-				{
-					return "ServiceInvocationContext$1(method="+method.getName()+", result="+result+")";
-				}
-
-			});
+					public void exceptionOccurred(Exception exception)
+					{
+	//					if(sid.getProviderId().getParent()==null)
+	//						System.out.println("invoke after: "+method.getName()+" "+interceptor);
+	
+	//					if(method.getName().equals("isValid"))
+	//						System.out.println("interceptor(ex): "+interceptor);
+	
+						pop();
+						fret.setException(exception);
+					}
+					
+					public String toString()
+					{
+						return "ServiceInvocationContext$1(method="+method.getName()+", result="+result+")";
+					}
+	
+				});
+			}
 		}
 		else
 		{
 			System.out.println("No interceptor: "+method.getName());
-			ret.setException(new RuntimeException("No interceptor found: "+method.getName()));
+			ret	= new Future<Void>(new RuntimeException("No interceptor found: "+method.getName()));
 		}
 
 		return ret;

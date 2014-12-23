@@ -11,7 +11,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 /**
- *  Calls a methods on an object and returns the result.
+ *  Calls a method on an object and returns the result.
  */
 public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 {

@@ -30,6 +30,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -205,6 +206,8 @@ public class SServiceProvider
 						{
 							ea.scheduleImmediate(new IComponentStep<T>()
 							{
+								@Classname("getService(final IInternalAccess provider, final IServiceIdentifier sid)")
+
 								public IFuture<T> execute(IInternalAccess ia)
 								{
 									return getService(ia, sid);
@@ -247,6 +250,8 @@ public class SServiceProvider
 						{
 							ea.scheduleImmediate(new IComponentStep<T>()
 							{
+								@Classname("getService(final IInternalAccess provider, final IComponentIdentifier cid, final Class<T> type)")
+								
 								public IFuture<T> execute(IInternalAccess ia)
 								{
 									return getService(ia, cid, type);
@@ -382,6 +387,7 @@ public class SServiceProvider
 		
 		return provider.scheduleImmediate(new IComponentStep<T>()
 		{
+			@Classname("getService(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				return getService(ia, type, scope, filter);
@@ -398,6 +404,7 @@ public class SServiceProvider
 	{
 		return provider.scheduleImmediate(new IComponentStep<T>()
 		{
+			@Classname("getService(IExternalAccess provider, final IServiceIdentifier sid)")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				return getService(ia, sid);
@@ -416,6 +423,7 @@ public class SServiceProvider
 	{
 		return provider.scheduleImmediate(new IComponentStep<T>()
 		{
+			@Classname("getService(IExternalAccess provider, final IComponentIdentifier cid, final Class<T> type)")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				return getService(ia, cid, type);
@@ -454,6 +462,7 @@ public class SServiceProvider
 		
 		provider.scheduleImmediate(new IComponentStep<Collection<T>>()
 		{
+			@Classname("getServices(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)")
 			public IFuture<Collection<T>> execute(IInternalAccess ia)
 			{
 				getServices(ia, type, scope, filter).addResultListener(new IntermediateDelegationResultListener<T>(ret));
@@ -493,6 +502,7 @@ public class SServiceProvider
 	{
 		return (IIntermediateFuture<IService>)provider.scheduleImmediate(new IComponentStep<Collection<IService>>()
 		{
+			@Classname("getDeclaredServices(IExternalAccess provider)")
 			public IFuture<Collection<IService>> execute(IInternalAccess ia)
 			{
 				return getDeclaredServices(ia);

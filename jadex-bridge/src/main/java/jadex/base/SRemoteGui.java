@@ -1403,6 +1403,7 @@ public class SRemoteGui
 	{
 		return exta.scheduleImmediate(new IComponentStep<Void>()
 		{
+			@Classname("logWarning")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.getLogger().warning(msg);
