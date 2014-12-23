@@ -671,4 +671,6 @@ task buildDistGpmnEditor(type: Zip, dependsOn: srcZipGpmnEditor) {
 	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING')
 }
 
-
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}
