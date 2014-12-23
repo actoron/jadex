@@ -430,8 +430,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			throw new RuntimeException("Cannot block: no executor");
 		}
 		
-		// Todo: before/after block for features?
-//		component.beforeBlock();
+		beforeBlock();
 		
 		this.executing	= false;
 		this.componentthread	= null;
@@ -484,8 +483,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 
 		this.componentthread	= Thread.currentThread();
 		
-		// Todo: before/after block for features?
-//		component.afterBlock();
+		afterBlock();
 	}
 	
 	/**
@@ -508,6 +506,21 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 		exe.switchThread(monitor, exception);
 	}
+	
+	/**
+	 *  Called before blocking the component thread.
+	 */
+	protected void	beforeBlock()
+	{
+	}
+	
+	/**
+	 *  Called after unblocking the component thread.
+	 */
+	protected void	afterBlock()
+	{
+	}
+
 	
 	//-------- IExecutable interface --------
 	
