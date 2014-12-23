@@ -12,6 +12,7 @@ import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -23,6 +24,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -37,8 +39,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -65,6 +69,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/** The thread currently executing the component (null for none). */
 	protected Thread componentthread;
+	
+	/** The blocked threads by monitor. */
+	protected Map<Object, Executor>	blocked; 
 	
 	//-------- constructors --------
 	
@@ -408,112 +415,76 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public void	block(final Object monitor, long timeout)
 	{
-		throw new UnsupportedOperationException();
-		// todo...
+		if(!isComponentThread())
+		{
+			throw new RuntimeException("Can only block current component thread: "+componentthread+", "+Thread.currentThread());
+		}
 		
-//		if(!isComponentThread())
-//		{
-//			throw new RuntimeException("Can only block current component thread: "/*+componentthread+", "*/+Thread.currentThread());
-//		}
-//		
-//		// Retain listener notifications for new component thread.
-//		assert notifications==null;
-//		notifications	= FutureHelper.removeStackedListeners();
-////		System.out.println("removed stack size: "+notifications.size()+", "+getComponentIdentifier());
-//		
-//		Executor	exe	= Executor.EXECUTOR.get();
-//		if(exe==null)
-//		{
-//			throw new RuntimeException("Cannot block: no executor");
-//		}
-//		
+		// Retain listener notifications for new component thread.
+		assert notifications==null;
+		notifications	= FutureHelper.removeStackedListeners();
+		
+		Executor	exe	= Executor.EXECUTOR.get();
+		if(exe==null)
+		{
+			throw new RuntimeException("Cannot block: no executor");
+		}
+		
+		// Todo: before/after block for features?
 //		component.beforeBlock();
-//		
-////		if(getComponentIdentifier().toString().indexOf("@Receiver.EventSystem")!=-1)
-////		{
-////			System.err.println(getComponentIdentifier()+": !execution1 "+System.identityHashCode(Executor.EXECUTOR.get()));
-////		}
-//		this.executing	= false;
-//		this.componentthread	= null;
-////		
-////		if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
-//////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
-////		{
-////			System.out.println("Blocking: "+getComponentIdentifier()+", "+System.currentTimeMillis());
-////		}
-//		
-//		if(blocked==null)
-//		{
-//			blocked	= new HashMap<Object, Executor>();
-//		}
-//		blocked.put(monitor, exe);
-//		
-//		
-//		
-//		
-//		final boolean[]	unblocked	= new boolean[1];
-//		
-//		if(timeout!=Timeout.NONE)
-//		{
-//			waitForDelay(timeout)
-//				.addResultListener(new IResultListener<Void>()
-//			{
-//				public void resultAvailable(Void result)
-//				{
-//					if(!unblocked[0])
-//					{
-////						if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
-////						{
-////							System.out.println("Unblocking after timeout: "+getComponentIdentifier()+", "+System.currentTimeMillis());
-////						}
-//						
-//						// Cannot use timeout exception as component would not be correctly entered.
-//						// Todo: allow informing future about timeout.
-//						unblock(monitor, null); //new TimeoutException());
-//					}
-////					else if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
-////					{
-////						System.out.println("Not unblocking after timeout (already unblocked): "+getComponentIdentifier()+", "+System.currentTimeMillis());
-////					}
-//				}
-//				
-//				public void exceptionOccurred(Exception exception)
-//				{
-//				}
-//			});
-//		}
-//		
-//		exe.blockThread(monitor);
-//		
-//		unblocked[0]	= true;
-//		
-//		
-//		
-//		
-//		assert !IComponentDescription.STATE_TERMINATED.equals(desc.getState());
-//		
-////		if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
-//////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
-////		{
-////			System.out.println("Unblocked: "+getComponentIdentifier()+", "+System.currentTimeMillis());
-////		}
-////		
-//		synchronized(this)
-//		{
-//			if(executing)
-//			{
-//				System.err.println(getComponent().getComponentIdentifier()+": double execution");
-//				new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
-//			}
-//			this.executing	= true;
-//		}
-////		if(getComponentIdentifier().toString().indexOf("@Receiver.EventSystem")!=-1)
-////		{
-////			System.err.println(getComponentIdentifier()+": execution1 "+System.identityHashCode(Executor.EXECUTOR.get()));
-////		}
-//
-//		this.componentthread	= Thread.currentThread();
-//		
+		
+		this.executing	= false;
+		this.componentthread	= null;
+		
+		if(blocked==null)
+		{
+			blocked	= new HashMap<Object, Executor>();
+		}
+		blocked.put(monitor, exe);
+		
+		// Flag to check if unblocked before timeout
+		final boolean[]	unblocked	= new boolean[1];
+		
+		if(timeout!=Timeout.NONE)
+		{
+			waitForDelay(timeout)
+				.addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					if(!unblocked[0])
+					{
+						// Cannot use timeout exception as component would not be correctly entered.
+						// Todo: allow informing future about timeout.
+						unblock(monitor, null); //new TimeoutException());
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			});
+		}
+		
+		exe.blockThread(monitor);
+		
+		unblocked[0]	= true;
+		
+		assert !IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState());
+		
+		synchronized(this)
+		{
+			if(executing)
+			{
+				System.err.println(getComponent().getComponentIdentifier()+": double execution");
+				new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
+			}
+			this.executing	= true;
+		}
+
+		this.componentthread	= Thread.currentThread();
+		
+		// Todo: before/after block for features?
 //		component.afterBlock();
 	}
 	
@@ -524,20 +495,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public void	unblock(Object monitor, Throwable exception)
 	{
-		// todo...
+		if(!isComponentThread())
+		{
+			throw new RuntimeException("Can only unblock from component thread: "+componentthread+", "+Thread.currentThread());
+		}
 		
-//		if(!isComponentThread())
-//		{
-//			throw new RuntimeException("Can only unblock from component thread: "/*+componentthread+", "*/+Thread.currentThread());
-//		}
-//		
-//		Executor exe = blocked.remove(monitor);
-//		if(blocked.isEmpty())
-//		{
-//			blocked	= null;
-//		}
-//				
-//		exe.switchThread(monitor, exception);
+		Executor exe = blocked.remove(monitor);
+		if(blocked.isEmpty())
+		{
+			blocked	= null;
+		}
+				
+		exe.switchThread(monitor, exception);
 	}
 	
 	//-------- IExecutable interface --------
