@@ -9,11 +9,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-import jadex.micro.IPojoMicroAgent;
-import jadex.micro.MicroAgent;
-
-import java.io.File;
-import java.io.FileInputStream;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 /**
  *  Local (i.e. user-oriented) interface to a resource. 
@@ -38,7 +34,7 @@ public class ResourceService	implements IResourceService
 	@ServiceStart
 	public void	start()
 	{
-		rpa	= (ResourceProviderAgent)((IPojoMicroAgent)agent).getPojoAgent();
+		rpa	= (ResourceProviderAgent)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 	}
 	
 	//-------- IResourceService interface --------

@@ -112,7 +112,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 							}
 //							nl.add(new InsnNode(Opcodes.SWAP));
 						}						
-						nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bridge/IInternalAccess", mnode.name, mnode.desc));
+						nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bridge/IInternalAccess", mnode.name, mnode.desc));
 						Class<?> rett = m.getReturnType();
 						if(ret!=null && !rett.equals(void.class) && !rett.equals(Void.class))
 						{

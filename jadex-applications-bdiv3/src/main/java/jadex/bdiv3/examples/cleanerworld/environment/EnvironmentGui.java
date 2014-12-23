@@ -20,7 +20,7 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -137,7 +137,7 @@ public class EnvironmentGui	extends JFrame
 				
 //				System.out.println(((IPojoMicroAgent)ia).getPojoAgent().getClass().getClassLoader());
 							
-				final Environment env = ((EnvironmentLocalBDI)((IPojoMicroAgent)ia).getPojoAgent()).getEnvironment();
+				final Environment env = ((EnvironmentLocalBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent()).getEnvironment();
 				
 //				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 				SwingUtilities.invokeLater(new Runnable()
@@ -428,7 +428,7 @@ public class EnvironmentGui	extends JFrame
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 //										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										final Environment env = ((EnvironmentLocalBDI)((IPojoMicroAgent)ia).getPojoAgent()).getEnvironment();
+										final Environment env = ((EnvironmentLocalBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent()).getEnvironment();
 //										Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 										
 										Waste[] wastes = env.getWastes();

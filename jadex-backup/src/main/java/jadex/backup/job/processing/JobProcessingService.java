@@ -14,7 +14,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class JobProcessingService implements IJobProcessingService
 	@ServiceStart
 	public IFuture<Void> start()
 	{
-		pojoagent = (SyncJobProcessingAgent)((IPojoMicroAgent)agent).getPojoAgent();
+		pojoagent = (SyncJobProcessingAgent)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 		return IFuture.DONE;
 	}
 	

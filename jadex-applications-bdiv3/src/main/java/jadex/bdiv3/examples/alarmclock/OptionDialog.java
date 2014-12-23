@@ -6,10 +6,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.BorderLayout;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -71,7 +70,7 @@ public class OptionDialog extends JDialog
 			@Classname("create")
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				final AlarmclockBDI agent = (AlarmclockBDI)((IPojoMicroAgent)ia).getPojoAgent();
+				final AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 				final Settings orig_sets = agent.getSettings();
 				final Settings sets = (Settings)orig_sets.clone();
 				

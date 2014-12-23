@@ -71,7 +71,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
-import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
 import jadex.micro.features.IMicroLifecycleFeature;
@@ -549,7 +548,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		try
 		{
-			Object pojo = ((IPojoMicroAgent)agent).getPojoAgent();
+			Object pojo = agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 		
 			Method getter = pojo.getClass().getMethod("get"+belname.substring(0,1).toUpperCase()+belname.substring(1), new Class[0]);
 			Object oldval = getter.invoke(pojo, new Object[0]);
@@ -634,17 +633,17 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 *  Get the value of an abstract belief.
 	 */
-	public Object	getAbstractBeliefValue(String capa, String name, Class<?> type)
+	public static Object	getAbstractBeliefValue(IInternalAccess component, String capa, String name, Class<?> type)
 	{
 //			System.out.println("getAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name+", "+type);
-		BDIModel bdimodel = (BDIModel)getComponent().getComponentFeature(IBDIAgentFeature.class).getBDIModel();
+		BDIModel bdimodel = (BDIModel)component.getComponentFeature(IBDIAgentFeature.class).getBDIModel();
 		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
 			throw new RuntimeException("No mapping for abstract belief: "+capa+MElement.CAPABILITY_SEPARATOR+name);
 		}
 		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
-		Object	ret	= bel.getValue(getComponent());
+		Object	ret	= bel.getValue(component);
 		
 		if(ret==null)
 		{
@@ -668,10 +667,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 *  Set the value of an abstract belief.
 	 */
-	public void	setAbstractBeliefValue(String capa, String name, Object value)
+	public static void	setAbstractBeliefValue(IInternalAccess component, String capa, String name, Object value)
 	{
 //			System.out.println("setAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
-		BDIModel bdimodel = (BDIModel)getComponent().getComponentFeature(IBDIAgentFeature.class).getBDIModel();
+		BDIModel bdimodel = (BDIModel)component.getComponentFeature(IBDIAgentFeature.class).getBDIModel();
 		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
@@ -680,17 +679,17 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		MBelief	mbel = bdimodel.getCapability().getBelief(belname);
 
 		// Maybe unobserve old value
-		Object	old	= mbel.getValue(getComponent());
+		Object	old	= mbel.getValue(component);
 
-		boolean	field = mbel.setValue(getComponent(), value);
+		boolean	field = mbel.setValue(component, value);
 		
 		if(field)
 		{
 //			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-			RuleSystem rs = getComponent().getComponentFeature(IBDIAgentFeature.class).getRuleSystem();
+			RuleSystem rs = component.getComponentFeature(IBDIAgentFeature.class).getRuleSystem();
 			rs.unobserveObject(old);	
-			createChangeEvent(value, old, null, getComponent(), mbel.getName());
-			observeValue(rs, value, getComponent(), ChangeEvent.FACTCHANGED+"."+mbel.getName(), mbel);
+			createChangeEvent(value, old, null, component, mbel.getName());
+			observeValue(rs, value, component, ChangeEvent.FACTCHANGED+"."+mbel.getName(), mbel);
 		}
 	}
 	

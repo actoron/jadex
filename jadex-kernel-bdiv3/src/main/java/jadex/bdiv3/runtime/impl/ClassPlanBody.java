@@ -10,7 +10,6 @@ import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
-import jadex.micro.IPojoMicroAgent;
 import jadex.micro.features.IMicroLifecycleFeature;
 import jadex.rules.eca.ChangeInfo;
 

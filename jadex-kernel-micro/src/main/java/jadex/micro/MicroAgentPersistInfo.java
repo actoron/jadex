@@ -19,13 +19,13 @@ public class MicroAgentPersistInfo
 	{
 	}
 	
-	/**
-	 *  Creates the state info object.
-	 */
-	public MicroAgentPersistInfo(IPojoMicroAgent agent)
-	{
-		setUserAgentObject(agent.getPojoAgent());
-	}
+//	/**
+//	 *  Creates the state info object.
+//	 */
+//	public MicroAgentPersistInfo(IPojoMicroAgent agent)
+//	{
+//		setUserAgentObject(agent.getPojoAgent());
+//	}
 
 	/**
 	 *  Gets the user agent object.

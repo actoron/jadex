@@ -6,7 +6,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,7 +33,7 @@ public class ChatServiceF4 implements IChatService
 	public void message(final String sender, final String text)
 	{
 		// Reply if the message contains the keyword.
-		final ChatBotF4Agent	chatbot	= (ChatBotF4Agent)((IPojoMicroAgent)agent).getPojoAgent();
+		final ChatBotF4Agent	chatbot	= (ChatBotF4Agent)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 		if(text.toLowerCase().indexOf(chatbot.getKeyword().toLowerCase())!=-1)
 		{
 			IFuture<Collection<IChatService>> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");

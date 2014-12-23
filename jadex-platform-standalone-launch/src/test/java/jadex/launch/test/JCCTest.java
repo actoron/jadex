@@ -17,7 +17,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 import jadex.tools.jcc.ControlCenter;
 import jadex.tools.jcc.JCCAgent;
 import jadex.tools.jcc.PlatformControlCenter;
@@ -54,7 +54,7 @@ public class JCCTest //extends TestCase
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				final JCCAgent	jcca	= (JCCAgent)((IPojoMicroAgent)ia).getPojoAgent();
+				final JCCAgent	jcca	= (JCCAgent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 				final ControlCenter	cc	= jcca.getControlCenter();
 				
 				final Future<Void>	ret	= new Future<Void>();

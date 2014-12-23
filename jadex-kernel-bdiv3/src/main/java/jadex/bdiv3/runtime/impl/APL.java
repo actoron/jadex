@@ -17,7 +17,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -350,7 +350,7 @@ public class APL
 				if(!Modifier.isStatic(m.getModifiers()))
 				{
 					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia);
-					final Object agent = ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia;
+					final Object agent = ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 					pojo = rp.getBody().getBody(agent);
 				}
 				try

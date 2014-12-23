@@ -20,6 +20,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -517,7 +518,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				}
 				else
 				{
-					ret.setException(new RuntimeException("Factory not found: " + model));
+					ret.setException(new ServiceNotFoundException("Factory not found: " + model));
 				}
 			}
 			

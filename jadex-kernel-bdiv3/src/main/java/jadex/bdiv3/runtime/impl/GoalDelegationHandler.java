@@ -9,7 +9,7 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -85,7 +85,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 		{
 			Class<?>[] mptypes2 = new Class<?>[mptypes.length+1];
 			System.arraycopy(mptypes, 0, mptypes2, 1, mptypes.length);
-			Object pojo = ((IPojoMicroAgent)agent).getPojoAgent();
+			Object pojo = agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 			mptypes2[0] = pojo.getClass();
 			Constructor<?> c = goalcl.getConstructor(mptypes2);
 			Object[] args2 = new Object[args.length+1];

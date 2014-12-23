@@ -15,7 +15,7 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -93,7 +93,7 @@ public class BlocksworldGui	extends JFrame
 			@Classname("start")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+				BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 				final Block[] blocks = (Block[])pag.getBlocks().toArray(new Block[0]);
 				final Table table = pag.getTable();//new Table(pag.getTable());
 				final Object md = pag.getMode();
@@ -187,7 +187,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("clear")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 										final Block[] blocks = (Block[])pag.getBlocks().toArray(new Block[0]);
 //										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 //										final Block[]	blocks = (Block[])bia.getBeliefbase().getBeliefSet("blocks").getFacts();
@@ -229,7 +229,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("configure")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 //										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										
 										Set<Block> bls = SUtil.arrayToSet(newtable.getAllBlocks());
@@ -297,7 +297,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("createBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 										final Block block = new Block(showcol.getBackground(), pag.getTable());
 										pag.getBlocks().add(block);
 										
@@ -359,7 +359,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("deleteBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 										pag.getBlocks().remove(block);
 										clear.doClick();
 										return IFuture.DONE;
@@ -394,7 +394,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("mode")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 										pag.setMode(sel);
 										return IFuture.DONE;
 									}
@@ -411,7 +411,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("step")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 										
 										pag.steps.addIntermediateResult(null);
 										
@@ -508,7 +508,7 @@ public class BlocksworldGui	extends JFrame
 //										});
 //									}
 //								});
-								ia.getComponentFeature(IMonitoringComponentFeature.class).getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+								ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 									.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 								{
 									public void intermediateResultAvailable(IMonitoringEvent result)

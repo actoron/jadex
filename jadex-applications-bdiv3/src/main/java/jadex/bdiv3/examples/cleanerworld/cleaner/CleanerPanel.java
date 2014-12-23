@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.examples.cleanerworld.world.Cleaner;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
@@ -8,7 +7,6 @@ import jadex.bdiv3.examples.cleanerworld.world.MapPoint;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -16,7 +14,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -217,7 +215,7 @@ class CleanerPanel extends JPanel
 	{
 		public IFuture<DrawData> execute(IInternalAccess ia)
 		{
-			CleanerBDI cleaner = (CleanerBDI)((IPojoMicroAgent)ia).getPojoAgent();
+			CleanerBDI cleaner = (CleanerBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 			DrawData	drawdata	= new DrawData();
 			drawdata.daytime = cleaner.isDaytime();
 			drawdata.visited_positions = cleaner.getVisitedPositions().toArray(new MapPoint[0]);

@@ -12,8 +12,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
-import jadex.micro.IPojoMicroAgent;
-import jadex.micro.MicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -253,7 +252,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 */
 	protected IBackupResource	getResource()
 	{
-		return ((ResourceProviderAgent)((IPojoMicroAgent)agent).getPojoAgent()).getResource();
+		return ((ResourceProviderAgent)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent()).getResource();
 	}
 	
 	/**

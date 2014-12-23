@@ -14,7 +14,7 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.environment.space3d.Space3D;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector1Double;
-import jadex.micro.IPojoMicroAgent;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -103,7 +103,7 @@ public class Move3DTask extends AbstractTask
 				@Classname("add")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					BaseBDI ba = (BaseBDI)((IPojoMicroAgent)ia).getPojoAgent();
+					BaseBDI ba = (BaseBDI)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 					for(Iterator<ISpaceObject> it=objects.iterator(); it.hasNext(); )
 					{
 						final ISpaceObject so = it.next();
