@@ -77,6 +77,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -117,9 +118,6 @@ public class ComponentManagementService implements IComponentManagementService
 	
 	/** The listeners. */
 	protected MultiCollection listeners;
-	
-	/** The result (kill listeners). */
-	protected Map<IComponentIdentifier, IntermediateResultListener> resultlisteners;
 	
 //	/** The execution service (cached to avoid using futures). */
 //	protected IExecutionService	exeservice;
@@ -185,7 +183,6 @@ public class ComponentManagementService implements IComponentManagementService
 		this.cfs = SCollection.createLinkedHashMap();
 //		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");
 		this.listeners = SCollection.createMultiCollection();
-		this.resultlisteners = SCollection.createHashMap();
 		this.initinfos = SCollection.createHashMap();
 		this.childcounts = SCollection.createHashMap();
 		this.localtypes	= new LRU<Tuple, String>(100);
@@ -460,8 +457,6 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		final CreationInfo cinfo = new CreationInfo(info);	// Dummy default info, if null. Must be cloned as localtype is set on info later.
 		
-		final IntermediateResultListener reslis = resultlistener!=null ? new IntermediateResultListener(resultlistener) : null;
-		
 		if(cinfo.getParent()!=null)
 		{
 			// Check if parent is killing itself -> no new child component, exception
@@ -668,7 +663,43 @@ public class ComponentManagementService implements IComponentManagementService
 																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, access.getServiceRegistry(), cinfo.getProvidedServiceInfos(), realtime, copy);
 																	component.create(cci, features);
 																	IArgumentsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsFeature.class);
-																	af.subscribeToResults().addResultListener(reslis);
+																	if(resultlistener!=null)
+																	{
+																		IResultListener<Collection<Tuple2<String, Object>>>	rl;
+																		if(!(resultlistener instanceof IIntermediateResultListener))
+																		{
+																			rl	= new IIntermediateResultListener<Tuple2<String, Object>>()
+																			{
+																				Map<String, Tuple2<String, Object>>	results	= new LinkedHashMap<String, Tuple2<String, Object>>();
+																				
+																				public void exceptionOccurred(Exception exception)
+																				{
+																					resultlistener.exceptionOccurred(exception);
+																				}
+																				
+																				public void finished()
+																				{
+																					resultlistener.resultAvailable(results.values());																		
+																				}
+																				
+																				public void intermediateResultAvailable(Tuple2<String, Object> result)
+																				{
+																					results.put(result.getFirstEntity(), result);
+																				}
+																				
+																				public void resultAvailable(Collection<Tuple2<String, Object>> result)
+																				{
+																					// shouldn't happen...
+																					Thread.dumpStack();
+																				}
+																			}; 
+																		}
+																		else
+																		{
+																			rl	= resultlistener;
+																		}
+																		af.subscribeToResults().addResultListener(rl);
+																	}
 																	
 																	initinfos.put(cid, new InitInfo(component, cinfo, resfut));
 																	
@@ -725,10 +756,6 @@ public class ComponentManagementService implements IComponentManagementService
 			//																		System.out.println("created: "+cid.getLocalName());//+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
 							//														System.out.println("added: "+descs.size()+", "+aid);
 																					
-																					resultlisteners.put(cid, reslis);
-//																								if(resultlistener!=null)
-//																									resultlisteners.put(cid, resultlistener);
-																					
 //																					if(modelname.indexOf("jadex.platform.service.message.transport.ssltcpmtp.ProviderAgent")!=-1)
 //																						System.out.println("inited, return: "+cid);//+" "+info!=null? info.getResourceIdentifier(): "norid");
 																					
@@ -778,7 +805,6 @@ public class ComponentManagementService implements IComponentManagementService
 																					if(exception instanceof ComponentTerminatedException)
 																					{
 																						notifyListenersAdded(cid, ad);
-																						resultlisteners.put(cid, reslis);
 																						inited.setResult(cid);
 																					}
 																					else
@@ -802,9 +828,10 @@ public class ComponentManagementService implements IComponentManagementService
 																					components.remove(cid);
 																					removeInitInfo(cid);
 																					
-																					IntermediateResultListener reslis = resultlisteners.remove(cid);
-																					if(reslis!=null)
-																						reslis.exceptionOccurred(exception);
+																					if(resultlistener!=null)
+																					{
+																						resultlistener.exceptionOccurred(exception);
+																					}
 																					
 																					exitDestroy(cid, ad, exception, null);
 																					
@@ -1005,7 +1032,7 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 //			System.out.println("create start2: "+model+" "+cinfo.getParent());
 						
-			selectComponentFactory(factories==null? null: (IComponentFactory[])factories.toArray(new IComponentFactory[factories.size()]), model, cinfo, rid, 0)
+			selectComponentFactory(factories==null? null: factories.iterator(), model, cinfo, rid)
 				.addResultListener(createResultListener(new DelegationResultListener<IComponentFactory>(ret)
 			{
 				public void exceptionOccurred(Exception exception)
@@ -1040,20 +1067,21 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  model can be loaded.
 	 *  @param factories The collection of factories.
 	 *  @param model The model file name.
-	 *  @param cinfo The creaion info.
+	 *  @param cinfo The creation info.
 	 *  @param cl The classloader.
 	 *  @return The component factory.
 	 */
-	protected IFuture<IComponentFactory> selectComponentFactory(final IComponentFactory[] factories, 
-		final String model, final CreationInfo cinfo, final IResourceIdentifier rid, final int idx)
+	protected IFuture<IComponentFactory> selectComponentFactory(final Iterator<IComponentFactory> factories, 
+		final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
 	{
 //		System.out.println("select factory: "+model+", "+SUtil.arrayToString(factories));
 		
 		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
-		if(factories!=null && factories.length>0)
+		if(factories!=null && factories.hasNext())
 		{
-			factories[idx].isLoadable(model, cinfo.getImports(), rid)
+			final IComponentFactory	factory	= factories.next();
+			factory.isLoadable(model, cinfo.getImports(), rid)
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
 			{
 				public void customResultAvailable(Boolean res)
@@ -1061,7 +1089,7 @@ public class ComponentManagementService implements IComponentManagementService
 					if(res.booleanValue())
 					{
 						// If multi factory, clear cache and invoke again to obtain real factory.
-						if(factories[idx].toString().toLowerCase().indexOf("multi")!=-1)
+						if(factory.toString().toLowerCase().indexOf("multi")!=-1)
 						{
 							ComponentManagementService.this.factories	= null;
 							getComponentFactory(model, cinfo, rid, false, false)
@@ -1069,12 +1097,12 @@ public class ComponentManagementService implements IComponentManagementService
 						}
 						else
 						{
-							ret.setResult(factories[idx]);
+							ret.setResult(factory);
 						}
 					}
-					else if(idx+1<factories.length)
+					else if(factories.hasNext())
 					{
-						selectComponentFactory(factories, model, cinfo, rid, idx+1)
+						selectComponentFactory(factories, model, cinfo, rid)
 							.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 					}
 					else
@@ -1787,48 +1815,6 @@ public class ComponentManagementService implements IComponentManagementService
 		return IFuture.DONE;
     }
     
-    /**
-	 *  Add a result listener. Also intermediate result listeners can be
-	 *  added. In this case results are immediately fed back when set.
-	 *  @param listener The result (or intermediate) result listener.
-	 */
-	public IFuture<Void> addComponentResultListener(IResultListener<Collection<Tuple2<String, Object>>> listener, IComponentIdentifier cid)
-	{
-		Future<Void> ret = new Future<Void>();
-		IntermediateResultListener lis = (IntermediateResultListener)resultlisteners.get(cid);
-		if(lis!=null)
-		{
-			lis.addListener(listener);
-			ret.setResult(null);
-		}
-		else
-		{
-			ret.setException(new RuntimeException("Component has no registered listener: "+cid));
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Add a previously added result listener. 
-	 *  @param listener The result (or intermediate) result listener.
-	 */
-	public IFuture<Void> removeComponentResultListener(IResultListener<Collection<Tuple2<String, Object>>> listener, IComponentIdentifier cid)
-	{
-		Future<Void> ret = new Future<Void>();
-		IntermediateResultListener lis = (IntermediateResultListener)resultlisteners.get(cid);
-		if(lis!=null)
-		{
-			lis.removeListener(listener);
-			ret.setResult(null);
-		}
-		else
-		{
-			ret.setException(new RuntimeException("Component has no registered listener: "+cid));
-		}
-		return ret;
-	}
-
-    
     //-------- helper classes --------
 
 	/**
@@ -1944,26 +1930,12 @@ public class ComponentManagementService implements IComponentManagementService
 			
 			// Use adapter exception before cleanup exception as it probably happened first.
 			Exception	ex	= comp.getException()!=null ? comp.getException() : exception;
-			IntermediateResultListener reslis = resultlisteners.remove(cid);
-//			System.out.println("kill lis: "+cid+" "+reslis+" "+results+" "+ex);
-			if(reslis!=null)	// null for platform.
+			if(ex!=null)
 			{
-				if(ex!=null)
-				{
-					reslis.exceptionOccurred(ex);
-				}
-				else
-				{
-					reslis.finished();
-				}
-			
-				if(ex!=null && !reslis.isInitial())
-				{
-					// Unhandled component exception
-					// Todo: delegate printing to parent component (if any).
-					comp.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-					ex.printStackTrace();
-				}
+				// Unhandled component exception
+				// Todo: delegate printing to parent component (if any).
+				comp.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+				ex.printStackTrace();
 			}
 			
 //			System.out.println("CleanupCommand end.");

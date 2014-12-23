@@ -9,6 +9,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.wrappers.MapWrapper;
@@ -145,6 +146,34 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 
 		return IFuture.DONE;
 	}
+	
+	/**
+	 *  Shutdown the feature.
+	 */
+	public IFuture<Void>	shutdown()
+	{
+		if(resfuts!=null)
+		{
+			Exception	ex	= ((IPlatformComponentAccess)getComponent()).getException();
+			if(ex!=null)
+			{
+				for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)
+				{
+					fut.setExceptionIfUndone(ex);
+				}
+			}
+			else
+			{
+				for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)
+				{
+					fut.setFinishedIfUndone();
+				}				
+			}
+		}
+		
+		return IFuture.DONE;
+	}
+
 	
 	//-------- IValueFetcher interface --------
 	

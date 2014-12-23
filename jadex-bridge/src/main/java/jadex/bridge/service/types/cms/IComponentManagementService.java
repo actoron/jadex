@@ -90,20 +90,6 @@ public interface IComponentManagementService
 	 */
 	public IFuture<Void> resumeComponent(IComponentIdentifier componentid);
 	
-	/**
-	 *  Add a result listener. Also intermediate result listeners can be
-	 *  added. In this case results are immediately fed back when set.
-	 *  @param listener The result (or intermediate) result listener.
-	 */
-	public IFuture<Void> addComponentResultListener(IResultListener<Collection<Tuple2<String, Object>>> listener, IComponentIdentifier cid);
-	
-	/**
-	 *  Add a previously added result listener. 
-	 *  @param listener The result (or intermediate) result listener.
-	 */
-	public IFuture<Void> removeComponentResultListener(IResultListener<Collection<Tuple2<String, Object>>> listener, IComponentIdentifier cid);
-
-	
 	//-------- debugging methods --------
 	
 	/**

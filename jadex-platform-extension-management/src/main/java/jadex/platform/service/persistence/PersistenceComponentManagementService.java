@@ -7,14 +7,11 @@ import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.persistence.IIdleHook;
 import jadex.bridge.service.types.persistence.IPersistenceService;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -23,10 +20,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
 import jadex.platform.service.cms.ComponentManagementService;
-import jadex.platform.service.cms.IntermediateResultListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -226,16 +221,16 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 								public void customResultAvailable(final IModelInfo model)
 								{
 									
-									IntermediateResultListener	reslis;
-									if(resultlisteners.containsKey(pi.getComponentDescription().getName()))
-									{
-										reslis	= resultlisteners.get(pi.getComponentDescription().getName());
-									}
-									else
-									{
-										reslis	= new IntermediateResultListener(null);	
-										resultlisteners.put(pi.getComponentDescription().getName(), reslis);
-									}
+//									IntermediateResultListener	reslis;
+//									if(resultlisteners.containsKey(pi.getComponentDescription().getName()))
+//									{
+//										reslis	= resultlisteners.get(pi.getComponentDescription().getName());
+//									}
+//									else
+//									{
+//										reslis	= new IntermediateResultListener(null);	
+//										resultlisteners.put(pi.getComponentDescription().getName(), reslis);
+//									}
 		
 									// Todo: allow adapting component identifier (e.g. to changed platform suffix).
 //									Future<Void>	init	= new Future<Void>();

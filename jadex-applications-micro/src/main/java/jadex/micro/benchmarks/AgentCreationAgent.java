@@ -138,28 +138,28 @@ public class AgentCreationAgent
 //					}
 			
 			// If nested, use initial component to kill others
-//					else
-//			{
-//				IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//				String	initial	= createPeerName(1, agent.getComponentIdentifier());
-//				IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
-//				cms.getExternalAccess(cid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
-//				{
-//					public void resultAvailable(IExternalAccess exta)
-//					{
-//						exta.scheduleStep(new IComponentStep<Void>()
-//						{
-//							@Classname("deletePeers")
-//							public IFuture<Void> execute(final IInternalAccess ia)
-//							{
-//								IClockService clock = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//								((AgentCreationAgent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent()).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
-//								return IFuture.DONE;
-//							}
-//						});
-//					}
-//				}));
-//			}
+//			else
+			{
+				IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				String	initial	= createPeerName(1, agent.getComponentIdentifier());
+				IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
+				cms.getExternalAccess(cid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
+				{
+					public void resultAvailable(IExternalAccess exta)
+					{
+						exta.scheduleStep(new IComponentStep<Void>()
+						{
+							@Classname("deletePeers")
+							public IFuture<Void> execute(final IInternalAccess ia)
+							{
+								IClockService clock = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+								((AgentCreationAgent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent()).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
+								return IFuture.DONE;
+							}
+						});
+					}
+				}));
+			}
 		}
 	}
 
