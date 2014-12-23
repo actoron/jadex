@@ -268,9 +268,7 @@ public class MessageService extends BasicService implements IMessageService
 		deliveryhandlers.put(StreamSendTask.MESSAGE_TYPE_STREAM, new StreamDeliveryHandler());
 		
 		this.icons = Collections.synchronizedMap(new HashMap<Integer, AbstractConnectionHandler>());
-		this.pcons = Collections.synchronizedMap(new HashMap<Integer, AbstractConnectionHandler>());
-		
-		this.contentcodecinfos = Collections.synchronizedMap(new HashMap<IComponentIdentifier, Map<Class<?>, Object[]>>());
+		this.pcons = Collections.synchronizedMap(new HashMap<Integer, AbstractConnectionHandler>());		
 	}
 	
 	//-------- interface methods --------
@@ -801,8 +799,11 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Get a matching content codec.
 	 *  @param props The properties.
 	 */
+	// todo: called from rms, hack :-(
 	public void setContentCodecInfo(IComponentIdentifier cid, Map<Class<?>, Object[]> info)
 	{
+		if(contentcodecinfos==null)
+			contentcodecinfos = Collections.synchronizedMap(new HashMap<IComponentIdentifier, Map<Class<?>, Object[]>>());
 		contentcodecinfos.put(cid, info);
 	}
 	
@@ -813,7 +814,10 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public Map<Class<?>, Object[]> getContentCodecInfo(IComponentIdentifier cid)
 	{
-		return (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
+		Map<Class<?>, Object[]> ret = (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
+		if(ret==null)
+			System.out.println("sdffdsdf");
+		return ret;
 	}
 
 	/**
@@ -2181,7 +2185,7 @@ public class MessageService extends BasicService implements IMessageService
 									if(lis!=null)
 									{
 										// Decode message for listener. What if listener has different class loader?
-										decodeMessage(logger, messagetype, msg, classloader);
+										decodeMessage(logger, messagetype, msg, classloader, null);
 										IMessageAdapter message = new DefaultMessageAdapter(msg, messagetype);
 										for(int i=0; i<lis.length; i++)
 										{
@@ -2279,7 +2283,7 @@ public class MessageService extends BasicService implements IMessageService
 						if(com!=null)
 						{
 							ClassLoader cl = classloader!=null? classloader: ia.getClassLoader();
-							decodeMessage(logger, messagetype, fmessage, cl);
+							decodeMessage(logger, messagetype, fmessage, cl, receiver);
 							
 							try
 							{
@@ -2750,10 +2754,22 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Decode a message.
 	 */
-	protected void decodeMessage(final Logger logger, final MessageType messagetype, final Map<String, Object> fmessage, ClassLoader cl)
+	protected void decodeMessage(final Logger logger, final MessageType messagetype, final Map<String, Object> fmessage, ClassLoader cl, IComponentIdentifier rec)
 	{
-//							System.out.println("dec: "+cl+" "+component.getComponentIdentifier()+" "+MessageService.this.component.getComponentIdentifier());
+//		System.out.println("dec: "+cl+" "+component.getComponentIdentifier()+" "+MessageService.this.component.getComponentIdentifier());
 		// Conversion via platform specific codecs
+		if(rec==null)
+		{
+			Object recs = fmessage.get(messagetype.getReceiverIdentifier());
+			if(SReflect.isIterable(recs))
+			{
+				rec = (IComponentIdentifier)SReflect.getIterator(recs).next();
+			}
+			else
+			{
+				rec = (IComponentIdentifier)recs;
+			}
+		}
 		IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
 		for(Iterator it=fmessage.keySet().iterator(); it.hasNext(); )
 		{
@@ -2766,7 +2782,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			if(codec!=null)
 			{
-//									System.out.println("dec2: "+codec+fmessage);
+//				System.out.println("dec2: "+codec+fmessage);
 				try
 				{
 					final List<Exception>	errors	= new ArrayList<Exception>();
@@ -2777,7 +2793,7 @@ public class MessageService extends BasicService implements IMessageService
 							errors.add(e);
 						}
 					};
-					Object val = codec.decode((byte[])value, cl, getContentCodecInfo(component.getComponentIdentifier()), rep);
+					Object val = codec.decode((byte[])value, cl, getContentCodecInfo(rec), rep);
 					
 					if(!errors.isEmpty())
 					{

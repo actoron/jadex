@@ -106,34 +106,14 @@ public class RemoteServiceManagementAgent
 		STransformation.registerClass(DefaultHashcodeMethodReplacement.class);
 		STransformation.registerClass(GetComponentFeatureMethodReplacement.class);
 		
-		SServiceProvider.getService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
-		{
-			public void customResultAvailable(final ILibraryService libservice)
-			{
-				SServiceProvider.getService(agent, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
-				{
-					public void customResultAvailable(final IMarshalService marshalservice)
-					{
-						SServiceProvider.getService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
-						{
-							public void customResultAvailable(final IMessageService msgservice)
-							{
-//								boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
-								rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice);//, binarymode);
-								
-								// Todo:
-								agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
-								
-								ret.setResult(null);
-							}
-						}));
-					}
-				}));
-			}
-		}));
+		ILibraryService libservice = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IMarshalService marshalservice = SServiceProvider.getLocalService(agent, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IMessageService msgservice = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
+		rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice);//, binarymode);
+		agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+		ret.setResult(null);
+		
 		return ret;
 	}
 	
