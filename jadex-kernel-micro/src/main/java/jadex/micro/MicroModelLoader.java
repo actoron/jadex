@@ -39,9 +39,9 @@ public class MicroModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public MicroModel loadComponentModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
+	public MicroModel loadComponentModel(String name, String[] imports, IResourceIdentifier clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return (MicroModel)loadModel(name, FILE_EXTENSION_MICRO, imports, classloader, context);
+		return (MicroModel)loadModel(name, FILE_EXTENSION_MICRO, imports, clkey, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------

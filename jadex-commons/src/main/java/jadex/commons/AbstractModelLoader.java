@@ -196,11 +196,42 @@ public abstract class AbstractModelLoader
 	//-------- methods --------
 
 	/**
+	 *  Get a cached model.
+	 *  @param name	The name of the model (file name or logical name).
+	 *  @param extension	The specific extension to look for.
+	 *  @param imports	The imports to use when resolving logical names.
+	 *  @param clkey	The class loader key to allow caching by e.g. RID.
+	 *  @return null, when model not found or not yet loaded.
+	 */
+	public synchronized ICacheableModel	getCachedModel(String name, String extension, String[] imports, Object clkey)
+	{
+		ICacheableModel cached = null;
+		if(registered.containsKey(name))
+		{
+			cached = registered.get(name);
+		}
+		else
+		{
+			// Lookup cache by name/extension/imports
+			Object[] keys	= imports!=null? new Object[imports.length+3]: new Object[3];
+			keys[0]	= name;
+			keys[1]	= extension;
+			keys[2] = clkey;
+			if(imports!=null)
+				System.arraycopy(imports, 0, keys, 3, imports.length);
+			Tuple	keytuple	= new Tuple(keys);
+			cached	= modelcache.get(keytuple);
+		}
+		return cached;
+	}
+	
+	/**
 	 *  Load a model.
 	 *  @param name	The name of the model (file name or logical name).
 	 *  @param imports	The imports to use when resolving logical names.
+	 *  @param clkey	The class loader key to allow caching by e.g. RID.
 	 */
-	public synchronized ICacheableModel	loadModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
+	public synchronized ICacheableModel	loadModel(String name, String[] imports, Object clkey, ClassLoader classloader, Object context) throws Exception
 	{
 		return loadModel(name, null, imports, classloader, context);
 	}
@@ -210,8 +241,9 @@ public abstract class AbstractModelLoader
 	 *  @param name	The name of the model (file name or logical name).
 	 *  @param extension	The specific extension to look for.
 	 *  @param imports	The imports to use when resolving logical names.
+	 *  @param clkey	The class loader key to allow caching by e.g. RID.
 	 */
-	public synchronized ICacheableModel	loadModel(String name, String extension, String[] imports, ClassLoader classloader, Object context) throws Exception
+	public synchronized ICacheableModel	loadModel(String name, String extension, String[] imports, Object clkey, ClassLoader classloader, Object context) throws Exception
 	{
 //		System.out.println("filename: "+name);
 		
@@ -226,7 +258,7 @@ public abstract class AbstractModelLoader
 			Object[] keys	= imports!=null? new Object[imports.length+3]: new Object[3];
 			keys[0]	= name;
 			keys[1]	= extension;
-			keys[2] = classloader;
+			keys[2] = clkey;
 			if(imports!=null)
 				System.arraycopy(imports, 0, keys, 3, imports.length);
 			Tuple	keytuple	= new Tuple(keys);

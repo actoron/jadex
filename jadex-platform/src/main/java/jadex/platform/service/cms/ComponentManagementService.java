@@ -460,7 +460,7 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		final CreationInfo cinfo = new CreationInfo(info);	// Dummy default info, if null. Must be cloned as localtype is set on info later.
 		
-		final IntermediateResultListener reslis = new IntermediateResultListener(resultlistener);
+		final IntermediateResultListener reslis = resultlistener!=null ? new IntermediateResultListener(resultlistener) : null;
 		
 		if(cinfo.getParent()!=null)
 		{

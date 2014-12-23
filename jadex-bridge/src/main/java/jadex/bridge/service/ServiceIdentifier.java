@@ -28,6 +28,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/** The scope. */
 	protected String scope;
 	
+	/** The string representation (cached for reducing memory consumption). */
+	protected String	tostring;
+	
 	//-------- constructors --------
 	
 	/**
@@ -176,11 +179,12 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 */
 	public String toString()
 	{
-		return getServiceName()+"@"+getProviderId();
+		if(tostring==null)
+		{
+			tostring	= getServiceName()+"@"+getProviderId();
 //		return "ServiceIdentifier(providerid=" + providerid + ", type=" + type
 //				+ ", servicename=" + servicename + ")";
+		}
+		return tostring;
 	}
-	
-	
-	
 }
