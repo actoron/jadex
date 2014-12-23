@@ -13,7 +13,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test using injected values in init expressions or constructors.
  */
-@Agent(keepalive=Boolean3.TRUE)
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ConstructorsBDI	extends ConstructorsSuper
 {
@@ -48,7 +48,7 @@ public class ConstructorsBDI	extends ConstructorsSuper
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody//(keepalive=false)
+	@AgentBody
 	public void	body()
 	{
 		TestReport	tr	= new TestReport("#1", "Test if constructor calls work.");

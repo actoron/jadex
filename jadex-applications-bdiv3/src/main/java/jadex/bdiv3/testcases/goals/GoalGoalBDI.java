@@ -119,7 +119,7 @@ public class GoalGoalBDI
 			{
 				if(!tr.isFinished())
 				{
-					tr.setFailed("Goal did return");
+					tr.setFailed("Goal did not return");
 					agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				

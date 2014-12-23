@@ -9,7 +9,6 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -20,7 +19,7 @@ import jadex.micro.annotation.Results;
  *  Agent that has a plan that return a value form the body.
  *  The value is then used as result value of the goal when the goal uses the @GoalResult.
  */
-@Agent(keepalive=Boolean3.TRUE)
+@Agent(keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalPlanResultBDI
 {
@@ -64,7 +63,7 @@ public class GoalPlanResultBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody//(keepalive=false)
+	@AgentBody
 	public void body()
 	{
 		String res1 = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AGoal()).get();
