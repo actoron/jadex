@@ -350,32 +350,68 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		if(services.hasNext())
 		{
 			final IInternalService	is	= services.next();
-			component.getLogger().info("Starting service: "+is.getServiceIdentifier());
-			is.setComponentAccess(component).addResultListener(new DelegationResultListener<Void>(ret)
+			initService(is).addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
-					is.startService().addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-							component.getLogger().info("Started service: "+is.getServiceIdentifier());
-							
-							initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							ret.setException(exception);
-						}
-					});
+					initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
+//			component.getLogger().info("Starting service: "+is.getServiceIdentifier());
+//			is.setComponentAccess(component).addResultListener(new DelegationResultListener<Void>(ret)
+//			{
+//				public void customResultAvailable(Void result)
+//				{
+//					is.startService().addResultListener(new IResultListener<Void>()
+//					{
+//						public void resultAvailable(Void result)
+//						{
+//							component.getLogger().info("Started service: "+is.getServiceIdentifier());
+//							
+//							
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							ret.setException(exception);
+//						}
+//					});
+//				}
+//			});
 		}
 		else
 		{
 			ret.setResult(null);
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Init a service, i.e. set the component (internal access) and call startService.
+	 */
+	protected IFuture<Void> initService(final IInternalService is)
+	{
+		final Future<Void> ret = new Future<Void>();
+		component.getLogger().info("Starting service: "+is.getServiceIdentifier());
+		is.setComponentAccess(component).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				is.startService().addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						component.getLogger().info("Started service: "+is.getServiceIdentifier());
+						ret.setResult(null);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+		});
 		return ret;
 	}
 	
@@ -575,9 +611,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param type The public service interface.
 	 *  @param service The service.
 	 */
-	public void addService(String name, Class<?> type, Object service)
+	public IFuture<Void> addService(String name, Class<?> type, Object service)
 	{
-		addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null);
+		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null);
 	}
 	
 	/**
@@ -588,9 +624,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param service The service.
 	 *  @param type The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public void	addService(String name, Class<?> type, Object service, String proxytype)
+	public IFuture<Void>	addService(String name, Class<?> type, Object service, String proxytype)
 	{
-		addService(name, type, proxytype, null, service, null);
+		return addService(name, type, proxytype, null, service, null);
 	}
 	
 	// todo:
@@ -613,10 +649,10 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param type The public service interface.
 	 *  @param service The service.
 	 */
-	public void	addService(String name, Class<?> type, Object service, PublishInfo pi)
+	public IFuture<Void>	addService(String name, Class<?> type, Object service, PublishInfo pi)
 	{
 		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, null, pi, null): null;
-		addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi);
+		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi);
 	}
 
 	/**
@@ -802,7 +838,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public IInternalService addService(final String name, final Class<?> type, final String proxytype, 
+	public IFuture<Void> addService(final String name, final Class<?> type, final String proxytype, 
 		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info)
 	{
 //		System.out.println("addS:"+service);
@@ -818,8 +854,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			info, info!=null? info.getScope(): null);
 		
 		addService(proxy, info);
-		
-		return proxy;
+				
+		return initService(proxy);
 	}
 	
 	/**
