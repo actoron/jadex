@@ -64,7 +64,7 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	{
 		publisher.unobserveValue(oldvalue);
 		publisher.observeValue(newvalue);
-		publisher.getRuleSystem().addEvent(new Event(publisher.getRemEvent(), new ChangeInfo<T>(newvalue, oldvalue,  index>-1? Integer.valueOf(index): null)));
+		publisher.getRuleSystem().addEvent(new Event(publisher.getChangeEvent(), new ChangeInfo<T>(newvalue, oldvalue,  index>-1? Integer.valueOf(index): null)));
 		publisher.publishToolBeliefEvent();
 	}
 }

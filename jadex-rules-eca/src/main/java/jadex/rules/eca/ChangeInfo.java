@@ -77,4 +77,12 @@ public class ChangeInfo<T>
 	{
 		this.info = info;
 	}
+	
+	/**
+	 * Get a string representation.
+	 */
+	public String	toString()
+	{
+		return "ChangeInfo(value="+getValue()+", old="+getOldValue()+", info="+getInfo()+")";
+	}
 }

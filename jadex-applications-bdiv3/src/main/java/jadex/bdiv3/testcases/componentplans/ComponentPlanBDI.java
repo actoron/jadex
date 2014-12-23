@@ -46,7 +46,7 @@ public class ComponentPlanBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody//(keepalive=false)
+	@AgentBody
 	public void	body(IInternalAccess agent)
 	{
 		TestReport	tr	= new TestReport("#1", "Test if goal can be achieved by component plan.");
