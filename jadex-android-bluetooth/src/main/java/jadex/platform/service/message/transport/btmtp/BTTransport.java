@@ -1,4 +1,4 @@
-package jadex.base.service.message.transport.btmtp;
+package jadex.platform.service.message.transport.btmtp;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.AndroidContextManager.AndroidContextChangeListener;
@@ -400,9 +400,9 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 
 	class BTServiceConnection implements ServiceConnection {
 
-		private Future fut;
+		private Future<Void> fut;
 
-		public BTServiceConnection(Future fut) {
+		public BTServiceConnection(Future<Void> fut) {
 			this.fut = fut;
 		}
 
@@ -440,9 +440,10 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 														.getBTAddress()) };
 												binder.registerMessageCallback(msgCallback);
 												binder.startAutoConnect();
-												fut.setResult(true);
+												fut.setResult(null);
 											} catch (RemoteException e) {
 												e.printStackTrace();
+												fut.setException(e);
 											}
 										}
 									});

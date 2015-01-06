@@ -1,4 +1,4 @@
-package jadex.base.service.awareness.discovery.bluetoothp2p;
+package jadex.platform.service.awareness.discovery.bluetoothp2p;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.AndroidContextManager.AndroidContextChangeListener;
@@ -9,24 +9,14 @@ import jadex.android.bluetooth.service.ConnectionService;
 import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.android.bluetooth.util.Helper;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.awareness.IDiscoveryService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
+import jadex.micro.annotation.Properties;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
-import jadex.platform.service.awareness.discovery.DiscoveryService;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
 import jadex.platform.service.awareness.discovery.SendHandler;
 import android.app.Activity;
@@ -41,11 +31,11 @@ import android.util.Log;
 /**
  *  Agent that uses the Bluetooth Connection Service to locate other Jadex awareness agents.
  */
-@Description("This agent looks for other awareness agents in the local net.")
+@Description("This agent looks for other awareness agents in the bluetooth neighbourhood.")
 @Arguments(
 {
-	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
-	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
+//	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
+//	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
 	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior).")
 })
@@ -55,14 +45,7 @@ import android.util.Log;
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000")),
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
 })
-@ProvidedServices(
-	@ProvidedService(type=IDiscoveryService.class, implementation=@Implementation(DiscoveryService.class))
-)
-@RequiredServices(
-{
-	@RequiredService(name="threadpool", type=IThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="management", type=IAwarenessManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
-})
+@Properties(@NameValue(name="system", value="true"))
 public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements AndroidContextChangeListener
 {
 
@@ -95,16 +78,21 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements Androi
 
 	@Override
 	public void onContextCreate(Context ctx) {
+		Log.d(Helper.LOG_TAG, "(BTP2PDiscoveryAgent) Context created");
 		context = ctx;
 		if (isStarted()) {
 			intent = new Intent(context, ConnectionService.class);
-			Log.d(Helper.LOG_TAG, "(BTP2PDiscovery) Trying to bind BT Service...");
-			context.bindService(intent, sc, Activity.BIND_AUTO_CREATE);
+			Log.d(Helper.LOG_TAG, "(BTP2PDiscoveryAgent) Trying to bind BT Service...");
+			boolean bindService = context.bindService(intent, sc, Activity.BIND_AUTO_CREATE);
+			if (!bindService) {
+				Log.e(Helper.LOG_TAG, "(BTP2PDiscoveryAgent) Could not bind Service, maybe it's not declared correctly?");
+			}
 		}
 	}
 	
 	@Override
 	public void setStarted(boolean started) {
+		Log.d(Helper.LOG_TAG, "(BTP2PDiscoveryAgent) started");
 		super.setStarted(started);
 		if (context != null) {
 			onContextCreate(context);
@@ -124,8 +112,11 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements Androi
 		if (context != null && binder == null) {
 			//context.startService(intent);
 			intent = new Intent(context, ConnectionService.class);
-			Log.d(Helper.LOG_TAG, "(BTP2PDiscovery) Trying to bind BT Service...");
-			context.bindService(intent, sc, Activity.BIND_AUTO_CREATE);
+			Log.d(Helper.LOG_TAG, "(BTP2PDiscoveryAgent) Trying to bind BT Service...");
+			boolean bindService = context.bindService(intent, sc, Activity.BIND_AUTO_CREATE);
+			if (!bindService) {
+				Log.e(Helper.LOG_TAG, "(BTP2PDiscovery) Could not bind Service, maybe it's not declared correctly?");
+			}
 		}
 	}
 

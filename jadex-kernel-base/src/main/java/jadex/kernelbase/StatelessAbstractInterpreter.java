@@ -989,7 +989,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			{
 				Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType().getType(getClassLoader(), getModel().getAllImports());
 				if(sermap.put(key, ps[i])!=null)
-					throw new RuntimeException("Services with same type must have different name.");  // Is catched and set to ret below
+					throw new RuntimeException("Services with same type (" + ps[i].getType() + ") must have different name: " + ps[i].getName());  // Is catched and set to ret below
 			}
 			if(config!=null)
 			{

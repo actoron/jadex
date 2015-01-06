@@ -35,7 +35,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 @RunWith(CustomTestRunner.class)
 public abstract class PacketRouterTest {
 
-	private static final String ownAddress = TestConstants.defaultAdapterAddress;
+	protected static final String ownAddress = TestConstants.defaultAdapterAddress;
 	private static final String ownAddress2 = TestConstants.defaultAdapterAddress2;
 	protected static final String device1 = TestConstants.adapterAddress1;
 	protected static final String device2 = TestConstants.adapterAddress2;
@@ -155,6 +155,17 @@ public abstract class PacketRouterTest {
 		packetRouter1.addConnectedDevice(device1);
 		reachableDeviceAddresses = packetRouter1.getReachableDeviceAddresses();
 		assertFalse(reachableDeviceAddresses.contains(device1));
+	}
+	
+	@Test
+	public void testUpdateRoutingInformation_shouldNotContainSelf() {
+		assertTrue(packetRouter1.getReachableDeviceAddresses().isEmpty());
+		System.out.println(packetRouter1);
+		packetRouter1.updateRoutingInformation(getSampleRoutingInformation_containingOwnDevice());
+		
+		Set<String> reachableDeviceAddresses = packetRouter1.getReachableDeviceAddresses();
+		System.out.println(packetRouter1);
+		assertFalse(reachableDeviceAddresses.contains(ownAddress));
 	}
 
 	private List<String> getDeviceList(RoutingInformation routingInformation) {
@@ -417,5 +428,7 @@ public abstract class PacketRouterTest {
 	protected abstract List<String> getSampleExpectedReachableDevices();
 
 	protected abstract List<String> getSampleExpectedConnectedDevices();
+
+	protected abstract RoutingInformation getSampleRoutingInformation_containingOwnDevice();
 
 }

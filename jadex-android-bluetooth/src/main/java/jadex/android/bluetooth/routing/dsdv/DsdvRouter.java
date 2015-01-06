@@ -292,37 +292,14 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 					// If the dest is myself and the sequence num is higher and
 					// odd then increment own seq num to one higher then the one
 					// sent
-					if (rte.getDestination().equals(getOwnAddress())
-							&& rte.getSeqNum() % 2 == 1
-							&& rte.getSeqNum() > CurrentInfo.lastSeqNum) {
-						CurrentInfo.setOwnSeqNum(rte.getSeqNum() + 1);
-						rte.setSeqNum(CurrentInfo.lastSeqNum);
-						rte.setNextHop(getOwnAddress());
-						rte.setNumHops(0);
-						rte.setRouteChanged(true);
-						routeTable.addRoutingEntry(rte);
-						if (rte.getNumHops() < 2){
-							changedConnected = true;
-						} else {
-							changedReachable = true;
-						}
-						reBroadcast = true;
-					} else if (existing.getSeqNum() < rte.getSeqNum()) {
-						// System.out.println("Got from " +
-						// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
-						// +
-						// " with sewnum "+rte.getSeqNum()+" existing seq is lower");
-						// if there is a newer Seq num and the node I get the
-						// message
-						// from is the next hop for the destination then store
-						// route
+					if (rte.getDestination().equals(getOwnAddress())) {
 						if (rte.getSeqNum() % 2 == 1
-								&& rBroad.getFromAddress() == existing
-										.getNextHop()) {
-							// System.out.println("Got from " +
-							// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
-							// +
-							// " with sewnum "+rte.getSeqNum()+" route is odd num");
+							&& rte.getSeqNum() > CurrentInfo.lastSeqNum) {
+							// only care if seqNr was higher
+							CurrentInfo.setOwnSeqNum(rte.getSeqNum() + 1);
+							rte.setSeqNum(CurrentInfo.lastSeqNum);
+							rte.setNextHop(getOwnAddress());
+							rte.setNumHops(0);
 							rte.setRouteChanged(true);
 							routeTable.addRoutingEntry(rte);
 							if (rte.getNumHops() < 2){
@@ -331,38 +308,65 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 								changedReachable = true;
 							}
 							reBroadcast = true;
-
-						} else if (rte.getSeqNum() % 2 == 0) {
+						}
+					} else {
+						if (existing.getSeqNum() < rte.getSeqNum()) {
 							// System.out.println("Got from " +
 							// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
 							// +
-							// " with sewnum "+rte.getSeqNum()+" route is even num");
-							// routeSender.reset();
+							// " with sewnum "+rte.getSeqNum()+" existing seq is lower");
+							// if there is a newer Seq num and the node I get the
+							// message
+							// from is the next hop for the destination then store
+							// route
+							if (rte.getSeqNum() % 2 == 1
+									&& rBroad.getFromAddress() == existing
+											.getNextHop()) {
+								// System.out.println("Got from " +
+								// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
+								// +
+								// " with sewnum "+rte.getSeqNum()+" route is odd num");
+								rte.setRouteChanged(true);
+								routeTable.addRoutingEntry(rte);
+								if (rte.getNumHops() < 2){
+									changedConnected = true;
+								} else {
+									changedReachable = true;
+								}
+								reBroadcast = true;
+	
+							} else if (rte.getSeqNum() % 2 == 0) {
+								// System.out.println("Got from " +
+								// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
+								// +
+								// " with sewnum "+rte.getSeqNum()+" route is even num");
+								// routeSender.reset();
+								routeTable.addRoutingEntry(rte);
+								if (rte.getNumHops() < 2){
+									changedConnected = true;
+								} else {
+									changedReachable = true;
+								}
+								// reBroadcast = true;
+							} else {
+								// System.out.println("Doing nada !! ");
+							}
+						} else if (existing.getSeqNum() == rte.getSeqNum()
+								&& (existing.getNumHops() > rte.getNumHops())) {
+							// System.out.println("Got from " +
+							// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
+							// +
+							// " with sewnum "+rte.getSeqNum()+" same seq lower hop");
+							rte.setRouteChanged(true);
 							routeTable.addRoutingEntry(rte);
 							if (rte.getNumHops() < 2){
 								changedConnected = true;
 							} else {
 								changedReachable = true;
 							}
-							// reBroadcast = true;
 						} else {
-							// System.out.println("Doing nada !! ");
+							// System.out.println("Do nothing with Route");
 						}
-					} else if (existing.getSeqNum() == rte.getSeqNum()
-							&& (existing.getNumHops() > rte.getNumHops())) {
-						// System.out.println("Got from " +
-						// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
-						// +
-						// " with sewnum "+rte.getSeqNum()+" same seq lower hop");
-						rte.setRouteChanged(true);
-						routeTable.addRoutingEntry(rte);
-						if (rte.getNumHops() < 2){
-							changedConnected = true;
-						} else {
-							changedReachable = true;
-						}
-					} else {
-						// System.out.println("Do nothing with Route");
 					}
 				}
 			}
@@ -443,7 +447,7 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 			try {
 				sendMessageToConnectedDevice(packet, nextHop);
 				if (!nextHop.equals(packet.getDestination())) {
-					Log.d(TAG, "Message sent to intermediate device: " + nextHop);
+					Log.d(TAG, "Message sent to intermediate device: " + nextHop + " (dest: " + packet.getDestination() + ")");
 				}
 				result.setResult(BluetoothMessage.MESSAGE_SENT);
 			} catch (MessageNotSendException e) {

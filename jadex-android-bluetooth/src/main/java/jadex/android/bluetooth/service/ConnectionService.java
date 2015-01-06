@@ -118,10 +118,13 @@ public class ConnectionService extends Service implements
 					public synchronized void messageReceived(
 							BluetoothMessage msg) {
 						try {
-							if (msg.getType() == DataPacket.TYPE_AWARENESS_INFO
-									&& awarenessCallback != null) {
-								awarenessCallback.awarenessInfoReceived(msg
-										.getData());
+							if (msg.getType() == DataPacket.TYPE_AWARENESS_INFO) {
+								if (awarenessCallback != null) {
+									awarenessCallback.awarenessInfoReceived(msg
+											.getData());
+								} else {
+									Log.w(Helper.LOG_TAG, "Received awareness info but no callback registered!");
+								}
 							} else if (msgCallback != null) {
 								// showToast(msg.getDataAsString());
 								msgCallback.messageReceived(msg.getData());

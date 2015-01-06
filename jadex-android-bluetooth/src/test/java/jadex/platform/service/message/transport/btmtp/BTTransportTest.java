@@ -1,5 +1,7 @@
-package jadex.base.service.message.transport.btmtp;
+package jadex.platform.service.message.transport.btmtp;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import jadex.android.bluetooth.CustomTestRunner;
 import jadex.android.bluetooth.TestConstants;
 import jadex.android.bluetooth.device.IBluetoothDevice;
@@ -7,7 +9,6 @@ import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.service.IBTP2PMessageCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
-import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -18,9 +19,9 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.Writer;
-import static junit.framework.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;

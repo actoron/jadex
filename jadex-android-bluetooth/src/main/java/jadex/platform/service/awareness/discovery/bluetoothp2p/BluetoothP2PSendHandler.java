@@ -1,4 +1,4 @@
-package jadex.base.service.awareness.discovery.bluetoothp2p;
+package jadex.platform.service.awareness.discovery.bluetoothp2p;
 
 import jadex.android.bluetooth.util.Helper;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
@@ -23,8 +23,7 @@ public class BluetoothP2PSendHandler extends SendHandler {
 	 */
 	@Override
 	public void send(AwarenessInfo info) {
-		// Log.d(Helper.LOG_TAG,
-		// "BluetoothP2PSendHandler: sending Awareness Info");
+		Log.d(Helper.LOG_TAG, "BluetoothP2PSendHandler: sending Awareness Info");
 		byte[] data = DiscoveryAgent.encodeObject(info, getAgent().getDefaultCodecs(),
 				getAgent().getMicroAgent().getClassLoader());
 		getAgent().sendAwarenessInfo(data);
@@ -36,4 +35,6 @@ public class BluetoothP2PSendHandler extends SendHandler {
 	protected BluetoothP2PDiscoveryAgent getAgent() {
 		return (BluetoothP2PDiscoveryAgent) agent;
 	}
+	
+	
 }

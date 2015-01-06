@@ -1,4 +1,4 @@
-package jadex.base.service.awareness.discovery.bluetoothp2p;
+package jadex.platform.service.awareness.discovery.bluetoothp2p;
 
 import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.util.Helper;
@@ -27,26 +27,23 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 
 	/**
 	 * Receive a packet.
+	 * @throws InterruptedException 
 	 */
 	@Override
-	public Object[] receive() {
+	public Object[] receive() throws InterruptedException {
 
-		try {
-			// blocks until Awarenessinfo is available:
-			byte[] take = awarenessQueue.take();
+		// blocks until Awarenessinfo is available:
+		byte[] take = awarenessQueue.take();
 
-			// create object to be handled by Jadex
-			Object[] ret = new Object[3];
-			// address:
-			ret[0] = null;
-			// port:
-			ret[1] = 0;
-			ret[2] = take;
+		// create object to be handled by Jadex
+		Object[] ret = new Object[3];
+		// address:
+		ret[0] = null;
+		// port:
+		ret[1] = 0;
+		ret[2] = take;
 
-			return ret;
-		} catch (InterruptedException e) {
-			return null;
-		}
+		return ret;
 	}
 
 	/**
@@ -61,7 +58,8 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 	 * @param data
 	 */
 	public void addReceivedAwarenessInfo(byte[] data) {
-		Log.d(Helper.LOG_TAG, "AwarenessInfo received.");
-		awarenessQueue.add(data);
+		awarenessQueue.offer(data);
+		Log.d(Helper.LOG_TAG, "AwarenessInfo received. Queue size: " + awarenessQueue.size());
 	}
+	
 }

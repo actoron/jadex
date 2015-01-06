@@ -631,7 +631,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 									"finished pinging known devices");
 							result.setResult(getBondedDevicesInRange());
 						}
-						Log.d(Helper.LOG_TAG, "Not trying " + device.getName()
+						Log.d(Helper.LOG_TAG, "Not trying " + device.getName() + " (" + device.getAddress() +") "
 								+ ", because it is already reachable.");
 						continue;
 					}
@@ -644,7 +644,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 							if (messageResult != BluetoothMessage.MESSAGE_SENT) {
 								Log.d(Helper.LOG_TAG,
 										"Bonded device not available: "
-												+ device.getName());
+												+ device.getName() + " (" + device.getAddress() +") ");
 								if (getBondedDevicesInRange().contains(device)) {
 									getBondedDevicesInRange().remove(device);
 									notifyKnownDevicesChanged();
@@ -745,6 +745,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		switch (newState) {
 		case on:
 			ownAdress = btAdapter.getAddress();
+			Log.d(Helper.LOG_TAG, "Local Device Address: " + ownAdress);
 			packetRouter.setOwnAddress(ownAdress);
 			packetRouter.start();
 			break;
@@ -762,7 +763,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 
 	@Override
 	public void bluetoothDeviceFound(IBluetoothDevice device) {
-		Log.d(Helper.LOG_TAG, "Device found: " + device.getName());
+		Log.d(Helper.LOG_TAG, "Device found: " + device.getName() + " (" + device.getAddress() +") ");
 		if (!btAdapter.isDeviceBonded(device)) {
 			getUnbondedDevicesInRange().add(
 					new AndroidBluetoothDeviceWrapper(device));
@@ -907,11 +908,14 @@ public class BTP2PConnector implements IBluetoothStateListener {
 							Log.i(Helper.LOG_TAG,
 									"Not activating Autoconnect. Already Connected to "
 											+ connections.size() + " devices.");
+							
+							Log.d(Helper.LOG_TAG, packetRouter.toString());
 							return;
 						}
 						Log.i(Helper.LOG_TAG,
 								"Autoconnect Task Active... currently connected to "
 										+ connections.size() + " devices.");
+						Log.d(Helper.LOG_TAG, packetRouter.toString());
 						IFuture result = scanEnvironment(false);
 						result.addResultListener(new IResultListener() {
 							@Override
