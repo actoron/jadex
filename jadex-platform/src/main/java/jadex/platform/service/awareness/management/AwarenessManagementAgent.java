@@ -83,9 +83,7 @@ import java.util.TimerTask;
 	@Argument(name="excludes", clazz=String.class, defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to exclude (comma separated). Matches start of platform/IP/hostname.")
 })
 @ComponentTypes({
-	/* if[android]
-	@ComponentType(name = "Bluetooth", filename = "jadex/platform/service/awareness/discovery/bluetoothp2p/BluetoothP2PDiscoveryAgent.class"),
-	end[android]*/
+	@ComponentType(name="bluetooth", filename = "jadex/platform/service/awareness/discovery/bluetoothp2p/BluetoothP2PDiscoveryAgent.class"),
 	@ComponentType(name="broadcast", filename="jadex/platform/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
 	@ComponentType(name="multicast", filename="jadex/platform/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
 	@ComponentType(name="scanner", filename="jadex/platform/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),

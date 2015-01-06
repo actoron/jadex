@@ -122,6 +122,8 @@
 		<argument name="ssltcptransport" class="boolean">false</argument>
 		<!-- Port for SSL TCP transport. -->
 		<argument name="ssltcpport" class="int">44334</argument>
+		<!-- Flag for Bluetooth Transport (Android only)  -->
+		<argument name="bluetoothtransport" class="boolean">false</argument>
 		
 		<!-- The file name(s) of extension component(s) to load (separated by comma). -->
 		<argument name="extensions" class="String">
@@ -263,7 +265,8 @@
 						$args.tcptransport? new jadex.platform.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null,
 						$args.niotcptransport? new jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,
 						$args.ssltcptransport? jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport.create($component.getServiceProvider(), $args.ssltcpport): null,
-						$args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress, $args.relaysecurity): null
+						$args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress, $args.relaysecurity): null,
+						$args.bluetoothtransport? jadex.platform.service.message.transport.btmtp.BTTransport.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()}): null
 					},
 					new jadex.bridge.service.types.message.MessageType[]
 					{

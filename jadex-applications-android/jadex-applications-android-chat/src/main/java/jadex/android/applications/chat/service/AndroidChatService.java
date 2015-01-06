@@ -105,8 +105,10 @@ public class AndroidChatService extends JadexPlatformService
 			"-chat true " +
 			"-log false " +
 			"-niotcptransport false " +
-			"-networkname jadexnetwork " +
-			"-networkpass laxlax");
+			"-networkname \"jadexnetwork\" " +
+			"-networkpass \"laxlax\" " + 
+			"-bluetoothtransport true " + 
+			"-awamechanisms \"Broadcast, Multicast, Message, Relay, Local, Bluetooth\"");
 
 		uiHandler = new Handler();
 	}

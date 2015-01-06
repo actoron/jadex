@@ -30,6 +30,13 @@
 			<artifactId>jadex-android-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+			<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-bluetooth</artifactId>
+			<version>${project.version}</version>
+			<type>apklib</type>
+		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>

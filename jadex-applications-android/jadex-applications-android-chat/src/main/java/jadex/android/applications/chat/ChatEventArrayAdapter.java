@@ -60,7 +60,7 @@ public class ChatEventArrayAdapter extends ArrayAdapter<ChatEvent>
 //				viewHolder.userTextView.setTextColor(0xFFa82f2f);
 				viewHolder.userTextView.setTextColor(0xFFCC0000);
 			} else {
-				viewHolder.userTextView.setTextColor(Color.WHITE);
+				viewHolder.userTextView.setTextColor(Color.BLACK);
 			}
 		}
 		
