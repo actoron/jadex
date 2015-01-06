@@ -476,7 +476,7 @@ public class ThreadPool implements IThreadPool
 
 					if(park)
 					{
-						park();
+						markParked();
 						
 						synchronized(this)
 						{
@@ -496,7 +496,7 @@ public class ThreadPool implements IThreadPool
 						if(notified)
 						{
 							notified = false;
-							unpark();
+							markUnpark();
 						}
 						else
 						{
@@ -515,9 +515,9 @@ public class ThreadPool implements IThreadPool
 		}
 		
 		/**
-		 * 
+		 * (method "park" already exists in android - do not overwrite)
 		 */
-		protected void park()
+		protected void markParked()
 		{
 			synchronized(ThreadPool.this)
 			{
@@ -528,9 +528,9 @@ public class ThreadPool implements IThreadPool
 		}
 		
 		/**
-		 * 
+		 * (method "unpark" already exists in android - do not overwrite)
 		 */
-		protected void unpark()
+		protected void markUnpark()
 		{
 			synchronized(ThreadPool.this)
 			{
