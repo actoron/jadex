@@ -609,6 +609,7 @@
 				<module>jadex-android-xmlpull</module>
 				<module>jadex-android-platformclient</module>
 				<module>jadex-android-platformapp</module>
+				<module>jadex-android-bluetooth</module>
 				<module>jadex-platform-android</module>
 				<module>jadex-runtimetools-android</module>
 				<module>jadex-kernel-bdiv3-android</module>
