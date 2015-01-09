@@ -2,10 +2,11 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -26,12 +27,12 @@ public class GatewayXORActivityHandler implements IActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void execute(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		// Notify listeners as gateways are not followed by step handler execution
-		if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
-			instance.publishEvent(instance.createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
+			instance.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
 		}
 		
 		List<MSequenceEdge>	incoming	= activity.getIncomingSequenceEdges();
@@ -89,7 +90,7 @@ public class GatewayXORActivityHandler implements IActivityHandler
 	 *  @param thread The process thread.
 	 *  @param info The info object.
 	 */
-	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void cancel(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 	}
 	

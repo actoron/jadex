@@ -3,9 +3,9 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessServiceInvocationHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IntermediateFuture;
 
@@ -20,7 +20,7 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		//boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
 		
@@ -36,7 +36,7 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 			if(activity.isThrowing())
 			{
 				sendReturnValue(activity, instance, thread);
-				instance.step(activity, instance, thread, null);
+				getBpmnFeature(instance).step(activity, instance, thread, null);
 			}
 			else
 			{
@@ -49,7 +49,7 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 					|| (activity.isEventHandler()))
 				{
 					doExecute(activity, instance, thread);
-					instance.step(activity, instance, thread, null);
+					getBpmnFeature(instance).step(activity, instance, thread, null);
 				}
 				// Internal subprocess -> treat like intermediate event.
 				else
@@ -68,7 +68,7 @@ public class EventIntermediateServiceActivityHandler extends EventIntermediateMe
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	protected void sendReturnValue(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	protected void sendReturnValue(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		Future<Object> ret	= (Future<Object>)thread.getParameterValue(ProcessServiceInvocationHandler.THREAD_PARAMETER_SERVICE_RESULT);
 		

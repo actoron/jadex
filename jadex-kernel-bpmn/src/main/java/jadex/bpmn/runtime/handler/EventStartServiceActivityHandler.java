@@ -5,8 +5,8 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IInternalAccess;
 
 /**
  *
@@ -19,7 +19,7 @@ public class EventStartServiceActivityHandler extends EventIntermediateServiceAc
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		// Top level event -> just move forward to next activity.
 		// Or start event of event subprocess -> just move forward.
@@ -28,7 +28,7 @@ public class EventStartServiceActivityHandler extends EventIntermediateServiceAc
 			&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getParent().getModelElement()).getSubprocessType())))
 		{
 			doExecute(activity, instance, thread);
-			instance.step(activity, instance, thread, null);
+			getBpmnFeature(instance).step(activity, instance, thread, null);
 		}
 		
 		// Internal subprocess -> treat like intermediate event.

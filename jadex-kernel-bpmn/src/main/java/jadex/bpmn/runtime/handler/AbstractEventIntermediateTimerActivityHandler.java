@@ -1,8 +1,8 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.IFilter;
 
 /**
@@ -21,7 +21,7 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void execute(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 //		Number dur = (Number)getPropertyValue(activity, instance, thread, "duration");
 		Object d = thread.getPropertyValue("duration", activity); // does not wait if initial cron time pattern was specified "* * * * *"
@@ -48,7 +48,7 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param thread	The process thread.
 	 *  @param duration	The duration to wait.
 	 */
-	public abstract void doWait(MActivity activity, BpmnInterpreter instance, ProcessThread thread, long duration);
+	public abstract void doWait(MActivity activity, IInternalAccess instance, ProcessThread thread, long duration);
 
 	/**
 	 *  Execute an activity.
@@ -57,7 +57,7 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param thread The process thread.
 	 *  @param info The info object.
 	 */
-	public void cancel(final MActivity activity, BpmnInterpreter instance, final ProcessThread thread)
+	public void cancel(final MActivity activity, IInternalAccess instance, final ProcessThread thread)
 	{
 		ICancelable ca = (ICancelable)thread.getWaitInfo();
 		if(ca!=null)

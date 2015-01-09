@@ -1,8 +1,11 @@
 package jadex.bpmn.runtime;
 
+import jadex.bpmn.features.IBpmnComponentFeature;
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -36,7 +39,7 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	//-------- attributes --------
 	
 	/** The process instance. */
-	protected BpmnInterpreter instance;
+	protected IInternalAccess instance;
 	
 	/** The method / event mapping. */
 	protected Map<String, MActivity> events;
@@ -46,7 +49,7 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Create a new process service invocation handler.
 	 */
-	public ProcessServiceInvocationHandler(BpmnInterpreter instance, Map<String, MActivity> events)
+	public ProcessServiceInvocationHandler(IInternalAccess instance, Map<String, MActivity> events)
 	{
 		this.instance	= instance;
 		this.events	= events;
@@ -55,11 +58,11 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Create a new process service invocation handler.
 	 */
-	public ProcessServiceInvocationHandler(BpmnInterpreter instance, String actid)
+	public ProcessServiceInvocationHandler(IInternalAccess instance, String actid)
 	{
 		this.instance	= instance;
 		
-		MBpmnModel model = instance.getModelElement();
+		MBpmnModel model = (MBpmnModel)instance.getModel().getRawModel();
 		
 		MSubProcess proc = (MSubProcess)model.getActivityById(actid);
 		final Map<MSubProcess, List<MActivity>> evtsubstarts = model.getEventSubProcessStartEventMapping();
@@ -113,8 +116,8 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		MActivity act = events.get(SReflect.getMethodSignature(method));
 		if(act==null)
 			act = events.get(method.toString());
-		ProcessThread	thread	= new ProcessThread(act, instance.getTopLevelThread(), instance);
-		instance.getTopLevelThread().addThread(thread);
+		ProcessThread	thread	= new ProcessThread(act, ((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).getTopLevelThread(), instance);
+		((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).getTopLevelThread().addThread(thread);
 
 //		List<MParameter> params	= act.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
 //		String[] params	= act.getPropertyNames();
@@ -138,7 +141,7 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		thread.setOrCreateParameterValue("$callargs", args);
 		thread.setOrCreateParameterValue(THREAD_PARAMETER_SERVICE_RESULT, ret);
 		
-		instance.step(act, instance, thread, null);
+		((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).step(act, instance, thread, null);
 		
 		return ret;
 	}

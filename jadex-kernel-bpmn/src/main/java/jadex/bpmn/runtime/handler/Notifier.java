@@ -1,8 +1,8 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IInternalAccess;
 
 /**
  *  Notifier for initiating external notifications.  
@@ -15,7 +15,7 @@ public class Notifier
 	protected MActivity activity;
 	
 	/** The instance. */
-	protected BpmnInterpreter instance;
+	protected IInternalAccess instance;
 	
 	/** The process thread. */
 	protected ProcessThread thread;
@@ -25,7 +25,7 @@ public class Notifier
 	/**
 	 *  Create a notifier.
 	 */
-	public Notifier(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public Notifier(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		this.activity = activity;
 		this.instance = instance;
@@ -40,6 +40,6 @@ public class Notifier
 	 */
 	public void notify(final Object event)
 	{
-		instance.notify(activity, thread, event);
+		DefaultActivityHandler.getBpmnFeature(instance).notify(activity, thread, event);
 	}
 }

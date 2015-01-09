@@ -1,12 +1,12 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -55,7 +55,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		//boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
 		
@@ -75,15 +75,15 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	protected void sendMessage(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	protected void sendMessage(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
-		SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(instance.createResultListener(new DefaultResultListener<IMessageService>()
+		SServiceProvider.getService(instance, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IMessageService>()
 		{
 			public void resultAvailable(final IMessageService ms)
 			{
-				SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(instance.createResultListener(new DefaultResultListener<IComponentManagementService>()
+				SServiceProvider.getService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(IComponentManagementService cms)
 					{
@@ -176,18 +176,18 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 						}
 						
 						thread.setWaiting(true);
-						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getModel().getResourceIdentifier(), null, codecids)
+						ms.sendMessage(msg, mt, instance.getComponentIdentifier(), instance.getModel().getResourceIdentifier(), null, codecids)
 							.addResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
-								instance.notify(activity, thread, null);
+								getBpmnFeature(instance).notify(activity, thread, null);
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
 								thread.setException(exception);
-								instance.notify(activity, thread, null);
+								getBpmnFeature(instance).notify(activity, thread, null);
 							}
 						});
 					}
@@ -202,7 +202,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	protected void receiveMessage(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	protected void receiveMessage(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		thread.setWaiting(true);
 //		thread.setWaitInfo(type);

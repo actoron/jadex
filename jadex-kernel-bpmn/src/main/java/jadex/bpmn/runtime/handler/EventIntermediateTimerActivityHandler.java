@@ -1,16 +1,15 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -30,11 +29,11 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 *  @param thread	The process thread.
 	 *  @param duration	The duration to wait.
 	 */
-	public void	doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final long duration)
+	public void	doWait(final MActivity activity, final IInternalAccess instance, final ProcessThread thread, final long duration)
 	{
 		final Future<ITimer>	wifuture	= new Future<ITimer>(); 
-		SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(instance.createResultListener(new IResultListener<IClockService>()
+		SServiceProvider.getService(instance, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IClockService>()
 		{
 			public void resultAvailable(final IClockService cs)
 			{
@@ -45,7 +44,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 						try
 						{
 //							System.out.println("timer notification: "+activity+", "+thread+", "+this);
-							instance.notify(activity, thread, TIMER_EVENT);
+							getBpmnFeature(instance).notify(activity, thread, TIMER_EVENT);
 						}
 						catch(ComponentTerminatedException cte)
 						{

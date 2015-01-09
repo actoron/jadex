@@ -1,9 +1,11 @@
 package jadex.bpmn.runtime.handler;
 
+import jadex.bpmn.features.IBpmnComponentFeature;
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IInternalAccess;
 
 
 /**
@@ -21,10 +23,10 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void execute(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		doExecute(activity, instance, thread);
-		instance.step(activity, instance, thread, null);
+		getBpmnFeature(instance).step(activity, instance, thread, null);
 //		return thread;
 	}
 	
@@ -35,7 +37,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param thread The process thread.
 	 *  @param info The info object.
 	 */
-	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void cancel(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 	}
 	
@@ -45,9 +47,17 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	protected void doExecute(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		if(DEBUG)
 			System.out.println("Executed: "+activity+", "+instance);
+	}
+	
+	/**
+	 *  Get the internal bpmn feature from internal access.
+	 */
+	public static IInternalBpmnComponentFeature getBpmnFeature(IInternalAccess instance)
+	{
+		return (IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class);
 	}
 }

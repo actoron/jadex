@@ -1,9 +1,9 @@
 package jadex.bpmn.runtime.handler.ui;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
@@ -27,7 +27,7 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_TASK);
 		thread.setWaiting(true);
@@ -39,7 +39,7 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				instance.notify(activity, thread, null);
+				getBpmnFeature(instance).notify(activity, thread, null);
 				frame.dispose();
 			}
 		});
@@ -50,7 +50,7 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				instance.notify(activity, thread, null);
+				getBpmnFeature(instance).notify(activity, thread, null);
 //				System.exit(0);
 			}
 		});

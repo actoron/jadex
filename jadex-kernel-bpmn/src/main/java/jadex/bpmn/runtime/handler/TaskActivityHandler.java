@@ -2,10 +2,10 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.task.ITask;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.exttask.ExternalTaskWrapper;
 import jadex.bpmn.runtime.task.PojoTaskWrapper;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
 
 /**
@@ -19,7 +19,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		if(thread.isCanceled())
 			return;
@@ -34,7 +34,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				Object tmp = taskimpl.newInstance();
 				if(!(tmp instanceof ITask))
 				{
-					tmp = new PojoTaskWrapper(tmp, instance.getInternalAccess(), thread, activity.getComponentInjections(instance.getClassLoader()),
+					tmp = new PojoTaskWrapper(tmp, instance, thread, activity.getComponentInjections(instance.getClassLoader()),
 						activity.getArgumentInjections(instance.getClassLoader()), activity.getResultInjections(instance.getClassLoader()));
 				}
 				ITask task = (ITask)tmp;
@@ -55,7 +55,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 					public void resultAvailable(Object result)
 					{
 						if(!thread.isCanceled())
-							instance.notify(activity, thread, null);
+							getBpmnFeature(instance).notify(activity, thread, null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -64,7 +64,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 						if(!thread.isCanceled())
 						{
 							thread.setException(exception);
-							instance.notify(activity, thread, null);
+							getBpmnFeature(instance).notify(activity, thread, null);
 						}	
 					}
 				});
@@ -74,7 +74,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				if(thread.getException()==null)
 				{
 					thread.setException(e);
-					instance.notify(activity, thread, null);
+					getBpmnFeature(instance).notify(activity, thread, null);
 				}
 				else
 				{
@@ -99,7 +99,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 *  @param info The info object.
 	 */
 
-	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void cancel(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		thread.setCanceled(true);
 		ITask task = thread.getTask();

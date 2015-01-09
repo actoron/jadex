@@ -1,7 +1,7 @@
 package jadex.bpmn.runtime;
 
+import jadex.bridge.IInternalAccess;
 import jadex.commons.IValueFetcher;
-import jadex.kernelbase.InterpreterFetcher;
 
 /**
  *  Fetch values from the context variables of a BPMN process instance
@@ -19,7 +19,7 @@ public class BpmnInstanceFetcher extends InterpreterFetcher
 	/**
 	 *  Create a BPMN instance value fetcher.
 	 */
-	public BpmnInstanceFetcher(BpmnInterpreter interpreter, IValueFetcher fetcher)
+	public BpmnInstanceFetcher(IInternalAccess interpreter, IValueFetcher fetcher)
 	{
 		super(interpreter);
 		this.fetcher	= fetcher;

@@ -1,11 +1,11 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessServiceInvocationHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.handler.EventIntermediateErrorActivityHandler.EventIntermediateErrorException;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.Future;
@@ -19,7 +19,7 @@ public class EventEndErrorActivityHandler extends DefaultActivityHandler
 	/**
 	 *  Execute the activity.
 	 */
-	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	protected void doExecute(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		Exception ex = null;
 		if (thread.getPropertyValue("exception", activity) instanceof Exception)

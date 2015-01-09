@@ -5,10 +5,12 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -28,9 +30,9 @@ public class DefaultStepHandler implements IStepHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
+	public void step(MActivity activity, IInternalAccess instance, ProcessThread thread, Object event)
 	{
-		assert !instance.getComponentAdapter().isExternalThread();
+		assert instance.getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
 //		System.out.println(instance.getComponentIdentifier().getLocalName()+": step "+activity+", data "+thread.getData());
 		
@@ -163,7 +165,7 @@ public class DefaultStepHandler implements IStepHandler
 								for(int i=0; handlers!=null && i<handlers.size(); i++)
 								{
 									MActivity handler = (MActivity)handlers.get(i);
-									instance.getActivityHandler(handler).cancel(handler, instance, remove.getParent());
+									DefaultActivityHandler.getBpmnFeature(instance).getActivityHandler(handler).cancel(handler, instance, remove.getParent());
 								}
 							}
 						}
@@ -203,9 +205,9 @@ public class DefaultStepHandler implements IStepHandler
 //					instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
 //				}
 //			}
-			if(thread.getActivity()!=null && instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
-				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+				instance.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 			}
 		}
 
@@ -233,17 +235,17 @@ public class DefaultStepHandler implements IStepHandler
 		if(next instanceof MSequenceEdge)
 		{
 			thread.setLastEdge((MSequenceEdge)next);
-			if(thread.getActivity()!=null && instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
-				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+				instance.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 			}
 		}
 		else if(next instanceof MActivity)
 		{
 			thread.setActivity((MActivity)next);
-			if(thread.getActivity()!=null && instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
-				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+				instance.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 			}
 		}
 		else if(next==null)

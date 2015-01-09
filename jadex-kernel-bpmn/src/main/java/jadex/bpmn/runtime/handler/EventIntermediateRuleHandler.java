@@ -2,7 +2,6 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IInternalProcessEngineService;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IComponentIdentifier;
@@ -11,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -37,7 +37,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		thread.setWaiting(true);
 
@@ -65,119 +65,96 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 		final Map<String, Object>	fparams	= params;
 		
 		// Todo: allow injecting service binding from outside?
-		instance.getServiceContainer().searchService(IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION)
-			.addResultListener(new IResultListener<IInternalProcessEngineService>()
-		{
-			public void resultAvailable(IInternalProcessEngineService ipes)
-			{
-				final IExternalAccess	exta	= instance.getExternalAccess();
-				final String	actid	= activity.getId();
-				final String	procid	= thread.getId();
-				
+		IInternalProcessEngineService ipes = SServiceProvider.getLocalService(instance, IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION);
+		
+		final IExternalAccess	exta	= instance.getExternalAccess();
+		final String	actid	= activity.getId();
+		final String	procid	= thread.getId();
+		
 //				System.out.println("Adding event matcher: "+instance.getComponentIdentifier());
-				
-				final IComponentIdentifier	cid	= instance.getComponentIdentifier();
-				final IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new IResultCommand<IFuture<Void>, Object>()
-				{
-					public IFuture<Void> execute(final Object event)
-					{
+		
+		final IComponentIdentifier	cid	= instance.getComponentIdentifier();
+		final IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new IResultCommand<IFuture<Void>, Object>()
+		{
+			public IFuture<Void> execute(final Object event)
+			{
 //						System.out.println("Triggered event matcher: "+cid);
+				
+				return exta.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						IFuture<Void>	ret	= IFuture.DONE;
 						
-						return exta.scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								IFuture<Void>	ret	= IFuture.DONE;
-								
-								BpmnInterpreter	instance	= (BpmnInterpreter)ia;
-								MActivity	activity	= instance.getModelElement().getAllActivities().get(actid);
-								StringTokenizer	stok	= new StringTokenizer(procid, ":");
-								ProcessThread	thread	= null;
+						MActivity	activity	= ((MBpmnModel)ia.getModel().getRawModel()).getAllActivities().get(actid);
+						StringTokenizer	stok	= new StringTokenizer(procid, ":");
+						ProcessThread	thread	= null;
 //								ThreadContext	context	= instance.getThreadContext();
-								ProcessThread context = instance.getTopLevelThread();
-								String	pid	= null;
-								while(stok.hasMoreTokens() && context!=null)
+						ProcessThread context = getBpmnFeature(instance).getTopLevelThread();
+						String	pid	= null;
+						while(stok.hasMoreTokens() && context!=null)
+						{
+							thread	= null;
+							pid	= pid!=null ? pid+":"+stok.nextToken() : stok.nextToken();
+							for(ProcessThread pt: context.getSubthreads())
+							{
+								if(pt.getId().equals(pid))
 								{
-									thread	= null;
-									pid	= pid!=null ? pid+":"+stok.nextToken() : stok.nextToken();
-									for(ProcessThread pt: context.getSubthreads())
-									{
-										if(pt.getId().equals(pid))
-										{
-											thread	= pt;
-											context	= thread;
-											break;
-										}
-									}
+									thread	= pt;
+									context	= thread;
+									break;
 								}
-								
-								if(activity==null)
-								{
-									ret	= new Future<Void>(new RuntimeException("Activity not found: "+actid));
-								}
-								else if(thread==null)
-								{
-									ret	= new Future<Void>(new RuntimeException("Process thread not found: "+procid));
-								}
-								
-								instance.notify(activity, thread, event);
-								return ret;
+							}
+						}
+						
+						if(activity==null)
+						{
+							ret	= new Future<Void>(new RuntimeException("Activity not found: "+actid));
+						}
+						else if(thread==null)
+						{
+							ret	= new Future<Void>(new RuntimeException("Process thread not found: "+procid));
+						}
+						
+						getBpmnFeature(instance).notify(activity, thread, event);
+						return ret;
+					}
+				});
+			}
+		});
+		
+		ICancelable ca = new ICancelable()
+		{
+			public IFuture<Void> cancel()
+			{
+				final Future<Void> ret = new Future<Void>();
+				fut.addResultListener(new ExceptionDelegationResultListener<String, Void>(ret)
+				{
+					public void customResultAvailable(final String id)
+					{
+						IInternalProcessEngineService ipes = SServiceProvider.getLocalService(instance, IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION);
+						
+						System.out.println("Cancel event matcher1: "+instance.getComponentIdentifier());
+						
+						ipes.removeEventMatcher(id).addResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void result)
+							{
+								// done.
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								instance.getLogger().warning("Event deregistration failed: "+exception);
 							}
 						});
 					}
 				});
-				
-				ICancelable ca = new ICancelable()
-				{
-					public IFuture<Void> cancel()
-					{
-						final Future<Void> ret = new Future<Void>();
-						fut.addResultListener(new ExceptionDelegationResultListener<String, Void>(ret)
-						{
-							public void customResultAvailable(final String id)
-							{
-								instance.getServiceContainer().searchService(IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION)
-									.addResultListener(new IResultListener<IInternalProcessEngineService>()
-								{
-									public void resultAvailable(IInternalProcessEngineService ipes)
-									{
-										System.out.println("Cancel event matcher1: "+instance.getComponentIdentifier());
-										
-										ipes.removeEventMatcher(id).addResultListener(new IResultListener<Void>()
-										{
-											public void resultAvailable(Void result)
-											{
-												// done.
-											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-												instance.getLogger().warning("Event deregistration failed: "+exception);
-											}
-										});
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										instance.getLogger().warning("Event deregistration failed: "+exception);
-									}
-								});		
-							}
-						});
-						return ret;
-					}
-				};
-				
-				thread.setWaitInfo(ca);
+				return ret;
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				thread.setException(exception);
-				instance.notify(activity, thread, null);
-//				processEngineNotFound(activity, instance, thread, exception);
-			}
-		});
+		};
+		
+		thread.setWaitInfo(ca);
 	}
 	
 //	/**

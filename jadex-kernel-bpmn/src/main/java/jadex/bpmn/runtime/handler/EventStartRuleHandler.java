@@ -2,8 +2,8 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IInternalAccess;
 
 /**
  *  When a subprocess has a rule start event it needs to be treated
@@ -22,7 +22,7 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		// Top level event -> just move forward to next activity.
 		// Or start event of event subprocess -> just move forward.
@@ -31,7 +31,7 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 			&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getParent().getModelElement()).getSubprocessType())))
 		{
 			doExecute(activity, instance, thread);
-			instance.step(activity, instance, thread, null);
+			getBpmnFeature(instance).step(activity, instance, thread, null);
 		}
 		
 		// Internal subprocess -> treat like intermediate event.
@@ -44,7 +44,7 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 	/**
 	 *  Called when the process thread is aborted and waiting is no longer wanted.
 	 */
-	public void cancel(MActivity activity, final BpmnInterpreter instance, ProcessThread thread)
+	public void cancel(MActivity activity, final IInternalAccess instance, ProcessThread thread)
 	{
 		// Internal subprocess -> treat like intermediate event.
 //		if(thread.getThreadContext().getParent()!=null)

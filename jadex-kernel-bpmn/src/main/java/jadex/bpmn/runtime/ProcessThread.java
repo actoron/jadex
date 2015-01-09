@@ -1,5 +1,7 @@
 package jadex.bpmn.runtime;
 
+import jadex.bpmn.features.IBpmnComponentFeature;
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MDataEdge;
@@ -15,6 +17,9 @@ import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler.SubprocessResultHandler;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -76,7 +81,7 @@ public class ProcessThread	implements ITaskContext
 	protected List<ProcessThread> subthreads;
 	
 	/** The Bpmn instance. */
-	protected BpmnInterpreter instance;
+	protected IInternalAccess instance;
 	
 	/** The exception that has just occurred in the process (if any). */
 	protected Exception	exception;
@@ -114,7 +119,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(MActivity activity, ProcessThread parent, BpmnInterpreter instance)
+	public ProcessThread(MActivity activity, ProcessThread parent, IInternalAccess instance)
 	{
 		this(null, activity, parent, instance);
 	}
@@ -123,7 +128,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(String id, MActivity activity, ProcessThread parent, BpmnInterpreter instance)
+	public ProcessThread(String id, MActivity activity, ProcessThread parent, IInternalAccess instance)
 	{
 		this.id	= parent!=null? parent.getNextChildId(): null;
 		this.activity	= activity;
@@ -134,12 +139,20 @@ public class ProcessThread	implements ITaskContext
 	//-------- methods --------
 	
 	/**
+	 * 
+	 */
+	protected IInternalBpmnComponentFeature getBpmnFeature(IInternalAccess ia)
+	{
+		return (IInternalBpmnComponentFeature)ia.getComponentFeature(IBpmnComponentFeature.class);
+	}
+	
+	/**
 	 *  Get the model.
 	 *  @return	The bpmn model.
 	 */
 	public MBpmnModel getBpmnModel()
 	{
-		return instance.getModelElement();
+		return (MBpmnModel)instance.getModel().getRawModel();
 	}
 	
 	/**
@@ -245,9 +258,9 @@ public class ProcessThread	implements ITaskContext
 	{
 //		System.out.println("Set waiting thread: "+getId()+" "+waiting);
 		this.waiting = waiting;
-		if(getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
-			instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
+			getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
 		}
 	}
 	
@@ -260,9 +273,9 @@ public class ProcessThread	implements ITaskContext
 //		this.waitinfo = null;
 		this.cancelinfo = null;
 		this.waitfilter = null;
-		if(getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
-			instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
+			getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
 		}
 //		System.out.println("Thread: "+ComponentIdentifier.LOCAL.get()+", "+getId()+" "+waiting);
 	}
@@ -471,7 +484,8 @@ public class ProcessThread	implements ITaskContext
 			// Try local parameter in parent
 			getParent().internalSetParameterValue(name, key, value, start);
 		}
-		else if(getParent()==null && instance.getModelElement().getContextVariable(name)!=null)
+//		else if(getParent()==null && instance.getModelElement().getContextVariable(name)!=null)
+		else if(getParent()==null && ((MBpmnModel)getInstance().getModel().getRawModel()).getContextVariable(name)!=null)
 		{
 			// Global parameter
 			setOrCreateParameterValue(name, key, value);			
@@ -690,7 +704,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Get the instance.
 	 *  @return The instance.
 	 */
-	public BpmnInterpreter getInstance()
+	public IInternalAccess getInstance()
 	{
 		return this.instance;
 	}
@@ -751,7 +765,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Update parameters based on edge inscriptions and initial values.
 	 *  @param instance	The calling BPMN instance.
 	 */
-	protected  void updateParametersBeforeStep(BpmnInterpreter instance)
+	protected  void updateParametersBeforeStep(IInternalAccess instance)
 	{
 //		System.out.println("before: "+getActivity());
 
@@ -852,16 +866,16 @@ public class ProcessThread	implements ITaskContext
 							}
 							
 							// else if bpmn instance has context variable
-							if(!found && instance.hasContextVariable(name))
+							if(!found && instance.getComponentFeature(IInternalBpmnComponentFeature.class).hasContextVariable(name))
 							{
 								if(iexp!=null)
 								{
-									Object	array	= instance.getContextVariable(name);
+									Object	array	= instance.getComponentFeature(IInternalBpmnComponentFeature.class).getContextVariable(name);
 									Array.set(array, ((Number)index).intValue(), value);
 								}
 								else
 								{
-									instance.setContextVariable(name, value);
+									instance.getComponentFeature(IInternalBpmnComponentFeature.class).setContextVariable(name, value);
 								}
 								found	= true;
 							}
@@ -1015,7 +1029,7 @@ public class ProcessThread	implements ITaskContext
 					else if (de.getSource() == null)
 					{
 						// Argument data edge
-						passedparams.put(de.getTargetParameter(), instance.getArguments().get(de.getSourceParameter()));
+						passedparams.put(de.getTargetParameter(), instance.getComponentFeature(IArgumentsFeature.class).getArguments().get(de.getSourceParameter()));
 					}
 					else
 					{
@@ -1039,7 +1053,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Remove in parameters after step.
 	 *  @param instance	The calling BPMN instance.
 	 */
-	public  void updateParametersAfterStep(MActivity activity, BpmnInterpreter instance)
+	public  void updateParametersAfterStep(MActivity activity, IInternalAccess instance)
 	{
 //		System.out.println("after: "+activity);
 		
@@ -1116,7 +1130,7 @@ public class ProcessThread	implements ITaskContext
 					if(de.getTarget() == null)
 					{
 						// Result data edge
-						instance.setResultValue(de.getTargetParameter(), value);
+						instance.getComponentFeature(IArgumentsFeature.class).getResults().put(de.getTargetParameter(), value);
 					}
 					else
 					{
@@ -1275,7 +1289,7 @@ public class ProcessThread	implements ITaskContext
 			MActivity	act	= thread.getActivity();
 			if(act!=null && thread.isWaiting())
 			{
-				thread.getInstance().getActivityHandler(act).cancel(act, thread.getInstance(), thread);
+				getBpmnFeature(thread.getInstance()).getActivityHandler(act).cancel(act, thread.getInstance(), thread);
 			}
 			thread.setActivity(null);
 			// Notify the thread itself that it has finished
@@ -1290,10 +1304,10 @@ public class ProcessThread	implements ITaskContext
 			if(rem)
 			{
 //				System.out.println("remove1: "+thread);
-				BpmnInterpreter in = thread.getInstance();
-				if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+//				BpmnInterpreter in = thread.getInstance();
+				if(thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{	
-					in.publishEvent(in.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
+					thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(thread.getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
 				}
 			}
 		}
@@ -1315,9 +1329,9 @@ public class ProcessThread	implements ITaskContext
 			subthreads	= new ArrayList<ProcessThread>();
 		
 		subthreads.add(thread);
-		if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
-			thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+			thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(thread.getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
 		}
 //		System.out.println("add: "+thread);
 	}
@@ -1344,9 +1358,9 @@ public class ProcessThread	implements ITaskContext
 ////			threads.putAll(oldthreads);
 //		}
 		
-		if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
-			thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+			thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(thread.getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
 		}
 //		System.out.println("add: "+thread);
 	}

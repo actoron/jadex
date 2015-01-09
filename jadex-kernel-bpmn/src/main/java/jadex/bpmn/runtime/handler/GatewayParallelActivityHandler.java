@@ -2,9 +2,9 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IInternalAccess;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +20,7 @@ public class GatewayParallelActivityHandler	extends AbstractGatewayActivityHandl
 	 *  Perform a split.
 	 *  @return All resulting threads after the split.
 	 */
-	protected Collection<ProcessThread>	performSplit(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	protected Collection<ProcessThread>	performSplit(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		Collection<ProcessThread>	threads	= new ArrayList<ProcessThread>();
 		

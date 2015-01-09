@@ -5,13 +5,15 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
@@ -20,7 +22,6 @@ import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 
@@ -42,7 +43,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 //		System.out.println(instance.getComponentIdentifier().getLocalName()+": sub "+activity);
 
@@ -152,7 +153,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				
 				if(timer!=null)
 				{
-					instance.getActivityHandler(timer).execute(timer, instance, thread);
+					getBpmnFeature(instance).getActivityHandler(timer).execute(timer, instance, thread);
 				}
 				else
 				{
@@ -162,7 +163,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			else
 			{
 				thread.setNonWaiting();
-				instance.step(activity, instance, thread, null);				
+				getBpmnFeature(instance).step(activity, instance, thread, null);				
 			}
 		}
 		
@@ -186,120 +187,100 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 			thread.setWaiting(true);
 			
-			instance.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new IResultListener<IComponentManagementService>()
-			{
-				public void resultAvailable(IComponentManagementService cms)
-				{
-					// Todo: If remote remember subprocess and kill on cancel.
+			IComponentManagementService cms = SServiceProvider.getLocalService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			// Todo: If remote remember subprocess and kill on cancel.
 
-					final CreationInfo	info = thread.hasPropertyValue("creation info")? 
-						(CreationInfo)thread.getPropertyValue("creation info"): new CreationInfo();
-					
-					// todo: other properties of creation info like
-					// instance name and flags like suspend
+			final CreationInfo	info = thread.hasPropertyValue("creation info")? 
+				(CreationInfo)thread.getPropertyValue("creation info"): new CreationInfo();
+			
+			// todo: other properties of creation info like
+			// instance name and flags like suspend
 
-					if(info.getArguments()==null && args.size()>0)
-						info.setArguments(args);
-					
-					IComponentIdentifier	parent	= thread.hasPropertyValue("parent")
-						? (IComponentIdentifier)thread.getPropertyValue("parent")
-						: instance.getComponentIdentifier();
-					if(info.getParent()==null && parent!=null)
-						info.setParent(parent);
-					
-					String[] imps = instance.getModelElement().getModelInfo().getAllImports();
-					if(info.getImports()==null && imps!=null)
-						info.setImports(imps);
-						
+			if(info.getArguments()==null && args.size()>0)
+				info.setArguments(args);
+			
+			IComponentIdentifier	parent	= thread.hasPropertyValue("parent")
+				? (IComponentIdentifier)thread.getPropertyValue("parent")
+				: instance.getComponentIdentifier();
+			if(info.getParent()==null && parent!=null)
+				info.setParent(parent);
+			
+			String[] imps = instance.getModel().getAllImports();
+			if(info.getImports()==null && imps!=null)
+				info.setImports(imps);
+				
 //					System.out.println("parent is: "+parent.getAddresses());	
 
-					cms.createComponent(info, null, file)
-						.addResultListener(instance.createResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+			cms.createComponent(info, null, file)
+				.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+			{
+				protected SubprocessResultHandler handler = new SubprocessResultHandler(thread, activity);	
+					
+				public void intermediateResultAvailable(CMSStatusEvent cse)
+				{
+					if(cse instanceof CMSIntermediateResultEvent)
 					{
-						protected SubprocessResultHandler handler = new SubprocessResultHandler(thread, activity);	
-							
-						public void intermediateResultAvailable(CMSStatusEvent cse)
+						String	param	= ((CMSIntermediateResultEvent)cse).getName();
+						Object	value	= ((CMSIntermediateResultEvent)cse).getValue();
+						
+						if(activity.getParameters()!=null && activity.getParameters().get(param)!=null)
 						{
-							if(cse instanceof CMSIntermediateResultEvent)
+							String	dir	= activity.getParameters().get(param).getDirection();
+							if(MParameter.DIRECTION_INOUT.equals(dir) || MParameter.DIRECTION_OUT.equals(dir))
 							{
-								String	param	= ((CMSIntermediateResultEvent)cse).getName();
-								Object	value	= ((CMSIntermediateResultEvent)cse).getValue();
-								
-								if(activity.getParameters()!=null && activity.getParameters().get(param)!=null)
-								{
-									String	dir	= activity.getParameters().get(param).getDirection();
-									if(MParameter.DIRECTION_INOUT.equals(dir) || MParameter.DIRECTION_OUT.equals(dir))
-									{
-										thread.setParameterValue(param, value);
-									}
-								}
-								
-								// todo: need to distinguish between collection and normal parameters
-								handler.handleProcessResult(param, null, value);
+								thread.setParameterValue(param, value);
 							}
 						}
 						
-						public void finished()
-						{
-//							System.out.println("end0: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
-							handler.updateParameters(thread, activity);
-							
-							thread.setNonWaiting();
-							instance.step(activity, instance, thread, null);
-						}
-						
-						public void resultAvailable(Collection<CMSStatusEvent> cses)
-						{
-							for(CMSStatusEvent cse: cses)
-							{
-								intermediateResultAvailable(cse);
-							}
-							finished();
-						}
-						
-						public void exceptionOccurred(final Exception exception)
-						{
-							// Hack!!! Ignore exception, when component already terminated.
-							if(!(exception instanceof ComponentTerminatedException)
-								|| !instance.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
-							{
-//								System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
-//								exception.printStackTrace();
-								thread.setNonWaiting();
-								thread.setException(exception);
-								instance.step(activity, instance, thread, null);
-							}
-						}
-						
-						public String toString()
-						{
-							return "lis: "+instance.getComponentIdentifier()+" "+file;
-						}
-					}));
+						// todo: need to distinguish between collection and normal parameters
+						handler.handleProcessResult(param, null, value);
+					}
 				}
 				
-				public void exceptionOccurred(Exception exception)
+				public void finished()
+				{
+//							System.out.println("end0: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
+					handler.updateParameters(thread, activity);
+					
+					thread.setNonWaiting();
+					getBpmnFeature(instance).step(activity, instance, thread, null);
+				}
+				
+				public void resultAvailable(Collection<CMSStatusEvent> cses)
+				{
+					for(CMSStatusEvent cse: cses)
+					{
+						intermediateResultAvailable(cse);
+					}
+					finished();
+				}
+				
+				public void exceptionOccurred(final Exception exception)
 				{
 					// Hack!!! Ignore exception, when component already terminated.
 					if(!(exception instanceof ComponentTerminatedException)
 						|| !instance.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 					{
-//						System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
-						exception.printStackTrace();
+//								System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+//								exception.printStackTrace();
 						thread.setNonWaiting();
 						thread.setException(exception);
-						instance.step(activity, instance, thread, null);
+						getBpmnFeature(instance).step(activity, instance, thread, null);
 					}
 				}
-			});
+				
+				public String toString()
+				{
+					return "lis: "+instance.getComponentIdentifier()+" "+file;
+				}
+			}));
 		}
 		
 		// Empty subprocess.
 		else if((start==null || start.isEmpty()) && (file==null || file.length()==0))
 		{
 			// If no activity in sub process, step immediately. 
-			instance.step(activity, instance, thread, null);
+			getBpmnFeature(instance).step(activity, instance, thread, null);
 		}
 		
 		// Inconsistent subprocess.

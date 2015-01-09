@@ -2,10 +2,10 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.IValueFetcher;
 import jadex.javaparser.IParsedExpression;
 
@@ -23,7 +23,7 @@ public class GatewayORActivityHandler	extends AbstractGatewayActivityHandler	 im
 	 *  Perform a split.
 	 *  @return All resulting threads after the split.
 	 */
-	protected Collection<ProcessThread>	performSplit(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	protected Collection<ProcessThread>	performSplit(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		List<MSequenceEdge>	outgoing	= activity.getOutgoingSequenceEdges();
 		

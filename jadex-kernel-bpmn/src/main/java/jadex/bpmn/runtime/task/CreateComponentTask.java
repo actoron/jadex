@@ -5,13 +5,12 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -99,8 +98,8 @@ public class CreateComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-			instance.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		SServiceProvider.getService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+			instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
@@ -236,11 +235,11 @@ public class CreateComponentTask implements ITask
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub? instance.getComponentIdentifier() : null, 
 						suspend, master, daemon, autoshutdown, synchronous, persistable, elm ,
-						((BpmnInterpreter) instance).getModelElement().getModelInfo().getAllImports(), bindings,
+						instance.getModel().getAllImports(), bindings,
 						instance.getModel().getResourceIdentifier()), lis)
-					.addResultListener(instance.createResultListener(new DelegationResultListener(creationfuture)));
+					.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(creationfuture)));
 				
-				creationfuture.addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				creationfuture.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier cid)
 					{
@@ -268,12 +267,12 @@ public class CreateComponentTask implements ITask
 	public IFuture<Void> cancel(final IInternalAccess instance)
 	{
 		final Future<Void> ret = new Future<Void>();
-		creationfuture.addResultListener(instance.createResultListener(new IResultListener<IComponentIdentifier>()
+		creationfuture.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
 		{
 			public void resultAvailable(final IComponentIdentifier cid)
 			{
-				SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IComponentManagementService.class, 
-					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener<IComponentManagementService>()
+				SServiceProvider.getService(instance, IComponentManagementService.class, 
+					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(IComponentManagementService cms)
 					{

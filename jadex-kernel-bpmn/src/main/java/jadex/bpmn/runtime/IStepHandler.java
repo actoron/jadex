@@ -1,6 +1,7 @@
 package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bridge.IInternalAccess;
 
 /**
  *  Handles the transition of steps.
@@ -19,5 +20,5 @@ public interface IStepHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event);
+	public void step(MActivity activity, IInternalAccess instance, ProcessThread thread, Object event);
 }

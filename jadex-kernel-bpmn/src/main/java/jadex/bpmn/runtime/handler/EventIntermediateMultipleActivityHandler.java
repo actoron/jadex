@@ -2,10 +2,9 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.IFilter;
-import jadex.commons.future.IFuture;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 //		System.out.println("Executed: "+activity+", "+instance);
 		
@@ -37,7 +36,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 		{
 			MSequenceEdge next	= (MSequenceEdge)outgoing.get(i);
 			MActivity act = next.getTarget();
-			instance.getActivityHandler(act).execute(act, instance, thread);
+			getBpmnFeature(instance).getActivityHandler(act).execute(act, instance, thread);
 			
 			// Remember wait setting and delete them in the thread.
 			filters[i] = thread.getWaitFilter();

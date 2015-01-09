@@ -2,8 +2,9 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -37,7 +38,7 @@ public abstract class AbstractGatewayActivityHandler
 	 *  Perform a split.
 	 *  @return All resulting threads after the split.
 	 */
-	protected abstract Collection<ProcessThread>	performSplit(MActivity activity, BpmnInterpreter instance, ProcessThread thread);
+	protected abstract Collection<ProcessThread>	performSplit(MActivity activity, IInternalAccess instance, ProcessThread thread);
 	
 	/**
 	 *  Execute an activity.
@@ -45,12 +46,12 @@ public abstract class AbstractGatewayActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void execute(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		// Notify listeners as gateways are not followed by step handler execution
-		if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
-			instance.publishEvent(instance.createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
+			instance.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
 		}
 		
 		List<MSequenceEdge>	incoming	= activity.getIncomingSequenceEdges();
@@ -87,7 +88,7 @@ public abstract class AbstractGatewayActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread The process thread.
 	 */
-	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void cancel(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 	}
 	
