@@ -158,8 +158,6 @@ public class SServiceProvider
 				}
 				else
 				{
-					if(type.getName().indexOf("ICompo")!=-1)
-						System.out.println("sdfsdf");
 					ret.setException(new ServiceNotFoundException(type.getName()));
 				}
 			}

@@ -2973,8 +2973,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				capaname = melement.getName().substring(0, idx);
 			}
 		}
-		Object capa = capaname!=null ? getCapabilityObject(capaname): getComponent().getComponentFeature(IBDIAgentFeature.class).getCapability();
+		Object capa = capaname!=null ? getCapabilityObject(capaname): getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 //			: getAgent() instanceof PojoBDIAgent? ((PojoBDIAgent)getAgent()).getPojoAgent(): getAgent();
+		
 		vals.add(capa);
 		vals.add(new CapabilityWrapper(getComponent(), capa, capaname));
 		vals.add(getComponent());
@@ -3614,4 +3615,5 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //		System.out.println("eveve: "+p[0]+" "+p[1]);
 		return new EventType(p);
 	}
+	
 }
