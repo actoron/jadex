@@ -119,6 +119,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 
 	/** Timeout for remote method invocation. */
 	public static final String REMOTE_TIMEOUT = "remote_timeout";
+	
+	/** The target determiner class (to dynamically resolve the called service). */
+	public static final String REMOTE_TARGETDETERMINER = "remote_targetdeterminer";
+
 
 	//-------- attributes --------
 	
@@ -1703,5 +1707,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		return ret;
 	}
+	
+	
 }
 

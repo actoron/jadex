@@ -815,7 +815,11 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public Map<Class<?>, Object[]> getContentCodecInfo(IComponentIdentifier cid)
 	{
-		return (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
+		Map<Class<?>, Object[]> ret = (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
+		if(ret==null)
+			System.out.println("sdffdsdf");
+		return ret;
+//		return (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
 	}
 
 	/**

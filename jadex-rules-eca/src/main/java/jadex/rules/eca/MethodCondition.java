@@ -119,13 +119,13 @@ public class MethodCondition implements ICondition
 		}
 		if(guesser==null)
 		{
-			params = new SimpleMethodParameterGuesser(vals).guessParameters(method.getParameterTypes());
+			params = new SimpleMethodParameterGuesser(vals).guessParameters(method.getParameterTypes(), null);
 		}
 		else
 		{
 			// Hack!!! what if already has a parent?
-			guesser.getGuesser().setParent(new SimpleParameterGuesser(vals));
-			params = guesser.guessParameters(method.getParameterTypes());
+//			guesser.getGuesser().setParent(new SimpleParameterGuesser(vals));
+			params = guesser.guessParameters(method.getParameterTypes(), new SimpleParameterGuesser(vals));
 		}
 			
 		return method.invoke(object, params);

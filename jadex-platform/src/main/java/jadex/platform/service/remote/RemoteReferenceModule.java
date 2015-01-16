@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IService;
@@ -12,6 +13,7 @@ import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Replacement;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Synchronous;
+import jadex.bridge.service.annotation.TargetResolver;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.annotation.Uncached;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -306,6 +308,12 @@ public class RemoteReferenceModule
 					}
 				}
 			}
+			Object td = SJavaParser.getProperty(properties, RemoteServiceManagementService.REMOTE_TARGETDETERMINER, imports, null, cl);
+			if(td!=null)
+			{
+				Class<ITargetResolver> tmp = (Class<ITargetResolver>)td;
+				ret.setTargetResolverClazz(tmp);
+			}
 		}
 		
 		// Add properties from annotations.
@@ -325,6 +333,13 @@ public class RemoteReferenceModule
 			
 			boolean	allex	= allinterfaces[i].isAnnotationPresent(Excluded.class);
 			boolean	allsec	= allinterfaces[i].isAnnotationPresent(SecureTransmission.class);
+			
+			if(allinterfaces[i].isAnnotationPresent(TargetResolver.class))
+			{
+				TargetResolver tr = allinterfaces[i].getAnnotation(TargetResolver.class);
+				ret.setTargetResolverClazz((Class)tr.value()); 
+			}
+			
 			Method[]	methods	= allinterfaces[i].getDeclaredMethods();
 			for(int j=0; j<methods.length; j++)
 			{
