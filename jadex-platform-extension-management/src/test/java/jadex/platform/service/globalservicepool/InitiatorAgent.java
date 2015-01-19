@@ -198,11 +198,11 @@ public class InitiatorAgent extends TestAgent
 			public void intermediateResultAvailable(ITestService result)
 			{
 				System.out.println("found: "+((IService)result).getServiceIdentifier());
-//				if(cid.equals(((IService)result).getServiceIdentifier().getProviderId()))
-//				{
-//					called = true;
-//					callService(result);
-//				}
+				if(cid.equals(((IService)result).getServiceIdentifier().getProviderId()))
+				{
+					called = true;
+					callService(result);
+				}
 			}
 			public void finished()
 			{
