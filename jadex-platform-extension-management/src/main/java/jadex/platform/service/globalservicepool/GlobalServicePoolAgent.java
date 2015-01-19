@@ -2,6 +2,8 @@ package jadex.platform.service.globalservicepool;
 
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -27,6 +29,10 @@ import jadex.platform.service.servicepool.PoolServiceInfo;
 import jadex.platform.service.servicepool.ServiceHandler;
 import jadex.platform.service.servicepool.ServicePoolAgent;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,8 +60,8 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 	@Agent
 	protected MicroAgent agent;
 	
-	/** The registered service types. */
-	protected Map<Class<?>, ServiceHandler> servicetypes;
+//	/** The registered service types. */
+//	protected Map<Class<?>, ServiceHandler> servicetypes;
 	
 	/** The pool manager. */
 	protected Map<Class<?>, PoolServiceManager> managers = new HashMap<Class<?>, PoolServiceManager>();
@@ -99,23 +105,53 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 	 *  @param servicetype The service type.
 	 *  @param componentmodel The component model.
 	 */
-	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel, CreationInfo info)
+	public IFuture<Void> addServiceType(final Class<?> servicetype, final String componentmodel, CreationInfo info)
 	{
-		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
+		final Future<Void> ret = new Future<Void>();
+		// Create one service manager per service type
 		PoolServiceManager manager = new PoolServiceManager(agent, servicetype, componentmodel, info);
 		managers.put(servicetype, manager);
-		return ser.addServiceType(servicetype, componentmodel, info);
+		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
+		// todo: fix if more than one service type should be suppotred by one worker (not intended)
+		if(info==null)
+			info = new CreationInfo();
+		info.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
+		ser.addServiceType(servicetype, componentmodel, info).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result) 
+			{
+				Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{servicetype}, new ForwardHandler(servicetype));
+				agent.addService(null, servicetype, service).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+		return ret;
 	}
 	
 	/**
 	 *  Remove a service type.
 	 *  @param servicetype The service type.
 	 */
-	public IFuture<Void> removeServiceType(Class<?> servicetype)
+	public IFuture<Void> removeServiceType(final Class<?> servicetype)
 	{
+		final Future<Void> ret = new Future<Void>();
 		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
 		managers.remove(servicetype);
-		return ser.removeServiceType(servicetype);
+		ser.removeServiceType(servicetype).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result) 
+			{
+				IService service = agent.getServiceContainer().getProvidedService(servicetype);
+				if(service!=null)
+				{
+					agent.removeService(service.getServiceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				else
+				{
+					ret.setException(new RuntimeException("Service could not be removed: "+servicetype));
+				}
+			}
+		});
+		return ret;
 	}	
 	
 	/**
@@ -127,5 +163,29 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 	{
 		PoolServiceManager manager = managers.get(type);
 		return manager.getPoolServices(type);
+	}
+	
+	/**
+	 *  Invocation handler that forwards to the contained local pool.
+	 */
+	public class ForwardHandler implements InvocationHandler
+	{
+		/** The service type. */
+		protected Class<?> servicetype;
+		
+		/**
+		 *  Create a new forward handler.
+		 */
+		public ForwardHandler(Class<?> servicetype)
+		{
+			this.servicetype = servicetype;
+		}
+		
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+		{
+			IService poolser = (IService)SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
+			IService ser = (IService)SServiceProvider.getLocalService(agent.getServiceProvider(), servicetype, poolser.getServiceIdentifier().getProviderId());
+			return method.invoke(ser, args);
+		}
 	}
 }

@@ -198,6 +198,7 @@ public class InitiatorAgent extends TestAgent
 			boolean called;
 			public void intermediateResultAvailable(ITestService result)
 			{
+				System.out.println("found: "+((IService)result).getServiceIdentifier());
 				if(cid.equals(((IService)result).getServiceIdentifier().getProviderId()))
 				{
 					called = true;

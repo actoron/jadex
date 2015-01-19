@@ -174,6 +174,7 @@ public class ServiceHandler implements InvocationHandler
 				CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
 				ci.setParent(component.getComponentIdentifier());
 				ci.setImports(component.getModel().getAllImports());
+				// Worker services are exposed with scope parent only to hinder others finding directly the worker services
 				ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
 				cms.createComponent(null, componentname, ci, null)
 					.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IService>(ret)

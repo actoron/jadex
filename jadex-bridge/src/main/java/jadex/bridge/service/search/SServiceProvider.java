@@ -53,7 +53,7 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(final IServiceProvider provider, final Class<T> type)
 	{
-		return getLocalService(provider, type, null);
+		return getLocalService(provider, type, (String)null);
 	}
 	
 	/**
@@ -79,6 +79,36 @@ public class SServiceProvider
 		{
 			IServiceContainer container = (IServiceContainer)provider;
 			ret = container.getServiceRegistry().searchService(type, provider.getId(), scope, filter);
+			if(ret==null)
+				throw new ServiceNotFoundException(type.getName());
+		}
+		else
+		{
+			throw new IllegalArgumentException("Must be used with local service provider.");
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IServiceProvider provider, final Class<T> type, final IComponentIdentifier target)
+	{
+		T ret = null;
+		
+		if(provider instanceof IServiceContainer)
+		{
+			IServiceContainer container = (IServiceContainer)provider;
+			ret = container.getServiceRegistry().searchService(type, provider.getId(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+			{
+				public boolean filter(T obj) 
+				{
+					return ((IService)obj).getServiceIdentifier().getProviderId().equals(target);
+				}
+			});
 			if(ret==null)
 				throw new ServiceNotFoundException(type.getName());
 		}

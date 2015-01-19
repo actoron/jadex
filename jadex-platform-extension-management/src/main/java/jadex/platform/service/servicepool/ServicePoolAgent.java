@@ -41,9 +41,13 @@ import java.util.Map;
 	@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos.")
 })
 @ProvidedServices(@ProvidedService(type=IServicePoolService.class))
-public class ServicePoolAgent extends MicroAgent implements IServicePoolService
+public class ServicePoolAgent implements IServicePoolService
 {
 	//-------- attributes --------
+	
+	/** The agent. */
+	@Agent
+	protected MicroAgent agent;
 	
 	/** The registered service types. */
 	protected Map<Class<?>, ServiceHandler> servicetypes;
@@ -57,7 +61,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		PoolServiceInfo[] psis = (PoolServiceInfo[])getArgument("serviceinfos");
+		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getArgument("serviceinfos");
 		
 		if(psis!=null)
 		{
@@ -67,7 +71,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 				IPoolStrategy str = psi.getPoolStrategy()==null? new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
 					Runtime.getRuntime().availableProcessors()+1): psi.getPoolStrategy();
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
-				addServiceType(psi.getServicetype().getType(getClassLoader(), getModel().getAllImports()), str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
+				addServiceType(psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports()), str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
 			}
 		}
 		else
@@ -144,12 +148,12 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	{
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
-		ServiceHandler handler = new ServiceHandler(this, servicetype, strategy, componentmodel, info);
+		ServiceHandler handler = new ServiceHandler(agent, servicetype, strategy, componentmodel, info);
 		servicetypes.put(servicetype, handler);
 
 		// add service proxy
-		Object service = Proxy.newProxyInstance(getClassLoader(), new Class<?>[]{servicetype}, handler);
-		return addService(null, servicetype, service, pi);
+		Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
+		return agent.addService(null, servicetype, service, pi);
 	}
 	
 	
@@ -165,10 +169,10 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 		{
 			servicetypes.remove(servicetype);
 			// remove service proxy
-			ser = getServiceContainer().getProvidedService(servicetype);
+			ser = agent.getServiceContainer().getProvidedService(servicetype);
 			if(ser!=null)
 			{
-				removeService(ser.getServiceIdentifier());
+				agent.removeService(ser.getServiceIdentifier());
 				ret.setResult(null);
 			}
 		}
@@ -179,24 +183,25 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 		return ret;
 	}
 	
-	/**
-	 *  Get the service container.
-	 *  @return The service container.
-	 */
-	public IServiceContainer createServiceContainer(Map<String, Object> args)
-	{
-		return new ComponentServiceContainer(getAgentAdapter(), getModel().getType(), this, getInterpreter().isRealtime(), getInterpreter().getServiceRegistry())
-		{
-			/**
-			 *  Get the children container.
-			 *  @return The children container.
-			 *  
-			 *  Returns no children to avoid finding them via search and pool manages these resources.
-			 */
-			public IFuture<Collection<IServiceProvider>>	getChildren()
-			{
-				return new Future<Collection<IServiceProvider>>(Collections.EMPTY_LIST);
-			}
-		};
-	}
+	// Not necessary because service publication scope of workers is set to parent
+//	/**
+//	 *  Get the service container.
+//	 *  @return The service container.
+//	 */
+//	public IServiceContainer createServiceContainer(Map<String, Object> args)
+//	{
+//		return new ComponentServiceContainer(getAgentAdapter(), getModel().getType(), this, getInterpreter().isRealtime(), getInterpreter().getServiceRegistry())
+//		{
+//			/**
+//			 *  Get the children container.
+//			 *  @return The children container.
+//			 *  
+//			 *  Returns no children to avoid finding them via search and pool manages these resources.
+//			 */
+//			public IFuture<Collection<IServiceProvider>>	getChildren()
+//			{
+//				return new Future<Collection<IServiceProvider>>(Collections.EMPTY_LIST);
+//			}
+//		};
+//	}
 }
