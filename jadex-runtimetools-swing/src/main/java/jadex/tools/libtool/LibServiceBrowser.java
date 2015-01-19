@@ -60,6 +60,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -130,6 +131,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		final JPanel classview = new JPanel(new BorderLayout());
 		
 		ridtree = new JTree(new DefaultTreeModel(null));
+		ToolTipManager.sharedInstance().registerComponent(ridtree);
 		ridtree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		
 		ridtree.setCellRenderer(new DefaultTreeCellRenderer() 
@@ -887,7 +889,19 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		 */
 		public String getTooltipText()
 		{
-			return null;
+			String ret = null;
+			
+			Object o = getUserObject();
+			if(o instanceof IResourceIdentifier)
+			{
+				IGlobalResourceIdentifier grid = ((IResourceIdentifier)o).getGlobalIdentifier();
+				if(grid!=null && grid.getResourceId().startsWith("::"))
+				{
+					ret = grid.getResourceId();
+				}
+			}
+			
+			return ret;
 		}
 		
 		/**
@@ -1114,7 +1128,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			else if(o instanceof IResourceIdentifier)
 			{
 				IGlobalResourceIdentifier grid = ((IResourceIdentifier)o).getGlobalIdentifier();
-				if(grid!=null)
+				if(grid!=null && !grid.getResourceId().startsWith("::"))
 				{
 					ret = grid.getResourceId();
 				}
@@ -1122,7 +1136,6 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 				{
 					ILocalResourceIdentifier lrid = ((IResourceIdentifier)o).getLocalIdentifier();
 					ret = lrid.getUri().toString();
-					
 				}
 			}
 			else

@@ -1,7 +1,13 @@
 package jadex.bridge;
 
 import jadex.bridge.service.annotation.Reference;
+import jadex.commons.Base64;
 import jadex.commons.SUtil;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 
 /**
  *  Default implementation for resource identification.
@@ -41,6 +47,35 @@ public class ResourceIdentifier implements IResourceIdentifier
 		
 		this.lid = lid;
 		this.gid = gid;
+		
+		File	f;
+		if(gid==null && lid!=null && (f=new File(lid.getUri().getPath())).exists() && f.isFile())
+		{
+			try
+			{
+				long	start	= System.nanoTime();
+				MessageDigest md = MessageDigest.getInstance("MD5");
+				DigestInputStream	dis	= new DigestInputStream(new FileInputStream(f), md);
+				byte[]	buf	= new byte[8192];
+				int	total	= 0;
+				int	read;
+				while((read=dis.read(buf))!=-1)
+				{
+					total	+= read;
+				}
+				dis.close();
+				String	hash	= new String(Base64.encode(md.digest()), "UTF-8");
+				this.gid	= new GlobalResourceIdentifier("::"+hash, null, null);
+				long	end	= System.nanoTime();				
+				
+				System.out.println("Hashing "+SUtil.bytesToString(total)+" of "+f.getName()+" took "+((end-start)/100000)/10.0+" ms.");
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		}
 	}
 	
 	//-------- methods --------

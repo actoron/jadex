@@ -72,6 +72,13 @@ public interface ILibraryService
 	@Excluded
 	public @Reference IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid, boolean workspace);
 	
+	//-------- remote rid handling --------
+	
+	/**
+	 *  Get a resource as stream (jar).
+	 */
+	
+	
 	//-------- url handling --------
 	
 	/**
