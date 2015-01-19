@@ -641,6 +641,8 @@ public class LocalServiceRegistry
 	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final Class<T> type, final IRemoteFilter<T> filter)
 	{
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+		// Must not find services twice (e.g. having two proxies for the same platform)
+		final Set<T> founds = new HashSet<T>();
 		
 		if(services!=null)
 		{
@@ -671,7 +673,11 @@ public class LocalServiceRegistry
 								{
 									for(T t: result)
 									{
-										ret.addIntermediateResult(t);
+										if(!founds.contains(t))
+										{
+											ret.addIntermediateResult(t);
+										}
+										founds.add(t);
 									}
 									clis.resultAvailable(null);
 								}
