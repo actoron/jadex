@@ -1,11 +1,8 @@
 package jadex.platform.service.servicepool;
 
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.IPoolStrategy;
@@ -21,8 +18,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 import java.lang.reflect.Proxy;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -138,7 +133,6 @@ public class ServicePoolAgent implements IServicePoolService
 		return addServiceType(servicetype, strategy, componentmodel, null, null);
 	}
 	
-	
 	/**
 	 *  Add a new service type and a strategy.
 	 *  @param servicetype The service type.
@@ -146,14 +140,26 @@ public class ServicePoolAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi)
 	{
+		return addServiceType(servicetype, strategy, componentmodel, info, pi, null);
+	}
+	
+	/**
+	 *  Add a new service type and a strategy.
+	 *  @param servicetype The service type.
+	 *  @param strategy The service pool strategy.
+	 */
+	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi, String scope)
+	{
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
+		if(strategy==null)
+			strategy = new DefaultPoolStrategy(5, 35000, 10);
 		ServiceHandler handler = new ServiceHandler(agent, servicetype, strategy, componentmodel, info);
 		servicetypes.put(servicetype, handler);
 
 		// add service proxy
 		Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
-		return agent.addService(null, servicetype, service, pi);
+		return agent.addService(null, servicetype, service, pi, scope);
 	}
 	
 	

@@ -38,6 +38,7 @@ import java.util.Set;
  *  Search fetches services by types and excludes some according to
  *  the scope.
  */
+//todo: rename PlatformServiceRegistry
 public class LocalServiceRegistry
 {
 	/** The map of published services sorted by type. */
@@ -93,8 +94,8 @@ public class LocalServiceRegistry
 	 */
 	public synchronized void addService(ClassInfo key, IService service)
 	{
-//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("Factory")!=-1)
-//			System.out.println("added: "+service.getServiceIdentifier().getServiceType() + service.getServiceIdentifier().getProviderId());
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+//			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
 		
 		if(services==null)
 		{
@@ -117,6 +118,9 @@ public class LocalServiceRegistry
 	 */
 	public synchronized void removeService(ClassInfo key, IService service)
 	{
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+//			System.out.println("removed: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
+		
 		if(services!=null)
 		{
 			Set<IService> sers = services.get(key);
@@ -617,7 +621,7 @@ public class LocalServiceRegistry
 			// check if parent of service reaches the searcher
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
 			String subname = getSubcomponentName(sercid);
-			ret = cid.getName().endsWith(subname);
+			ret = getDotName(cid).endsWith(subname);
 		}
 		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
 		{

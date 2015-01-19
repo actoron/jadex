@@ -8,7 +8,6 @@ import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
@@ -55,7 +54,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		testLocal(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testRemote(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
@@ -199,11 +198,11 @@ public class InitiatorAgent extends TestAgent
 			public void intermediateResultAvailable(ITestService result)
 			{
 				System.out.println("found: "+((IService)result).getServiceIdentifier());
-				if(cid.equals(((IService)result).getServiceIdentifier().getProviderId()))
-				{
-					called = true;
-					callService(result);
-				}
+//				if(cid.equals(((IService)result).getServiceIdentifier().getProviderId()))
+//				{
+//					called = true;
+//					callService(result);
+//				}
 			}
 			public void finished()
 			{

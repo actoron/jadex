@@ -1348,7 +1348,7 @@ public class ComponentManagementService implements IComponentManagementService
 			InitInfo infos	= getInitInfo(cid);
 			IComponentAdapter adapter	= infos!=null ? infos.getAdapter() : (IComponentAdapter)adapters.get(cid);
 			
-//			if(adapter!=null && adapter.getDescription().getModelName().indexOf("Proxy")==-1)
+//			if(adapter!=null && adapter.getDescription().getModelName().indexOf("Pool")==-1)
 //				System.out.println("Terminating component: "+cid.getName());
 			
 			// Terminate component that is shut down during init.
