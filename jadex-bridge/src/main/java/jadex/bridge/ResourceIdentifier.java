@@ -3,6 +3,7 @@ package jadex.bridge;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
+import jadex.commons.collection.LRU;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +18,11 @@ import java.security.MessageDigest;
 @Reference(local=true, remote=false)
 public class ResourceIdentifier implements IResourceIdentifier
 {
+	//-------- constants --------
+	
+	/** LRU for hashes (hack!!!). */
+	protected static LRU<String, String>	hashes	= new LRU<String, String>(200);
+	
 	//-------- attributes --------
 	
 	/** The local identifier. */
@@ -51,30 +57,36 @@ public class ResourceIdentifier implements IResourceIdentifier
 		File	f;
 		if(gid==null && lid!=null && (f=new File(lid.getUri().getPath())).exists() && f.isFile())
 		{
-			try
+			String	hash	= hashes.get(lid.getUri().getPath());
+			if(hash==null)
 			{
-				long	start	= System.nanoTime();
-				MessageDigest md = MessageDigest.getInstance("MD5");
-				DigestInputStream	dis	= new DigestInputStream(new FileInputStream(f), md);
-				byte[]	buf	= new byte[8192];
-				int	total	= 0;
-				int	read;
-				while((read=dis.read(buf))!=-1)
+				try
 				{
-					total	+= read;
+					long	start	= System.nanoTime();
+					MessageDigest md = MessageDigest.getInstance("MD5");
+					DigestInputStream	dis	= new DigestInputStream(new FileInputStream(f), md);
+					byte[]	buf	= new byte[8192];
+					int	total	= 0;
+					int	read;
+					while((read=dis.read(buf))!=-1)
+					{
+						total	+= read;
+					}
+					dis.close();
+					hash	= "::" + new String(Base64.encode(md.digest()), "UTF-8");
+					long	end	= System.nanoTime();				
+					
+					System.out.println("Hashing "+SUtil.bytesToString(total)+" of "+f.getName()+" took "+((end-start)/100000)/10.0+" ms.");
+					hashes.put(lid.getUri().getPath(), hash);
 				}
-				dis.close();
-				String	hash	= new String(Base64.encode(md.digest()), "UTF-8");
-				this.gid	= new GlobalResourceIdentifier("::"+hash, null, null);
-				long	end	= System.nanoTime();				
-				
-				System.out.println("Hashing "+SUtil.bytesToString(total)+" of "+f.getName()+" took "+((end-start)/100000)/10.0+" ms.");
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
 			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
+			
+			this.gid	= new GlobalResourceIdentifier(hash, null, null);
 		}
 	}
 	

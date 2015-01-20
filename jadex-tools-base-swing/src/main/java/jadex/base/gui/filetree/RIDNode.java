@@ -4,6 +4,8 @@ import jadex.base.JarAsDirectory;
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.bridge.IGlobalResourceIdentifier;
+import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.collection.SortedList;
@@ -124,9 +126,18 @@ public class RIDNode extends AbstractSwingTreeNode implements IFileNode
 	 */
 	public String getTooltipText()
 	{
-		String ret = rid.toString();
-		if(file!=null)
-			ret += "file: "+file.getAbsolutePath();
+		String	ret;
+		IGlobalResourceIdentifier grid = rid.getGlobalIdentifier();
+		if(grid!=null && grid.getResourceId().startsWith("::"))
+		{
+			ret = file.getAbsolutePath() + "("+grid.getResourceId()+")";
+		}
+		else
+		{
+			ret = rid.toString();
+			if(file!=null)
+				ret += "file: "+file.getAbsolutePath();
+		}
 		return ret;
 	}
 	
@@ -252,7 +263,23 @@ public class RIDNode extends AbstractSwingTreeNode implements IFileNode
 	 */
 	public String toString()
 	{
-		return rid.getGlobalIdentifier().toString();
+		String	ret;
+		IGlobalResourceIdentifier grid = rid.getGlobalIdentifier();
+		if(grid!=null && !grid.getResourceId().startsWith("::"))
+		{
+			ret = grid.getResourceId();
+		}
+		else
+		{
+			ILocalResourceIdentifier lrid = rid.getLocalIdentifier();
+			ret = lrid.getUri().getPath();
+			if(ret.indexOf('/')!=-1)
+			{
+				ret	= ret.substring(ret.lastIndexOf('/'));
+			}
+		}
+
+		return ret;
 	}
 	
 	/**
