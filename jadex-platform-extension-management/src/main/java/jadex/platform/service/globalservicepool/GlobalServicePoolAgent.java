@@ -140,11 +140,11 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 				agent.addService(null, servicetype, service).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			
-//			public void exceptionOccurred(Exception exception) 
-//			{
-//				exception.printStackTrace();
-//				super.exceptionOccurred(exception);
-//			}
+			public void exceptionOccurred(Exception exception) 
+			{
+				exception.printStackTrace();
+				super.exceptionOccurred(exception);
+			}
 		});
 		return ret;
 	}

@@ -14,6 +14,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TargetResolver
 {
+	/** The target resolver class (to dynamically resolve the called service). */
+	public static final String TARGETRESOLVER = "targetresolver";
+	
 	/**
 	 *  The target resolver class.
 	 */

@@ -12,10 +12,5 @@ public interface ITargetResolver
 	/**
 	 * 
 	 */
-//	public IFuture<ProxyReference> determineTarget(ProxyReference oldtarget, RemoteServiceManagementService rsms);
-	
-	/**
-	 * 
-	 */
-	public IFuture<IService> determineTarget(IComponentIdentifier rms, IServiceIdentifier sid, IExternalAccess agent);
+	public IFuture<IService> determineTarget(IServiceIdentifier sid, IExternalAccess agent);
 }

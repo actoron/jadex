@@ -190,7 +190,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		if(tr!=null)
 		{
 			final Future<Object> ffuture = future;
-			tr.determineTarget(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier(), rsms.getComponent())
+			tr.determineTarget((IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier(), rsms.getComponent())
 				.addResultListener(new ExceptionDelegationResultListener<IService, Object>(future) 
 			{
 				public void customResultAvailable(IService ser) 

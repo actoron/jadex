@@ -135,11 +135,22 @@ public class PoolServiceManager
 		final int n = 3;
 		
 		// Check if service is available in global pool itself
-		IService ownser = (IService)SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), servicetype);
-		if(ownser!=null && !allservices.contains(ownser))
+		Collection<IService> ownsers = (Collection<IService>)SServiceProvider.getLocalServices((IServiceProvider)component.getServiceContainer(), servicetype);
+		if(ownsers!=null)
 		{
-			System.out.println("Added own global pool service: "+ownser);
-			allservices.add(ownser);
+			for(IService ser: ownsers)
+			{
+				if(!ser.getServiceIdentifier().getProviderId().equals(component.getComponentIdentifier()))
+				{
+					System.out.println("Added own global service pool worker: "+ser);
+					allservices.add(ser);
+				}
+//				else
+//				{
+//					System.out.println("Omitting own global service: "+ser);
+//				}
+			}
+			
 		}
 			
 		// If too few services are available try to create new ones

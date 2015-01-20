@@ -11,6 +11,7 @@ import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
+import jadex.bridge.service.annotation.TargetResolver;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -32,12 +33,13 @@ import java.util.Map;
 public class BasicService extends NFMethodPropertyProvider implements IInternalService
 {
 	//-------- constants --------
-	
+
 	/** Constant for remote default timeout. */
 	private static long DEFAULT_REMOTE = 30000;
 
 	/** Constant for local default timeout. */
 	private static long DEFAULT_LOCAL = 30000;
+
 	
 	static
 	{
@@ -201,6 +203,14 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 			if(this.properties==null) 
 				this.properties = new HashMap<String, Object>();
 			this.properties.put("componentviewer.viewerclass", guiClasses);
+		}
+		
+		if(type.isAnnotationPresent(TargetResolver.class))
+		{
+			TargetResolver tr = type.getAnnotation(TargetResolver.class);
+			if(this.properties==null) 
+				this.properties = new HashMap<String, Object>();
+			this.properties.put(TargetResolver.TARGETRESOLVER, tr.value());
 		}
 		
 //		if(type.isAnnotationPresent(NFProperties.class))

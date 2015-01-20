@@ -1,17 +1,11 @@
 package jadex.platform.service.globalservicepool;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.IResultCommand;
 import jadex.commons.future.CallMultiplexer;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -48,7 +42,7 @@ public class ServicePoolTargetResolver implements ITargetResolver
 	/**
 	 * 
 	 */
-	public IFuture<IService> determineTarget(IComponentIdentifier rms, IServiceIdentifier sid, IExternalAccess agent)
+	public IFuture<IService> determineTarget(IServiceIdentifier sid, IExternalAccess agent)
 	{
 		System.out.println("Called service pool resolver: "+sid+" "+(services==null? 0: services.size()));
 		final Future<IService> ret = new Future<IService>();

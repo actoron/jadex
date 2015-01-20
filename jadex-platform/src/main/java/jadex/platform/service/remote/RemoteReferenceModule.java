@@ -308,7 +308,7 @@ public class RemoteReferenceModule
 					}
 				}
 			}
-			Object td = SJavaParser.getProperty(properties, RemoteServiceManagementService.REMOTE_TARGETDETERMINER, imports, null, cl);
+			Object td = SJavaParser.getProperty(properties, TargetResolver.TARGETRESOLVER, imports, null, cl);
 			if(td!=null)
 			{
 				Class<ITargetResolver> tmp = (Class<ITargetResolver>)td;

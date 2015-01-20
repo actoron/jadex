@@ -24,6 +24,7 @@ import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.component.interceptors.IntelligentProxyInterceptor;
 import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.MonitoringInterceptor;
@@ -650,6 +651,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, copy, false));
 			}
 			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
+			handler.addFirstServiceInterceptor(new IntelligentProxyInterceptor(ia.getExternalAccess(), sid));
 		}
 		
 		if(ics!=null)
