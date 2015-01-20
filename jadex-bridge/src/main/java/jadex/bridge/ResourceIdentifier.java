@@ -20,11 +20,6 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 @Reference(local=true, remote=false)
 public class ResourceIdentifier implements IResourceIdentifier
 {
-	//-------- constants --------
-	
-	/** LRU for hashes (hack!!!). */
-	protected static LRU<String, String>	hashes	= new LRU<String, String>(200);
-	
 	//-------- attributes --------
 	
 	/** The local identifier. */
@@ -56,39 +51,10 @@ public class ResourceIdentifier implements IResourceIdentifier
 		this.lid = lid;
 		this.gid = gid;
 		
-		File	f;
-		if(gid==null && lid!=null && (f=new File(lid.getUri().getPath())).exists() && f.isFile())
+		if(gid==null && lid!=null)
 		{
-			String	hash	= hashes.get(lid.getUri().getPath());
-			if(hash==null)
-			{
-				try
-				{
-					long	start	= System.nanoTime();
-					MessageDigest md = MessageDigest.getInstance("SHA-512");
-					DigestInputStream	dis	= new DigestInputStream(new FileInputStream(f), md);
-					byte[]	buf	= new byte[8192];
-					int	total	= 0;
-					int	read;
-					while((read=dis.read(buf))!=-1)
-					{
-						total	+= read;
-					}
-					dis.close();
-					hash	= "::" + new String(Base64.encode(md.digest()), "UTF-8");
-					long	end	= System.nanoTime();				
-					
-//					System.out.println("Hashing "+SUtil.bytesToString(total)+" of "+f.getName()+" took "+((end-start)/100000)/10.0+" ms.");
-					hashes.put(lid.getUri().getPath(), hash);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-			}
-			
-			this.gid	= new GlobalResourceIdentifier(hash, null, null);
+			File f	= new File(lid.getUri().getPath());
+			this.gid	= new GlobalResourceIdentifier("::"+SUtil.getHashCode(f), null, null);
 		}
 	}
 	
