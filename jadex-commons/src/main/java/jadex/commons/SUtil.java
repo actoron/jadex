@@ -1,5 +1,6 @@
 package jadex.commons;
 
+import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
@@ -34,18 +35,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -65,9 +66,11 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 
@@ -4465,5 +4468,120 @@ public class SUtil
 	    }
 
 	    return ret;
+	}
+	
+	//-------- file/jar hash --------
+	
+	/** LRU for hashes. */
+	// Todo: recompute during runtime?
+	protected static LRU<String, String>	hashes	= new LRU<String, String>(200);
+	
+	/**
+	 *  Get the hash code for a file or directory.
+	 */
+	public static String	getHashCode(File f)
+	{
+		try
+		{
+			String	path	= f.getCanonicalPath();
+			String	ret	= hashes.get(path);
+			
+			if(ret==null && f.exists())
+			{
+				String	hash;
+				long	start	= System.nanoTime();
+				MessageDigest md = MessageDigest.getInstance("SHA-512");
+				if(f.isDirectory())
+				{
+					hashDirectory(path, f, md);
+				}
+				else
+				{
+					try
+					{
+						// Try zip file as directory.
+						ZipFile	zf	= new ZipFile(f);
+						List<ZipEntry>	entries	= new ArrayList<ZipEntry>();
+						Enumeration<? extends ZipEntry>	en	= zf.entries();
+						while(en.hasMoreElements())
+						{
+							ZipEntry	ze	= en.nextElement();
+							if(!ze.isDirectory())
+							{
+								entries.add(ze);
+							}
+						}
+						Collections.sort(entries, new Comparator<ZipEntry>()
+						{
+							public int compare(ZipEntry o1, ZipEntry o2)
+							{
+								return o1.getName().compareTo(o2.getName());
+							}
+						});
+						for(ZipEntry entry: entries)
+						{
+							System.out.println("Entry: "+entry.getName());
+							md.digest(entry.getName().getBytes("UTF-8"));
+							hashStream(zf.getInputStream(entry), md);
+						}
+					}
+					catch(ZipException ze)
+					{
+						// Treat as flat file.
+						hashStream(new FileInputStream(f), md);					
+					}
+				}
+				hash	= new String(Base64.encode(md.digest()), "UTF-8");
+				long	end	= System.nanoTime();
+				
+				System.out.println("Hashing of "+f.getName()+" took "+((end-start)/100000)/10.0+" ms.");
+				hashes.put(path, hash);
+			}
+			
+			return ret;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Get the hash code of a directory recursively.
+	 */
+	protected static void	hashDirectory(String root, File dir, MessageDigest md) throws Exception
+	{
+		File[]	files	= dir.listFiles();
+		Arrays.sort(files);
+		for(File f: files)
+		{
+			if(f.isDirectory())
+			{
+				hashDirectory(root, f, md);
+			}
+			else
+			{
+				String	fpath	= f.getAbsolutePath();
+				assert fpath.startsWith(root);
+				String	entry	= fpath.substring(root.length()+1).replace(File.separatorChar, '/');
+				System.out.println("Entry: "+entry);
+				md.digest(entry.getBytes("UTF-8"));
+				hashStream(new FileInputStream(f), md);
+			}
+		}
+	}
+
+	protected static void hashStream(InputStream is, MessageDigest md) throws Exception
+	{
+		DigestInputStream	dis	= new DigestInputStream(is, md);
+		byte[]	buf	= new byte[8192];
+		int	total	= 0;
+		int	read;
+		while((read=dis.read(buf))!=-1)
+		{
+			total	+= read;
+		}
+		dis.close();
 	}
 }
