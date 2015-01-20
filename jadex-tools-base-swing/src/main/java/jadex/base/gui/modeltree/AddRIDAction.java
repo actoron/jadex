@@ -86,7 +86,7 @@ public class AddRIDAction extends ToolTipAction
 		{
 			getThreadPool().addResultListener(new SwingDefaultResultListener<IThreadPool>()
 			{
-				public void customResultAvailable(IThreadPool result)
+				public void customResultAvailable(IThreadPool tp)
 				{
 					try
 					{

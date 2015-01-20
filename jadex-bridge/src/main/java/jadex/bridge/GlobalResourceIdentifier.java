@@ -6,7 +6,6 @@ package jadex.bridge;
 import jadex.bridge.service.annotation.Reference;
 
 import java.net.URI;
-import java.net.URL;
 
 /**
  *  Default implementation for global resource identification.
