@@ -8,10 +8,9 @@ import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -59,7 +58,8 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				ret.setResult(null);
+				// hack: do not quit for better testing
+//				ret.setResult(null);
 			}
 		}));
 		
@@ -92,40 +92,21 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(null).addResultListener(agent.createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
-		{
-			public void customResultAvailable(final IExternalAccess platform)
-			{
-				// Hack: announce platform immediately
-				IFuture<IComponentManagementService> fut = agent.getRequiredService("cms");
-				fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
+//		createPlatform(null).addResultListener(agent.createResultListener(
+//			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+//		{
+//			public void customResultAvailable(final IExternalAccess platform)
+//			{
+				setupRemotePlatform().addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret) 
 				{
-					public void customResultAvailable(IComponentManagementService cms)
+					public void customResultAvailable(IExternalAccess platform) 
 					{
-						CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getComponentIdentifier().getRoot()}));
-						cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
-							new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
-//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
-						{
-							public void firstResultAvailable(IComponentIdentifier result)
-							{
-								performTest(platform.getComponentIdentifier(), testno, false)
-									.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
-							}
-							public void secondResultAvailable(Map<String,Object> result) 
-							{
-								System.out.println("sec");
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								ret.setExceptionIfUndone(exception);
-							}
-						});
+						performTest(platform.getComponentIdentifier(), testno, false)
+							.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
 					}
 				});
-			}
-		}));
+//			}
+//		}));
 		
 		return ret;
 	}
@@ -227,24 +208,26 @@ public class InitiatorAgent extends TestAgent
 			
 			protected void callService(final ITestService ts)
 			{
-				ts.methodA().addResultListener(new IFutureCommandResultListener<Void>()
+				int cnt = 10;
+				
+				CounterResultListener<Void> lis = new CounterResultListener<Void>(cnt, new ExceptionDelegationResultListener<Void, TestReport>(ret)
 				{
-					public void resultAvailable(Void result)
+					public void customResultAvailable(Void result) 
 					{
-						tr.setSucceeded(true);
+						if(tr.getReason()==null)
+							tr.setSucceeded(true);
 						ret.setResult(tr);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						tr.setFailed("Failed with exception: "+exception);
-						ret.setResult(tr);
-					}
-					
-					public void commandAvailable(Object command)
-					{
 					}
 				});
+				
+				ts.methodA(0).addResultListener(lis);
+				
+				agent.waitForDelay(1000).get();
+				
+				for(int i=0; i<cnt-1; i++)
+				{
+					ts.methodA(i+1).addResultListener(lis);
+				}
 			}
 		});
 		

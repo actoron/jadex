@@ -1,5 +1,6 @@
 package jadex.platform.service.globalservicepool;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
 import jadex.commons.future.IIntermediateFuture;
 
@@ -13,6 +14,6 @@ public interface IPoolManagementService
 	 *  @param type The service type.
 	 *  @return A number of services from the pool.
 	 */
-	public IIntermediateFuture<IService> getPoolServices(Class<?> type);
+	public IIntermediateFuture<IService> getPoolServices(ClassInfo type);
 
 }

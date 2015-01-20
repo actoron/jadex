@@ -7,11 +7,9 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -80,42 +78,48 @@ public class PoolServiceManager
 		this.info = info;
 	}
 	
-	/**
-	 * 
-	 */
-	@ServiceStart
-	public IFuture<Void> init()
-	{
-//		System.out.println("called init: "+this);
-		final Future<Void> ret = new Future<Void>();
-//		if(strategy.getWorkerCount()>0)
+//	/**
+//	 * 
+//	 */
+//	@ServiceStart
+//	public IFuture<Void> init()
+//	{
+////		System.out.println("called init: "+this);
+//		final Future<Void> ret = new Future<Void>();
+////		if(strategy.getWorkerCount()>0)
+////		{
+////			CounterResultListener<IService> lis = new CounterResultListener<IService>(strategy.getWorkerCount(), new DelegationResultListener<Void>(ret));
+////			for(int i=0; i<strategy.getWorkerCount(); i++)
+////			{
+////				createService().addResultListener(lis);
+////			}
+////		}
+////		else
+////		{
+////			ret.setResult(null);
+////		}
+//		
+//		IService ownser = (IService)SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), servicetype);
+//		if(ownser!=null)
 //		{
-//			CounterResultListener<IService> lis = new CounterResultListener<IService>(strategy.getWorkerCount(), new DelegationResultListener<Void>(ret));
-//			for(int i=0; i<strategy.getWorkerCount(); i++)
+//			allservices.add(ownser);
+//		}
+//		
+//		createServices(3).addResultListener(new IResultListener<Collection<IService>>() 
+//		{
+//			public void resultAvailable(Collection<IService> result) 
 //			{
-//				createService().addResultListener(lis);
+//				ret.setResult(null);
 //			}
-//		}
-//		else
-//		{
-//			ret.setResult(null);
-//		}
-		
-		createServices(3).addResultListener(new IResultListener<Collection<IService>>() 
-		{
-			public void resultAvailable(Collection<IService> result) 
-			{
-				ret.setResult(null);
-			}
-			public void exceptionOccurred(Exception exception) 
-			{
-				exception.printStackTrace();
-				ret.setResult(null);
-			}
-		});
-		
-		return ret;
-	}
+//			public void exceptionOccurred(Exception exception) 
+//			{
+//				exception.printStackTrace();
+//				ret.setResult(null);
+//			}
+//		});
+//		
+//		return ret;
+//	}
 	
 	//-------- methods --------
 
@@ -130,6 +134,14 @@ public class PoolServiceManager
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		final int n = 3;
 		
+		// Check if service is available in global pool itself
+		IService ownser = (IService)SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), servicetype);
+		if(ownser!=null && !allservices.contains(ownser))
+		{
+			System.out.println("Added own global pool service: "+ownser);
+			allservices.add(ownser);
+		}
+			
 		// If too few services are available try to create new ones
 		if(allservices.size()<n)
 		{
@@ -189,22 +201,9 @@ public class PoolServiceManager
 	
 	//-------- helper methods --------
 	
-//	/**
-//	 * 
-//	 */
-//	protected IFuture<Void> createPoolServices(int n)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		CounterResultListener<IService> lis = new CounterResultListener<IService>(n, true, new DelegationResultListener<Void>(ret));
-//		for(int i=0; i<3; i++)
-//		{
-//			createService().addResultListener(lis);
-//		}
-//		return ret;
-//	}
-	
 	/**
-	 * 
+	 *  Get all available platforms for workers.
+	 *  (Excludes the own platforms because global pool already provides workers)
 	 */
 	protected ITerminableIntermediateFuture<IComponentManagementService> getPlatforms()
 	{
@@ -225,7 +224,8 @@ public class PoolServiceManager
 	}
 	
 	/**
-	 * 
+	 *  Get all free platforms. A free platform is a platform on which no worker
+	 *  of this pool has been started.
 	 */
 	protected ITerminableIntermediateFuture<IComponentManagementService> getFreePlatforms()
 	{
@@ -237,6 +237,7 @@ public class PoolServiceManager
 		{
 			for(IComponentManagementService cms: freeplatforms)
 			{
+				System.out.println("found free platform1: "+cms);
 				ret.addIntermediateResult(cms);
 			}
 			ret.setFinished();
@@ -245,14 +246,23 @@ public class PoolServiceManager
 		{
 			getPlatforms().addResultListener(new IIntermediateResultListener<IComponentManagementService>() 
 			{
-				public void intermediateResultAvailable(IComponentManagementService result) 
+				public void intermediateResultAvailable(IComponentManagementService cms) 
 				{
-					freeplatforms.add(result);
-					ret.addIntermediateResult(result);
+					if(!((IService)cms).getServiceIdentifier().getProviderId().getRoot().equals(component.getComponentIdentifier().getRoot()))
+					{
+						System.out.println("found free platform2: "+cms);
+						freeplatforms.add(cms);
+						ret.addIntermediateResult(cms);
+					}
+					else
+					{
+						System.out.println("Excluding platform hosting the global pool: "+cms);
+					}
 				}
 
 				public void finished() 
 				{
+//					System.out.println("free platforms: "+freeplatforms);
 					ret.setFinished();
 				}
 				
@@ -270,89 +280,7 @@ public class PoolServiceManager
 					ret.setException(exception);
 				}
 			});
-			return SServiceProvider.getServices((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Create a service on some platform.
-	 */
-	protected IFuture<IService> createService()
-	{
-		final Future<IService> ret = new Future<IService>();
-		
-		getFreePlatforms().addResultListener(new IIntermediateResultListener<IComponentManagementService>() 
-		{
-			public void intermediateResultAvailable(final IComponentManagementService cms) 
-			{
-				freeplatforms.remove(cms);
-				
-				CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
-//				ci.setParent(((IService)cms).getServiceIdentifier().getProviderId().getRoot());
-				ci.setImports(component.getModel().getAllImports());
-				ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
-				cms.createComponent(null, componentname, ci, null)
-					.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IService>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier result)
-					{
-	//					System.out.println("created: "+result);
-						cms.getExternalAccess(result)
-							.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IService>(ret)
-						{
-							public void customResultAvailable(IExternalAccess ea)
-							{
-								Future<IService> fut = (Future<IService>)SServiceProvider.getService(ea.getServiceProvider(), servicetype, RequiredServiceInfo.SCOPE_LOCAL);
-								fut.addResultListener(component.createResultListener(new DelegationResultListener<IService>(ret)
-								{
-									public void customResultAvailable(IService ser)
-									{
-										allservices.add(ser);
-										ret.setResult(ser);
-									}
-								}));
-							}
-							
-	//						public void exceptionOccurred(Exception exception)
-	//						{
-	//							System.out.println("method: "+method+" "+args+" "+sc);
-	//							super.exceptionOccurred(exception);
-	//						}
-						}));
-					};
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-						super.exceptionOccurred(exception);
-					}
-				}));
-			}
-
-			public void finished() 
-			{
-				if(!ret.isDone())
-				{
-					ret.setException(new RuntimeException("No free platform found."));
-				}
-			}
-			
-			public void resultAvailable(Collection<IComponentManagementService> result) 
-			{
-				for(IComponentManagementService cms: result)
-				{
-					intermediateResultAvailable(cms);
-				}
-				finished();
-			}
-			
-			public void exceptionOccurred(Exception exception) 
-			{
-				ret.setException(exception);
-			}
-		});
 		
 		return ret;
 	}
@@ -365,11 +293,13 @@ public class PoolServiceManager
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		final int[] creating = new int[1];
 		final int[] created = new int[1];
-		
+				
 		getFreePlatforms().addResultListener(new IIntermediateResultListener<IComponentManagementService>() 
 		{
+			boolean fini = false;
 			public void intermediateResultAvailable(final IComponentManagementService cms) 
 			{
+				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot());
 				if(creating[0]++<n)
 				{
 					freeplatforms.remove(cms);
@@ -383,7 +313,7 @@ public class PoolServiceManager
 					{
 						public void resultAvailable(IComponentIdentifier result)
 						{
-		//					System.out.println("created: "+result);
+//							System.out.println("created: "+result);
 							cms.getExternalAccess(result)
 								.addResultListener(component.createResultListener(new IResultListener<IExternalAccess>()
 							{
@@ -396,7 +326,7 @@ public class PoolServiceManager
 										{
 											allservices.add(ser);
 											ret.addIntermediateResult(ser);
-											if(created[0]++==n)
+											if(++created[0]==n || created[0]==creating[0] && fini)
 											{
 												ret.setFinished();
 											}
@@ -430,10 +360,11 @@ public class PoolServiceManager
 
 			public void finished() 
 			{
-				if(!ret.isDone())
+				if(!ret.isDone() && creating[0]==created[0])
 				{
 					ret.setFinished();
 				}
+				fini = true;
 			}
 			
 			public void resultAvailable(Collection<IComponentManagementService> result) 

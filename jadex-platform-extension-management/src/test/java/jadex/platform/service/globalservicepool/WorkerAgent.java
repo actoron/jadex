@@ -22,9 +22,9 @@ public class WorkerAgent implements ITestService
 	/**
 	 * 
 	 */
-	public IFuture<Void> methodA()
+	public IFuture<Void> methodA(int cnt)
 	{
-		System.out.println("Called methodA");
+		System.out.println(cnt+" called methodA on: "+agent.getComponentIdentifier());
 		return IFuture.DONE;
 	}
 }

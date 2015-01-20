@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Timeout;
@@ -189,10 +190,12 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		if(tr!=null)
 		{
 			final Future<Object> ffuture = future;
-			tr.determineTarget(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier(), rsms.getComponent()).addResultListener(new ExceptionDelegationResultListener<IServiceIdentifier, Object>(future) 
+			tr.determineTarget(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier(), rsms.getComponent())
+				.addResultListener(new ExceptionDelegationResultListener<IService, Object>(future) 
 			{
-				public void customResultAvailable(IServiceIdentifier sid) 
+				public void customResultAvailable(IService ser) 
 				{
+					IServiceIdentifier sid = ser.getServiceIdentifier();
 					IComponentIdentifier rrms = new ComponentIdentifier("rms@system."+sid.getProviderId().getPlatformName(), sid.getProviderId().getAddresses());
 					RemoteReference rr = new RemoteReference(rrms, sid);
 					// non-func is in command to let stream handlers access the properties in RMI processing

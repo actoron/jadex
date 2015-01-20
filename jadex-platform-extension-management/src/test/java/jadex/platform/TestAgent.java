@@ -374,8 +374,48 @@ public abstract class TestAgent
 						{
 							public void customResultAvailable(IComponentIdentifier result)
 							{
-								createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
-									.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+								if(filename!=null)
+								{
+									createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
+										.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+								}
+								else
+								{
+									ret.setResult(null);
+								}
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create remote platform and add proxies on both sides.
+	 */
+	protected IFuture<IExternalAccess>	setupRemotePlatform()
+	{
+		final Future<IExternalAccess> ret	= new Future<IExternalAccess>();
+		
+		createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IExternalAccess>(ret)
+		{
+			public void customResultAvailable(final IExternalAccess exta)
+			{
+				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier())
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
+					{
+						// inverse proxy from remote to local.
+						createProxy(exta.getComponentIdentifier(), agent.getComponentIdentifier().getRoot())
+							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+						{
+							public void customResultAvailable(IComponentIdentifier result)
+							{
+								ret.setResult(exta);
 							}
 						});
 					}

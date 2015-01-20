@@ -17,5 +17,5 @@ public interface ITargetResolver
 	/**
 	 * 
 	 */
-	public IFuture<IServiceIdentifier> determineTarget(IComponentIdentifier rms, IServiceIdentifier sid, IExternalAccess agent);
+	public IFuture<IService> determineTarget(IComponentIdentifier rms, IServiceIdentifier sid, IExternalAccess agent);
 }

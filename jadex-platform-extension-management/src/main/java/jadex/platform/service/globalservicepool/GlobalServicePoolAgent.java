@@ -1,6 +1,7 @@
 package jadex.platform.service.globalservicepool;
 
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
@@ -180,10 +181,11 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 	 *  @param type The service type.
 	 *  @return A number of services from the pool.
 	 */
-	public IIntermediateFuture<IService> getPoolServices(Class<?> type)
+	public IIntermediateFuture<IService> getPoolServices(ClassInfo type)
 	{
-		PoolServiceManager manager = managers.get(type);
-		return manager.getPoolServices(type);
+		Class<?> clazz = type.getType(agent.getClassLoader());
+		PoolServiceManager manager = managers.get(clazz);
+		return manager.getPoolServices(clazz);
 	}
 	
 	/**
