@@ -253,15 +253,15 @@ public class ModelTreePanel extends FileTreePanel
 								ret	= ret.substring(ret.indexOf(':')+1);
 							}
 						}
-						else
-						{
-							ILocalResourceIdentifier lrid = rid.getLocalIdentifier();
-							ret = lrid.getUri().getPath();
-							if(ret.indexOf('/')!=-1)
-							{
-								ret	= ret.substring(ret.lastIndexOf('/')+1);
-							}
-						}
+//						else
+//						{
+//							ILocalResourceIdentifier lrid = rid.getLocalIdentifier();
+//							ret = lrid.getUri().getPath();
+//							if(ret.indexOf('/')!=-1)
+//							{
+//								ret	= ret.substring(ret.lastIndexOf('/')+1);
+//							}
+//						}
 					}
 				}
 				

@@ -198,10 +198,12 @@ public abstract class TestAgent
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		// Start platform
-		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
+//		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
 //		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
-		String[] defargs = new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+		String[] defargs = new String[]{
+//			"-libpath", url,
+			"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging", "true",
 //			"-relaytransport", "false",
@@ -271,10 +273,10 @@ public abstract class TestAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//				IResourceIdentifier	rid	= new ResourceIdentifier(
+//					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
-				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
+				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, agent.getModel().getResourceIdentifier());
 				ci.setArguments(args);
 				ci.setConfiguration(config);
 				cms.createComponent(null, filename, ci, reslis)

@@ -102,7 +102,7 @@ public class ComponentTest extends TestCase
 			return;
 		}
 		
-		System.out.println("starting: "+filename);
+//		System.out.println("starting: "+filename);
 		
 		// Start the component.
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
@@ -128,7 +128,7 @@ public class ComponentTest extends TestCase
 		// Evaluate the results.
 		Map<String, Object>	res	= finished.get();
 		t.cancel();
-		System.out.println("finished: "+filename);
+//		System.out.println("finished: "+filename);
 		Testcase	tc	= null;
 		for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )
 		{

@@ -94,7 +94,7 @@ public class ServiceCallAgent	extends TestAgent
 	{
 		final Future<Void> ret	= new Future<Void>();
 		CreationInfo	ci	= ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
-			? new CreationInfo(agent.getComponentIdentifier()) : null;
+			? new CreationInfo(agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
 		cms.createComponent(null, agentname, ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{

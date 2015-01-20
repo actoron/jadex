@@ -10,6 +10,8 @@ import java.io.FileInputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
+import org.bouncycastle.crypto.digests.SHA512Digest;
+
 /**
  *  Default implementation for resource identification.
  *  Contains only a local identifier and a global identifier
@@ -63,7 +65,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 				try
 				{
 					long	start	= System.nanoTime();
-					MessageDigest md = MessageDigest.getInstance("MD5");
+					MessageDigest md = MessageDigest.getInstance("SHA-512");
 					DigestInputStream	dis	= new DigestInputStream(new FileInputStream(f), md);
 					byte[]	buf	= new byte[8192];
 					int	total	= 0;
@@ -76,7 +78,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 					hash	= "::" + new String(Base64.encode(md.digest()), "UTF-8");
 					long	end	= System.nanoTime();				
 					
-					System.out.println("Hashing "+SUtil.bytesToString(total)+" of "+f.getName()+" took "+((end-start)/100000)/10.0+" ms.");
+//					System.out.println("Hashing "+SUtil.bytesToString(total)+" of "+f.getName()+" took "+((end-start)/100000)/10.0+" ms.");
 					hashes.put(lid.getUri().getPath(), hash);
 				}
 				catch(Exception e)
