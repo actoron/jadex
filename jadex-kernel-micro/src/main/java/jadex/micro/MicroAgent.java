@@ -743,6 +743,27 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param type The public service interface.
 	 *  @param service The service.
 	 */
+	public IFuture<Void>	addService(String name, Class<?> type, Object service, ProvidedServiceInfo info)
+	{
+		final Future<Void> ret = new Future<Void>();
+		IFuture<IInternalService> fut = interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, info, interpreter.getComponentFetcher());
+		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
+		{
+			public void customResultAvailable(IInternalService result)
+			{
+				ret.setResult(null);
+			}
+		}));
+		return ret;
+	}
+	
+	/**
+	 *  Add a service to the platform. 
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
+	 *  @param service The service.
+	 */
 	public IFuture<Void>	addService(String name, Class<?> type, Object service, PublishInfo pi)
 	{
 		return addService(name, type, service, pi, null);

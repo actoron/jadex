@@ -2,20 +2,19 @@ package jadex.platform.service.globalservicepool;
 
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.TargetResolver;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.IPoolStrategy;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -30,14 +29,14 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.servicepool.IServicePoolService;
 import jadex.platform.service.servicepool.PoolServiceInfo;
-import jadex.platform.service.servicepool.ServiceHandler;
 import jadex.platform.service.servicepool.ServicePoolAgent;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -131,13 +130,18 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 		// todo: fix if more than one service type should be suppotred by one worker (not intended)
 		if(info==null)
 			info = new CreationInfo();
-		info.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
+		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null);
+		info.setProvidedServiceInfos(new ProvidedServiceInfo[]{psi});
 		ser.addServiceType(servicetype, null, componentmodel, info, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result) 
 			{
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, null, null, null);
+				List<UnparsedExpression> props = new ArrayList<UnparsedExpression>();
+				props.add(new UnparsedExpression(TargetResolver.TARGETRESOLVER, ServicePoolTargetResolver.class.getName()+".class"));
+				psi.setProperties(props);
 				Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{servicetype}, new ForwardHandler(servicetype));
-				agent.addService(null, servicetype, service).addResultListener(new DelegationResultListener<Void>(ret));
+				agent.addService(null, servicetype, service, psi).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception) 
