@@ -4520,7 +4520,7 @@ public class SUtil
 						});
 						for(ZipEntry entry: entries)
 						{
-							System.out.println("Entry: "+entry.getName());
+//							System.out.println("Entry: "+entry.getName());
 							md.digest(entry.getName().getBytes("UTF-8"));
 							hashStream(zf.getInputStream(entry), md);
 						}
@@ -4534,7 +4534,7 @@ public class SUtil
 				hash	= new String(Base64.encode(md.digest()), "UTF-8");
 				long	end	= System.nanoTime();
 				
-				System.out.println("Hashing of "+f.getName()+" took "+((end-start)/100000)/10.0+" ms.");
+				System.out.println("Hashing of "+f.getName()+" took "+((end-start)/100000)/10.0+" ms: "+hash);
 				hashes.put(path, hash);
 			}
 			
@@ -4565,7 +4565,7 @@ public class SUtil
 				String	fpath	= f.getAbsolutePath();
 				assert fpath.startsWith(root);
 				String	entry	= fpath.substring(root.length()+1).replace(File.separatorChar, '/');
-				System.out.println("Entry: "+entry);
+//				System.out.println("Entry: "+entry);
 				md.digest(entry.getBytes("UTF-8"));
 				hashStream(new FileInputStream(f), md);
 			}
