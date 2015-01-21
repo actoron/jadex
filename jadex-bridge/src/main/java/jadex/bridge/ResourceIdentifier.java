@@ -1,16 +1,9 @@
 package jadex.bridge;
 
 import jadex.bridge.service.annotation.Reference;
-import jadex.commons.Base64;
 import jadex.commons.SUtil;
-import jadex.commons.collection.LRU;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-
-import org.bouncycastle.crypto.digests.SHA512Digest;
 
 /**
  *  Default implementation for resource identification.
