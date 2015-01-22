@@ -24,3 +24,4 @@ jadex-platform-standalone-launch/highscore.dmp
 /jadex-platform-extension-relay-standalone/.relaystats
 **/.idea
 *.iml
+/jadex-android-bluetooth/lint.xml

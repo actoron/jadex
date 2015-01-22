@@ -53,6 +53,7 @@ import java.util.jar.Manifest;
 /**
  *  Library service for loading classpath elements.
  */
+// http://tools.ietf.org/html/rfc3548#section-4 for local storage of hashed resources
 @Service(ILibraryService.class)
 public class LibraryService	implements ILibraryService, IPropertiesProvider
 {
@@ -773,12 +774,13 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				
 				if(alldeps==null)
 				{
-//					System.out.println("getdeps in getcl: "+rid);
+					System.out.println("getdeps in getcl: "+component.getComponentIdentifier()+", "+rid);
 					getDependencies(rid, workspace).addResultListener(
 						new ExceptionDelegationResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>, DelegationURLClassLoader>(ret)
 					{
 						public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 						{
+							System.out.println("getdeps in getcl2: "+component.getComponentIdentifier()+", "+rid);
 							createClassLoader(deps.getFirstEntity(), deps.getSecondEntity(), support, workspace).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
 							{
 								public void customResultAvailable(DelegationURLClassLoader result)
@@ -807,6 +809,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				}
 				else
 				{
+					System.out.println("create cl: "+component.getComponentIdentifier()+", "+rid);
 					createClassLoader(rid, alldeps, support, workspace).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
 					{
 						public void customResultAvailable(DelegationURLClassLoader result)

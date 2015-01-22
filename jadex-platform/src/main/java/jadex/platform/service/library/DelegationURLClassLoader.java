@@ -5,7 +5,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 
 /**
