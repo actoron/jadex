@@ -10,6 +10,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -28,8 +29,10 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.platform.TestAgent;
 import jadex.platform.service.servicepool.PoolServiceInfo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,7 +56,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		testLocal(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testRemote(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
@@ -92,21 +95,15 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-//		createPlatform(null).addResultListener(agent.createResultListener(
-//			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
-//		{
-//			public void customResultAvailable(final IExternalAccess platform)
-//			{
-				setupRemotePlatform().addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret) 
-				{
-					public void customResultAvailable(IExternalAccess platform) 
-					{
-						performTest(platform.getComponentIdentifier(), testno, false)
-							.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
-					}
-				});
-//			}
-//		}));
+		final List<IExternalAccess> pls = new ArrayList<IExternalAccess>();
+		setupRemotePlatforms(4, 0, pls).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret) 
+		{
+			public void customResultAvailable(Void result) 
+			{
+				performTest(pls.get(0).getComponentIdentifier(), testno, false)
+					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
+			}
+		});
 		
 		return ret;
 	}
