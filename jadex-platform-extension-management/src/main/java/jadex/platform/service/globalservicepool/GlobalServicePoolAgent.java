@@ -2,12 +2,12 @@ package jadex.platform.service.globalservicepool;
 
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.ITargetResolver;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.TargetResolver;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.CounterResultListener;
@@ -40,7 +40,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  The service pool agent can be used to handle services in a pooled manner.
+ *  The global service pool agent can be used to handle services in a pooled manner.
+ *  
+ *  A global pool consists of workers on different platforms. These workers typically
+ *  are local service pools themselves.
  */
 @Agent
 @Service
@@ -51,11 +54,11 @@ import java.util.Map;
 @ProvidedServices(
 {
 	@ProvidedService(type=IGlobalServicePoolService.class),
-	@ProvidedService(type=IPoolManagementService.class)
+	@ProvidedService(type=IGlobalPoolManagementService.class)
 })
 @ComponentTypes(@ComponentType(name="pool", clazz=ServicePoolAgent.class))
 @Configurations(@Configuration(name="def", components=@Component(type="pool")))
-public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolManagementService
+public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGlobalPoolManagementService
 {
 	//-------- attributes --------
 	
@@ -64,7 +67,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 	protected MicroAgent agent;
 	
 	/** The pool manager. */
-	protected Map<Class<?>, PoolServiceManager> managers = new HashMap<Class<?>, PoolServiceManager>();
+	protected Map<Class<?>, GlobalPoolServiceManager> managers = new HashMap<Class<?>, GlobalPoolServiceManager>();
 	
 	//-------- interface methods --------
 	
@@ -75,7 +78,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
-		this.managers = new HashMap<Class<?>, PoolServiceManager>();
+		this.managers = new HashMap<Class<?>, GlobalPoolServiceManager>();
 		
 		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getArguments().get("serviceinfos");
 		
@@ -107,7 +110,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 	{
 		final Future<Void> ret = new Future<Void>();
 		// Create one service manager per service type
-		PoolServiceManager manager = new PoolServiceManager(agent, servicetype, componentmodel, info);
+		GlobalPoolServiceManager manager = new GlobalPoolServiceManager(agent, servicetype, componentmodel, info);
 		managers.put(servicetype, manager);
 		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
 		// todo: fix if more than one service type should be supported by one worker (not intended)
@@ -122,7 +125,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 				// Add to global pool with magic targetresolver for intelligent proxy
 				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, null, null, null);
 				List<UnparsedExpression> props = new ArrayList<UnparsedExpression>();
-				props.add(new UnparsedExpression(TargetResolver.TARGETRESOLVER, ServicePoolTargetResolver.class.getName()+".class"));
+				props.add(new UnparsedExpression(ITargetResolver.TARGETRESOLVER, GlobalServicePoolTargetResolver.class.getName()+".class"));
 				psi.setProperties(props);
 				Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{servicetype}, new ForwardHandler(servicetype));
 				agent.addService(null, servicetype, service, psi).addResultListener(new DelegationResultListener<Void>(ret));
@@ -164,6 +167,8 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 		return ret;
 	}	
 	
+	//-------- interface methods --------
+	
 	/**
 	 *  Get a set of services managed by the pool.
 	 *  @param type The service type.
@@ -172,8 +177,23 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 	public IIntermediateFuture<IService> getPoolServices(ClassInfo type)
 	{
 		Class<?> clazz = type.getType(agent.getClassLoader());
-		PoolServiceManager manager = managers.get(clazz);
+		GlobalPoolServiceManager manager = managers.get(clazz);
 		return manager.getPoolServices(clazz);
+	}
+	
+	/**
+	 *  Inform about service usage.
+	 *  @param The usage infos per service class.
+	 */
+	public IFuture<Void> sendUsageInfo(Map<ClassInfo, UsageInfo> infos)
+	{
+		for(ClassInfo type: infos.keySet())
+		{
+			Class<?> clazz = type.getType(agent.getClassLoader());
+			GlobalPoolServiceManager manager = managers.get(clazz);
+			manager.addUsageInfo(infos);
+		}
+		return IFuture.DONE;
 	}
 	
 	/**

@@ -7,7 +7,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.ArrayBlockingQueue;
@@ -56,7 +59,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		testRemote(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
@@ -65,6 +68,16 @@ public class InitiatorAgent extends TestAgent
 //				ret.setResult(null);
 			}
 		}));
+		
+//		testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+//		{
+//			public void customResultAvailable(TestReport result)
+//			{
+//				tc.addReport(result);
+//				// hack: do not quit for better testing
+////				ret.setResult(null);
+//			}
+//		}));
 		
 		return ret;
 	}
@@ -76,14 +89,16 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getComponentIdentifier().getRoot(), testno, true)
-			.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+		final List<IExternalAccess> pls = new ArrayList<IExternalAccess>();
+		pls.add(agent.getExternalAccess());
+		setupRemotePlatforms(4, 0, pls).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret) 
 		{
-			public void customResultAvailable(final TestReport result)
+			public void customResultAvailable(Void result) 
 			{
-				ret.setResult(result);
+				performTest(agent.getComponentIdentifier(), testno, true)
+					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -96,6 +111,7 @@ public class InitiatorAgent extends TestAgent
 		final Future<TestReport> ret = new Future<TestReport>();
 		
 		final List<IExternalAccess> pls = new ArrayList<IExternalAccess>();
+		pls.add(agent.getExternalAccess());
 		setupRemotePlatforms(4, 0, pls).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret) 
 		{
 			public void customResultAvailable(Void result) 

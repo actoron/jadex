@@ -1,11 +1,12 @@
 package jadex.platform.service.globalservicepool;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -19,9 +20,12 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.platform.service.servicepool.PoolServiceInfo;
+import jadex.platform.service.servicepool.ServicePoolAgent;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +33,18 @@ import java.util.Set;
 
 /**
  *  The pool manager handles the pool resources.
+ *  
+ *  It implements the getPoolServices() method to deliver
+ *  workers to the intelligent proxy.
+ *  
+ *  Creates new workers on free platforms if needed.
+ *  
+ *  todo: remove unused workers after some timeout
  */
-public class PoolServiceManager
+public class GlobalPoolServiceManager
 {
 	//-------- attributes --------
 	
-//	/** The strategy. */
-//	protected IPoolStrategy strategy;
-
 	/** All services. */
 	protected Set<IService> allservices;
 	
@@ -58,13 +66,15 @@ public class PoolServiceManager
 	/** The creation info. */
 	protected CreationInfo info;
 	
+	/** The latest usage infos per worker (service id). */
+	protected Map<IServiceIdentifier, UsageInfo> usages;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service handler.
 	 */
-	public PoolServiceManager (IInternalAccess component, Class<?> servicetype, 
+	public GlobalPoolServiceManager (IInternalAccess component, Class<?> servicetype, 
 //		IPoolStrategy strategy, 
 		String componentname, CreationInfo info)
 	{
@@ -76,50 +86,8 @@ public class PoolServiceManager
 		this.allplatforms = new HashSet<IComponentManagementService>();
 		this.freeplatforms = new HashSet<IComponentManagementService>();
 		this.info = info;
+		this.usages = new HashMap<IServiceIdentifier, UsageInfo>();
 	}
-	
-//	/**
-//	 * 
-//	 */
-//	@ServiceStart
-//	public IFuture<Void> init()
-//	{
-////		System.out.println("called init: "+this);
-//		final Future<Void> ret = new Future<Void>();
-////		if(strategy.getWorkerCount()>0)
-////		{
-////			CounterResultListener<IService> lis = new CounterResultListener<IService>(strategy.getWorkerCount(), new DelegationResultListener<Void>(ret));
-////			for(int i=0; i<strategy.getWorkerCount(); i++)
-////			{
-////				createService().addResultListener(lis);
-////			}
-////		}
-////		else
-////		{
-////			ret.setResult(null);
-////		}
-//		
-//		IService ownser = (IService)SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), servicetype);
-//		if(ownser!=null)
-//		{
-//			allservices.add(ownser);
-//		}
-//		
-//		createServices(3).addResultListener(new IResultListener<Collection<IService>>() 
-//		{
-//			public void resultAvailable(Collection<IService> result) 
-//			{
-//				ret.setResult(null);
-//			}
-//			public void exceptionOccurred(Exception exception) 
-//			{
-//				exception.printStackTrace();
-//				ret.setResult(null);
-//			}
-//		});
-//		
-//		return ret;
-//	}
 	
 	//-------- methods --------
 
@@ -150,7 +118,6 @@ public class PoolServiceManager
 //					System.out.println("Omitting own global service: "+ser);
 //				}
 			}
-			
 		}
 			
 		// If too few services are available try to create new ones
@@ -210,6 +177,19 @@ public class PoolServiceManager
 		return ret;
 	}
 	
+	/**
+	 *  Add service usages.
+	 *  @param The usage infos per service class.
+	 */
+	public void addUsageInfo(Map<ClassInfo, UsageInfo> infos)
+	{
+		for(UsageInfo info: infos.values())
+		{
+			// todo: store more than one value or unify results?!
+			usages.put(info.getServiceIdentifier(), info);
+		}
+	}
+	
 	//-------- helper methods --------
 	
 	/**
@@ -248,7 +228,7 @@ public class PoolServiceManager
 		{
 			for(IComponentManagementService cms: freeplatforms)
 			{
-				System.out.println("found free platform1: "+cms);
+//				System.out.println("found free platform1: "+cms);
 				ret.addIntermediateResult(cms);
 			}
 			ret.setFinished();
@@ -261,7 +241,7 @@ public class PoolServiceManager
 				{
 					if(!((IService)cms).getServiceIdentifier().getProviderId().getRoot().equals(component.getComponentIdentifier().getRoot()))
 					{
-						System.out.println("found free platform2: "+cms);
+//						System.out.println("found free platform2: "+cms);
 						freeplatforms.add(cms);
 						ret.addIntermediateResult(cms);
 					}
@@ -315,11 +295,26 @@ public class PoolServiceManager
 				{
 					freeplatforms.remove(cms);
 					
+//					CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
+//	//				ci.setParent(((IService)cms).getServiceIdentifier().getProviderId().getRoot());
+//					ci.setImports(component.getModel().getAllImports());
+//					ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
+					
 					CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
 	//				ci.setParent(((IService)cms).getServiceIdentifier().getProviderId().getRoot());
 					ci.setImports(component.getModel().getAllImports());
-					ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
-					cms.createComponent(null, componentname, ci, null)
+//					ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
+					
+//					PoolServiceInfo[] psi = new PoolServiceInfo[]{};
+					PoolServiceInfo psi = new PoolServiceInfo(componentname, servicetype);
+					if(info!=null && info.getArguments()!=null)
+						psi.setArguments(info.getArguments());
+					Map<String, Object> args = new HashMap<String, Object>();
+					args.put("serviceinfos", new PoolServiceInfo[]{psi});
+					ci.setArguments(args);
+					
+					cms.createComponent(null, ServicePoolAgent.class.getName()+".class", ci, null)
+//					cms.createComponent(null, componentname, ci, null)
 						.addResultListener(component.createResultListener(new IResultListener<IComponentIdentifier>()
 					{
 						public void resultAvailable(IComponentIdentifier result)

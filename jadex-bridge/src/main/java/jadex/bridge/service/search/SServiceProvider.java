@@ -244,11 +244,11 @@ public class SServiceProvider
 						{
 							ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()+" in "+provider.getId())
 							{
-	//							public void printStackTrace()
-	//							{
-	//								Thread.dumpStack();
-	//								super.printStackTrace();
-	//							}
+								public void printStackTrace()
+								{
+									Thread.dumpStack();
+									super.printStackTrace();
+								}
 							});
 						}
 					}

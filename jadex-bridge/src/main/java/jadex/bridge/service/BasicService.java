@@ -11,7 +11,6 @@ import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
-import jadex.bridge.service.annotation.TargetResolver;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -205,13 +204,13 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 			this.properties.put("componentviewer.viewerclass", guiClasses);
 		}
 		
-		if(type.isAnnotationPresent(TargetResolver.class))
-		{
-			TargetResolver tr = type.getAnnotation(TargetResolver.class);
-			if(this.properties==null) 
-				this.properties = new HashMap<String, Object>();
-			this.properties.put(TargetResolver.TARGETRESOLVER, tr.value());
-		}
+//		if(type.isAnnotationPresent(TargetResolver.class))
+//		{
+//			TargetResolver tr = type.getAnnotation(TargetResolver.class);
+//			if(this.properties==null) 
+//				this.properties = new HashMap<String, Object>();
+//			this.properties.put(TargetResolver.TARGETRESOLVER, tr.value());
+//		}
 		
 //		if(type.isAnnotationPresent(NFProperties.class))
 //		{

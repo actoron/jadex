@@ -9,6 +9,9 @@ import jadex.commons.future.IFuture;
  */
 public interface ITargetResolver 
 {
+	/** The target resolver class (to dynamically resolve the called service). */
+	public static final String TARGETRESOLVER = "targetresolver";
+	
 	/**
 	 * 
 	 */

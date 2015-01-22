@@ -25,7 +25,7 @@ import javax.management.ServiceNotFoundException;
  *  It has the purpose the direct the call to a suitable service worker
  *  from the queue of workers.
  */
-public class ServicePoolTargetResolver implements ITargetResolver
+public class GlobalServicePoolTargetResolver implements ITargetResolver
 {
 	/** The cached target services. */
 	protected List<IService> services;
@@ -145,10 +145,10 @@ public class ServicePoolTargetResolver implements ITargetResolver
 	{
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
-		SServiceProvider.getService(agent.getServiceProvider(), sid.getProviderId(), IPoolManagementService.class)
-			.addResultListener(new IResultListener<IPoolManagementService>() 
+		SServiceProvider.getService(agent.getServiceProvider(), sid.getProviderId(), IGlobalPoolManagementService.class)
+			.addResultListener(new IResultListener<IGlobalPoolManagementService>() 
 		{
-			public void resultAvailable(final IPoolManagementService pms) 
+			public void resultAvailable(final IGlobalPoolManagementService pms) 
 			{
 				pms.getPoolServices(sid.getServiceType())
 					.addResultListener(new IResultListener<Collection<IService>>() 

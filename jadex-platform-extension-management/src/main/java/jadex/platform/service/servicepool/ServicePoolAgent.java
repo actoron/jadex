@@ -12,6 +12,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.ProvidedService;
@@ -52,6 +53,7 @@ public class ServicePoolAgent implements IServicePoolService
 	/**
 	 *  Called once after agent creation.
 	 */
+	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
