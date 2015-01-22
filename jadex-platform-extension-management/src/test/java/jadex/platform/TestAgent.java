@@ -36,6 +36,7 @@ import jadex.micro.annotation.Results;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -275,8 +276,9 @@ public abstract class TestAgent
 			{
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
-				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
+//				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
+//				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
+				CreationInfo ci	= new CreationInfo(root==null? agent.getComponentIdentifier(): root, rid);
 				ci.setArguments(args);
 				ci.setConfiguration(config);
 				cms.createComponent(null, filename, ci, reslis)
@@ -424,6 +426,46 @@ public abstract class TestAgent
 				});
 			}
 		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create remote platform and add proxies on all sides.
+	 */
+	protected IFuture<Void>	setupRemotePlatforms(final int n, final int cnt, final List<IExternalAccess> platforms)
+	{
+		final Future<Void> ret	= new Future<Void>();
+		
+		if(cnt<n)
+		{
+			createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			{
+				public void customResultAvailable(final IExternalAccess exta)
+				{
+					CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(platforms.size()*2, new DelegationResultListener<Void>(ret)
+					{
+						public void customResultAvailable(Void result) 
+						{
+							platforms.add(exta);
+							setupRemotePlatforms(n+1, cnt, platforms).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					});
+					
+					for(IExternalAccess other: platforms)
+					{
+						// connect other platforms with new one
+						createProxy(other.getComponentIdentifier(), exta.getComponentIdentifier()).addResultListener(lis);
+						// connect this platform to all others
+						createProxy(exta.getComponentIdentifier(), other.getComponentIdentifier()).addResultListener(lis);
+					}
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}

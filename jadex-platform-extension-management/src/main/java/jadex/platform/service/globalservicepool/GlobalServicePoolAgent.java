@@ -63,9 +63,6 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 	@Agent
 	protected MicroAgent agent;
 	
-//	/** The registered service types. */
-//	protected Map<Class<?>, ServiceHandler> servicetypes;
-	
 	/** The pool manager. */
 	protected Map<Class<?>, PoolServiceManager> managers = new HashMap<Class<?>, PoolServiceManager>();
 	
@@ -98,20 +95,6 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 			ret.setResult(null);
 		}
 		
-//		ret.addResultListener(new IResultListener<Void>() 
-//		{
-//			public void resultAvailable(Void result) 
-//			{
-//				System.out.println("oki");
-//			}
-//			
-//			public void exceptionOccurred(Exception exception) 
-//			{
-//				System.out.println("ex: "+exception);
-//			}
-//		});
-		
-//		return IFuture.DONE;
 		return ret;
 	}
 	
@@ -127,7 +110,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 		PoolServiceManager manager = new PoolServiceManager(agent, servicetype, componentmodel, info);
 		managers.put(servicetype, manager);
 		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
-		// todo: fix if more than one service type should be suppotred by one worker (not intended)
+		// todo: fix if more than one service type should be supported by one worker (not intended)
 		if(info==null)
 			info = new CreationInfo();
 		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null);
@@ -136,6 +119,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IPoolM
 		{
 			public void customResultAvailable(Void result) 
 			{
+				// Add to global pool with magic targetresolver for intelligent proxy
 				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, null, null, null);
 				List<UnparsedExpression> props = new ArrayList<UnparsedExpression>();
 				props.add(new UnparsedExpression(TargetResolver.TARGETRESOLVER, ServicePoolTargetResolver.class.getName()+".class"));
