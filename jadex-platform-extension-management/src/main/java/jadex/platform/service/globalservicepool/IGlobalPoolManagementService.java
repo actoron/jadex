@@ -2,6 +2,7 @@ package jadex.platform.service.globalservicepool;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 
@@ -24,5 +25,5 @@ public interface IGlobalPoolManagementService
 	 *  Inform about service usage.
 	 *  @param The usage infos per service class.
 	 */
-	public IFuture<Void> sendUsageInfo(Map<ClassInfo, UsageInfo> infos);
+	public IFuture<Void> sendUsageInfo(Map<IServiceIdentifier, UsageInfo> infos);
 }

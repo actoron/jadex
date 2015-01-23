@@ -5,6 +5,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -110,7 +111,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	{
 		final Future<Void> ret = new Future<Void>();
 		// Create one service manager per service type
-		GlobalPoolServiceManager manager = new GlobalPoolServiceManager(agent, servicetype, componentmodel, info);
+		GlobalPoolServiceManager manager = new GlobalPoolServiceManager(agent, servicetype, componentmodel, info, 3);
 		managers.put(servicetype, manager);
 		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
 		// todo: fix if more than one service type should be supported by one worker (not intended)
@@ -185,10 +186,12 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	 *  Inform about service usage.
 	 *  @param The usage infos per service class.
 	 */
-	public IFuture<Void> sendUsageInfo(Map<ClassInfo, UsageInfo> infos)
+	public IFuture<Void> sendUsageInfo(Map<IServiceIdentifier, UsageInfo> infos)
 	{
-		for(ClassInfo type: infos.keySet())
+		if(infos.size()>0)
 		{
+			IServiceIdentifier sid = infos.keySet().iterator().next();
+			ClassInfo type = sid.getServiceType();
 			Class<?> clazz = type.getType(agent.getClassLoader());
 			GlobalPoolServiceManager manager = managers.get(clazz);
 			manager.addUsageInfo(infos);

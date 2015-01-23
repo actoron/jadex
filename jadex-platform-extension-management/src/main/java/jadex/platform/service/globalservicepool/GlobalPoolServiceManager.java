@@ -25,6 +25,8 @@ import jadex.platform.service.servicepool.ServicePoolAgent;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -69,23 +71,25 @@ public class GlobalPoolServiceManager
 	/** The latest usage infos per worker (service id). */
 	protected Map<IServiceIdentifier, UsageInfo> usages;
 	
+	/** The number of services delivered per proxy. */
+	protected int numservices;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service handler.
 	 */
 	public GlobalPoolServiceManager (IInternalAccess component, Class<?> servicetype, 
-//		IPoolStrategy strategy, 
-		String componentname, CreationInfo info)
+		String componentname, CreationInfo info, int numservices)
 	{
 		this.component = component;
 		this.servicetype = servicetype;
-//		this.strategy = strategy;
 		this.componentname = componentname;
 		this.allservices = new HashSet<IService>();
 		this.allplatforms = new HashSet<IComponentManagementService>();
 		this.freeplatforms = new HashSet<IComponentManagementService>();
 		this.info = info;
+		this.numservices = numservices;
 		this.usages = new HashMap<IServiceIdentifier, UsageInfo>();
 	}
 	
@@ -100,7 +104,6 @@ public class GlobalPoolServiceManager
 	public IIntermediateFuture<IService> getPoolServices(Class<?> type)
 	{
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
-		final int n = 3;
 		
 		// Check if service is available in global pool itself
 		Collection<IService> ownsers = (Collection<IService>)SServiceProvider.getLocalServices((IServiceProvider)component.getServiceContainer(), servicetype);
@@ -121,10 +124,10 @@ public class GlobalPoolServiceManager
 		}
 			
 		// If too few services are available try to create new ones
-		if(allservices.size()<n)
+		if(allservices.size()<numservices)
 		{
 			final List<IService> sers = new ArrayList<IService>(allservices);
-			createServices(n).addResultListener(new IIntermediateResultListener<IService>() 
+			createServices(numservices).addResultListener(new IIntermediateResultListener<IService>() 
 			{
 				int cnt = 0;
 				public void intermediateResultAvailable(IService result) 
@@ -135,12 +138,12 @@ public class GlobalPoolServiceManager
 
 				public void finished() 
 				{
-					if(cnt<n)
+					if(cnt<numservices)
 					{
 						for(IService ser: sers)
 						{
 							ret.addIntermediateResult(ser);
-							if(++cnt==n)
+							if(++cnt==numservices)
 								break;
 						}
 					}
@@ -165,10 +168,27 @@ public class GlobalPoolServiceManager
 		else
 		{
 			int cnt = 0;
-			for(IService ser: allservices)
+			List<IService> sers = new ArrayList<IService>(allservices);
+			Collections.sort(sers, new Comparator<IService>() 
+			{
+				public int compare(IService s1, IService s2) 
+				{
+					UsageInfo ui1 = usages.get(s1.getServiceIdentifier());
+					UsageInfo ui2 = usages.get(s1.getServiceIdentifier());
+					return ui1==null && ui2==null? (int)(s1.hashCode()-s2.hashCode()): ui1==null? -1: ui2==null? 1: (int)Math.round(ui1.usages-ui2.usages);
+				}
+			});
+			
+			for(IService ser: sers)
+			{
+				UsageInfo ui = usages.get(ser.getServiceIdentifier());
+				System.out.println(ser.getServiceIdentifier()+ ": "+ui!=null? ui.getUsages(): "");
+			}
+			
+			for(IService ser: sers)
 			{
 				ret.addIntermediateResult(ser);
-				if(++cnt==n)
+				if(++cnt==numservices)
 					break;
 			}
 			ret.setFinished();
@@ -181,12 +201,20 @@ public class GlobalPoolServiceManager
 	 *  Add service usages.
 	 *  @param The usage infos per service class.
 	 */
-	public void addUsageInfo(Map<ClassInfo, UsageInfo> infos)
+	public void addUsageInfo(Map<IServiceIdentifier, UsageInfo> infos)
 	{
+		System.out.println("received usage infos: "+infos);
 		for(UsageInfo info: infos.values())
 		{
-			// todo: store more than one value or unify results?!
-			usages.put(info.getServiceIdentifier(), info);
+			UsageInfo ui = usages.get(info.getServiceIdentifier());
+			if(ui!=null)
+			{
+				ui.integrateUsage(info);
+			}
+			else
+			{
+				usages.put(info.getServiceIdentifier(), info);
+			}
 		}
 	}
 	

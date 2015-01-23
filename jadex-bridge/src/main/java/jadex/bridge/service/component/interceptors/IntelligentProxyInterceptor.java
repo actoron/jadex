@@ -59,13 +59,13 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(sic.getMethod().getName().indexOf("methodA")!=-1)
-			System.out.println("methodA");
+//		if(sic.getMethod().getName().indexOf("methodA")!=-1)
+//			System.out.println("methodA");
 		
 		ITargetResolver tr = getTargetResolver(sic);
 		if(tr!=null && isRedirectable(sic))
 		{
-			System.out.println("redirecting call: "+sic.getMethod());
+//			System.out.println("redirecting call: "+sic.getMethod());
 			
 			tr.determineTarget(sid, ea)
 				.addResultListener(new ExceptionDelegationResultListener<IService, Void>(ret) 

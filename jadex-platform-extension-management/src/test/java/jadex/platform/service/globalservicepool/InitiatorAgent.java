@@ -221,7 +221,7 @@ public class InitiatorAgent extends TestAgent
 			
 			protected void callService(final ITestService ts)
 			{
-				int cnt = 10;
+				int cnt = 101;
 				
 				CounterResultListener<Void> lis = new CounterResultListener<Void>(cnt, new ExceptionDelegationResultListener<Void, TestReport>(ret)
 				{
@@ -235,11 +235,14 @@ public class InitiatorAgent extends TestAgent
 				
 				ts.methodA(0).addResultListener(lis);
 				
-				agent.waitForDelay(1000).get();
-				
-				for(int i=0; i<cnt-1; i++)
+				for(int i=0; i<10; i++)
 				{
-					ts.methodA(i+1).addResultListener(lis);
+					for(int j=0; j<10; j++)
+					{
+						ts.methodA(i*10+j).addResultListener(lis);
+					}
+					
+					agent.waitForDelay(10000).get();
 				}
 			}
 		});

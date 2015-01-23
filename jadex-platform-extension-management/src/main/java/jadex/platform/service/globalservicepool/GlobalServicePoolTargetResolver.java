@@ -5,7 +5,8 @@ import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.future.CallMultiplexer;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -15,7 +16,9 @@ import jadex.commons.future.IntermediateFuture;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.management.ServiceNotFoundException;
 
@@ -24,27 +27,41 @@ import javax.management.ServiceNotFoundException;
  *  global pool manager. 
  *  It has the purpose the direct the call to a suitable service worker
  *  from the queue of workers.
+ *  
+ *  The resolver is used by 
+ *  a) the RemoteMethodInvocationHandler in case of RMI calls
+ *  b) the IntelligentProxyInterceptor in case of local calls
+ *  
+ *  The ITargetResolver.TARGETRESOLVER constant is used by both
+ *  to determine the redirection target. 
  */
 public class GlobalServicePoolTargetResolver implements ITargetResolver
 {
+	//-------- attributes --------
+	
 	/** The cached target services. */
 	protected List<IService> services;
 	
 	/** The position counter. */
 	protected int position;
 	
-	/** The call multiplexer. */
-	protected CallMultiplexer cpex = new CallMultiplexer();
-	
 	/** The search future. Only one search at the same time. */
 	protected IIntermediateFuture<IService> searchfuture;
 	
+	/** The current usage info. */
+	protected Map<IServiceIdentifier, UsageInfo> usageinfos = new HashMap<IServiceIdentifier, UsageInfo>();
+	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Determine the target of a call.
+	 *  @param sid The service identifier of the original call.
+	 *  @param agent The external access.
+	 *  @return The new service that should be called instead of the original one.
 	 */
-	public IFuture<IService> determineTarget(IServiceIdentifier sid, IExternalAccess agent)
+	public IFuture<IService> determineTarget(final IServiceIdentifier sid, final IExternalAccess agent)
 	{
-		System.out.println("Called service pool resolver: "+sid+" "+(services==null? 0: services.size()));
+//		System.out.println("Called service pool resolver: "+sid+" "+(services==null? 0: services.size()));
 		final Future<IService> ret = new Future<IService>();
 		
 		// todo: update in certain intervals
@@ -54,7 +71,10 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 		{
 			if(position==services.size())
 				position = 0;
-			ret.setResult(services.get(position++));
+			IService ser = services.get(position++);
+			
+			reportUsage(ser, agent, sid);
+			ret.setResult(ser);
 		}
 		// case we have no services and search is not running -> start search
 		else if(services==null && searchfuture==null) // || timeout
@@ -70,6 +90,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 					services.add(result);
 					if(first)
 					{
+						reportUsage(result, agent, sid);
 						ret.setResult(result);
 						first = false;
 					}
@@ -108,6 +129,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				{
 					if(first)
 					{
+						reportUsage(result, agent, sid);
 						ret.setResult(result);
 						first = false;
 					}
@@ -139,12 +161,14 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 	}
 	
 	/**
-	 * 
+	 *  Search for services a call can be redirected to.
+	 *  Contacts the IGlobalPoolManagementService to get services.
 	 */
 	protected IIntermediateFuture<IService> searchServices(final IServiceIdentifier sid, final IExternalAccess agent)
 	{
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
+		// Fetch the global pools management service via its component id.
 		SServiceProvider.getService(agent.getServiceProvider(), sid.getProviderId(), IGlobalPoolManagementService.class)
 			.addResultListener(new IResultListener<IGlobalPoolManagementService>() 
 		{
@@ -167,7 +191,6 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 						ret.setException(exception);
 					}
 				});
-				
 			}
 			
 			public void exceptionOccurred(Exception exception) 
@@ -175,6 +198,51 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				ret.setException(exception);
 			}
 		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Save usage info and send it in certain intervals.
+	 */
+	protected IFuture<Void> reportUsage(IService ser, IExternalAccess agent, final IServiceIdentifier sid)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		UsageInfo ui = usageinfos.get(ser.getServiceIdentifier());
+		if(ui==null)
+		{
+			ui = new UsageInfo();
+			usageinfos.put(ser.getServiceIdentifier(), ui);
+			ui.setStartTime(System.currentTimeMillis());
+			ui.setUsages(1);
+			ret.setResult(null);
+		}
+		else
+		{
+			ui.setUsages(ui.getUsages()+1);
+			
+			// send a report every minute
+			long time = System.currentTimeMillis()-ui.getStartTime();
+			if(time>1000*60)
+			{
+				// normalize usage by / timeinterval
+				ui.setUsages(ui.getUsages()/(time/1000));
+			}
+			else
+			{
+				System.out.println("no reporting: "+time);
+			}
+			
+			SServiceProvider.getService(agent.getServiceProvider(), sid.getProviderId(), IGlobalPoolManagementService.class)
+				.addResultListener(new ExceptionDelegationResultListener<IGlobalPoolManagementService, Void>(ret) 
+			{
+				public void customResultAvailable(final IGlobalPoolManagementService pms) 
+				{
+					pms.sendUsageInfo(usageinfos).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
 		
 		return ret;
 	}
