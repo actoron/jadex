@@ -188,15 +188,20 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	 */
 	public IFuture<Void> sendUsageInfo(Map<IServiceIdentifier, UsageInfo> infos)
 	{
+		Future<Void> ret = new Future<Void>();
 		if(infos.size()>0)
 		{
 			IServiceIdentifier sid = infos.keySet().iterator().next();
 			ClassInfo type = sid.getServiceType();
 			Class<?> clazz = type.getType(agent.getClassLoader());
 			GlobalPoolServiceManager manager = managers.get(clazz);
-			manager.addUsageInfo(infos);
+			manager.addUsageInfo(infos).addResultListener(new DelegationResultListener<Void>(ret));
 		}
-		return IFuture.DONE;
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
 	}
 	
 	/**

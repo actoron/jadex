@@ -214,6 +214,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 		{
 			ui = new UsageInfo();
 			usageinfos.put(ser.getServiceIdentifier(), ui);
+			ui.setServiceIdentifier(ser.getServiceIdentifier());
 			ui.setStartTime(System.currentTimeMillis());
 			ui.setUsages(1);
 			ret.setResult(null);
@@ -226,22 +227,33 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 			long time = System.currentTimeMillis()-ui.getStartTime();
 			if(time>1000*60)
 			{
-				// normalize usage by / timeinterval
-				ui.setUsages(ui.getUsages()/(time/1000));
+				final Map<IServiceIdentifier, UsageInfo> uclone = new HashMap<IServiceIdentifier, UsageInfo>(usageinfos);
+				// Start collecting anew
+				usageinfos.clear();
+				
+				for(IServiceIdentifier sidi: usageinfos.keySet())
+				{
+					UsageInfo uii = uclone.get(sidi);
+					long span = System.currentTimeMillis()-ui.getStartTime();
+					// normalize usage by / timeinterval
+					uii.setUsages(uii.getUsages()/(span/1000));
+				}
+				
+				// send infos to global pool
+				SServiceProvider.getService(agent.getServiceProvider(), sid.getProviderId(), IGlobalPoolManagementService.class)
+					.addResultListener(new ExceptionDelegationResultListener<IGlobalPoolManagementService, Void>(ret) 
+				{
+					public void customResultAvailable(final IGlobalPoolManagementService pms) 
+					{
+						pms.sendUsageInfo(uclone).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
 			}
 			else
 			{
-				System.out.println("no reporting: "+time);
+//				System.out.println("no reporting: "+time);
+				ret.setResult(null);
 			}
-			
-			SServiceProvider.getService(agent.getServiceProvider(), sid.getProviderId(), IGlobalPoolManagementService.class)
-				.addResultListener(new ExceptionDelegationResultListener<IGlobalPoolManagementService, Void>(ret) 
-			{
-				public void customResultAvailable(final IGlobalPoolManagementService pms) 
-				{
-					pms.sendUsageInfo(usageinfos).addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
 		}
 		
 		return ret;

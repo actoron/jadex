@@ -1,7 +1,7 @@
 package jadex.platform.service.globalservicepool;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
@@ -9,8 +9,13 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -48,7 +53,10 @@ public class GlobalPoolServiceManager
 	//-------- attributes --------
 	
 	/** All services. */
-	protected Set<IService> allservices;
+	protected Map<IServiceIdentifier, IService> services;
+	
+	/** The worker timers. */
+	protected Map<IServiceIdentifier, ITimer> timers;
 	
 	/** The current set of platforms. */
 	protected Set<IComponentManagementService> allplatforms;
@@ -85,7 +93,8 @@ public class GlobalPoolServiceManager
 		this.component = component;
 		this.servicetype = servicetype;
 		this.componentname = componentname;
-		this.allservices = new HashSet<IService>();
+		this.services = new HashMap<IServiceIdentifier, IService>();
+		this.timers = new HashMap<IServiceIdentifier, ITimer>();
 		this.allplatforms = new HashSet<IComponentManagementService>();
 		this.freeplatforms = new HashSet<IComponentManagementService>();
 		this.info = info;
@@ -114,7 +123,8 @@ public class GlobalPoolServiceManager
 				if(!ser.getServiceIdentifier().getProviderId().equals(component.getComponentIdentifier()))
 				{
 					System.out.println("Added own global service pool worker: "+ser);
-					allservices.add(ser);
+					services.put(ser.getServiceIdentifier(), ser);
+					// currently no timer for own service pool?!
 				}
 //				else
 //				{
@@ -124,9 +134,9 @@ public class GlobalPoolServiceManager
 		}
 			
 		// If too few services are available try to create new ones
-		if(allservices.size()<numservices)
+		if(services.size()<numservices)
 		{
-			final List<IService> sers = new ArrayList<IService>(allservices);
+			final List<IService> sers = new ArrayList<IService>(services.values());
 			createServices(numservices).addResultListener(new IIntermediateResultListener<IService>() 
 			{
 				int cnt = 0;
@@ -168,7 +178,7 @@ public class GlobalPoolServiceManager
 		else
 		{
 			int cnt = 0;
-			List<IService> sers = new ArrayList<IService>(allservices);
+			List<IService> sers = new ArrayList<IService>(services.values());
 			Collections.sort(sers, new Comparator<IService>() 
 			{
 				public int compare(IService s1, IService s2) 
@@ -201,9 +211,14 @@ public class GlobalPoolServiceManager
 	 *  Add service usages.
 	 *  @param The usage infos per service class.
 	 */
-	public void addUsageInfo(Map<IServiceIdentifier, UsageInfo> infos)
+	public IFuture<Void> addUsageInfo(Map<IServiceIdentifier, UsageInfo> infos)
 	{
+		Future<Void> ret = new Future<Void>();
+		
 		System.out.println("received usage infos: "+infos);
+		
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(infos.size(), new DelegationResultListener<Void>(ret));
+		
 		for(UsageInfo info: infos.values())
 		{
 			UsageInfo ui = usages.get(info.getServiceIdentifier());
@@ -215,7 +230,20 @@ public class GlobalPoolServiceManager
 			{
 				usages.put(info.getServiceIdentifier(), info);
 			}
+			
+			// update timers of services
+			if(services.containsKey(info.getServiceIdentifier()))
+			{
+				updateWorkerTimer(info.getServiceIdentifier()).addResultListener(lis);
+			}
+			else
+			{
+				System.out.println("service not found: "+ui.getServiceIdentifier()+" "+services);
+				lis.resultAvailable(null);
+			}
 		}
+		
+		return ret;
 	}
 	
 	//-------- helper methods --------
@@ -356,19 +384,39 @@ public class GlobalPoolServiceManager
 									Future<IService> fut = (Future<IService>)SServiceProvider.getService(ea.getServiceProvider(), servicetype, RequiredServiceInfo.SCOPE_LOCAL);
 									fut.addResultListener(component.createResultListener(new IResultListener<IService>()
 									{
-										public void resultAvailable(IService ser)
+										public void resultAvailable(final IService ser)
 										{
-											allservices.add(ser);
-											ret.addIntermediateResult(ser);
-											if(++created[0]==n || created[0]==creating[0] && fini)
+											services.put(ser.getServiceIdentifier(), ser);
+											updateWorkerTimer(ser.getServiceIdentifier()).addResultListener(new IResultListener<Void>() 
 											{
-												ret.setFinished();
-											}
+												public void resultAvailable(Void result) 
+												{
+													// added in updateWorkerTimer
+													ret.addIntermediateResult(ser);
+													if(++created[0]==n || created[0]==creating[0] && fini)
+													{
+														ret.setFinished();
+													}
+												}
+												
+												public void exceptionOccurred(Exception exception) 
+												{
+													exception.printStackTrace();
+													if(created[0]++==n)
+													{
+														ret.setFinished();
+													}
+												}
+											});
 										}
 
 										public void exceptionOccurred(Exception exception) 
 										{
 											exception.printStackTrace();
+											if(created[0]++==n)
+											{
+												ret.setFinished();
+											}
 										}
 									}));
 								}
@@ -376,6 +424,10 @@ public class GlobalPoolServiceManager
 								public void exceptionOccurred(Exception exception)
 								{
 									exception.printStackTrace();
+									if(created[0]++==n)
+									{
+										ret.setFinished();
+									}
 								}
 							}));
 						};
@@ -421,32 +473,36 @@ public class GlobalPoolServiceManager
 	}
 	
 	
-//	/**
-//	 *  Update the worker timer by:
-//	 *  - creating a timer (if timeout)
-//	 *  - updating the service pool entry for the service (service, timer)
-//	 */
-//	protected IFuture<Void> updateWorkerTimer(final IService service)
-//	{
-//		assert component.isComponentThread();
-//		final IInternalAccess inta = component;
-//		
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		if(strategy.getWorkerTimeout()>0)// && false)
-//		{
-//			// Add service with timer to pool
-//			createTimer(strategy.getWorkerTimeout(), new ITimedObject()
-//			{
-//				public void timeEventOccurred(long currenttime)
-//				{
-//					inta.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-//					{
-//						public IFuture<Void> execute(IInternalAccess ia)
-//						{
-//							// When timer triggers check that pool contains service and remove it
-//							if(idleservices.containsKey(service))
-//							{
+	/**
+	 *  Update the worker timer by:
+	 *  - creating a timer (if timeout)
+	 *  - updating the service pool entry for the service (service, timer)
+	 */
+	protected IFuture<Void> updateWorkerTimer(final IServiceIdentifier sid)
+	{
+		assert component.isComponentThread();
+		final IInternalAccess inta = component;
+		
+		final Future<Void> ret = new Future<Void>();
+		
+		long workerto = 1000*60*2; // default 2 min
+		
+		if(workerto>0)// && false)
+		{
+			// Add service with timer to pool
+			createTimer(workerto, new ITimedObject()
+			{
+				public void timeEventOccurred(long currenttime)
+				{
+					inta.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							// When timer triggers check that pool contains service and remove it
+							if(services.containsKey(sid))
+							{
+								return removeService(sid); //.addResultListener(new DelegationResultListener<Void>(ret));
+								
 //								boolean remove = strategy.workerTimeoutOccurred();
 //								if(remove)
 //								{
@@ -465,41 +521,41 @@ public class GlobalPoolServiceManager
 //										}
 //									});
 //								}
-//							}
-////							else
-////							{
-////								System.out.println("timer occurred but service not in pool: "+service+" "+servicepool);
-////							}
-//							return IFuture.DONE;
-//						}
-//					});
-//				}
-//			}).addResultListener(new ExceptionDelegationResultListener<ITimer, Void>(ret)
-//			{
-//				public void customResultAvailable(ITimer timer)
-//				{
-//					idleservices.put(service, timer);
-//					ret.setResult(null);
-//				}
-//				
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					super.exceptionOccurred(exception);
-//				}
-//			});
-//		}
-//		else
-//		{
+							}
+							else
+							{
+								System.out.println("timer occurred but service not in pool: "+sid+" "+services);
+								return IFuture.DONE;
+							}
+						}
+					});
+				}
+			}).addResultListener(new ExceptionDelegationResultListener<ITimer, Void>(ret)
+			{
+				public void customResultAvailable(ITimer timer)
+				{
+					// remember timer
+					System.out.println("Updated worker timer: "+sid);
+					ITimer oldt = timers.put(sid, timer);
+					if(oldt!=null)
+						oldt.cancel();
+					ret.setResult(null);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
 //			idleservices.put(service, null);
-//		}
-//		
-//		return ret;
-//	}
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Remove a service and the worker.
 	 */
-	protected IFuture<Void> removeService(final IService service)
+	protected IFuture<Void> removeService(final IServiceIdentifier sid)
 	{
 		assert component.isComponentThread();
 
@@ -507,7 +563,7 @@ public class GlobalPoolServiceManager
 		
 		final IInternalAccess inta = component;
 		
-		final IComponentIdentifier workercid = service.getServiceIdentifier().getProviderId();
+		final IComponentIdentifier workercid = sid.getProviderId();
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
 		
@@ -518,9 +574,9 @@ public class GlobalPoolServiceManager
 		{
 			public void customResultAvailable(Map<String, Object> result) 
 			{
-//				System.out.println("removed worker: "+workercid);
+				System.out.println("removed worker: "+workercid);
 //				System.out.println("strategy state: "+strategy);
-				allservices.remove(service);
+				services.remove(sid);
 				ret.setResult(null);
 			}
 		}));
@@ -528,57 +584,22 @@ public class GlobalPoolServiceManager
 		return ret;
 	}
 	
-//	/**
-//	 *  Get the clockservice (cached).
-//	 */
-//	protected IFuture<IClockService> getClockService()
-//	{
-//		final Future<IClockService> ret = new Future<IClockService>();
-//		
-//		if(clock!=null)
-//		{
-//			ret.setResult(clock);
-//		}
-//		else
-//		{
-//			SServiceProvider.getService((IServiceProvider)component.getServiceContainer(), 
-//				IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				.addResultListener(new DelegationResultListener<IClockService>(ret)
-//			{
-//				public void customResultAvailable(IClockService cs)
-//				{
-//					assert component.isComponentThread();
-//
-//					clock = cs;
-//					ret.setResult(clock);
-//				}
-//			});
-//		}
-//		
-//		return ret;
-//	}
-	
-//	/**
-//	 *  Create a timer via the clock service.
-//	 */
-//	protected IFuture<ITimer> createTimer(final long delay, final ITimedObject to)
-//	{
-//		assert component.isComponentThread();
-//
-////		System.out.println("create timer");
-//		
-//		final Future<ITimer> ret = new Future<ITimer>();
-//		
-//		getClockService().addResultListener(new ExceptionDelegationResultListener<IClockService, ITimer>(ret)
-//		{
-//			public void customResultAvailable(IClockService cs)
-//			{
-//				ret.setResult(cs.createTimer(delay, to));
-//			}
-//		});
-//		
-//		return ret;
-//	}
+	/**
+	 *  Create a timer via the clock service.
+	 */
+	protected IFuture<ITimer> createTimer(final long delay, final ITimedObject to)
+	{
+		assert component.isComponentThread();
+
+//		System.out.println("create timer");
+		
+		final Future<ITimer> ret = new Future<ITimer>();
+		
+		IClockService cs = SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		ret.setResult(cs.createTimer(delay, to));
+		
+		return ret;
+	}
 
 //	/**
 //	 *  Get the string representation.
