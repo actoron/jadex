@@ -122,7 +122,7 @@ public class GlobalPoolServiceManager
 			{
 				if(!ser.getServiceIdentifier().getProviderId().equals(component.getComponentIdentifier()))
 				{
-					System.out.println("Added own global service pool worker: "+ser);
+//					System.out.println("Added own global service pool worker: "+ser);
 					services.put(ser.getServiceIdentifier(), ser);
 					// currently no timer for own service pool?!
 				}
@@ -301,10 +301,10 @@ public class GlobalPoolServiceManager
 						freeplatforms.add(cms);
 						ret.addIntermediateResult(cms);
 					}
-					else
-					{
-						System.out.println("Excluding platform hosting the global pool: "+cms);
-					}
+//					else
+//					{
+//						System.out.println("Excluding platform hosting the global pool: "+cms);
+//					}
 				}
 
 				public void finished() 
@@ -356,7 +356,7 @@ public class GlobalPoolServiceManager
 //					ci.setImports(component.getModel().getAllImports());
 //					ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
 					
-					CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
+					CreationInfo ci  = new CreationInfo(); // info!=null? new CreationInfo(info): 
 	//				ci.setParent(((IService)cms).getServiceIdentifier().getProviderId().getRoot());
 					ci.setImports(component.getModel().getAllImports());
 //					ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});

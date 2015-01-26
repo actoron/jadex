@@ -69,9 +69,9 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 		// Case that we have services -> just pick one
 		if(services!=null && services.size()>0)
 		{
+			IService ser = services.get(position++);
 			if(position==services.size())
 				position = 0;
-			IService ser = services.get(position++);
 			
 			reportUsage(ser, agent, sid);
 			ret.setResult(ser);
@@ -137,6 +137,8 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				
 				public void finished() 
 				{
+					System.out.println("received services: "+services);
+					
 					if(!ret.isDone())
 						ret.setException(new ServiceNotFoundException());
 				}
