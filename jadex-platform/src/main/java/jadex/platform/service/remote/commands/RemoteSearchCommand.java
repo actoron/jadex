@@ -69,6 +69,9 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	/** The filter. */
 	protected IRemoteFilter<IService> filter;
 	
+	/** The caller. */
+	protected IComponentIdentifier caller;
+	
 	//-------- constructors --------
 	
 	/**
@@ -78,24 +81,11 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	{
 	}
 
-//	/**
-//	 *  Create a new remote search command.
-//	 */
-//	public RemoteSearchCommand(IComponentIdentifier providerid, ISearchManager manager, 
-//		IVisitDecider decider, IResultSelector selector, String callid)
-//	{
-//		this.providerid = providerid;
-//		this.manager = manager;
-//		this.decider = decider;
-//		this.selector = selector;
-//		this.callid = callid;
-//	}
-	
 	/**
 	 *  Create a new remote search command.
 	 */
 	public RemoteSearchCommand(IComponentIdentifier providerid, Class<?> type, 
-		boolean multiple, String scope, String callid, IRemoteFilter<IService> filter)
+		boolean multiple, String scope, String callid, IRemoteFilter<IService> filter, IComponentIdentifier caller)
 	{
 		if(type==null)
 			System.out.println("type is null");
@@ -106,6 +96,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 		this.scope = scope;
 		this.callid = callid;
 		this.filter = filter;
+		this.caller	= caller;
 	}
 
 	//-------- methods --------
@@ -572,6 +563,14 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	public void setCallId(String callid)
 	{
 		this.callid = callid;
+	}
+
+	/**
+	 *  Get the sender component (if other than rms).
+	 */
+	public IComponentIdentifier getSender()
+	{
+		return caller;
 	}
 
 	/**

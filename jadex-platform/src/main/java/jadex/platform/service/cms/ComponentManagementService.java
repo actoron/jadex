@@ -3289,20 +3289,20 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			public void customResultAvailable(IRemoteServiceManagementService rms)
 			{
-				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, null)
+				rms.getServiceProxy(agent.getComponentIdentifier(), cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, null)
 					.addResultListener(createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
 					{
-						public void customResultAvailable(Object result)
-						{
-							if(!(result instanceof IComponentManagementService))
-								System.out.println("aaaa");
-							super.customResultAvailable(result);
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-							super.exceptionOccurred(exception);
-						}
-					}));
+						if(!(result instanceof IComponentManagementService))
+							System.out.println("aaaa");
+						super.customResultAvailable(result);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						super.exceptionOccurred(exception);
+					}
+				}));
 			}
 		}));
 		

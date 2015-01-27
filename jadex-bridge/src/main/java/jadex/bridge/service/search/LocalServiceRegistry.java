@@ -437,6 +437,7 @@ public class LocalServiceRegistry
 	public synchronized <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IRemoteFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
+		final IComponentIdentifier	lcid	= IComponentIdentifier.LOCAL.get();
 		
 		searchService(type, cid, RequiredServiceInfo.SCOPE_PLATFORM, filter).addResultListener(new IResultListener<T>()
 		{
@@ -447,7 +448,7 @@ public class LocalServiceRegistry
 
 			public void exceptionOccurred(Exception exception)
 			{
-				searchRemoteService(type, filter).addResultListener(new DelegationResultListener<T>(ret));
+				searchRemoteService(lcid, type, filter).addResultListener(new DelegationResultListener<T>(ret));						
 			}
 		});
 		
@@ -457,10 +458,9 @@ public class LocalServiceRegistry
 	/**
 	 *  Search for services.
 	 */
-	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IRemoteFilter<T> filter)
+	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(final Class<T> type, IComponentIdentifier cid, final IRemoteFilter<T> filter)
 	{
 //		System.out.println("Search global services: "+type);
-		
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		
 		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, true, new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
@@ -489,7 +489,7 @@ public class LocalServiceRegistry
 			}
 		});
 		
-		searchRemoteServices(type, filter).addResultListener(new IntermediateDefaultResultListener<T>()
+		searchRemoteServices(IComponentIdentifier.LOCAL.get(), type, filter).addResultListener(new IntermediateDefaultResultListener<T>()
 		{
 			public void intermediateResultAvailable(T result)
 			{
@@ -635,10 +635,11 @@ public class LocalServiceRegistry
 	
 	/**
 	 *  Search for services on remote platforms.
+	 *  @param caller	The component that started the search.
 	 *  @param type The type.
-	 *  @param scope The scope.
+	 *  @param filter The filter.
 	 */
-	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final Class<T> type, final IRemoteFilter<T> filter)
+	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final IComponentIdentifier caller, final Class<T> type, final IRemoteFilter<T> filter)
 	{
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		// Must not find services twice (e.g. having two proxies for the same platform)
@@ -666,7 +667,7 @@ public class LocalServiceRegistry
 						public void resultAvailable(IComponentIdentifier rcid)
 						{
 							IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);	
-							IFuture<Collection<T>> rsers = rms.getServiceProxies(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+							IFuture<Collection<T>> rsers = rms.getServiceProxies(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 							rsers.addResultListener(new IResultListener<Collection<T>>()
 							{
 								public void resultAvailable(Collection<T> result)
@@ -727,7 +728,7 @@ public class LocalServiceRegistry
 	 *  @param type The type.
 	 *  @param scope The scope.
 	 */
-	protected <T> IFuture<T> searchRemoteService(final Class<T> type, final IRemoteFilter<T> filter)
+	protected <T> IFuture<T> searchRemoteService(final IComponentIdentifier caller, final Class<T> type, final IRemoteFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -753,7 +754,7 @@ public class LocalServiceRegistry
 						public void resultAvailable(IComponentIdentifier rcid)
 						{
 							IRemoteServiceManagementService rms = getService(IRemoteServiceManagementService.class);	
-							IFuture<T> rsers = rms.getServiceProxy(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+							IFuture<T> rsers = rms.getServiceProxy(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 							rsers.addResultListener(new IResultListener<T>()
 							{
 								public void resultAvailable(T result)
@@ -805,7 +806,7 @@ public class LocalServiceRegistry
 	 */
 	protected Set<IService> getServices(Class<?> type)
 	{
-		Set<IService> ret = Collections.EMPTY_SET;;
+		Set<IService> ret = Collections.emptySet();
 		if(services!=null)
 		{
 			if(type!=null)
@@ -821,6 +822,7 @@ public class LocalServiceRegistry
 				}
 			}
 		}
+		
 		return ret;
 	}
 	

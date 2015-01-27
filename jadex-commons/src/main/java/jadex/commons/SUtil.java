@@ -4036,8 +4036,17 @@ public class SUtil
 	 */
 	public static String getMacAddress()
 	{
-		String[] ret = getMacAddresses();
-		return ret!=null && ret.length>0 ? ret[0] : null;
+		String[] adrs = getMacAddresses();
+		String	ret	= null;
+		for(int i=0; ret==null && i<adrs.length; i++)
+		{
+			// Use first real, i.e. non-tunnel, mac address
+			if(!"[0, 0, 0, 0, 0, 0, 0, -32]".equals(adrs[i]))
+			{
+				ret	= adrs[i];
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -4484,11 +4493,10 @@ public class SUtil
 		try
 		{
 			String	path	= f.getCanonicalPath();
-			String	ret	= hashes.get(path);
+			String	hash	= hashes.get(path);
 			
-			if(ret==null && f.exists())
+			if(hash==null && f.exists())
 			{
-				String	hash;
 				long	start	= System.nanoTime();
 				MessageDigest md = MessageDigest.getInstance("SHA-512");
 				if(f.isDirectory())
@@ -4506,7 +4514,7 @@ public class SUtil
 						while(en.hasMoreElements())
 						{
 							ZipEntry	ze	= en.nextElement();
-							if(!ze.isDirectory())
+							if(!ze.isDirectory() && !ze.getName().startsWith("META-INF/"))
 							{
 								entries.add(ze);
 							}
@@ -4538,7 +4546,7 @@ public class SUtil
 				hashes.put(path, hash);
 			}
 			
-			return ret;
+			return hash;
 		}
 		catch(Exception e)
 		{
@@ -4556,7 +4564,7 @@ public class SUtil
 		Arrays.sort(files);
 		for(File f: files)
 		{
-			if(f.isDirectory())
+			if(f.isDirectory() && !(dir.getName().equals("META-INF") && dir.getParentFile().getAbsolutePath().equals(root)))
 			{
 				hashDirectory(root, f, md);
 			}
