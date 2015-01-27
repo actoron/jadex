@@ -357,11 +357,17 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									public void resultAvailable(Void v)
 									{
 										final Map reply = createReply(msg, mt);
-										if(rid[0]!=null && rid[0].getGlobalIdentifier()!=null)
+										
+										if((""+result).indexOf("RemoteSearchCommand")!=-1 && (""+result).indexOf("IServiceCallService")!=-1)
 										{
-//											System.out.println("rid: "+rid+" "+result.getClass());
-											reply.put(SFipa.X_RID, rid[0]);
+											System.out.println("sdhkl");
 										}
+										
+//										if(rid[0]!=null && rid[0].getGlobalIdentifier()!=null)
+//										{
+////											System.out.println("rid: "+rid+" "+result.getClass());
+//											reply.put(SFipa.X_RID, rid[0]);
+//										}
 //										else
 //										{
 //											System.out.println("no rid: "+result.getClass());

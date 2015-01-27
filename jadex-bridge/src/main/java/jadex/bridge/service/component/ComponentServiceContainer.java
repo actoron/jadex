@@ -28,7 +28,6 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
-import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.SReflect;
 import jadex.commons.collection.ILRUEntryCleaner;
@@ -523,7 +522,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			{
 				public void customResultAvailable(IRemoteServiceManagementService rms)
 				{
-					rms.getServiceProxy(cid, type, RequiredServiceInfo.SCOPE_LOCAL, null)
+					rms.getServiceProxy(instance.getComponentIdentifier(), cid, type, RequiredServiceInfo.SCOPE_LOCAL, null)
 						.addResultListener(new DelegationResultListener<T>(fut)
 					{
 						public void customResultAvailable(T result)

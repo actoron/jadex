@@ -4514,7 +4514,7 @@ public class SUtil
 						while(en.hasMoreElements())
 						{
 							ZipEntry	ze	= en.nextElement();
-							if(!ze.isDirectory())
+							if(!ze.isDirectory() && !ze.getName().startsWith("META-INF/"))
 							{
 								entries.add(ze);
 							}
@@ -4564,7 +4564,7 @@ public class SUtil
 		Arrays.sort(files);
 		for(File f: files)
 		{
-			if(f.isDirectory())
+			if(f.isDirectory() && !(dir.getName().equals("META-INF") && dir.getParentFile().getAbsolutePath().equals(root)))
 			{
 				hashDirectory(root, f, md);
 			}
