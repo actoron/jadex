@@ -443,12 +443,13 @@ public abstract class TestAgent
 			{
 				public void customResultAvailable(final IExternalAccess exta)
 				{
+					System.out.println("creating platform: "+cnt);
 					CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(platforms.size()*2, new DelegationResultListener<Void>(ret)
 					{
 						public void customResultAvailable(Void result) 
 						{
 							platforms.add(exta);
-							setupRemotePlatforms(n+1, cnt, platforms).addResultListener(new DelegationResultListener<Void>(ret));
+							setupRemotePlatforms(n, cnt+1, platforms).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					});
 					

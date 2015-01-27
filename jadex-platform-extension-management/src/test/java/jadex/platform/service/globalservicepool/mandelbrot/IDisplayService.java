@@ -1,0 +1,27 @@
+package jadex.platform.service.globalservicepool.mandelbrot;
+
+import jadex.bridge.service.annotation.Timeout;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+
+/**
+ *  Service for displaying the result of a calculation. 
+ */
+public interface IDisplayService
+{
+	/**
+	 *  Display the result of a calculation.
+	 */
+	public IFuture<Void> displayResult(AreaData result);
+
+	/**
+	 *  Display intermediate calculation results.
+	 */
+	public IFuture<Void> displayIntermediateResult(ProgressData progress);
+	
+	/**
+	 *  Subscribe to display events.
+	 */
+	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid);
+}

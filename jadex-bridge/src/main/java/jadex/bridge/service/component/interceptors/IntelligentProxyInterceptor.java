@@ -4,7 +4,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.annotation.TargetResolver;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.SReflect;
@@ -60,13 +59,13 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(sic.getMethod().getName().indexOf("methodA")!=-1)
-			System.out.println("methodA");
+//		if(sic.getMethod().getName().indexOf("methodA")!=-1)
+//			System.out.println("methodA");
 		
 		ITargetResolver tr = getTargetResolver(sic);
 		if(tr!=null && isRedirectable(sic))
 		{
-			System.out.println("redirecting call: "+sic.getMethod());
+//			System.out.println("redirecting call: "+sic.getMethod());
 			
 			tr.determineTarget(sid, ea)
 				.addResultListener(new ExceptionDelegationResultListener<IService, Void>(ret) 
@@ -125,10 +124,10 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 				ser = (IService)service;
 			}
 			
-			if(ser.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITestService")!=-1)
-				System.out.println("reached");
+//			if(ser.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITestService")!=-1)
+//				System.out.println("reached");
 			
-			Class<ITargetResolver> cl = (Class<ITargetResolver>)ser.getPropertyMap().get(TargetResolver.TARGETRESOLVER);
+			Class<ITargetResolver> cl = (Class<ITargetResolver>)ser.getPropertyMap().get(ITargetResolver.TARGETRESOLVER);
 			if(cl!=null)
 			{
 				try

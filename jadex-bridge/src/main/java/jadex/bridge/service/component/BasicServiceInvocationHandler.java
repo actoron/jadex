@@ -489,8 +489,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service,
 		boolean realtime, ProvidedServiceInfo info, IResultCommand<Object, Class<?>> componentfetcher, String scope)
 	{
-		if(type.getName().indexOf("ITestService")!=-1 && ia.getComponentIdentifier().getName().startsWith("Global"))
-			System.out.println("gaga");
+//		if(type.getName().indexOf("ITestService")!=-1 && ia.getComponentIdentifier().getName().startsWith("Global"))
+//			System.out.println("gaga");
 		
 		Map<String, Object> serprops = new HashMap<String, Object>();
 		if(info != null && info.getProperties() != null)

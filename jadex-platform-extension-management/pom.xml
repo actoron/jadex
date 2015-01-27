@@ -51,6 +51,11 @@
 			<artifactId>jadex-platform</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+			<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-tools-base-swing</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 		    <groupId>commons-daemon</groupId>
 		    <artifactId>commons-daemon</artifactId>
