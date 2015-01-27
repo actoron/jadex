@@ -7,6 +7,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  The global pool management service is exposed by the global pool
@@ -19,7 +20,7 @@ public interface IGlobalPoolManagementService
 	 *  @param type The service type.
 	 *  @return A number of services from the pool.
 	 */
-	public IIntermediateFuture<IService> getPoolServices(ClassInfo type);
+	public IIntermediateFuture<IService> getPoolServices(ClassInfo type, Set<IServiceIdentifier> brokens);
 
 	/**
 	 *  Inform about service usage.

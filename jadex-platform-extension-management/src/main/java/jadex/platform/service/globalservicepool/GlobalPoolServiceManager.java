@@ -23,6 +23,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.platform.service.servicepool.PoolServiceInfo;
@@ -37,6 +38,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.omg.CORBA.FREE_MEM;
 
 /**
  *  The pool manager handles the pool resources.
@@ -54,15 +57,16 @@ public class GlobalPoolServiceManager
 	
 	/** All services. */
 	protected Map<IServiceIdentifier, IService> services;
+	protected Map<IServiceIdentifier, IService> onholds;
 	
 	/** The worker timers. */
 	protected Map<IServiceIdentifier, ITimer> timers;
 	
 	/** The current set of platforms. */
-	protected Set<IComponentManagementService> allplatforms;
+	protected Map<IComponentIdentifier, IComponentManagementService> platforms;
 	
 	/** The current set of free platforms. */
-	protected Set<IComponentManagementService> freeplatforms;
+	protected Map<IComponentIdentifier, IComponentManagementService> freeplatforms;
 
 	/** The component. */
 	protected IInternalAccess component;
@@ -94,9 +98,10 @@ public class GlobalPoolServiceManager
 		this.servicetype = servicetype;
 		this.componentname = componentname;
 		this.services = new HashMap<IServiceIdentifier, IService>();
+		this.onholds = new HashMap<IServiceIdentifier, IService>();
 		this.timers = new HashMap<IServiceIdentifier, ITimer>();
-		this.allplatforms = new HashSet<IComponentManagementService>();
-		this.freeplatforms = new HashSet<IComponentManagementService>();
+		this.platforms = new HashMap<IComponentIdentifier, IComponentManagementService>();
+		this.freeplatforms = new HashMap<IComponentIdentifier, IComponentManagementService>();
 		this.info = info;
 		this.numservices = numservices;
 		this.usages = new HashMap<IServiceIdentifier, UsageInfo>();
@@ -110,7 +115,7 @@ public class GlobalPoolServiceManager
 	 *  @return A number of services from the pool.
 	 */
 	// todo: select service using some metrics how often it gets used (or is utilized)
-	public IIntermediateFuture<IService> getPoolServices(Class<?> type)
+	public IIntermediateFuture<IService> getPoolServices(Class<?> type, Set<IServiceIdentifier> brokens)
 	{
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
@@ -132,12 +137,32 @@ public class GlobalPoolServiceManager
 //				}
 			}
 		}
-			
+
+		// Move potentially broken services to onhold
+		if(brokens!=null)
+		{
+			for(IServiceIdentifier broken: brokens)
+			{
+				IService ser = services.remove(broken);
+				if(ser!=null)
+				{
+					System.out.println("Potentially broken service on hold: "+broken);
+					onholds.put(broken, ser);
+					IComponentManagementService cms = platforms.get(broken.getProviderId().getRoot());
+					if(cms!=null)
+					{
+						System.out.println("adding free broken: "+broken.getProviderId().getRoot());
+						freeplatforms.put(broken.getProviderId().getRoot(), cms);
+					}
+				}
+			}
+		}
+
 		// If too few services are available try to create new ones
 		if(services.size()<numservices)
 		{
 			final List<IService> sers = new ArrayList<IService>(services.values());
-			createServices(numservices).addResultListener(new IIntermediateResultListener<IService>() 
+			createServices(numservices-services.size()).addResultListener(new IIntermediateResultListener<IService>() 
 			{
 				int cnt = 0;
 				public void intermediateResultAvailable(IService result) 
@@ -178,7 +203,9 @@ public class GlobalPoolServiceManager
 		else
 		{
 			int cnt = 0;
-			List<IService> sers = new ArrayList<IService>(services.values());
+			final List<IService> sers = new ArrayList<IService>(services.values());
+			
+			// Sort according to usage info
 			Collections.sort(sers, new Comparator<IService>() 
 			{
 				public int compare(IService s1, IService s2) 
@@ -254,20 +281,33 @@ public class GlobalPoolServiceManager
 	 */
 	protected ITerminableIntermediateFuture<IComponentManagementService> getPlatforms()
 	{
-		if(allplatforms!=null && allplatforms.size()>0)
+		TerminableIntermediateFuture<IComponentManagementService> ret = new TerminableIntermediateFuture<IComponentManagementService>();
+		if(platforms!=null && platforms.size()>0)
 		{
-			TerminableIntermediateFuture<IComponentManagementService> ret = new TerminableIntermediateFuture<IComponentManagementService>();
-			for(IComponentManagementService cms: allplatforms)
+			for(IComponentManagementService cms: platforms.values())
 			{
 				ret.addIntermediateResult(cms);
 			}
 			ret.setFinished();
-			return ret;
 		}
 		else
 		{
-			return SServiceProvider.getServices((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+			SServiceProvider.getServices((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				.addResultListener(new IntermediateDelegationResultListener<IComponentManagementService>(ret)
+			{
+				public void customIntermediateResultAvailable(IComponentManagementService cms) 
+				{
+					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
+					if(!platforms.containsKey(cid))
+					{
+						platforms.put(cid, cms);
+						super.customIntermediateResultAvailable(cms);
+					}
+				}
+			});
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -282,9 +322,9 @@ public class GlobalPoolServiceManager
 		
 		if(freeplatforms!=null && freeplatforms.size()>0)
 		{
-			for(IComponentManagementService cms: freeplatforms)
+			for(IComponentManagementService cms: freeplatforms.values())
 			{
-//				System.out.println("found free platform1: "+cms);
+				System.out.println("found free platform1: "+cms);
 				ret.addIntermediateResult(cms);
 			}
 			ret.setFinished();
@@ -295,10 +335,12 @@ public class GlobalPoolServiceManager
 			{
 				public void intermediateResultAvailable(IComponentManagementService cms) 
 				{
-					if(!((IService)cms).getServiceIdentifier().getProviderId().getRoot().equals(component.getComponentIdentifier().getRoot()))
+					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
+					if(!((IService)cms).getServiceIdentifier().getProviderId().getRoot().equals(component.getComponentIdentifier().getRoot())
+						&& !freeplatforms.containsKey(cid))
 					{
-//						System.out.println("found free platform2: "+cms);
-						freeplatforms.add(cms);
+						System.out.println("found free platform2: "+cid+" "+platforms);
+						freeplatforms.put(cid, cms);
 						ret.addIntermediateResult(cms);
 					}
 //					else
@@ -346,22 +388,17 @@ public class GlobalPoolServiceManager
 			boolean fini = false;
 			public void intermediateResultAvailable(final IComponentManagementService cms) 
 			{
-				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot());
+				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot()+" "+freeplatforms);
+				
 				if(creating[0]++<n)
 				{
-					freeplatforms.remove(cms);
-					
-//					CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
-//	//				ci.setParent(((IService)cms).getServiceIdentifier().getProviderId().getRoot());
-//					ci.setImports(component.getModel().getAllImports());
-//					ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
+					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
+					freeplatforms.remove(cid);
+					System.out.println("free are: "+freeplatforms+" "+cid);
 					
 					CreationInfo ci  = new CreationInfo(); // info!=null? new CreationInfo(info): 
-	//				ci.setParent(((IService)cms).getServiceIdentifier().getProviderId().getRoot());
 					ci.setImports(component.getModel().getAllImports());
-//					ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
 					
-//					PoolServiceInfo[] psi = new PoolServiceInfo[]{};
 					PoolServiceInfo psi = new PoolServiceInfo(componentname, servicetype);
 					if(info!=null && info.getArguments()!=null)
 						psi.setArguments(info.getArguments());

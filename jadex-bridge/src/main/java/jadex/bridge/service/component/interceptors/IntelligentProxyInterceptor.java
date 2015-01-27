@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.IService;
@@ -11,11 +12,13 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * 
+ *  Interceptor for realizing intelligent proxies. These proxies
+ *  are used e.g. by a global service pool to dynamically redirect service calls.
  */ 
 public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 {
@@ -32,7 +35,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 	
 	protected final static ITargetResolver NULL = new ITargetResolver() 
 	{
-		public IFuture<IService> determineTarget(IServiceIdentifier sid, IExternalAccess agent) 
+		public IFuture<IService> determineTarget(IServiceIdentifier sid, IExternalAccess agent, IServiceIdentifier broken) 
 		{
 			return null;
 		}
@@ -66,35 +69,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 		if(tr!=null && isRedirectable(sic))
 		{
 //			System.out.println("redirecting call: "+sic.getMethod());
-			
-			tr.determineTarget(sid, ea)
-				.addResultListener(new ExceptionDelegationResultListener<IService, Void>(ret) 
-			{
-				public void customResultAvailable(IService ser) 
-				{
-					try
-					{
-						Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
-						sic.setResult(res);
-						ret.setResult(null);
-					}
-					catch(Exception e)
-					{
-						Throwable t	= e instanceof InvocationTargetException
-							? ((InvocationTargetException)e).getTargetException() : e;
-						Exception re = t instanceof Exception ? (Exception)t : new RuntimeException(t);
-						
-						if(sic.getMethod().getReturnType().equals(IFuture.class))
-						{
-							sic.setResult(new Future(re));
-						}
-						else
-						{
-							throw re instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
-						}
-					}
-				}
-			});
+			invoke(null, sic, 3, 0).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
@@ -104,6 +79,89 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 		return ret;
 	}
 
+	/**
+	 * 
+	 */
+	protected IFuture<Void> invoke(final IServiceIdentifier broken, final ServiceInvocationContext sic, final int maxretries, final int cnt)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+//		System.out.println("Intelligent proxy called: "+broken+" "+cnt);
+		tr.determineTarget(sid, ea, broken)
+			.addResultListener(new ExceptionDelegationResultListener<IService, Void>(ret) 
+		{
+			public void customResultAvailable(final IService ser) 
+			{
+//				System.out.println("invoking on: "+ser.getServiceIdentifier()+" "+cnt);
+				try
+				{
+					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
+					if(res instanceof IFuture)
+					{
+						((IFuture)res).addResultListener(new IResultListener() 
+						{
+							public void resultAvailable(Object result) 
+							{
+								sic.setResult(res);
+								ret.setResult(null);
+							}
+							
+							public void exceptionOccurred(Exception exception) 
+							{
+								if(exception instanceof ComponentNotFoundException)
+								{
+									if(cnt<maxretries)
+									{
+										// Invoke again and rebind service
+										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
+										invoke(ser.getServiceIdentifier(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									else
+									{
+										sic.setResult(res);
+										ret.setResult(null);
+									}
+								}
+							}
+						});
+					}
+					else
+					{
+						sic.setResult(res);
+						ret.setResult(null);
+					}
+				}
+				catch(Exception e)
+				{
+					System.out.println("Intelli execption: "+e);
+					Exception res = handleException(e);
+					if(sic.getMethod().getReturnType().equals(IFuture.class))
+					{
+						sic.setResult(new Future(res));
+					}
+					else
+					{
+						throw res instanceof RuntimeException ? (RuntimeException)res : new RuntimeException(res);
+					}
+					ret.setResult(null);
+				}
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected static Exception handleException(Exception e)
+	{
+		Throwable t	= e instanceof InvocationTargetException
+			? ((InvocationTargetException)e).getTargetException() : e;
+		Exception re = t instanceof Exception ? (Exception)t : new RuntimeException(t);
+		return re;
+	}
+	
 	/**
 	 *  Get the target resolver.
 	 *  @return The target resolver.
@@ -161,12 +219,65 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 	/**
 	 * 
 	 */
-	protected boolean isRedirectable(ServiceInvocationContext sic)
+	public static boolean isRedirectable(ServiceInvocationContext sic)
 	{
 		return !ResolveInterceptor.SERVICEMETHODS.contains(sic.getMethod()) 
 			&& !ResolveInterceptor.START_METHOD.equals(sic.getMethod()) 
 			&& !ResolveInterceptor.SHUTDOWN_METHOD.equals(sic.getMethod())
 			&& !ValidationInterceptor.ALWAYSOK.contains(sic.getMethod())
 			&& SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType());
+	}
+	
+	/**
+	 * 
+	 */
+	public static IFuture<Object> invoke(final IServiceIdentifier broken, final ServiceInvocationContext sic, 
+			final IServiceIdentifier sid, final IExternalAccess ea, final ITargetResolver tr, final int maxretries, final int cnt)
+	{
+		final Future<Object> ret = new Future<Object>();
+		
+		tr.determineTarget(sid, ea, broken)
+			.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret) 
+		{
+			public void customResultAvailable(IService ser) 
+			{
+				try
+				{
+					Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
+					if(res instanceof IFuture && ((IFuture)res).getException() instanceof ComponentNotFoundException)
+					{
+						if(cnt<maxretries)
+						{
+							// Invoke again and rebind service
+							System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
+							invoke(ser.getServiceIdentifier(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
+						}
+						else
+						{
+							ret.setResult(res);
+						}
+					}
+					else
+					{
+						ret.setResult(res);
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					Exception res = handleException(e);
+					if(sic.getMethod().getReturnType().equals(IFuture.class))
+					{
+						ret.setResult(new Future(res));
+					}
+					else
+					{
+						throw res instanceof RuntimeException ? (RuntimeException)res : new RuntimeException(res);
+					}
+				}
+			}
+		});
+		
+		return ret;
 	}
 }

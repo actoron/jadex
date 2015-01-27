@@ -13,14 +13,17 @@ import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.bridge.service.component.interceptors.IntelligentProxyInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -97,7 +100,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 	 *  Invoke a method.
 	 */
 	public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
-	{
+	{		
 		final IComponentIdentifier compid = rsms.getRMSComponentIdentifier();
 		final String callid = SUtil.createUniqueId(compid.getName()+".0."+method.toString());
 	
@@ -180,44 +183,47 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		nf.put(Timeout.TIMEOUT, Long.valueOf(to));
 		final Map<String, Object> nonfunc = nf; 
 		
-		Class type = determineReturnType(proxy, method, args);
-		
+		Class<?> type = determineReturnType(proxy, method, args);
 		Future<Object> future = createReturnFuture(compid, callid, method, type, to, nonfunc, sic);
-		
+
 		// determine the call target
 		// can be redirected by intelligent proxies
 		ITargetResolver tr = getTargetResolver();
 		if(tr!=null)
 		{
-			final Future<Object> ffuture = future;
-			tr.determineTarget((IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier(), rsms.getComponent())
-				.addResultListener(new ExceptionDelegationResultListener<IService, Object>(future) 
-			{
-				public void customResultAvailable(IService ser) 
-				{
-					IServiceIdentifier sid = ser.getServiceIdentifier();
-					IComponentIdentifier rrms = new ComponentIdentifier("rms@system."+sid.getProviderId().getPlatformName(), sid.getProviderId().getAddresses());
-					RemoteReference rr = new RemoteReference(rrms, sid);
-					// non-func is in command to let stream handlers access the properties in RMI processing
-					final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
-						rr, method, args, callid, IComponentIdentifier.LOCAL.get(), nonfunc);
-					
-					// Can be invoked directly, because internally redirects to agent thread.
-//					System.out.println("invoke: "+method.getName());
-//					if(method.getName().equals("getResult"))
-//						System.out.println("sending invoke");
-					rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), 
-						null, content, callid, to, ffuture, nonfunc, sic);
-					
-//					// Provide alternative immediate future result, if method is asynchronous.
-//					if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))
-//					{
-////						System.out.println("Warning, void method call will be executed asynchronously: "
-////							+method.getDeclaringClass()+" "+method.getName()+" "+Thread.currentThread());
-//						future	= new Future(null);
-//					}
-				}
-			});
+			IServiceIdentifier sid = (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier();
+			
+			IntelligentProxyInterceptor.invoke(null, sic, sid, rsms.getComponent(), tr, 3, 0).addResultListener(new DelegationResultListener<Object>(future)); 
+
+//			final Future<Object> ffuture = future;
+//			tr.determineTarget((IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier(), rsms.getComponent())
+//				.addResultListener(new ExceptionDelegationResultListener<IService, Object>(future) 
+//			{
+//				public void customResultAvailable(IService ser) 
+//				{
+//					IServiceIdentifier sid = ser.getServiceIdentifier();
+//					IComponentIdentifier rrms = new ComponentIdentifier("rms@system."+sid.getProviderId().getPlatformName(), sid.getProviderId().getAddresses());
+//					RemoteReference rr = new RemoteReference(rrms, sid);
+//					// non-func is in command to let stream handlers access the properties in RMI processing
+//					final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
+//						rr, method, args, callid, IComponentIdentifier.LOCAL.get(), nonfunc);
+//					
+//					// Can be invoked directly, because internally redirects to agent thread.
+////					System.out.println("invoke: "+method.getName());
+////					if(method.getName().equals("getResult"))
+////						System.out.println("sending invoke");
+//					rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), 
+//						null, content, callid, to, ffuture, nonfunc, sic);
+//					
+////					// Provide alternative immediate future result, if method is asynchronous.
+////					if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))
+////					{
+//////						System.out.println("Warning, void method call will be executed asynchronously: "
+//////							+method.getDeclaringClass()+" "+method.getName()+" "+Thread.currentThread());
+////						future	= new Future(null);
+////					}
+//				}
+//			});
 		}
 		else
 		{

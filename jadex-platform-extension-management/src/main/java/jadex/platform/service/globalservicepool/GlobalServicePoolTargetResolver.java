@@ -5,6 +5,7 @@ import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -17,8 +18,11 @@ import jadex.commons.future.IntermediateFuture;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.management.ServiceNotFoundException;
 
@@ -40,7 +44,10 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 	//-------- attributes --------
 	
 	/** The cached target services. */
-	protected List<IService> services;
+	protected IndexMap<IServiceIdentifier, IService> services;
+	
+	/** The reported to be broken services. */
+	protected Set<IServiceIdentifier> brokens;
 	
 	/** The position counter. */
 	protected int position;
@@ -59,39 +66,54 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 	 *  @param agent The external access.
 	 *  @return The new service that should be called instead of the original one.
 	 */
-	public IFuture<IService> determineTarget(final IServiceIdentifier sid, final IExternalAccess agent)
+	public IFuture<IService> determineTarget(final IServiceIdentifier sid, final IExternalAccess agent, IServiceIdentifier broken)
 	{
 //		System.out.println("Called service pool resolver: "+sid+" "+(services==null? 0: services.size()));
 		final Future<IService> ret = new Future<IService>();
-		
+
+		// Clear all services in case a failure occurred
+		if(broken!=null)
+		{
+			if(services!=null)
+				services.removeKey(broken);
+			if(brokens==null)
+				brokens = new HashSet<IServiceIdentifier>();
+			brokens.add(broken);
+		}
 		// todo: update in certain intervals
 		
+		boolean done = false;
+		
 		// Case that we have services -> just pick one
-		if(services!=null && services.size()>0)
+		if(services!=null && services.size()>0) // min two services
 		{
-			IService ser = services.get(position++);
-			if(position==services.size())
+			if(position>=services.size())
 				position = 0;
+			IService ser = services.get(position++);
 			
 			reportUsage(ser, agent, sid);
 			ret.setResult(ser);
+			done = true;
 		}
+		
 		// case we have no services and search is not running -> start search
-		else if(services==null && searchfuture==null) // || timeout
+		if((services==null || services.size()<3) && searchfuture==null) // || timeout
 		{
+			done = true;
 			searchfuture = searchServices(sid, agent);
-			services = new ArrayList<IService>();
+			services = new IndexMap<IServiceIdentifier, IService>();
 			
 			searchfuture.addResultListener(new IIntermediateResultListener<IService>() 
 			{
 				boolean first=true;
 				public void intermediateResultAvailable(IService result) 
 				{
-					services.add(result);
+					services.put(result.getServiceIdentifier(), result);
 					if(first)
 					{
 						reportUsage(result, agent, sid);
-						ret.setResult(result);
+						if(!ret.isDone())
+							ret.setResult(result);
 						first = false;
 					}
 				}
@@ -114,13 +136,15 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				
 				public void exceptionOccurred(Exception exception) 
 				{
-					ret.setException(exception);
+					if(!ret.isDone())
+						ret.setException(exception);
 					searchfuture=null;
 				}
 			});
 		}
+		
 		// Case the search is already running so just add a listener and take the first incoming result
-		else if(searchfuture!=null)
+		if(searchfuture!=null && !done)
 		{
 			searchfuture.addResultListener(new IIntermediateResultListener<IService>() 
 			{
@@ -137,7 +161,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				
 				public void finished() 
 				{
-					System.out.println("received services: "+services);
+//					System.out.println("received services: "+services);
 					
 					if(!ret.isDone())
 						ret.setException(new ServiceNotFoundException());
@@ -176,7 +200,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 		{
 			public void resultAvailable(final IGlobalPoolManagementService pms) 
 			{
-				pms.getPoolServices(sid.getServiceType())
+				pms.getPoolServices(sid.getServiceType(), brokens)
 					.addResultListener(new IResultListener<Collection<IService>>() 
 				{
 					public void resultAvailable(Collection<IService> result) 

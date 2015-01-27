@@ -19,5 +19,5 @@ public interface ITargetResolver
 	 *  @param agent The external access.
 	 *  @return The new service that should be called instead of the original one.
 	 */
-	public IFuture<IService> determineTarget(IServiceIdentifier sid, IExternalAccess agent);
+	public IFuture<IService> determineTarget(IServiceIdentifier sid, IExternalAccess agent, IServiceIdentifier broken);
 }

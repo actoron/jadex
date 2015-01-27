@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  The global service pool agent can be used to handle services in a pooled manner.
@@ -175,11 +176,11 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	 *  @param type The service type.
 	 *  @return A number of services from the pool.
 	 */
-	public IIntermediateFuture<IService> getPoolServices(ClassInfo type)
+	public IIntermediateFuture<IService> getPoolServices(ClassInfo type, Set<IServiceIdentifier> brokens)
 	{
 		Class<?> clazz = type.getType(agent.getClassLoader());
 		GlobalPoolServiceManager manager = managers.get(clazz);
-		return manager.getPoolServices(clazz);
+		return manager.getPoolServices(clazz, brokens);
 	}
 	
 	/**

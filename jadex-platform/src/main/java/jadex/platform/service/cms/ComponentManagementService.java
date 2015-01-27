@@ -4,6 +4,7 @@ import jadex.base.Starter;
 import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentIdentifier;
@@ -1554,7 +1555,8 @@ public class ComponentManagementService implements IComponentManagementService
 			final IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
 			if(adapter==null)
 			{
-				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+				ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
+//				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
 				return ret;
 			}
 			
@@ -1575,7 +1577,7 @@ public class ComponentManagementService implements IComponentManagementService
 			if(!IComponentDescription.STATE_ACTIVE.equals(desc.getState())
 				/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
 			{
-				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+				ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
 				return ret;
 			}
 			
@@ -1634,7 +1636,7 @@ public class ComponentManagementService implements IComponentManagementService
 						boolean	changed	= false;
 						if(adapter==null && !initresume)	// Might be killed after init but before init resume
 						{
-							ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+							ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
 						}
 						else if(adapter!=null)
 						{
@@ -1808,7 +1810,7 @@ public class ComponentManagementService implements IComponentManagementService
 			final IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
 			if(adapter==null)
 			{
-				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+				ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
 				return ret;
 			}
 			if(!IComponentDescription.STATE_SUSPENDED.equals(adapter.getDescription().getState()))
@@ -1974,7 +1976,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			System.out.println("CleanupCommand remove called for: "+cid);
 			adapter = (IComponentAdapter)adapters.remove(cid);
 			if(adapter==null)
-				throw new RuntimeException("Component Identifier not registered: "+cid);
+				throw new ComponentNotFoundException("Component Identifier not registered: "+cid);
 			
 //				if(cid.getName().indexOf("Peer")==-1)
 //					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
@@ -2214,7 +2216,7 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			else if(!delayed)
 			{
-				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+				ret.setException(new ComponentNotFoundException("No local component found for component identifier: "+cid));
 			}
 			
 		}
@@ -2587,7 +2589,7 @@ public class ComponentManagementService implements IComponentManagementService
 				}
 				else
 				{
-					ret.setException(new RuntimeException("No description available for: "+cid));
+					ret.setException(new ComponentNotFoundException("No description available for: "+cid));
 				}
 			}
 			else
@@ -2621,7 +2623,7 @@ public class ComponentManagementService implements IComponentManagementService
 						}
 						else
 						{
-							ret.setException(new RuntimeException("No description available for: "+cid));
+							ret.setException(new ComponentNotFoundException("No description available for: "+cid));
 						}
 					}
 				});
