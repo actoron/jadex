@@ -66,12 +66,13 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
+import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 
 /**
@@ -4505,10 +4506,11 @@ public class SUtil
 				}
 				else
 				{
+					ZipFile	zf	= null;
 					try
 					{
 						// Try zip file as directory.
-						ZipFile	zf	= new ZipFile(f);
+						zf	= new ZipFile(f);
 						List<ZipEntry>	entries	= new ArrayList<ZipEntry>();
 						Enumeration<? extends ZipEntry>	en	= zf.entries();
 						while(en.hasMoreElements())
@@ -4528,8 +4530,8 @@ public class SUtil
 						});
 						for(ZipEntry entry: entries)
 						{
-//							System.out.println("Entry: "+entry.getName());
-							md.digest(entry.getName().getBytes("UTF-8"));
+							System.out.println("Zip entry: "+entry.getName());
+							md.update(entry.getName().getBytes("UTF-8"));
 							hashStream(zf.getInputStream(entry), md);
 						}
 					}
@@ -4537,6 +4539,13 @@ public class SUtil
 					{
 						// Treat as flat file.
 						hashStream(new FileInputStream(f), md);					
+					}
+					finally
+					{
+						if(zf!=null)
+						{
+							zf.close();
+						}
 					}
 				}
 				hash	= new String(Base64.encode(md.digest()), "UTF-8");
@@ -4573,8 +4582,8 @@ public class SUtil
 				String	fpath	= f.getAbsolutePath();
 				assert fpath.startsWith(root);
 				String	entry	= fpath.substring(root.length()+1).replace(File.separatorChar, '/');
-//				System.out.println("Entry: "+entry);
-				md.digest(entry.getBytes("UTF-8"));
+				System.out.println("Dir entry: "+entry);
+				md.update(entry.getBytes("UTF-8"));
 				hashStream(new FileInputStream(f), md);
 			}
 		}
@@ -4584,12 +4593,54 @@ public class SUtil
 	{
 		DigestInputStream	dis	= new DigestInputStream(is, md);
 		byte[]	buf	= new byte[8192];
-		int	total	= 0;
-		int	read;
-		while((read=dis.read(buf))!=-1)
-		{
-			total	+= read;
-		}
+		while(dis.read(buf)!=-1);
 		dis.close();
+	}
+	
+	/**
+	 *  Write a directory as jar to an output stream. 
+	 */
+	public static void	writeDirectory(File dir, OutputStream out)
+	{
+		try
+		{
+			ZipOutputStream	zos	= new JarOutputStream(out);
+			writeDirectory("", dir, zos, new byte[8192]);
+			zos.close();
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Write a directory as jar to an output stream. 
+	 */
+	protected static void	writeDirectory(String prefix, File dir, ZipOutputStream zos, byte[] buf)	throws Exception
+	{
+        File[]	files	= dir.listFiles();
+        for(int i=0; i<files.length; i++)
+        {
+        	if(files[i].isDirectory())
+        	{
+        		writeDirectory(prefix+files[i].getName()+"/", files[i], zos, buf);
+        	}
+        	else
+        	{
+	        	ZipEntry	ze	= new ZipEntry(prefix+files[i].getName());
+	        	ze.setTime(files[i].lastModified());
+	        	zos.putNextEntry(ze);
+	
+	        	FileInputStream	fis	= new FileInputStream(files[i]);
+	        	int	read;
+	        	while((read=fis.read(buf))>0)
+	        	{
+	        		zos.write(buf, 0, read);
+	        	}
+	        	zos.closeEntry();
+	        	fis.close();
+        	}
+        }
 	}
 }
