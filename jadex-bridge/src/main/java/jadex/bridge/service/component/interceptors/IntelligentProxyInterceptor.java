@@ -12,9 +12,13 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 
 /**
  *  Interceptor for realizing intelligent proxies. These proxies
@@ -86,17 +90,65 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		System.out.println("Intelligent proxy called: "+broken+" "+cnt);
+		System.out.println("Intelligent proxy called: "+broken+" "+cnt);
 		tr.determineTarget(sid, ea, broken)
 			.addResultListener(new ExceptionDelegationResultListener<IService, Void>(ret) 
 		{
 			public void customResultAvailable(final IService ser) 
 			{
-//				System.out.println("invoking on: "+ser.getServiceIdentifier()+" "+cnt);
+				System.out.println("invoking on: "+ser.getServiceIdentifier()+" "+cnt);
 				try
 				{
 					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
-					if(res instanceof IFuture)
+					if(res instanceof IIntermediateFuture)
+					{
+						IIntermediateResultListener lis = new IIntermediateResultListener()
+						{
+							public void intermediateResultAvailable(Object result)
+							{
+							}
+							
+							public void finished()
+							{
+								sic.setResult(res);
+								ret.setResult(null);
+							}
+							
+							public void resultAvailable(Collection result) 
+							{
+								sic.setResult(res);
+								ret.setResult(null);
+							}
+							
+							public void exceptionOccurred(Exception exception) 
+							{
+								if(exception instanceof ComponentNotFoundException)
+								{
+									if(cnt<maxretries)
+									{
+										// Invoke again and rebind service
+										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
+										invoke(ser.getServiceIdentifier(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									else
+									{
+										sic.setResult(res);
+										ret.setResult(null);
+									}
+								}
+							}
+						};
+						
+						if(res instanceof ISubscriptionIntermediateFuture)
+						{
+							((ISubscriptionIntermediateFuture)res).addQuietListener(lis);
+						}
+						else
+						{
+							((IIntermediateFuture)res).addResultListener(lis);
+						}
+					}
+					else if(res instanceof IFuture)
 					{
 						((IFuture)res).addResultListener(new IResultListener() 
 						{
@@ -239,23 +291,82 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 		tr.determineTarget(sid, ea, broken)
 			.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret) 
 		{
-			public void customResultAvailable(IService ser) 
+			public void customResultAvailable(final IService ser) 
 			{
 				try
 				{
-					Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
-					if(res instanceof IFuture && ((IFuture)res).getException() instanceof ComponentNotFoundException)
+					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
+					if(res instanceof IIntermediateFuture)
 					{
-						if(cnt<maxretries)
+						IIntermediateResultListener lis = new IIntermediateResultListener()
 						{
-							// Invoke again and rebind service
-							System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
-							invoke(ser.getServiceIdentifier(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
+							public void intermediateResultAvailable(Object result)
+							{
+							}
+							
+							public void finished()
+							{
+								ret.setResult(res);
+							}
+							
+							public void resultAvailable(Collection result) 
+							{
+								ret.setResult(res);
+							}
+							
+							public void exceptionOccurred(Exception exception) 
+							{
+								if(exception instanceof ComponentNotFoundException)
+								{
+									if(cnt<maxretries)
+									{
+										// Invoke again and rebind service
+										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
+										invoke(ser.getServiceIdentifier(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
+									}
+									else
+									{
+										ret.setResult(res);
+									}
+								}
+							}
+						};
+						
+						if(res instanceof ISubscriptionIntermediateFuture)
+						{
+							((ISubscriptionIntermediateFuture)res).addQuietListener(lis);
 						}
 						else
 						{
-							ret.setResult(res);
+							((IIntermediateFuture)res).addResultListener(lis);
 						}
+					}
+					else if(res instanceof IFuture)
+					{
+						((IFuture)res).addResultListener(new IResultListener() 
+						{
+							public void resultAvailable(Object result) 
+							{
+								ret.setResult(res);
+							}
+							
+							public void exceptionOccurred(Exception exception) 
+							{
+								if(exception instanceof ComponentNotFoundException)
+								{
+									if(cnt<maxretries)
+									{
+										// Invoke again and rebind service
+										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
+										invoke(ser.getServiceIdentifier(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
+									}
+									else
+									{
+										ret.setResult(res);
+									}
+								}
+							}
+						});
 					}
 					else
 					{

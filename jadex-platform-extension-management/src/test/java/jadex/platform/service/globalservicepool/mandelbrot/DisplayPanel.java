@@ -3,15 +3,12 @@ package jadex.platform.service.globalservicepool.mandelbrot;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -23,8 +20,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -376,141 +371,141 @@ public class DisplayPanel extends JComponent
 					progressdata	= new HashMap();
 				
 				Integer	percent	= (Integer)progressdata.remove(progress);
-				if(percent==null || progress.isFinished())
-				{
-					percent	= Integer.valueOf(progress.isFinished() ? 100 : 0);
-				}
+//				if(percent==null || progress.isFinished())
+//				{
+//					percent	= Integer.valueOf(progress.isFinished() ? 100 : 0);
+//				}
 				progressdata.put(progress, percent);
 				repaint();
 				
-				if(progressupdate==null)
-				{
-					progressupdate	= new Timer(1000, new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							if(calculating)
-							{
-								agent.scheduleStep(new IComponentStep<Void>()
-								{
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										// do not depend on hosting component!
-//										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
-										IFuture<IComponentManagementService>	fut	= SServiceProvider.getServiceUpwards((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class);
-										fut.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
-										{
-											public void resultAvailable(IComponentManagementService cms)
-											{
-												if(progressdata!=null)
-												{
-													Object[]	pds	= progressdata.keySet().toArray();
-													for(int i=0; i<pds.length; i++)
-													{
-														final ProgressData	progress	= (ProgressData)pds[i];
-														if(!progress.isFinished())
-														{
-															cms.getExternalAccess(progress.getProviderId())
-																.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
-															{
-																public void resultAvailable(IExternalAccess	ea)
-																{
-																	// It is not really possible to define the progress services as required service.
-																	// Needs component specific progress service.
-																	SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
-																		.addResultListener(new SwingResultListener<IProgressService>(new IResultListener<IProgressService>()
-																	{
-																		public void resultAvailable(IProgressService	ps)
-																		{
-																			if(ps!=null)
-																			{
-																				ps.getProgress(progress.getTaskId())
-																					.addResultListener(new SwingResultListener<Integer>(new IResultListener<Integer>()
-																				{
-																					public void resultAvailable(Integer current)
-																					{
-																						if(progressdata!=null && progressdata.containsKey(progress))
-																						{
-																							Integer	percent	= (Integer)progressdata.get(progress);
-																							if(current.intValue()>percent.intValue())
-																							{
-																								progressdata.put(progress, current);
-																								repaint();
-																							}
-																						}
-																					}
-					
-																					public void exceptionOccurred(Exception exception)
-																					{
-																						// Component removed.
-																						if(progressdata!=null)
-																						{
-																							progressdata.remove(progress);
-																						}
-																						else if(progressupdate!=null)
-																						{
-																							progressupdate.stop();
-																							progressupdate	= null;
-																						}
-																					}
-																				}));
-																			}
-																		}
-					
-																		public void exceptionOccurred(Exception exception)
-																		{
-																			// Component removed.
-																			if(progressdata!=null)
-																			{
-																				progressdata.remove(progress);
-																			}
-																			else if(progressupdate!=null)
-																			{
-																				progressupdate.stop();
-																				progressupdate	= null;
-																			}
-																		}
-																	}));
-																}
-					
-																public void exceptionOccurred(Exception exception)
-																{
-																	// Component removed.
-																	if(progressdata!=null)
-																	{
-																		progressdata.remove(progress);
-																	}
-																	else if(progressupdate!=null)
-																	{
-																		progressupdate.stop();
-																		progressupdate	= null;
-																	}
-																}
-															}));
-														}
-													}
-												}
-											}
-		
-											public void exceptionOccurred(Exception exception)
-											{
-												// ignore
-												exception.printStackTrace();
-											}
-										}));
-										return IFuture.DONE;
-									}
-								});
-							}
-							else if(progressupdate!=null)
-							{
-								progressupdate.stop();
-								progressupdate	= null;
-							}
-						}
-					});
-					progressupdate.start();
-				}
+//				if(progressupdate==null)
+//				{
+//					progressupdate	= new Timer(1000, new ActionListener()
+//					{
+//						public void actionPerformed(ActionEvent e)
+//						{
+//							if(calculating)
+//							{
+//								agent.scheduleStep(new IComponentStep<Void>()
+//								{
+//									public IFuture<Void> execute(IInternalAccess ia)
+//									{
+//										// do not depend on hosting component!
+////										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
+//										IFuture<IComponentManagementService>	fut	= SServiceProvider.getServiceUpwards((IServiceProvider)ia.getServiceContainer(), IComponentManagementService.class);
+//										fut.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
+//										{
+//											public void resultAvailable(IComponentManagementService cms)
+//											{
+//												if(progressdata!=null)
+//												{
+//													Object[]	pds	= progressdata.keySet().toArray();
+//													for(int i=0; i<pds.length; i++)
+//													{
+//														final ProgressData	progress	= (ProgressData)pds[i];
+//														if(!progress.isFinished())
+//														{
+//															cms.getExternalAccess(progress.getProviderId())
+//																.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
+//															{
+//																public void resultAvailable(IExternalAccess	ea)
+//																{
+//																	// It is not really possible to define the progress services as required service.
+//																	// Needs component specific progress service.
+//																	SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
+//																		.addResultListener(new SwingResultListener<IProgressService>(new IResultListener<IProgressService>()
+//																	{
+//																		public void resultAvailable(IProgressService ps)
+//																		{
+//																			if(ps!=null)
+//																			{
+//																				ps.getProgress(progress.getTaskId())
+//																					.addResultListener(new SwingResultListener<Integer>(new IResultListener<Integer>()
+//																				{
+//																					public void resultAvailable(Integer current)
+//																					{
+//																						if(progressdata!=null && progressdata.containsKey(progress))
+//																						{
+//																							Integer	percent	= (Integer)progressdata.get(progress);
+//																							if(current.intValue()>percent.intValue())
+//																							{
+//																								progressdata.put(progress, current);
+//																								repaint();
+//																							}
+//																						}
+//																					}
+//					
+//																					public void exceptionOccurred(Exception exception)
+//																					{
+//																						// Component removed.
+//																						if(progressdata!=null)
+//																						{
+//																							progressdata.remove(progress);
+//																						}
+//																						else if(progressupdate!=null)
+//																						{
+//																							progressupdate.stop();
+//																							progressupdate	= null;
+//																						}
+//																					}
+//																				}));
+//																			}
+//																		}
+//					
+//																		public void exceptionOccurred(Exception exception)
+//																		{
+//																			// Component removed.
+//																			if(progressdata!=null)
+//																			{
+//																				progressdata.remove(progress);
+//																			}
+//																			else if(progressupdate!=null)
+//																			{
+//																				progressupdate.stop();
+//																				progressupdate	= null;
+//																			}
+//																		}
+//																	}));
+//																}
+//					
+//																public void exceptionOccurred(Exception exception)
+//																{
+//																	// Component removed.
+//																	if(progressdata!=null)
+//																	{
+//																		progressdata.remove(progress);
+//																	}
+//																	else if(progressupdate!=null)
+//																	{
+//																		progressupdate.stop();
+//																		progressupdate	= null;
+//																	}
+//																}
+//															}));
+//														}
+//													}
+//												}
+//											}
+//		
+//											public void exceptionOccurred(Exception exception)
+//											{
+//												// ignore
+//												exception.printStackTrace();
+//											}
+//										}));
+//										return IFuture.DONE;
+//									}
+//								});
+//							}
+//							else if(progressupdate!=null)
+//							{
+//								progressupdate.stop();
+//								progressupdate	= null;
+//							}
+//						}
+//					});
+//					progressupdate.start();
+//				}
 			}
 		});
 	}

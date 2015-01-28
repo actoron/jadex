@@ -1,6 +1,5 @@
 package jadex.bridge;
 
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Timeout;
 
 import java.util.HashMap;

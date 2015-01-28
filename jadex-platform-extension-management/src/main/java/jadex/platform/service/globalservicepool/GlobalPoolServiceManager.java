@@ -166,29 +166,59 @@ public class GlobalPoolServiceManager
 		}
 
 		// If too few services are available try to create new ones
+		
+		
+		final List<IService> sers = new ArrayList<IService>(services.values());
+		
+		// Sort according to usage info
+		Collections.sort(sers, new Comparator<IService>() 
+		{
+			public int compare(IService s1, IService s2) 
+			{
+				UsageInfo ui1 = usages.get(s1.getServiceIdentifier());
+				UsageInfo ui2 = usages.get(s1.getServiceIdentifier());
+				return ui1==null && ui2==null? (int)(s1.hashCode()-s2.hashCode()): ui1==null? -1: ui2==null? 1: (int)Math.round(ui1.usages-ui2.usages);
+			}
+		});
+		
+//		for(IService ser: sers)
+//		{
+//			UsageInfo ui = usages.get(ser.getServiceIdentifier());
+//			System.out.println(ser.getServiceIdentifier()+ ": "+ui!=null? ui.getUsages(): "");
+//		}
+		
+		final int[] cnt = new int[1];
+		for(IService ser: sers)
+		{
+			ret.addIntermediateResult(ser);
+			if(++cnt[0]==strategy.getWorkersPerProxy())
+				break;
+		}
+			
 		if(services.size()<strategy.getDesiredWorkerCount())
 		{
-			final List<IService> sers = new ArrayList<IService>(services.values());
 			createServices(strategy.getDesiredWorkerCount()-services.size()).addResultListener(new IIntermediateResultListener<IService>() 
 			{
-				int cnt = 0;
 				public void intermediateResultAvailable(IService result) 
 				{
-					ret.addIntermediateResult(result);
-					cnt++;
+					if(cnt[0]++<strategy.getWorkersPerProxy())
+					{
+						ret.addIntermediateResult(result);
+					}
 				}
 
 				public void finished() 
 				{
-					if(cnt<strategy.getWorkersPerProxy())
-					{
-						for(IService ser: sers)
-						{
-							ret.addIntermediateResult(ser);
-							if(++cnt==strategy.getWorkersPerProxy())
-								break;
-						}
-					}
+//					if(cnt<strategy.getWorkersPerProxy())
+//					{
+//						for(IService ser: sers)
+//						{
+//							ret.addIntermediateResult(ser);
+//							if(++cnt==strategy.getWorkersPerProxy())
+//								break;
+//						}
+//					}
+//					System.out.println("search/create fini");
 					ret.setFinished();
 				}
 				
@@ -206,36 +236,6 @@ public class GlobalPoolServiceManager
 					ret.setException(exception);
 				}
 			});
-		}
-		else
-		{
-			int cnt = 0;
-			final List<IService> sers = new ArrayList<IService>(services.values());
-			
-			// Sort according to usage info
-			Collections.sort(sers, new Comparator<IService>() 
-			{
-				public int compare(IService s1, IService s2) 
-				{
-					UsageInfo ui1 = usages.get(s1.getServiceIdentifier());
-					UsageInfo ui2 = usages.get(s1.getServiceIdentifier());
-					return ui1==null && ui2==null? (int)(s1.hashCode()-s2.hashCode()): ui1==null? -1: ui2==null? 1: (int)Math.round(ui1.usages-ui2.usages);
-				}
-			});
-			
-			for(IService ser: sers)
-			{
-				UsageInfo ui = usages.get(ser.getServiceIdentifier());
-				System.out.println(ser.getServiceIdentifier()+ ": "+ui!=null? ui.getUsages(): "");
-			}
-			
-			for(IService ser: sers)
-			{
-				ret.addIntermediateResult(ser);
-				if(++cnt==strategy.getWorkersPerProxy())
-					break;
-			}
-			ret.setFinished();
 		}
 		
 		return ret;

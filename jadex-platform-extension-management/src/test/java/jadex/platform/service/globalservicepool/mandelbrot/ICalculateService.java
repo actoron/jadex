@@ -1,7 +1,7 @@
 package jadex.platform.service.globalservicepool.mandelbrot;
 
 import jadex.bridge.service.annotation.Timeout;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Interface for calculating an area of points.
@@ -14,5 +14,5 @@ public interface ICalculateService
 	 *  @return	A future containing the calculated area.
 	 */
 	@Timeout(30000)
-	public IFuture<AreaData> calculateArea(AreaData data);
+	public ISubscriptionIntermediateFuture<CalculateEvent> calculateArea(AreaData data);
 }

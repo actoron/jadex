@@ -21,10 +21,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Calculate agent allows calculating the colors of an area using a calculate service.
  */
 @Description("Agent offering a calculate service.")
-@ProvidedServices({
-	@ProvidedService(type=ICalculateService.class, implementation=@Implementation(CalculateService.class)),
-	@ProvidedService(type=IProgressService.class, implementation=@Implementation(value=ProgressService.class, proxytype=Implementation.PROXYTYPE_DIRECT))
-	})
+@ProvidedServices(@ProvidedService(type=ICalculateService.class, implementation=@Implementation(CalculateService.class)))
 @Arguments(@Argument(name="delay", description="Agent kills itself when no job arrives in the delay interval.", clazz=Long.class, defaultvalue="new Long(1000)"))
 @Configurations({
 	@Configuration(name="default"),
@@ -37,12 +34,6 @@ public class CalculateAgent extends MicroAgent
 	
 	/** Flag indicating that the agent had a job. */
 	protected boolean hadjob;
-	
-	/** Id of the current job. */
-	protected Object	taskid;
-	
-	/** Progress of the current job. */
-	protected int progress;
 	
 	//-------- methods --------
 	
@@ -91,37 +82,5 @@ public class CalculateAgent extends MicroAgent
 	public boolean isHadJob()
 	{
 		return hadjob;
-	}
-	
-	/**
-	 *  Get the current task id.
-	 */
-	public Object	getTaskId()
-	{
-		return taskid;
-	}
-	
-	/**
-	 *  Set the current task id.
-	 */
-	public void	setTaskId(Object taskid)
-	{
-		this.taskid	= taskid;
-	}
-	
-	/**
-	 *  Get the current progress.
-	 */
-	public int	getProgress()
-	{
-		return progress;
-	}
-	
-	/**
-	 *  Set the current progress.
-	 */
-	public void	setProgress(int progress)
-	{
-		this.progress	= progress;
 	}
 }

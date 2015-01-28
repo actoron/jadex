@@ -28,10 +28,14 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -377,43 +381,106 @@ public class ServiceHandler implements InvocationHandler
 			
 			// Put the components back in pool after call is done
 			// Must reschedule on component thread as it has no required service proxy
-			res.addResultListener(component.createResultListener(new IResultListener<Object>()
+			
+			if(res instanceof IIntermediateFuture)
 			{
-				public void resultAvailable(Object result)
+				IIntermediateResultListener lis = component.createResultListener(new IIntermediateResultListener<Object>()
 				{
-					boolean	remove	= strategy.taskFinished(); 
-					proceed(remove);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					component.getLogger().warning("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
-//					System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
-//					exception.printStackTrace();
-					boolean remove	= strategy.taskFinished();
-					boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getServiceIdentifier().getProviderId());
-					proceed(remove || killed);
-				}
-				
-				protected void proceed(boolean remove)
-				{
-					if(remove)
+					public void intermediateResultAvailable(Object result)
 					{
-						addFreeService(null);
-						removeService(service).addResultListener(new DefaultResultListener<Void>()
+					}
+					
+					public void finished()
+					{
+						boolean	remove	= strategy.taskFinished(); 
+						proceed(remove);
+					}
+					
+					public void resultAvailable(Collection<Object> result)
+					{
+						boolean	remove	= strategy.taskFinished(); 
+						proceed(remove);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						component.getLogger().warning("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
+	//						System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
+	//						exception.printStackTrace();
+						boolean remove	= strategy.taskFinished();
+						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getServiceIdentifier().getProviderId());
+						proceed(remove || killed);
+					}
+					
+					protected void proceed(boolean remove)
+					{
+						if(remove)
 						{
-							public void resultAvailable(Void result)
+							addFreeService(null);
+							removeService(service).addResultListener(new DefaultResultListener<Void>()
 							{
-								// nop
-							}
-						});
+								public void resultAvailable(Void result)
+								{
+									// nop
+								}
+							});
+						}
+						else
+						{
+							addFreeService(service);
+						}
 					}
-					else
-					{
-						addFreeService(service);
-					}
+				});
+				
+				if(res instanceof ISubscriptionIntermediateFuture)
+				{
+					((ISubscriptionIntermediateFuture)res).addQuietListener(lis);
 				}
-			}));
+				else
+				{
+					((IIntermediateFuture)res).addResultListener(lis);
+				}
+			}
+			else
+			{
+				res.addResultListener(component.createResultListener(new IResultListener<Object>()
+				{
+					public void resultAvailable(Object result)
+					{
+						boolean	remove	= strategy.taskFinished(); 
+						proceed(remove);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						component.getLogger().warning("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
+	//					System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
+	//					exception.printStackTrace();
+						boolean remove	= strategy.taskFinished();
+						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getServiceIdentifier().getProviderId());
+						proceed(remove || killed);
+					}
+					
+					protected void proceed(boolean remove)
+					{
+						if(remove)
+						{
+							addFreeService(null);
+							removeService(service).addResultListener(new DefaultResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									// nop
+								}
+							});
+						}
+						else
+						{
+							addFreeService(service);
+						}
+					}
+				}));
+			}
 		}
 		catch(Exception e)
 		{

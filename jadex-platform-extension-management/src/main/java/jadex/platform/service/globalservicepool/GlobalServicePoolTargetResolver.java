@@ -13,6 +13,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 	//-------- attributes --------
 	
 	/** The cached target services. */
-	protected IndexMap<IServiceIdentifier, IService> services;
+	protected IndexMap<IServiceIdentifier, IService> services = new IndexMap<IServiceIdentifier, IService>();
 	
 	/** The reported to be broken services. */
 	protected Set<IServiceIdentifier> brokens;
@@ -97,11 +98,11 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 		}
 		
 		// case we have no services and search is not running -> start search
-		if((services==null || services.size()<3) && searchfuture==null) // || timeout
+		if(services.size()<3 && searchfuture==null) // || timeout
 		{
 			done = true;
 			searchfuture = searchServices(sid, agent);
-			services = new IndexMap<IServiceIdentifier, IService>();
+//			services = new IndexMap<IServiceIdentifier, IService>();
 			
 			searchfuture.addResultListener(new IIntermediateResultListener<IService>() 
 			{
@@ -201,22 +202,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 			public void resultAvailable(final IGlobalPoolManagementService pms) 
 			{
 				pms.getPoolServices(sid.getServiceType(), brokens)
-					.addResultListener(new IResultListener<Collection<IService>>() 
-				{
-					public void resultAvailable(Collection<IService> result) 
-					{
-						for(IService ser: result)
-						{
-							ret.addIntermediateResult(ser);
-						}
-						ret.setFinished();
-					}
-					
-					public void exceptionOccurred(Exception exception) 
-					{
-						ret.setException(exception);
-					}
-				});
+					.addResultListener(new IntermediateDelegationResultListener<IService>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception) 

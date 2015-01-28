@@ -42,7 +42,6 @@ import javax.swing.JTextPane;
 })
 @RequiredServices({
 	@RequiredService(name="generateservice", type=IGenerateService.class),
-	@RequiredService(name="progressservice", type=IProgressService.class),
 	@RequiredService(name="cmsservice", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 	//@RequiredService(name="mandelservice", type=IMandelbrotService.class)
 })

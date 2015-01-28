@@ -1,5 +1,6 @@
 package jadex.platform.service.globalservicepool.mandelbrot;
 
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -10,10 +11,12 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Rectangle;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -316,11 +319,11 @@ public class GenerateService implements IGenerateService
 					}
 				});
 				
-				final ProgressData	pd	= new ProgressData(ad.getCalculatorId(), ad.getId(),
-					new Rectangle(ad.getXOffset(), ad.getYOffset(), ad.getSizeX(), ad.getSizeY()),
-					false, data.getSizeX(), data.getSizeY(), ad.getDisplayId());
-				pd.setFinished(true);
-				ds.displayIntermediateResult(pd); // todo: listener?!
+//				final ProgressData	pd	= new ProgressData(ad.getCalculatorId(), ad.getId(),
+//					new Rectangle(ad.getXOffset(), ad.getYOffset(), ad.getSizeX(), ad.getSizeY()),
+//					false, data.getSizeX(), data.getSizeY(), ad.getDisplayId());
+//				pd.setFinished(true);
+//				ds.displayIntermediateResult(pd); // todo: listener?!
 					
 //				System.out.println("x:y: end "+xs+" "+ys);
 	//			System.out.println("partial: "+SUtil.arrayToString(ad.getData()));
@@ -345,15 +348,45 @@ public class GenerateService implements IGenerateService
 		{
 			final ProgressData	pd	= new ProgressData(ad.getCalculatorId(), ad.getId(),
 				new Rectangle(ad.getXOffset(), ad.getYOffset(), ad.getSizeX(), ad.getSizeY()),
-				false, data.getSizeX(), data.getSizeY(), ad.getDisplayId());
+				0, data.getSizeX(), data.getSizeY(), ad.getDisplayId());
 			
 			// todo: should know the concrete service?!
 			ad.setCalculatorId(((IService)cs).getServiceIdentifier().getProviderId());
-			ds.displayIntermediateResult(pd).addResultListener(new DefaultResultListener<Void>()
+			
+			cs.calculateArea(ad).addResultListener(new IIntermediateResultListener<CalculateEvent>() 
 			{
-				public void resultAvailable(Void result)
+				public void intermediateResultAvailable(CalculateEvent result) 
 				{
-					cs.calculateArea(ad).addResultListener(lis);
+//					System.out.println("ires: "+ServiceCall.getCurrentInvocation().getCaller()+" "+result.getProgressData());
+//					pd.setProviderId(ServiceCall.);
+					if(result.getProgressData()!=null)
+					{
+						pd.setProgress(result.getProgressData());
+						ds.displayIntermediateResult(pd);  // todo: listener?!
+					}
+					else
+					{
+						lis.resultAvailable(result.getAreaData());
+					}
+				}
+				
+				public void finished() 
+				{
+					System.out.println("sdsa");
+				}
+				
+				public void resultAvailable(Collection<CalculateEvent> result) 
+				{
+					for(CalculateEvent ce: result)
+					{
+						intermediateResultAvailable(ce);
+					}
+					finished();
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					lis.exceptionOccurred(exception);
 				}
 			});
 		}

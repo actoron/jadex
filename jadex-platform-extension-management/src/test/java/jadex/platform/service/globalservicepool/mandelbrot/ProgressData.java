@@ -27,8 +27,8 @@ public class ProgressData
 	/** The image height. */
 	protected int imageheight;
 	
-	/** The state (finished or not). */
-	protected boolean finished;
+	/** The state. */
+	protected int progress;
 	
 	/** The display id. */
 	protected String displayid;
@@ -45,13 +45,13 @@ public class ProgressData
 	/**
 	 *  Create a new ProgressData.
 	 */
-	public ProgressData(IComponentIdentifier providerid, Object taskid, Rectangle area, boolean finished, 
+	public ProgressData(IComponentIdentifier providerid, Object taskid, Rectangle area, int progress, 
 		int imagewidth, int imageheight, String displayid)
 	{
 		this.providerid	= providerid;
 		this.taskid	= taskid;
 		this.area	= area;
-		this.finished	= finished;
+		this.progress = progress;
 		this.imagewidth = imagewidth;
 		this.imageheight = imageheight;
 		this.displayid = displayid;
@@ -108,21 +108,23 @@ public class ProgressData
 	}
 
 	/**
-	 *  Check if calculation is finished.
+	 *  Get the progress.
+	 *  @return the progress
 	 */
-	public boolean isFinished()
+	public int getProgress() 
 	{
-		return finished;
+		return progress;
 	}
 
 	/**
-	 *  Set the finished flag.
+	 *  Set the progress.
+	 *  @param progress The progress to set
 	 */
-	public void setFinished(boolean finished)
+	public void setProgress(int progress) 
 	{
-		this.finished = finished;
+		this.progress = progress;
 	}
-	
+
 	/**
 	 *  Get the imagewidth.
 	 *  @return the imagewidth.
@@ -176,6 +178,14 @@ public class ProgressData
 	{
 		this.displayid = displayid;
 	}
+	
+	/**
+	 * 
+	 */
+	public boolean isFinished()
+	{
+		return progress==100;
+	}
 
 	/**
 	 *  Calculate the hash code.
@@ -208,6 +218,6 @@ public class ProgressData
 	 */
 	public String toString()
 	{
-		return "Progress("+providerid+", "+area+", finished="+finished+")";
+		return "Progress("+providerid+", "+area+", progress="+progress+")";
 	}
 }

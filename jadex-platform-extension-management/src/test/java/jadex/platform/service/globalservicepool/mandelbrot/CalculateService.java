@@ -1,9 +1,11 @@
 package jadex.platform.service.globalservicepool.mandelbrot;
 
+import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
 /**
  *  Calculate service implementation.
@@ -24,19 +26,19 @@ public class CalculateService implements ICalculateService
 	 *  @param data	The area to be calculated.
 	 *  @return	A future containing the calculated area.
 	 */
-	public IFuture<AreaData> calculateArea(AreaData data)
+	public ISubscriptionIntermediateFuture<CalculateEvent> calculateArea(AreaData data)
 	{
-//		System.out.println("calc: "+data.getId()+" "+agent.getComponentIdentifier());
+		SubscriptionIntermediateFuture<CalculateEvent> ret = (SubscriptionIntermediateFuture)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+		System.out.println("calc: "+data.getId()+" "+agent.getComponentIdentifier());
 		
 		agent.setHadJob(true);
-		agent.setTaskId(data.getId());
 		
 		// This code iterates over the area in a bounding boxes
 		// If a complete bounding box has is in the set the rest
 		// is just set to -1 without calculation. This is more
 		// efficient for areas with 'much black'.
 		
-		Future<AreaData> ret = new Future<AreaData>();
+//		Future<AreaData> ret = new Future<AreaData>();
 		
 		double stepx = (data.getXEnd()-data.getXStart())/data.getSizeX();
 		double stepy = (data.getYEnd()-data.getYStart())/data.getSizeY();
@@ -58,6 +60,7 @@ public class CalculateService implements ICalculateService
 			
 		int	size	= data.getSizeX()*data.getSizeY();
 		int	cnt	= 0;
+		int last = -1;
 		
 		while(true)
 		{
@@ -71,8 +74,11 @@ public class CalculateService implements ICalculateService
 				if(allin && res[xi][ystart]!=fillcol)
 					allin = false;
 				cnt++;
-				agent.setProgress(cnt*100/size);
+				//agent.setProgress(cnt*100/size);
 			}
+//			ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
+			last = reportProgress(cnt, size, last, ret);
+			
 			ystart++;
 			if(ystart>yend)
 				break;
@@ -82,8 +88,11 @@ public class CalculateService implements ICalculateService
 				if(allin && res[xend][yi]!=fillcol)
 					allin = false;
 				cnt++;
-				agent.setProgress(cnt*100/size);
+//				agent.setProgress(cnt*100/size);
 			}
+//			ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
+			last = reportProgress(cnt, size, last, ret);
+			
 			xend--;
 			if(xstart>xend)
 				break;
@@ -93,8 +102,11 @@ public class CalculateService implements ICalculateService
 				if(allin && res[xi][yend]!=fillcol)
 					allin = false;
 				cnt++;
-				agent.setProgress(cnt*100/size);
+//				agent.setProgress(cnt*100/size);
 			}
+//			ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
+			last = reportProgress(cnt, size, last, ret);
+			
 			yend--;
 			if(ystart>yend)
 				break;
@@ -104,8 +116,10 @@ public class CalculateService implements ICalculateService
 				if(allin && res[xstart][yi]!=fillcol)
 					allin = false;
 				cnt++;
-				agent.setProgress(cnt*100/size);
+//				agent.setProgress(cnt*100/size);
 			}
+//			ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
+			last = reportProgress(cnt, size, last, ret);
 			xstart++;
 			
 			if(allin && usejustfill)
@@ -120,13 +134,31 @@ public class CalculateService implements ICalculateService
 			}
 		}
 		
-		agent.setTaskId(null);
-		agent.setProgress(0);
-		data.setData(res);
-		ret.setResult(data);
+//		ret.addIntermediateResult(new CalculateEvent(100));
 		
-//		System.out.println("calc finished: "+data.getId()+" "+agent.getComponentIdentifier());
+		data.setData(res);
+		
+		ret.addIntermediateResult(new CalculateEvent(data));
+		ret.setFinished();
+		
+		System.out.println("calc finished: "+data.getId()+" "+agent.getComponentIdentifier());
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected int reportProgress(int cnt, int size, int last, IntermediateFuture<CalculateEvent> ret)
+	{
+		int cur = cnt*100/size;
+		int tst = (cur/10)%10;
+		if(tst>last)
+		{
+//			System.out.println("sending ires: "+cur);
+			ret.addIntermediateResult(new CalculateEvent(cur));
+			last=tst;
+		}
+		return last;
 	}
 	
 //	/**
