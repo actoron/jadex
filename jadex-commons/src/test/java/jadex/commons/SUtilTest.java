@@ -46,9 +46,15 @@ public class SUtilTest //extends TestCase
 		subdir.mkdirs();
 		
 		java.util.Properties	props	= new java.util.Properties();
-		props.store(new FileWriter(new File(zip, "test.properties")), "test");
-		props.store(new FileWriter(new File(dir, "test1.properties")), "test1");
-		props.store(new FileWriter(new File(subdir, "test2.properties")), "test2");
+		FileWriter	fw	= new FileWriter(new File(zip, "test.properties"));
+		props.store(fw, "test");
+		fw.close();
+		fw	= new FileWriter(new File(dir, "test1.properties"));
+		props.store(fw, "test1");
+		fw.close();
+		fw	= new FileWriter(new File(subdir, "test2.properties"));
+		props.store(fw, "test2");
+		fw.close();
 		
 		FileOutputStream	fos	= new FileOutputStream(new File(temp, "test.jar"));
 		SUtil.writeDirectory(zip, new BufferedOutputStream(fos));
