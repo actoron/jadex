@@ -1,9 +1,12 @@
 package jadex.bridge;
 
 import jadex.bridge.service.annotation.Reference;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SUtil;
 
 import java.io.File;
+import java.net.URL;
 
 /**
  *  Default implementation for resource identification.
@@ -136,6 +139,86 @@ public class ResourceIdentifier implements IResourceIdentifier
 		return ret;
 	}
 	
+	/**
+	 *  Create properties from rid.
+	 *  @param The resource identifier.
+	 *  @return rid The resource identifier properties.
+	 */
+	public static Properties ridToProperties(IResourceIdentifier rid, IComponentIdentifier root)
+	{
+		Properties ret = new Properties();
+		boolean	local	= false;
+		boolean	global	= false;
+		
+		if(rid!=null && rid.getGlobalIdentifier()!=null && rid.getGlobalIdentifier().getResourceId()!=null
+			&& !rid.getGlobalIdentifier().getResourceId().startsWith("::"))	// Don't save hash ids as contents might change.
+		{
+			ret.addProperty(new Property("gid_ri", rid.getGlobalIdentifier().getResourceId()));
+			ret.addProperty(new Property("gid_vi", rid.getGlobalIdentifier().getVersionInfo()));
+//			ret.addProperty(new Property("url", rid.getGlobalIdentifier().getRepositoryInfo()));
+			global	= true;
+		}
+		if(isLocal(rid, root))
+		{
+			ret.addProperty(new Property("lid_url", SUtil.convertPathToRelative(rid.getLocalIdentifier().getUri().toString())));
+			local	= true;
+		}
+		
+		if(rid!=null && !global && !local)
+		{
+			throw new RuntimeException("Cannot store non-local, non-global RID: "+rid);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a rid from properties.
+	 *  @param rid The resource identifier properties.
+	 *  @return The resource identifier.
+	 */
+	public static IResourceIdentifier ridFromProperties(Properties rid, IComponentIdentifier root)
+	{
+		String gid_ri = rid.getStringProperty("gid_ri");
+		String gid_vi = rid.getStringProperty("gid_vi");
+		
+		String lid_url = rid.getStringProperty("lid_url");
+		
+		GlobalResourceIdentifier gid = null;
+		if(gid_vi!=null)
+		{
+			gid = new GlobalResourceIdentifier(gid_ri, null, gid_vi);
+		}
+		
+		LocalResourceIdentifier lid = null;
+		if(lid_url!=null)
+		{
+			try
+			{
+				URL	url	= SUtil.getFile(new URL(lid_url)).getCanonicalFile().toURI().toURL();
+//				System.out.println("url: "+url);
+				lid = new LocalResourceIdentifier(root, url);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return gid!=null || lid!=null? new ResourceIdentifier(lid, gid): null;
+	}
+
+	/**
+	 *  Test if a rid is local to this platform.
+	 *  Test is performed by MAC address.
+	 *  Root cid is only used as fallback.
+	 */
+	public static boolean	isLocal(IResourceIdentifier rid, IComponentIdentifier root)
+	{
+		return rid!=null && rid.getLocalIdentifier()!=null &&
+			(SUtil.equals(rid.getLocalIdentifier().getHostIdentifier(), SUtil.getMacAddress()) || SUtil.equals(rid.getLocalIdentifier().getHostIdentifier(), root.getName()));
+	}
+
 	/**
 	 *  Get a string representation of this object.
 	 */

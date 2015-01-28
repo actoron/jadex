@@ -1021,7 +1021,8 @@ public class StarterPanel extends JLayeredPane
 					props.addProperty(new Property("model", result.getFirstEntity()));
 					props.addProperty(new Property("ridurl", result.getSecondEntity()));
 					// todo: save also repo info of gid
-					String id = lastrid!=null && lastrid.getGlobalIdentifier()!=null? lastrid.getGlobalIdentifier().getResourceId(): null;
+					String id = lastrid!=null && lastrid.getGlobalIdentifier()!=null && lastrid.getGlobalIdentifier().getResourceId()!=null
+						&& !lastrid.getGlobalIdentifier().getResourceId().startsWith("::") ? lastrid.getGlobalIdentifier().getResourceId(): null;
 					props.addProperty(new Property("globalrid", id));
 				}
 

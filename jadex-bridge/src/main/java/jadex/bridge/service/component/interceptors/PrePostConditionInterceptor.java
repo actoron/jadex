@@ -109,7 +109,7 @@ public class PrePostConditionInterceptor extends AbstractLRUApplicableIntercepto
 				{
 					if(args[i]==null)
 					{
-						ret = new IllegalArgumentException("Argument must not null: "+i);
+						ret = new IllegalArgumentException("Argument must not null: "+i+", "+context.getMethod());
 					}
 				}
 				else if(paramannos[i][j] instanceof CheckIndex)
