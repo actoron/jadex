@@ -15,6 +15,7 @@ import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -34,12 +35,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.omg.CORBA.FREE_MEM;
 
 /**
  *  The pool manager handles the pool resources.
@@ -57,13 +55,15 @@ public class GlobalPoolServiceManager
 	
 	/** All services. */
 	protected Map<IServiceIdentifier, IService> services;
+	
+	/** The services on hold (reported to be broken by proxies). */
 	protected Map<IServiceIdentifier, IService> onholds;
 	
 	/** The worker timers. */
 	protected Map<IServiceIdentifier, ITimer> timers;
 	
 	/** The current set of platforms. */
-	protected Map<IComponentIdentifier, IComponentManagementService> platforms;
+	protected Map<IComponentIdentifier, PlatformInfo> platforms;
 	
 	/** The current set of free platforms. */
 	protected Map<IComponentIdentifier, IComponentManagementService> freeplatforms;
@@ -71,20 +71,24 @@ public class GlobalPoolServiceManager
 	/** The component. */
 	protected IInternalAccess component;
 	
+	//-------- worker info --------
+	
 	/** The service type. */
 	protected Class<?> servicetype;
 	
 	/** The worker component name. */
 	protected String componentname;
 		
-	/** The creation info. */
+	/** The creation info for the workers. */
 	protected CreationInfo info;
+
+	//-------- pool strategy --------
 	
 	/** The latest usage infos per worker (service id). */
 	protected Map<IServiceIdentifier, UsageInfo> usages;
 	
-	/** The number of services delivered per proxy. */
-	protected int numservices;
+	/** The strategy. */
+	protected IGlobalPoolStrategy strategy;
 	
 	//-------- constructors --------
 	
@@ -92,7 +96,7 @@ public class GlobalPoolServiceManager
 	 *  Create a new service handler.
 	 */
 	public GlobalPoolServiceManager (IInternalAccess component, Class<?> servicetype, 
-		String componentname, CreationInfo info, int numservices)
+		String componentname, CreationInfo info, IGlobalPoolStrategy strategy)
 	{
 		this.component = component;
 		this.servicetype = servicetype;
@@ -100,16 +104,18 @@ public class GlobalPoolServiceManager
 		this.services = new HashMap<IServiceIdentifier, IService>();
 		this.onholds = new HashMap<IServiceIdentifier, IService>();
 		this.timers = new HashMap<IServiceIdentifier, ITimer>();
-		this.platforms = new HashMap<IComponentIdentifier, IComponentManagementService>();
+		this.platforms = new HashMap<IComponentIdentifier, PlatformInfo>();
 		this.freeplatforms = new HashMap<IComponentIdentifier, IComponentManagementService>();
 		this.info = info;
-		this.numservices = numservices;
 		this.usages = new HashMap<IServiceIdentifier, UsageInfo>();
+		this.strategy = strategy;
 	}
 	
 	//-------- methods --------
 
 	/**
+	 *  Proxies call this method to get services (workers) from the pool.
+	 * 
 	 *  Get a set of services managed by the pool.
 	 *  @param type The service type.
 	 *  @return A number of services from the pool.
@@ -148,21 +154,22 @@ public class GlobalPoolServiceManager
 				{
 					System.out.println("Potentially broken service on hold: "+broken);
 					onholds.put(broken, ser);
-					IComponentManagementService cms = platforms.get(broken.getProviderId().getRoot());
-					if(cms!=null)
-					{
-						System.out.println("adding free broken: "+broken.getProviderId().getRoot());
-						freeplatforms.put(broken.getProviderId().getRoot(), cms);
-					}
+					updateServiceRemoved(broken);
+//					IComponentIdentifier cid = broken.getProviderId().getRoot();
+//					PlatformInfo pi = platforms.get(cid);
+//					pi.setWorker(null);
+//					System.out.println("adding free broken: "+broken.getProviderId().getRoot());
+//					freeplatforms.put(cid, pi.getCms());
+//					strategy.workersRemoved(cid);
 				}
 			}
 		}
 
 		// If too few services are available try to create new ones
-		if(services.size()<numservices)
+		if(services.size()<strategy.getDesiredWorkerCount())
 		{
 			final List<IService> sers = new ArrayList<IService>(services.values());
-			createServices(numservices-services.size()).addResultListener(new IIntermediateResultListener<IService>() 
+			createServices(strategy.getDesiredWorkerCount()-services.size()).addResultListener(new IIntermediateResultListener<IService>() 
 			{
 				int cnt = 0;
 				public void intermediateResultAvailable(IService result) 
@@ -173,12 +180,12 @@ public class GlobalPoolServiceManager
 
 				public void finished() 
 				{
-					if(cnt<numservices)
+					if(cnt<strategy.getWorkersPerProxy())
 					{
 						for(IService ser: sers)
 						{
 							ret.addIntermediateResult(ser);
-							if(++cnt==numservices)
+							if(++cnt==strategy.getWorkersPerProxy())
 								break;
 						}
 					}
@@ -225,7 +232,7 @@ public class GlobalPoolServiceManager
 			for(IService ser: sers)
 			{
 				ret.addIntermediateResult(ser);
-				if(++cnt==numservices)
+				if(++cnt==strategy.getWorkersPerProxy())
 					break;
 			}
 			ret.setFinished();
@@ -284,9 +291,9 @@ public class GlobalPoolServiceManager
 		TerminableIntermediateFuture<IComponentManagementService> ret = new TerminableIntermediateFuture<IComponentManagementService>();
 		if(platforms!=null && platforms.size()>0)
 		{
-			for(IComponentManagementService cms: platforms.values())
+			for(PlatformInfo pi: platforms.values())
 			{
-				ret.addIntermediateResult(cms);
+				ret.addIntermediateResult(pi.getCms());
 			}
 			ret.setFinished();
 		}
@@ -300,7 +307,7 @@ public class GlobalPoolServiceManager
 					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
 					if(!platforms.containsKey(cid))
 					{
-						platforms.put(cid, cms);
+						platforms.put(cid, new PlatformInfo(cms, null));
 						super.customIntermediateResultAvailable(cms);
 					}
 				}
@@ -337,15 +344,15 @@ public class GlobalPoolServiceManager
 				{
 					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
 					if(!((IService)cms).getServiceIdentifier().getProviderId().getRoot().equals(component.getComponentIdentifier().getRoot())
-						&& !freeplatforms.containsKey(cid))
+						&& platforms.get(cid).getWorker()==null)
 					{
-						System.out.println("found free platform2: "+cid+" "+platforms);
+//						System.out.println("found free platform2: "+cid+" "+platforms);
 						freeplatforms.put(cid, cms);
 						ret.addIntermediateResult(cms);
 					}
 //					else
 //					{
-//						System.out.println("Excluding platform hosting the global pool: "+cms);
+//						System.out.println("Excluding platform: "+cms);
 //					}
 				}
 
@@ -389,19 +396,18 @@ public class GlobalPoolServiceManager
 			public void intermediateResultAvailable(final IComponentManagementService cms) 
 			{
 				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot()+" "+freeplatforms);
-				
-				if(creating[0]++<n)
+			
+				if(strategy.isCreateWorkerOn(((IService)cms).getServiceIdentifier().getProviderId().getRoot()) 
+					&& creating[0]++<n)
 				{
 					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
 					freeplatforms.remove(cid);
-					System.out.println("free are: "+freeplatforms+" "+cid);
+//					System.out.println("free are: "+freeplatforms+" "+cid);
 					
 					CreationInfo ci  = new CreationInfo(); // info!=null? new CreationInfo(info): 
 					ci.setImports(component.getModel().getAllImports());
 					
-					PoolServiceInfo psi = new PoolServiceInfo(componentname, servicetype);
-					if(info!=null && info.getArguments()!=null)
-						psi.setArguments(info.getArguments());
+					PoolServiceInfo psi = new PoolServiceInfo(info, componentname, servicetype, null, null);
 					Map<String, Object> args = new HashMap<String, Object>();
 					args.put("serviceinfos", new PoolServiceInfo[]{psi});
 					ci.setArguments(args);
@@ -423,7 +429,14 @@ public class GlobalPoolServiceManager
 									{
 										public void resultAvailable(final IService ser)
 										{
-											services.put(ser.getServiceIdentifier(), ser);
+											// update worker infos
+											updateServiceAdded(ser);
+//											services.put(ser.getServiceIdentifier(), ser);
+//											IComponentIdentifier cid = ser.getServiceIdentifier().getProviderId().getRoot();
+//											PlatformInfo pi = platforms.get(cid);
+//											pi.setWorker(ser);
+//											strategy.workersAdded(cid);
+											
 											updateWorkerTimer(ser.getServiceIdentifier()).addResultListener(new IResultListener<Void>() 
 											{
 												public void resultAvailable(Void result) 
@@ -522,7 +535,7 @@ public class GlobalPoolServiceManager
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		long workerto = 1000*60*2; // default 2 min
+		long workerto = strategy.getWorkerTimeout(); 
 		
 		if(workerto>0)// && false)
 		{
@@ -538,26 +551,17 @@ public class GlobalPoolServiceManager
 							// When timer triggers check that pool contains service and remove it
 							if(services.containsKey(sid))
 							{
-								return removeService(sid); //.addResultListener(new DelegationResultListener<Void>(ret));
-								
-//								boolean remove = strategy.workerTimeoutOccurred();
-//								if(remove)
-//								{
-////									System.out.println("timeout of worker: "+service);
-//									idleservices.remove(service);
-//									removeService(service);
-//								}
-//								else
-//								{
-//									// add service to pool and initiate timer
-//									updateWorkerTimer(service).addResultListener(new DefaultResultListener<Void>()
-//									{
-//										public void resultAvailable(Void result)
-//										{
-//											// nop
-//										}
-//									});
-//								}
+								boolean remove = strategy.workerTimeoutOccurred(sid.getProviderId().getRoot());
+								if(remove)
+								{
+//									System.out.println("timeout of worker: "+service);
+									return removeService(sid);
+								}
+								else
+								{
+									// add service to pool and initiate timer
+									return updateWorkerTimer(sid);
+								}
 							}
 							else
 							{
@@ -612,13 +616,44 @@ public class GlobalPoolServiceManager
 			public void customResultAvailable(Map<String, Object> result) 
 			{
 				System.out.println("removed worker: "+workercid);
+				updateServiceRemoved(sid);
 //				System.out.println("strategy state: "+strategy);
-				services.remove(sid);
+//				services.remove(sid);
+//				IComponentIdentifier cid = sid.getProviderId().getRoot();
+//				PlatformInfo pi = platforms.get(cid);
+//				pi.setWorker(null);
+//				freeplatforms.put(cid, platforms.get(cid).getCms());
+//				strategy.workers(cid);
 				ret.setResult(null);
 			}
 		}));
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void updateServiceAdded(IService ser)
+	{
+		services.put(ser.getServiceIdentifier(), ser);
+		IComponentIdentifier cid = ser.getServiceIdentifier().getProviderId().getRoot();
+		PlatformInfo pi = platforms.get(cid);
+		pi.setWorker(ser);
+		strategy.workersAdded(cid);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void updateServiceRemoved(IServiceIdentifier sid)
+	{
+		services.remove(sid);
+		IComponentIdentifier cid = sid.getProviderId().getRoot();
+		PlatformInfo pi = platforms.get(cid);
+		pi.setWorker(null);
+		freeplatforms.put(cid, platforms.get(cid).getCms());
+		strategy.workersRemoved(cid);
 	}
 	
 	/**
@@ -638,6 +673,63 @@ public class GlobalPoolServiceManager
 		return ret;
 	}
 
+	/**
+	 * 
+	 */
+	public static class PlatformInfo
+	{
+		/** The cms. */
+		protected IComponentManagementService cms;
+		
+		/** The worker(s) that have been created on the platform. */
+		protected IService worker;
+
+		/**
+		 * Create a new PlatformInfo.
+		 */
+		public PlatformInfo(IComponentManagementService cms, IService worker) 
+		{
+			this.cms = cms;
+			this.worker = worker;
+		}
+
+		/**
+		 *  Get the cms.
+		 *  @return the cms
+		 */
+		public IComponentManagementService getCms() 
+		{
+			return cms;
+		}
+
+		/**
+		 *  Set the cms.
+		 *  @param cms The cms to set
+		 */
+		public void setCms(IComponentManagementService cms) 
+		{
+			this.cms = cms;
+		}
+
+		/**
+		 *  Get the worker.
+		 *  @return the worker
+		 */
+		public IService getWorker() 
+		{
+			return worker;
+		}
+
+		/**
+		 *  Set the worker.
+		 *  @param worker The worker to set
+		 */
+		public void setWorker(IService worker) 
+		{
+			this.worker = worker;
+		}
+	}
+	
 //	/**
 //	 *  Get the string representation.
 //	 */

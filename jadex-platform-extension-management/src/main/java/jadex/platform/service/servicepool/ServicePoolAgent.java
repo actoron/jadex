@@ -66,9 +66,12 @@ public class ServicePoolAgent implements IServicePoolService
 			for(PoolServiceInfo psi: psis)
 			{
 				IPoolStrategy str = psi.getPoolStrategy()==null? new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
-					Runtime.getRuntime().availableProcessors()+1): psi.getPoolStrategy();
+					Runtime.getRuntime().availableProcessors()+1): (IPoolStrategy)psi.getPoolStrategy();
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
-				addServiceType(psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports()), str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
+				Class<?> sertype = psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports());
+				if(sertype==null)
+					System.out.println("kaputt");
+				addServiceType(sertype, str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
 			}
 		}
 		else
@@ -160,8 +163,16 @@ public class ServicePoolAgent implements IServicePoolService
 		servicetypes.put(servicetype, handler);
 
 		// add service proxy
+		try
+		{
 		Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
 		return agent.addService(null, servicetype, service, pi, scope);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 	
 	

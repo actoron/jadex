@@ -89,10 +89,9 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 			CounterResultListener<Void> lis = new CounterResultListener<Void>(psis.length, true, new DelegationResultListener<Void>(ret));
 			for(PoolServiceInfo psi: psis)
 			{
-//				IPoolStrategy str = psi.getPoolStrategy()==null? new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
-//					Runtime.getRuntime().availableProcessors()+1): psi.getPoolStrategy();
-				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
-				addServiceType(psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports()), psi.getWorkermodel(), ci).addResultListener(lis);
+				IGlobalPoolStrategy str = psi.getPoolStrategy()==null? new ConstantGlobalPoolStrategy(): (IGlobalPoolStrategy)psi.getPoolStrategy();
+//				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
+				addServiceType(psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports()), psi.getWorkermodel(), psi.getCreationInfo(), str).addResultListener(lis);
 			}
 		}
 		else
@@ -108,11 +107,11 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	 *  @param servicetype The service type.
 	 *  @param componentmodel The component model.
 	 */
-	public IFuture<Void> addServiceType(final Class<?> servicetype, final String componentmodel, CreationInfo info)
+	public IFuture<Void> addServiceType(final Class<?> servicetype, final String componentmodel, CreationInfo info, IGlobalPoolStrategy strategy)
 	{
 		final Future<Void> ret = new Future<Void>();
 		// Create one service manager per service type
-		GlobalPoolServiceManager manager = new GlobalPoolServiceManager(agent, servicetype, componentmodel, info, 3);
+		GlobalPoolServiceManager manager = new GlobalPoolServiceManager(agent, servicetype, componentmodel, info, strategy);
 		managers.put(servicetype, manager);
 		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
 		// todo: fix if more than one service type should be supported by one worker (not intended)
