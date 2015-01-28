@@ -36,20 +36,23 @@ public interface IServicePoolService
 	 *  @param componentmodel The component model.
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel);
+//	
+//	/**
+//	 *  Add a new service type and a strategy.
+//	 *  @param servicetype The service type.
+//	 *  @param strategy The service pool strategy.
+//	 *  @param componentmodel The component model.
+//	 */
+//	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi);
 	
 	/**
 	 *  Add a new service type and a strategy.
 	 *  @param servicetype The service type.
 	 *  @param strategy The service pool strategy.
 	 *  @param componentmodel The component model.
-	 */
-	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi);
-	
-	/**
-	 *  Add a new service type and a strategy.
-	 *  @param servicetype The service type.
-	 *  @param strategy The service pool strategy.
-	 *  @param componentmodel The component model.
+	 *  @param info The worker creation info.
+	 *  @param pi The worker publish info. 
+	 *  @param scope The service publication scope.
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi, String scope);
 

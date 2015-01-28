@@ -15,7 +15,7 @@ public interface IGlobalServicePoolService
 	 *  @param servicetype The service type.
 	 *  @param componentmodel The component model.
 	 */
-	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel, CreationInfo info);
+	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel, CreationInfo info, IGlobalPoolStrategy strategy);
 	
 	/**
 	 *  Remove a service type.
