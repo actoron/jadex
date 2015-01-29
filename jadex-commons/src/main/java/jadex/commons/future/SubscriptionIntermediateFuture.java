@@ -103,7 +103,8 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
     	}
     	
-//    	System.out.println("adding listener: "+listener);
+//    	System.out.println("adding listener: "+this+" "+listener);
+    	
     	boolean first;
     	synchronized(this)
 		{

@@ -627,7 +627,8 @@ public class DisplayPanel extends JComponent
 							if(!progress.isFinished())
 							{
 								bar.setStringPainted(true);
-								bar.setValue(((Number)progressdata.get(progress)).intValue());
+								bar.setValue(progress.getProgress());
+//								bar.setValue(((Number)progressdata.get(progress)).intValue());
 								width	= Math.min(corw-10, barsize.width);
 								x	= bounds.x+drawarea.x+corx + (corw-width)/2;
 								y	= y + fm.getHeight()*2 + 2;
@@ -642,7 +643,7 @@ public class DisplayPanel extends JComponent
 							bar.setStringPainted(false);
 							int	x	= bounds.x+drawarea.x+corx + 2;
 							int	y	= bounds.y+drawarea.y+cory + Math.max((corh-barsize.height)/2, 2);
-							bar.setValue(((Number)progressdata.get(progress)).intValue());
+							bar.setValue(progress.getProgress());
 							bar.setBounds(0, 0, corw-4, Math.min(barsize.height, corh-4));
 							Graphics	g2	= g.create();
 							g2.translate(x, y);

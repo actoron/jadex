@@ -1,5 +1,7 @@
 package jadex.platform.service.globalservicepool.mandelbrot;
 
+import jadex.bridge.IComponentIdentifier;
+
 /**
  * 
  */
@@ -11,6 +13,9 @@ public class CalculateEvent
 	/** The progress data. */
 	protected Integer progressdata;
 
+	/** The worker id. */
+	protected IComponentIdentifier cid;
+	
 	/**
 	 *  Create a new CalculateEvent.
 	 */
@@ -21,26 +26,27 @@ public class CalculateEvent
 	/**
 	 *  Create a new CalculateEvent.
 	 */
-	public CalculateEvent(AreaData areaData) 
+	public CalculateEvent(AreaData areaData, IComponentIdentifier cid) 
 	{
-		this(areaData, null);
+		this(areaData, null, cid);
 	}
 	
 	/**
 	 *  Create a new CalculateEvent.
 	 */
-	public CalculateEvent(Integer progressData) 
+	public CalculateEvent(Integer progressdata, IComponentIdentifier cid) 
 	{
-		this(null, progressData);
+		this(null, progressdata, cid);
 	}
 	
 	/**
 	 *  Create a new CalculateEvent.
 	 */
-	public CalculateEvent(AreaData areaData, Integer progressData) 
+	public CalculateEvent(AreaData areadata, Integer progressdata, IComponentIdentifier cid) 
 	{
-		this.areadata = areaData;
-		this.progressdata = progressData;
+		this.areadata = areadata;
+		this.progressdata = progressdata;
+		this.cid = cid;
 	}
 
 	/**
@@ -78,6 +84,22 @@ public class CalculateEvent
 	{
 		this.progressdata = progressData;
 	}
-	
-	
+
+	/**
+	 *  Get the cid.
+	 *  @return the cid
+	 */
+	public IComponentIdentifier getCid()
+	{
+		return cid;
+	}
+
+	/**
+	 *  Set the cid.
+	 *  @param cid The cid to set
+	 */
+	public void setCid(IComponentIdentifier cid)
+	{
+		this.cid = cid;
+	}
 }

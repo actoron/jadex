@@ -1,12 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.monitoring.IMonitoringService;
-import jadex.commons.future.CallMultiplexer;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

@@ -817,7 +817,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							if(future instanceof ISubscriptionIntermediateFuture)
 							{
 								// IResultListener not allowed for subscription future.
-								((ISubscriptionIntermediateFuture)future).addResultListener(ia.createResultListener(new IIntermediateFutureCommandResultListener<Object>()
+								((ISubscriptionIntermediateFuture)future).addQuietListener(ia.createResultListener(new IIntermediateFutureCommandResultListener<Object>()
 								{
 									public void intermediateResultAvailable(Object result)
 									{

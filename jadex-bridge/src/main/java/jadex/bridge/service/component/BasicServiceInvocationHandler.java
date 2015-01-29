@@ -177,7 +177,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //		if(method.getName().indexOf("getExternalAccess")!=-1)
 //			System.out.println("call method ex");
 		
-//		if(method.getName().indexOf("getChildren")!=-1)
+//		if(method.getName().indexOf("calculate")!=-1)
 //			System.out.println("call method child");
 		
 //		ServiceInvocationContext sicon = null;
@@ -228,6 +228,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					{
 //						if(sic.getMethod().getName().indexOf("test")!=-1)
 //							System.out.println("connect: "+sic.getMethod().getName());
+//						if(method.getName().indexOf("calculate")!=-1)
+//							System.out.println("connect: "+proxy+" "+sic);
 						FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
 					}
 				});
