@@ -45,7 +45,7 @@ public class ColorChooserPanel	extends JPanel
 		gbc.weighty	= 1;
 		gbc.insets	= new Insets(1, 1, 1, 1);
 		
-		final JCheckBox	cycle	= new JCheckBox("Cycle", GenerateService.ALGORITHMS[0].useColorCycle());
+		final JCheckBox	cycle	= new JCheckBox("Cycle", GenerateAgent.ALGORITHMS[0].useColorCycle());
 		
 		final DefaultListModel	lm	= new DefaultListModel();
 		lm.addElement(new Color(204, 204, 255));

@@ -395,7 +395,7 @@ public class GlobalPoolServiceManager
 			boolean fini = false;
 			public void intermediateResultAvailable(final IComponentManagementService cms) 
 			{
-				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot()+" "+freeplatforms);
+//				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot()+" "+freeplatforms);
 			
 				if(strategy.isCreateWorkerOn(((IService)cms).getServiceIdentifier().getProviderId().getRoot()) 
 					&& creating[0]++<n)
@@ -576,7 +576,7 @@ public class GlobalPoolServiceManager
 				public void customResultAvailable(ITimer timer)
 				{
 					// remember timer
-					System.out.println("Updated worker timer: "+sid);
+//					System.out.println("Updated worker timer: "+sid);
 					ITimer oldt = timers.put(sid, timer);
 					if(oldt!=null)
 						oldt.cancel();

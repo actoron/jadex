@@ -10,6 +10,8 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
+import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -32,6 +34,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -129,6 +133,11 @@ public class DisplayPanel extends JComponent
 						else if(result instanceof ProgressData)
 						{
 							addProgress((ProgressData)result);
+						}
+						else if(result instanceof Object[])
+						{
+							AreaData[] ads = (AreaData[])result;
+							setPartialResults(ads[0], ads[1]);
 						}
 					}
 					
@@ -350,6 +359,98 @@ public class DisplayPanel extends JComponent
 				calculating	= false;
 				DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
+				getParent().invalidate();
+				getParent().doLayout();
+				getParent().repaint();
+			}
+		});
+	}
+	
+	/**
+	 *  Set new results.
+	 */
+	public void	setPartialResults(final AreaData all, final AreaData partial)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				if(image==null || !all.equalsWithoutData(data))
+				{
+//					System.out.println("new img");
+					DisplayPanel.this.data	= all;
+					data.setData(new short[all.getSizeX()][all.getSizeY()]);
+					if(image==null || image.getWidth(null)!=all.getSizeX() || image.getHeight(null)!=all.getSizeY())
+					{
+						if(image!=null)
+							System.out.println("create fresh image: "+image.getHeight(null)+" "+image.getWidth(null));
+						image = createImage(all.getSizeX(), all.getSizeY());
+					}
+				}
+
+				final int xs = partial.getXOffset();
+				final int ys = partial.getYOffset();
+	
+				final short[][] results = partial.fetchData();
+		
+//				JFrame f = new JFrame();
+//				Canvas ca = new Canvas()
+//				{
+//					public void paint(Graphics g) 
+//					{
+//						for(int yi=0; yi<partial.getSizeY(); yi++)
+//						{
+//							for(int xi=0; xi<partial.getSizeX(); xi++)
+//							{
+//								Color	c;
+//								if(results[xi][yi]==-1)
+//								{
+//									c	= Color.black;
+//								}
+//								else
+//								{
+//									c	= colors[results[xi][yi]%colors.length];
+//								}
+//								g.setColor(c);
+////								g.drawLine(x, results[x].length-y-1, x, results[x].length-y-1);	// Todo: use euclidean coordinates
+//								g.drawLine(xi, yi, xi, yi);
+//							}
+//						}
+//					}
+//				};
+//				f.getContentPane().add(ca, BorderLayout.CENTER);
+//				f.pack();
+//				f.setVisible(true);
+				
+				// todo: allow set finished instead of copy twice
+//				GenerateService.copyPartialData(partial, DisplayPanel.this.data);
+				
+				Graphics	g	= image.getGraphics();
+							
+//				System.out.println("x:y: end "+xs+" "+ys);
+//				System.out.println("partial: "+SUtil.arrayToString(partial.fetchData()));
+				for(int yi=0; yi<partial.getSizeY(); yi++)
+				{
+					for(int xi=0; xi<partial.getSizeX(); xi++)
+					{
+						Color	c;
+						if(results[xi][yi]==-1)
+						{
+							c	= Color.black;
+						}
+						else
+						{
+							c	= colors[results[xi][yi]%colors.length];
+						}
+						g.setColor(c);
+//						g.drawLine(x, results[x].length-y-1, x, results[x].length-y-1);	// Todo: use euclidean coordinates
+						g.drawLine(xs+xi, ys+yi, xs+xi, ys+yi);
+					}
+				}
+				
+				point	= null;
+				range	= null;
+				
 				getParent().invalidate();
 				getParent().doLayout();
 				getParent().repaint();
@@ -594,7 +695,7 @@ public class DisplayPanel extends JComponent
 					g.setColor(Color.white);
 					g.drawRect(bounds.x+drawarea.x+corx, bounds.y+drawarea.y+cory, corw, corh);
 					
-					System.out.println("provid: "+progress.getProviderId());
+//					System.out.println("provid: "+progress.getProviderId());
 
 					// Print provider name.
 					if(progress.getProviderId()!=null)
@@ -796,7 +897,7 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			short	max	= data!=null ? data.getMax() : GenerateService.ALGORITHMS[0].getDefaultSettings().getMax();
+			short	max	= data!=null ? data.getMax() : GenerateAgent.ALGORITHMS[0].getDefaultSettings().getMax();
 			colors	= new Color[max];
 			for(int i=0; i<colors.length; i++)
 			{
@@ -894,7 +995,7 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			settings	= GenerateService.ALGORITHMS[0].getDefaultSettings();
+			settings	= GenerateAgent.ALGORITHMS[0].getDefaultSettings();
 		}
 		
 		final Rectangle	bounds	= getInnerBounds(false);
@@ -968,7 +1069,7 @@ public class DisplayPanel extends JComponent
 	{
 		AreaData	settings;
 		if(data==null)
-			settings	= GenerateService.ALGORITHMS[0].getDefaultSettings();
+			settings	= GenerateAgent.ALGORITHMS[0].getDefaultSettings();
 		else
 			settings	= data;
 		

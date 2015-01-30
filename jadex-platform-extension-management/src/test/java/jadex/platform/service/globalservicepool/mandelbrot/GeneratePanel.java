@@ -41,7 +41,7 @@ public class GeneratePanel extends JPanel
 		this.setLayout(new BorderLayout());
 		this.pp	= new PropertiesPanel("Generate Options");
 		
-		final JComboBox	alg	= new JComboBox(GenerateService.ALGORITHMS);
+		final JComboBox	alg	= new JComboBox(GenerateAgent.ALGORITHMS);
 		alg.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent e)
@@ -51,7 +51,7 @@ public class GeneratePanel extends JPanel
 		});
 		
 		pp.addComponent("algorithm", alg, 0);
-		AreaData	data	= GenerateService.ALGORITHMS[0].getDefaultSettings();
+		AreaData	data	= GenerateAgent.ALGORITHMS[0].getDefaultSettings();
 		
 		pp.createTextField("xmin", ""+data.getXStart(), true, 0);
 		pp.createTextField("xmax", ""+data.getXEnd(), true, 0);

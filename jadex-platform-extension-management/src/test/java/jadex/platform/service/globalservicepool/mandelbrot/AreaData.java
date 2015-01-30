@@ -96,6 +96,15 @@ public class AreaData
 		this.data = data;
 		this.displayid = displayid;
 	}
+	
+	/**
+	 *  Create a new area data as clone
+	 *  without contained data.
+	 */
+	public AreaData(AreaData data)
+	{
+		this(data.xstart, data.xend, data.ystart, data.yend, data.xoff, data.yoff, data.sizex, data.sizey, data.max, data.par, data.tasksize, data.algorithm, data.cid, null, data.displayid);
+	}
 
 	/**
 	 * Get the xstart.
@@ -436,6 +445,22 @@ public class AreaData
 		return toString();
 	}
 
+	/**
+	 * 
+	 */
+	public boolean equalsWithoutData(AreaData data)
+	{
+		boolean ret = false;
+		if(data!=null)
+		{
+			ret = data.getXStart()==getXStart() && data.getYStart()==getYStart() 
+				&& data.getXEnd()==getXEnd() && data.getYEnd()==getYEnd()
+				&& data.getSizeX()==getSizeX() && data.getSizeY()==getSizeY(); 
+		}
+		return ret;
+	}
+	
+	
 	// /**
 	// * Get the string representation.
 	// */

@@ -17,7 +17,12 @@ public interface IDisplayService
 	/**
 	 *  Display intermediate calculation results.
 	 */
-	public IFuture<Void> displayIntermediateResult(ProgressData progress);
+	public IFuture<Void> displayProgress(ProgressData progress);
+	
+	/**
+	 *  Display intermediate calculation results.
+	 */
+	public IFuture<Void> displayPartialResult(AreaData all, AreaData data);
 	
 	/**
 	 *  Subscribe to display events.

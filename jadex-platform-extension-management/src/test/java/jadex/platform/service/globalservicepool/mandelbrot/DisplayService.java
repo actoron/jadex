@@ -57,7 +57,7 @@ public class DisplayService implements IDisplayService
 	/**
 	 *  Display intermediate calculation results.
 	 */
-	public IFuture<Void> displayIntermediateResult(ProgressData progress)
+	public IFuture<Void> displayProgress(ProgressData progress)
 	{
 //		System.out.println("displayInRes");
 //		agent.getPanel().addProgress(progress);
@@ -74,6 +74,32 @@ public class DisplayService implements IDisplayService
 			{
 				SubscriptionIntermediateFuture<Object> sub = it.next();
 				sub.addIntermediateResult(progress);
+			}
+		}
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Display intermediate calculation results.
+	 */
+	public IFuture<Void> displayPartialResult(AreaData all, AreaData data)
+	{
+//		System.out.println("displayInRes");
+//		agent.getPanel().addProgress(progress);
+		String id = data.getDisplayId();
+		if(id!=null)
+		{
+			SubscriptionIntermediateFuture<Object> sub = subscribers.get(id);
+			sub.addIntermediateResult(new AreaData[]{all, data});
+		}
+		else
+		{
+			// todo: use default display
+			for(Iterator<SubscriptionIntermediateFuture<Object>> it=subscribers.values().iterator(); it.hasNext(); )
+			{
+				SubscriptionIntermediateFuture<Object> sub = it.next();
+				sub.addIntermediateResult(new AreaData[]{all, data});
 			}
 		}
 		
