@@ -23,7 +23,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.bridge.service.types.settings.ISettingsService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
@@ -1011,7 +1011,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 												
 												public void finished()
 												{
-													System.out.println("finished");
+//													System.out.println("finished");
 													try
 													{
 														os.close();
@@ -1026,7 +1026,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 												public void intermediateResultAvailable(Long result)
 												{
 													// ignore
-													System.out.println("update: "+result);
+//													System.out.println("update: "+result);
 												}
 												
 												public void resultAvailable(Collection<Long> result)
@@ -1066,23 +1066,23 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				final PipedOutputStream	pos	= new PipedOutputStream();
 				is	= new PipedInputStream(pos, 8192*4);
 				
-				SServiceProvider.getService(component.getExternalAccess().getServiceProvider(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new IResultListener<IThreadPoolService>()
+				SServiceProvider.getService(component.getExternalAccess().getServiceProvider(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 				{
-					public void resultAvailable(IThreadPoolService tps)
+					public void resultAvailable(IDaemonThreadPoolService tps)
 					{
 						tps.execute(new Runnable()
 						{
 							public void run()
 							{
 								SUtil.writeDirectory(file, new BufferedOutputStream(pos));
-								try
-								{
-									is.close();
-								}
-								catch(IOException e)
-								{
-								}
+//								try
+//								{
+//									is.close();
+//								}
+//								catch(IOException e)
+//								{
+//								}
 							}
 						});
 					}

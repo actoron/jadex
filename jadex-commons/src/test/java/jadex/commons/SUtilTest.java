@@ -3,7 +3,6 @@ package jadex.commons;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,29 +38,17 @@ public class SUtilTest //extends TestCase
 	@Test
 	public void	testFileZippingAndHashing() throws Exception
 	{
-		File	temp	= new File("temp");
-		File	zip	= new File(temp, "zip");
-		File	dir	= new File(zip, "dir");
-		File	subdir	= new File(dir, "subdir");
-		subdir.mkdirs();
+//		File	src	= new File("../jadex-applications-micro/target/classes");
+		File	src	= new File("../jadex-commons/target/classes");
+		File	dest	= new File("temp", "test.jar");
+		dest.getParentFile().mkdirs();
 		
-		java.util.Properties	props	= new java.util.Properties();
-		FileWriter	fw	= new FileWriter(new File(zip, "test.properties"));
-		props.store(fw, "test");
-		fw.close();
-		fw	= new FileWriter(new File(dir, "test1.properties"));
-		props.store(fw, "test1");
-		fw.close();
-		fw	= new FileWriter(new File(subdir, "test2.properties"));
-		props.store(fw, "test2");
-		fw.close();
-		
-		FileOutputStream	fos	= new FileOutputStream(new File(temp, "test.jar"));
-		SUtil.writeDirectory(zip, new BufferedOutputStream(fos));
+		FileOutputStream	fos	= new FileOutputStream(dest);
+		SUtil.writeDirectory(src, new BufferedOutputStream(fos));
 		fos.close();
 		
-		Assert.assertEquals(SUtil.getHashCode(zip), SUtil.getHashCode(new File(temp, "test.jar")));
+		Assert.assertEquals(SUtil.getHashCode(src), SUtil.getHashCode(dest));
 		
-		SUtil.deleteDirectory(temp);
+		SUtil.deleteDirectory(dest.getParentFile());
 	}
 }

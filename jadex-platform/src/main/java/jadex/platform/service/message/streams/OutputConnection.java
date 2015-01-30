@@ -5,6 +5,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -116,123 +120,154 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 						// Stop transfer on cancel etc.
 						if(ret.isDone())
 						{
-							buf	= null;
-							close();
-							try
-							{
-								is.close();
-							}
-							catch(Exception e)
-							{
-							}
+							finished(null);
 						}
 						else
 						{
 							try
 							{
 								int size = Math.min(bytes.intValue(), is.available());
-								filesize[0] += size;
-								if(buf==null || buf.length!=size)
+								if(size>0)
 								{
-									buf = new byte[size];
-								}
-								int read = 0;
-								// Hack!!! Should only read once, as subsequent reads might block, because available() only provides an estimate
-								while(read!=buf.length)
-								{
-									read += is.read(buf, read, buf.length-read);
-								}
-								write(buf);
-//								System.out.println("wrote: "+filesize[0]);
-								
-								ret.addIntermediateResultIfUndone(Long.valueOf(filesize[0]));
-								
-								// Hack!!! Should not assume that stream is at end, only if currently no bytes are available
-								if(is.available()>0)
-								{
-//									final IResultListener<Integer> lis = this;
-//									ia.waitForDelay(100, new IComponentStep<Void>()
-//									{
-//										public IFuture<Void> execute(IInternalAccess ia)
-//										{
-//											waitForReady().addResultListener(ia.createResultListener(lis));
-//											return IFuture.DONE;
-//										}
-//									});
-									
-									// Cannot use simple version below, because this will lead to
-									// a non-ending loop of calls in local case (same platform, two components)
-									// (ia.createResultListener() does not help as is on right thread)
-//									waitForReady().addResultListener(ia.createResultListener(this));
-									waitForReady().addResultListener(ia.createResultListener(new IResultListener<Integer>()
+									if(buf==null || buf.length!=size)
 									{
-										public void resultAvailable(Integer result)
-										{
-											try
-											{
-												if(is.available()>0)
-												{
-													component.scheduleStep(self);
-												}
-												else
-												{
-													component.scheduleStep(self, 50);												
-												}
-											}
-											catch(Exception e)
-											{
-												buf	= null;
-												close();
-												ret.setExceptionIfUndone(e);
-												try
-												{
-													is.close();
-												}
-												catch(Exception ex)
-												{
-												}							
-											}
-										}
-										public void exceptionOccurred(Exception exception)
-										{
-										}
-									}));
+										buf = new byte[size];
+									}
+									int read = is.read(buf, 0, buf.length);
+									dataRead(read);
 								}
 								else
 								{
-									buf	= null;
-									close();
-									ret.setFinishedIfUndone();
-									is.close();
+									Future<Integer>	read	= new Future<Integer>();
+									asyncBlockingRead(read);
+									
+									read.addResultListener(ia.createResultListener(new IResultListener<Integer>()
+									{
+										public void resultAvailable(Integer read)
+										{
+											dataRead(read.intValue());
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											finished(exception);
+										}
+									}));
 								}
 							}
 							catch(Exception e)
 							{
-								buf	= null;
-								close();
-								ret.setExceptionIfUndone(e);
-								try
-								{
-									is.close();
-								}
-								catch(Exception ex)
-								{
-								}							
+								finished(e);
 							}
 						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						finished(exception);
+					}
+					
+					/**
+					 *  Called on end of transmission.
+					 */
+					protected void	finished(Exception ex)
+					{
 						buf	= null;
 						close();
-						ret.setExceptionIfUndone(exception);
+						if(ex!=null)
+						{
+							ret.setExceptionIfUndone(ex);
+						}
+						else
+						{
+							ret.setFinishedIfUndone();
+						}
+						
 						try
 						{
 							is.close();
 						}
 						catch(Exception e)
 						{
+						}
+					}
+					
+					/**
+					 *  Called, when read from input stream returned.
+					 */
+					protected void	dataRead(int read)
+					{
+						if(read==-1)
+						{
+							finished(null);							
+						}
+						else
+						{
+							// Maybe less bytes read than buffer size;
+							assert read<=buf.length;
+							if(read<buf.length)
+							{
+								byte[]	tmp	= new byte[read];
+								System.arraycopy(buf, 0, tmp, 0, read);
+								buf	= tmp;
+							}
+
+							write(buf);
+							filesize[0]	+= read;
+//							System.out.println("wrote: "+filesize[0]);
+							ret.addIntermediateResultIfUndone(Long.valueOf(filesize[0]));
+						
+							waitForReady().addResultListener(ia.createResultListener(new IResultListener<Integer>()
+							{
+								public void resultAvailable(Integer result)
+								{
+									component.scheduleStep(self);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									finished(exception);		
+								}
+							}));
+						}
+					}
+					
+					IDaemonThreadPoolService	dtps;
+					
+					/**
+					 *  Perform blocking read on extra thread.
+					 */
+					protected void	asyncBlockingRead(final Future<Integer> read)
+					{
+						if(dtps==null)
+						{
+							SServiceProvider.getService(component.getServiceProvider(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Integer>(read)
+							{
+								public void customResultAvailable(IDaemonThreadPoolService result)
+								{
+									dtps	= result;
+									asyncBlockingRead(read);
+								}
+							});
+						}
+						else
+						{
+							dtps.execute(new Runnable()
+							{
+								public void run()
+								{
+									try
+									{
+										int	len	= is.read(buf);
+										read.setResult(Integer.valueOf(len));
+									}
+									catch(Exception e)
+									{
+										read.setException(e);
+									}
+								}
+							});
 						}
 					}
 				}));

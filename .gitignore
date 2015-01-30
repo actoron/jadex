@@ -25,3 +25,4 @@ jadex-platform-standalone-launch/highscore.dmp
 **/.idea
 *.iml
 /jadex-android-bluetooth/lint.xml
+/jadex-platform-standalone-launch/.jadex/resources
