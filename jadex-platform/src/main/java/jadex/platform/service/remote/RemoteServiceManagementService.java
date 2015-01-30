@@ -9,6 +9,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
@@ -874,7 +875,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							{
 								public void customResultAvailable(IResourceIdentifier rid)
 								{
-									if(rid!=null && rid.getGlobalIdentifier()!=null)
+									if(rid!=null && rid.getGlobalIdentifier()!=null && !ResourceIdentifier.isJadexRid(rid))
 									{
 //										System.out.println("rid: "+rid+" "+content.getClass()+" "+msg.get(SFipa.SENDER));
 										msg.put(SFipa.X_RID, rid);

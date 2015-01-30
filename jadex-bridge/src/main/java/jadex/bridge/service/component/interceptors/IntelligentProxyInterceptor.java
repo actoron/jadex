@@ -104,7 +104,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
 					if(res instanceof IIntermediateFuture)
 					{
-						IIntermediateResultListener lis = new IIntermediateResultListener()
+						IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
 						{
 							boolean done;
 							public void intermediateResultAvailable(Object result)
@@ -118,7 +118,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 								proceed();
 							}
 							
-							public void resultAvailable(Collection result) 
+							public void resultAvailable(Collection<Object> result) 
 							{
 								proceed();
 							}
@@ -310,7 +310,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
 					if(res instanceof IIntermediateFuture)
 					{
-						IIntermediateResultListener lis = new IIntermediateResultListener()
+						IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
 						{
 							public void intermediateResultAvailable(Object result)
 							{
@@ -324,7 +324,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 								ret.setResult(res);
 							}
 							
-							public void resultAvailable(Collection result) 
+							public void resultAvailable(Collection<Object> result) 
 							{
 								ret.setResult(res);
 							}

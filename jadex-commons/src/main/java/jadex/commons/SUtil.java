@@ -4570,7 +4570,23 @@ public class SUtil
 	protected static void	hashDirectory(String root, File dir, MessageDigest md) throws Exception
 	{
 		File[]	files	= dir.listFiles();
-		Arrays.sort(files);
+		Arrays.sort(files, new Comparator<File>()
+		{
+			// Grr... files are sorted by default ignoring capitalization on windows but respecting capitalization on linux
+			// -> have to implement our own portable comparator for matching hash values on all systems. 
+			public int compare(File o1, File o2)
+			{
+				try
+				{
+					return o1.getCanonicalPath().compareTo(o2.getCanonicalPath());
+				}
+				catch(IOException e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		
 		for(File f: files)
 		{
 			if(f.isDirectory() && !(dir.getName().equals("META-INF") && dir.getParentFile().getAbsolutePath().equals(root)))
@@ -4579,7 +4595,7 @@ public class SUtil
 			}
 			else
 			{
-				String	fpath	= f.getAbsolutePath();
+				String	fpath	= f.getCanonicalPath();
 				assert fpath.startsWith(root);
 				String	entry	= fpath.substring(root.length()+1).replace(File.separatorChar, '/');
 //				System.out.println("Dir entry: "+entry);
@@ -4628,6 +4644,7 @@ public class SUtil
         	}
         	else
         	{
+//        		System.out.println("write: "+prefix+files[i].getName());
 	        	ZipEntry	ze	= new ZipEntry(prefix+files[i].getName());
 	        	ze.setTime(files[i].lastModified());
 	        	zos.putNextEntry(ze);
