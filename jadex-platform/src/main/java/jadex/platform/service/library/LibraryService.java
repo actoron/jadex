@@ -956,7 +956,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		// http://tools.ietf.org/html/rfc3548#section-4 for local storage of hashed resources
 		String	name	= rid.getGlobalIdentifier().getResourceId().substring(2).replace('+', '-').replace('/', '_') + ".jar";
 		
-		return new File("./.jadex/resources/"+name);
+		return new File(SUtil.JADEXDIR, "resources/"+name);
 	}
 	
 	/**

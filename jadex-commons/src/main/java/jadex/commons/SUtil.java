@@ -3,6 +3,7 @@ package jadex.commons;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
@@ -80,6 +81,9 @@ import java.util.zip.ZipOutputStream;
  */
 public class SUtil
 {
+	/** Directory were jadex stores files generated during runtime, to be used for later runs. */
+	public static final File	JADEXDIR	= new File("./.jadex");
+	
 	/** Line separator. */
 	public static final String LF = System.getProperty("line.separator");
 	
@@ -4483,22 +4487,26 @@ public class SUtil
 	//-------- file/jar hash --------
 	
 	/** LRU for hashes. */
-	// Todo: recompute during runtime?
-	protected static LRU<String, String>	hashes	= new LRU<String, String>(200);
+	protected static LRU<String, Tuple2<Long, String>>	HASHES	= loadHashCache();
+	
+	/** LRU for directory modification dates. */
+	protected static LRU<String, Long>	LASTMODS	= new LRU<String, Long>(1000);
 	
 	/**
 	 *  Get the hash code for a file or directory.
 	 */
 	public static String	getHashCode(File f)
 	{
+//		long	start0	= System.nanoTime();
 		try
 		{
 			String	path	= f.getCanonicalPath();
-			String	hash	= hashes.get(path);
+			Tuple2<Long, String>	entry	= HASHES.get(path);
+			String	hash	=	entry!=null ? entry.getSecondEntity() : null; 
 			
-			if(hash==null && f.exists())
+			if(f.exists() && (entry==null || entry.getFirstEntity().longValue()!=getLastModified(f)))
 			{
-				long	start	= System.nanoTime();
+//				long	start	= System.nanoTime();
 				MessageDigest md = MessageDigest.getInstance("SHA-512");
 				if(f.isDirectory())
 				{
@@ -4528,11 +4536,11 @@ public class SUtil
 								return o1.getName().compareTo(o2.getName());
 							}
 						});
-						for(ZipEntry entry: entries)
+						for(ZipEntry ze: entries)
 						{
-//							System.out.println("Zip entry: "+entry.getName());
-							md.update(entry.getName().getBytes("UTF-8"));
-							hashStream(zf.getInputStream(entry), md);
+//							System.out.println("Zip entry: "+ze.getName());
+							md.update(ze.getName().getBytes("UTF-8"));
+							hashStream(zf.getInputStream(ze), md);
 						}
 					}
 					catch(ZipException ze)
@@ -4549,12 +4557,15 @@ public class SUtil
 					}
 				}
 				hash	= new String(Base64.encode(md.digest()), "UTF-8");
-				long	end	= System.nanoTime();
 				
-				System.out.println("Hashing of "+(f.isDirectory() ? path : f.getName())+" took "+((end-start)/100000)/10.0+" ms: "+hash);
-				hashes.put(path, hash);
+//				long	end	= System.nanoTime();
+//				System.out.println("Hashing of "+(f.isDirectory() ? path : f.getName())+" took "+((end-start)/100000)/10.0+" ms: "+hash);
+				HASHES.put(path, new Tuple2<Long, String>(Long.valueOf(getLastModified(f)), hash));
+				saveHashCache();
 			}
 			
+//			long	end0	= System.nanoTime();
+//			System.out.println("Hashing of "+(f.isDirectory() ? path : f.getName())+" took "+((end0-start0)/100000)/10.0+" ms: "+hash);
 			return hash;
 		}
 		catch(Exception e)
@@ -4562,6 +4573,106 @@ public class SUtil
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 *  Load the stored hashes.
+	 */
+	protected static LRU<String, Tuple2<Long, String>>	loadHashCache()
+	{
+		LRU<String, Tuple2<Long, String>>	ret	= null;
+		
+		File	cache	= new File(JADEXDIR, "hash.cache");
+		if(cache.exists())
+		{
+			try
+			{
+				FileInputStream	fis	= new FileInputStream(cache);
+				ret	= (LRU<String, Tuple2<Long, String>>)SBinarySerializer2.readObjectFromStream(fis, null, null, null, null);
+			}
+			catch(Exception e)
+			{
+			}
+		}
+
+		return ret!=null ? ret : new LRU<String, Tuple2<Long,String>>(1000);
+	}
+	
+	/**
+	 *  Save the caclulated hashes.
+	 */
+	protected static void	saveHashCache()
+	{
+		File	cache	= new File(JADEXDIR, "hash.cache");
+		try
+		{
+			cache.getParentFile().mkdirs();
+			FileOutputStream	fos	= new FileOutputStream(cache);
+			SBinarySerializer2.writeObjectToStream(fos, HASHES, null);
+		}
+		catch(Exception e)
+		{
+			System.err.println("Warning: could not store hash cache: "+e);
+		}
+	}
+	
+	/**
+	 *  Recursively get the newest last modified of a file or directory tree.
+	 */
+	protected static long	getLastModified(File f)
+	{
+		long ret;
+		if(f.isDirectory())
+		{
+			try
+			{
+				String	path	= f.getCanonicalPath();
+				Long	lastmod	= LASTMODS.get(path);
+				if(lastmod!=null)
+				{
+					ret	= lastmod.longValue();
+				}
+				else
+				{
+					ret	= Integer.MIN_VALUE;
+					for(File f2: f.listFiles())
+					{
+						ret	= Math.max(ret, getLastModified(f2, true));
+					}
+					LASTMODS.put(path, Long.valueOf(ret));
+				}
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		else
+		{
+			ret	= f.lastModified();
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Recursively get the newest last modified of a file or directory tree.
+	 */
+	protected static long	getLastModified(File f, boolean nocache)
+	{
+		long ret;
+		if(f.isDirectory())
+		{
+			ret	= Integer.MIN_VALUE;
+			for(File f2: f.listFiles())
+			{
+				ret	= Math.max(ret, getLastModified(f2));
+			}
+		}
+		else
+		{
+			ret	= f.lastModified();
+		}
+		return ret;
 	}
 	
 	/**
