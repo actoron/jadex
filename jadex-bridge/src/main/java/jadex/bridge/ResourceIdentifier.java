@@ -64,7 +64,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 		"jadex-parent-pro",
 		"jadex-platform",
 		"jadex-platform-android",
-//		"jadex-platform-extension-management",	// Removed for testing global service pool
+		"jadex-platform-extension-management",	// Removed for testing global service pool
 		"jadex-platform-extension-maven",
 		"jadex-platform-extension-relay",
 		"jadex-platform-extension-relay-standalone",

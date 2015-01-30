@@ -6,11 +6,8 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.NameValue;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.globalservicepool.GlobalServicePoolAgent;
 import jadex.platform.service.servicepool.PoolServiceInfo;
 
