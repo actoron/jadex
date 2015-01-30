@@ -383,8 +383,12 @@ public class DisplayPanel extends JComponent
 					if(image==null || image.getWidth(null)!=all.getSizeX() || image.getHeight(null)!=all.getSizeY())
 					{
 						if(image!=null)
-							System.out.println("create fresh image: "+image.getHeight(null)+" "+image.getWidth(null));
+							System.out.println("create fresh image: "+image.getWidth(null)+" "+image.getHeight(null)+" "+all.getSizeX()+" "+all.getSizeY());
 						image = createImage(all.getSizeX(), all.getSizeY());
+					}
+					else
+					{
+						System.out.println("using existing image");
 					}
 				}
 
@@ -628,6 +632,7 @@ public class DisplayPanel extends JComponent
 			int	iwidth	= image.getWidth(this);
 			int iheight	= image.getHeight(this);
 			Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
+//			System.out.println("area: "+drawarea.width+" "+drawarea.height);
 
 			// Zoom into original image while calculating
 			if(calculating && range!=null)
@@ -1078,6 +1083,35 @@ public class DisplayPanel extends JComponent
 		
 		DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		calculating	= true;
+		
+//		if(image!=null)
+//		{
+//			Image old = image;
+//			image = createImage(sizex, sizey);
+//			
+//			Rectangle bounds = getInnerBounds(true);
+//			int	ix	= 0;
+//			int iy	= 0;
+//			final int iwidth	= image.getWidth(this);
+//			final int iheight	= image.getHeight(this);
+//			Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
+//			image.getGraphics().drawImage(old, bounds.x+drawarea.x, bounds.y+drawarea.y,
+//				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+//				ix, iy, ix+iwidth, iy+iheight, this);
+//			
+////			JFrame f = new JFrame();
+////			Canvas ca = new Canvas()
+////			{
+////				public void paint(Graphics g) 
+////				{
+////					g.drawImage(image, 0, 0, iwidth, iheight, 0, 0, iwidth, iheight, null);
+////				}
+////			};
+////			f.getContentPane().add(ca, BorderLayout.CENTER);
+////			f.pack();
+////			f.setVisible(true);
+//		}
+		
 		repaint();
 		
 //		if(manservice!=null)

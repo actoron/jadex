@@ -4,19 +4,22 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -25,6 +28,9 @@ import jadex.micro.annotation.RequiredServices;
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -37,7 +43,7 @@ import javax.swing.JTextPane;
  */
 @Description("Agent offering a display service.")
 @ProvidedServices({
-	@ProvidedService(type=IDisplayService.class, implementation=@Implementation(DisplayService.class))//,
+	@ProvidedService(type=IDisplayService.class)//,
 //	@ProvidedService(type=IAppProviderService.class, implementation=@Implementation(AppProviderService.class))
 })
 @RequiredServices({
@@ -45,23 +51,33 @@ import javax.swing.JTextPane;
 	@RequiredService(name="cmsservice", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 	//@RequiredService(name="mandelservice", type=IMandelbrotService.class)
 })
-public class DisplayAgent extends MicroAgent
+@Service
+@Agent
+public class DisplayAgent implements IDisplayService
 {
 	//-------- attributes --------
 	
+	/** The agent. */
+	@Agent
+	protected MicroAgent agent;
+	
 	/** The GUI. */
 	protected DisplayPanel	panel;
+	
+	/** The display subscribers. */
+	protected Map<String, SubscriptionIntermediateFuture<Object>> subscribers = new HashMap<String, SubscriptionIntermediateFuture<Object>>();
 	
 	//-------- MicroAgent methods --------
 	
 	/**
 	 *  Called once after agent creation.
 	 */
+	@AgentCreated
 	public IFuture<Void>	agentCreated()
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IDisplayService ds = (IDisplayService)getServiceContainer().getProvidedService(IDisplayService.class);
+		IDisplayService ds = (IDisplayService)agent.getServiceContainer().getProvidedService(IDisplayService.class);
 		
 //		IFuture<IMandelbrotService> fut = getRequiredService("mandelservice");
 //		fut.addResultListener(new SwingExceptionDelegationResultListener<IMandelbrotService, Void>(ret)
@@ -69,12 +85,12 @@ public class DisplayAgent extends MicroAgent
 //			public void customResultAvailable(IMandelbrotService result)
 //			{
 //				DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess(), result);
-				DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess(), ds);
+				DisplayAgent.this.panel	= new DisplayPanel(agent.getExternalAccess(), ds);
 
 //				addService(new DisplayService(this));
 				
-				final IExternalAccess	access	= getExternalAccess();
-				final JFrame	frame	= new JFrame(getAgentName());
+				final IExternalAccess	access	= agent.getExternalAccess();
+				final JFrame	frame	= new JFrame(agent.getAgentName());
 				JScrollPane	scroll	= new JScrollPane(panel);
 
 				JTextPane helptext = new JTextPane();
@@ -148,5 +164,96 @@ public class DisplayAgent extends MicroAgent
 	public DisplayPanel	getPanel()
 	{
 		return this.panel;
+	}
+	
+	
+	//-------- IDisplayService interface --------
+
+	/**
+	 *  Display the result of a calculation.
+	 */
+	public IFuture<Void> displayResult(AreaData result)
+	{
+//			System.out.println("displayRes: "+agent.getComponentIdentifier());
+//			agent.getPanel().setResults(result);
+		String id = result.getDisplayId();
+		if(id!=null)
+		{
+			SubscriptionIntermediateFuture<Object> sub = subscribers.get(id);
+			sub.addIntermediateResult(result);
+		}
+		else
+		{
+			// todo: use default display
+			for(Iterator<SubscriptionIntermediateFuture<Object>> it=subscribers.values().iterator(); it.hasNext(); )
+			{
+				SubscriptionIntermediateFuture<Object> sub = it.next();
+				sub.addIntermediateResult(result);
+			}
+		}
+		return IFuture.DONE;
+	}
+
+
+	/**
+	 *  Display intermediate calculation results.
+	 */
+	public IFuture<Void> displayProgress(ProgressData progress)
+	{
+//			System.out.println("displayInRes");
+//			agent.getPanel().addProgress(progress);
+		String id = progress.getDisplayId();
+		if(id!=null)
+		{
+			SubscriptionIntermediateFuture<Object> sub = subscribers.get(id);
+			sub.addIntermediateResult(progress);
+		}
+		else
+		{
+			// todo: use default display
+			for(Iterator<SubscriptionIntermediateFuture<Object>> it=subscribers.values().iterator(); it.hasNext(); )
+			{
+				SubscriptionIntermediateFuture<Object> sub = it.next();
+				sub.addIntermediateResult(progress);
+			}
+		}
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Display intermediate calculation results.
+	 */
+	public IFuture<Void> displayPartialResult(AreaData all, AreaData data)
+	{
+//			System.out.println("displayInRes");
+//			agent.getPanel().addProgress(progress);
+		String id = data.getDisplayId();
+		if(id!=null)
+		{
+			SubscriptionIntermediateFuture<Object> sub = subscribers.get(id);
+			sub.addIntermediateResult(new AreaData[]{all, data});
+		}
+		else
+		{
+			// todo: use default display
+			for(Iterator<SubscriptionIntermediateFuture<Object>> it=subscribers.values().iterator(); it.hasNext(); )
+			{
+				SubscriptionIntermediateFuture<Object> sub = it.next();
+				sub.addIntermediateResult(new AreaData[]{all, data});
+			}
+		}
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Subscribe to display events.
+	 */
+	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid)
+	{
+		SubscriptionIntermediateFuture<Object> ret = new SubscriptionIntermediateFuture<Object>();
+		subscribers.put(displayid, ret);
+		return ret;
 	}
 }
