@@ -27,9 +27,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JComponent;
@@ -82,7 +81,7 @@ public class DisplayPanel extends JComponent
 	protected boolean	calculating;
 	
 	/** Progress data objects, available only when calculating (progress data -> percent finished). */
-	protected Map	progressdata;
+	protected Set<ProgressData>	progressdata;
 	
 	/** Progress update timer. */
 	protected Timer	progressupdate;
@@ -368,14 +367,14 @@ public class DisplayPanel extends JComponent
 			public void run()
 			{
 				if(progressdata==null)
-					progressdata	= new HashMap();
+					progressdata	= new HashSet<ProgressData>();
 				
-				Integer	percent	= (Integer)progressdata.remove(progress);
 //				if(percent==null || progress.isFinished())
 //				{
 //					percent	= Integer.valueOf(progress.isFinished() ? 100 : 0);
 //				}
-				progressdata.put(progress, percent);
+				progressdata.remove(progress);
+				progressdata.add(progress);
 				repaint();
 				
 //				if(progressupdate==null)
@@ -578,10 +577,8 @@ public class DisplayPanel extends JComponent
 				JProgressBar	bar	= new JProgressBar(0, 100);
 				bar.setStringPainted(true);
 				Dimension	barsize	= bar.getPreferredSize();
-				for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
+				for(ProgressData progress: progressdata)
 				{
-					ProgressData	progress	= (ProgressData)it.next();
-					
 					double xf = drawarea.getWidth()/progress.getImageWidth();
 					double yf = drawarea.getHeight()/progress.getImageHeight();
 					int corx = (int)(progress.getArea().x*xf);
@@ -597,6 +594,8 @@ public class DisplayPanel extends JComponent
 					g.setColor(Color.white);
 					g.drawRect(bounds.x+drawarea.x+corx, bounds.y+drawarea.y+cory, corw, corh);
 					
+					System.out.println("provid: "+progress.getProviderId());
+
 					// Print provider name.
 					if(progress.getProviderId()!=null)
 					{

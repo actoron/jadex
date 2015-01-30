@@ -130,7 +130,7 @@ public class CalculateService implements ICalculateService
 					last = reportProgress(cnt, size, last, ret);
 					xstart++;
 					
-//					agent.waitForDelay(10).get();
+					agent.waitForDelay(10).get();
 					
 					if(allin && usejustfill)
 					{
