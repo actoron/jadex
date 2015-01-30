@@ -809,9 +809,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					{
 						IResourceIdentifier p = (IResourceIdentifier)uo;
 						IResourceIdentifier ch = (IResourceIdentifier)myo;
-						IResourceIdentifier pl = ResourceIdentifier.getLocalResourceIdentifier(p);
-						ret = remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>(p, ch))
-							|| (pl!=null && remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>(pl, ch)));
+						ret = remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>(p, ch));
 					}
 				}
 			}

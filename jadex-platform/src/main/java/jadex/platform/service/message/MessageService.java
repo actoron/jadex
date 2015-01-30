@@ -13,7 +13,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.MessageFailureException;
-import jadex.bridge.ServiceCall;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceTerminatedException;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -85,7 +85,6 @@ import java.lang.reflect.Proxy;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -462,7 +461,7 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				
 				final String ridid = type.getResourceIdIdentifier();
-				if(msg.get(ridid)==null && rid!=null && rid.getGlobalIdentifier()!=null)
+				if(msg.get(ridid)==null && rid!=null && rid.getGlobalIdentifier()!=null && !ResourceIdentifier.isJadexRid(rid))
 				{
 					msg.put(ridid, rid);
 				}
@@ -816,8 +815,8 @@ public class MessageService extends BasicService implements IMessageService
 	public Map<Class<?>, Object[]> getContentCodecInfo(IComponentIdentifier cid)
 	{
 		Map<Class<?>, Object[]> ret = (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
-		if(ret==null)
-			System.out.println("sdffdsdf");
+//		if(ret==null)
+//			System.out.println("sdffdsdf");
 		return ret;
 //		return (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
 	}

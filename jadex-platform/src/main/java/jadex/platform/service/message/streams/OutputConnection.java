@@ -168,7 +168,30 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 									{
 										public void resultAvailable(Integer result)
 										{
-											component.scheduleStep(self);
+											try
+											{
+												if(is.available()>0)
+												{
+													component.scheduleStep(self);
+												}
+												else
+												{
+													component.scheduleStep(self, 50);												
+												}
+											}
+											catch(Exception e)
+											{
+												buf	= null;
+												close();
+												ret.setExceptionIfUndone(e);
+												try
+												{
+													is.close();
+												}
+												catch(Exception ex)
+												{
+												}							
+											}
 										}
 										public void exceptionOccurred(Exception exception)
 										{

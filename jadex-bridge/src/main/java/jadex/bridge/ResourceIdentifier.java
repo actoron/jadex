@@ -7,6 +7,10 @@ import jadex.commons.SUtil;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *  Default implementation for resource identification.
@@ -16,6 +20,73 @@ import java.net.URL;
 @Reference(local=true, remote=false)
 public class ResourceIdentifier implements IResourceIdentifier
 {
+	//-------- constants --------
+	
+	/** The ignored directories for determining resource project name. */
+	protected static final Set<String>	IGNORED	= Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+		"bin",
+		"classes",
+		"target"
+	)));
+	
+	/** The jadex project names. */
+	protected static final Set<String>	JADEX_PROJECTS	= Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+		"jadex-android-antlr",
+		"jadex-android-commons",
+		"jadex-android-parent",
+		"jadex-android-platformapp",
+		"jadex-android-platformclient",
+		"jadex-android-xmlpull",
+		"jadex-applib-bdi",
+		"jadex-bridge",
+		"jadex-commons",
+		"jadex-distribution-minimal",
+		"jadex-distribution-pro",
+		"jadex-distribution-standard",
+		"jadex-javaparser",
+		"jadex-kernel-application",
+		"jadex-kernel-base",
+		"jadex-kernel-bdi",
+		"jadex-kernel-bdibpmn",
+		"jadex-kernel-bdiv3",
+		"jadex-kernel-bdiv3-android",
+		"jadex-kernel-bpmn",
+		"jadex-kernel-component",
+		"jadex-kernel-extension-agr",
+		"jadex-kernel-extension-envsupport",
+		"jadex-kernel-extension-envsupport-jmonkey",
+		"jadex-kernel-extension-envsupport-opengl",
+		"jadex-kernel-gpmn",
+		"jadex-kernel-micro",
+		"jadex-model-bpmn",
+		"jadex-nuggets",
+		"jadex-parent",
+		"jadex-parent-pro",
+		"jadex-platform",
+		"jadex-platform-android",
+		"jadex-platform-extension-management",
+		"jadex-platform-extension-maven",
+		"jadex-platform-extension-relay",
+		"jadex-platform-extension-relay-standalone",
+		"jadex-platform-extension-securetransport",
+		"jadex-platform-extension-webservice",
+		"jadex-platform-extension-webservice-android",
+		"jadex-platform-extension-webservice-desktop",
+		"jadex-platform-standalone-launch",
+		"jadex-rules",
+		"jadex-rules-eca",
+		"jadex-rules-tools",
+		"jadex-runtimetools-android",
+		"jadex-runtimetools-swing",
+		"jadex-servletfilter",
+		"jadex-tools-base",
+		"jadex-tools-base-swing",
+		"jadex-tools-bdi",
+		"jadex-tools-bpmn",
+		"jadex-tools-comanalyzer",
+		"jadex-xml"
+	)));
+	
 	//-------- attributes --------
 	
 	/** The local identifier. */
@@ -123,22 +194,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 		}
 		return ret;
 	}
-	
-	/**
-	 * 
-	 */
-	public static IResourceIdentifier getLocalResourceIdentifier(IResourceIdentifier rid)
-	{
-		IResourceIdentifier ret = null;
-		// why check that global is not null???
-//		if(rid!=null && rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
-		if(rid!=null && rid.getLocalIdentifier()!=null)
-		{
-			ret = new ResourceIdentifier(rid.getLocalIdentifier(), null);
-		}
-		return ret;
-	}
-	
+		
 	/**
 	 *  Create properties from rid.
 	 *  @param The resource identifier.
@@ -217,6 +273,51 @@ public class ResourceIdentifier implements IResourceIdentifier
 	{
 		return rid!=null && rid.getLocalIdentifier()!=null &&
 			(SUtil.equals(rid.getLocalIdentifier().getHostIdentifier(), SUtil.getMacAddress()) || SUtil.equals(rid.getLocalIdentifier().getHostIdentifier(), root.getName()));
+	}
+	
+	/**
+	 *  Test if a rid refers to one of the jadex platform modules, i.e. is not application-specific.
+	 */
+	public static boolean	isJadexRid(IResourceIdentifier rid)
+	{
+		String	project	= null;
+		
+		// Maven id.
+		if(rid.getGlobalIdentifier()!=null && rid.getGlobalIdentifier().getResourceId()!=null && !rid.getGlobalIdentifier().getResourceId().startsWith("::"))
+		{
+			project	= rid.getGlobalIdentifier().getResourceId();
+			// Strip group id.
+			project	= project.substring(project.indexOf(':')+1);
+			// Strip version
+			if(project.indexOf(':')!=-1)
+			{
+				project	= project.substring(0, project.indexOf(':'));
+			}
+		}
+		
+		// file name
+		else if(rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getUri()!=null)
+		{
+			File	file	= SUtil.getFile(SUtil.toURL(rid.getLocalIdentifier().getUri()));
+			if(file.getName().endsWith(".jar"))
+			{
+				project	= SUtil.getJarName(file.getName());
+			}
+			else
+			{
+				while(file!=null && IGNORED.contains(file.getName()))
+				{
+					file	= file.getParentFile();
+				}
+				
+				if(file!=null)
+				{
+					project	= file.getName();
+				}
+			}
+		}
+		
+		return JADEX_PROJECTS.contains(project);
 	}
 
 	/**

@@ -4628,6 +4628,7 @@ public class SUtil
         	}
         	else
         	{
+//        		System.out.println("write: "+prefix+files[i].getName());
 	        	ZipEntry	ze	= new ZipEntry(prefix+files[i].getName());
 	        	ze.setTime(files[i].lastModified());
 	        	zos.putNextEntry(ze);

@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.library;
 
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
@@ -77,7 +78,7 @@ public interface ILibraryService
 	/**
 	 *  Get a resource as stream (jar).
 	 */
-	
+	public IFuture<IInputConnection>	getResourceAsStream(IResourceIdentifier rid);
 	
 	//-------- url handling --------
 	

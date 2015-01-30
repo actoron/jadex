@@ -56,7 +56,9 @@ public abstract class IntermediateDefaultResultListener<E>	extends DefaultResult
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.
 	 */
-	public abstract void intermediateResultAvailable(E result);
+	public void intermediateResultAvailable(E result)
+	{
+	}
 	
 	/**
      *  Declare that the future is finished.
