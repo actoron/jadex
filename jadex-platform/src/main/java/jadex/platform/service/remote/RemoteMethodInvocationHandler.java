@@ -948,6 +948,14 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 				{
 					super.setExceptionIfUndone(exception);
 				}
+				
+//				public void addResultListener(IResultListener listener) 
+//				{
+//					if(method.getName().indexOf("calculate")!=-1)
+//						System.out.println("dfg");
+//						
+//					super.addResultListener(listener);
+//				}
 			};
 		}
 		else if(SReflect.isSupertype(ITerminableIntermediateFuture.class, type))

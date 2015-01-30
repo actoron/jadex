@@ -16,9 +16,11 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 /**
  *  Interceptor for realizing intelligent proxies. These proxies
@@ -90,13 +92,13 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		System.out.println("Intelligent proxy called: "+broken+" "+cnt);
+//		System.out.println("Intelligent proxy called: "+broken+" "+cnt);
 		tr.determineTarget(sid, ea, broken)
 			.addResultListener(new ExceptionDelegationResultListener<IService, Void>(ret) 
 		{
 			public void customResultAvailable(final IService ser) 
 			{
-				System.out.println("invoking on: "+ser.getServiceIdentifier()+" "+cnt);
+//				System.out.println("invoking on: "+ser.getServiceIdentifier()+" "+cnt);
 				try
 				{
 					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
@@ -104,20 +106,21 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 					{
 						IIntermediateResultListener lis = new IIntermediateResultListener()
 						{
+							boolean done;
 							public void intermediateResultAvailable(Object result)
 							{
+								proceed();
+//								System.out.println("iires: "+result);
 							}
 							
 							public void finished()
 							{
-								sic.setResult(res);
-								ret.setResult(null);
+								proceed();
 							}
 							
 							public void resultAvailable(Collection result) 
 							{
-								sic.setResult(res);
-								ret.setResult(null);
+								proceed();
 							}
 							
 							public void exceptionOccurred(Exception exception) 
@@ -132,9 +135,18 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 									}
 									else
 									{
-										sic.setResult(res);
-										ret.setResult(null);
+										proceed();
 									}
+								}
+							}
+							
+							protected void proceed()
+							{
+								if(!done)
+								{
+									sic.setResult(res);
+									ret.setResult(null);
+									done = true;
 								}
 							}
 						};
@@ -286,7 +298,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 	public static IFuture<Object> invoke(final IServiceIdentifier broken, final ServiceInvocationContext sic, 
 			final IServiceIdentifier sid, final IExternalAccess ea, final ITargetResolver tr, final int maxretries, final int cnt)
 	{
-		final Future<Object> ret = new Future<Object>();
+		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(sic.getMethod().getReturnType(), new FutureFunctionality((Logger)null));
 		
 		tr.determineTarget(sid, ea, broken)
 			.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret) 
@@ -302,10 +314,13 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 						{
 							public void intermediateResultAvailable(Object result)
 							{
+								System.out.println("rec inter: "+result);
+								((IntermediateFuture)ret).addIntermediateResult(result);
 							}
 							
 							public void finished()
 							{
+								System.out.println("fini result");
 								ret.setResult(res);
 							}
 							

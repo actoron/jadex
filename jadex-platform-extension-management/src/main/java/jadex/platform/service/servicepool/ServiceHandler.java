@@ -378,6 +378,8 @@ public class ServiceHandler implements InvocationHandler
 			}
 			IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
 			FutureFunctionality.connectDelegationFuture(ret, res);
+//			if(method.getName().indexOf("calculate")!=-1)
+//				System.out.println("connect in pool: "+ret);
 			
 			// Put the components back in pool after call is done
 			// Must reschedule on component thread as it has no required service proxy

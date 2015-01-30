@@ -295,10 +295,10 @@ public class GlobalPoolServiceManager
 			{
 				ret.addIntermediateResult(pi.getCms());
 			}
-			ret.setFinished();
+//			ret.setFinished();
 		}
-		else
-		{
+//		else
+//		{
 			SServiceProvider.getServices((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 				.addResultListener(new IntermediateDelegationResultListener<IComponentManagementService>(ret)
 			{
@@ -312,7 +312,7 @@ public class GlobalPoolServiceManager
 					}
 				}
 			});
-		}
+//		}
 		
 		return ret;
 	}

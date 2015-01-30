@@ -65,8 +65,7 @@ public class ServicePoolAgent implements IServicePoolService
 			CounterResultListener<Void> lis = new CounterResultListener<Void>(psis.length, true, new DelegationResultListener<Void>(ret));
 			for(PoolServiceInfo psi: psis)
 			{
-				IPoolStrategy str = psi.getPoolStrategy()==null? new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
-					Runtime.getRuntime().availableProcessors()+1): (IPoolStrategy)psi.getPoolStrategy();
+				IPoolStrategy str = psi.getPoolStrategy()==null? getDefaultStrategy(): (IPoolStrategy)psi.getPoolStrategy();
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
 				Class<?> sertype = psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports());
 				if(sertype==null)
@@ -115,7 +114,7 @@ public class ServicePoolAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel)
 	{
-		return addServiceType(servicetype, new DefaultPoolStrategy(5, 35000, 10), componentmodel);
+		return addServiceType(servicetype, null, componentmodel);
 	}
 	
 	/**
@@ -125,7 +124,7 @@ public class ServicePoolAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel, CreationInfo info)
 	{
-		return addServiceType(servicetype, new DefaultPoolStrategy(5, 35000, 10), componentmodel, info, null);
+		return addServiceType(servicetype, null, componentmodel, info, null);
 	}
 	
 	/**
@@ -158,7 +157,7 @@ public class ServicePoolAgent implements IServicePoolService
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
 		if(strategy==null)
-			strategy = new DefaultPoolStrategy(5, 35000, 10);
+			strategy = getDefaultStrategy();
 		ServiceHandler handler = new ServiceHandler(agent, servicetype, strategy, componentmodel, info);
 		servicetypes.put(servicetype, handler);
 
@@ -200,6 +199,16 @@ public class ServicePoolAgent implements IServicePoolService
 			ret.setException(new IllegalArgumentException("Service type not found: "+servicetype));
 
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IPoolStrategy getDefaultStrategy()
+	{
+		return new DefaultPoolStrategy(5, 35000, 10);
+//		return new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
+//			Runtime.getRuntime().availableProcessors()+1);
 	}
 	
 	// Not necessary because service publication scope of workers is set to parent

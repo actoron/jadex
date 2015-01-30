@@ -27,9 +27,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JComponent;
@@ -82,7 +81,7 @@ public class DisplayPanel extends JComponent
 	protected boolean	calculating;
 	
 	/** Progress data objects, available only when calculating (progress data -> percent finished). */
-	protected Map	progressdata;
+	protected Set<ProgressData>	progressdata;
 	
 	/** Progress update timer. */
 	protected Timer	progressupdate;
@@ -368,14 +367,14 @@ public class DisplayPanel extends JComponent
 			public void run()
 			{
 				if(progressdata==null)
-					progressdata	= new HashMap();
+					progressdata	= new HashSet<ProgressData>();
 				
-				Integer	percent	= (Integer)progressdata.remove(progress);
 //				if(percent==null || progress.isFinished())
 //				{
 //					percent	= Integer.valueOf(progress.isFinished() ? 100 : 0);
 //				}
-				progressdata.put(progress, percent);
+				progressdata.remove(progress);
+				progressdata.add(progress);
 				repaint();
 				
 //				if(progressupdate==null)
@@ -578,10 +577,8 @@ public class DisplayPanel extends JComponent
 				JProgressBar	bar	= new JProgressBar(0, 100);
 				bar.setStringPainted(true);
 				Dimension	barsize	= bar.getPreferredSize();
-				for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
+				for(ProgressData progress: progressdata)
 				{
-					ProgressData	progress	= (ProgressData)it.next();
-					
 					double xf = drawarea.getWidth()/progress.getImageWidth();
 					double yf = drawarea.getHeight()/progress.getImageHeight();
 					int corx = (int)(progress.getArea().x*xf);
@@ -597,6 +594,8 @@ public class DisplayPanel extends JComponent
 					g.setColor(Color.white);
 					g.drawRect(bounds.x+drawarea.x+corx, bounds.y+drawarea.y+cory, corw, corh);
 					
+					System.out.println("provid: "+progress.getProviderId());
+
 					// Print provider name.
 					if(progress.getProviderId()!=null)
 					{
@@ -627,7 +626,8 @@ public class DisplayPanel extends JComponent
 							if(!progress.isFinished())
 							{
 								bar.setStringPainted(true);
-								bar.setValue(((Number)progressdata.get(progress)).intValue());
+								bar.setValue(progress.getProgress());
+//								bar.setValue(((Number)progressdata.get(progress)).intValue());
 								width	= Math.min(corw-10, barsize.width);
 								x	= bounds.x+drawarea.x+corx + (corw-width)/2;
 								y	= y + fm.getHeight()*2 + 2;
@@ -642,7 +642,7 @@ public class DisplayPanel extends JComponent
 							bar.setStringPainted(false);
 							int	x	= bounds.x+drawarea.x+corx + 2;
 							int	y	= bounds.y+drawarea.y+cory + Math.max((corh-barsize.height)/2, 2);
-							bar.setValue(((Number)progressdata.get(progress)).intValue());
+							bar.setValue(progress.getProgress());
 							bar.setBounds(0, 0, corw-4, Math.min(barsize.height, corh-4));
 							Graphics	g2	= g.create();
 							g2.translate(x, y);

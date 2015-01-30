@@ -1,8 +1,11 @@
 package jadex.platform.service.globalservicepool.mandelbrot;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -26,10 +29,11 @@ public class CalculateService implements ICalculateService
 	 *  @param data	The area to be calculated.
 	 *  @return	A future containing the calculated area.
 	 */
-	public ISubscriptionIntermediateFuture<CalculateEvent> calculateArea(AreaData data)
+	public ISubscriptionIntermediateFuture<CalculateEvent> calculateArea(final AreaData data)
 	{
-		SubscriptionIntermediateFuture<CalculateEvent> ret = (SubscriptionIntermediateFuture)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
-		System.out.println("calc: "+data.getId()+" "+agent.getComponentIdentifier());
+		final SubscriptionIntermediateFuture<CalculateEvent> ret = (SubscriptionIntermediateFuture)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+		
+//		System.out.println("calc: "+data.getId()+" "+agent.getComponentIdentifier());
 		
 		agent.setHadJob(true);
 		
@@ -40,108 +44,119 @@ public class CalculateService implements ICalculateService
 		
 //		Future<AreaData> ret = new Future<AreaData>();
 		
-		double stepx = (data.getXEnd()-data.getXStart())/data.getSizeX();
-		double stepy = (data.getYEnd()-data.getYStart())/data.getSizeY();
-		
-		short[][] res = new short[data.getSizeX()][data.getSizeY()];
-		
-		int xstart = 0;
-		int xend = data.getSizeX()-1;
-		int ystart = 0;
-		int yend = data.getSizeY()-1;
-		boolean allin = true;
-		boolean justfill = false;
-		short fillcol = -2;
-		boolean	usejustfill	= data.getAlgorithm().isOptimizationAllowed()
-			&& (data.getXStart()<2 && data.getXStart()>-2
-			|| data.getYStart()<2 && data.getYStart()>-2
-			|| data.getXEnd()<2 && data.getXEnd()>-2
-			|| data.getYEnd()<2 && data.getYEnd()>-2);
-			
-		int	size	= data.getSizeX()*data.getSizeY();
-		int	cnt	= 0;
-		int last = -1;
-		
-		while(true)
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			if(xstart>xend)
-				break;
-			for(int xi=xstart; xi<=xend; xi++)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				res[xi][ystart] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xi*stepx, data.getYStart()+ystart*stepy, data.getMax());
-				if(!justfill && xi==xstart)
-					fillcol = res[xi][ystart];
-				if(allin && res[xi][ystart]!=fillcol)
-					allin = false;
-				cnt++;
-				//agent.setProgress(cnt*100/size);
+				double stepx = (data.getXEnd()-data.getXStart())/data.getSizeX();
+				double stepy = (data.getYEnd()-data.getYStart())/data.getSizeY();
+				
+				short[][] res = new short[data.getSizeX()][data.getSizeY()];
+				
+				int xstart = 0;
+				int xend = data.getSizeX()-1;
+				int ystart = 0;
+				int yend = data.getSizeY()-1;
+				boolean allin = true;
+				boolean justfill = false;
+				short fillcol = -2;
+				boolean	usejustfill	= data.getAlgorithm().isOptimizationAllowed()
+					&& (data.getXStart()<2 && data.getXStart()>-2
+					|| data.getYStart()<2 && data.getYStart()>-2
+					|| data.getXEnd()<2 && data.getXEnd()>-2
+					|| data.getYEnd()<2 && data.getYEnd()>-2);
+					
+				int	size	= data.getSizeX()*data.getSizeY();
+				int	cnt	= 0;
+				int last = -1;
+				
+				while(true)
+				{
+					if(xstart>xend)
+						break;
+					for(int xi=xstart; xi<=xend; xi++)
+					{
+						res[xi][ystart] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xi*stepx, data.getYStart()+ystart*stepy, data.getMax());
+						if(!justfill && xi==xstart)
+							fillcol = res[xi][ystart];
+						if(allin && res[xi][ystart]!=fillcol)
+							allin = false;
+						cnt++;
+						//agent.setProgress(cnt*100/size);
+					}
+//					ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
+					last = reportProgress(cnt, size, last, ret);
+					
+					ystart++;
+					if(ystart>yend)
+						break;
+					for(int yi=ystart; yi<=yend; yi++)
+					{
+						res[xend][yi] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xend*stepx, data.getYStart()+yi*stepy, data.getMax());
+						if(allin && res[xend][yi]!=fillcol)
+							allin = false;
+						cnt++;
+//						agent.setProgress(cnt*100/size);
+					}
+//					ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
+					last = reportProgress(cnt, size, last, ret);
+					
+					xend--;
+					if(xstart>xend)
+						break;
+					for(int xi=xend; xi>=xstart; xi--)
+					{
+						res[xi][yend] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xi*stepx, data.getYStart()+yend*stepy, data.getMax());
+						if(allin && res[xi][yend]!=fillcol)
+							allin = false;
+						cnt++;
+//						agent.setProgress(cnt*100/size);
+					}
+//					ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
+					last = reportProgress(cnt, size, last, ret);
+					
+					yend--;
+					if(ystart>yend)
+						break;
+					for(int yi=yend; yi>=ystart; yi--)
+					{
+						res[xstart][yi] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xstart*stepx, data.getYStart()+yi*stepy, data.getMax());
+						if(allin && res[xstart][yi]!=fillcol)
+							allin = false;
+						cnt++;
+//						agent.setProgress(cnt*100/size);
+					}
+//					ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
+					last = reportProgress(cnt, size, last, ret);
+					xstart++;
+					
+					agent.waitForDelay(10).get();
+					
+					if(allin && usejustfill)
+					{
+						justfill = true;
+//						System.out.println("justfill"+fillcol);
+						allin = false;
+					}
+					else if(!justfill)
+					{
+						allin = true;
+					}
+				}
+				
+				data.setData(res);
+				
+				ret.addIntermediateResult(new CalculateEvent(100, agent.getComponentIdentifier()));
+				ret.addIntermediateResult(new CalculateEvent(data, agent.getComponentIdentifier()));
+				ret.setFinished();
+				
+				return IFuture.DONE;
 			}
-//			ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
-			last = reportProgress(cnt, size, last, ret);
-			
-			ystart++;
-			if(ystart>yend)
-				break;
-			for(int yi=ystart; yi<=yend; yi++)
-			{
-				res[xend][yi] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xend*stepx, data.getYStart()+yi*stepy, data.getMax());
-				if(allin && res[xend][yi]!=fillcol)
-					allin = false;
-				cnt++;
-//				agent.setProgress(cnt*100/size);
-			}
-//			ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
-			last = reportProgress(cnt, size, last, ret);
-			
-			xend--;
-			if(xstart>xend)
-				break;
-			for(int xi=xend; xi>=xstart; xi--)
-			{
-				res[xi][yend] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xi*stepx, data.getYStart()+yend*stepy, data.getMax());
-				if(allin && res[xi][yend]!=fillcol)
-					allin = false;
-				cnt++;
-//				agent.setProgress(cnt*100/size);
-			}
-//			ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
-			last = reportProgress(cnt, size, last, ret);
-			
-			yend--;
-			if(ystart>yend)
-				break;
-			for(int yi=yend; yi>=ystart; yi--)
-			{
-				res[xstart][yi] = justfill? fillcol: data.getAlgorithm().determineColor(data.getXStart()+xstart*stepx, data.getYStart()+yi*stepy, data.getMax());
-				if(allin && res[xstart][yi]!=fillcol)
-					allin = false;
-				cnt++;
-//				agent.setProgress(cnt*100/size);
-			}
-//			ret.addIntermediateResult(new CalculateEvent(cnt*100/size));
-			last = reportProgress(cnt, size, last, ret);
-			xstart++;
-			
-			if(allin && usejustfill)
-			{
-				justfill = true;
-//				System.out.println("justfill"+fillcol);
-				allin = false;
-			}
-			else if(!justfill)
-			{
-				allin = true;
-			}
-		}
+		});
 		
 //		ret.addIntermediateResult(new CalculateEvent(100));
 		
-		data.setData(res);
-		
-		ret.addIntermediateResult(new CalculateEvent(data));
-		ret.setFinished();
-		
-		System.out.println("calc finished: "+data.getId()+" "+agent.getComponentIdentifier());
+//		System.out.println("calc finished: "+data.getId()+" "+agent.getComponentIdentifier());
 		return ret;
 	}
 	
@@ -155,7 +170,7 @@ public class CalculateService implements ICalculateService
 		if(tst>last)
 		{
 //			System.out.println("sending ires: "+cur);
-			ret.addIntermediateResult(new CalculateEvent(cur));
+			ret.addIntermediateResult(new CalculateEvent(cur, agent.getComponentIdentifier()));
 			last=tst;
 		}
 		return last;
