@@ -250,6 +250,7 @@
 				</dependency>
 	        </dependencies>
 	    </profile>
+	    <!-- removed for testing global service pool
 	    <profile>
 	        <id>management</id>
 	        <activation>
@@ -265,6 +266,7 @@
 				</dependency>
 	        </dependencies>
 	    </profile>
+	     -->
 	</profiles>
 	
 </project>
