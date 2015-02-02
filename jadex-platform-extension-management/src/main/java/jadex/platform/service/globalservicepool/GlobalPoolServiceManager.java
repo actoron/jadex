@@ -15,7 +15,6 @@ import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -406,6 +405,7 @@ public class GlobalPoolServiceManager
 					
 					CreationInfo ci  = new CreationInfo(); // info!=null? new CreationInfo(info): 
 					ci.setImports(component.getModel().getAllImports());
+					ci.setResourceIdentifier(component.getModel().getResourceIdentifier());
 					
 					PoolServiceInfo psi = new PoolServiceInfo(info, componentname, servicetype, null, null);
 					Map<String, Object> args = new HashMap<String, Object>();

@@ -116,7 +116,13 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
 		// todo: fix if more than one service type should be supported by one worker (not intended)
 		if(info==null)
+		{
 			info = new CreationInfo();
+		}
+		if(info.getResourceIdentifier()==null)
+		{
+			info.setResourceIdentifier(agent.getModel().getResourceIdentifier());
+		}
 		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null);
 		info.setProvidedServiceInfos(new ProvidedServiceInfo[]{psi});
 		ser.addServiceType(servicetype, null, componentmodel, info, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret)

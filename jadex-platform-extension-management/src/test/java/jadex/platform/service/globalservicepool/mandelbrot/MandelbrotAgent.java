@@ -29,6 +29,7 @@ import jadex.platform.service.servicepool.PoolServiceInfo;
 		{
 			@NameValue(name="serviceinfos", clazz=PoolServiceInfo[].class, value="new PoolServiceInfo[]{"
 				+ "new PoolServiceInfo(\"jadex.platform.service.globalservicepool.mandelbrot.CalculateAgent.class\", ICalculateService.class,"
+				+ "$component.getModel().getResourceIdentifier(), null, null,"
 				+ "new String[]{\"delay\"}, new Object[]{-1})}")
 		}),
 //		@Component(type="Calculator"),

@@ -1,6 +1,7 @@
 package jadex.platform.service.servicepool;
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IPoolStrategy;
@@ -75,13 +76,22 @@ public class PoolServiceInfo
 	public PoolServiceInfo(String workermodel, Class<?> servicetype,
 		Object poolstrategy, PublishInfo publishinfo, String[] argnames, Object[] argvals)
 	{
+		this(workermodel, servicetype, null, null, null, argnames, argvals);
+	}
+	
+	/**
+	 *  Create a new PoolServiceInfo.
+	 */
+	public PoolServiceInfo(String workermodel, Class<?> servicetype, IResourceIdentifier rid,
+		Object poolstrategy, PublishInfo publishinfo, String[] argnames, Object[] argvals)
+	{
 		this.workermodel = workermodel;
 		this.servicetype = new ClassInfo(servicetype);
 		this.poolstrategy = poolstrategy;
 		this.publishinfo = publishinfo;
+		this.info = new CreationInfo();
 		if(argnames!=null && argnames.length>0)
 		{
-			this.info = new CreationInfo();
 			Map<String, Object> arguments = new HashMap<String, Object>();
 			for(int i=0; i<argnames.length; i++)
 			{
@@ -89,6 +99,7 @@ public class PoolServiceInfo
 			}
 			info.setArguments(arguments);
 		}
+		info.setResourceIdentifier(rid);
 	}
 	
 	/**
