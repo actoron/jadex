@@ -8,6 +8,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -39,6 +40,9 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 	/** The target resolver. */
 	protected ITargetResolver tr;
 	
+	/** The worker timeout. */
+	protected long wto;
+	
 	protected final static ITargetResolver NULL = new ITargetResolver() 
 	{
 		public IFuture<IService> determineTarget(IServiceIdentifier sid, IExternalAccess agent, IServiceIdentifier broken) 
@@ -52,10 +56,11 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public IntelligentProxyInterceptor(IExternalAccess ea, IServiceIdentifier sid)
+	public IntelligentProxyInterceptor(IExternalAccess ea, IServiceIdentifier sid)//, long wto)
 	{
 		this.ea = ea;
 		this.sid = sid;
+//		this.wto = wto;
 	}
 	
 	//-------- methods --------
@@ -102,6 +107,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 				try
 				{
 					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
+					
 					if(res instanceof IIntermediateFuture)
 					{
 						IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
@@ -125,7 +131,9 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 							
 							public void exceptionOccurred(Exception exception) 
 							{
-								if(exception instanceof ComponentNotFoundException)
+								exception.printStackTrace();
+								if(exception instanceof ComponentNotFoundException
+									|| exception instanceof TimeoutException)
 								{
 									if(cnt<maxretries)
 									{
@@ -162,7 +170,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 					}
 					else if(res instanceof IFuture)
 					{
-						((IFuture)res).addResultListener(new IResultListener() 
+						((IFuture<Object>)res).addResultListener(new IResultListener<Object>() 
 						{
 							public void resultAvailable(Object result) 
 							{
@@ -172,7 +180,8 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 							
 							public void exceptionOccurred(Exception exception) 
 							{
-								if(exception instanceof ComponentNotFoundException)
+								if(exception instanceof ComponentNotFoundException
+									|| exception instanceof TimeoutException)
 								{
 									if(cnt<maxretries)
 									{
