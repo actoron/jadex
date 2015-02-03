@@ -10,8 +10,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
-import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -34,8 +32,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -705,14 +701,14 @@ public class DisplayPanel extends JComponent
 					// Print provider name.
 					if(progress.getProviderId()!=null)
 					{
-						String	name	= progress.getProviderId().toString();
-						String	provider	= "";
-						int index	=	name.indexOf('@');
-						if(index!=-1)
-						{
-							provider	= name.substring(index+1);
-							name	= name.substring(0, index);
-						}
+						String	name	= progress.getProviderId().getParent().getLocalName();
+						String	provider	= progress.getProviderId().getPlatformName();
+//						int index	=	name.indexOf('@');
+//						if(index!=-1)
+//						{
+//							provider	= name.substring(index+1);
+//							name	= name.substring(0, index);
+//						}
 //						provider	= progress.getTaskId().toString();
 						
 						FontMetrics	fm	= g.getFontMetrics();

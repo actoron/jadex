@@ -148,6 +148,11 @@ public class ServiceCall
 //				System.out.println("sflöjyhö");
 //				Thread.dumpStack();
 //			}
+			
+//			if(ret!=null && ret.getCause()==null)
+//			{
+//				System.out.println(Thread.currentThread().hashCode()+": create: "+ret+", "+Thread.currentThread());
+//			}
 
 			NEXT.set(ret);
 			

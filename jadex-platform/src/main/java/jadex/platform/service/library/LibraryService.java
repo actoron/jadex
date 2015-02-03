@@ -845,7 +845,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			final DelegationURLClassLoader cl = createNewDelegationClassLoader(rid, baseloader, null);
 			classloaders.put(rid, cl);
 			
-			System.out.println("createClassLoader() put: "+component.getComponentIdentifier()+", "+rid);
+//			System.out.println("createClassLoader() put: "+component.getComponentIdentifier()+", "+rid);
 			
 			final List<IResourceIdentifier> deps = alldeps.get(rid);
 			CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
