@@ -15,10 +15,12 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -631,23 +633,24 @@ public class DisplayPanel extends JComponent
 //			System.out.println("area: "+drawarea.width+" "+drawarea.height);
 
 			// Zoom into original image while calculating
-			if(calculating && range!=null)
-			{
-				ix	= (range.x-drawarea.x-bounds.x)*iwidth/drawarea.width;
-				iy	= (range.y-drawarea.y-bounds.y)*iheight/drawarea.height;
-				iwidth	= range.width*iwidth/drawarea.width;
-				iheight	= range.height*iheight/drawarea.height;
-				
-				// Scale again to fit new image size.
-				drawarea = scaleToFit(bounds, iwidth, iheight);
-				
-				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-					ix, iy, ix+iwidth, iy+iheight, this);
-			}
+//			if(calculating && range!=null)
+//			{
+//				ix	= (range.x-drawarea.x-bounds.x)*iwidth/drawarea.width;
+//				iy	= (range.y-drawarea.y-bounds.y)*iheight/drawarea.height;
+//				iwidth	= range.width*iwidth/drawarea.width;
+//				iheight	= range.height*iheight/drawarea.height;
+//				
+//				// Scale again to fit new image size.
+//				drawarea = scaleToFit(bounds, iwidth, iheight);
+//				
+//				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+//					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+//					ix, iy, ix+iwidth, iy+iheight, this);
+//			}
 			
 			// Offset and clip image and show border while dragging.
-			else if(startdrag!=null && enddrag!=null)
+//			else
+				if(startdrag!=null && enddrag!=null)
 			{
 				// Draw original image in background
 				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
@@ -1080,33 +1083,44 @@ public class DisplayPanel extends JComponent
 		DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		calculating	= true;
 		
-//		if(image!=null)
-//		{
-//			Image old = image;
-//			image = createImage(sizex, sizey);
-//			
+		if(image!=null && range != null)
+		{
+			Image old = image;
+			
+			
 //			Rectangle bounds = getInnerBounds(true);
-//			int	ix	= 0;
-//			int iy	= 0;
-//			final int iwidth	= image.getWidth(this);
-//			final int iheight	= image.getHeight(this);
+			old = createImage(getBounds().width, getBounds().height);
+			paint(old.getGraphics());
+			image = createImage(sizex, sizey);
+			int	ix	= 0;
+			int iy	= 0;
+			final int iwidth	= image.getWidth(this);
+			final int iheight	= image.getHeight(this);
+//			System.out.println(old.getWidth(this));
 //			Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
 //			image.getGraphics().drawImage(old, bounds.x+drawarea.x, bounds.y+drawarea.y,
 //				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
 //				ix, iy, ix+iwidth, iy+iheight, this);
-//			
-////			JFrame f = new JFrame();
-////			Canvas ca = new Canvas()
-////			{
-////				public void paint(Graphics g) 
-////				{
-////					g.drawImage(image, 0, 0, iwidth, iheight, 0, 0, iwidth, iheight, null);
-////				}
-////			};
-////			f.getContentPane().add(ca, BorderLayout.CENTER);
-////			f.pack();
-////			f.setVisible(true);
-//		}
+			Graphics2D g = (Graphics2D) image.getGraphics();
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g.drawImage(old, ix, iy, ix+iwidth, iy+iheight,
+					range.x, range.y, range.x + range.width, range.y + range.height, this);
+//			image.getGraphics().drawImage(old, ix, iy, ix+iwidth - 1, iy+iheight - 1,
+//					0, 0, iwidth - 1, iheight - 1, this);
+//			image.getGraphics().setColor(Color.RED);
+//			image.getGraphics().fillRect(0, 0, iwidth / 1, iheight / 2);
+//			JFrame f = new JFrame();
+//			Canvas ca = new Canvas()
+//			{
+//				public void paint(Graphics g) 
+//				{
+//					g.drawImage(image, 0, 0, iwidth, iheight, 0, 0, iwidth, iheight, null);
+//				}
+//			};
+//			f.getContentPane().add(ca, BorderLayout.CENTER);
+//			f.pack();
+//			f.setVisible(true);
+		}
 		
 		repaint();
 		
