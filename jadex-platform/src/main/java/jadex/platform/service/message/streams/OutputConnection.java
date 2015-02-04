@@ -259,6 +259,10 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 								{
 									try
 									{
+										if(buf==null)
+										{
+											buf	= new byte[256];
+										}
 										int	len	= is.read(buf);
 										read.setResult(Integer.valueOf(len));
 									}

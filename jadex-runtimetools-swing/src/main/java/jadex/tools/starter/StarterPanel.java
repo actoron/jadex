@@ -7,6 +7,7 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -1022,7 +1023,7 @@ public class StarterPanel extends JLayeredPane
 					props.addProperty(new Property("ridurl", result.getSecondEntity()));
 					// todo: save also repo info of gid
 					String id = lastrid!=null && lastrid.getGlobalIdentifier()!=null && lastrid.getGlobalIdentifier().getResourceId()!=null
-						&& !lastrid.getGlobalIdentifier().getResourceId().startsWith("::") ? lastrid.getGlobalIdentifier().getResourceId(): null;
+						&& !ResourceIdentifier.isHashGid(lastrid) ? lastrid.getGlobalIdentifier().getResourceId(): null;
 					props.addProperty(new Property("globalrid", id));
 				}
 

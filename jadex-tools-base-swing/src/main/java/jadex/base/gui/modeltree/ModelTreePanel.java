@@ -14,9 +14,9 @@ import jadex.base.gui.filetree.RIDNode;
 import jadex.base.gui.filetree.RootNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IGlobalResourceIdentifier;
-import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.deployment.FileData;
@@ -219,7 +219,7 @@ public class ModelTreePanel extends FileTreePanel
 //					URL	url	= SUtil.toURL(((IFileNode)node).getFilePath());
 //					IResourceIdentifier	rid	= rootentries.get(url);
 					IResourceIdentifier rid = getRootEntry(((IFileNode)node).getFilePath());
-					if(rid!=null && rid.getGlobalIdentifier()!=null)
+					if(rid!=null && rid.getGlobalIdentifier()!=null && !ResourceIdentifier.isHashGid(rid))
 					{
 						overlay	= ModelTreePanel.icons.getIcon("gid");
 					}

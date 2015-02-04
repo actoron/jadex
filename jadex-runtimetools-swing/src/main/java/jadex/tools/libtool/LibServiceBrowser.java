@@ -843,7 +843,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			}
 			else if(o instanceof IResourceIdentifier)
 			{
-				if(((IResourceIdentifier)o).getGlobalIdentifier()!=null)
+				if(((IResourceIdentifier)o).getGlobalIdentifier()!=null && !ResourceIdentifier.isHashGid((IResourceIdentifier)o))
 				{
 					ilist.add(icons.getIcon("global"));
 				}
@@ -859,8 +859,11 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					{
 						ilist.add(icons.getIcon("folder"));
 					}
-					ilist.add(icons.getIcon("oglobal"));
 					
+					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getComponentIdentifier().getRoot()))
+					{
+						ilist.add(icons.getIcon("oglobal"));
+					}
 				}
 			}
 			else if(o instanceof String)
@@ -892,10 +895,9 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			Object o = getUserObject();
 			if(o instanceof IResourceIdentifier)
 			{
-				IGlobalResourceIdentifier grid = ((IResourceIdentifier)o).getGlobalIdentifier();
-				if(grid!=null && grid.getResourceId().startsWith("::"))
+				if(ResourceIdentifier.isHashGid((IResourceIdentifier)o))
 				{
-					ret = grid.getResourceId();
+					ret = ((IResourceIdentifier)o).getGlobalIdentifier().getResourceId();
 				}
 			}
 			
@@ -1126,7 +1128,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			else if(o instanceof IResourceIdentifier)
 			{
 				IGlobalResourceIdentifier grid = ((IResourceIdentifier)o).getGlobalIdentifier();
-				if(grid!=null && !grid.getResourceId().startsWith("::"))
+				if(grid!=null && !ResourceIdentifier.isHashGid((IResourceIdentifier)o))
 				{
 					ret = grid.getResourceId();
 				}
@@ -1134,6 +1136,11 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 				{
 					ILocalResourceIdentifier lrid = ((IResourceIdentifier)o).getLocalIdentifier();
 					ret = lrid.getUri().toString();
+					
+					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getComponentIdentifier().getRoot()))
+					{
+						ret += " ("+((IResourceIdentifier)o).getLocalIdentifier().getComponentIdentifier()+")";
+					}
 				}
 			}
 			else

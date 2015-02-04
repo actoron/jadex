@@ -4700,9 +4700,12 @@ public class SUtil
 		
 		for(File f: files)
 		{
-			if(f.isDirectory() && !(dir.getName().equals("META-INF") && dir.getParentFile().getAbsolutePath().equals(root)))
+			if(f.isDirectory())
 			{
-				hashDirectory(root, f, md);
+				if(!(f.getName().equals("META-INF") && f.getParentFile().getAbsolutePath().equals(root)))
+				{
+					hashDirectory(root, f, md);
+				}
 			}
 			else
 			{
