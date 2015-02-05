@@ -39,7 +39,9 @@ public class SUtilTest //extends TestCase
 	public void	testFileZippingAndHashing() throws Exception
 	{
 //		File	src	= new File("../jadex-applications-micro/target/classes");
-		File	src	= new File("../jadex-commons/target/classes");
+		File	src1	= new File("../jadex-commons/target/classes");	// maven
+		File	src2	= new File("../jadex-commons/build/classes/main");	// gradle
+		File	src	= src1.exists() ? src1 : src2;
 		File	dest	= new File("temp", "test.jar");
 		dest.getParentFile().mkdirs();
 		
