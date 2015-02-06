@@ -10,6 +10,8 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
+import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -28,12 +30,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.ImageObserver;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -384,10 +388,10 @@ public class DisplayPanel extends JComponent
 							System.out.println("create fresh image: "+image.getWidth(null)+" "+image.getHeight(null)+" "+all.getSizeX()+" "+all.getSizeY());
 						image = createImage(all.getSizeX(), all.getSizeY());
 					}
-					else
-					{
-						System.out.println("using existing image");
-					}
+//					else
+//					{
+//						System.out.println("using existing image");
+//					}
 				}
 
 				final int xs = partial.getXOffset();
@@ -1087,24 +1091,53 @@ public class DisplayPanel extends JComponent
 		{
 			Image old = image;
 			
-			
 //			Rectangle bounds = getInnerBounds(true);
-			old = createImage(getBounds().width, getBounds().height);
-			paint(old.getGraphics());
+//			old = createImage(getBounds().width, getBounds().height);
+//			paint(old.getGraphics());
 			image = createImage(sizex, sizey);
-			int	ix	= 0;
-			int iy	= 0;
-			final int iwidth	= image.getWidth(this);
-			final int iheight	= image.getHeight(this);
+//			int	ix	= 0;
+//			int iy	= 0;
+//			final int iwidth	= image.getWidth(this);
+//			final int iheight	= image.getHeight(this);
 //			System.out.println(old.getWidth(this));
 //			Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
 //			image.getGraphics().drawImage(old, bounds.x+drawarea.x, bounds.y+drawarea.y,
 //				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
 //				ix, iy, ix+iwidth, iy+iheight, this);
-			Graphics2D g = (Graphics2D) image.getGraphics();
+			final Graphics2D g = (Graphics2D)image.getGraphics();
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			g.drawImage(old, ix, iy, ix+iwidth, iy+iheight,
-					range.x, range.y, range.x + range.width, range.y + range.height, this);
+			// old image could be smaller than the window
+			int ow = old.getWidth(null);
+			int oh = old.getHeight(null);
+			Rectangle r = getInnerBounds(true);
+			Rectangle olddraw = scaleToFit(r, ow, oh);
+			double factor = ((double)ow)/olddraw.width;
+			int rx = (int)((range.x-olddraw.x)*factor);
+			int ry = (int)((range.y-olddraw.y)*factor);
+			int rw = (int)(range.width*factor);
+			int rh = (int)(range.height*factor);
+			Rectangle drawarea = scaleToFit(r, range.width, range.height);
+			g.drawImage(old, 0, 0, drawarea.width, drawarea.height,
+				rx, ry, rx + rw, ry + rh, this);
+		
+//			final Image fimage = createImage(sizex, sizey);
+//			fimage.getGraphics().drawImage(old, drawarea.x, drawarea.y, drawarea.x+drawarea.width, drawarea.y+drawarea.height,
+//				rx, ry, rx + rw, ry + rh, this);
+//			
+//			JFrame f = new JFrame();
+//			Canvas ca = new Canvas()
+//			{
+//				public void paint(Graphics gr) 
+//				{
+//					gr.drawImage(fimage, 0, 0, fimage.getWidth(null), fimage.getHeight(null), 0, 0, fimage.getWidth(null),fimage.getHeight(null), null);
+//				}
+//			};
+//			f.getContentPane().add(ca, BorderLayout.CENTER);
+//			f.pack();
+//			f.setVisible(true);
+			
+			
+//				range.x, range.y, range.x + range.width, range.y + range.height, this);
 //			image.getGraphics().drawImage(old, ix, iy, ix+iwidth - 1, iy+iheight - 1,
 //					0, 0, iwidth - 1, iheight - 1, this);
 //			image.getGraphics().setColor(Color.RED);
