@@ -36,6 +36,7 @@ public class RemoteReferenceTest //extends TestCase
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false",
 			"-gui", "false",
+//			"-logging", "true",
 			"-awareness", "false", "-printpass", "false",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(sus, timeout);
 		
@@ -71,7 +72,7 @@ public class RemoteReferenceTest //extends TestCase
 
 		// Kill platforms and end test case.
 		platform1.killComponent().get(sus, timeout);
-		platform2.killComponent().get(sus, timeout);
+//		platform2.killComponent().get(sus, timeout);
 	}
 	
 	/**

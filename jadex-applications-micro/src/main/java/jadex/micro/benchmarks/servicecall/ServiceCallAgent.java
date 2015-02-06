@@ -53,7 +53,6 @@ public class ServiceCallAgent	extends TestAgent
 	
 	//-------- methods --------
 	
-	
 	/**
 	 *  Perform tests.
 	 */

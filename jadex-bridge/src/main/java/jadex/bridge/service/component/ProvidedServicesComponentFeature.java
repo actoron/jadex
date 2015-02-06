@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -203,7 +204,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		Collection<IInternalService>	allservices	= getAllServices();
 		if(!allservices.isEmpty())
 		{
-			shutdownServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
+			LinkedList<IInternalService>	list	= new LinkedList<IInternalService>(allservices);
+			shutdownServices(list.descendingIterator()).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
