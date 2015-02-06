@@ -32,6 +32,14 @@ def getReleaseVariant(project) {
     }
 }
 
+def getVariants(project) {
+	if (isAndroidLibraryProject(project)) {
+		return project.android.libraryVariants
+	} else {
+		project.android.applicationVariants
+	}
+}
+
 def getSourceDir(project) {
     if (isAndroidProject(project)) {
         project.android.sourceSets.main.java.srcDirs
@@ -88,6 +96,7 @@ ext {
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     getReleaseVariant = this.&getReleaseVariant
+    getVariants = this.&getVariants
     getSourceDir = this.&getSourceDir
     getResourcesDir = this.&getResourcesDir
     getCompileClassPath = this.&getCompileClassPath

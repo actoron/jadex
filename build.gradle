@@ -322,29 +322,29 @@ subprojects
 
         }
 
-        if (!isAndroidLibraryProject(project)) {
-            android.applicationVariants.all {variant ->
-                task("generate${variant.name}JavaDoc", type:Javadoc) {
-                    source = variant.javaCompile.source
-                    ext.androidJar =
-                            "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-                    classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-                    options.links("http://docs.oracle.com/javase/7/docs/api/");
-                    options.links("http://d.android.com/reference/");
-                    exclude '**/BuildConfig.java'
-                    exclude '**/R.java'
-
-                    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
-                    def javaVersion = JavaVersion.current()
-                    if (javaVersion >= JavaVersion.VERSION_1_8) {
-                        options.addStringOption('Xdoclint:none', '-quiet')
-                    } else {
-                        options.addStringOption('-quiet')
-                    }
-                }
-            }
-        }
-
+    	// add custom task to generate javadocs to exclude R and BuildConfig and to include correct links
+    	getVariants(project).all {variant -> 
+	    	task("generate${variant.name}JavaDoc", type:Javadoc) {
+		        source = variant.javaCompile.source
+		        ext.androidJar =
+		                "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+		        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+		        options.links("http://docs.oracle.com/javase/7/docs/api/");
+		        options.links("http://d.android.com/reference/");
+		        exclude '**/BuildConfig.java'
+		        exclude '**/R.java'
+		
+		        // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
+		        def javaVersion = JavaVersion.current()
+		        if (javaVersion >= JavaVersion.VERSION_1_8) {
+		            options.addStringOption('Xdoclint:none', '-quiet')
+		        } else {
+		            options.addStringOption('-quiet')
+		        }
+	        }
+    	} 
+        
+        // disable default javadoc task because we created a custom one
         myJavadocs.enabled = false
 
         task classes(dependsOn: 'compileDebugSources') {
