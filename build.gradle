@@ -373,9 +373,7 @@ subprojects
 }
 
 task docs(type: Javadoc) {
-    source subprojects.collect {project -> getSourceDir(project)}
-    // this is needed to avoid (failing) javadoc generation for xmls in android-projects:
-    exclude('**/*.xml','**/*.bpmn*','**/*.txt','**/*.bpmn')
+    source subprojects.collect {project -> getOnlyJavaSources(project)}
     classpath = files(subprojects.collect {project -> project.getCompileClassPath(project)})
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")
