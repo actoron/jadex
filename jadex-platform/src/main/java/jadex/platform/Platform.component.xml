@@ -22,8 +22,8 @@
 		<argument name="configname" class="String">"auto"</argument>
 		<!-- Automatically shut down the platform when no user agents are running anymore. -->	
 		<argument name="autoshutdown" class="boolean">false</argument>
-		<!-- Tell the starter to use the standalone adapter factory (usually no need to change). -->	
-		<argument name="adapterfactory" class="Class">jadex.platform.service.cms.ComponentAdapterFactory.class</argument>
+		<!-- Tell the starter to use the default platform component implementation (usually no need to change). -->	
+		<argument name="platformcomponent" class="Class">jadex.platform.service.cms.PlatformComponent.class</argument>
 		<!-- Tell starter to print welcome message. -->
 		<argument name="welcome" class="boolean">true</argument>
 		<!-- The saved program arguments. -->
@@ -182,22 +182,24 @@
 		<providedservice class="jadex.bridge.service.types.threadpool.IThreadPoolService">
 			<implementation proxytype="raw">
 				new jadex.platform.service.threadpool.ThreadPoolService(
-					$args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance()
-						: new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component)
-				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component)
+					$args.threadpoolclass!=null
+						? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance()
+						: new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)),
+					$component.getComponentIdentifier())
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.threadpool.IDaemonThreadPoolService">
 			<implementation proxytype="raw">
 				new jadex.platform.service.threadpool.ThreadPoolService(
-					$args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance()
-						: new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component)
-				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component)
+					$args.threadpoolclass!=null
+						? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance()
+						: new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)),
+					$component.getComponentIdentifier())
 			</implementation>
 		</providedservice>
 	    <providedservice class="jadex.bridge.service.types.marshal.IMarshalService">
 			<implementation proxytype="raw">
-				new jadex.platform.service.marshal.MarshalService($component.getExternalAccess())
+				new jadex.platform.service.marshal.MarshalService($component)
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.context.IContextService">
@@ -205,8 +207,8 @@
 				$args.contextserviceclass!=null
 					? jadex.commons.SReflect.classForName0($args.contextserviceclass, jadex.commons.SReflect.class.getClassLoader()).newInstance()
 					: jadex.commons.SReflect.isAndroid()
-						? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component})
-						: jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component})
+						? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})
+						: jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
@@ -271,12 +273,9 @@
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService" name="cms">
 			<implementation>
-				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService",
-					jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
-				? jadex.platform.service.persistence.PersistenceComponentManagementService.create($component.getComponentAdapter(), 
-					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
-			    : new jadex.platform.service.cms.ComponentManagementService($component.getComponentAdapter(), 
-					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
+				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
+					? jadex.platform.service.persistence.PersistenceComponentManagementService.create($args.platformaccess, $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
+					: new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.df.IDF">
@@ -300,10 +299,9 @@
 		</providedservice> -->
 		<providedservice class="jadex.bridge.service.types.persistence.IPersistenceService">
 			<implementation>
-				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService",
-					jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
-				? $component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl("cms")
-			    : null
+				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
+					? $component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.cms.IComponentManagementService.class)
+					: null
 			</implementation>
 		</providedservice>
 		<requiredservice name="factoryservices" class="jadex.bridge.service.types.factory.IComponentFactory" multiple="true">
