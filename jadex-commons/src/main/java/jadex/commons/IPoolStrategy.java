@@ -12,12 +12,6 @@ public interface IPoolStrategy
 	public boolean taskAdded();
 	
 	/**
-	 *  Called when a new worker was added proactively to the pool.
-	 *  @param cnt The number of new workers.
-	 */
-	public void workersAdded(int cnt);
-	
-	/**
 	 *  Called when a new task was served from the pool.
 	 *  @param waitdur The waiting time of the task.
 	 */
@@ -30,13 +24,19 @@ public interface IPoolStrategy
 	public boolean taskFinished();
 	
 	/**
+	 *  Called when a new worker was added proactively to the pool.
+	 *  @param cnt The number of new workers.
+	 */
+	public void workersAdded(int cnt);
+	
+	/**
 	 *  Get the component timeout.
 	 *  @return The timeout for the component to wait for new workers in the pool. 
 	 */
 	public long getWorkerTimeout();
 	
 	/**
-	 *  Notify the strategy that a timeout for a component has occurred,
+	 *  Notify the strategy that a timeout for a worker component has occurred,
 	 *  i.e. it was not needed for serving some worker.
 	 *  @return True, if the component be excluded from the pool.
 	 */

@@ -8,6 +8,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
     <application
         android:allowBackup="true"
@@ -28,6 +30,8 @@
 
 
         <service android:name="jadex.android.service.JadexPlatformService" android:label="JadexPlatformService"></service>
+        
+        <service android:name="jadex.android.bluetooth.service.ConnectionService" android:label="BluetoothConnectionService"></service>
         
         <service android:name="jadex.android.standalone.clientservice.UniversalClientService" android:label="UniversalClientservice"></service>
 

@@ -3,7 +3,9 @@ check.dependsOn -= test
 
 dependencies
 {
-    compile libraries.android
-    compile project(':jadex-xml')
+    provided libraries.android
+    compile(project(':jadex-xml')) {
+        exclude module: 'bcprov-jdk15'
+    }
 //    testCompile('net.sourceforge.jadex:jadex-commons:2.5-SNAPSHOT:test-jar')
 }

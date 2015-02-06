@@ -4,6 +4,7 @@ import jadex.base.Starter;
 import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentIdentifier;
@@ -437,8 +438,8 @@ public class ComponentManagementService implements IComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
 
-		if(name!=null && name.indexOf("abc")!=-1)
-			System.out.println("create compo: "+modelname+" "+info);
+//		if(name!=null && name.indexOf("abc")!=-1)
+//			System.out.println("create compo: "+modelname+" "+info);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
@@ -1287,7 +1288,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			IComponentAdapter adapter	= infos!=null ? infos.getAdapter() : (IComponentAdapter)adapters.get(cid);
 			IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : components.get(cid);
 			
-//			if(adapter!=null && adapter.getDescription().getModelName().indexOf("Proxy")==-1)
+//			if(adapter!=null && adapter.getDescription().getModelName().indexOf("Pool")==-1)
 //				System.out.println("Terminating component: "+cid.getName());
 			
 			// Terminate component that is shut down during init.
@@ -1498,7 +1499,8 @@ public class ComponentManagementService implements IComponentManagementService
 			final IPlatformComponentAccess comp = components.get(cid);
 			if(comp==null)
 			{
-				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+				ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
+//				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
 				return ret;
 			}
 			
@@ -1519,7 +1521,7 @@ public class ComponentManagementService implements IComponentManagementService
 			if(!IComponentDescription.STATE_ACTIVE.equals(desc.getState())
 				/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
 			{
-				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+				ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
 				return ret;
 			}
 			
@@ -1580,7 +1582,7 @@ public class ComponentManagementService implements IComponentManagementService
 						boolean	changed	= false;
 						if(adapter==null && !initresume)	// Might be killed after init but before init resume
 						{
-							ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+							ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
 						}
 						else if(adapter!=null)
 						{
@@ -1729,7 +1731,7 @@ public class ComponentManagementService implements IComponentManagementService
 			final PlatformComponent adapter = (PlatformComponent)components.get(cid);
 			if(adapter==null)
 			{
-				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+				ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
 				return ret;
 			}
 			if(!IComponentDescription.STATE_SUSPENDED.equals(adapter.getComponentDescription().getState()))
@@ -1858,7 +1860,7 @@ public class ComponentManagementService implements IComponentManagementService
 			PlatformComponent comp = (PlatformComponent)components.remove(cid);
 			PlatformComponent pad = null;
 			if(comp==null)
-				throw new RuntimeException("Component Identifier not registered: "+cid);
+				throw new ComponentNotFoundException("Component Identifier not registered: "+cid);
 			
 //				if(cid.getName().indexOf("Peer")==-1)
 //					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
@@ -2080,7 +2082,7 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			else if(!delayed)
 			{
-				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+				ret.setException(new ComponentNotFoundException("No local component found for component identifier: "+cid));
 			}
 			
 		}
@@ -2460,7 +2462,7 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			else
 			{
-				ret.setException(new RuntimeException("No description available for: "+cid));
+				ret.setException(new ComponentNotFoundException("No description available for: "+cid));
 			}
 		}			
 		
@@ -3108,20 +3110,20 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 			public void customResultAvailable(IRemoteServiceManagementService rms)
 			{
-				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, null)
+				rms.getServiceProxy(agent.getComponentIdentifier(), cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, null)
 					.addResultListener(createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
 					{
-						public void customResultAvailable(Object result)
-						{
-							if(!(result instanceof IComponentManagementService))
-								System.out.println("aaaa");
-							super.customResultAvailable(result);
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-							super.exceptionOccurred(exception);
-						}
-					}));
+						if(!(result instanceof IComponentManagementService))
+							System.out.println("aaaa");
+						super.customResultAvailable(result);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						super.exceptionOccurred(exception);
+					}
+				}));
 			}
 		}));
 		

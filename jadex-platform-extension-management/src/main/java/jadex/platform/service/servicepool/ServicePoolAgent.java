@@ -14,6 +14,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.ProvidedService;
@@ -54,6 +55,7 @@ public class ServicePoolAgent implements IServicePoolService
 	/**
 	 *  Called once after agent creation.
 	 */
+	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -65,10 +67,12 @@ public class ServicePoolAgent implements IServicePoolService
 			CounterResultListener<Void> lis = new CounterResultListener<Void>(psis.length, true, new DelegationResultListener<Void>(ret));
 			for(PoolServiceInfo psi: psis)
 			{
-				IPoolStrategy str = psi.getPoolStrategy()==null? new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
-					Runtime.getRuntime().availableProcessors()+1): psi.getPoolStrategy();
+				IPoolStrategy str = psi.getPoolStrategy()==null? getDefaultStrategy(): (IPoolStrategy)psi.getPoolStrategy();
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
-				addServiceType(psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports()), str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
+				Class<?> sertype = psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports());
+				if(sertype==null)
+					System.out.println("kaputt");
+				addServiceType(sertype, str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
 			}
 		}
 		else
@@ -112,7 +116,7 @@ public class ServicePoolAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel)
 	{
-		return addServiceType(servicetype, new DefaultPoolStrategy(5, 35000, 10), componentmodel);
+		return addServiceType(servicetype, null, componentmodel);
 	}
 	
 	/**
@@ -122,7 +126,7 @@ public class ServicePoolAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel, CreationInfo info)
 	{
-		return addServiceType(servicetype, new DefaultPoolStrategy(5, 35000, 10), componentmodel, info, null);
+		return addServiceType(servicetype, null, componentmodel, info, null);
 	}
 	
 	/**
@@ -135,7 +139,6 @@ public class ServicePoolAgent implements IServicePoolService
 		return addServiceType(servicetype, strategy, componentmodel, null, null);
 	}
 	
-	
 	/**
 	 *  Add a new service type and a strategy.
 	 *  @param servicetype The service type.
@@ -143,15 +146,26 @@ public class ServicePoolAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi)
 	{
+		return addServiceType(servicetype, strategy, componentmodel, info, pi, null);
+	}
+	
+	/**
+	 *  Add a new service type and a strategy.
+	 *  @param servicetype The service type.
+	 *  @param strategy The service pool strategy.
+	 */
+	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi, String scope)
+	{
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
+		if(strategy==null)
+			strategy = getDefaultStrategy();
 		ServiceHandler handler = new ServiceHandler(agent, servicetype, strategy, componentmodel, info);
 		servicetypes.put(servicetype, handler);
 
 		// add service proxy
 		Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
-		agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, pi);
-		return IFuture.DONE;
+		return agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, pi, scope);
 	}
 	
 	
@@ -181,6 +195,17 @@ public class ServicePoolAgent implements IServicePoolService
 		return ret;
 	}
 	
+	/**
+	 * 
+	 */
+	protected IPoolStrategy getDefaultStrategy()
+	{
+		return new DefaultPoolStrategy(5, 35000, 10);
+//		return new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
+//			Runtime.getRuntime().availableProcessors()+1);
+	}
+	
+	// Not necessary because service publication scope of workers is set to parent
 //	/**
 //	 *  Get the service container.
 //	 *  @return The service container.

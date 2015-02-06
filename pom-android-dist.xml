@@ -183,6 +183,7 @@
 			<modules>
 				<module>jadex-android-parent</module>
 				<module>jadex-android-commons</module>
+				<module>jadex-android-bluetooth</module>
 				<module>jadex-android-antlr</module>	
 				<module>jadex-android-xmlpull</module>
 				<module>jadex-android-platformclient</module>
@@ -213,6 +214,8 @@
 
 				<!-- ready-to-run apps -->
 				<module>jadex-applications-android-demos</module>
+				<module>jadex-applications-android/jadex-applications-android-puzzle</module>
+				<module>jadex-applications-android/jadex-applications-android-chat</module>
 				<module>jadex-android-platformapp</module>
 			</modules>
 		</profile>
@@ -224,6 +227,7 @@
 				<!-- runtime -->
 			    <module>jadex-android-parent</module>
 				<module>jadex-android-commons</module>
+				<module>jadex-android-bluetooth</module>
 				<module>jadex-android-antlr</module>	
 				<module>jadex-android-xmlpull</module>
 				<module>jadex-android-platformclient</module>

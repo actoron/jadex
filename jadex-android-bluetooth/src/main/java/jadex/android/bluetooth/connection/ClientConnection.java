@@ -42,7 +42,7 @@ public class ClientConnection extends AConnection {
 
 		@Override
 		public void run() {
-			Log.e(Helper.LOG_TAG, "Connection to " + remoteDevice.getAddress()
+			Log.e(Helper.LOG_TAG, "Connection to " + remoteDevice.getName() + "(" + remoteDevice.getAddress() + ")" 
 					+ " timed out after "
 					+ (System.currentTimeMillis() - lastPingReceivedTime)
 					+ "ms");
@@ -114,7 +114,7 @@ public class ClientConnection extends AConnection {
 						uuidNum++;
 						Log.d(Helper.LOG_TAG,
 								"Device "
-										+ mmDevice.getName()
+										+ mmDevice.getName() + "(" + mmDevice.getAddress() + ")" 
 										+ " seems to be available. Trying to connect on UUID #"
 										+ uuidNum);
 						mmSocket = mmDevice
@@ -138,7 +138,7 @@ public class ClientConnection extends AConnection {
 									.createRfcommSocketToServiceRecord(BTServer.UUIDS[uuidNum]);
 							Log.d(Helper.LOG_TAG,
 									"Device "
-											+ mmDevice.getName()
+											+ mmDevice.getName() + "(" + mmDevice.getAddress() + ")" 
 											+ " seems to be available. Trying to connect on UUID #"
 											+ uuidNum);
 						} catch (IOException e2) {

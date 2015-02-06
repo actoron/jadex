@@ -80,7 +80,7 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 			intermediateResultAvailable(result);
 			if(undone && delegate instanceof IUndoneResultListener)
 			{
-				((IUndoneResultListener<E>)delegate).resultAvailableIfUndone(result);
+				((IUndoneResultListener<E>)delegate).resultAvailableIfUndone(null);
 			}
 			else
 			{

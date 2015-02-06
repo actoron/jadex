@@ -334,6 +334,9 @@ public class Starter
 			if(scn==null)
 			{
 				scn = CallAccess.getOrCreateNextInvocation();
+			}
+			if(scn.getCause()==null)
+			{
 				scn.setCause(new Cause((String)null, "createPlatform"));
 			}
 			
@@ -454,6 +457,10 @@ public class Starter
 					String ctype	= cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get(null);
 					IComponentIdentifier caller = sc==null? null: sc.getCaller();
 					Cause cause = sc==null? null: sc.getCause();
+					if(cause==null)
+					{
+						System.out.println(Thread.currentThread().hashCode()+": kaputt "+sc);
+					}
 					assert cause!=null;
 					Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
 					Object tmpmoni = getArgumentValue(MONITORING, model, cmdargs, compargs);

@@ -60,6 +60,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -130,6 +131,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		final JPanel classview = new JPanel(new BorderLayout());
 		
 		ridtree = new JTree(new DefaultTreeModel(null));
+		ToolTipManager.sharedInstance().registerComponent(ridtree);
 		ridtree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		
 		ridtree.setCellRenderer(new DefaultTreeCellRenderer() 
@@ -807,9 +809,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					{
 						IResourceIdentifier p = (IResourceIdentifier)uo;
 						IResourceIdentifier ch = (IResourceIdentifier)myo;
-						IResourceIdentifier pl = ResourceIdentifier.getLocalResourceIdentifier(p);
-						ret = remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>(p, ch))
-							|| (pl!=null && remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>(pl, ch)));
+						ret = remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>(p, ch));
 					}
 				}
 			}
@@ -843,7 +843,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			}
 			else if(o instanceof IResourceIdentifier)
 			{
-				if(((IResourceIdentifier)o).getGlobalIdentifier()!=null)
+				if(((IResourceIdentifier)o).getGlobalIdentifier()!=null && !ResourceIdentifier.isHashGid((IResourceIdentifier)o))
 				{
 					ilist.add(icons.getIcon("global"));
 				}
@@ -859,8 +859,11 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					{
 						ilist.add(icons.getIcon("folder"));
 					}
-					ilist.add(icons.getIcon("oglobal"));
 					
+					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getComponentIdentifier().getRoot()))
+					{
+						ilist.add(icons.getIcon("oglobal"));
+					}
 				}
 			}
 			else if(o instanceof String)
@@ -887,7 +890,18 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		 */
 		public String getTooltipText()
 		{
-			return null;
+			String ret = null;
+			
+			Object o = getUserObject();
+			if(o instanceof IResourceIdentifier)
+			{
+				if(ResourceIdentifier.isHashGid((IResourceIdentifier)o))
+				{
+					ret = ((IResourceIdentifier)o).getGlobalIdentifier().getResourceId();
+				}
+			}
+			
+			return ret;
 		}
 		
 		/**
@@ -1114,7 +1128,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			else if(o instanceof IResourceIdentifier)
 			{
 				IGlobalResourceIdentifier grid = ((IResourceIdentifier)o).getGlobalIdentifier();
-				if(grid!=null)
+				if(grid!=null && !ResourceIdentifier.isHashGid((IResourceIdentifier)o))
 				{
 					ret = grid.getResourceId();
 				}
@@ -1123,6 +1137,10 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					ILocalResourceIdentifier lrid = ((IResourceIdentifier)o).getLocalIdentifier();
 					ret = lrid.getUri().toString();
 					
+					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getComponentIdentifier().getRoot()))
+					{
+						ret += " ("+((IResourceIdentifier)o).getLocalIdentifier().getComponentIdentifier()+")";
+					}
 				}
 			}
 			else

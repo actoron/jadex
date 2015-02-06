@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.library;
 
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
@@ -71,6 +72,13 @@ public interface ILibraryService
 	 */
 	@Excluded
 	public @Reference IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid, boolean workspace);
+	
+	//-------- remote rid handling --------
+	
+	/**
+	 *  Get a resource as stream (jar).
+	 */
+	public IFuture<IInputConnection>	getResourceAsStream(IResourceIdentifier rid);
 	
 	//-------- url handling --------
 	

@@ -101,6 +101,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 				{
 					final ServiceCall sc = ServiceCall.getCurrentInvocation();
 					// Problem with subscription futures: if is first listener it will fetch the initial events :-(
+					// todo: use addQuietListener for those
 					if(res instanceof IFuture && !(res instanceof ISubscriptionIntermediateFuture))
 					{
 						final long fstart = start;

@@ -78,7 +78,7 @@ public class MethodInfo
 			this.parametertypes = new ClassInfo[parametertypes.length];
 			for(int i = 0; i < parametertypes.length; ++i)
 			{
-				this.parametertypes[i] = new ClassInfo(parametertypes[i].getName());
+				this.parametertypes[i] = new ClassInfo(SReflect.getClassName(parametertypes[i]));
 			}
 		}
 	}

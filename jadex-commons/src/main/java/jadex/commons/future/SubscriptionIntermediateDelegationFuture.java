@@ -79,6 +79,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	super.addResultListener(listener);		
 	}
 
+	Exception e;
 	
 	/**
      *  Add a result listener.
@@ -91,8 +92,16 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
     	}
     	
-//    	System.out.println("adding listener: "+listener);
-    	boolean first;
+//    	if(storeforfirst)
+//    		e = new RuntimeException();
+//    	
+//    	if(!storeforfirst && listeners!=null && listeners.size()>=0)
+//    	{
+//    		e.printStackTrace();
+//    		System.out.println("adding listener: "+this+" "+listener);
+//    	}
+    	
+      	boolean first;
     	synchronized(this)
 		{
 			first = storeforfirst;

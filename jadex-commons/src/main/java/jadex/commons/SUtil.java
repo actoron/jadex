@@ -1,7 +1,9 @@
 package jadex.commons;
 
+import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
@@ -34,18 +36,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -65,10 +67,13 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 
 /**
@@ -76,6 +81,9 @@ import java.util.zip.ZipFile;
  */
 public class SUtil
 {
+	/** Directory were jadex stores files generated during runtime, to be used for later runs. */
+	public static final File	JADEXDIR	= new File("./.jadex");
+	
 	/** Line separator. */
 	public static final String LF = System.getProperty("line.separator");
 	
@@ -4033,8 +4041,17 @@ public class SUtil
 	 */
 	public static String getMacAddress()
 	{
-		String[] ret = getMacAddresses();
-		return ret!=null && ret.length>0 ? ret[0] : null;
+		String[] adrs = getMacAddresses();
+		String	ret	= null;
+		for(int i=0; ret==null && i<adrs.length; i++)
+		{
+			// Use first real, i.e. non-tunnel, mac address
+			if(!"[0, 0, 0, 0, 0, 0, 0, -32]".equals(adrs[i]))
+			{
+				ret	= adrs[i];
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -4465,5 +4482,296 @@ public class SUtil
 	    }
 
 	    return ret;
+	}
+	
+	//-------- file/jar hash --------
+	
+	/** LRU for hashes. */
+	protected static LRU<String, Tuple2<Long, String>>	HASHES	= loadHashCache();
+	
+	/** LRU for directory modification dates. */
+	protected static LRU<String, Long>	LASTMODS	= new LRU<String, Long>(1000);
+	
+	/**
+	 *  Get the hash code for a file or directory.
+	 */
+	public static String	getHashCode(File f)
+	{
+//		long	start0	= System.nanoTime();
+		try
+		{
+			String	path	= f.getCanonicalPath();
+			Tuple2<Long, String>	entry	= HASHES.get(path);
+			String	hash	=	entry!=null ? entry.getSecondEntity() : null; 
+			
+			if(f.exists() && (entry==null || entry.getFirstEntity().longValue()!=getLastModified(f)))
+			{
+//				long	start	= System.nanoTime();
+				MessageDigest md = MessageDigest.getInstance("SHA-512");
+				if(f.isDirectory())
+				{
+					hashDirectory(path, f, md);
+				}
+				else
+				{
+					ZipFile	zf	= null;
+					try
+					{
+						// Try zip file as directory.
+						zf	= new ZipFile(f);
+						List<ZipEntry>	entries	= new ArrayList<ZipEntry>();
+						Enumeration<? extends ZipEntry>	en	= zf.entries();
+						while(en.hasMoreElements())
+						{
+							ZipEntry	ze	= en.nextElement();
+							if(!ze.isDirectory() && !ze.getName().startsWith("META-INF/"))
+							{
+								entries.add(ze);
+							}
+						}
+						Collections.sort(entries, new Comparator<ZipEntry>()
+						{
+							public int compare(ZipEntry o1, ZipEntry o2)
+							{
+								return o1.getName().compareTo(o2.getName());
+							}
+						});
+						for(ZipEntry ze: entries)
+						{
+//							System.out.println("Zip entry: "+ze.getName());
+							md.update(ze.getName().getBytes("UTF-8"));
+							hashStream(zf.getInputStream(ze), md);
+						}
+					}
+					catch(ZipException ze)
+					{
+						// Treat as flat file.
+						hashStream(new FileInputStream(f), md);					
+					}
+					finally
+					{
+						if(zf!=null)
+						{
+							zf.close();
+						}
+					}
+				}
+				hash	= new String(Base64.encode(md.digest()), "UTF-8");
+				
+//				long	end	= System.nanoTime();
+//				System.out.println("Hashing of "+(f.isDirectory() ? path : f.getName())+" took "+((end-start)/100000)/10.0+" ms: "+hash);
+				HASHES.put(path, new Tuple2<Long, String>(Long.valueOf(getLastModified(f)), hash));
+				saveHashCache();
+			}
+			
+//			long	end0	= System.nanoTime();
+//			System.out.println("Hashing of "+(f.isDirectory() ? path : f.getName())+" took "+((end0-start0)/100000)/10.0+" ms: "+hash);
+			return hash;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Load the stored hashes.
+	 */
+	protected static LRU<String, Tuple2<Long, String>>	loadHashCache()
+	{
+		LRU<String, Tuple2<Long, String>>	ret	= null;
+		
+		File	cache	= new File(JADEXDIR, "hash.cache");
+		if(cache.exists())
+		{
+			try
+			{
+				FileInputStream	fis	= new FileInputStream(cache);
+				ret	= (LRU<String, Tuple2<Long, String>>)SBinarySerializer2.readObjectFromStream(fis, null, null, null, null);
+			}
+			catch(Exception e)
+			{
+			}
+		}
+
+		return ret!=null ? ret : new LRU<String, Tuple2<Long,String>>(1000);
+	}
+	
+	/**
+	 *  Save the caclulated hashes.
+	 */
+	protected static void	saveHashCache()
+	{
+		File	cache	= new File(JADEXDIR, "hash.cache");
+		try
+		{
+			cache.getParentFile().mkdirs();
+			FileOutputStream	fos	= new FileOutputStream(cache);
+			SBinarySerializer2.writeObjectToStream(fos, HASHES, null);
+		}
+		catch(Exception e)
+		{
+			System.err.println("Warning: could not store hash cache: "+e);
+		}
+	}
+	
+	/**
+	 *  Recursively get the newest last modified of a file or directory tree.
+	 */
+	protected static long	getLastModified(File f)
+	{
+		long ret;
+		if(f.isDirectory())
+		{
+			try
+			{
+				String	path	= f.getCanonicalPath();
+				Long	lastmod	= LASTMODS.get(path);
+				if(lastmod!=null)
+				{
+					ret	= lastmod.longValue();
+				}
+				else
+				{
+					ret	= Integer.MIN_VALUE;
+					for(File f2: f.listFiles())
+					{
+						ret	= Math.max(ret, getLastModified(f2, true));
+					}
+					LASTMODS.put(path, Long.valueOf(ret));
+				}
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		else
+		{
+			ret	= f.lastModified();
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Recursively get the newest last modified of a file or directory tree.
+	 */
+	protected static long	getLastModified(File f, boolean nocache)
+	{
+		long ret;
+		if(f.isDirectory())
+		{
+			ret	= Integer.MIN_VALUE;
+			for(File f2: f.listFiles())
+			{
+				ret	= Math.max(ret, getLastModified(f2));
+			}
+		}
+		else
+		{
+			ret	= f.lastModified();
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the hash code of a directory recursively.
+	 */
+	protected static void	hashDirectory(String root, File dir, MessageDigest md) throws Exception
+	{
+		File[]	files	= dir.listFiles();
+		Arrays.sort(files, new Comparator<File>()
+		{
+			// Grr... files are sorted by default ignoring capitalization on windows but respecting capitalization on linux
+			// -> have to implement our own portable comparator for matching hash values on all systems. 
+			public int compare(File o1, File o2)
+			{
+				try
+				{
+					return o1.getCanonicalPath().compareTo(o2.getCanonicalPath());
+				}
+				catch(IOException e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		
+		for(File f: files)
+		{
+			if(f.isDirectory())
+			{
+				if(!(f.getName().equals("META-INF") && f.getParentFile().getAbsolutePath().equals(root)))
+				{
+					hashDirectory(root, f, md);
+				}
+			}
+			else
+			{
+				String	fpath	= f.getCanonicalPath();
+				assert fpath.startsWith(root);
+				String	entry	= fpath.substring(root.length()+1).replace(File.separatorChar, '/');
+//				System.out.println("Dir entry: "+entry);
+				md.update(entry.getBytes("UTF-8"));
+				hashStream(new FileInputStream(f), md);
+			}
+		}
+	}
+
+	protected static void hashStream(InputStream is, MessageDigest md) throws Exception
+	{
+		DigestInputStream	dis	= new DigestInputStream(is, md);
+		byte[]	buf	= new byte[8192];
+		while(dis.read(buf)!=-1);
+		dis.close();
+	}
+	
+	/**
+	 *  Write a directory as jar to an output stream. 
+	 */
+	public static void	writeDirectory(File dir, OutputStream out)
+	{
+		try
+		{
+			ZipOutputStream	zos	= new JarOutputStream(out);
+			writeDirectory("", dir, zos, new byte[8192]);
+			zos.close();
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Write a directory as jar to an output stream. 
+	 */
+	protected static void	writeDirectory(String prefix, File dir, ZipOutputStream zos, byte[] buf)	throws Exception
+	{
+        File[]	files	= dir.listFiles();
+        for(int i=0; i<files.length; i++)
+        {
+        	if(files[i].isDirectory())
+        	{
+        		writeDirectory(prefix+files[i].getName()+"/", files[i], zos, buf);
+        	}
+        	else
+        	{
+//        		System.out.println("write: "+prefix+files[i].getName());
+	        	ZipEntry	ze	= new ZipEntry(prefix+files[i].getName());
+	        	ze.setTime(files[i].lastModified());
+	        	zos.putNextEntry(ze);
+	
+	        	FileInputStream	fis	= new FileInputStream(files[i]);
+	        	int	read;
+	        	while((read=fis.read(buf))>0)
+	        	{
+	        		zos.write(buf, 0, read);
+	        	}
+	        	zos.closeEntry();
+	        	fis.close();
+        	}
+        }
 	}
 }

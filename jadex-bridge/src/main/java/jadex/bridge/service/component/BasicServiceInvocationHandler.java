@@ -22,6 +22,7 @@ import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.component.interceptors.IntelligentProxyInterceptor;
 import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.MonitoringInterceptor;
@@ -172,7 +173,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //		if(method.getName().indexOf("getExternalAccess")!=-1)
 //			System.out.println("call method ex");
 		
-//		if(method.getName().indexOf("getChildren")!=-1)
+//		if(method.getName().indexOf("calculate")!=-1)
 //			System.out.println("call method child");
 		
 //		ServiceInvocationContext sicon = null;
@@ -223,6 +224,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					{
 //						if(sic.getMethod().getName().indexOf("test")!=-1)
 //							System.out.println("connect: "+sic.getMethod().getName());
+//						if(method.getName().indexOf("calculate")!=-1)
+//							System.out.println("connect: "+proxy+" "+sic);
 						FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
 					}
 				});
@@ -483,10 +486,13 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, boolean realtime, ProvidedServiceInfo info, String scope)
 	{
+//		if(type.getName().indexOf("ITestService")!=-1 && ia.getComponentIdentifier().getName().startsWith("Global"))
+//			System.out.println("gaga");
+		
 		Map<String, Object> serprops = new HashMap<String, Object>();
-		if (info != null && info.getProperties() != null)
+		if(info != null && info.getProperties() != null)
 		{
-			for (UnparsedExpression exp : info.getProperties())
+			for(UnparsedExpression exp : info.getProperties())
 			{
 				Object val = SJavaParser.parseExpression(exp, ia.getModel().getAllImports(), ia.getClassLoader()).getValue(null);
 				serprops.put(exp.getName(), val);
@@ -635,6 +641,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, copy, false));
 			}
 			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
+			handler.addFirstServiceInterceptor(new IntelligentProxyInterceptor(ia.getExternalAccess(), sid));
 		}
 		
 		if(ics!=null)

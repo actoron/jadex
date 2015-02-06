@@ -1,5 +1,6 @@
 package jadex.platform.service.remote;
 
+import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.BasicService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *  Info struct that holds all necessary information to generate
+ *  Info struct that holds all necessary model information to generate
  *  a proxy on the local platform. Is necessary because a proxy
  *  cannot be directly created on the remote side and then sent 
  *  per message to the calling side.
@@ -44,6 +45,9 @@ public class ProxyInfo
 	
 	/** The secure transport methods. */
 	protected Set<MethodInfo> secure;
+	
+	/** The target resolver (for intelligent proxies). */
+	protected Class<ITargetResolver> trcl;
 	
 	//-------- constructors --------
 	
@@ -378,6 +382,26 @@ public class ProxyInfo
 		return secure!=null && secure.contains(new MethodInfo(m));
 	}
 	
+	
+	
+	/**
+	 *  Get the target determiner clazz.
+	 *  @return The target determiner clazz
+	 */
+	public Class<ITargetResolver> getTargetResolverClazz() 
+	{
+		return trcl;
+	}
+
+	/**
+	 *  Set the target determiner class.
+	 *  @param tdcl The target determiner clazz to set
+	 */
+	public void setTargetResolverClazz(Class<ITargetResolver> tdcl) 
+	{
+		this.trcl = tdcl;
+	}
+
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.

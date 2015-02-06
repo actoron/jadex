@@ -1,7 +1,9 @@
 package jadex.platform.service.servicepool;
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IPoolStrategy;
 
 import java.util.HashMap;
@@ -20,13 +22,13 @@ public class PoolServiceInfo
 	protected ClassInfo servicetype;
 	
 	/** The pool strategy. */
-	protected IPoolStrategy poolstrategy;
+	protected Object poolstrategy; // IPoolStrategy or IGlobalPoolStrategy
 	
 	/** The publication info. */
 	protected PublishInfo publishinfo;
 
-	/** The argument names. */
-	protected Map<String, Object> arguments;
+	/** The creation info for the worker. */
+	protected CreationInfo info;
 	
 	/**
 	 *  Create a new PoolServiceInfo.
@@ -55,7 +57,7 @@ public class PoolServiceInfo
 	/**
 	 *  Create a new PoolServiceInfo.
 	 */
-	public PoolServiceInfo(String workermodel, Class<?> servicetype, IPoolStrategy poolstrategy)
+	public PoolServiceInfo(String workermodel, Class<?> servicetype, Object poolstrategy)
 	{
 		this(workermodel, servicetype, poolstrategy, null, null, null);
 	}
@@ -72,20 +74,45 @@ public class PoolServiceInfo
 	 *  Create a new PoolServiceInfo.
 	 */
 	public PoolServiceInfo(String workermodel, Class<?> servicetype,
-		IPoolStrategy poolstrategy, PublishInfo publishinfo, String[] argnames, Object[] argvals)
+		Object poolstrategy, PublishInfo publishinfo, String[] argnames, Object[] argvals)
+	{
+		this(workermodel, servicetype, null, null, null, argnames, argvals);
+	}
+	
+	/**
+	 *  Create a new PoolServiceInfo.
+	 */
+	public PoolServiceInfo(String workermodel, Class<?> servicetype, IResourceIdentifier rid,
+		Object poolstrategy, PublishInfo publishinfo, String[] argnames, Object[] argvals)
 	{
 		this.workermodel = workermodel;
 		this.servicetype = new ClassInfo(servicetype);
 		this.poolstrategy = poolstrategy;
 		this.publishinfo = publishinfo;
+		this.info = new CreationInfo();
 		if(argnames!=null && argnames.length>0)
 		{
-			this.arguments = new HashMap<String, Object>();
+			Map<String, Object> arguments = new HashMap<String, Object>();
 			for(int i=0; i<argnames.length; i++)
 			{
 				arguments.put(argnames[i], argvals[i]);
 			}
+			info.setArguments(arguments);
 		}
+		info.setResourceIdentifier(rid);
+	}
+	
+	/**
+	 *  Create a new PoolServiceInfo.
+	 */
+	public PoolServiceInfo(CreationInfo info, String workermodel, Class<?> servicetype,
+		IPoolStrategy poolstrategy, PublishInfo publishinfo)
+	{
+		this.info = info;
+		this.workermodel = workermodel;
+		this.servicetype = new ClassInfo(servicetype);
+		this.poolstrategy = poolstrategy;
+		this.publishinfo = publishinfo;
 	}
 
 	/**
@@ -146,7 +173,7 @@ public class PoolServiceInfo
 	 *  Get the poolstrategy.
 	 *  return The poolstrategy.
 	 */
-	public IPoolStrategy getPoolStrategy()
+	public Object getPoolStrategy()
 	{
 		return poolstrategy;
 	}
@@ -155,9 +182,27 @@ public class PoolServiceInfo
 	 *  Set the pool strategy. 
 	 *  @param poolstrategy The pool strategy to set.
 	 */
-	public void setPoolStrategy(IPoolStrategy poolstrategy)
+	public void setPoolStrategy(Object poolstrategy)
 	{
 		this.poolstrategy = poolstrategy;
+	}
+
+	/**
+	 *  Get the info.
+	 *  @return the info
+	 */
+	public CreationInfo getCreationInfo() 
+	{
+		return info;
+	}
+
+	/**
+	 *  Set the info.
+	 *  @param info The info to set
+	 */
+	public void setCreationInfo(CreationInfo info) 
+	{
+		this.info = info;
 	}
 
 	/**
@@ -166,15 +211,18 @@ public class PoolServiceInfo
 	 */
 	public Map<String, Object> getArguments()
 	{
-		return arguments;
+		return info==null? null: info.getArguments();//arguments;
 	}
-
-	/**
-	 *  Set the arguments.
-	 *  @param arguments The arguments to set.
-	 */
-	public void setArguments(Map<String, Object> arguments)
-	{
-		this.arguments = arguments;
-	}
+//
+//	/**
+//	 *  Set the arguments.
+//	 *  @param arguments The arguments to set.
+//	 */
+//	public void setArguments(Map<String, Object> arguments)
+//	{
+//		info.setArguments(arguments);
+////		this.arguments = arguments;
+//	}
+	
+	
 }

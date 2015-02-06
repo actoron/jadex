@@ -43,7 +43,7 @@ public class FIPAMessageType extends MessageType
 			// Extra parameters
 			new MessageType.ParameterSpecification(SFipa.X_MESSAGE_ID, String.class, false),
 			new MessageType.ParameterSpecification(SFipa.X_TIMESTAMP, String.class, false),
-			new MessageType.ParameterSpecification(SFipa.X_RID, IResourceIdentifier.class, false),
+			new MessageType.ParameterSpecification(SFipa.X_RID, IResourceIdentifier.class, SFipa.X_RID, false, false),
 			new MessageType.ParameterSpecification(SFipa.X_RECEIVER, IComponentIdentifier.class, false),
 			new MessageType.ParameterSpecification(SFipa.X_NONFUNCTIONAL, Map.class, SFipa.X_NONFUNCTIONAL, false, false)
 		},

@@ -22,3 +22,12 @@ jadex-platform-standalone-launch/highscore.dmp
 /docs/keys/random_seed
 /.gradle
 /jadex-platform-extension-relay-standalone/.relaystats
+**/.idea
+*.iml
+/jadex-android-bluetooth/lint.xml
+/jadex-platform-standalone-launch/.jadex/resources
+/jadex-platform-standalone-launch/.jadex
+/jadex-commons/.jadex
+/jadex-platform-extension-management/.jadex
+/jadex-platform-extension-securetransport/.jadex
+/jadex-platform-extension-webservice-desktop/.jadex

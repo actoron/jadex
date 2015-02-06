@@ -208,7 +208,7 @@ public class RoutingTableEntryWrapper {
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("Dest: ").append(entryBuilder.getDestination())
-				.append("next: ").append(entryBuilder.getNextHop());
+				.append(" next: ").append(entryBuilder.getNextHop());
 		sb.append(" Seq:").append(entryBuilder.getSeqNum()).append(" hop:")
 				.append(entryBuilder.getNumHops());
 		return sb.toString();

@@ -26,12 +26,13 @@ import java.util.Map;
 public class BasicService extends ExternalFeatureProvider implements IInternalService //extends NFMethodPropertyProvider implements IInternalService
 {
 	//-------- constants --------
-	
+
 	/** Constant for remote default timeout. */
 	private static long DEFAULT_REMOTE = 30000;
 
 	/** Constant for local default timeout. */
 	private static long DEFAULT_LOCAL = 30000;
+
 	
 	static
 	{
@@ -196,6 +197,14 @@ public class BasicService extends ExternalFeatureProvider implements IInternalSe
 				this.properties = new HashMap<String, Object>();
 			this.properties.put("componentviewer.viewerclass", guiClasses);
 		}
+		
+//		if(type.isAnnotationPresent(TargetResolver.class))
+//		{
+//			TargetResolver tr = type.getAnnotation(TargetResolver.class);
+//			if(this.properties==null) 
+//				this.properties = new HashMap<String, Object>();
+//			this.properties.put(TargetResolver.TARGETRESOLVER, tr.value());
+//		}
 		
 //		if(type.isAnnotationPresent(NFProperties.class))
 //		{

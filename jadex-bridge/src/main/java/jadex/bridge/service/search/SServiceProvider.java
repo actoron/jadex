@@ -55,7 +55,7 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type)
 	{
-		return getLocalService(provider, type, null);
+		return getLocalService(provider, type, (String)null);
 	}
 	
 	/**
@@ -84,6 +84,23 @@ public class SServiceProvider
 		return ret;
 	}
 	
+	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type, final IComponentIdentifier target)
+	{
+		T ret = ((IPlatformComponentAccess)provider).getServiceRegistry().searchService(type, provider.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+		{
+			public boolean filter(T obj) 
+			{
+				return ((IService)obj).getServiceIdentifier().getProviderId().equals(target);
+			}
+		});
+		if(ret==null)
+		{
+			throw new ServiceNotFoundException(type.getName());
+		}
+		
+		return ret;
+	}
+
 	/**
 	 *  Get one service of a type.
 	 *  @param type The class.

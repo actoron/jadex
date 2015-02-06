@@ -8,7 +8,12 @@ import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+
+import java.util.Collection;
 
 /**
  *  Calls a method on an object and returns the result.
@@ -59,7 +64,40 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 			{
 //				System.out.println("method call lis end: "+sic.hashCode());
 				Object	res	= sic.getResult();
-				if(res instanceof IFuture)
+				if(res instanceof IIntermediateFuture)
+				{
+					IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
+					{
+						public void intermediateResultAvailable(Object result)
+						{
+						}
+							
+						public void finished()
+						{
+							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+						}
+						
+						public void resultAvailable(Collection<Object> result)
+						{
+							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+						}
+					};
+					
+					if(res instanceof ISubscriptionIntermediateFuture)
+					{
+						((ISubscriptionIntermediateFuture)res).addQuietListener(lis);
+					}
+					else
+					{
+						((IIntermediateFuture)res).addResultListener(lis);
+					}
+				}
+				else if(res instanceof IFuture)
 				{
 					((IFuture<Object>)res).addResultListener(new IResultListener<Object>()
 					{

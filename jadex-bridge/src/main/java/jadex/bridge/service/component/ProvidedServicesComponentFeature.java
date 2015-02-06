@@ -613,7 +613,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public IFuture<Void> addService(String name, Class<?> type, Object service)
 	{
-		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null);
+		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null, null);
 	}
 	
 	/**
@@ -626,7 +626,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public IFuture<Void>	addService(String name, Class<?> type, Object service, String proxytype)
 	{
-		return addService(name, type, proxytype, null, service, null);
+		return addService(name, type, proxytype, null, service, null, null);
 	}
 	
 	// todo:
@@ -648,11 +648,12 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  the old one is removed and shutdowned.
 	 *  @param type The public service interface.
 	 *  @param service The service.
+	 *  @param scope	The service scope.
 	 */
-	public IFuture<Void>	addService(String name, Class<?> type, Object service, PublishInfo pi)
+	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, String scope)
 	{
 		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, null, pi, null): null;
-		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi);
+		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi, scope);
 	}
 
 	/**
@@ -839,7 +840,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
 	public IFuture<Void> addService(final String name, final Class<?> type, final String proxytype, 
-		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info)
+		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info, String scope)
 	{
 //		System.out.println("addS:"+service);
 
@@ -851,7 +852,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getComponent(), service, name, type, proxytype, ics, getComponent().isCopy(), 
 			getComponent().isRealtime(), moni, 
-			info, info!=null? info.getScope(): null);
+			info, scope!=null ? scope : info!=null? info.getScope(): null);
 		
 		addService(proxy, info);
 				

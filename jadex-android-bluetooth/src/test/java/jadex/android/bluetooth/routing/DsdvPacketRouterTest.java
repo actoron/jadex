@@ -75,6 +75,30 @@ public class DsdvPacketRouterTest extends PacketRouterTest {
 	}
 	
 	@Override
+	protected RoutingInformation getSampleRoutingInformation_containingOwnDevice() {
+		Builder riBuilder = MessageProtos.RoutingInformation.newBuilder();
+		jadex.android.bluetooth.message.MessageProtos.RoutingTable.Builder rtBuilder = MessageProtos.RoutingTable.newBuilder();
+		jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry.Builder entryBuilder = MessageProtos.RoutingTableEntry.newBuilder();
+		
+		entryBuilder.setNextHop(device2);
+		entryBuilder.setNumHops(0);
+		entryBuilder.setSeqNum(CurrentInfo.incrementOwnSeqNum());
+		entryBuilder.setDestination(device2);
+		RoutingTableEntry dev2 = entryBuilder.build();
+		 
+		entryBuilder.setNextHop(ownAddress);
+		entryBuilder.setNumHops(1);
+		entryBuilder.setDestination(ownAddress);
+		RoutingTableEntry dev3 = entryBuilder.build();
+		
+		RoutingTable table = rtBuilder.addEntry(dev2).addEntry(dev3).build();
+		
+		RoutingInformation ri = riBuilder.setType(getRouterRoutingType()).setRoutingTable(table).setFromAddress(device2).build();
+		
+		return ri;
+	}
+	
+	@Override
 	protected List<String> getSampleExpectedReachableDevices() {
 		List<String> list = new ArrayList<String>();
 		list.add(device3);

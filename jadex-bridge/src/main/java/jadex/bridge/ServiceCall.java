@@ -1,6 +1,5 @@
 package jadex.bridge;
 
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Timeout;
 
 import java.util.HashMap;
@@ -148,6 +147,11 @@ public class ServiceCall
 //			{
 //				System.out.println("sflöjyhö");
 //				Thread.dumpStack();
+//			}
+			
+//			if(ret!=null && ret.getCause()==null)
+//			{
+//				System.out.println(Thread.currentThread().hashCode()+": create: "+ret+", "+Thread.currentThread());
 //			}
 
 			NEXT.set(ret);

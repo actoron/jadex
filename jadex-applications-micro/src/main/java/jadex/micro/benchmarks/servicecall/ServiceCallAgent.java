@@ -3,6 +3,7 @@ package jadex.micro.benchmarks.servicecall;
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -90,26 +91,26 @@ public class ServiceCallAgent	extends TestAgent
 	{
 		final Future<Void> ret	= new Future<Void>();
 		CreationInfo	ci	= ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
-			? new CreationInfo(agent.getComponentIdentifier()) : null;
+			? new CreationInfo(agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
 		cms.createComponent(null, agentname, ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
 				final Future<Void>	ret2	= new Future<Void>();
-				performSingleTest("raw", 5*factor).addResultListener(new DelegationResultListener<Void>(ret2)
+				performSingleTest("raw", 5*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 				{
 					public void customResultAvailable(Void result)
 					{
-						performSingleTest("direct", 2*factor).addResultListener(new DelegationResultListener<Void>(ret2)
+						performSingleTest("direct", 2*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 						{
 							public void customResultAvailable(Void result)
 							{
-								performSingleTest("decoupled", 1*factor).addResultListener(new DelegationResultListener<Void>(ret2));
+								performSingleTest("decoupled", 1*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
 							}
-						});
+						}));
 					}
-				});
+				}));
 				
 				ret2.addResultListener(new IResultListener<Void>()
 				{

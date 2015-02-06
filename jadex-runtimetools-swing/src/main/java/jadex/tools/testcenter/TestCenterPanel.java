@@ -5,6 +5,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -612,9 +613,11 @@ public class TestCenterPanel extends JSplitPanel
 					Properties	entry	= new Properties();
 					entry.addProperty(new Property("model", local.getFirstEntity()));
 					entry.addProperty(new Property("ridurl", local.getSecondEntity()));
+
 					// todo: save also repo info of gid
 					IResourceIdentifier rid = tests.get(i).getSecondEntity();
-					String id = rid!=null && rid.getGlobalIdentifier()!=null? rid.getGlobalIdentifier().getResourceId(): null;
+					String id = rid!=null && rid.getGlobalIdentifier()!=null && rid.getGlobalIdentifier().getResourceId()!=null
+						&& !ResourceIdentifier.isHashGid(rid) ? rid.getGlobalIdentifier().getResourceId(): null;
 					entry.addProperty(new Property("globalrid", id));
 					props.addSubproperties("entry", entry);
 				}

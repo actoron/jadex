@@ -38,6 +38,7 @@ import java.util.Set;
  *  Search fetches services by types and excludes some according to
  *  the scope.
  */
+//todo: rename PlatformServiceRegistry
 public class LocalServiceRegistry
 {
 	/** The map of published services sorted by type. */
@@ -93,8 +94,8 @@ public class LocalServiceRegistry
 	 */
 	public synchronized void addService(ClassInfo key, IService service)
 	{
-//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("Factory")!=-1)
-//			System.out.println("added: "+service.getServiceIdentifier().getServiceType() + service.getServiceIdentifier().getProviderId());
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+//			System.out.println("added: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
 		
 		if(services==null)
 		{
@@ -117,6 +118,9 @@ public class LocalServiceRegistry
 	 */
 	public synchronized void removeService(ClassInfo key, IService service)
 	{
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+//			System.out.println("removed: "+service.getServiceIdentifier().getServiceType()+" - "+service.getServiceIdentifier().getProviderId());
+		
 		if(services!=null)
 		{
 			Set<IService> sers = services.get(key);
@@ -433,6 +437,7 @@ public class LocalServiceRegistry
 	public synchronized <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
+		final IComponentIdentifier	lcid	= IComponentIdentifier.LOCAL.get();
 		
 		searchService(type, cid, RequiredServiceInfo.SCOPE_PLATFORM, filter).addResultListener(new IResultListener<T>()
 		{
@@ -443,7 +448,7 @@ public class LocalServiceRegistry
 
 			public void exceptionOccurred(Exception exception)
 			{
-				searchRemoteService(type, filter).addResultListener(new DelegationResultListener<T>(ret));
+				searchRemoteService(lcid, type, filter).addResultListener(new DelegationResultListener<T>(ret));						
 			}
 		});
 		
@@ -456,7 +461,6 @@ public class LocalServiceRegistry
 	public synchronized <T> ITerminableIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter)
 	{
 //		System.out.println("Search global services: "+type);
-		
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		
 		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, true, new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
@@ -485,7 +489,7 @@ public class LocalServiceRegistry
 			}
 		});
 		
-		searchRemoteServices(type, filter).addResultListener(new IntermediateDefaultResultListener<T>()
+		searchRemoteServices(IComponentIdentifier.LOCAL.get(), type, filter).addResultListener(new IntermediateDefaultResultListener<T>()
 		{
 			public void intermediateResultAvailable(T result)
 			{
@@ -617,7 +621,7 @@ public class LocalServiceRegistry
 			// check if parent of service reaches the searcher
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
 			String subname = getSubcomponentName(sercid);
-			ret = cid.getName().endsWith(subname);
+			ret = getDotName(cid).endsWith(subname);
 		}
 		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
 		{
@@ -631,12 +635,15 @@ public class LocalServiceRegistry
 	
 	/**
 	 *  Search for services on remote platforms.
+	 *  @param caller	The component that started the search.
 	 *  @param type The type.
-	 *  @param scope The scope.
+	 *  @param filter The filter.
 	 */
-	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final Class<T> type, final IAsyncFilter<T> filter)
+	protected <T> ITerminableIntermediateFuture<T> searchRemoteServices(final IComponentIdentifier caller, final Class<T> type, final IAsyncFilter<T> filter)
 	{
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+		// Must not find services twice (e.g. having two proxies for the same platform)
+		final Set<T> founds = new HashSet<T>();
 		
 		if(services!=null)
 		{
@@ -662,14 +669,18 @@ public class LocalServiceRegistry
 						{
 							public void resultAvailable(IComponentIdentifier rcid)
 							{
-								IFuture<Collection<T>> rsers = rms.getServiceProxies(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+								IFuture<Collection<T>> rsers = rms.getServiceProxies(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 								rsers.addResultListener(new IResultListener<Collection<T>>()
 								{
 									public void resultAvailable(Collection<T> result)
 									{
 										for(T t: result)
 										{
-											ret.addIntermediateResult(t);
+											if(!founds.contains(t))
+											{
+												ret.addIntermediateResult(t);
+											}
+											founds.add(t);
 										}
 										clis.resultAvailable(null);
 									}
@@ -724,7 +735,7 @@ public class LocalServiceRegistry
 	 *  @param type The type.
 	 *  @param scope The scope.
 	 */
-	protected <T> IFuture<T> searchRemoteService(final Class<T> type, final IAsyncFilter<T> filter)
+	protected <T> IFuture<T> searchRemoteService(final IComponentIdentifier caller, final Class<T> type, final IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -752,7 +763,7 @@ public class LocalServiceRegistry
 						{
 							public void resultAvailable(IComponentIdentifier rcid)
 							{
-								IFuture<T> rsers = rms.getServiceProxy(rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+								IFuture<T> rsers = rms.getServiceProxy(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 								rsers.addResultListener(new IResultListener<T>()
 								{
 									public void resultAvailable(T result)
@@ -809,7 +820,7 @@ public class LocalServiceRegistry
 	 */
 	protected Set<IService> getServices(Class<?> type)
 	{
-		Set<IService> ret = Collections.EMPTY_SET;;
+		Set<IService> ret = Collections.emptySet();
 		if(services!=null)
 		{
 			if(type!=null)
@@ -825,6 +836,7 @@ public class LocalServiceRegistry
 				}
 			}
 		}
+		
 		return ret;
 	}
 	

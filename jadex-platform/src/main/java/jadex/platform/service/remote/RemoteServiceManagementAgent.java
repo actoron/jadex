@@ -22,7 +22,6 @@ import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -358,11 +357,17 @@ public class RemoteServiceManagementAgent
 									public void resultAvailable(Void v)
 									{
 										final Map reply = mt.createReply(msg);
-										if(rid[0]!=null && rid[0].getGlobalIdentifier()!=null)
+										
+										if((""+result).indexOf("RemoteSearchCommand")!=-1 && (""+result).indexOf("IServiceCallService")!=-1)
 										{
-//											System.out.println("rid: "+rid+" "+result.getClass());
-											reply.put(SFipa.X_RID, rid[0]);
+											System.out.println("sdhkl");
 										}
+										
+//										if(rid[0]!=null && rid[0].getGlobalIdentifier()!=null)
+//										{
+////											System.out.println("rid: "+rid+" "+result.getClass());
+//											reply.put(SFipa.X_RID, rid[0]);
+//										}
 //										else
 //										{
 //											System.out.println("no rid: "+result.getClass());

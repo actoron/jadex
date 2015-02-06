@@ -110,7 +110,7 @@ public class ComponentStartTest extends	TestCase
 		}
 		
 		// Start the component.
-		System.out.println("starting: "+this);
+//		System.out.println("starting: "+this);
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		final Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
 		Timer	t	= new Timer(true);
@@ -123,7 +123,7 @@ public class ComponentStartTest extends	TestCase
 		}, timeout);
 		final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
 			new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
-		System.out.println("started: "+this);
+//		System.out.println("started: "+this);
 		
 		try
 		{
@@ -158,7 +158,7 @@ public class ComponentStartTest extends	TestCase
 			
 			finished.get();
 			t.cancel();
-			System.out.println("killed: "+this);
+//			System.out.println("killed: "+this);
 		}
 		catch(ComponentTerminatedException cte)
 		{				

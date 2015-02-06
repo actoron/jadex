@@ -9,6 +9,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
@@ -120,7 +121,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 
 	/** Timeout for remote method invocation. */
 	public static final String REMOTE_TIMEOUT = "remote_timeout";
-
+	
 	//-------- attributes --------
 	
 	/** The component. */
@@ -368,16 +369,17 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Get a service proxy from a remote component.
 	 *  (called from arbitrary components)
+	 *  @param caller	The component that started the search.
 	 *  @param cid	The remote provider id.
 	 *  @param service	The service type.
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope, IAsyncFilter<T> filter)
+	public <T> IFuture<T> getServiceProxy(IComponentIdentifier caller, final IComponentIdentifier cid, final Class<T> service, String scope, IAsyncFilter<T> filter)
 	{
 //		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
 		final Future<T>	ret	= new Future<T>();
-		getServiceProxies(cid, service, scope, false, filter).addResultListener(new ExceptionDelegationResultListener<Collection<T>, T>(ret)
+		getServiceProxies(caller, cid, service, scope, false, filter).addResultListener(new ExceptionDelegationResultListener<Collection<T>, T>(ret)
 		{
 			public void customResultAvailable(Collection<T> result)
 			{
@@ -405,25 +407,27 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Get all service proxies from a remote component.
 	 *  (called from arbitrary components)
+	 *  @param caller	The component that started the search.
 	 *  @param cid	The remote provider id.
 	 *  @param service	The service type.
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier cid, final Class<T> service, final String scope, IAsyncFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(IComponentIdentifier caller, final IComponentIdentifier cid, final Class<T> service, final String scope, IAsyncFilter<T> filter)
 	{
-		return getServiceProxies(cid, service, scope, true, filter);
+		return getServiceProxies(caller, cid, service, scope, true, filter);
 	}
 	
 	/**
 	 *  Get all service proxies from a remote component.
 	 *  (called from arbitrary components)
+	 *  @param caller	The component that started the search.
 	 *  @param cid	The remote provider id.
 	 *  @param service	The service type.
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final IComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
 	{
 //		final Future<T>	ret	= new Future<T>();
 //		
@@ -530,7 +534,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
 						// Hack! create remote rms cid with "rms" assumption.
-						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid, (IAsyncFilter<IService>)filter);
+						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid, (IAsyncFilter<IService>)filter, caller);
 						
 //						System.out.println("send to: "+rrms+" "+callid);
 						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func
@@ -815,7 +819,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							if(future instanceof ISubscriptionIntermediateFuture)
 							{
 								// IResultListener not allowed for subscription future.
-								((ISubscriptionIntermediateFuture)future).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener<Object>()
+								((ISubscriptionIntermediateFuture)future).addQuietListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener<Object>()
 								{
 									public void intermediateResultAvailable(Object result)
 									{
@@ -872,7 +876,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							{
 								public void customResultAvailable(IResourceIdentifier rid)
 								{
-									if(rid!=null && rid.getGlobalIdentifier()!=null)
+									if(rid!=null && rid.getGlobalIdentifier()!=null && !ResourceIdentifier.isJadexRid(rid))
 									{
 //										System.out.println("rid: "+rid+" "+content.getClass()+" "+msg.get(SFipa.SENDER));
 										msg.put(SFipa.X_RID, rid);
@@ -1704,5 +1708,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		return ret;
 	}
+	
+	
 }
 

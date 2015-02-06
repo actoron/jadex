@@ -1,7 +1,9 @@
 package jadex.platform.service.library;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.GlobalResourceIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
@@ -16,13 +18,16 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
-import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
@@ -31,9 +36,20 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -244,7 +260,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 						{
 	//						System.out.println("add end "+rid+" on: "+parid);
 		
-							// Must be added with resolved rid (what about resolving parent)
+							// Must be added with resolved rid (what about resolving parent?)
 							addLink(parid, rid);
 		
 							getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
@@ -652,29 +668,26 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			ret.setResult(rootloader);
 //			System.out.println("root classloader: "+rid);
 		}
-		else if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
+		else if(ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
 		{
 			ret.setResult(baseloader);
 //			System.out.println("base classloader: "+rid);
 		}	
 		else
 		{
-			// Resolve global rid or local rid from same platform.
-			if(rid.getGlobalIdentifier()!=null || isLocal(rid))
+			if(!internalGetResourceIdentifiers().getSecondEntity().containsKey(rid))
 			{
-				getClassLoader(rid, null, rootloader.getResourceIdentifier(), workspace).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
+				addLink(null, rid);
+			}
+			
+			getClassLoader(rid, null, rootloader.getResourceIdentifier(), workspace).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
+			{
+				public void customResultAvailable(DelegationURLClassLoader result)
 				{
-					public void customResultAvailable(DelegationURLClassLoader result)
-					{
-						ret.setResult(result);
-//						System.out.println("custom classloader: "+result.hashCode()+" "+rid);
-					}
-				});
-			}
-			else
-			{
-				ret.setResult(null);
-			}
+					ret.setResult(result);
+//					System.out.println("custom classloader: "+result.hashCode()+" "+rid);
+				}
+			});
 		}
 		
 		return ret;
@@ -739,8 +752,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		// full=(global, local) calls followed by any other call are ok, because global and local can be cached
 		// pure global call followed by pure local call -> would mean rids have not been resolved
 		// pure local call followed by pure global call -> would mean rids have not been resolved
-		final IResourceIdentifier lrid = ResourceIdentifier.getLocalResourceIdentifier(rid);
-		if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
+		if(ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
 		{
 			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
 			notifyAdditionListeners(support, rid);
@@ -748,10 +760,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		else if(clfuts.containsKey(rid))
 		{
 			ret	= clfuts.get(rid);
-		}
-		else if(lrid!=null && clfuts.containsKey(lrid))
-		{
-			ret	= clfuts.get(lrid);
 		}
 		else
 		{
@@ -768,14 +776,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			else
 			{
 				clfuts.put(rid, ret);
-				if(lrid!=null)
-					clfuts.put(lrid, ret);
 //				if(rid.getGlobalIdentifier()==null)
 //					System.out.println("getClassLoader(): "+rid);
 				
 				if(alldeps==null)
 				{
-//					System.out.println("getdeps in getcl: "+rid);
+//					System.out.println("getdeps in getcl: "+component.getComponentIdentifier()+", "+rid);
 					getDependencies(rid, workspace).addResultListener(
 						new ExceptionDelegationResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>, DelegationURLClassLoader>(ret)
 					{
@@ -786,14 +792,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 								public void customResultAvailable(DelegationURLClassLoader result)
 								{
 									clfuts.remove(rid);
-									clfuts.remove(lrid);
 									super.customResultAvailable(result);
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
 									clfuts.remove(rid);
-									clfuts.remove(lrid);
 									super.exceptionOccurred(exception);
 								}
 							});
@@ -802,26 +806,24 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 						public void exceptionOccurred(Exception exception)
 						{
 							clfuts.remove(rid);
-							clfuts.remove(lrid);
 							super.exceptionOccurred(exception);
 						}
 					});
 				}
 				else
 				{
+//					System.out.println("create cl: "+component.getComponentIdentifier()+", "+rid);
 					createClassLoader(rid, alldeps, support, workspace).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
 					{
 						public void customResultAvailable(DelegationURLClassLoader result)
 						{
 							clfuts.remove(rid);
-							clfuts.remove(lrid);
 							super.customResultAvailable(result);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
 							clfuts.remove(rid);
-							clfuts.remove(lrid);
 							super.exceptionOccurred(exception);
 						}
 					});
@@ -836,63 +838,67 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 *  Create a new classloader.
 	 */
 	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, 
-		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
+		final Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
 	{
 		checkLocalRid(rid);
 		
 		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
-		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri());
+		assert rid.getLocalIdentifier()==null || !ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot()) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri());
 		
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
-//		final URL url = rid.getLocalIdentifier().getSecondEntity();
-		final List<IResourceIdentifier> deps = alldeps.get(rid);
-
-		final DelegationURLClassLoader cl = createNewDelegationClassLoader(rid, baseloader, null);
-		classloaders.put(rid, cl);
-		// Add also local rid to ensure that classloader will be found for these searches as well
-		if(rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
-//		if(rid.getGlobalIdentifier()==null && rid.getLocalIdentifier()!=null)
+		
+		if(isAvailable(rid))
 		{
-			IResourceIdentifier localrid = ResourceIdentifier.getLocalResourceIdentifier(rid);
-			if(localrid!=null)
+			final DelegationURLClassLoader cl = createNewDelegationClassLoader(rid, baseloader, null);
+			classloaders.put(rid, cl);
+			
+//			System.out.println("createClassLoader() put: "+component.getComponentIdentifier()+", "+rid);
+			
+			final List<IResourceIdentifier> deps = alldeps.get(rid);
+			CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
+				(deps.size(), true, new ExceptionDelegationResultListener<Collection<DelegationURLClassLoader>, DelegationURLClassLoader>(ret)
 			{
-				classloaders.put(localrid, cl);
+				public void customResultAvailable(Collection<DelegationURLClassLoader> result)
+				{
+					// Strip null values of provided dependencies from results.
+					for(Iterator<DelegationURLClassLoader> it=result.iterator(); it.hasNext(); )
+					{
+						if(it.next()==null)
+							it.remove();
+					}
+					
+					for(DelegationURLClassLoader dcl: result)
+					{
+						cl.addDelegateClassLoader(dcl);
+					}
+					addSupport(rid, support);
+					ret.setResult(cl);
+				}
+			});
+			
+			for(int i=0; i<deps.size(); i++)
+			{
+				IResourceIdentifier myrid = (IResourceIdentifier)deps.get(i);
+				getClassLoader(myrid, alldeps, rid, workspace).addResultListener(lis);
 			}
 		}
-		
-//		System.out.println("createClassLoader() put: "+rid);
-		
-		CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
-			(deps.size(), true, new ExceptionDelegationResultListener<Collection<DelegationURLClassLoader>, DelegationURLClassLoader>(ret)
+		else
 		{
-			public void customResultAvailable(Collection<DelegationURLClassLoader> result)
+			downloadResource(rid)
+				.addResultListener(new ExceptionDelegationResultListener<Void, DelegationURLClassLoader>(ret)
 			{
-				// Strip null values of provided dependencies from results.
-				for(Iterator<DelegationURLClassLoader> it=result.iterator(); it.hasNext(); )
+				public void customResultAvailable(Void result)
 				{
-					if(it.next()==null)
-						it.remove();
+					createClassLoader(rid, alldeps, support, workspace).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
 				}
-				
-				for(DelegationURLClassLoader dcl: result)
-				{
-					cl.addDelegateClassLoader(dcl);
-				}
-				addSupport(rid, support);
-				ret.setResult(cl);
-			}
-		});
-		
-		for(int i=0; i<deps.size(); i++)
-		{
-			IResourceIdentifier myrid = (IResourceIdentifier)deps.get(i);
-			getClassLoader(myrid, alldeps, rid, workspace).addResultListener(lis);
+			});
 		}
+		
 		return ret;
 	}
 
 	/**
-	 * Handle instanciation here, so the DelegationURLClassLoader can be another
+	 * Handle instantiation here, so the DelegationURLClassLoader can be another
 	 * implementation.
 	 * @param rid
 	 * @param baseloader
@@ -901,8 +907,242 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected DelegationURLClassLoader createNewDelegationClassLoader(final IResourceIdentifier rid, ClassLoader baseloader, DelegationURLClassLoader[] delegates)
 	{
-		return new DelegationURLClassLoader(rid, baseloader, delegates);
+		URL url = getRidUrl(rid);
+		return new DelegationURLClassLoader(rid, url, baseloader, delegates);
 	}
+	
+	/**
+	 *  Get the local file url for a rid.
+	 */
+	protected URL getRidUrl(final IResourceIdentifier rid)
+	{
+		URL	url;
+		if(ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot()))
+		{
+			url	= rid!=null && rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getUri()!=null? SUtil.toURL(rid.getLocalIdentifier().getUri()): null;
+		}
+		else
+		{
+			File	jar	= getHashRidFile(rid);
+			if(!jar.exists())
+			{
+				throw new RuntimeException("Resource not found: "+jar);
+			}
+			else
+			{
+				try
+				{
+					url	= jar.toURI().toURL();
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		return url;
+	}
+	
+	/**
+	 * Test, if a resource is available locally.
+	 */
+	protected boolean	isAvailable(IResourceIdentifier rid)	
+	{
+		// Do not check existence of manually added (local) resources
+		return ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot())
+			|| getHashRidFile(rid).exists();
+	}
+
+	/**
+	 *  Get the file for a hash rid.
+	 */
+	protected File	getHashRidFile(IResourceIdentifier rid)
+	{
+		assert ResourceIdentifier.isHashGid(rid);
+
+		// http://tools.ietf.org/html/rfc3548#section-4 for local storage of hashed resources
+		String	name	= rid.getGlobalIdentifier().getResourceId().substring(2).replace('+', '-').replace('/', '_') + ".jar";
+		
+		return new File(SUtil.JADEXDIR, "resources/"+name);
+	}
+	
+	/**
+	 *  Download a resource from another platform.
+	 */
+	protected IFuture<Void>	downloadResource(final IResourceIdentifier rid)
+	{
+		assert rid!=null && rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier()!=null;
+		
+		final Future<Void>	ret	= new Future<Void>();
+		final IComponentIdentifier	remote	= rid.getLocalIdentifier().getComponentIdentifier();
+		SServiceProvider.getService(component.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.getExternalAccess(remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				{
+					public void customResultAvailable(IExternalAccess exta)
+					{
+						SServiceProvider.getService(exta, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+						{
+							public void customResultAvailable(ILibraryService ls)
+							{
+								ls.getResourceAsStream(rid)
+									.addResultListener(new ExceptionDelegationResultListener<IInputConnection, Void>(ret)
+								{
+									public void customResultAvailable(IInputConnection icon)
+									{
+										try
+										{
+											File	f	= getHashRidFile(rid);
+											f.getParentFile().mkdirs();
+											final OutputStream	os	= new BufferedOutputStream(new FileOutputStream(f));
+											icon.writeToOutputStream(os, component.getExternalAccess())
+												.addResultListener(new IIntermediateResultListener<Long>()
+											{
+												public void exceptionOccurred(Exception exception)
+												{
+													exception.printStackTrace();
+													try
+													{
+														os.close();
+													}
+													catch(Exception e)
+													{
+														// ignore
+													}
+													ret.setException(null);
+												}
+												
+												public void finished()
+												{
+//													System.out.println("finished");
+													try
+													{
+														os.close();
+													}
+													catch(Exception e)
+													{
+														// ignore
+													}
+													ret.setResult(null);
+												}
+												
+												public void intermediateResultAvailable(Long result)
+												{
+													// ignore
+//													System.out.println("update: "+result);
+												}
+												
+												public void resultAvailable(Collection<Long> result)
+												{
+													// should not be called.
+												}
+											});
+										}
+										catch(FileNotFoundException e)
+										{
+											throw new RuntimeException(e);
+										}
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a resource as stream (jar).
+	 */
+	public IFuture<IInputConnection>	getResourceAsStream(IResourceIdentifier rid)
+	{
+		try
+		{
+			final InputStream	is;
+			final File	file	= SUtil.getFile(getRidUrl(rid));
+			
+			if(file.isDirectory())
+			{
+				final PipedOutputStream	pos	= new PipedOutputStream();
+				is	= new PipedInputStream(pos, 8192*4);
+				
+				SServiceProvider.getService(component.getExternalAccess(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener<IDaemonThreadPoolService>()
+				{
+					public void resultAvailable(IDaemonThreadPoolService tps)
+					{
+						tps.execute(new Runnable()
+						{
+							public void run()
+							{
+								SUtil.writeDirectory(file, new BufferedOutputStream(pos));
+//								try
+//								{
+//									is.close();
+//								}
+//								catch(IOException e)
+//								{
+//								}
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// Shouldn't happen...
+						exception.printStackTrace();
+					}
+				});
+			}
+			else
+			{
+				is	= new FileInputStream(file);
+			}
+			
+			ServiceOutputConnection	soc	= new ServiceOutputConnection();
+			soc.writeFromInputStream(is, component.getExternalAccess())
+				.addResultListener(new IntermediateDefaultResultListener<Long>()
+			{
+				public void finished()
+				{
+					try
+					{
+						is.close();
+					}
+					catch(IOException e)
+					{
+						// ignore
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					try
+					{
+						is.close();
+					}
+					catch(IOException e)
+					{
+						// ignore
+					}
+				}
+			});
+			
+			return new Future<IInputConnection>(soc.getInputConnection());
+		}
+		catch(IOException e)
+		{
+			return new Future<IInputConnection>(e);
+		}
+	}
+
 	
 	/**
 	 *  Get the dependent urls.
@@ -936,7 +1176,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		// special case that parid is local and already handled by baseloader
-		if(pacl==null && isLocal(parid) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
+		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getComponentIdentifier().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
 		{
 			pacl = rootloader;
 		}
@@ -971,7 +1211,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		// special case that parid is local and already handled by baseloader
-		if(pacl==null && isLocal(parid) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
+		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getComponentIdentifier().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
 		{
 			pacl = rootloader;
 		}
@@ -992,7 +1232,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				removeSupport(del.getResourceIdentifier(), rid);
 			}
 			classloaders.remove(rid);
-			classloaders.remove(ResourceIdentifier.getLocalResourceIdentifier(rid));
 		}
 	}
 	
@@ -1312,16 +1551,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/**
-	 *  Test if a rid is local to this platform.
-	 */
-	protected boolean isLocal(IResourceIdentifier rid)
-	{
-//		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot());		
-		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getHostIdentifier().equals(
-			SUtil.getMacAddress()!=null ? SUtil.getMacAddress() : rootrid.getLocalIdentifier().getComponentIdentifier().getName());
-	}
-	
-	/**
 	 *  Add a link.
 	 */
 	protected void addLink(IResourceIdentifier parid, IResourceIdentifier rid)
@@ -1369,8 +1598,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			Properties pa = links[i].getSubproperty("a");
 			Properties pb = links[i].getSubproperty("b");
 			
-			IResourceIdentifier a = ridFromProperties(pa);
-			IResourceIdentifier b = ridFromProperties(pb);
+			IResourceIdentifier a = ResourceIdentifier.ridFromProperties(pa, component.getComponentIdentifier().getRoot());
+			IResourceIdentifier b = ResourceIdentifier.ridFromProperties(pb, component.getComponentIdentifier().getRoot());
 			
 			if(SYSTEMCPRID.equals(a))
 			{
@@ -1411,8 +1640,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		for(Tuple2<IResourceIdentifier, IResourceIdentifier> link: addedlinks)
 		{
 			Properties plink = new Properties();
-			Properties a = ridToProperties(link.getFirstEntity());
-			Properties b = ridToProperties(link.getSecondEntity());
+			Properties a = ResourceIdentifier.ridToProperties(link.getFirstEntity(), component.getComponentIdentifier().getRoot());
+			Properties b = ResourceIdentifier.ridToProperties(link.getSecondEntity(), component.getComponentIdentifier().getRoot());
 			plink.addSubproperties("a", a);
 			plink.addSubproperties("b", b);
 			props.addSubproperties("link", plink);
@@ -1420,68 +1649,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		return new Future<Properties>(props);		
 	}
-	
-	/**
-	 *  Create properties from rid.
-	 *  @param The resource identifier.
-	 *  @return rid The resource identifier properties.
-	 */
-	public Properties ridToProperties(IResourceIdentifier rid)
-	{
-		Properties ret = new Properties();
 		
-		if(rid!=null && rid.getGlobalIdentifier()!=null)
-		{
-			ret.addProperty(new Property("gid_ri", rid.getGlobalIdentifier().getResourceId()));
-			ret.addProperty(new Property("gid_vi", rid.getGlobalIdentifier().getVersionInfo()));
-//			ret.addProperty(new Property("url", rid.getGlobalIdentifier().getRepositoryInfo()));
-		}
-		if(rid!=null && rid.getLocalIdentifier()!=null)
-		{
-			ret.addProperty(new Property("lid_url", SUtil.convertPathToRelative(rid.getLocalIdentifier().getUri().toString())));
-			// todo: check if own platform cid?
-//			ret.addProperty(new Property("lid_cid", rid.getLocalIdentifier().getComponentIdentifier()));
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Create a rid from properties.
-	 *  @param rid The resource identifier properties.
-	 *  @return The resource identifier.
-	 */
-	public IResourceIdentifier ridFromProperties(Properties rid)
-	{
-		String gid_ri = rid.getStringProperty("gid_ri");
-		String gid_vi = rid.getStringProperty("gid_vi");
-		
-		String lid_url = rid.getStringProperty("lid_url");
-		
-		GlobalResourceIdentifier gid = null;
-		if(gid_vi!=null)
-		{
-			gid = new GlobalResourceIdentifier(gid_ri, null, gid_vi);
-		}
-		
-		LocalResourceIdentifier lid = null;
-		if(lid_url!=null)
-		{
-			try
-			{
-				URL	url	= SUtil.getFile(new URL(lid_url)).getCanonicalFile().toURI().toURL();
-//				System.out.println("url: "+url);
-				lid = new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-		
-		return gid!=null || lid!=null? new ResourceIdentifier(lid, gid): null;
-	}
-	
 	/**
 	 *  Check if a local url is backed by a file.
 	 */

@@ -147,10 +147,12 @@ public abstract class TestAgent
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		// Start platform
-		String url	= "new String[]{\"target/test-classes\"}";	// Todo: support RID for all loaded models.
+//		String url	= "new String[]{\"target/test-classes\"}";	// Todo: support RID for all loaded models.
 //		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
-		String[] defargs = new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+		String[] defargs = new String[]{
+//			"-libpath", url,
+			"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging", "true",
 //			"-relaytransport", "false",

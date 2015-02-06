@@ -21,6 +21,7 @@ def androidIncl = ['jadex-android-commons',
                 'jadex-android-antlr',
                 'jadex-android-xmlpull',
                 'jadex-android-platformclient',
+                'jadex-android-bluetooth',
                 'jadex-platform-android',
                 'jadex-runtimetools-android',
                 'jadex-platform-extension-webservice-android',
@@ -42,7 +43,6 @@ def androidIncl = ['jadex-android-commons',
                 'jadex-kernel-bdibpmn',
                 'jadex-platform',
                 'jadex-platform-extension-webservice',
-                'jadex-android-maven-plugin',
                 'jadex-android-platformapp',
                 'jadex-applications-android-demos',
                 'jadex-applications-android:jadex-applications-android:chat',
@@ -69,6 +69,25 @@ allprojects
     configurations
     {
         deployerJars
+
+        // see http://www.sinking.in/blog/provided-scope-in-gradle/
+        provided {
+            dependencies.all { dep ->
+                // New inheritance: testRuntime -> testCompile -> compile -> provided
+                // This has to be done here to assure the new inheritance before artifacts are excluded from runtime
+                testRuntime.extendsFrom = [testCompile]
+                configurations.runtime.exclude group: dep.group, module: dep.name
+            }
+        }
+        // new inheritance: default -> runtime -> compile -> provided
+        compile.extendsFrom provided
+
+        // configurations which includes artifacts to include in dist
+        androidDistribution
+        desktopDistribution
+        // distributions should contain all runtime artifacts by default
+        androidDistribution.extendsFrom runtime
+        desktopDistribution.extendsFrom runtime
     }
 
     dependencies
@@ -129,15 +148,6 @@ subprojects
             testCompile junit
         }
 
-        configurations {
-            provided {
-                dependencies.all { dep ->
-                    configurations.default.exclude group: dep.group, module: dep.name
-                }
-            }
-            compile.extendsFrom provided
-        }
-
     }
 
     apply plugin: 'maven'
@@ -163,9 +173,9 @@ subprojects
         from new File(projectDir, 'build/docs')
     }
 
-    javadocJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("uploadArchives") }
+    javadocJar.onlyIf { calledWithTask("uploadArchives") }
 
-	//sourcesJar.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("uploadArchives") }
+	//sourcesJar.onlyIf { calledWithTask("uploadArchives") }
 	
     artifacts
     {
@@ -291,19 +301,6 @@ subprojects
         }
 
         configurations {
-            // add new configuration to define provided deps, see http://www.sinking.in/blog/provided-scope-in-gradle/
-            provided {
-//                dependencies.all { dep ->
-//                    configurations.default.exclude group: dep.group, module: dep.name
-//                }
-            }
-
-            compile.extendsFrom provided
-//            debugProvided.extendsFrom provided
-//            releaseProvided.extendsFrom provided
-
-
-
             // exclude transitive deps that are not supported on android
             all*.exclude group:'org.javassist', module:'javassist'
             all*.exclude group:'javax.mail', module:'mail'
@@ -318,10 +315,6 @@ subprojects
         {
             compile libraries.android
             androidTestCompile 'com.pivotallabs:robolectric:1.0'
-//            releaseProvided 'org.javassist:javassist:3.14.0-GA'
-//            releaseProvided 'javax.mail:mail:1.4.5'
-//            releaseProvided 'org.antlr:antlr-runtime:3.1.3'
-//            releaseProvided 'bouncycastle:bcprov-jdk15:140'
         }
 
         // dummy tasks to allow dependencies on tasks that are missing in android-plugin
@@ -329,29 +322,29 @@ subprojects
 
         }
 
-        if (!isAndroidLibraryProject(project)) {
-            android.applicationVariants.all {variant ->
-                task("generate${variant.name}JavaDoc", type:Javadoc) {
-                    source = variant.javaCompile.source
-                    ext.androidJar =
-                            "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-                    classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-                    options.links("http://docs.oracle.com/javase/7/docs/api/");
-                    options.links("http://d.android.com/reference/");
-                    exclude '**/BuildConfig.java'
-                    exclude '**/R.java'
-
-                    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
-                    def javaVersion = JavaVersion.current()
-                    if (javaVersion >= JavaVersion.VERSION_1_8) {
-                        options.addStringOption('Xdoclint:none', '-quiet')
-                    } else {
-                        options.addStringOption('-quiet')
-                    }
-                }
-            }
-        }
-
+    	// add custom task to generate javadocs to exclude R and BuildConfig and to include correct links
+    	getVariants(project).all {variant -> 
+	    	task("generate${variant.name}JavaDoc", type:Javadoc) {
+		        source = variant.javaCompile.source
+		        ext.androidJar =
+		                "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+		        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+		        options.links("http://docs.oracle.com/javase/7/docs/api/");
+		        options.links("http://d.android.com/reference/");
+		        exclude '**/BuildConfig.java'
+		        exclude '**/R.java'
+		
+		        // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
+		        def javaVersion = JavaVersion.current()
+		        if (javaVersion >= JavaVersion.VERSION_1_8) {
+		            options.addStringOption('Xdoclint:none', '-quiet')
+		        } else {
+		            options.addStringOption('-quiet')
+		        }
+	        }
+    	} 
+        
+        // disable default javadoc task because we created a custom one
         myJavadocs.enabled = false
 
         task classes(dependsOn: 'compileDebugSources') {
@@ -366,13 +359,21 @@ subprojects
             }
         }
 
+    } else {
+        // configure "non"-android project transitive excludes
+        if (androidIncl.contains(project.name)) {
+            project.configurations.androidDistribution.exclude group:'org.javassist', module:'javassist'
+            project.configurations.androidDistribution.exclude group:'javax.mail', module:'mail'
+            project.configurations.androidDistribution.exclude group:'org.antlr', module:'antlr-runtime'
+            project.configurations.androidDistribution.exclude group:'bouncycastle', module:'bcprov-jdk15'
+            project.configurations.androidDistribution.exclude group:'org.ow2.asm', module:'asm-all'
+            project.configurations.androidDistribution.exclude module:'junit' // no junit in runtime classpath
+        }
     }
 }
 
 task docs(type: Javadoc) {
-    source subprojects.collect {project -> getSourceDir(project)}
-    // this is needed to avoid (failing) javadoc generation for xmls in android-projects:
-    exclude('**/*.xml','**/*.bpmn*','**/*.txt','**/*.bpmn')
+    source subprojects.collect {project -> getOnlyJavaSources(project)}
     classpath = files(subprojects.collect {project -> project.getCompileClassPath(project)})
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")
@@ -466,24 +467,31 @@ task buildExampleProject(type: Zip) {
 	from('docs/jadex-example-project')
 }
 
+/**
+ * Generates non-maven and gradle example projects
+ */
 task buildAndroidExampleProject(type: Zip) {
     destinationDir = new File(project.distsDir, "standard-version")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveName = 'jadex-android-example-projects.zip'
     from('docs/android/jadex-android-example-project-maven') {into ('jadex-android-example-project-maven')}
-    // non-maven example project:
+    // non-maven and gradle example project:
     from('docs/android/jadex-android-example-project') {into ('jadex-android-example-project')}
+    from('docs/android/jadex-android-example-project-gradle') {into ('jadex-android-example-project-gradle')}
     // Copy sources from maven example project to non-maven example project
     from('docs/android/jadex-android-example-project-maven/src/main/java') {into ('jadex-android-example-project/src')}
+    from('docs/android/jadex-android-example-project-maven/src/main/java') {into ('jadex-android-example-project-gradle/src/main/java')}
     // Copy resources from maven example project to non-maven example project
     from('docs/android/jadex-android-example-project-maven/res') {into ('jadex-android-example-project/res')}
+    from('docs/android/jadex-android-example-project-maven/res') {into ('jadex-android-example-project-gradle/src/main/res')}
     // Copy Manifest from maven example project to non-maven example project
     from('docs/android/jadex-android-example-project-maven/AndroidManifest.xml') {into ('jadex-android-example-project/')}
+    from('docs/android/jadex-android-example-project-maven/AndroidManifest.xml') {into ('jadex-android-example-project-gradle/src/main/')}
 
     from('docs/android/jadex-android-clientapp-example-maven') {into ('jadex-android-clientapp-example-maven')}
 }
 
-def buildDistribution(task, excl, incl) {
+def buildDistribution(task, excl, incl, configuration="desktopDistribution") {
 	//println("diststart:" + task.name + " excludes: " + excl + " includes: " + incl)
 
 	task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -492,13 +500,19 @@ def buildDistribution(task, excl, incl) {
 		if ((excl != null && !isExcluded(excl, subproject.name))
             || (incl != null && incl.contains(subproject.name)))
 		{
-			task.from(subproject.configurations.runtime) { into('lib') }
-			task.from(subproject.jar) { into('lib') }
+//            if (android) {
+                task.from(subproject.configurations[configuration]) { into('lib') }
+//            } else {
+//                task.from(subproject.configurations[configuration]) { into('lib') }
+//            }
+
             if (isAndroidProject(subproject) && !isAndroidLibraryProject(subproject)) {
                 subproject.afterEvaluate {
                     def releaseApkVariant = getReleaseVariant(subproject).outputs.find({o -> o.name.contains('release')})
                     task.from(releaseApkVariant.outputFile) {into('apk')}
                 }
+            } else {
+                task.from(subproject.jar) { into('lib') }
             }
 		}
 		else
@@ -510,30 +524,31 @@ def buildDistribution(task, excl, incl) {
     //from(subprojects.configurations.runtime){ into('lib') }
     //from('subprojects.jar'){ into('lib') }
     //from('sourceSets.main.allSource') { into('src') }
-    task.from('docs/junit-3.8.1.jar'){ into('lib') }
-    
-    task.from('docs/junit-3.8.1.jar'){ into('lib') }
-    task.from(project(":jadex-platform-standalone-launch").jar) { into('lib') }
-    task.from('build/jadex-example-project.zip')
+
     task.from('docs/readme.txt')
     task.from('docs/license.txt')
     task.from('docs/api-changes.txt')
-    task.from('docs/jcc.settings.xml') 
     task.from('docs/default.settings.xml')
-    task.from('docs/jadex.bat')
-    task.from('docs/jadex_no_awareness.bat') 
-    task.from('docs/jadex.sh')
-    task.from('docs/jadex_no_awareness.sh')
-    task.from('docs/bpmn_editor.bat')
-    task.from('docs/bpmn_editor.sh')
-    task.from('docs/howtostart.txt')
-    //println("distend")
+
+    if (configuration == "desktopDistribution") {
+        task.from('docs/junit-3.8.1.jar'){ into('lib') }
+        task.from(project(":jadex-platform-standalone-launch").jar) { into('lib') }
+        task.from('build/jadex-example-project.zip')
+        task.from('docs/jcc.settings.xml')
+        task.from('docs/jadex.bat')
+        task.from('docs/jadex_no_awareness.bat')
+        task.from('docs/jadex.sh')
+        task.from('docs/jadex_no_awareness.sh')
+        task.from('docs/bpmn_editor.bat')
+        task.from('docs/bpmn_editor.sh')
+        task.from('docs/howtostart.txt')
+    }
 }
 
 task buildDistAndroid(type: Zip, dependsOn: [srcAndroidZip, buildAndroidExampleProject]) {
     archiveName = 'jadex-android-' + project.version + '.zip'
     destinationDir = new File(project.distsDir, "standard-version")
-    buildDistribution(buildDistAndroid, null, androidIncl)
+    buildDistribution(buildDistAndroid, null, androidIncl, "androidDistribution")
     from(srcAndroidZip.archivePath)
     from(buildAndroidExampleProject.archivePath)
 }
@@ -655,4 +670,6 @@ task buildDistGpmnEditor(type: Zip, dependsOn: srcZipGpmnEditor) {
 	from('jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING')
 }
 
-
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}

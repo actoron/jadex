@@ -1,6 +1,11 @@
 dependencies
 {
-    compile project(':jadex-platform')
+    provided libraries.android
+    compile(project(':jadex-platform')) {
+        exclude module: 'bcprov-jdk15'
+        exclude module: 'junit'
+        exclude group: 'javax.mail', module: 'mail'
+    }
     compile project(':jadex-android-commons')
     testCompile libraries.robotium
     testCompile libraries.robolectric

@@ -50,7 +50,9 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 */
 	public LocalResourceIdentifier(IComponentIdentifier cid, URI uri)
 	{
-		this(cid, uri, SUtil.getMacAddress());
+		this(cid, uri,
+//			SUtil.getMacAddress());
+			cid.getRoot().getName());	// Hack for testing jar transfer.
 	}
 		
 	/**

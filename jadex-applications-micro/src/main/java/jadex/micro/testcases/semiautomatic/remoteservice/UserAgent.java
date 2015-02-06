@@ -69,7 +69,7 @@ public class UserAgent
 							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
 						// Search for remote service
-						rms.getServiceProxy(platid, IMathService.class, RequiredServiceInfo.SCOPE_PLATFORM, null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+						rms.getServiceProxy(agent.getComponentIdentifier(), platid, IMathService.class, RequiredServiceInfo.SCOPE_PLATFORM, null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{

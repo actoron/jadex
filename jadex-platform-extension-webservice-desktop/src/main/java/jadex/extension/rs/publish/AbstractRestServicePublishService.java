@@ -645,7 +645,16 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 					MemberValue[] mvals = new MemberValue[methodmapper.getParameterTypeInfos().length];
 					for(int i=0; i<mvals.length; i++)
 					{
-						mvals[i] = new ClassMemberValue(ptypes[i].getName(), constpool);
+//						if(ptypes[i].isArray())
+//						{
+//							mvals[i] = new ClassMemberValue("[B;", constpool);
+//							System.out.println("2");
+//						}
+//						else
+//						{
+							// does not work for arrays currently (seems javassist bug) 
+							mvals[i] = new ClassMemberValue(ptypes[i].getName(), constpool);
+//						}
 					}
 					vals.setValue(mvals);
 					annot.addMemberValue("parameters", vals);

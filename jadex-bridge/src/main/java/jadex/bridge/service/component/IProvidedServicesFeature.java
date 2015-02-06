@@ -40,8 +40,9 @@ public interface IProvidedServicesFeature
 	 *  the old one is removed and shutdowned.
 	 *  @param type The public service interface.
 	 *  @param service The service.
+	 *  @param scope	The service scope.
 	 */
-	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi);
+	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, String scope);
 	
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).

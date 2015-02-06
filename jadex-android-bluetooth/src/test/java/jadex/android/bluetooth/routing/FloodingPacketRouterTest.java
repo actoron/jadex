@@ -40,6 +40,22 @@ public class FloodingPacketRouterTest extends PacketRouterTest {
 		
 		return ri;
 	}
+	
+	@Override
+	protected RoutingInformation getSampleRoutingInformation_containingOwnDevice() {
+		Builder riBuilder = MessageProtos.RoutingInformation.newBuilder();
+		jadex.android.bluetooth.message.MessageProtos.RoutingTable.Builder rtBuilder = MessageProtos.RoutingTable.newBuilder();
+		jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry.Builder entryBuilder = MessageProtos.RoutingTableEntry.newBuilder();
+		
+		RoutingTableEntry dev2 = entryBuilder.setDestination(ownAddress).build();
+		RoutingTableEntry dev3 = entryBuilder.setDestination(device3).build();
+		
+		RoutingTable table = rtBuilder.addEntry(dev2).addEntry(dev3).build();
+		
+		RoutingInformation ri = riBuilder.setType(getRouterRoutingType()).setRoutingTable(table).build();
+		
+		return ri;
+	}
 
 	@Override
 	protected List<String> getSampleExpectedReachableDevices() {
@@ -59,6 +75,8 @@ public class FloodingPacketRouterTest extends PacketRouterTest {
 	protected int getBroadcastWaitTime() {
 		return 0;
 	}
+
+
 	
 	
 }

@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITargetResolver;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
@@ -37,7 +38,6 @@ import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
 import jadex.platform.service.remote.replacements.DefaultHashcodeMethodReplacement;
-import jadex.platform.service.remote.replacements.GetComponentFeatureMethodReplacement;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -307,6 +307,12 @@ public class RemoteReferenceModule
 					}
 				}
 			}
+			Object td = SJavaParser.getProperty(properties, ITargetResolver.TARGETRESOLVER, imports, null, cl);
+			if(td!=null)
+			{
+				Class<ITargetResolver> tmp = (Class<ITargetResolver>)td;
+				ret.setTargetResolverClazz(tmp);
+			}
 		}
 		
 		// Add properties from annotations.
@@ -326,6 +332,13 @@ public class RemoteReferenceModule
 			
 			boolean	allex	= allinterfaces[i].isAnnotationPresent(Excluded.class);
 			boolean	allsec	= allinterfaces[i].isAnnotationPresent(SecureTransmission.class);
+			
+//			if(allinterfaces[i].isAnnotationPresent(TargetResolver.class))
+//			{
+//				TargetResolver tr = allinterfaces[i].getAnnotation(TargetResolver.class);
+//				ret.setTargetResolverClazz((Class)tr.value()); 
+//			}
+			
 			Method[]	methods	= allinterfaces[i].getDeclaredMethods();
 			for(int j=0; j<methods.length; j++)
 			{

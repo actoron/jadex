@@ -56,7 +56,7 @@ if (androidSdkExists()) {
     include 'jadex-android-antlr',
     'jadex-android-commons',
     'jadex-android-xmlpull',
-//    'jadex-android-bluetooth',
+    'jadex-android-bluetooth',
 //    'jadex-android-integration-test',
     'jadex-android-maven-plugin',
     'jadex-android-platformclient',
@@ -76,7 +76,7 @@ if (androidSdkExists()) {
             'To include android projects in build, set ANDROID_HOME to your android sdk root.')
 }
 
-include 'jadex-test'
+//include 'jadex-test'
 
 def androidSdkExists() {
     def androidHome = System.env.'ANDROID_HOME'
