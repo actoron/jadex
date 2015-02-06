@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -187,12 +188,12 @@ public class BlockingAgentCreationAgent
 	
 	protected static IComponentManagementService	getCMS(IInternalAccess ia)
 	{
-		return ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class).get();
+		return ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 	}
 	
 	
 	protected static IClockService getClock(IInternalAccess ia)
 	{
-		return ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class).get();
+		return ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 	}
 }
