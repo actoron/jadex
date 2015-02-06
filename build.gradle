@@ -321,6 +321,11 @@ subprojects
         task jar(type:Jar) {
 
         }
+        
+        // create configuration -> dependency mappings for maven pom generation
+        project.conf2ScopeMappings.addMapping(10,configurations.compile,Conf2ScopeMappingContainer.COMPILE)
+        project.conf2ScopeMappings.addMapping(11,configurations.androidTestCompile,Conf2ScopeMappingContainer.TEST)
+        project.conf2ScopeMappings.addMapping(12,configurations.provided,Conf2ScopeMappingContainer.PROVIDED)
 
     	// add custom task to generate javadocs to exclude R and BuildConfig and to include correct links
     	getVariants(project).all {variant -> 
@@ -370,6 +375,11 @@ subprojects
             project.configurations.androidDistribution.exclude module:'junit' // no junit in runtime classpath
         }
     }
+    
+    // debug task to show configuration -> maven dep. scope mappings
+    task mappings << {
+    	println project.conf2ScopeMappings.mappings
+	}
 }
 
 task docs(type: Javadoc) {
