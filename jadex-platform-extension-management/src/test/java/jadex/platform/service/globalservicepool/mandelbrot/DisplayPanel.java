@@ -3,6 +3,7 @@ package jadex.platform.service.globalservicepool.mandelbrot;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -1160,7 +1161,7 @@ public class DisplayPanel extends JComponent
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getServiceContainer().getRequiredService("generateservice")
+					ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("generateservice")
 						.addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
 					{
 						public void resultAvailable(Object result)

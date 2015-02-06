@@ -6,10 +6,14 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -23,7 +27,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
@@ -57,7 +60,7 @@ import java.util.Set;
 public abstract class TestAgent
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	protected Set<IExternalAccess>	platforms	= new LinkedHashSet<IExternalAccess>();
 	
@@ -93,13 +96,13 @@ public abstract class TestAgent
 		final Testcase tc = new Testcase();
 		tc.setTestCount(getTestCount());
 		
-		performTests(tc).addResultListener(agent.createResultListener(new IResultListener<Void>()
+		performTests(tc).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 //				System.out.println("tests finished: "+agent.getComponentIdentifier());
 
-				agent.setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).setResultValue("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();				
 			}
@@ -110,7 +113,7 @@ public abstract class TestAgent
 				
 				exception.printStackTrace();
 				
-				agent.setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).setResultValue("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();	
 			}
@@ -126,7 +129,7 @@ public abstract class TestAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IFuture<IComponentManagementService>	fut	= agent.getServiceContainer().getRequiredService("cms");
+		IFuture<IComponentManagementService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -144,8 +147,8 @@ public abstract class TestAgent
 								{
 									public void customResultAvailable(IComponentIdentifier result)
 									{
-										SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
-											.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+										SServiceProvider.getService(exta, IComponentManagementService.class)
+											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 										{
 											public void customResultAvailable(IComponentManagementService cms2)
 											{
@@ -239,7 +242,7 @@ public abstract class TestAgent
 
 //		System.out.println("platform args: "+SUtil.arrayToString(defargs));
 		
-		Starter.createPlatform(defargs).addResultListener(agent.createResultListener(
+		Starter.createPlatform(defargs).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)

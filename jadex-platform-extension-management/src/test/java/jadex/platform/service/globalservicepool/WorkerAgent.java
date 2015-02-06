@@ -1,8 +1,8 @@
 package jadex.platform.service.globalservicepool;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -17,7 +17,7 @@ import jadex.micro.annotation.ProvidedServices;
 public class WorkerAgent implements ITestService
 {
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 * 

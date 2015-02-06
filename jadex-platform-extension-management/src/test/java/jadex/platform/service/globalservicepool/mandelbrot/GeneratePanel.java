@@ -4,6 +4,7 @@ import jadex.base.gui.StatusBar;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
@@ -87,7 +88,7 @@ public class GeneratePanel extends JPanel
 						public IFuture<Void> execute(final IInternalAccess ia)
 						{
 //							SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
-							ia.getServiceContainer().getRequiredService("generateservice")
+							ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("generateservice")
 //								.addResultListener(ia.createResultListener(new DefaultResultListener()
 								.addResultListener(new DefaultResultListener()
 							{
@@ -103,7 +104,7 @@ public class GeneratePanel extends JPanel
 											final AreaData res = (AreaData)result;
 											
 //											SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
-											ia.getServiceContainer().getRequiredService("displayservice")	
+											ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("displayservice")	
 												.addResultListener(new DefaultResultListener()
 											{
 												public void resultAvailable(Object result)

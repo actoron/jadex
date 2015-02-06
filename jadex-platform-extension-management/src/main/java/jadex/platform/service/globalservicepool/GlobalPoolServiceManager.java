@@ -4,9 +4,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -125,7 +125,7 @@ public class GlobalPoolServiceManager
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
 		// Check if service is available in global pool itself
-		Collection<IService> ownsers = (Collection<IService>)SServiceProvider.getLocalServices((IServiceProvider)component.getServiceContainer(), servicetype);
+		Collection<IService> ownsers = (Collection<IService>)SServiceProvider.getLocalServices(component, servicetype);
 		if(ownsers!=null)
 		{
 			for(IService ser: ownsers)
@@ -298,7 +298,7 @@ public class GlobalPoolServiceManager
 		}
 //		else
 //		{
-			SServiceProvider.getServices((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			SServiceProvider.getServices(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 				.addResultListener(new IntermediateDelegationResultListener<IComponentManagementService>(ret)
 			{
 				public void customIntermediateResultAvailable(IComponentManagementService cms) 
@@ -414,18 +414,18 @@ public class GlobalPoolServiceManager
 					
 					cms.createComponent(null, ServicePoolAgent.class.getName()+".class", ci, null)
 //					cms.createComponent(null, componentname, ci, null)
-						.addResultListener(component.createResultListener(new IResultListener<IComponentIdentifier>()
+						.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
 					{
 						public void resultAvailable(IComponentIdentifier result)
 						{
 //							System.out.println("created: "+result);
 							cms.getExternalAccess(result)
-								.addResultListener(component.createResultListener(new IResultListener<IExternalAccess>()
+								.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess ea)
 								{
-									Future<IService> fut = (Future<IService>)SServiceProvider.getService(ea.getServiceProvider(), servicetype, RequiredServiceInfo.SCOPE_LOCAL);
-									fut.addResultListener(component.createResultListener(new IResultListener<IService>()
+									Future<IService> fut = (Future<IService>)SServiceProvider.getService(ea, servicetype, RequiredServiceInfo.SCOPE_LOCAL);
+									fut.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IService>()
 									{
 										public void resultAvailable(final IService ser)
 										{
@@ -530,7 +530,7 @@ public class GlobalPoolServiceManager
 	 */
 	protected IFuture<Void> updateWorkerTimer(final IServiceIdentifier sid)
 	{
-		assert component.isComponentThread();
+		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
 		final IInternalAccess inta = component;
 		
 		final Future<Void> ret = new Future<Void>();
@@ -598,7 +598,7 @@ public class GlobalPoolServiceManager
 	 */
 	protected IFuture<Void> removeService(final IServiceIdentifier sid)
 	{
-		assert component.isComponentThread();
+		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
 
 		final Future<Void> ret = new Future<Void>();
 		
@@ -608,10 +608,10 @@ public class GlobalPoolServiceManager
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
 		
-		IComponentManagementService cms = SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		
 		cms.destroyComponent(workercid).addResultListener(
-			inta.createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+			inta.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
 			public void customResultAvailable(Map<String, Object> result) 
 			{
@@ -661,13 +661,13 @@ public class GlobalPoolServiceManager
 	 */
 	protected IFuture<ITimer> createTimer(final long delay, final ITimedObject to)
 	{
-		assert component.isComponentThread();
+		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
 
 //		System.out.println("create timer");
 		
 		final Future<ITimer> ret = new Future<ITimer>();
 		
-		IClockService cs = SServiceProvider.getLocalService((IServiceProvider)component.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		ret.setResult(cs.createTimer(delay, to));
 		
 		return ret;

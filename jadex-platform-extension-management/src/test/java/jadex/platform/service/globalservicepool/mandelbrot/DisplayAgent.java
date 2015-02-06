@@ -3,8 +3,10 @@ package jadex.platform.service.globalservicepool.mandelbrot;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -15,7 +17,6 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
@@ -59,7 +60,7 @@ public class DisplayAgent implements IDisplayService
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The GUI. */
 	protected DisplayPanel	panel;
@@ -77,7 +78,7 @@ public class DisplayAgent implements IDisplayService
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IDisplayService ds = (IDisplayService)agent.getServiceContainer().getProvidedService(IDisplayService.class);
+		IDisplayService ds = (IDisplayService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IDisplayService.class);
 		
 //		IFuture<IMandelbrotService> fut = getRequiredService("mandelservice");
 //		fut.addResultListener(new SwingExceptionDelegationResultListener<IMandelbrotService, Void>(ret)
@@ -90,7 +91,7 @@ public class DisplayAgent implements IDisplayService
 //				addService(new DisplayService(this));
 				
 				final IExternalAccess	access	= agent.getExternalAccess();
-				final JFrame	frame	= new JFrame(agent.getAgentName());
+				final JFrame	frame	= new JFrame(agent.getComponentIdentifier().getLocalName());
 				JScrollPane	scroll	= new JScrollPane(panel);
 
 				JTextPane helptext = new JTextPane();

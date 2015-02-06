@@ -9,7 +9,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
@@ -37,7 +36,7 @@ public class CalculateAgent implements ICalculateService
 	//-------- attributes --------
 	
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** Flag indicating that the agent had a job. */
 	protected boolean hadjob;

@@ -4,12 +4,12 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
@@ -59,13 +59,13 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		testLocal(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
 
-				testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
@@ -94,7 +94,7 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(Void result) 
 			{
 				performTest(agent.getComponentIdentifier(), testno, true)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
 		
@@ -115,7 +115,7 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(Void result) 
 			{
 				performTest(pls.get(0).getComponentIdentifier(), testno, false)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
 		
@@ -183,7 +183,7 @@ public class InitiatorAgent extends TestAgent
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();
 		
-		IIntermediateFuture<ITestService> fut = agent.getRequiredServices("aser");
+		IIntermediateFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{
 			boolean called;
@@ -240,7 +240,7 @@ public class InitiatorAgent extends TestAgent
 						ts.methodA(i*10+j).addResultListener(lis);
 					}
 					
-					agent.waitForDelay(10000).get();
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000).get();
 				}
 			}
 		});

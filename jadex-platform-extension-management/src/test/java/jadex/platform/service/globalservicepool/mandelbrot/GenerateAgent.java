@@ -1,5 +1,6 @@
 package jadex.platform.service.globalservicepool.mandelbrot;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -13,7 +14,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.CreationInfo;
@@ -59,7 +59,7 @@ public class GenerateAgent implements IGenerateService
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The generate panel. */
 	protected GeneratePanel panel;
@@ -75,7 +75,7 @@ public class GenerateAgent implements IGenerateService
 	@ServiceStart
 	public void start()
 	{
-			System.out.println("start: "+agent.getAgentName());
+		System.out.println("start: "+agent.getComponentIdentifier());
 		this.panel = (GeneratePanel)GeneratePanel.createGui(agent.getExternalAccess());
 	}
 	
@@ -179,10 +179,10 @@ public class GenerateAgent implements IGenerateService
 		
 		if(cs==null)
 		{
-			cs = SServiceProvider.getLocalService(agent.getServiceProvider(), ICalculateService.class);
+			cs = SServiceProvider.getLocalService(agent, ICalculateService.class);
 			System.out.println("found calculate service: "+cs);
 		}
-		final IDisplayService ds = SServiceProvider.getLocalService(agent.getServiceProvider(), IDisplayService.class);
+		final IDisplayService ds = SServiceProvider.getLocalService(agent, IDisplayService.class);
 			
 		final int[] acnt = new int[1];
 		final CounterResultListener<AreaData> lis = new CounterResultListener<AreaData>(areas.size(), new IResultListener<Void>() 

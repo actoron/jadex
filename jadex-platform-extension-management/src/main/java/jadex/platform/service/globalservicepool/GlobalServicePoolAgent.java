@@ -2,13 +2,17 @@ package jadex.platform.service.globalservicepool;
 
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.CounterResultListener;
@@ -16,7 +20,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
@@ -66,7 +69,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The pool manager. */
 	protected Map<Class<?>, GlobalPoolServiceManager> managers = new HashMap<Class<?>, GlobalPoolServiceManager>();
@@ -82,7 +85,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		final Future<Void> ret = new Future<Void>();
 		this.managers = new HashMap<Class<?>, GlobalPoolServiceManager>();
 		
-		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getArguments().get("serviceinfos");
+		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("serviceinfos");
 		
 		if(psis!=null)
 		{
@@ -113,7 +116,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		// Create one service manager per service type
 		GlobalPoolServiceManager manager = new GlobalPoolServiceManager(agent, servicetype, componentmodel, info, strategy);
 		managers.put(servicetype, manager);
-		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
+		IServicePoolService ser = SServiceProvider.getLocalService(agent, IServicePoolService.class);
 		// todo: fix if more than one service type should be supported by one worker (not intended)
 		if(info==null)
 		{
@@ -154,13 +157,13 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	public IFuture<Void> removeServiceType(final Class<?> servicetype)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IServicePoolService ser = SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
+		IServicePoolService ser = SServiceProvider.getLocalService(agent, IServicePoolService.class);
 		managers.remove(servicetype);
 		ser.removeServiceType(servicetype).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result) 
 			{
-				IService service = agent.getServiceContainer().getProvidedService(servicetype);
+				IService service = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(servicetype);
 				if(service!=null)
 				{
 					agent.removeService(service.getServiceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret));
@@ -228,8 +231,8 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
-			IService poolser = (IService)SServiceProvider.getLocalService(agent.getServiceProvider(), IServicePoolService.class);
-			IService ser = (IService)SServiceProvider.getLocalService(agent.getServiceProvider(), servicetype, poolser.getServiceIdentifier().getProviderId());
+			IService poolser = (IService)SServiceProvider.getLocalService(agent, IServicePoolService.class);
+			IService ser = (IService)SServiceProvider.getLocalService(agent, servicetype, poolser.getServiceIdentifier().getProviderId());
 			return method.invoke(ser, args);
 		}
 	}
