@@ -183,12 +183,24 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 			
 			if(ret instanceof IParsedExpression)
 			{
-				ret = ((IParsedExpression)ret).getValue(fetcher);
+				try
+				{
+					ret = ((IParsedExpression)ret).getValue(fetcher);
+				}
+				catch(Exception e)
+				{
+				}
 			}
 			
 			if(ret==null)
 			{
-				ret = ((IParsedExpression)prop).getValue(fetcher);
+				try
+				{
+					ret = ((IParsedExpression)prop).getValue(fetcher);
+				}
+				catch(Exception e)
+				{
+				}
 			}
 			
 			if(ret==null)

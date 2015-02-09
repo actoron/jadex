@@ -103,7 +103,7 @@ public class Move3DTask extends AbstractTask
 				@Classname("add")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					BaseBDI ba = (BaseBDI)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+					BaseBDI ba = (BaseBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 					for(Iterator<ISpaceObject> it=objects.iterator(); it.hasNext(); )
 					{
 						final ISpaceObject so = it.next();

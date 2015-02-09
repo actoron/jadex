@@ -135,7 +135,7 @@ public class ObserverCenter implements IObserverCenter
 			selecteddataviewname = (String)spaceviews.keySet().iterator().next();
 		activeplugin = null;
 		
-		SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<IClockService>()
 		{
 			public void resultAvailable(IClockService result)
@@ -815,7 +815,7 @@ public class ObserverCenter implements IObserverCenter
 		{
 			if(delay==-1)
 			{
-				SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -835,7 +835,7 @@ public class ObserverCenter implements IObserverCenter
 			}
 			else if(delay==0)
 			{
-				SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -855,7 +855,7 @@ public class ObserverCenter implements IObserverCenter
 			}
 			else
 			{
-				SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -893,7 +893,7 @@ public class ObserverCenter implements IObserverCenter
 			dispose();
 			if(killonexit)
 			{
-				SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class)
+				SServiceProvider.getServiceUpwards(space.getExternalAccess(), IComponentManagementService.class)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)

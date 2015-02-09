@@ -3,12 +3,13 @@ package jadex.micro.examples.hunterprey;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.extension.envsupport.EnvironmentService;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -55,13 +56,13 @@ public class MicroPreyAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		getParentAccess().getExtension("my2dspace").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+		final Future<Void>	ret	= new Future<Void>();
+		
+		EnvironmentService.getSpace(agent)
+			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentSpace, Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IEnvironmentSpace result)
 			{
-				if(result==null)
-					return;
-				
 				env	= (Grid2D)result;
 		
 				myself	= env.getAvatar(agent.getComponentDescription());
@@ -127,9 +128,9 @@ public class MicroPreyAgent
 		
 				act();
 			}
-		}));
+		});
 		
-		return new Future<Void>(); // never kill?!
+		return ret; // never kill!
 	}
 	
 	//-------- methods --------

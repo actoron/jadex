@@ -193,6 +193,12 @@
 		</env:envspacetype>
 	</extensiontypes>
 
+	<services>
+	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
+	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
+	    </providedservice>
+	</services>
+	
 	<componenttypes>
 		<componenttype name="Sentry" filename="jadex/bdiv3/examples/marsworld/sentry/SentryBDI.class"/>
 		<componenttype name="Producer" filename="jadex/bdiv3/examples/marsworld/producer/ProducerBDI.class"/>

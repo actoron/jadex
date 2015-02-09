@@ -1,11 +1,9 @@
 package jadex.extension.envsupport.environment;
 
-import jadex.extension.envsupport.dataview.IDataView;
-import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -17,6 +15,8 @@ import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.dataview.IDataView;
+import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 
 import java.util.Iterator;
 
@@ -32,7 +32,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	protected long timestamp;
 	
 	/** The platform. */
-	protected IServiceProvider container;
+	protected IExternalAccess container;
 	
 	/** The clock listener. */
 	protected IChangeListener clocklistener;
@@ -79,7 +79,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
-		this.container	= space.getExternalAccess().getServiceProvider();
+		this.container	= space.getExternalAccess();
 
 		SServiceProvider.getService(container, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<IExecutionService>()

@@ -186,11 +186,16 @@
 	</componenttypes>
 	
 	<services>
+	    <!-- 
 	    <providedservice class="IHunterPreyEnvironmentService">
 	        <implementation>new HunterPreyEnvironmentService("my2dspace")</implementation>
 	    </providedservice>
+	    -->
+	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
+	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
+	    </providedservice>
 	</services>
-
+	    
 	<configurations>
 		<configuration name="One Micro Prey">
 			<extensions>

@@ -1,15 +1,6 @@
 package jadex.extension.agr;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import jadex.xml.stax.QName;
-
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.types.factory.IComponentFactoryExtensionService;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
@@ -18,20 +9,24 @@ import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+import jadex.xml.stax.QName;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *  Extension service for loading AGR (agent, group, role) models.
  */
-@Service
-public class AGRExtensionService implements IComponentFactoryExtensionService
+//@Service
+public class AGRExtensionService //implements IComponentFactoryExtensionService
 {
-	/**
-	 *  Get extension. 
-	 */
-	public IFuture<Set<Object>> getExtension(String componenttype)
-	{
-		return new Future<Set<Object>>(getXMLMapping());
-	}
+//	/**
+//	 *  Get extension. 
+//	 */
+//	public IFuture<Set<Object>> getExtension(String componenttype)
+//	{
+//		return new Future<Set<Object>>(getXMLMapping());
+//	}
 
 	//-------- static part --------
 	

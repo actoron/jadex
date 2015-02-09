@@ -1,13 +1,14 @@
 package jadex.micro.examples.fireflies;
 
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.IFilter;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
+import jadex.extension.envsupport.EnvironmentService;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
@@ -50,16 +51,16 @@ public class FireflyAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		IExternalAccess	paexta = (IExternalAccess)getParentAccess();
+		final Future<Void>	ret	= new Future<Void>();
 		
-		paexta.getExtension("mygc2dspace")
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		EnvironmentService.getSpace(agent)
+			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentSpace, Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IEnvironmentSpace result)
 			{
 				final ContinuousSpace2D space = (ContinuousSpace2D)result;
-				
-				IComponentStep step = new IComponentStep<Void>()
+					
+				IComponentStep<Void> step = new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -93,8 +94,8 @@ public class FireflyAgent
 						// here 0 degree is 12 o'clock and the rotation right
 						double x = Math.sin(newdir);
 						double y = -Math.cos(newdir);
-//								double x = Math.sin(newdir);
-//								double y = Math.cos(newdir);
+//											double x = Math.sin(newdir);
+//											double y = Math.cos(newdir);
 						double stepwidth = 0.1;
 						IVector2 newdirvec = new Vector2Double(x*stepwidth, y*stepwidth);
 						IVector2 newpos = mypos.copy().add(newdirvec);
@@ -124,7 +125,7 @@ public class FireflyAgent
 							if(tmp.size()>=flashestoreset)
 							{
 								clock = resetlevel;
-//										System.out.println("Reset: "+avatar.getId());
+//													System.out.println("Reset: "+avatar.getId());
 							}
 						}
 			
@@ -147,13 +148,8 @@ public class FireflyAgent
 				
 				agent.getComponentFeature(IExecutionFeature.class).waitForTick(step);
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// ignore...
-			}
-		}));
+		});				
 		
-		return new Future<Void>(); // never kill?!
+		return ret; // never kill!
 	}
 }

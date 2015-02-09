@@ -2,6 +2,7 @@ package jadex.bdiv3.examples.garbagecollector;
 
 import jadex.bdiv3.annotation.Belief;
 import jadex.bridge.IInternalAccess;
+import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -26,7 +27,7 @@ public abstract class BaseAgentBDI
 	protected IInternalAccess agent;
 	
 	/** The environment. */
-	protected Grid2D env = (Grid2D)agent.getParentAccess().getExtension("mygc2dspace").get();
+	protected Grid2D env = (Grid2D)EnvironmentService.getSpace(agent).get();
 	
 	/** The environment. */
 	protected ISpaceObject myself = env.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
