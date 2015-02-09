@@ -5,6 +5,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
@@ -650,7 +652,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
-					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
+					SServiceProvider.getServiceUpwards(getExternalAccess(), IComponentManagementService.class)
 						.addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(final Object result)
@@ -1699,7 +1701,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						{
 							final String filename = (String)result;
 							
-							SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+							SServiceProvider.getServiceUpwards(exta, IComponentManagementService.class).addResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -1855,7 +1857,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
+					SServiceProvider.getServiceUpwards(getExternalAccess(), IComponentManagementService.class)
 						.addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
@@ -2595,7 +2597,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected IFuture getComponentType(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(getExternalAccess(), IComponentManagementService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -2875,7 +2877,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 
 		final Future<Void>	ret	= new Future<Void>();
 		
-		initSpace().addResultListener(ia.createResultListener(new DelegationResultListener<Void>(ret)
+		initSpace().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{

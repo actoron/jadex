@@ -1,38 +1,24 @@
 package jadex.application;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentInstance;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Excluded;
-import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.factory.IComponentFactoryExtensionService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
-import jadex.commons.Tuple2;
-import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.component.ComponentInterpreter;
-import jadex.kernelbase.CacheableKernelModel;
+import jadex.extension.agr.AGRExtensionService;
+import jadex.extension.envsupport.MEnvSpaceType;
 import jadex.kernelbase.IBootstrapFactory;
 
 import java.io.IOException;
@@ -40,7 +26,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,9 +47,6 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	/** The application component file type. */
 	public static final String	FILETYPE_APPLICATION = "Application";
 	
-//	/** The application file extension. */
-//	public static final String	FILE_EXTENSION_APPLICATION	= ".application.xml";
-
 	/** The image icon. */
 	protected static final LazyResource	ICON = new LazyResource(ApplicationComponentFactory.class, "/jadex/application/images/application.png");
 	
@@ -74,13 +56,16 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	protected ApplicationModelLoader loader;
 	
 	/** The provider. */
-	protected IServiceProvider provider;
+	protected IInternalAccess provider;
 	
 	/** The library service. */
 	protected ILibraryService libservice;
 	
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
+	
+	/** The standard + XML component features. */
+	protected Collection<IComponentFeatureFactory>	features;
 	
 	//-------- constructors --------
 	
@@ -120,8 +105,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			
 		}
 		
-		
 		this.loader = new ApplicationModelLoader(mappings.toArray(new Set[0]));
+		this.features	= SComponentFactory.DEFAULT_FEATURES;
 	}
 	
 	/**
@@ -129,10 +114,11 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param platform	The platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
-	public ApplicationComponentFactory(IServiceProvider provider)
+	public ApplicationComponentFactory(IInternalAccess provider)
 	{
-		super(provider.getId(), IComponentFactory.class, null);
+		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
 		this.provider = provider;
+		this.features	= SComponentFactory.DEFAULT_FEATURES;
 	}
 	
 	/**
@@ -140,8 +126,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 */
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
-		this.provider = (IServiceProvider)component.getServiceContainer();
-		this.providerid = provider.getId();
+		this.provider = component;
+		this.providerid = provider.getComponentIdentifier();
 		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null);
 		return startService();
 	}
@@ -163,47 +149,32 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 					{
 						libservice = result;
 						
-						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactoryExtensionService>, Void>(ret)
+						// Todo: make configurable again?
+						Set<?>[]	mappings	= new Set[]
 						{
-							public void customResultAvailable(Collection<IComponentFactoryExtensionService> fes)
+							AGRExtensionService.getXMLMapping(),
+							MEnvSpaceType.getXMLMapping()
+						};
+						loader = new ApplicationModelLoader(mappings);
+						
+						libservicelistener = new ILibraryServiceListener()
+						{
+							public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, IResourceIdentifier rid)
 							{
-								CollectionResultListener<Set<Object>> lis = new CollectionResultListener<Set<Object>>(fes.size(), true, new ExceptionDelegationResultListener<Collection<Set<Object>>, Void>(ret)
-								{
-									public void customResultAvailable(Collection<Set<Object>> exts)
-									{
-										Set<Object>[] mappings = (Set<Object>[])exts.toArray(new Set[exts.size()]);
-										
-										loader = new ApplicationModelLoader(mappings);
-										
-										libservicelistener = new ILibraryServiceListener()
-										{
-											public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, IResourceIdentifier rid)
-											{
-												loader.clearModelCache();
-												return IFuture.DONE;
-											}
-											
-											public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier parid, IResourceIdentifier rid, boolean rem)
-											{
-												loader.clearModelCache();
-												return IFuture.DONE;
-											}
-										};
-										
-										libservice.addLibraryServiceListener(libservicelistener);
-										
-										ret.setResult(null);
-									}
-								});
-								
-								for(Iterator<IComponentFactoryExtensionService> it=fes.iterator(); it.hasNext(); )
-								{
-									IComponentFactoryExtensionService fex = it.next();
-									fex.getExtension(FILETYPE_APPLICATION).addResultListener(lis);
-								}
-							}	
-						});
+								loader.clearModelCache();
+								return IFuture.DONE;
+							}
+							
+							public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier parid, IResourceIdentifier rid, boolean rem)
+							{
+								loader.clearModelCache();
+								return IFuture.DONE;
+							}
+						};
+						
+						libservice.addLibraryServiceListener(libservicelistener);
+						
+						ret.setResult(null);
 					}
 				});
 			}
@@ -253,7 +224,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				{
 					try
 					{
-						ret.setResult(loader.loadApplicationModel(model, imports, cl, 
+						ret.setResult(loader.loadApplicationModel(model, imports, rid, cl, 
 							new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
 					}
 					catch(Exception e)
@@ -268,7 +239,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				ret.setResult(loader.loadApplicationModel(model, imports, cl, 
+				ret.setResult(loader.loadApplicationModel(model, imports, rid, cl, 
 						new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
 			}
 			catch(Exception e)
@@ -276,94 +247,6 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				ret.setException(e);
 			}			
 		}
-
-		return ret;
-	}
-	
-	/**
-	 * Create a component instance.
-	 * @param desc	The component description.
-	 * @param factory The component adapter factory.
-	 * @param modelinfo The component model.
-	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the component as name/value pairs.
-	 * @param parent The parent component (if any).
-	 * @param bindings	Optional bindings to override bindings from model.
-	 * @param pinfos	Optional provided service infos to override settings from model.
-	 * @param copy	Global flag for parameter copying.
-	 * @param realtime	Global flag for real time timeouts.
-	 * @param persist	Global flag for persistence support.
-	 * @param resultlistener	Optional listener to be notified when the component finishes.
-	 * @param init	Future to be notified when init of the component is completed.
-	 * @return An instance of a component and the corresponding adapter.
-	 */
-	@Excluded
-	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference final IComponentDescription desc, 
-		final IComponentAdapterFactory factory, final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, 
-		final IExternalAccess parent, @Reference final RequiredServiceBinding[] bindings, @Reference final ProvidedServiceInfo[] pinfos, final boolean copy, final boolean realtime, final boolean persist,
-		final IPersistInfo persistinfo, 
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, @Reference final LocalServiceRegistry registry)
-	{
-		final Future<Tuple2<IComponentInstance, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
-		
-		if(libservice!=null)
-		{
-			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
-				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
-			{
-				public void customResultAvailable(ClassLoader cl)
-				{
-					try
-					{
-						CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, 
-							new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-						ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, pinfos, copy, realtime, persist,
-								persistinfo, resultlistener, init, cl, registry);
-						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
-					}
-					catch(Exception e)
-					{
-						ret.setException(e);
-					}
-				}
-			});
-		}
-		
-		// for platform bootstrapping
-		else
-		{
-			try
-			{
-				ClassLoader cl = getClass().getClassLoader();
-				CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, 
-					new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-				ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, pinfos, copy, realtime, persist,
-					persistinfo, resultlistener, init, cl, registry);
-				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
-		}
-		
-//		try
-//		{
-//			// libservice is null for platform bootstrap factory.
-//			ClassLoader cl = libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier());
-//			CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, 
-//				libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
-//			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
-//			
-//			// todo: result listener?
-//			// todo: create application context as return value?!
-//					
-//			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
-//		}
-//		catch(Exception e)
-//		{
-//			throw new RuntimeException(e);
-//		}
 
 		return ret;
 	}
@@ -443,5 +326,16 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	{
 		return FILETYPE_APPLICATION.equals(type)
 			? Collections.EMPTY_MAP : null;
+	}
+	
+	
+	/**
+	 *  Get the component features for a model.
+	 *  @param model The component model.
+	 *  @return The component features.
+	 */
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
+	{
+		return new Future<Collection<IComponentFeatureFactory>>(features);
 	}
 }

@@ -113,6 +113,12 @@
 		<componenttype name="Firefly" filename="jadex/micro/examples/fireflies/FireflyAgent.class"/>
 	</componenttypes>
 	
+	<services>
+	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
+	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
+	    </providedservice>
+	</services>
+	
 	<configurations>	
 		<configuration name="15x15 and 500 flies, kd-tree enabled">
 			<arguments>

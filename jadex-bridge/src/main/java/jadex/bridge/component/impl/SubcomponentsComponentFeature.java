@@ -1,9 +1,11 @@
 package jadex.bridge.component.impl;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -16,7 +18,10 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -282,9 +287,37 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	/**
 	 *  Called, when a subcomponent has been created.
 	 */
-	public IFuture<Void>	componentCreated(IComponentDescription desc, IModelInfo model)
+	public IFuture<Void>	componentCreated(final IComponentDescription desc, IModelInfo model)
 	{
-		return IFuture.DONE;
+		// Throw component events for extensions (envsupport)
+		final IMonitoringComponentFeature	mon	= getComponent().getComponentFeature(IMonitoringComponentFeature.class);
+		if(mon!=null)
+		{
+			return getComponent().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					Future<Void>	ret	= new Future<Void>();
+					if(mon.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+					{
+						MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
+							MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime(), PublishEventLevel.COARSE);
+						me.setProperty("details", desc);
+						// for extensions only
+						mon.publishEvent(me, PublishTarget.TOALL) .addResultListener(new DelegationResultListener<Void>(ret));
+					}
+					else
+					{
+						ret.setResult(null);
+					}
+					return ret;
+				}
+			});
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
 	}
 	
 	/**

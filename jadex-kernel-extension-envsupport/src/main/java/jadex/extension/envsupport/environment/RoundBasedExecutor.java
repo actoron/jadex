@@ -5,7 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -13,7 +13,6 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.execution.IExecutionService;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
@@ -92,14 +91,13 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
-		final IServiceProvider provider	= space.getExternalAccess().getServiceProvider();
 		
-		SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(space.getExternalAccess(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<IExecutionService>()
 		{
 			public void resultAvailable(final IExecutionService exeservice)
 			{
-				SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new DefaultResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService clockservice)
@@ -266,9 +264,9 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		for(IExecutable task: tasks)
 		{
 			// Only print warning for sub-components
-			if(task instanceof IComponentAdapter)
+			if(task instanceof ExecutionComponentFeature)
 			{
-				IComponentIdentifier	cid	= ((IComponentAdapter)task).getComponentIdentifier();
+				IComponentIdentifier	cid	= ((ExecutionComponentFeature)task).getComponent().getComponentIdentifier();
 				IComponentIdentifier	test	= cid;
 				while(test!=null && !test.equals(ea.getComponentIdentifier()))
 				{
