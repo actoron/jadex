@@ -10,6 +10,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -37,7 +38,7 @@ public class MovementCapa implements IEnvAccess
 	protected ICapability capa;
 	
 	/** The environment. */
-	protected ContinuousSpace2D env = (ContinuousSpace2D)capa.getAgent().getParentAccess().getExtension("my2dspace").get();
+	protected ContinuousSpace2D env = (ContinuousSpace2D)EnvironmentService.getSpace(capa.getAgent()).get();
 	
 	/** The environment. */
 	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());

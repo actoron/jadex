@@ -1,16 +1,22 @@
 package jadex.extension.envsupport;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IExtensionInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SReflect;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 
 /**
  *  Environment service implementation.
@@ -77,5 +83,24 @@ public class	EnvironmentService	implements IEnvironmentService
 	public @Reference(remote=false) IFuture<IEnvironmentSpace>	getSpace()
 	{
 		return new Future<IEnvironmentSpace>(space);
+	}
+	
+	/**
+	 *	Get the environment space for a component
+	 */
+	public static IFuture<IEnvironmentSpace>	getSpace(IInternalAccess component)
+	{
+		final Future<IEnvironmentSpace>	ret	= new Future<IEnvironmentSpace>();
+		
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IEnvironmentService.class, RequiredServiceInfo.SCOPE_APPLICATION)
+			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentService, IEnvironmentSpace>(ret)
+		{
+			public void customResultAvailable(IEnvironmentService es)
+			{
+				es.getSpace().addResultListener(new DelegationResultListener<IEnvironmentSpace>(ret));
+			}
+		});
+		
+		return ret;
 	}
 }

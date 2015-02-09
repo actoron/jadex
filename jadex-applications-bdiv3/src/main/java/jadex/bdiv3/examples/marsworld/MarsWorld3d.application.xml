@@ -244,6 +244,12 @@
 		<componenttype name="Carry" filename="jadex/bdiv3/examples/marsworld/carry/CarryBDI.class"/>
 	</componenttypes>
 	
+	<services>
+	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
+	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
+	    </providedservice>
+	</services>
+	
 	<properties>
 		<property name="clock" class="IFuture">
 			SServiceProvider.getService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)

@@ -27,8 +27,8 @@ public class BDIV3Test	extends	ComponentTestSuite
 	public BDIV3Test(String cpRoot)	throws Exception
 	{
 		// Use BDI classes directory as classpath root,
-		super(new File(SReflect.isAndroid() ? "jadex.bdiv3.testcases" : "../jadex-applications-bdiv3/target/classes/jadex/bdiv3/testcases"),
-//		super(new File(SReflect.isAndroid() ? "jadex.bdiv3.testcases" : "../jadex-applications-bdiv3/target/classes/"),
+//		super(new File(SReflect.isAndroid() ? "jadex.bdiv3.testcases" : "../jadex-applications-bdiv3/target/classes/jadex/bdiv3/testcases"),
+		super(new File(SReflect.isAndroid() ? "jadex.bdiv3.testcases" : "../jadex-applications-bdiv3/target/classes/"),
 			new File(cpRoot),
 			// Exclude failing tests to allow maven build.
 			new String[]

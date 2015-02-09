@@ -9,6 +9,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.IEnvironmentService;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
@@ -60,112 +61,106 @@ public class HeatbugAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IEnvironmentService.class, RequiredServiceInfo.SCOPE_APPLICATION)
-			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentService, Void>(ret)
+		EnvironmentService.getSpace(agent)
+			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentSpace, Void>(ret)
 		{
-			public void customResultAvailable(IEnvironmentService es)
+			public void customResultAvailable(IEnvironmentSpace result)
 			{
-				es.getSpace().addResultListener(new ExceptionDelegationResultListener<IEnvironmentSpace, Void>(ret)
+				final Grid2D grid = (Grid2D)result;
+				ISpaceObject avatar = grid.getAvatar(agent.getComponentDescription());
+				
+//						unhappiness = Math.abs(ideal_temp - temp);
+				randomchance = ((Number)avatar.getProperty("random_move_chance")).doubleValue();
+				ideal_temp = ((Number)avatar.getProperty("ideal_temp")).doubleValue();
+//						System.out.println("ideal_temp: "+ideal_temp+" "+getArgument("ideal_temp"));
+				
+				IComponentStep com = new IComponentStep<Void>()
 				{
-					public void customResultAvailable(IEnvironmentSpace result)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						final Grid2D grid = (Grid2D)result;
 						ISpaceObject avatar = grid.getAvatar(agent.getComponentDescription());
-						
-		//						unhappiness = Math.abs(ideal_temp - temp);
-						randomchance = ((Number)avatar.getProperty("random_move_chance")).doubleValue();
-						ideal_temp = ((Number)avatar.getProperty("ideal_temp")).doubleValue();
-		//						System.out.println("ideal_temp: "+ideal_temp+" "+getArgument("ideal_temp"));
-						
-						IComponentStep com = new IComponentStep<Void>()
+						IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
+						Collection coll	= grid.getSpaceObjectsByGridPosition(mypos, "patch");
+						if(coll!=null)
 						{
-							public IFuture<Void> execute(IInternalAccess ia)
+							ISpaceObject patch = (ISpaceObject)coll.iterator().next();
+							mytemp = ((Number)patch.getProperty("heat")).doubleValue();
+	
+							unhappiness = ((Number)avatar.getProperty("unhappiness")).doubleValue();
+							if(unhappiness>0)
 							{
-								ISpaceObject avatar = grid.getAvatar(agent.getComponentDescription());
-								IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
-								Collection coll	= grid.getSpaceObjectsByGridPosition(mypos, "patch");
-								if(coll!=null)
+								Set tmp = grid.getNearObjects((IVector2)avatar.getProperty(
+									Space2D.PROPERTY_POSITION), new Vector1Int(1), "patch");
+								tmp.remove(patch);
+								ISpaceObject[] neighbors = (ISpaceObject[])tmp.toArray(new ISpaceObject[tmp.size()]); 
+								
+								IVector2 target = null;
+								if(Math.random()<randomchance)
 								{
-									ISpaceObject patch = (ISpaceObject)coll.iterator().next();
-									mytemp = ((Number)patch.getProperty("heat")).doubleValue();
-			
-									unhappiness = ((Number)avatar.getProperty("unhappiness")).doubleValue();
-									if(unhappiness>0)
+					//				for(int tries=0; target==null && tries<10; tries++)
+					//				{
+										int choice = (int)(Math.random()*neighbors.length);
+										IVector2 choicepos = (IVector2)neighbors[choice].getProperty(Space2D.PROPERTY_POSITION);
+					//					if(grid.getSpaceObjectsByGridPosition(choicepos, "heatbug")==null)
+										target = choicepos;
+					//				}
+								}
+								else
+								{
+									if(mytemp>ideal_temp)
 									{
-										Set tmp = grid.getNearObjects((IVector2)avatar.getProperty(
-											Space2D.PROPERTY_POSITION), new Vector1Int(1), "patch");
-										tmp.remove(patch);
-										ISpaceObject[] neighbors = (ISpaceObject[])tmp.toArray(new ISpaceObject[tmp.size()]); 
-										
-										IVector2 target = null;
-										if(Math.random()<randomchance)
+										ISpaceObject min = patch;
+										double minheat = mytemp;
+										for(int i=0; i<neighbors.length; i++)
 										{
-							//				for(int tries=0; target==null && tries<10; tries++)
-							//				{
-												int choice = (int)(Math.random()*neighbors.length);
-												IVector2 choicepos = (IVector2)neighbors[choice].getProperty(Space2D.PROPERTY_POSITION);
-							//					if(grid.getSpaceObjectsByGridPosition(choicepos, "heatbug")==null)
-												target = choicepos;
-							//				}
-										}
-										else
-										{
-											if(mytemp>ideal_temp)
+											double heat = ((Number)neighbors[i].getProperty("heat")).doubleValue();
+											if(heat<minheat)
 											{
-												ISpaceObject min = patch;
-												double minheat = mytemp;
-												for(int i=0; i<neighbors.length; i++)
-												{
-													double heat = ((Number)neighbors[i].getProperty("heat")).doubleValue();
-													if(heat<minheat)
-													{
-														min = neighbors[i];
-														minheat = heat;
-													}
-												}
-												target = (IVector2)min.getProperty(Space2D.PROPERTY_POSITION);
-											}
-											else
-											{
-												ISpaceObject max = patch;
-												double maxheat = mytemp;
-												for(int i=0; i<neighbors.length; i++)
-												{
-													double heat = ((Number)neighbors[i].getProperty("heat")).doubleValue();
-													if(heat>maxheat)
-													{
-														max = neighbors[i];
-														maxheat = heat;
-													}
-												}
-												target = (IVector2)max.getProperty(Space2D.PROPERTY_POSITION);
+												min = neighbors[i];
+												minheat = heat;
 											}
 										}
-										
-			//									if(!target.equals(mypos))
+										target = (IVector2)min.getProperty(Space2D.PROPERTY_POSITION);
+									}
+									else
+									{
+										ISpaceObject max = patch;
+										double maxheat = mytemp;
+										for(int i=0; i<neighbors.length; i++)
 										{
-			//										System.out.println("res: "+avatar.getProperty(ISpaceObject.PROPERTY_OWNER)+" "+target);
-											Map params = new HashMap();
-											params.put(ISpaceAction.OBJECT_ID, avatar.getId());
-											params.put(MoveAction.PARAMETER_POSITION, target);
-											grid.performSpaceAction("move", params, null);
+											double heat = ((Number)neighbors[i].getProperty("heat")).doubleValue();
+											if(heat>maxheat)
+											{
+												max = neighbors[i];
+												maxheat = heat;
+											}
 										}
+										target = (IVector2)max.getProperty(Space2D.PROPERTY_POSITION);
 									}
 								}
 								
-								agent.getComponentFeature(IExecutionFeature.class).waitForTick(this);
-								return IFuture.DONE;
+	//									if(!target.equals(mypos))
+								{
+	//										System.out.println("res: "+avatar.getProperty(ISpaceObject.PROPERTY_OWNER)+" "+target);
+									Map params = new HashMap();
+									params.put(ISpaceAction.OBJECT_ID, avatar.getId());
+									params.put(MoveAction.PARAMETER_POSITION, target);
+									grid.performSpaceAction("move", params, null);
+								}
 							}
-							
-							public String toString()
-							{
-								return "heatbug.body()";
-							}
-						};
+						}
 						
-						agent.getComponentFeature(IExecutionFeature.class).waitForTick(com);
+						agent.getComponentFeature(IExecutionFeature.class).waitForTick(this);
+						return IFuture.DONE;
 					}
-				});
+					
+					public String toString()
+					{
+						return "heatbug.body()";
+					}
+				};
+				
+				agent.getComponentFeature(IExecutionFeature.class).waitForTick(com);
 			}
 		});
 		
