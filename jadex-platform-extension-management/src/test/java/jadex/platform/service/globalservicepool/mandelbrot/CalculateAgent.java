@@ -3,6 +3,8 @@ package jadex.platform.service.globalservicepool.mandelbrot;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -51,7 +53,7 @@ public class CalculateAgent implements ICalculateService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final long delay = ((Number)agent.getArgument("delay")).longValue();
+		final long delay = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay")).longValue();
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -63,12 +65,12 @@ public class CalculateAgent implements ICalculateService
 					ret.setResult(null);
 				}
 				setHadJob(false);
-				agent.waitFor(delay, this);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
 				return IFuture.DONE;
 			}
 		};
 		if(delay>0)
-			agent.waitFor(delay, step);
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
 		
 		return ret;
 	}
@@ -113,7 +115,7 @@ public class CalculateAgent implements ICalculateService
 		
 //			Future<AreaData> ret = new Future<AreaData>();
 		
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -199,7 +201,7 @@ public class CalculateAgent implements ICalculateService
 					last = reportProgress(cnt, size, last, ret);
 					xstart++;
 					
-					agent.waitForDelay(10).get();
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10).get();
 					
 					if(allin && usejustfill)
 					{

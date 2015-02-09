@@ -102,7 +102,7 @@ public abstract class TestAgent
 			{
 //				System.out.println("tests finished: "+agent.getComponentIdentifier());
 
-				agent.getComponentFeature(IArgumentsFeature.class).setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();				
 			}
@@ -113,7 +113,7 @@ public abstract class TestAgent
 				
 				exception.printStackTrace();
 				
-				agent.getComponentFeature(IArgumentsFeature.class).setResultValue("testresults", tc);
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();	
 			}
@@ -272,7 +272,7 @@ public abstract class TestAgent
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -312,7 +312,7 @@ public abstract class TestAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -488,7 +488,7 @@ public abstract class TestAgent
 	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
 	{
 		final Future<T>	ret	= new Future<T>();
-		IFuture<IClockService>	clockfut	= agent.getServiceContainer().getRequiredService("clock");
+		IFuture<IClockService>	clockfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clock");
 		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 		{
 			public void customResultAvailable(IClockService clock)
@@ -497,7 +497,7 @@ public abstract class TestAgent
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						agent.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
 					}
 				});
 			}

@@ -5,7 +5,6 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.component.IArgumentsFeature;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -138,7 +137,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 				props.add(new UnparsedExpression(ITargetResolver.TARGETRESOLVER, GlobalServicePoolTargetResolver.class.getName()+".class"));
 				psi.setProperties(props);
 				Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{servicetype}, new ForwardHandler(servicetype));
-				agent.addService(null, servicetype, service, psi).addResultListener(new DelegationResultListener<Void>(ret));
+				agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception) 
@@ -163,10 +162,10 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		{
 			public void customResultAvailable(Void result) 
 			{
-				IService service = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(servicetype);
+				IService service = (IService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(servicetype);
 				if(service!=null)
 				{
-					agent.removeService(service.getServiceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret));
+					agent.getComponentFeature(IProvidedServicesFeature.class).removeService(service.getServiceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 				else
 				{
