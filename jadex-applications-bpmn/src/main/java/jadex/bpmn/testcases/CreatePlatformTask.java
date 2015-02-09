@@ -8,6 +8,7 @@ import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -38,7 +39,7 @@ public class CreatePlatformTask implements ITask
 			"-gui", "false"
 //			"-usepass", "false"//, "-simulation", "false"
 			})
-			.addResultListener(process.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			.addResultListener(process.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(IExternalAccess exta)
 			{

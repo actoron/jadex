@@ -1,5 +1,6 @@
 package jadex.bpmn;
 
+import jadex.bpmn.features.impl.BpmnComponentFeature;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -10,6 +11,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
@@ -20,7 +22,9 @@ import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 
@@ -41,6 +45,11 @@ public abstract class BpmnFactory extends BasicService implements IComponentFact
 	/** The image icon. */
 	protected static final LazyResource ICON = new LazyResource(BpmnFactory.class, "/jadex/bpmn/images/bpmn_process.png");
 	
+	public static final Collection<IComponentFeatureFactory> BPMN_FEATURES = Collections.unmodifiableCollection(
+		Arrays.asList(
+			BpmnComponentFeature.FACTORY
+		));
+	
 	//-------- attributes --------
 	
 	/** The provider. */
@@ -58,6 +67,9 @@ public abstract class BpmnFactory extends BasicService implements IComponentFact
 	/** The properties. */
 	protected Map<String, Object> fproperties;
 	
+	/** The standard + micro component features. */
+	protected Collection<IComponentFeatureFactory>	features;
+	
 	//-------- constructors --------
 	
 	/**
@@ -69,6 +81,7 @@ public abstract class BpmnFactory extends BasicService implements IComponentFact
 	{
 		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new BpmnModelLoader();
+		this.features = SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BPMN_FEATURES));
 	}
 	
 	/**
@@ -81,7 +94,8 @@ public abstract class BpmnFactory extends BasicService implements IComponentFact
 		this.provider = provider;
 		this.loader = new BpmnModelLoader();
 		this.fproperties	= properties;
-		
+		this.features = SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BPMN_FEATURES));
+
 		this.libservicelistener = new ILibraryServiceListener()
 		{
 			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, IResourceIdentifier rid)
@@ -280,8 +294,13 @@ public abstract class BpmnFactory extends BasicService implements IComponentFact
 		? fproperties : null;
 	}
 	
+	/**
+	 *  Get the component features for a model.
+	 *  @param model The component model.
+	 *  @return The component features.
+	 */
 	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
 	{
-		throw new UnsupportedOperationException("todo...");
+		return new Future<Collection<IComponentFeatureFactory>>(features);
 	}
 }

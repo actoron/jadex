@@ -1,9 +1,10 @@
 package jadex.bpmn.runtime.task;
 
+import jadex.bpmn.features.IBpmnComponentFeature;
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IInternalAccess;
 
 /**
@@ -31,7 +32,7 @@ public class WriteContextTask extends AbstractTask
 			String name = (String)context.getParameterValue("name");
 			Object val = context.getParameterValue("value");
 			Object key = context.getParameterValue("key");
-			((BpmnInterpreter)instance).setContextVariable(name, key, val);
+			((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable(name, key, val);
 		}
 		
 		for(int i=0; ; i++)
@@ -41,7 +42,7 @@ public class WriteContextTask extends AbstractTask
 				String name = (String)context.getParameterValue("name"+i);
 				Object val = context.getParameterValue("value"+i);
 				Object key = context.getParameterValue("key"+i);
-				((BpmnInterpreter)instance).setContextVariable(name, key, val);
+				((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable(name, key, val);
 			}
 			else
 			{

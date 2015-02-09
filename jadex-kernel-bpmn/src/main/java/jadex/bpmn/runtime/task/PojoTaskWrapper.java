@@ -3,7 +3,6 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;

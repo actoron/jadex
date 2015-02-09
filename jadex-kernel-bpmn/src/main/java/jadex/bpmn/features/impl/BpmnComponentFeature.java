@@ -4,20 +4,30 @@ import jadex.bpmn.features.IBpmnComponentFeature;
 import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.tools.ProcessThreadInfo;
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.RuleSystem;
 
@@ -32,7 +42,9 @@ import java.util.Set;
  */
 public class BpmnComponentFeature extends AbstractComponentFeature implements IBpmnComponentFeature, IInternalBpmnComponentFeature
 {
-//	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBPMNComponentFeature.class, BPMNFeature.class, new Class[]{IMicroLifecycleFeature.class}, null);
+	/** The factory. */
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBpmnComponentFeature.class, BpmnComponentFeature.class,
+		new Class<?>[]{IRequiredServicesFeature.class, IProvidedServicesFeature.class, ISubcomponentsFeature.class}, null);
 	
 	/** Constant for step event. */
 	public static final String TYPE_ACTIVITY = "activity";
@@ -316,28 +328,29 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	 */
 	public void	notify(final MActivity activity, final ProcessThread thread, final Object event)
 	{
-		if(adapter.isExternalThread())
+		if(!getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
-				getComponentAdapter().invokeLater(new Runnable()
+				getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run()
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						if(isCurrentActivity(activity, thread))
 						{
 //							System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
-							step(activity, BpmnInterpreter.this, thread, event);
+							step(activity, getComponent(), thread, event);
 							thread.setNonWaiting();
-							if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+							if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 							{
-								publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+								getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 							}
 						}
 						else
 						{
 							System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
 						}
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -350,12 +363,12 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		{
 			if(isCurrentActivity(activity, thread))
 			{
-//				System.out.println("Notify2: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
-				step(activity, BpmnInterpreter.this, thread, event);
+//				System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
+				step(activity, getComponent(), thread, event);
 				thread.setNonWaiting();
-				if(thread.getActivity()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+				if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{
-					publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+					getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 				}
 			}
 			else
@@ -363,5 +376,38 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 				System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
 			}
 		}
+	}
+	
+	/**
+	 *  Test if the notification is relevant for the current thread.
+	 *  The normal test is if thread.getActivity().equals(activity).
+	 *  This method must handle the additional cases that the current
+	 *  activity of the thread is a multiple event activity or
+	 *  when the activity is a subprocess with an attached timer event.
+	 *  In this case the notification could be for one of the child/attached events. 
+	 */
+	protected boolean isCurrentActivity(final MActivity activity, final ProcessThread thread)
+	{
+		boolean ret = SUtil.equals(thread.getActivity(), activity);
+		if(!ret && thread.getActivity()!=null && MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(thread.getActivity().getActivityType()))
+		{
+			List<MSequenceEdge> outedges = thread.getActivity().getOutgoingSequenceEdges();
+			for(int i=0; i<outedges.size() && !ret; i++)
+			{
+				MSequenceEdge edge = outedges.get(i);
+				ret = edge.getTarget().equals(activity);
+			}
+		}
+		if(!ret && thread.getActivity()!=null && MBpmnModel.SUBPROCESS.equals(thread.getActivity().getActivityType()))
+		{
+			List<MActivity> handlers = thread.getActivity().getEventHandlers();
+			for(int i=0; !ret && handlers!=null && i<handlers.size(); i++)
+			{
+				MActivity handler = handlers.get(i);
+				ret	= activity.equals(handler) && handler.getActivityType().equals("EventIntermediateTimer");
+			}
+		}
+		return ret;
+		
 	}
 }

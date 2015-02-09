@@ -1,6 +1,6 @@
 package jadex.bpmn.runtime.persist;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bridge.IInternalAccess;
 import jadex.kernelbase.DefaultPersistInfo;
 
 /**
@@ -27,27 +27,27 @@ public class BpmnPersistInfo extends DefaultPersistInfo
 	/**
 	 *  Create a new BpmnPersistInfo.
 	 */
-	public BpmnPersistInfo(BpmnInterpreter interpreter)
+	public BpmnPersistInfo(IInternalAccess interpreter)
 	{
 		super(interpreter);
-		topthread = new ThreadInfo(interpreter.getTopLevelThread());
+//		topthread = new ThreadInfo(interpreter.getTopLevelThread());
 	}
 	
 	//-------- methods --------
 	
-	/**
-	 *  Get the top thread.
-	 */
-	public ThreadInfo	getTopLevelThread()
-	{
-		return topthread;
-	}
-	
-	/**
-	 *  Set the top thread.
-	 */
-	public void	setTopLevelThread(ThreadInfo topthread)
-	{
-		this.topthread	= topthread;
-	}
+//	/**
+//	 *  Get the top thread.
+//	 */
+//	public ThreadInfo	getTopLevelThread()
+//	{
+//		return topthread;
+//	}
+//	
+//	/**
+//	 *  Set the top thread.
+//	 */
+//	public void	setTopLevelThread(ThreadInfo topthread)
+//	{
+//		this.topthread	= topthread;
+//	}
 }

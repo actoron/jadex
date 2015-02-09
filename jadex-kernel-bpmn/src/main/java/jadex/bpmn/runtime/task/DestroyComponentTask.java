@@ -11,7 +11,7 @@ import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -44,8 +44,8 @@ public class DestroyComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService((IServiceProvider)instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		SServiceProvider.getService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{

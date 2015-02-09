@@ -4,14 +4,12 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  A task that provides the current platform time in the 'time' parameter.
@@ -26,26 +24,8 @@ public class GetTimeTask	 implements ITask
 	public IFuture<Void> execute(final ITaskContext context, final IInternalAccess process)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IClockService> clockfut	= SServiceProvider.getServiceUpwards((IServiceProvider)process.getServiceContainer(), IClockService.class);
-		clockfut.addResultListener(new IResultListener<IClockService>()
-		{
-			public void resultAvailable(final IClockService	clock)
-			{
-				((BpmnInterpreter) process).getComponentAdapter().invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						context.setParameterValue("time", Long.valueOf(clock.getTime()));
-						ret.setResult(null);
-					}
-				});
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		IClockService clock = SServiceProvider.getLocalService(process, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		context.setParameterValue("time", Long.valueOf(clock.getTime()));
 		return ret;
 	}
 	

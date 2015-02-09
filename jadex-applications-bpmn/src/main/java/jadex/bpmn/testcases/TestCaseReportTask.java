@@ -2,11 +2,12 @@ package jadex.bpmn.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bpmn.features.IBpmnComponentFeature;
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 @Task(description="Generates a simple test case report", parameters={
@@ -31,7 +32,7 @@ public class TestCaseReportTask implements ITask
 		String reason = (String) context.getParameterValue("reason");
 		TestReport report = new TestReport(name, description, succeded, reason);
 		Testcase testcase = new Testcase(1, new TestReport[] { report });
-		((BpmnInterpreter) process).setContextVariable("testresults", testcase);
+		((IInternalBpmnComponentFeature)process.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable("testresults", testcase);
 		return IFuture.DONE;
 	}
 	

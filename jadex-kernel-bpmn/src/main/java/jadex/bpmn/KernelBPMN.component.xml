@@ -12,6 +12,7 @@
 		<import>jadex.commons.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.bridge.service.types.factory.*</import>
+		<import>jadex.bpmn</import>
 	</imports>
 	
 	<properties>

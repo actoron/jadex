@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -51,7 +52,7 @@ public class ChoosePlatformTask implements ITask
 		
 		final IExternalAccess exta	= process.getExternalAccess();
 		
-		process.getServiceContainer().searchServices(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+		process.getComponentFeature(IRequiredServicesFeature.class).searchServices(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentManagementService>, Void>(ret)
 		{
 			public void customResultAvailable(final Collection<IComponentManagementService> result)

@@ -2,10 +2,11 @@ package jadex.bpmn.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bpmn.features.IBpmnComponentFeature;
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -27,7 +28,7 @@ public class CompensationTestTask implements ITask
 	 */
 	public IFuture<Void> execute(ITaskContext context, IInternalAccess process)
 	{
-		((BpmnInterpreter) process).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", false, "Compensation did not occur.")}));
+		((IInternalBpmnComponentFeature)process.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", false, "Compensation did not occur.")}));
 		exefut = new Future<Void>();
 		process.killComponent();
 		return exefut;
@@ -42,7 +43,7 @@ public class CompensationTestTask implements ITask
 	 */
 	public IFuture<Void> cancel(IInternalAccess instance)
 	{
-		((BpmnInterpreter) instance).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", true, null)}));
+		((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", true, null)}));
 		exefut.setResult(null);
 		return IFuture.DONE;
 	}

@@ -1,5 +1,7 @@
 package jadex.bpmn.runtime.task;
 
+import jadex.bpmn.features.IBpmnComponentFeature;
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
@@ -10,7 +12,6 @@ import jadex.bpmn.model.task.ITaskPropertyGui;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskProperty;
 import jadex.bpmn.model.task.annotation.TaskPropertyGui;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.task.ServiceCallTask.ServiceCallTaskGui;
 import jadex.bpmn.task.info.ParameterMetaInfo;
@@ -21,6 +22,7 @@ import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.nonfunctional.search.IServiceEvaluator;
 import jadex.bridge.nonfunctional.search.ServiceRankingResultListener;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -172,7 +174,7 @@ public class ServiceCallTask implements ITask
 		final String	fmethod	= method;
 		final String	fresultparam	= resultparam;
 		
-		Class<?> servicetype = process.getServiceContainer().getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
+		Class<?> servicetype = process.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
 		Method[] methods = servicetype.getMethods();
 		Method met = null;
 		for(Method meth : methods)
@@ -219,7 +221,7 @@ public class ServiceCallTask implements ITask
 				ComposedEvaluator<Object> ranker = new ComposedEvaluator<Object>();
 				ranker.addEvaluator(eval);
 				
-				process.getServiceContainer().getRequiredServices(service)
+				process.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(service)
 					.addResultListener(new ServiceRankingResultListener<Object>(new ExceptionDelegationResultListener<Collection<Tuple2<Object, Double>>, Void>(ret)
 				{
 					public void customResultAvailable(Collection<Tuple2<Object, Double>> results)
@@ -245,7 +247,7 @@ public class ServiceCallTask implements ITask
 		}
 		else
 		{
-			process.getServiceContainer().getRequiredService(service)
+			process.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(service)
 				.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -304,10 +306,11 @@ public class ServiceCallTask implements ITask
 							if(fhandler!=null)
 							{
 								// Hack! Need to start threads from 'user' task. Should be done in a handler.
-								BpmnInterpreter ip = (BpmnInterpreter)process;
+//								BpmnInterpreter ip = (BpmnInterpreter)process;
+//								IInternalBpmnComponentFeature bf = (IInternalBpmnComponentFeature)process.getComponentFeature(IBpmnComponentFeature.class);
 								ProcessThread th = (ProcessThread)context;
 								ProcessThread pat = th.getParent();
-								ProcessThread thread = new ProcessThread(fhandler, pat, ip)
+								ProcessThread thread = new ProcessThread(fhandler, pat, process)
 								{
 									public void notifyFinished() 
 									{

@@ -1,6 +1,7 @@
 package jadex.bpmn.examples.nfprops;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -32,7 +33,7 @@ public class AService implements IAService
 	public IFuture<String> test()
 	{
 		System.out.println("invoked service: "+sid.getProviderId()+" cnt="+(++cnt)+" wait="+wait);
-		comp.waitForDelay(wait).get();
+		comp.getComponentFeature(IExecutionFeature.class).waitForDelay(wait).get();
 		return new Future<String>(sid.toString());
 	}
 }
