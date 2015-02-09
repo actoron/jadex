@@ -4,13 +4,19 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.extension.envsupport.IEnvironmentService;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
@@ -55,81 +61,87 @@ public class MicroPreyAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		getParentAccess().getExtension("my2dspace").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				if(result==null)
-					return;
-				
-				env	= (Grid2D)result;
+		final Future<Void>	ret	= new Future<Void>();
 		
-				myself	= env.getAvatar(agent.getComponentDescription());
-				listener = new IResultListener()
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IEnvironmentService.class, RequiredServiceInfo.SCOPE_APPLICATION)
+			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentService, Void>(ret)
+		{
+			public void customResultAvailable(IEnvironmentService es)
+			{
+				es.getSpace().addResultListener(new ExceptionDelegationResultListener<IEnvironmentSpace, Void>(ret)
 				{
-					public void exceptionOccurred(Exception e)
+					public void customResultAvailable(IEnvironmentSpace result)
 					{
-		//				e.printStackTrace();
-						try
+						env	= (Grid2D)result;
+				
+						myself	= env.getAvatar(agent.getComponentDescription());
+						listener = new IResultListener()
 						{
-							agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+							public void exceptionOccurred(Exception e)
 							{
-								@Classname("act")
-								public IFuture<Void> execute(IInternalAccess agent)
+				//				e.printStackTrace();
+								try
 								{
-									// If move failed, forget about food and turn 90 degrees.
-									food	= null;
-									
-		//							System.out.println("Move failed: "+e);
-									if(MoveAction.DIRECTION_LEFT.equals(lastdir) || MoveAction.DIRECTION_RIGHT.equals(lastdir))
+									agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 									{
-										lastdir	= Math.random()>0.5 ? MoveAction.DIRECTION_UP : MoveAction.DIRECTION_DOWN;
-									}
-									else
-									{
-										lastdir	= Math.random()>0.5 ? MoveAction.DIRECTION_LEFT : MoveAction.DIRECTION_RIGHT;
-									}
-			
-									act();
-									
-									return IFuture.DONE;
-								}
-								
-								public String toString()
-								{
-									return "prey.act()";
-								}
-							});
-						}
-						catch(ComponentTerminatedException ate)
-						{
-						}
-					}
+										@Classname("act")
+										public IFuture<Void> execute(IInternalAccess agent)
+										{
+											// If move failed, forget about food and turn 90 degrees.
+											food	= null;
+											
+				//							System.out.println("Move failed: "+e);
+											if(MoveAction.DIRECTION_LEFT.equals(lastdir) || MoveAction.DIRECTION_RIGHT.equals(lastdir))
+											{
+												lastdir	= Math.random()>0.5 ? MoveAction.DIRECTION_UP : MoveAction.DIRECTION_DOWN;
+											}
+											else
+											{
+												lastdir	= Math.random()>0.5 ? MoveAction.DIRECTION_LEFT : MoveAction.DIRECTION_RIGHT;
+											}
 					
-					public void resultAvailable(Object result)
-					{
-						agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-						{
-							@Classname("act2")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								act();
-								return IFuture.DONE;
+											act();
+											
+											return IFuture.DONE;
+										}
+										
+										public String toString()
+										{
+											return "prey.act()";
+										}
+									});
+								}
+								catch(ComponentTerminatedException ate)
+								{
+								}
 							}
 							
-							public String toString()
+							public void resultAvailable(Object result)
 							{
-								return "prey.act()";
+								agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+								{
+									@Classname("act2")
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										act();
+										return IFuture.DONE;
+									}
+									
+									public String toString()
+									{
+										return "prey.act()";
+									}
+								});
 							}
-						});
+						};
+				
+						act();
 					}
-				};
-		
-				act();
+				});
 			}
-		}));
+		});
 		
-		return new Future<Void>(); // never kill?!
+		return ret; // never kill!
 	}
 	
 	//-------- methods --------

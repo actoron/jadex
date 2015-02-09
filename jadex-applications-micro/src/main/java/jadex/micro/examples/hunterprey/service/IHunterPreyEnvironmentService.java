@@ -1,9 +1,5 @@
 package jadex.micro.examples.hunterprey.service;
 
-import jadex.commons.future.IFuture;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-
-import java.util.Collection;
 
 /**
  *  Service-based interface to hunter-prey environment.
@@ -29,27 +25,27 @@ public interface IHunterPreyEnvironmentService
 
 	//-------- methods --------
 	
-	/**
-	 *  Register the calling component as a prey.
-	 *  @return	The subscription will publish the percepts for the prey.
-	 *    Termination of the subscription will destroy the prey avatar.
-	 */
-	public ISubscriptionIntermediateFuture<Collection<IPreyPerceivable>>	registerPrey();
-	
-	/**
-	 *  Perform a move action for the avatar of the calling component.
-	 *  @param direction The move direction.
-	 *  @return	The future returns, when the action is done.
-	 *    If the action could not be performed (e.g. due to obstacles)
-	 *    an exception is returned.
-	 */
-	public IFuture<Void>	move(String direction);
-	
-	/**
-	 *  Perform an eat action for the avatar of the calling component.
-	 *  @param food The food to eat.
-	 *  @return	The future returns, when the action is done.
-	 *    If the action could not be performed an exception is returned.
-	 */
-	public IFuture<Void>	eat(IFood food);	
+//	/**
+//	 *  Register the calling component as a prey.
+//	 *  @return	The subscription will publish the percepts for the prey.
+//	 *    Termination of the subscription will destroy the prey avatar.
+//	 */
+//	public ISubscriptionIntermediateFuture<Collection<IPreyPerceivable>>	registerPrey();
+//	
+//	/**
+//	 *  Perform a move action for the avatar of the calling component.
+//	 *  @param direction The move direction.
+//	 *  @return	The future returns, when the action is done.
+//	 *    If the action could not be performed (e.g. due to obstacles)
+//	 *    an exception is returned.
+//	 */
+//	public IFuture<Void>	move(String direction);
+//	
+//	/**
+//	 *  Perform an eat action for the avatar of the calling component.
+//	 *  @param food The food to eat.
+//	 *  @return	The future returns, when the action is done.
+//	 *    If the action could not be performed an exception is returned.
+//	 */
+//	public IFuture<Void>	eat(IFood food);	
 }

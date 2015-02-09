@@ -65,6 +65,12 @@
 		</env:envspacetype>
 	</extensiontypes>
 	
+	<services>
+	    <providedservice class="jadex.extension.envsupport.IEnvironmentService">
+	        <implementation class="jadex.extension.envsupport.EnvironmentService"/>
+	    </providedservice>
+	</services>
+	
 	<configurations>
 		<configuration name="10x10">
 			<extensions>
