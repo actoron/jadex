@@ -241,7 +241,7 @@ public class FutureFunctionality
 	/**
 	 * 
 	 */
-	public static Future getDelegationFuture(IFuture<?> orig, final FutureFunctionality func)
+	public static <T> Future<T> getDelegationFuture(IFuture<T> orig, final FutureFunctionality func)
 	{
 		Future ret = null;
 		
