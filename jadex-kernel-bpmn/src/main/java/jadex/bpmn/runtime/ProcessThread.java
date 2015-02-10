@@ -765,7 +765,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Update parameters based on edge inscriptions and initial values.
 	 *  @param instance	The calling BPMN instance.
 	 */
-	protected  void updateParametersBeforeStep(IInternalAccess instance)
+	public  void updateParametersBeforeStep(IInternalAccess instance)
 	{
 //		System.out.println("before: "+getActivity());
 
@@ -1494,7 +1494,7 @@ public class ProcessThread	implements ITaskContext
 	 *  @param id The thread id.
 	 *  @return The process thread.
 	 */
-	protected ProcessThread getThread(String id)
+	public ProcessThread getThread(String id)
 	{
 		ProcessThread ret = null;
 		if(SUtil.equals(getId(), id))

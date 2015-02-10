@@ -4,14 +4,38 @@ import jadex.bpmn.features.IBpmnComponentFeature;
 import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.MTask;
 import jadex.bpmn.runtime.IActivityHandler;
+import jadex.bpmn.runtime.IInternalProcessEngineService;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.handler.DefaultActivityHandler;
+import jadex.bpmn.runtime.handler.DefaultStepHandler;
+import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
+import jadex.bpmn.runtime.handler.EventEndSignalActivityHandler;
+import jadex.bpmn.runtime.handler.EventEndTerminateActivityHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateErrorActivityHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateNotificationHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateRuleHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateServiceActivityHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateTimerActivityHandler;
+import jadex.bpmn.runtime.handler.EventMultipleStepHandler;
+import jadex.bpmn.runtime.handler.EventStartRuleHandler;
+import jadex.bpmn.runtime.handler.EventStartServiceActivityHandler;
+import jadex.bpmn.runtime.handler.GatewayORActivityHandler;
+import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
+import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
+import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
+import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
@@ -21,24 +45,39 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * 
- *
+ *  Base bpmn feature holding the important data structures.
  */
 public class BpmnComponentFeature extends AbstractComponentFeature implements IBpmnComponentFeature, IInternalBpmnComponentFeature
 {
@@ -52,10 +91,13 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	/** The change event prefix denoting a thread event. */
 	public static final String	TYPE_THREAD	= "thread";
 	
-	//-------- attributes --------
+	/** The activity execution handlers (activity type -> handler). */
+	public static final Map<String, IActivityHandler> DEFAULT_ACTIVITY_HANDLERS;
 	
-	/** The micro agent model. */
-	protected MBpmnModel bpmnmodel;
+	/** The step execution handlers (activity type -> handler). */
+	public static final Map<String, IStepHandler> DEFAULT_STEP_HANDLERS;
+	
+	//-------- attributes --------
 	
 	/** The rule system. */
 	protected RuleSystem rulesystem;
@@ -69,9 +111,6 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	/** The top level process thread. */
 	protected ProcessThread topthread;
 	
-//	/** The finishing flag marker. */
-//	protected boolean finishing;
-	
 	/** The messages waitqueue. */
 	protected List<Object> messages;
 
@@ -80,12 +119,72 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 
 //	/** The inited future. */
 //	protected Future<Void> inited;
-	
-//	/** The started flag. */
-//	protected boolean started;
-	
+		
 	/** The thread id counter. */
 	protected int idcnt;
+	
+	//-------- static initializers --------
+	
+	static
+	{
+		Map<String, IStepHandler> stephandlers = new HashMap<String, IStepHandler>();
+		
+		stephandlers.put(IStepHandler.STEP_HANDLER, new DefaultStepHandler());
+		stephandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventMultipleStepHandler());
+		
+		DEFAULT_STEP_HANDLERS = Collections.unmodifiableMap(stephandlers);
+		
+		Map<String, IActivityHandler> activityhandlers = new HashMap<String, IActivityHandler>();
+		
+		// Task/Subprocess handler.
+//		activityhandlers.put(MBpmnModel.TASK, new TaskActivityHandler());
+		activityhandlers.put(MTask.TASK, new TaskActivityHandler());
+		activityhandlers.put(MBpmnModel.SUBPROCESS, new SubProcessActivityHandler());
+	
+		// Gateway handler.
+		activityhandlers.put(MBpmnModel.GATEWAY_PARALLEL, new GatewayParallelActivityHandler());
+		activityhandlers.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new GatewayXORActivityHandler());
+		activityhandlers.put(MBpmnModel.GATEWAY_DATABASED_INCLUSIVE, new GatewayORActivityHandler());
+	
+		// Initial events.
+		// Options: empty, message, rule, timer, signal, multi, link
+		// Missing: link 
+		// Note: non-empty start events are currently only supported in subworkflows
+		// It is currently not possible to start a top-level workflow using the other event types,
+		// i.e. the creation of a workflow is not supported. 
+		activityhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_TIMER, new EventIntermediateTimerActivityHandler());
+//		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventStartServiceActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_MULTIPLE, new EventIntermediateMultipleActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_RULE, new EventStartRuleHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_SIGNAL, new EventIntermediateNotificationHandler());
+			
+		// Intermediate events.
+		// Options: empty, message, rule, timer, error, signal, multi, link, compensation, cancel
+		// Missing: link, compensation, cancel
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_EMPTY, new DefaultActivityHandler());
+//		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateServiceActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateRuleHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new EventIntermediateErrorActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventIntermediateMultipleActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL, new EventIntermediateNotificationHandler());
+//		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new UserInteractionActivityHandler());
+		
+		// End events.
+		// Options: empty, message, error, compensation, terminate, signal, multi, cancel, link
+		// Missing: link, compensation, cancel, terminate, signal, multi
+		activityhandlers.put(MBpmnModel.EVENT_END_TERMINATE, new EventEndTerminateActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
+//		activityhandlers.put(MBpmnModel.EVENT_END_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_MESSAGE, new EventIntermediateServiceActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_SIGNAL, new EventEndSignalActivityHandler());
+
+		DEFAULT_ACTIVITY_HANDLERS = Collections.unmodifiableMap(activityhandlers);
+	}
 	
 	//-------- constructors --------
 	
@@ -95,16 +194,207 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	public BpmnComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-		this.bpmnmodel = (MBpmnModel)getComponent().getModel().getRawModel();
-	}
+		construct(activityhandlers, stephandlers);
+		initContextVariables();
 
+//		this.bpmnmodel = (MBpmnModel)getComponent().getModel().getRawModel();
+	}
+	
+	/**
+	 *  Special init that is used to announce event start events to process engine (if any).
+	 */
+//	public IFuture<Void> init(IModelInfo model, String config, Map<String, Object> arguments)
+//	{
+	
 	/**
 	 *  Initialize the feature.
 	 *  Empty implementation that can be overridden.
 	 */
 	public IFuture<Void> init()
 	{
-		return IFuture.DONE;
+//		System.out.println("init: "+model+" "+arguments);
+		
+		final Future<Void> ret = new Future<Void>();
+		
+		final Map<MSubProcess, List<MActivity>> evtsubstarts = getModel().getEventSubProcessStartEventMapping();
+		
+		if(!evtsubstarts.isEmpty())
+		{
+			IFuture<IInternalProcessEngineService> fut = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchService(IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION);
+			fut.addResultListener(new IResultListener<IInternalProcessEngineService>()
+			{
+				public void resultAvailable(IInternalProcessEngineService ipes)
+				{
+					final CounterResultListener<String> crl = new CounterResultListener<String>(evtsubstarts.size(), new DelegationResultListener<Void>(ret)
+					{
+						public void customResultAvailable(Void result)
+						{
+//							System.out.println("init done");
+							super.customResultAvailable(result);
+						}
+					});
+					
+					for(Map.Entry<MSubProcess, List<MActivity>> evtsubentry : evtsubstarts.entrySet())
+					{
+						for(MActivity mact: evtsubentry.getValue())
+						{
+							String[] eventtypes = (String[])mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+							UnparsedExpression	upex	= mact.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
+							Map<String, Object>	params	= null; 
+							if(upex!=null)
+							{
+								IParsedExpression	exp	= SJavaParser.parseExpression(upex, getComponent().getModel().getAllImports(), getComponent().getClassLoader());
+								for(String param: exp.getParameters())
+								{
+									if(hasContextVariable(param))
+									{
+										Object	val	= getContextVariable(param);
+										if(val!=null)	// omit null values (also excludes '$event')
+										{
+											if(params==null)
+											{
+												params	= new LinkedHashMap<String, Object>();
+											}
+											params.put(param, val);
+										}
+									}
+								}
+							}
+							
+							final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), mact);
+							final IExternalAccess exta = getComponent().getExternalAccess();
+							IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getComponent().getModel().getAllImports(), params, false, new IResultCommand<IFuture<Void>, Object>()
+							{
+								public IFuture<Void> execute(final Object event)
+								{
+									return exta.scheduleStep(new IComponentStep<Void>()
+									{
+										public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+										{
+//											BpmnInterpreter ip = (BpmnInterpreter)ia;
+											IInternalBpmnComponentFeature feat = (IInternalBpmnComponentFeature)ia.getComponentFeature(IBpmnComponentFeature.class);
+											ProcessThread thread = new ProcessThread(fevtsubentry.getFirstEntity(), 
+												feat.getTopLevelThread(), ia);
+											feat.getTopLevelThread().addThread(thread);
+											ProcessThread subthread = new ProcessThread(fevtsubentry.getSecondEntity(), thread, ia);
+											thread.addThread(subthread);
+											subthread.setOrCreateParameterValue("$event", event);
+											return IFuture.DONE;
+										}
+									});
+								}
+							});
+							fut.addResultListener(crl);
+						}
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					if(exception instanceof ServiceNotFoundException)
+					{
+						getComponent().getLogger().warning("Process "+getComponent().getComponentIdentifier()+" contains event subprocesses but no process engine found. Subprocess start events will not trigger...");
+						ret.setResult(null);
+					}
+					else if(exception instanceof ComponentTerminatedException)
+					{							
+						ret.setResult(null);
+					}
+					else
+					{
+						ret.setException(exception);
+					}
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+	
+		return ret;
+	}
+		
+	/**
+	 *  Init method holds constructor code for both implementations.
+	 */
+	protected void construct(Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers)
+	{
+//		this.bpmnmodel = model;
+		
+//		// Extract pool/lane from config.
+//		String config = getConfiguration();
+//		if(config==null || ALL.equals(config))
+//		{
+//			this.pool	= null;
+//			this.lane	= null;
+//		}
+//		else
+//		{
+//			String poollane = model.getPoolLane(config);
+//			if(poollane!=null && poollane.length()>0)
+//			{
+//				int idx	= config.indexOf('.');
+//				if(idx==-1)
+//				{
+//					this.pool	= config;
+//					this.lane	= null;
+//				}
+//				else
+//				{
+//					this.pool	= config.substring(0, idx);
+//					this.lane	= config.substring(idx+1);
+//				}
+//			}
+//		}
+		
+		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
+		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
+		
+		this.topthread = new ProcessThread(null, null, getComponent());
+		this.messages = new ArrayList<Object>();
+		this.streams = new ArrayList<IConnection>();
+		
+		if(getComponent().getComponentFeature(IArgumentsFeature.class).getArguments()!=null)
+		{
+			for(Map.Entry<String, Object> entry: getComponent().getComponentFeature(IArgumentsFeature.class).getArguments().entrySet())
+			{
+				topthread.setParameterValue(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+	
+	/**
+	 *  Init context variables.
+	 */
+	protected void initContextVariables()
+	{
+		List<MContextVariable>	vars	= getModel().getContextVariables();
+		for(Iterator<MContextVariable> it=vars.iterator(); it.hasNext(); )
+		{
+			MContextVariable	cv	= it.next();
+//			if(!variables.containsKey(cv.getName()))	// Don't overwrite arguments.
+			if(!topthread.hasParameterValue(cv.getName()))	// Don't overwrite arguments.
+			{
+				Object	value	= null;
+				UnparsedExpression	exp	= cv.getValue(getComponent().getConfiguration());
+				if(exp!=null)
+				{
+					try
+					{
+						IParsedExpression parsed = (IParsedExpression) exp.getParsed();
+						value = parsed != null? parsed.getValue(getComponent().getFetcher()) : null;
+					}
+					catch(RuntimeException e)
+					{
+						e.printStackTrace();
+						throw new RuntimeException("Error parsing context variable: "+this+", "+cv.getName()+", "+exp, e);
+					}
+				}
+				topthread.setParameterValue(cv.getName(), value);
+//				variables.put(cv.getName(), value);
+			}
+		}
 	}
 	
 	/**
@@ -410,4 +700,80 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		return ret;
 		
 	}
+
+	/**
+	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 */
+	public boolean	isReady()
+	{
+		return isReady(null, null);
+	}
+	
+	/**
+	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 */
+	public boolean	isReady(String pool, String lane)
+	{
+		boolean	ready;
+//		// Todo: consider only external entries belonging to pool/lane
+//		synchronized(ext_entries)
+//		{
+//			ready	= !ext_entries.isEmpty();
+//		}
+		ready = topthread.getExecutableThread(pool, lane)!=null;
+		return ready;
+	}
+	
+	/**
+	 *  Check, if the process has terminated.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return True, when the process instance is finished with regards to the specified pool/lane. When both pool and lane are null, true is returned only when all pools/lanes are finished.
+	 */
+	public boolean isFinished()
+	{
+		return topthread.isFinished(null, null);
+	}
+	
+	/**
+	 *  Check, if the process has terminated.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return True, when the process instance is finished with regards to the specified pool/lane. When both pool and lane are null, true is returned only when all pools/lanes are finished.
+	 */
+	public boolean isFinished(String pool, String lane)
+	{
+		return topthread.isFinished(pool, lane);
+	}
+
+	/**
+	 *  Get the messages.
+	 *  @return The messages
+	 */
+	public List<Object> getMessages()
+	{
+		return messages;
+	}
+
+	/**
+	 *  Get the streams.
+	 *  @return The streams
+	 */
+	public List<IConnection> getStreams()
+	{
+		return streams;
+	}
+	
+	/**
+	 * 
+	 */
+	protected MBpmnModel getModel()
+	{
+		return (MBpmnModel)getComponent().getModel().getRawModel();
+	}
+	
 }

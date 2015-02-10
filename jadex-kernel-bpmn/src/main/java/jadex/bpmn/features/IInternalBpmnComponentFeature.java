@@ -1,6 +1,7 @@
 package jadex.bpmn.features;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IInternalAccess;
@@ -78,4 +79,35 @@ public interface IInternalBpmnComponentFeature
 	 *  @param event	The event that has occurred, if any.
 	 */
 	public void	notify(final MActivity activity, final ProcessThread thread, final Object event);
+	
+	/**
+	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 */
+	public boolean	isReady();
+	
+	/**
+	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 */
+	public boolean	isReady(String pool, String lane);
+	
+	/**
+	 *  Check, if the process has terminated.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return True, when the process instance is finished with regards to the specified pool/lane. When both pool and lane are null, true is returned only when all pools/lanes are finished.
+	 */
+	public boolean isFinished();
+	
+	/**
+	 *  Check, if the process has terminated.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return True, when the process instance is finished with regards to the specified pool/lane. When both pool and lane are null, true is returned only when all pools/lanes are finished.
+	 */
+	public boolean isFinished(String pool, String lane);
+	
 }
