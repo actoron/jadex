@@ -1419,7 +1419,9 @@ public class ImageProvider
 						 
 					    tc.addTranscodingHint(PNGTranscoder.KEY_WIDTH, (float) size.width);
 					    tc.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, (float) size.height);
-					 
+					    // Batik 1.7 bug workaround
+					    tc.addTranscodingHint(PNGTranscoder.KEY_AOI, new Rectangle2D.Float(0, 0, size.width, size.height));
+					    
 					    TranscoderInput input = new TranscoderInput(svgstream);
 					    tc.transcode(input, null);
 					    ret = bfimg[0];
@@ -1427,6 +1429,7 @@ public class ImageProvider
 				}
 				catch (Exception e)
 				{
+					e.printStackTrace();
 				}
 			}
 			

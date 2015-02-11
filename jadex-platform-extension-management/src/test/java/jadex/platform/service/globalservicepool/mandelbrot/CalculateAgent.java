@@ -3,7 +3,6 @@ package jadex.platform.service.globalservicepool.mandelbrot;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
@@ -12,6 +11,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -27,7 +27,10 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Description("Agent offering a calculate service.")
 @ProvidedServices(@ProvidedService(type=ICalculateService.class))
-@Arguments(@Argument(name="delay", description="Agent kills itself when no job arrives in the delay interval.", clazz=Long.class, defaultvalue="new Long(1000)"))
+@Arguments({
+	@Argument(name="diedelay", description="Agent kills itself when no job arrives in the delay interval.", clazz=Long.class, defaultvalue="new Long(1000)"),
+	@Argument(name="drawdelay", description="Draw delay.", clazz=Long.class, defaultvalue="new Long(10)")
+})
 @Configurations({
 	@Configuration(name="default"),
 	@Configuration(name="long lived", arguments={@NameValue(name="delay", value="-1")})
@@ -43,6 +46,12 @@ public class CalculateAgent implements ICalculateService
 	/** Flag indicating that the agent had a job. */
 	protected boolean hadjob;
 	
+	@AgentArgument
+	protected long drawdelay;
+	
+	@AgentArgument
+	protected long diedelay;
+	
 	//-------- methods --------
 	
 	/**
@@ -53,7 +62,6 @@ public class CalculateAgent implements ICalculateService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final long delay = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay")).longValue();
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -65,12 +73,12 @@ public class CalculateAgent implements ICalculateService
 					ret.setResult(null);
 				}
 				setHadJob(false);
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(diedelay, this);
 				return IFuture.DONE;
 			}
 		};
-		if(delay>0)
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
+		if(diedelay>0)
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(diedelay, step);
 		
 		return ret;
 	}
@@ -201,7 +209,8 @@ public class CalculateAgent implements ICalculateService
 					last = reportProgress(cnt, size, last, ret);
 					xstart++;
 					
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10).get();
+					if(drawdelay>0)
+						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(drawdelay).get();
 					
 					if(allin && usejustfill)
 					{

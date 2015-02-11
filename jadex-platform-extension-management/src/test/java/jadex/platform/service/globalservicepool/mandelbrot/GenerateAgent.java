@@ -75,7 +75,7 @@ public class GenerateAgent implements IGenerateService
 	@ServiceStart
 	public void start()
 	{
-		System.out.println("start: "+agent.getComponentIdentifier());
+//		System.out.println("start: "+agent.getComponentIdentifier());
 		this.panel = (GeneratePanel)GeneratePanel.createGui(agent.getExternalAccess());
 	}
 	
