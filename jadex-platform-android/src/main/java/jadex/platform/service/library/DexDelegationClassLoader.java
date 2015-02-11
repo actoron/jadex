@@ -1,6 +1,7 @@
 package jadex.platform.service.library;
 
 import jadex.bridge.IResourceIdentifier;
+import jadex.commons.SUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,13 +18,13 @@ public class DexDelegationClassLoader extends DelegationURLClassLoader
 
 	public DexDelegationClassLoader(IResourceIdentifier rid, ClassLoader basecl, DelegationURLClassLoader[] delegates, File dexOutputPath)
 	{
-		super(rid, basecl, delegates);
+		super(rid, SUtil.toURL(rid.getLocalIdentifier().getUri()), basecl, delegates);
 		URI url = rid.getLocalIdentifier().getUri();
 		dexCl = new DexClassLoader(url.getPath(),dexOutputPath.getAbsolutePath(), null, basecl);
 	}
 	
 	public DexDelegationClassLoader(IResourceIdentifier rid, ClassLoader basecl, ClassLoader delegate) {
-		super(rid, basecl, null);
+		super(rid, SUtil.toURL(rid.getLocalIdentifier().getUri()), basecl, null);
 		this.dexCl = delegate;
 	}
 	

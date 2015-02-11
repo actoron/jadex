@@ -39,6 +39,10 @@ public abstract class CallAccess	extends ServiceCall
 	 */
 	public static void	setCurrentInvocation(ServiceCall call)
 	{
+//		if(call!=null && call.getCause()==null)
+//		{
+//			System.out.println(Thread.currentThread().hashCode()+": set: "+call+", "+Thread.currentThread());
+//		}
 		ServiceCall.CALLS.set(call);
 	}
 
@@ -56,6 +60,11 @@ public abstract class CallAccess	extends ServiceCall
 	 */
 	public static void	setNextInvocation(ServiceCall call)
 	{
+//		if(call!=null && call.getCause()==null)
+//		{
+//			System.out.println(Thread.currentThread().hashCode()+": set next: "+call+", "+Thread.currentThread());
+//		}
+
 		NEXT.set(call);
 	}
 

@@ -32,9 +32,27 @@ def getReleaseVariant(project) {
     }
 }
 
+def getVariants(project) {
+	if (isAndroidLibraryProject(project)) {
+		return project.android.libraryVariants
+	} else {
+		project.android.applicationVariants
+	}
+}
+
 def getSourceDir(project) {
     if (isAndroidProject(project)) {
         project.android.sourceSets.main.java.srcDirs
+    } else {
+        project.sourceSets.main.allJava
+    }
+}
+
+// only return java sources 
+// (getSourceDir includes xml, bpmn, aidl, ... which is wrong for javadoc generation)
+def getOnlyJavaSources(project) {
+    if (isAndroidProject(project)) {
+    	getReleaseVariant(project).javaCompile.source
     } else {
         project.sourceSets.main.allJava
     }
@@ -88,7 +106,9 @@ ext {
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     getReleaseVariant = this.&getReleaseVariant
+    getVariants = this.&getVariants
     getSourceDir = this.&getSourceDir
+    getOnlyJavaSources = this.&getOnlyJavaSources
     getResourcesDir = this.&getResourcesDir
     getCompileClassPath = this.&getCompileClassPath
     isExcluded = this.&isExcluded

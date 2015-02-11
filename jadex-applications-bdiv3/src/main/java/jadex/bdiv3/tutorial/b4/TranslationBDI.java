@@ -96,6 +96,7 @@ public class TranslationBDI
 			{
 				public void printStackTrace()
 				{
+					Thread.dumpStack();
 					super.printStackTrace();
 				}
 			};

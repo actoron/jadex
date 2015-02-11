@@ -258,7 +258,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 						{
 	//						System.out.println("add end "+rid+" on: "+parid);
 		
-							// Must be added with resolved rid (what about resolving parent)
+							// Must be added with resolved rid (what about resolving parent?)
 							addLink(parid, rid);
 		
 							getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
@@ -673,6 +673,11 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}	
 		else
 		{
+			if(!internalGetResourceIdentifiers().getSecondEntity().containsKey(rid))
+			{
+				addLink(null, rid);
+			}
+			
 			getClassLoader(rid, null, rootloader.getResourceIdentifier(), workspace).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
 			{
 				public void customResultAvailable(DelegationURLClassLoader result)
@@ -845,7 +850,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			final DelegationURLClassLoader cl = createNewDelegationClassLoader(rid, baseloader, null);
 			classloaders.put(rid, cl);
 			
-			System.out.println("createClassLoader() put: "+component.getComponentIdentifier()+", "+rid);
+//			System.out.println("createClassLoader() put: "+component.getComponentIdentifier()+", "+rid);
 			
 			final List<IResourceIdentifier> deps = alldeps.get(rid);
 			CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
@@ -951,7 +956,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected File	getHashRidFile(IResourceIdentifier rid)
 	{
-		assert rid.getGlobalIdentifier()!=null && rid.getGlobalIdentifier().getResourceId()!=null && rid.getGlobalIdentifier().getResourceId().startsWith("::");
+		assert ResourceIdentifier.isHashGid(rid);
 
 		// http://tools.ietf.org/html/rfc3548#section-4 for local storage of hashed resources
 		String	name	= rid.getGlobalIdentifier().getResourceId().substring(2).replace('+', '-').replace('/', '_') + ".jar";

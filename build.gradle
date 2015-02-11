@@ -321,30 +321,35 @@ subprojects
         task jar(type:Jar) {
 
         }
+        
+        // create configuration -> dependency mappings for maven pom generation
+        project.conf2ScopeMappings.addMapping(10,configurations.compile,Conf2ScopeMappingContainer.COMPILE)
+        project.conf2ScopeMappings.addMapping(11,configurations.androidTestCompile,Conf2ScopeMappingContainer.TEST)
+        project.conf2ScopeMappings.addMapping(12,configurations.provided,Conf2ScopeMappingContainer.PROVIDED)
 
-        if (!isAndroidLibraryProject(project)) {
-            android.applicationVariants.all {variant ->
-                task("generate${variant.name}JavaDoc", type:Javadoc) {
-                    source = variant.javaCompile.source
-                    ext.androidJar =
-                            "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-                    classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-                    options.links("http://docs.oracle.com/javase/7/docs/api/");
-                    options.links("http://d.android.com/reference/");
-                    exclude '**/BuildConfig.java'
-                    exclude '**/R.java'
-
-                    // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
-                    def javaVersion = JavaVersion.current()
-                    if (javaVersion >= JavaVersion.VERSION_1_8) {
-                        options.addStringOption('Xdoclint:none', '-quiet')
-                    } else {
-                        options.addStringOption('-quiet')
-                    }
-                }
-            }
-        }
-
+    	// add custom task to generate javadocs to exclude R and BuildConfig and to include correct links
+    	getVariants(project).all {variant -> 
+	    	task("generate${variant.name}JavaDoc", type:Javadoc) {
+		        source = variant.javaCompile.source
+		        ext.androidJar =
+		                "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+		        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+		        options.links("http://docs.oracle.com/javase/7/docs/api/");
+		        options.links("http://d.android.com/reference/");
+		        exclude '**/BuildConfig.java'
+		        exclude '**/R.java'
+		
+		        // On java 1.8, disable doclint. This checks the runtime, not the actual JDK version.
+		        def javaVersion = JavaVersion.current()
+		        if (javaVersion >= JavaVersion.VERSION_1_8) {
+		            options.addStringOption('Xdoclint:none', '-quiet')
+		        } else {
+		            options.addStringOption('-quiet')
+		        }
+	        }
+    	} 
+        
+        // disable default javadoc task because we created a custom one
         myJavadocs.enabled = false
 
         task classes(dependsOn: 'compileDebugSources') {
@@ -370,12 +375,15 @@ subprojects
             project.configurations.androidDistribution.exclude module:'junit' // no junit in runtime classpath
         }
     }
+    
+    // debug task to show configuration -> maven dep. scope mappings
+    task mappings << {
+    	println project.conf2ScopeMappings.mappings
+	}
 }
 
 task docs(type: Javadoc) {
-    source subprojects.collect {project -> getSourceDir(project)}
-    // this is needed to avoid (failing) javadoc generation for xmls in android-projects:
-    exclude('**/*.xml','**/*.bpmn*','**/*.txt','**/*.bpmn')
+    source subprojects.collect {project -> getOnlyJavaSources(project)}
     classpath = files(subprojects.collect {project -> project.getCompileClassPath(project)})
     destinationDir = new File(projectDir, 'build/docs')
     options.links("http://docs.oracle.com/javase/7/docs/api/")

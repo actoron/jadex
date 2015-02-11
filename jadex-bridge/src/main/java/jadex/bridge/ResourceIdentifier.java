@@ -194,7 +194,15 @@ public class ResourceIdentifier implements IResourceIdentifier
 		}
 		return ret;
 	}
-		
+	
+	/**
+	 *  Test if the global id is non-null and a hash id.
+	 */
+	public static boolean	isHashGid(IResourceIdentifier rid)
+	{
+		return rid!=null && rid.getGlobalIdentifier()!=null && rid.getGlobalIdentifier().getResourceId()!=null && rid.getGlobalIdentifier().getResourceId().startsWith("::");
+	}
+	
 	/**
 	 *  Create properties from rid.
 	 *  @param The resource identifier.
@@ -207,7 +215,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 		boolean	global	= false;
 		
 		if(rid!=null && rid.getGlobalIdentifier()!=null && rid.getGlobalIdentifier().getResourceId()!=null
-			&& !rid.getGlobalIdentifier().getResourceId().startsWith("::"))	// Don't save hash ids as contents might change.
+			&& !isHashGid(rid))	// Don't save hash ids as contents might change.
 		{
 			ret.addProperty(new Property("gid_ri", rid.getGlobalIdentifier().getResourceId()));
 			ret.addProperty(new Property("gid_vi", rid.getGlobalIdentifier().getVersionInfo()));
@@ -283,7 +291,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 		String	project	= null;
 		
 		// Maven id.
-		if(rid.getGlobalIdentifier()!=null && rid.getGlobalIdentifier().getResourceId()!=null && !rid.getGlobalIdentifier().getResourceId().startsWith("::"))
+		if(rid.getGlobalIdentifier()!=null && rid.getGlobalIdentifier().getResourceId()!=null && !isHashGid(rid))
 		{
 			project	= rid.getGlobalIdentifier().getResourceId();
 			// Strip group id.

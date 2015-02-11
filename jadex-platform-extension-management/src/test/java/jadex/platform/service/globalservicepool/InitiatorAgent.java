@@ -64,20 +64,18 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				// hack: do not quit for better testing
-//				ret.setResult(null);
+
+				testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				{
+					public void customResultAvailable(TestReport result)
+					{
+						tc.addReport(result);
+						
+						ret.setResult(null);
+					}
+				}));
 			}
 		}));
-		
-//		testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
-//		{
-//			public void customResultAvailable(TestReport result)
-//			{
-//				tc.addReport(result);
-//				// hack: do not quit for better testing
-////				ret.setResult(null);
-//			}
-//		}));
 		
 		return ret;
 	}

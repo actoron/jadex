@@ -13,7 +13,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -122,16 +122,28 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 		String	ret	= "unknown";
 		try
 		{
-			// Get geo location, e.g. "134.100.11.232","DE","Germany","04","Hamburg","Hamburg","","53.5500","10.0000","",""
-			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/csv").openStream(), "UTF-8");
-			scanner.findInLine("\"([^\"]*)\"");
-			scanner.findInLine("\"([^\"]*)\"");
-			scanner.findInLine("\"([^\"]*)\"");
+			// Get geo location, e.g.
+			// 134.100.11.200,DE,Germany,HH,Hamburg,Hamburg,22767,Europe/Berlin,53.55,10.00,0
+			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/csv/").openStream(), "UTF-8");
+			scanner.findInLine("([^,]*),");
+			scanner.findInLine("([^,]*),");
+			scanner.findInLine("([^,]*),");
 			ret	= scanner.match().group(1);	// Country
-			scanner.findInLine("\"([^\"]*)\"");
-			scanner.findInLine("\"([^\"]*)\"");
+			scanner.findInLine("([^,]*),");
+			scanner.findInLine("([^,]*),");
 			ret	= scanner.match().group(1) + ", " + ret;	// City
 			scanner.close();
+
+			// old: "134.100.11.232","DE","Germany","04","Hamburg","Hamburg","","53.5500","10.0000","",""
+//			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/csv/").openStream(), "UTF-8");
+//			scanner.findInLine("\"([^\"]*)\"");
+//			scanner.findInLine("\"([^\"]*)\"");
+//			scanner.findInLine("\"([^\"]*)\"");
+//			ret	= scanner.match().group(1);	// Country
+//			scanner.findInLine("\"([^\"]*)\"");
+//			scanner.findInLine("\"([^\"]*)\"");
+//			ret	= scanner.match().group(1) + ", " + ret;	// City
+//			scanner.close();
 		}
 		catch(Exception e)
 		{
@@ -139,5 +151,19 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 		}
 		
 		return ret;
+	}
+	
+	public static void main(String[] args) throws Exception
+	{
+		InputStream	is	= new URL("http://freegeoip.net/csv/").openStream();
+		byte[]	buf	= new byte[1234];
+		int read;
+		while((read=is.read(buf))!=-1)
+		{
+			System.out.write(buf, 0, read);
+		}
+		is.close();
+		
+		System.out.println("\n"+determineLocation());
 	}
 }

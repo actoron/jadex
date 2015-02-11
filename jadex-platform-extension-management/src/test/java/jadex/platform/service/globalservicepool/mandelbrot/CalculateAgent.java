@@ -11,6 +11,7 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -26,7 +27,10 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Description("Agent offering a calculate service.")
 @ProvidedServices(@ProvidedService(type=ICalculateService.class))
-@Arguments(@Argument(name="delay", description="Agent kills itself when no job arrives in the delay interval.", clazz=Long.class, defaultvalue="new Long(1000)"))
+@Arguments({
+	@Argument(name="diedelay", description="Agent kills itself when no job arrives in the delay interval.", clazz=Long.class, defaultvalue="new Long(1000)"),
+	@Argument(name="drawdelay", description="Draw delay.", clazz=Long.class, defaultvalue="new Long(10)")
+})
 @Configurations({
 	@Configuration(name="default"),
 	@Configuration(name="long lived", arguments={@NameValue(name="delay", value="-1")})
@@ -42,6 +46,12 @@ public class CalculateAgent implements ICalculateService
 	/** Flag indicating that the agent had a job. */
 	protected boolean hadjob;
 	
+	@AgentArgument
+	protected long drawdelay;
+	
+	@AgentArgument
+	protected long diedelay;
+	
 	//-------- methods --------
 	
 	/**
@@ -52,7 +62,6 @@ public class CalculateAgent implements ICalculateService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final long delay = ((Number)agent.getArgument("delay")).longValue();
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -64,12 +73,12 @@ public class CalculateAgent implements ICalculateService
 					ret.setResult(null);
 				}
 				setHadJob(false);
-				agent.waitFor(delay, this);
+				agent.waitFor(diedelay, this);
 				return IFuture.DONE;
 			}
 		};
-		if(delay>0)
-			agent.waitFor(delay, step);
+		if(diedelay>0)
+			agent.waitFor(diedelay, step);
 		
 		return ret;
 	}
@@ -200,7 +209,8 @@ public class CalculateAgent implements ICalculateService
 					last = reportProgress(cnt, size, last, ret);
 					xstart++;
 					
-					agent.waitForDelay(10).get();
+					if(drawdelay>0)
+						agent.waitForDelay(drawdelay).get();
 					
 					if(allin && usejustfill)
 					{
