@@ -129,17 +129,20 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 						Security	sec	= null;
 						List<Class<?>>	classes	= new ArrayList<Class<?>>();
 						Class<?> typecl = type.getType(result);
-						classes.add(typecl);
-						for(int i=0; sec==null && i<classes.size(); i++)
+						if(typecl!=null)
 						{
-							Class<?>	clazz	= classes.get(i);
-							sec	= clazz.getAnnotation(Security.class);
-							if(sec==null)
+							classes.add(typecl);
+							for(int i=0; sec==null && i<classes.size(); i++)
 							{
-								classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
-								if(clazz.getSuperclass()!=null)
+								Class<?>	clazz	= classes.get(i);
+								sec	= clazz.getAnnotation(Security.class);
+								if(sec==null)
 								{
-									classes.add(clazz.getSuperclass());
+									classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
+									if(clazz.getSuperclass()!=null)
+									{
+										classes.add(clazz.getSuperclass());
+									}
 								}
 							}
 						}

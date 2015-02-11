@@ -2,6 +2,7 @@ package jadex.bpmn;
 
 import jadex.bpmn.features.impl.BpmnComponentFeature;
 import jadex.bpmn.features.impl.BpmnExecutionFeature;
+import jadex.bpmn.features.impl.BpmnMessageComponentFeature;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -51,7 +52,8 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	public static final Collection<IComponentFeatureFactory> BPMN_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
 			BpmnComponentFeature.FACTORY,
-			new ComponentFeatureFactory(IExecutionFeature.class, BpmnExecutionFeature.class)
+			new ComponentFeatureFactory(IExecutionFeature.class, BpmnExecutionFeature.class),
+			BpmnMessageComponentFeature.FACTORY
 		));
 	
 	//-------- attributes --------
