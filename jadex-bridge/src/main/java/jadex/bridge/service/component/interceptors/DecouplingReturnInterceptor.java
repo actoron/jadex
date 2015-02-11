@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -99,43 +100,20 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									
 									public void exceptionOccurred(Exception exception)
 									{
-//										catch(ComponentTerminatedException e)
-//										{
-//											// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
-//											if(sic.getMethod().getName().equals("destroyComponent")
-//												&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
-//											{
-//												Runnable run = new Runnable()
-//												{
-//													public void run() 
-//													{
-//														if(isUndone() && listener instanceof IUndoneResultListener)
-//														{
-//															((IUndoneResultListener)listener).resultAvailableIfUndone(null);
-//														}
-//														else
-//														{
-//															listener.resultAvailable(null);
-//														}
-//													}
-//												};
-//												
-//												if(caller.getParent()==null)
-//												{
-//													// If destroy of platform, run directly as rescue thread already shut down.
-//													run.run();
-//												}
-//												else
-//												{
-//													Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
-//												}
-//											}
-//											else
-//											{
-//												// pass exception back to result provider as receiver is already dead.
-//												throw e;
-//											}
-//										}										
+										// Special case: ignore ComponentTerminatedException when component has called cms.destroyComponent() for itself
+										if(exception instanceof ComponentTerminatedException)
+										{
+											if(sic.getMethod().getName().equals("destroyComponent")
+												&& sic.getArguments().size()==1 && caller!=null && caller.getComponentIdentifier().equals(sic.getArguments().get(0)))
+											{
+												// ignore
+											}
+											else
+											{
+												// pass exception back to result provider as receiver is already dead.
+												throw (ComponentTerminatedException)exception;
+											}
+										}
 									}
 								});
 							}

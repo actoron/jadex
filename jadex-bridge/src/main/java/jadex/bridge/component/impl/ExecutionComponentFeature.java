@@ -112,14 +112,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		synchronized(this)
 		{
-			if(steps==null)
+			// Todo: synchronize with last step!
+			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()))
 			{
-				steps	= new LinkedList<Tuple2<IComponentStep<?>,Future<?>>>();
+				ret.setException(new ComponentTerminatedException(getComponent().getComponentIdentifier()));
 			}
-			steps.add(new Tuple2<IComponentStep<?>, Future<?>>(step, ret));
+			else
+			{
+				if(steps==null)
+				{
+					steps	= new LinkedList<Tuple2<IComponentStep<?>,Future<?>>>();
+				}
+				steps.add(new Tuple2<IComponentStep<?>, Future<?>>(step, ret));
+			}
 		}
 
-		wakeup();
+		if(!ret.isDone())
+		{
+			wakeup();
+		}
 		
 		return ret;
 	}
@@ -134,14 +145,25 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		synchronized(this)
 		{
-			if(isteps==null)
+			// Todo: synchronize with last step!
+			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()))
 			{
-				isteps	= new LinkedList<Tuple2<IComponentStep<?>,Future<?>>>();
+				ret.setException(new ComponentTerminatedException(getComponent().getComponentIdentifier()));
 			}
-			isteps.add(new Tuple2<IComponentStep<?>, Future<?>>(step, ret));
+			else
+			{
+				if(isteps==null)
+				{
+					isteps	= new LinkedList<Tuple2<IComponentStep<?>,Future<?>>>();
+				}
+				isteps.add(new Tuple2<IComponentStep<?>, Future<?>>(step, ret));
+			}
 		}
 
-		wakeup();
+		if(!ret.isDone())
+		{
+			wakeup();
+		}
 		
 		return ret;
 	}
@@ -701,30 +723,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(step!=null)
 		{
+			IFuture<?>	stepfut	= null;
 			try
 			{
-				step.getFirstEntity().execute(component)
-					.addResultListener(new DelegationResultListener(step.getSecondEntity()));
-
-				if(!step.getSecondEntity().hasResultListener())
-				{
-					((Future<Object>)step.getSecondEntity()).addResultListener(new IResultListener<Object>()
-					{
-						public void resultAvailable(Object result)
-						{
-							getComponent().getLogger().warning("No listener for component step: "+step.getFirstEntity());
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// Todo: fail fast vs robust components.
-							
-							StringWriter	sw	= new StringWriter();
-							exception.printStackTrace(new PrintWriter(sw));
-							getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
-						}
-					});
-				}
+				stepfut	= step.getFirstEntity().execute(component);
 			}
 			catch(Exception e)
 			{
@@ -738,6 +740,42 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				
 				step.getSecondEntity().setException(e);
+			}
+			
+			if(stepfut!=null)
+			{
+				try
+				{
+					stepfut.addResultListener(new DelegationResultListener(step.getSecondEntity()));
+		
+					if(!step.getSecondEntity().hasResultListener())
+					{
+						((Future<Object>)step.getSecondEntity()).addResultListener(new IResultListener<Object>()
+						{
+							public void resultAvailable(Object result)
+							{
+								getComponent().getLogger().warning("No listener for component step: "+step.getFirstEntity());
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								// Todo: fail fast vs robust components.
+								
+								StringWriter	sw	= new StringWriter();
+								exception.printStackTrace(new PrintWriter(sw));
+								getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+							}
+						});
+					}
+				}
+				catch(Exception e)
+				{
+					// Todo: fail fast vs robust components.
+					
+					StringWriter	sw	= new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					getComponent().getLogger().severe("Component step listener failed: "+step.getFirstEntity()+"\n"+sw);
+				}
 			}
 			
 			synchronized(this)

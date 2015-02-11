@@ -1,13 +1,11 @@
 package jadex.platform.service.remote;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Timeout;
@@ -17,13 +15,11 @@ import jadex.bridge.service.component.interceptors.IntelligentProxyInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;

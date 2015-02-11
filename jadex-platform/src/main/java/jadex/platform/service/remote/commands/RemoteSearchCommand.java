@@ -127,22 +127,26 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 					public void customResultAvailable(ClassLoader result)
 					{
 						Security	sec	= null;
-						List<Class<?>>	classes	= new ArrayList<Class<?>>();
 						Class<?> typecl = type.getType(result);
-						classes.add(typecl);
-						for(int i=0; sec==null && i<classes.size(); i++)
+						if(typecl!=null)
 						{
-							Class<?>	clazz	= classes.get(i);
-							sec	= clazz.getAnnotation(Security.class);
-							if(sec==null)
+							List<Class<?>>	classes	= new ArrayList<Class<?>>();
+							classes.add(typecl);
+							for(int i=0; sec==null && i<classes.size(); i++)
 							{
-								classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
-								if(clazz.getSuperclass()!=null)
+								Class<?>	clazz	= classes.get(i);
+								sec	= clazz.getAnnotation(Security.class);
+								if(sec==null)
 								{
-									classes.add(clazz.getSuperclass());
+									classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
+									if(clazz.getSuperclass()!=null)
+									{
+										classes.add(clazz.getSuperclass());
+									}
 								}
 							}
 						}
+
 						// Default to max security if not found.
 						securitylevel	= sec!=null ? sec.value() : Security.PASSWORD;
 						
