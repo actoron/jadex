@@ -1,11 +1,14 @@
 package jadex.bpmn;
 
 import jadex.bpmn.features.impl.BpmnComponentFeature;
+import jadex.bpmn.features.impl.BpmnExecutionFeature;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -31,7 +34,7 @@ import java.util.Map;
 /**
  *  Factory for loading bpmn processes.
  */
-public abstract class BpmnFactory extends BasicService implements IComponentFactory, IBootstrapFactory
+public class BpmnFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
 	
@@ -47,7 +50,8 @@ public abstract class BpmnFactory extends BasicService implements IComponentFact
 	
 	public static final Collection<IComponentFeatureFactory> BPMN_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
-			BpmnComponentFeature.FACTORY
+			BpmnComponentFeature.FACTORY,
+			new ComponentFeatureFactory(IExecutionFeature.class, BpmnExecutionFeature.class)
 		));
 	
 	//-------- attributes --------

@@ -153,8 +153,8 @@ public class BasicService extends ExternalFeatureProvider implements IInternalSe
 	{
 //		super(null);
 		
-		if(properties!=null && properties.size()>0)
-			System.out.println("sdyf");
+//		if(properties!=null && properties.size()>0)
+//			System.out.println("sdyf");
 		
 //		if(!SReflect.isSupertype(type, getClass()))
 //			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());

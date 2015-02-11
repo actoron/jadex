@@ -219,6 +219,19 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			fut	= cf.init();
 		}
 		
+//		fut.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("ini fin: "+getComponentIdentifier());
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ini ex: "+getComponentIdentifier());
+//			}
+//		});
+		
 		if(!fut.isDone())
 		{
 			final Future<Void>	ret	= new Future<Void>();
