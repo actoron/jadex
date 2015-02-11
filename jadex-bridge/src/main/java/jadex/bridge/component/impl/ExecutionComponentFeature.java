@@ -694,6 +694,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				}
 //			}
 			
+		if(getComponent().getComponentIdentifier().getName().indexOf("B2_Sequence")!=-1)
+		{
+			System.out.println("seough");
+		}
+			
 		final Tuple2<IComponentStep<?>, Future<?>>	step;
 		synchronized(this)
 		{
@@ -705,7 +710,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					isteps	= null;
 				}
 			}
-			else if(steps!=null)
+			else if(steps!=null && IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()))
 			{
 				step	= steps.remove(0);
 				if(steps.isEmpty())
