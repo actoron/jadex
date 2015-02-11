@@ -55,6 +55,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IResultCommand;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
@@ -776,4 +777,29 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		return (MBpmnModel)getComponent().getModel().getRawModel();
 	}
 	
+	
+	/**
+	 *  The feature can inject parameters for expression evaluation
+	 *  by providing an optional value fetcher. The fetch order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
+	 */
+	public IValueFetcher	getValueFetcher()
+	{
+		return new IValueFetcher()
+		{
+			public Object fetchValue(String name)
+			{
+				Object	ret;
+				if(hasContextVariable(name))
+				{
+					ret	= getContextVariable(name);
+				}
+				else
+				{
+					throw new RuntimeException("Parameter not found: "+name);
+				}
+				return ret;
+			}
+		};
+	}
 }

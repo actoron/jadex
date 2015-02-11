@@ -1,9 +1,11 @@
 package jadex.bpmn.features;
 
+import java.util.List;
+
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 
@@ -110,4 +112,15 @@ public interface IInternalBpmnComponentFeature
 	 */
 	public boolean isFinished(String pool, String lane);
 	
+	/**
+	 *  Get the messages.
+	 *  @return The messages
+	 */
+	public List<Object> getMessages();
+	
+	/**
+	 *  Get the streams.
+	 *  @return The streams
+	 */
+	public List<IConnection> getStreams();
 }

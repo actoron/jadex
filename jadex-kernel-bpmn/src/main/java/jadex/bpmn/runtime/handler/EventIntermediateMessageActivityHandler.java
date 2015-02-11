@@ -77,123 +77,111 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	 */
 	protected void sendMessage(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
-		SServiceProvider.getService(instance, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IMessageService>()
+		IMessageService ms = SServiceProvider.getLocalService(instance, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		IComponentManagementService cms = SServiceProvider.getLocalService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		String mtname = (String)thread.getPropertyValue(PROPERTY_MESSAGETYPE, activity);
+		MessageType mt = mtname!=null? ms.getMessageType(mtname): ms.getMessageType("fipa");
+		
+		Map<String, Object> msg;
+		
+		if(thread.hasPropertyValue(PROPERTY_MESSAGE))
 		{
-			public void resultAvailable(final IMessageService ms)
+			msg = (Map<String, Object>)thread.getPropertyValue(PROPERTY_MESSAGE);
+		}
+		else
+		{
+			msg = new HashMap<String, Object>();
+		}
+			
+		// Convenience conversion of strings to component identifiers for receivers.
+		String ri = mt.getReceiverIdentifier();
+		if(thread.hasPropertyValue(ri))
+		{
+			Object recs = thread.getPropertyValue(ri);
+			List<IComponentIdentifier> newrecs = new ArrayList<IComponentIdentifier>();
+			if(SReflect.isIterable(recs))
 			{
-				SServiceProvider.getService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IComponentManagementService>()
+				for(Iterator<IComponentIdentifier> it=SReflect.getIterator(recs); it.hasNext(); )
 				{
-					public void resultAvailable(IComponentManagementService cms)
+					Object rec = it.next();
+					if(rec instanceof String)
 					{
-						String mtname = (String)thread.getPropertyValue(PROPERTY_MESSAGETYPE, activity);
-						MessageType mt = mtname!=null? ms.getMessageType(mtname): ms.getMessageType("fipa");
-						
-						Map<String, Object> msg;
-						
-						if(thread.hasPropertyValue(PROPERTY_MESSAGE))
-						{
-							msg = (Map<String, Object>)thread.getPropertyValue(PROPERTY_MESSAGE);
-						}
-						else
-						{
-							msg = new HashMap<String, Object>();
-						}
-							
-						// Convenience conversion of strings to component identifiers for receivers.
-						String ri = mt.getReceiverIdentifier();
-						if(thread.hasPropertyValue(ri))
-						{
-							Object recs = thread.getPropertyValue(ri);
-							List<IComponentIdentifier> newrecs = new ArrayList<IComponentIdentifier>();
-							if(SReflect.isIterable(recs))
-							{
-								for(Iterator<IComponentIdentifier> it=SReflect.getIterator(recs); it.hasNext(); )
-								{
-									Object rec = it.next();
-									if(rec instanceof String)
-									{
 //										newrecs.add(cms.createComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent(), null));
-										newrecs.add(new ComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent()));
-									}
-									else if(rec instanceof IComponentIdentifier)
-									{
-										newrecs.add((IComponentIdentifier)rec);
-									}
-								}
-							}
-							else
-							{
-								if(recs instanceof String)
-								{
-//									newrecs.add(cms.createComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent(), null));
-									newrecs.add(new ComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent()));
-								}
-								else if(recs instanceof IComponentIdentifier)
-								{
-									newrecs.add((IComponentIdentifier)recs);
-								}
-								else
-								{
-									throw new RuntimeException("Receiver nulls.");
-								}
-							}
-							msg.put(ri, newrecs);
-						}
-						
-						String[] params	= mt.getParameterNames();
-						for(int i=0; params!=null && i<params.length; i++)
-						{
-							if(thread.hasPropertyValue(params[i]) && !params[i].equals(ri))
-							{
-								msg.put(params[i], thread.getPropertyValue(params[i]));
-							}
-						}
-						
-						String[] paramsets	= mt.getParameterSetNames();
-						for(int i=0; paramsets!=null && i<paramsets.length; i++)
-						{
-							if(thread.hasPropertyValue(paramsets[i]) && !paramsets[i].equals(ri))
-							{
-								msg.put(paramsets[i], thread.getPropertyValue(paramsets[i]));
-							}
-						}
-						
-						// todo: implement me on gui layer
-						byte[] codecids;
-						String tmp = (String)thread.getPropertyValue(PROPERTY_CODECIDS);
-						if(tmp!=null)
-						{
-							StringTokenizer stok = new StringTokenizer(tmp, ",");
-							codecids = new byte[stok.countTokens()];
-							for(int i=0; stok.hasMoreTokens(); i++)
-								codecids[i] = Byte.parseByte(stok.nextToken());
-						}
-						else
-						{
-							codecids	= null;
-						}
-						
-						thread.setWaiting(true);
-						ms.sendMessage(msg, mt, instance.getComponentIdentifier(), instance.getModel().getResourceIdentifier(), null, codecids)
-							.addResultListener(new IResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-								getBpmnFeature(instance).notify(activity, thread, null);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								thread.setException(exception);
-								getBpmnFeature(instance).notify(activity, thread, null);
-							}
-						});
+						newrecs.add(new ComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent()));
 					}
-				}));
+					else if(rec instanceof IComponentIdentifier)
+					{
+						newrecs.add((IComponentIdentifier)rec);
+					}
+				}
 			}
-		}));
+			else
+			{
+				if(recs instanceof String)
+				{
+//									newrecs.add(cms.createComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent(), null));
+					newrecs.add(new ComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent()));
+				}
+				else if(recs instanceof IComponentIdentifier)
+				{
+					newrecs.add((IComponentIdentifier)recs);
+				}
+				else
+				{
+					throw new RuntimeException("Receiver nulls.");
+				}
+			}
+			msg.put(ri, newrecs);
+		}
+		
+		String[] params	= mt.getParameterNames();
+		for(int i=0; params!=null && i<params.length; i++)
+		{
+			if(thread.hasPropertyValue(params[i]) && !params[i].equals(ri))
+			{
+				msg.put(params[i], thread.getPropertyValue(params[i]));
+			}
+		}
+		
+		String[] paramsets	= mt.getParameterSetNames();
+		for(int i=0; paramsets!=null && i<paramsets.length; i++)
+		{
+			if(thread.hasPropertyValue(paramsets[i]) && !paramsets[i].equals(ri))
+			{
+				msg.put(paramsets[i], thread.getPropertyValue(paramsets[i]));
+			}
+		}
+		
+		// todo: implement me on gui layer
+		byte[] codecids;
+		String tmp = (String)thread.getPropertyValue(PROPERTY_CODECIDS);
+		if(tmp!=null)
+		{
+			StringTokenizer stok = new StringTokenizer(tmp, ",");
+			codecids = new byte[stok.countTokens()];
+			for(int i=0; stok.hasMoreTokens(); i++)
+				codecids[i] = Byte.parseByte(stok.nextToken());
+		}
+		else
+		{
+			codecids	= null;
+		}
+		
+		thread.setWaiting(true);
+		ms.sendMessage(msg, mt, instance.getComponentIdentifier(), instance.getModel().getResourceIdentifier(), null, codecids)
+			.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				getBpmnFeature(instance).notify(activity, thread, null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				thread.setException(exception);
+				getBpmnFeature(instance).notify(activity, thread, null);
+			}
+		});
 	}
 	
 	/**
