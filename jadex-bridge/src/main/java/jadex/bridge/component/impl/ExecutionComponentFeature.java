@@ -733,15 +733,32 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				stepfut	= step.getFirstEntity().execute(component);
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
 				// Todo: fail fast vs robust components.
 				
 				if(!step.getSecondEntity().hasResultListener())
 				{
-					StringWriter	sw	= new StringWriter();
-					e.printStackTrace(new PrintWriter(sw));
-					getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+					// Wait for delayed listener addition.
+					waitForDelay(1000, true)
+						.addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+							if(!step.getSecondEntity().hasResultListener())
+							{
+								StringWriter	sw	= new StringWriter();
+								e.printStackTrace(new PrintWriter(sw));
+								getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// shouldn't happen:
+							exception.printStackTrace();
+						}
+					});
 				}
 				
 				step.getSecondEntity().setException(e);
@@ -755,20 +772,37 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 					if(!step.getSecondEntity().hasResultListener())
 					{
-						((Future<Object>)step.getSecondEntity()).addResultListener(new IResultListener<Object>()
+						// Wait for delayed listener addition.
+						waitForDelay(1000, true)
+							.addResultListener(new IResultListener<Void>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(Void result)
 							{
-								getComponent().getLogger().warning("No listener for component step: "+step.getFirstEntity());
+								if(!step.getSecondEntity().hasResultListener())
+								{
+									((Future<Object>)step.getSecondEntity()).addResultListener(new IResultListener<Object>()
+									{
+										public void resultAvailable(Object result)
+										{
+											getComponent().getLogger().warning("No listener for component step: "+step.getFirstEntity());
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											// Todo: fail fast vs robust components.
+											
+											StringWriter	sw	= new StringWriter();
+											exception.printStackTrace(new PrintWriter(sw));
+											getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+										}
+									});
+								}
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								// Todo: fail fast vs robust components.
-								
-								StringWriter	sw	= new StringWriter();
-								exception.printStackTrace(new PrintWriter(sw));
-								getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+								// shouldn't happen:
+								exception.printStackTrace();
 							}
 						});
 					}
