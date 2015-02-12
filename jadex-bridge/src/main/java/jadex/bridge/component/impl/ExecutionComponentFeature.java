@@ -22,6 +22,7 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.Executor;
@@ -50,6 +51,12 @@ import java.util.logging.Logger;
  */
 public class ExecutionComponentFeature	extends	AbstractComponentFeature implements IExecutionFeature, IInternalExecutionFeature, IExecutable
 {
+	//-------- constants --------
+	
+	/** Debug flag. */
+	// Hack!!! Non-final to be setable from Starter 
+	public static boolean DEBUG = false;
+	
 	//-------- attributes --------
 	
 	/** The component steps. */
@@ -103,6 +110,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	//-------- IExecutionFeature interface --------
 	
+	// for debugging: remember stack trace of stack addition
+	protected Map<IComponentStep<?>, Exception>	stepadditions;
+	
 	/**
 	 *  Execute a component step.
 	 */
@@ -124,6 +134,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					steps	= new LinkedList<Tuple2<IComponentStep<?>,Future<?>>>();
 				}
 				steps.add(new Tuple2<IComponentStep<?>, Future<?>>(step, ret));
+				
+				if(DEBUG)
+				{
+					if(stepadditions==null)
+					{
+						stepadditions	= new HashMap<IComponentStep<?>, Exception>();
+					}
+					stepadditions.put(step, new DebugException(step.toString()));
+				}
 			}
 		}
 
@@ -157,6 +176,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					isteps	= new LinkedList<Tuple2<IComponentStep<?>,Future<?>>>();
 				}
 				isteps.add(new Tuple2<IComponentStep<?>, Future<?>>(step, ret));
+				
+				if(DEBUG)
+				{
+					if(stepadditions==null)
+					{
+						stepadditions	= new HashMap<IComponentStep<?>, Exception>();
+					}
+					stepadditions.put(step, new DebugException(step.toString()));
+				}
 			}
 		}
 
@@ -244,8 +272,22 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								ret.setResult(null);
 								return IFuture.DONE;
+							}
+							
+							public String toString()
+							{
+								return "waitForDelay("+getComponent().getComponentIdentifier()+")";
+							}
+						}).addResultListener(new DelegationResultListener<Void>(ret)
+						{
+							public void exceptionOccurred(Exception exception)
+							{
+								// Ignore outdated timer entries when component is already dead.
+								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
+								{
+									super.exceptionOccurred(exception);									
+								}
 							}
 						});
 					}
@@ -750,6 +792,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 								StringWriter	sw	= new StringWriter();
 								e.printStackTrace(new PrintWriter(sw));
 								getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+								
+								if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+								{
+									stepadditions.get(step.getFirstEntity()).printStackTrace();
+								}
 							}
 						}
 						
@@ -785,6 +832,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										public void resultAvailable(Object result)
 										{
 											getComponent().getLogger().warning("No listener for component step: "+step.getFirstEntity());
+											
+											if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+											{
+												stepadditions.get(step.getFirstEntity()).printStackTrace();
+											}
 										}
 										
 										public void exceptionOccurred(Exception exception)
@@ -794,6 +846,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 											StringWriter	sw	= new StringWriter();
 											exception.printStackTrace(new PrintWriter(sw));
 											getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+											
+											if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+											{
+												stepadditions.get(step.getFirstEntity()).printStackTrace();
+											}
 										}
 									});
 								}
@@ -814,6 +871,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					StringWriter	sw	= new StringWriter();
 					e.printStackTrace(new PrintWriter(sw));
 					getComponent().getLogger().severe("Component step listener failed: "+step.getFirstEntity()+"\n"+sw);
+					
+					if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+					{
+						stepadditions.get(step.getFirstEntity()).printStackTrace();
+					}
 				}
 			}
 			

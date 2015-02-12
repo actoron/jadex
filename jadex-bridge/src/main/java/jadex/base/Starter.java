@@ -11,6 +11,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -112,6 +113,9 @@ public class Starter
 	/** The debug futures services argument. */
 	public static final String DEBUGSERVICES = "debugservices";
 	
+	/** The debug futures services argument. */
+	public static final String DEBUGSTEPS = "debugsteps";
+	
 	/** The stack compaction disable flag argument. */
 	public static final String NOSTACKCOMPACTION = "nostackcompaction";
 	
@@ -141,6 +145,7 @@ public class Starter
 		RESERVED.add(PERSIST);
 		RESERVED.add(DEBUGFUTURES);
 		RESERVED.add(DEBUGSERVICES);
+		RESERVED.add(DEBUGSTEPS);
 		RESERVED.add(NOSTACKCOMPACTION);
 		RESERVED.add(OPENGL);
 		RESERVED.add(DEFTIMEOUT);
@@ -602,6 +607,10 @@ public class Starter
 		else if(DEBUGSERVICES.equals(key) && "true".equals(val))
 		{
 			MethodInvocationInterceptor.DEBUG = true;
+		}
+		else if(DEBUGSTEPS.equals(key) && "true".equals(val))
+		{
+			ExecutionComponentFeature.DEBUG = true;
 		}
 		else if(DEFTIMEOUT.equals(key))
 		{

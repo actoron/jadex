@@ -110,9 +110,14 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 											}
 											else
 											{
-												// pass exception back to result provider as receiver is already dead.
-												throw (ComponentTerminatedException)exception;
+												// pass exception back to future functionality as receiver is already dead.
+												listener.exceptionOccurred(exception);
 											}
+										}
+										else
+										{
+											// shouldn't happen?
+											exception.printStackTrace();
 										}
 									}
 								});

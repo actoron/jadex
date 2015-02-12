@@ -1138,11 +1138,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			if(cnt==num)
 			{
-				if(future instanceof ISubscriptionIntermediateFuture)
-				{
-					System.out.println("dfsguhp");
-				}
-				
 				IntermediateFuture ifut = (IntermediateFuture)future;
 				cnt++;
 				if(fini)

@@ -14,11 +14,11 @@ public class ComponentTerminatedException	extends RuntimeException
 	//-------- constructors --------
 	
 	/**
-	 *  Simple constructor for deserialization.
+	 *  Empty constructor for deserialization.
 	 */
-	public ComponentTerminatedException(String message)
+	public ComponentTerminatedException()
 	{
-		super(message);
+		super();
 	}
 	
 	/**
