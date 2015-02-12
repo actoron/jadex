@@ -3,12 +3,12 @@ package jadex.webservice.examples.ws.quote;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
@@ -39,7 +39,7 @@ public class UserAgent
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The gui. */
 	protected JFrame	f;
@@ -90,7 +90,7 @@ public class UserAgent
 							public IFuture<Object> execute(IInternalAccess ia)
 							{
 								final Future<Object> ret = new Future<Object>();
-								IFuture<IQuoteService> fut = ia.getServiceContainer().getRequiredService("quoteservice");
+								IFuture<IQuoteService> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("quoteservice");
 								fut.addResultListener(new ExceptionDelegationResultListener<IQuoteService, Object>(ret)
 								{
 									public void customResultAvailable(IQuoteService qs)

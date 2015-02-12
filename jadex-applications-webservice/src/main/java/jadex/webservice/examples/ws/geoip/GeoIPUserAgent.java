@@ -1,16 +1,16 @@
 package jadex.webservice.examples.ws.geoip;
 
-import java.net.InetAddress;
-
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.RestServiceAgent;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.webservice.examples.ws.geoip.gen.GeoIP;
+
+import java.net.InetAddress;
 
 
 /**
@@ -29,7 +29,7 @@ public class GeoIPUserAgent extends RestServiceAgent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IGeoIPService> fut = agent.getServiceContainer().getRequiredService("geoipservice");
+		IFuture<IGeoIPService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("geoipservice");
 		fut.addResultListener(new DefaultResultListener<IGeoIPService>()
 		{
 			public void resultAvailable(IGeoIPService gs)

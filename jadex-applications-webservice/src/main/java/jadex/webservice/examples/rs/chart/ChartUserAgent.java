@@ -3,7 +3,6 @@ package jadex.webservice.examples.rs.chart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.RestServiceAgent;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
@@ -47,7 +46,7 @@ public class ChartUserAgent extends RestServiceAgent
 				{
 					public void windowClosing(WindowEvent e)
 					{
-						agent.killAgent();
+						agent.killComponent();
 					}
 				});
 				ret.setResult(null);

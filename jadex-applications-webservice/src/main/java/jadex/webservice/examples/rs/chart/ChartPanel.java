@@ -3,6 +3,7 @@ package jadex.webservice.examples.rs.chart;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.PropertiesPanel;
@@ -106,7 +107,7 @@ public class ChartPanel extends JPanel
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							IFuture<IChartService> csfut = ia.getServiceContainer().getRequiredService("chartservice");
+							IFuture<IChartService> csfut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("chartservice");
 							csfut.addResultListener(new SwingDefaultResultListener<IChartService>()
 							{
 								public void customResultAvailable(IChartService chartservice)
