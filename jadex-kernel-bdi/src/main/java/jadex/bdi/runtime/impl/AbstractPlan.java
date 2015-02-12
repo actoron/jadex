@@ -40,7 +40,9 @@ import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SReflect;
@@ -543,7 +545,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 *  Get the service container.
 	 *  @return The service container.
 	 */
-	public IServiceContainer getServiceContainer()
+	public IRequiredServicesFeature/*hack to reduce compile errors*/ getServiceContainer()
 	{
 		return new ServiceContainerProxy(getInterpreter(), getRCapability()); 
 	}

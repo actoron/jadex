@@ -2,8 +2,8 @@ package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -135,7 +135,7 @@ public interface ICapability	extends IElement
 	 *  Get the container
 	 *  @return The container.
 	 */
-	public IServiceContainer getServiceContainer();
+	public IInternalAccess getServiceContainer();
 	
 	/**
 	 *  Get the current time.

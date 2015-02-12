@@ -5,6 +5,7 @@ import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -29,7 +30,7 @@ public class WaitForSpaceObjectTaskTask	implements ITask
 		Object	objectid	= context.getParameterValue("objectid");
 		Object	taskid	= context.getParameterValue("taskid");
 		space.addTaskListener(taskid, objectid, 
-			process.createResultListener(new DelegationResultListener(ret)));
+			process.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 		
 		return ret;
 	}

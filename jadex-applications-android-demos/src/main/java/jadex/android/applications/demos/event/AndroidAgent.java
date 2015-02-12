@@ -1,13 +1,15 @@
 package jadex.android.applications.demos.event;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -25,8 +27,13 @@ import android.util.Log;
 @RequiredServices({
 		@RequiredService(name="androidcontext", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 })
-public class AndroidAgent extends MicroAgent
+@Agent
+public class AndroidAgent
 {
+	/** This field is injected by jadex. */
+	@Agent
+	protected IInternalAccess	agent;
+	
 	//-------- methods --------
 	
 	/**
@@ -34,7 +41,7 @@ public class AndroidAgent extends MicroAgent
 	 */
 	public IFuture<Void> executeBody()
 	{
-		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying hello!");
+		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying hello!");
 		return new Future<Void>();
 	}
 	
@@ -45,7 +52,7 @@ public class AndroidAgent extends MicroAgent
 	 */
 	public IFuture<Void> agentKilled()
 	{
-		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying goodbye!");
+		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying goodbye!");
 		return IFuture.DONE;
 	}
 
@@ -55,7 +62,7 @@ public class AndroidAgent extends MicroAgent
 	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
 		if (msg.get(SFipa.CONTENT).equals("ping")) {
-			showAndroidMessage(getAgentName() + ": pong");
+			showAndroidMessage(agent.getComponentIdentifier().getLocalName()  + ": pong");
 		}
 	}
 	
@@ -69,7 +76,8 @@ public class AndroidAgent extends MicroAgent
 	{
 		final ShowToastEvent event = new ShowToastEvent();
 		event.setMessage(msg);
-		getRequiredService("androidcontext").addResultListener(new DefaultResultListener<Object>() {
+		agent.getComponentFeature(IRequiredServicesFeature.class)
+			.getRequiredService("androidcontext").addResultListener(new DefaultResultListener<Object>() {
 
 			public void resultAvailable(Object result) {
 				IContextService contextService = (IContextService) result;

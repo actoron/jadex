@@ -27,7 +27,6 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Binding;
-import jadex.platform.service.cms.IntermediateResultListener;
 
 import java.io.File;
 import java.util.Collection;
@@ -253,13 +252,13 @@ public class AndroidChatService extends JadexPlatformService
 	private IFuture<Void> subscribe()
 	{
 		final Future<Void> fut = new Future<Void>();
-		SServiceProvider.getService(platform.getServiceProvider(), IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(platform, IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener<IChatGuiService>()
 				{
 					public void resultAvailable(IChatGuiService service)
 					{
 						chatgui = service;
-						subscription = chatgui.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents();
+						subscription = chatgui.subscribeToEvents();
 						subscription.addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
 						{
 							public void intermediateResultAvailable(ChatEvent ce)
@@ -363,7 +362,7 @@ public class AndroidChatService extends JadexPlatformService
 	private IFuture<Void> sendMessage(final String message)
 	{
 		final Future<Void> fut = new Future<Void>();
-		SServiceProvider.getService(platform.getServiceProvider(), IChatGuiService.class, Binding.SCOPE_PLATFORM).addResultListener(
+		SServiceProvider.getService(platform, IChatGuiService.class, Binding.SCOPE_PLATFORM).addResultListener(
 				new DefaultResultListener<IChatGuiService>()
 				{
 					public void resultAvailable(IChatGuiService chat)

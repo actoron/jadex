@@ -5,7 +5,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -15,14 +17,13 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
-import jadex.micro.PojoMicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class PojoAgentCreationAgent
 	
 	/** The agent. */
 	@Agent
-	protected MicroAgent	agent;
+	protected IInternalAccess	agent;
 	
 	/** Maximum number of agents to create. */
 	@AgentArgument
@@ -164,12 +165,12 @@ public class PojoAgentCreationAgent
 										public IFuture<Void> execute(final IInternalAccess ia)
 										{
 											final Future<Void> ret = new Future<Void>();
-											ia.getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 											{
 												public void customResultAvailable(IClockService result)
 												{
-													((PojoAgentCreationAgent)((PojoMicroAgent)ia).getPojoAgent())
+													((PojoAgentCreationAgent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent())
 														.deletePeers(max, result.getTime(), dur, pera, omem, upera);
 													ret.setResult(null);
 												}
@@ -266,9 +267,9 @@ public class PojoAgentCreationAgent
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				agent.setResultValue("microcreationtime", new Tuple(""+pera, "s"));
-				agent.setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
-				agent.setResultValue("micromem", new Tuple(""+upera, "kb"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 				agent.killComponent();
 			}
 		});
@@ -276,12 +277,12 @@ public class PojoAgentCreationAgent
 	
 	protected IFuture<IComponentManagementService>	getCMS()
 	{
-		return agent.getServiceContainer().searchServiceUpwards(IComponentManagementService.class);
+		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 	
 	
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getServiceContainer().searchServiceUpwards(IClockService.class);
+		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 }

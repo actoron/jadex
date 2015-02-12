@@ -1,19 +1,14 @@
 package jadex.android.applications.demos.bpmn.tasks;
 
-import jadex.bpmn.model.task.annotation.Task;
-import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.annotation.RequiredService;
-import jadex.platform.service.context.ContextService;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -38,7 +33,7 @@ public class ShowActivityWithResultTask implements ITask, Serializable
 	public IFuture<Void> execute(ITaskContext taskContext, IInternalAccess process)
 	{
 		// retrieve service that is set as required in workflow definition
-		IFuture<Object> requiredService = process.getServiceContainer().getRequiredService("androidcontext");
+		IFuture<Object> requiredService = process.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("androidcontext");
 		IContextService contextService = (IContextService) requiredService.get();
 		// get task attributes
 //		android.content.Context androidContext = (android.content.Context)taskContext.getParameterValue("androidContext");

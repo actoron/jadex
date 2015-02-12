@@ -3,6 +3,7 @@ package jadex.android.exampleproject.simple;
 import jadex.android.exampleproject.MyEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -48,7 +49,7 @@ public class MyAgent
 		MyEvent myEvent = new MyEvent();
 		myEvent.setMessage(txt);
 		
-		IContextService	cs	= agent.getServiceContainer().searchService(IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IContextService	cs	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		cs.dispatchEvent(myEvent).get();
 	}

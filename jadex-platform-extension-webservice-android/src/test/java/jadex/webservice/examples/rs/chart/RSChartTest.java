@@ -41,7 +41,7 @@ public class RSChartTest
 	public void testAccessRestService() throws InterruptedException
 	{
 		ThreadSuspendable sus = new ThreadSuspendable();
-		IFuture<IChartService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<IChartService> fut = SServiceProvider.getService(extAcc, IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		IChartService hs = fut.get(sus);
 		double[][] data = new double[][] {{30, 50, 20, 90}, {55, 88, 11, 14}};
 		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get(sus);

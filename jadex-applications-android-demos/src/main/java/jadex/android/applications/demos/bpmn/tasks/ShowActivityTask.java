@@ -1,19 +1,16 @@
 package jadex.android.applications.demos.bpmn.tasks;
 
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.IFuture;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
-
-import android.content.Intent;
 
 @Task(description="Show an activity on the screen", parameters={
 		@TaskParameter(name="androidContext", clazz=android.content.Context.class, direction=TaskParameter.DIRECTION_IN, description="The context of the Android application, used to activate the activity."),
@@ -28,7 +25,7 @@ public class ShowActivityTask extends AbstractTask
 		System.out.println("ShowActivityTask: activityClass=" + ((Class)taskContext.getParameterValue("activityClass")).getName());
 		
 		// retrieve service that is set as required in workflow definition
-		IFuture<Object> requiredService = process.getServiceContainer().getRequiredService("androidcontext");
+		IFuture<Object> requiredService = process.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("androidcontext");
 		IContextService contextService = (IContextService) requiredService.get();
 		
 		// get task attributes

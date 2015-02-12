@@ -5,6 +5,7 @@ import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -76,7 +77,7 @@ public class CreateSpaceObjectTaskTask	implements	ITask
 	public IFuture cancel(final IInternalAccess instance)
 	{
 		final Future ret = new Future();
-		creationFuture.addResultListener(instance.createResultListener(new IResultListener()
+		creationFuture.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

@@ -7,7 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -26,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import android.util.Log;
@@ -209,8 +208,8 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			{
 				Future<S> ret = new Future<S>();
 				SServiceProvider
-						.getService((IServiceProvider)ia.getServiceContainer(), serviceClazz, scope)
-						.addResultListener(ia.createResultListener(new DelegationResultListener<S>(ret)));
+						.getService(ia, serviceClazz, scope)
+						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<S>(ret)));
 
 				return ret;
 			}

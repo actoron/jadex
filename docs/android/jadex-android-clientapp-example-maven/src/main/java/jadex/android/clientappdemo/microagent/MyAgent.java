@@ -1,11 +1,15 @@
 package jadex.android.clientappdemo.microagent;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
@@ -25,13 +29,18 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Service
-public class MyAgent extends MicroAgent implements IAgentInterface
+@Agent
+public class MyAgent	implements IAgentInterface
 {
+	/** This field is injected by jadex. */
+	@Agent
+	protected IInternalAccess	agent;
 	
 	//-------- methods --------
 	/**
 	 *  Called when the agent is started.
 	 */
+	@AgentBody
 	public IFuture<Void> executeBody()
 	{
 		return new Future<Void>();
@@ -40,9 +49,10 @@ public class MyAgent extends MicroAgent implements IAgentInterface
 	/**
 	 *  Called when the agent is killed.
 	 */
+	@AgentKilled
 	public IFuture<Void> agentKilled()
 	{
-		callAgent("This is Agent <<" + this.getAgentName() + ">> saying goodbye!");
+		callAgent("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying goodbye!");
 		return IFuture.DONE;
 	}
 
@@ -55,11 +65,9 @@ public class MyAgent extends MicroAgent implements IAgentInterface
 	@Override
 	public void callAgent(String message)
 	{
-		IContextService contextService = (IContextService) getRequiredService("context").get();
+		IContextService contextService = (IContextService) agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("context").get();
 		MyEvent myEvent = new MyEvent();
 		myEvent.setMessage("I was called with: " + message);
 		contextService.dispatchEvent(myEvent);
 	}
-	
-	
 }

@@ -33,12 +33,10 @@ import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.search.LocalServiceRegistry;
@@ -46,8 +44,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
@@ -70,8 +66,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.kernelbase.DefaultPersistInfo;
-import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
@@ -245,7 +239,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 //	protected Set eal;
 	
 	/** The service container. */
-	protected IServiceContainer container;
+	protected IInternalAccess container;
 	
 	/** The cms future for init return. */
 	protected Future inited;
@@ -1747,7 +1741,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  Create the service container.
 	 *  @return The service container.
 	 */
-	public IServiceContainer getServiceContainer()
+	public IInternalAccess getServiceContainer()
 	{
 //		assert container!=null;
 		if(container==null)
@@ -2149,7 +2143,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  Create the service container.
 	 *  @return The service conainer.
 	 */
-	public IServiceContainer createServiceContainer()
+	public IInternalAccess createServiceContainer()
 	{
 		assert container==null;
 		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess(), isRealtime(), getServiceRegistry());

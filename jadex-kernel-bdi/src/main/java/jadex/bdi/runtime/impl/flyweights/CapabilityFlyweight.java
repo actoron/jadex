@@ -19,11 +19,11 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -413,7 +413,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get the service container.
 	 *  @return The service container.
 	 */
-	public IServiceContainer getServiceContainer()
+	public IInternalAccess getServiceContainer()
 	{
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{

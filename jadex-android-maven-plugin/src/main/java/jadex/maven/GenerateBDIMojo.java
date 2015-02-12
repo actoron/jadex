@@ -421,7 +421,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 
 				try
 				{
-					model = (BDIModel) modelLoader.loadModel(relativePath, imports, inputCl, new Object[]
+					model = (BDIModel) modelLoader.loadModel(relativePath, imports, inputCl, inputCl, new Object[]
 					{rid, null});
 				}
 				catch (Throwable t)
