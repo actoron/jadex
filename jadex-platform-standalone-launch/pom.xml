@@ -86,16 +86,11 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-gpmn</artifactId>
-			<version>${project.version}</version>
-		</dependency>		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-component</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
-		<!-- BDI kernel -->
+		<!-- BDI kernel - ->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdibpmn</artifactId>
@@ -112,7 +107,19 @@
 			<version>${project.version}</version>
 		</dependency>
 		
-	
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-gpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-tools-bdi</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
+		-->
+			
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdiv3</artifactId>
@@ -138,11 +145,6 @@
 			<artifactId>jadex-runtimetools-swing</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-tools-bdi</artifactId>
-			<version>${project.version}</version>
-		</dependency>		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-tools-bpmn</artifactId>
