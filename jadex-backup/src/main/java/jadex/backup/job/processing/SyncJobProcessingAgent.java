@@ -14,8 +14,11 @@ import jadex.backup.resource.IResourceService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -27,7 +30,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -80,7 +82,7 @@ public class SyncJobProcessingAgent
 
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected IInternalAccess agent;
 	
 	/** The job. */
 	@AgentArgument
@@ -110,7 +112,7 @@ public class SyncJobProcessingAgent
 
 		this.resservices = new ArrayList<IResourceService>();
 		
-		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -127,7 +129,7 @@ public class SyncJobProcessingAgent
 					{
 						public void customResultAvailable(IComponentIdentifier cid) 
 						{
-							agent.getServiceContainer().getService(ILocalResourceService.class, cid)
+							agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILocalResourceService.class, cid)
 								.addResultListener(new ExceptionDelegationResultListener<ILocalResourceService, Void>(ret)
 							{
 								public void customResultAvailable(ILocalResourceService result)
@@ -157,7 +159,7 @@ public class SyncJobProcessingAgent
 	{
 		final long delay = 20000;
 		
-		agent.scheduleStep(new IComponentStep<Void>()
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -170,7 +172,7 @@ public class SyncJobProcessingAgent
 				// search remote resource services (if none available)
 				if(resservices.size()==0)
 				{
-					agent.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+					agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 						.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
 					{
 						public void intermediateResultAvailable(IResourceService result)
@@ -228,13 +230,13 @@ public class SyncJobProcessingAgent
 								public void resultAvailable(Void result)
 								{
 									System.out.println("waiting...");
-									agent.waitForDelay(delay, self, false);
+									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, self, false);
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
 									System.out.println("waiting...");
-									agent.waitForDelay(delay, self, false);
+									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, self, false);
 								}
 							});	
 						}
@@ -248,7 +250,7 @@ public class SyncJobProcessingAgent
 					public void exceptionOccurred(Exception exception) 
 					{
 						System.out.println("waiting... (no sync partner): "+agent.getComponentIdentifier());
-						agent.waitForDelay(delay, self, false);
+						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, self, false);
 					}
 				});
 				
@@ -321,7 +323,7 @@ public class SyncJobProcessingAgent
 				System.out.println("finished sync scan");
 				if(!autoupdate)
 				{
-					SServiceProvider.getService(agent.getServiceProvider(), IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(agent, IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new IResultListener<IJobManagementService>()
 					{
 						public void resultAvailable(IJobManagementService js)
@@ -558,7 +560,7 @@ public class SyncJobProcessingAgent
 	 */
 	protected void publishEvent(AJobProcessingEvent event)
 	{
-		JobProcessingService jps = (JobProcessingService)agent.getServiceContainer().getProvidedServiceRawImpl(IJobProcessingService.class);
+		JobProcessingService jps = (JobProcessingService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(IJobProcessingService.class);
 		jps.publishEvent(event);
 	}
 	

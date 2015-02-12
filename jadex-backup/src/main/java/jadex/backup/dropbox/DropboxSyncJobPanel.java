@@ -529,7 +529,7 @@ public class DropboxSyncJobPanel extends JPanel
 		final IdTreeNode<List<IResourceService>> root = new IdTreeNode<List<IResourceService>>("root", "root", tm, false, null, null, null);
 		tm.setRoot(root);
 		
-		IIntermediateFuture<IResourceService> fut = SServiceProvider.getServices(ea.getServiceProvider(), IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+		IIntermediateFuture<IResourceService> fut = SServiceProvider.getServices(ea, IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 		fut.addResultListener(new SwingIntermediateResultListener<IResourceService>(new IntermediateDefaultResultListener<IResourceService>()
 		{
 			public void intermediateResultAvailable(IResourceService result)
@@ -568,7 +568,7 @@ public class DropboxSyncJobPanel extends JPanel
 	{
 		final Future<IJobProcessingService> ret = new Future<IJobProcessingService>();
 		
-		SServiceProvider.getServices(ea.getServiceProvider(), IJobProcessingService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+		SServiceProvider.getServices(ea, IJobProcessingService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(new IIntermediateResultListener<IJobProcessingService>()
 		{
 			public void intermediateResultAvailable(final IJobProcessingService jps)

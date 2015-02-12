@@ -147,7 +147,7 @@ public class ResourceTreeModel	implements TreeModel
 			if(ROOT.equals(node))
 			{
 				final List<Tuple2<FileMetaInfo, IResourceService>>	found	= new ArrayList<Tuple2<FileMetaInfo, IResourceService>>();
-				IIntermediateFuture<IResourceService>	fut	= SServiceProvider.getServices(ea.getServiceProvider(), IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+				IIntermediateFuture<IResourceService>	fut	= SServiceProvider.getServices(ea, IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 				fut.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
 				{
 					public void intermediateResultAvailable(final IResourceService remote)

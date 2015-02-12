@@ -220,7 +220,7 @@ public class JobsPanel extends JPanel
 			{
 				System.out.println("job: "+job);
 				detailsp.removeTabAt(detailsp.indexOfTab("New Job"));
-                SServiceProvider.getService(ea.getServiceProvider(), IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+                SServiceProvider.getService(ea, IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
                     .addResultListener(new DefaultResultListener<IJobManagementService>()
                 {
                     public void resultAvailable(IJobManagementService js)
@@ -286,7 +286,7 @@ public class JobsPanel extends JPanel
 		
 		// todo: terminate subscription on shutdown
 		
-		SServiceProvider.getService(ea.getServiceProvider(), IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(ea, IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<IJobManagementService>()
 		{
 			public void resultAvailable(IJobManagementService js)
@@ -404,7 +404,7 @@ public class JobsPanel extends JPanel
 	 */
 	protected void removeJob(IExternalAccess ea, final Job job)
 	{
-		SServiceProvider.getService(ea.getServiceProvider(), IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(ea, IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<IJobManagementService>()
 		{
 			public void resultAvailable(IJobManagementService js)

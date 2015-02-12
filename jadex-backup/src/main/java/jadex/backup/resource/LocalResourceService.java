@@ -1,6 +1,7 @@
 package jadex.backup.resource;
 
 import jadex.bridge.IInputConnection;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.Tuple2;
@@ -30,7 +31,7 @@ public class LocalResourceService	implements ILocalResourceService
 	
 	/** The component. */
 	@ServiceComponent
-	protected MicroAgent	agent;
+	protected IInternalAccess	agent;
 	
 	//-------- ILocalResourceService interface --------
 	

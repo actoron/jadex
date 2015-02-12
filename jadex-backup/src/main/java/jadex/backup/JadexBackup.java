@@ -64,7 +64,7 @@ public class JadexBackup
 		
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		IExternalAccess	platform	= Starter.createPlatform(newargs).get(sus);
-		IComponentManagementService	cms	= SServiceProvider.getService(platform.getServiceProvider(),
+		IComponentManagementService	cms	= SServiceProvider.getService(platform,
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
 		Map<String, Object> baargs = new HashMap<String, Object>();
 		baargs.put("cmdargs", (String[])bargs.toArray(new String[bargs.size()]));

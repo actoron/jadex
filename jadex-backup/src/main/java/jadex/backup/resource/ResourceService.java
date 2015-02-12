@@ -1,6 +1,7 @@
 package jadex.backup.resource;
 
 import jadex.bridge.IInputConnection;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -21,7 +22,7 @@ public class ResourceService	implements IResourceService
 	
 	/** The component. */
 	@ServiceComponent
-	protected MicroAgent	agent;
+	protected IInternalAccess	agent;
 	
 	/** The resource provider agent. */
 	protected ResourceProviderAgent	rpa;

@@ -5,10 +5,12 @@ import jadex.backup.job.Job;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -72,7 +74,7 @@ public class JobManagementService implements IJobManagementService
 		this.jobs = new LinkedHashMap<String, Job>();
 		this.jobagents = new HashMap<String, IExternalAccess>();
 
-		String[] cmdargs = (String[])agent.getArguments().get("cmdargs");
+		String[] cmdargs = (String[])agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("cmdargs");
 		if(cmdargs!=null)
 		{
 			for(int i=0; i<cmdargs.length; i++)
@@ -119,7 +121,7 @@ public class JobManagementService implements IJobManagementService
 		
 		saveSettings(cfgfile);
 		
-		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
