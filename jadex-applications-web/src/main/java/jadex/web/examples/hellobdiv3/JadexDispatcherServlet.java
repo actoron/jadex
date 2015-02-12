@@ -49,7 +49,7 @@ public class JadexDispatcherServlet extends HttpServlet
 		};
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		this.platform	= Starter.createPlatform(args).get(sus, 30000);
-		IComponentManagementService cms = SServiceProvider.getService(platform.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus, 30000);
+		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus, 30000);
 		cms.createComponent("jadex.web.examples.hellobdiv3.SayHelloBDI.class", null).getFirstResult(sus);
 	}
 	
@@ -71,7 +71,7 @@ public class JadexDispatcherServlet extends HttpServlet
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		ThreadSuspendable	sus	= new ThreadSuspendable();
-		ISayHelloService shs = SServiceProvider.getService(platform.getServiceProvider(), ISayHelloService.class).get(sus, 30000);
+		ISayHelloService shs = SServiceProvider.getService(platform, ISayHelloService.class).get(sus, 30000);
 		String text = shs.sayHello().get(sus, 30000);
 		request.setAttribute("text", text);
 		

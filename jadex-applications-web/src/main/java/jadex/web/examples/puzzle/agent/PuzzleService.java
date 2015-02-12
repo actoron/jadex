@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
@@ -69,7 +70,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		exta	= agent.getExternalAccess();
 		entries	= new HashMap<Integer, SortedSet<HighscoreEntry>>();
 		
-		agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
@@ -97,7 +98,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		
 		// Does not work, because capability service container no longer available after component cleanup. 
 //		agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-		SServiceProvider.getService(exta.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(exta, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
@@ -221,7 +222,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)

@@ -62,7 +62,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		int	timeout	= 30000;
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		platform	= Starter.createPlatform(args).get(sus, timeout);
-		puzzle	= SServiceProvider.getService(platform.getServiceProvider(), IPuzzleService.class).get(sus, timeout);
+		puzzle	= SServiceProvider.getService(platform, IPuzzleService.class).get(sus, timeout);
 	}
 	
 	/**
@@ -200,7 +200,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			}
 			
 			// Save platform settings in case of server crash
-			ISettingsService	settings	= SServiceProvider.getService(platform.getServiceProvider(), ISettingsService.class).get(sus, timeout);
+			ISettingsService	settings	= SServiceProvider.getService(platform, ISettingsService.class).get(sus, timeout);
 			settings.saveProperties().get(sus, timeout);
 			
 			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";

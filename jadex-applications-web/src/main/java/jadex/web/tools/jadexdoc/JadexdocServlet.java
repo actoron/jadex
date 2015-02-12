@@ -32,7 +32,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -224,7 +223,7 @@ public class JadexdocServlet extends HttpServlet
 		{
 			public void customResultAvailable(final IExternalAccess ea)
 			{
-				SServiceProvider.getService(ea.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(ea, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Collection<IModelInfo>>(ret)
 				{
 					public void customResultAvailable(ILibraryService ls)
