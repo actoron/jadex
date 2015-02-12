@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
@@ -244,8 +245,9 @@ public class InitiatorAgent extends TestAgent
 						{
 							MethodInfo mi = new MethodInfo(ITestService.class.getMethod("methodA", new Class[]{long.class}));
 							System.out.println("service: "+ts);
-							INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
-							Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
+							Long lat = (Long)SNFPropertyProvider.getRequiredMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ts).getServiceIdentifier(), mi, LatencyProperty.NAME).get();
+//							INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
+//							Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
 							System.out.println("latency: "+lat);
 							// Test is ok if latency could be fetched.
 							// todo? Could also test if local latency is faster than remote

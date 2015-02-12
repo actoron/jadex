@@ -4,8 +4,6 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
-import jadex.bridge.component.INFPropertyComponentFeature;
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;

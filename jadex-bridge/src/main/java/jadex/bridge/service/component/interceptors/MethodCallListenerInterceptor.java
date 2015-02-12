@@ -74,17 +74,17 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 							
 						public void finished()
 						{
-							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 						
 						public void resultAvailable(Collection<Object> result)
 						{
-							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 					};
 					

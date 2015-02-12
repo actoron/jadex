@@ -1,5 +1,6 @@
 package jadex.bridge.sensor.service;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.search.BasicEvaluator;
 import jadex.bridge.sensor.service.WaitqueueProperty;
 import jadex.commons.MethodInfo;
@@ -16,17 +17,17 @@ public class WaitqueueEvaluator extends BasicEvaluator<Integer>
 	/**
 	 *  Create a new evaluator.
 	 */
-	public WaitqueueEvaluator(MethodInfo mi) throws Exception
+	public WaitqueueEvaluator(IExternalAccess component, MethodInfo mi) throws Exception
 	{
-		this(mi, 10);
+		this(component, mi, 10);
 	}
 	
 	/**
 	 *  Create a new evaluator.
 	 */
-	public WaitqueueEvaluator(MethodInfo mi, int max) throws Exception
+	public WaitqueueEvaluator(IExternalAccess component, MethodInfo mi, int max) throws Exception
 	{
-		super(WaitqueueProperty.NAME, mi);
+		super(component, WaitqueueProperty.NAME, mi);
 		this.max = max;
 	}
 	

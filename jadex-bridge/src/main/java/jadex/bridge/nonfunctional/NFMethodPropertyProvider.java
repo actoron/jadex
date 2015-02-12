@@ -1,6 +1,12 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
@@ -19,7 +25,7 @@ import java.util.Set;
 /**
  *  Default implementation for a method property provider.
  */
-public abstract class NFMethodPropertyProvider extends NFPropertyProvider implements INFMixedPropertyProvider
+public class NFMethodPropertyProvider extends NFPropertyProvider implements INFMixedPropertyProvider
 {
 	/** Non-functional properties of methods. */
 	protected Map<MethodInfo, Map<String, INFProperty<?, ?>>> methodnfproperties;
@@ -31,6 +37,14 @@ public abstract class NFMethodPropertyProvider extends NFPropertyProvider implem
 //	{
 //		super(parent);
 //	}
+	
+	/**
+	 *  Create a new provider.
+	 */
+	public NFMethodPropertyProvider(IComponentIdentifier parent, IInternalAccess component)
+	{
+		super(parent, component);
+	}
 	
 	/**
 	 *  Returns meta information about a non-functional properties of all methods.
@@ -93,19 +107,21 @@ public abstract class NFMethodPropertyProvider extends NFPropertyProvider implem
 	 *  Returns the names of all non-functional properties of this method.
 	 *  @return The names of the non-functional properties of this method.
 	 */
-	public IFuture<String[]> getMethodNFAllPropertyNames(MethodInfo method)
+	// todo: does this method makes sense because on parent it invokes getNFAllPropertyNames?
+	public IFuture<String[]> getMethodNFAllPropertyNames(final MethodInfo method)
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		final String[] myprops = nfmap != null? nfmap.keySet().toArray(new String[nfproperties.size()]) : new String[0];
 		
-		getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, String[]>(ret)
+		if(getParentId()!=null)
 		{
-			public void customResultAvailable(INFPropertyProvider parent)
+			IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
-				if(parent!=null)
+				public void customResultAvailable(IExternalAccess component) 
 				{
-					parent.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
+					SNFPropertyProvider.getNFAllPropertyNames(component).addResultListener(new DelegationResultListener<String[]>(ret)
 					{
 						public void customResultAvailable(String[] result)
 						{
@@ -122,12 +138,42 @@ public abstract class NFMethodPropertyProvider extends NFPropertyProvider implem
 						}
 					});
 				}
-				else
-				{
-					ret.setResult(myprops);
-				}
-			}
-		});
+			});
+		}
+		else
+		{
+			ret.setResult(myprops);		
+		}
+		
+//		getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, String[]>(ret)
+//		{
+//			public void customResultAvailable(INFPropertyProvider parent)
+//			{
+//				if(parent!=null)
+//				{
+//					parent.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
+//					{
+//						public void customResultAvailable(String[] result)
+//						{
+//							Set<String> tmp = new LinkedHashSet<String>();
+//							for(String p: result)
+//							{
+//								tmp.add(p);
+//							}
+//							for(String p: myprops)
+//							{
+//								tmp.add(p);
+//							}
+//							ret.setResult((String[])tmp.toArray(new String[tmp.size()]));
+//						}
+//					});
+//				}
+//				else
+//				{
+//					ret.setResult(myprops);
+//				}
+//			}
+//		});
 			
 		return ret;
 	}
@@ -158,7 +204,7 @@ public abstract class NFMethodPropertyProvider extends NFPropertyProvider implem
 		Future<T> ret = new Future<T>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		INFProperty<T, ?> prop = (INFProperty<T, ?>) (nfmap != null? nfmap.get(name) : null);
-		if (prop != null)
+		if(prop != null)
 		{
 			try
 			{

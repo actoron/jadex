@@ -1,10 +1,13 @@
 package jadex.micro.testcases.nflatency;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -50,12 +53,15 @@ public class UserAgent
 				
 				ITerminableIntermediateFuture<ITestService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
 				Collection<ITestService> tss = sfut.get();
+				INFPropertyComponentFeature nfp = agent.getComponentFeature(INFPropertyComponentFeature.class);
 				if(tss.size()>0)
 				{
 					ITestService ts = tss.iterator().next();
 					ts.methodA(100).get();
-					INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
-					Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
+					Long lat = (Long)nfp.getRequiredServicePropertyProvider(((IService)ts).getServiceIdentifier()).getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
+//					Long lat = (Long)SNFPropertyProvider.getRequiredMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ts).getServiceIdentifier(), mi, LatencyProperty.NAME).get();
+//					INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
+//					Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
 					System.out.println("latency: "+lat);
 				}
 			}

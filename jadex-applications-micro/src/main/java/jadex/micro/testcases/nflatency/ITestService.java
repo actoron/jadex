@@ -1,5 +1,8 @@
 package jadex.micro.testcases.nflatency;
 
+import jadex.bridge.nonfunctional.annotation.NFProperties;
+import jadex.bridge.nonfunctional.annotation.NFProperty;
+import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.commons.future.IFuture;
 
 /**

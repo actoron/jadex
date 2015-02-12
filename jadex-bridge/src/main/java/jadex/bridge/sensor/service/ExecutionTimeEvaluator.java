@@ -1,5 +1,6 @@
 package jadex.bridge.sensor.service;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.search.BasicEvaluator;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.commons.MethodInfo;
@@ -13,17 +14,17 @@ public class ExecutionTimeEvaluator extends BasicEvaluator<Long>
 	/**
 	 *  Create a new evaluator.
 	 */
-	public ExecutionTimeEvaluator(MethodInfo mi) throws Exception
+	public ExecutionTimeEvaluator(IExternalAccess component, MethodInfo mi) throws Exception
 	{
-		super(ExecutionTimeProperty.NAME, mi);
+		super(component, ExecutionTimeProperty.NAME, mi);
 	}
 	
 	/**
 	 *  Create a new evaluator.
 	 */
-	public ExecutionTimeEvaluator(MethodInfo mi, boolean required) throws Exception
+	public ExecutionTimeEvaluator(IExternalAccess component, MethodInfo mi, boolean required) throws Exception
 	{
-		super(ExecutionTimeProperty.NAME, mi, null, required);
+		super(component, ExecutionTimeProperty.NAME, mi, null, required);
 	}
 	
 	/**

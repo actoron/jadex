@@ -882,7 +882,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 									INFMixedPropertyProvider nfpp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(service.getServiceIdentifier());
 									
 									List<NFRPropertyInfo> nfprops = info.getNFRProperties();
-									if(nfprops!=null)
+									if(nfprops!=null && nfprops.size()>0)
 									{
 										for(NFRPropertyInfo nfprop: nfprops)
 										{

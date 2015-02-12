@@ -1,8 +1,5 @@
 package jadex.bridge.component.impl;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.INFPropertyComponentFeature;
@@ -19,18 +16,14 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ProvidedServicesComponentFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -73,6 +66,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	public NFPropertyComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
+		this.maxreq = 100; // todo: make configurable
 	}
 	
 	/**
@@ -150,43 +144,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	{
 		if(compprovider==null)
 		{
-			this.compprovider = new NFPropertyProvider() 
-			{
-				public IInternalAccess getInternalAccess() 
-				{
-					return getComponent();
-				}
-				
-				public IFuture<INFPropertyProvider> getParent()
-				{
-					final Future<INFPropertyProvider> ret = new Future<INFPropertyProvider>();
-					final IComponentIdentifier pacid = getComponent().getComponentIdentifier().getParent();
-
-					if(parent!=null)
-					{
-						ret.setResult(parent);
-					}
-					else if(pacid!=null)
-					{
-						IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-						cms.getExternalAccess(pacid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyProvider>(ret) 
-						{
-							public void customResultAvailable(IExternalAccess exta) 
-							{
-								exta.scheduleStep(new IComponentStep<INFPropertyProvider>() 
-								{
-									public IFuture<INFPropertyProvider> execute(IInternalAccess ia) 
-									{
-										INFPropertyComponentFeature nff = ia.getComponentFeature(INFPropertyComponentFeature.class);
-										return new Future<INFPropertyProvider>(nff.getComponentPropertyProvider());
-									}
-								}).addResultListener(new DelegationResultListener<INFPropertyProvider>(ret)); 
-							}
-						});
-					}
-					return ret;
-				}
-			};
+			this.compprovider = new NFPropertyProvider(getComponent().getComponentIdentifier().getParent(), getComponent()); 
 		}
 		
 		return compprovider;
@@ -216,20 +174,9 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		ret = reqserprops.get(sid);
 		if(ret==null)
 		{
-			ret = new NFMethodPropertyProvider() 
-			{
-				public IInternalAccess getInternalAccess() 
-				{
-					return getComponent();
-				}
-				
-				// parent of required service property?
-				public IFuture<INFPropertyProvider> getParent()
-				{
-					return new Future<INFPropertyProvider>((INFMixedPropertyProvider)null);
-				}
-			}; 
+			ret = new NFMethodPropertyProvider(null, getComponent()); 
 			reqserprops.put(sid, ret);
+//			System.out.println("created req ser provider: "+sid+" "+hashCode());
 		}
 		return ret;
 	}
@@ -255,18 +202,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		ret = proserprops.get(sid);
 		if(ret==null)
 		{
-			ret = new NFMethodPropertyProvider() 
-			{
-				public IInternalAccess getInternalAccess() 
-				{
-					return getComponent();
-				}
-				
-				public IFuture<INFPropertyProvider> getParent()
-				{
-					return new Future<INFPropertyProvider>(compprovider);
-				}
-			}; 
+			ret = new NFMethodPropertyProvider(getComponent().getComponentIdentifier(), getComponent()); 
 			proserprops.put(sid, ret);
 		}
 		return ret;

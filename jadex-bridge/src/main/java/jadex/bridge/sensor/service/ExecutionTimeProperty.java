@@ -49,20 +49,7 @@ public class ExecutionTimeProperty extends TimedProperty
 		{
 			this.sid = service.getServiceIdentifier();
 		
-			SServiceProvider.getService(comp, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new IResultListener<IClockService>()
-			{
-				public void resultAvailable(IClockService result)
-				{
-					ExecutionTimeProperty.this.clock = result;
-	//				System.out.println("assigned clock");
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					comp.getLogger().warning("Could not fetch time service in property.");
-				}
-			});
+			clock = SServiceProvider.getLocalService(comp, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		
 			if(Proxy.isProxyClass(service.getClass()))
 			{

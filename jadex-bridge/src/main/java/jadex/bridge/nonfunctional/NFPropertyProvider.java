@@ -1,10 +1,15 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -19,10 +24,14 @@ import java.util.Set;
 /**
  *  Base impl for nf property property provider.
  */
-public abstract class NFPropertyProvider implements INFPropertyProvider
+public class NFPropertyProvider implements INFPropertyProvider
 {
 	/** The parent. */
 //	protected INFPropertyProvider nfparent;
+	protected IComponentIdentifier parent;
+	
+	/** The component. */
+	protected IInternalAccess component;
 	
 	/** Non-functional properties. */
 	protected Map<String, INFProperty<?, ?>> nfproperties;
@@ -30,8 +39,10 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	/**
 	 *  Create a new provider.
 	 */
-	public NFPropertyProvider()
+	public NFPropertyProvider(IComponentIdentifier parent, IInternalAccess component)
 	{
+		this.parent = parent;
+		this.component = component;
 	}
 	
 //	/**
@@ -59,13 +70,15 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		final String[] myprops = nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
-		getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, String[]>(ret)
+		
+		if(getParentId()!=null)
 		{
-			public void customResultAvailable(INFPropertyProvider parent)
+			IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
-				if(parent!=null)
+				public void customResultAvailable(IExternalAccess component) 
 				{
-					parent.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
+					SNFPropertyProvider.getNFAllPropertyNames(component).addResultListener(new DelegationResultListener<String[]>(ret)
 					{
 						public void customResultAvailable(String[] result)
 						{
@@ -82,12 +95,42 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 						}
 					});
 				}
-				else
-				{
-					ret.setResult(myprops);
-				}
-			}
-		});
+			});
+		}
+		else
+		{
+			ret.setResult(myprops);
+		}
+		
+//		getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, String[]>(ret)
+//		{
+//			public void customResultAvailable(INFPropertyProvider parent)
+//			{
+//				if(parent!=null)
+//				{
+//					parent.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
+//					{
+//						public void customResultAvailable(String[] result)
+//						{
+//							Set<String> tmp = new LinkedHashSet<String>();
+//							for(String p: result)
+//							{
+//								tmp.add(p);
+//							}
+//							for(String p: myprops)
+//							{
+//								tmp.add(p);
+//							}
+//							ret.setResult((String[])tmp.toArray(new String[tmp.size()]));
+//						}
+//					});
+//				}
+//				else
+//				{
+//					ret.setResult(myprops);
+//				}
+//			}
+//		});
 			
 		return ret;
 	}
@@ -132,20 +175,21 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 		}
 		else 
 		{
-			getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, INFPropertyMetaInfo>(ret)
+			if(getParentId()!=null)
 			{
-				public void customResultAvailable(INFPropertyProvider parent)
+				IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
 				{
-					if(parent!=null)
+					public void customResultAvailable(IExternalAccess component) 
 					{
-						parent.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+						SNFPropertyProvider.getNFPropertyMetaInfo(component, name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 					}
-					else
-					{
-						ret.setException(new RuntimeException("Property not found: "+name));
-					}
-				}
-			});
+				});
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Property not found: "+name));
+			}
 		}
 		
 		return ret;
@@ -176,21 +220,22 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 		}
 		else 
 		{
-			getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, T>(ret)
+			if(getParentId()!=null)
 			{
-				public void customResultAvailable(INFPropertyProvider parent)
+				IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
-					if(parent!=null)
+					public void customResultAvailable(IExternalAccess component) 
 					{
-						IFuture<T> fut = parent.getNFPropertyValue(name);
-						fut.addResultListener(new DelegationResultListener<T>(ret));
+						IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(component, name);
+						res.addResultListener(new DelegationResultListener<T>(ret));
 					}
-					else
-					{
-						ret.setException(new RuntimeException("Property not found: "+name));
-					}
-				}
-			});
+				});
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Property not found: "+name));
+			}
 		}	
 		
 		return ret;
@@ -223,21 +268,22 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 		}
 		else 
 		{
-			getParent().addResultListener(new ExceptionDelegationResultListener<INFPropertyProvider, T>(ret)
+			if(getParentId()!=null)
 			{
-				public void customResultAvailable(INFPropertyProvider parent)
+				IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
-					if(parent!=null)
+					public void customResultAvailable(IExternalAccess component) 
 					{
-						IFuture<T> fut = parent.getNFPropertyValue(name, unit);
-						fut.addResultListener(new DelegationResultListener<T>(ret));
+						IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(component, name, unit);
+						res.addResultListener(new DelegationResultListener<T>(ret));
 					}
-					else
-					{
-						ret.setException(new RuntimeException("Property not found: "+name));
-					}
-				}
-			});
+				});
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Property not found: "+name));
+			}
 		}	
 		
 		return ret;
@@ -314,7 +360,18 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	 *  Get the parent.
 	 *  return The parent.
 	 */
-	public abstract IFuture<INFPropertyProvider> getParent();
+//	public abstract IFuture<INFPropertyProvider> getParent();
+//	public abstract Object getParent();
+	
+//	public final IFuture<INFPropertyProvider> getParent()
+//	{
+//		return null;
+//	}
+	
+	public IComponentIdentifier getParentId()
+	{
+		return parent;
+	}
 	
 //	/**
 //	 *  Get the parent.
@@ -358,5 +415,8 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	/**
 	 *  Get the internal access.
 	 */
-	public abstract IInternalAccess getInternalAccess();
+	public IInternalAccess getInternalAccess()
+	{
+		return component;
+	}
 }

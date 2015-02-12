@@ -633,8 +633,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			{
 				handler.addFirstServiceInterceptor(new ResolveInterceptor());
 			}
-			// Todo
-//			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
+			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
 			handler.addFirstServiceInterceptor(new ValidationInterceptor(ia));
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 			{
@@ -709,7 +708,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, false, true));
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 			// service.getServiceIdentifier().getServiceType()
-			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports())}, handler); 
+//			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports())}, handler); 
+			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports())}, handler); 
 		
 			// todo: think about orders of decouping interceptors
 			// if we want the decoupling return interceptor to schedule back on an external caller actual order must be reversed
