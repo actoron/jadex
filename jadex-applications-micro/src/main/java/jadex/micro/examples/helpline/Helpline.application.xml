@@ -20,11 +20,12 @@
 		<componenttype name="HelplineAgent" filename="jadex/micro/examples/helpline/HelplineAgent.class"/>
 	</componenttypes>
 	
-	<properties>
+	<!--<properties>
 		<property name="clock" class="IFuture">
-			SServiceProvider.getService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			 SServiceProvider.getService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM) 
+			SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 		</property>
-	</properties>
+	</properties>-->
 	
 	<configurations>
 		<configuration name="1 Helpline Agent">
@@ -34,9 +35,9 @@
 						<argument name="infos">
 							new InformationEntry[]
 							{
-								new InformationEntry("Lennie Lost", "First aid given at Hummel square.", $properties.clock.getTime()-2*60*60*1000),
-								new InformationEntry("Lennie Lost", "Brought to collection point.", $properties.clock.getTime()-1*60*60*1000),
-								new InformationEntry("Lennie Lost", "Savely reached Mainville Hospital.", $properties.clock.getTime())
+								new InformationEntry("Lennie Lost", "First aid given at Hummel square.", ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()-2*60*60*1000),
+								new InformationEntry("Lennie Lost", "Brought to collection point.", ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()-1*60*60*1000),
+								new InformationEntry("Lennie Lost", "Savely reached Mainville Hospital.", ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime())
 							}
 						</argument>
 					</arguments>
