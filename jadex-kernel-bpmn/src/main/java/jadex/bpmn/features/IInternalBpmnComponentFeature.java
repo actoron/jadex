@@ -13,7 +13,13 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
  * 
  */
 public interface IInternalBpmnComponentFeature
-{
+{	
+	/** Constant for step event. */
+	public static final String TYPE_ACTIVITY = "activity";
+	
+	/** The change event prefix denoting a thread event. */
+	public static final String	TYPE_THREAD	= "thread";
+	
 	/**
 	 *  Test if the given context variable is declared.
 	 *  @param name	The variable name.

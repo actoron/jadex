@@ -86,11 +86,11 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBpmnComponentFeature.class, BpmnComponentFeature.class,
 		new Class<?>[]{IRequiredServicesFeature.class, IProvidedServicesFeature.class, ISubcomponentsFeature.class}, null);
 	
-	/** Constant for step event. */
-	public static final String TYPE_ACTIVITY = "activity";
-	
-	/** The change event prefix denoting a thread event. */
-	public static final String	TYPE_THREAD	= "thread";
+//	/** Constant for step event. */
+//	public static final String TYPE_ACTIVITY = "activity";
+//	
+//	/** The change event prefix denoting a thread event. */
+//	public static final String	TYPE_THREAD	= "thread";
 	
 	/** The activity execution handlers (activity type -> handler). */
 	public static final Map<String, IActivityHandler> DEFAULT_ACTIVITY_HANDLERS;

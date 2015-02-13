@@ -1,10 +1,9 @@
 package jadex.bpmn.tools.ui;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
@@ -224,7 +223,7 @@ public class ProcessViewPanel extends JPanel
 						}
 					}
 				}
-				else if(event.getType().endsWith(BpmnInterpreter.TYPE_THREAD))
+				else if(event.getType().endsWith(IInternalBpmnComponentFeature.TYPE_THREAD))
 				{
 					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
 					{
@@ -240,7 +239,7 @@ public class ProcessViewPanel extends JPanel
 						threadinfos.add(event.getProperty("details"));
 					}
 				}
-				else if(event.getType().endsWith(BpmnInterpreter.TYPE_ACTIVITY))
+				else if(event.getType().endsWith(IInternalBpmnComponentFeature.TYPE_ACTIVITY))
 				{
 					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 					{

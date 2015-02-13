@@ -1,11 +1,14 @@
 package jadex.bridge.nonfunctional.hardconstraints;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -15,6 +18,9 @@ import jadex.commons.future.IResultListener;
  */
 public abstract class AbstractConstraintFilter<T> implements IAsyncFilter<T>
 {
+	/** The component. */
+	protected IExternalAccess component;
+	
 	/** Name of the property being kept constant. */
 	protected String propname;
 	
@@ -31,8 +37,9 @@ public abstract class AbstractConstraintFilter<T> implements IAsyncFilter<T>
 	/**
 	 *  Creates a constant value filter.
 	 */
-	public AbstractConstraintFilter(String propname, Object value)
+	public AbstractConstraintFilter(IExternalAccess component, String propname, Object value)
 	{
+		this.component = component;
 		this.propname = propname;
 		this.value = value;
 	}
@@ -43,26 +50,33 @@ public abstract class AbstractConstraintFilter<T> implements IAsyncFilter<T>
 	 */
 	public final IFuture<Boolean> filter(final T service)
 	{
-		if (getValue() == null)
-		{
+		if(getValue() == null)
 			return IFuture.TRUE;
-		}
 		
 		final Future<Boolean> ret = new Future<Boolean>();
-		INFMixedPropertyProvider prov = ((INFMixedPropertyProvider)((IService)service).getExternalComponentFeature(INFPropertyComponentFeature.class));
-//		((IService)service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
-		prov.getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+		SNFPropertyProvider.getNFPropertyValue(component, ((IService)service).getServiceIdentifier(), propname)
+			.addResultListener(new ExceptionDelegationResultListener<Object, Boolean>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				doFilter((IService) service, result).addResultListener(new DelegationResultListener<Boolean>(ret));
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
 		});
+//		
+//		INFMixedPropertyProvider prov = ((INFMixedPropertyProvider)((IService)service).getExternalComponentFeature(INFPropertyComponentFeature.class));
+////		((IService)service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+//		prov.getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				doFilter((IService) service, result).addResultListener(new DelegationResultListener<Boolean>(ret));
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
 		return ret;
 	}
 	

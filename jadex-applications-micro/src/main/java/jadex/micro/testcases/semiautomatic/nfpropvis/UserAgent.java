@@ -116,7 +116,7 @@ public class UserAgent
 		// no one will ever use it again
 		
 		ranker = new ComposedEvaluator<ICryptoService>();
-		AverageEvaluator eva = new AverageEvaluator(new WaitqueueEvaluator(new MethodInfo(ICryptoService.class.getMethod("encrypt", new Class[]{String.class}))));
+		AverageEvaluator eva = new AverageEvaluator(new WaitqueueEvaluator(agent.getExternalAccess(), new MethodInfo(ICryptoService.class.getMethod("encrypt", new Class[]{String.class}))));
 		ranker.addEvaluator(eva);
 //		ranker.addEvaluator(new ExecutionTimeEvaluator(new MethodInfo(IAService.class.getMethod("test", new Class[0]))));
 		

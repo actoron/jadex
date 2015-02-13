@@ -1,14 +1,18 @@
 package jadex.bridge.nonfunctional.hardconstraints;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.ComposedRemoteFilter;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -25,6 +29,9 @@ import java.util.List;
  */
 public class RHardConstraints
 {
+	/** The component. */
+	protected IExternalAccess component;
+	
 	/** Hard constraint model */
 	protected Collection<MHardConstraint> constraintmodel;
 	
@@ -39,10 +46,11 @@ public class RHardConstraints
 	 * 
 	 *  @param mhc The declared model hard constraints.
 	 */
-	public RHardConstraints(Collection<MHardConstraint> mhc)
+	public RHardConstraints(IExternalAccess component, Collection<MHardConstraint> constraintmodel)
 	{
-		constraintmodel = mhc;
-		for (MHardConstraint hc : mhc)
+		this.component = component;
+		this.constraintmodel = constraintmodel;
+		for(MHardConstraint hc : constraintmodel)
 		{
 			if (MHardConstraint.CONSTANT.equals(hc.getOperator()))
 			{
@@ -179,14 +187,12 @@ public class RHardConstraints
 					{
 						final ConstantValueFilter filter = unboundconstantfilters.get(i);
 						
-						INFMixedPropertyProvider prov = ((INFMixedPropertyProvider)((IService)service).getExternalComponentFeature(INFPropertyComponentFeature.class));
-//						((IService)service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
-						prov.getMethodNFPropertyValue(method, filter.getValueName()).addResultListener(new IResultListener<Object>()
-//						service.getMethodNFPropertyValue(method, filter.getValueName()).addResultListener(new IResultListener<Object>()
+						SNFPropertyProvider.getMethodNFPropertyValue(component, ((IService)service).getServiceIdentifier(), method, filter.getValueName())
+							.addResultListener(new IResultListener<Object>()
 						{
 							public void resultAvailable(Object result)
 							{
-								if (filter.getValue() == null)
+								if(filter.getValue() == null)
 								{
 									filter.bind(result);
 									boundconstantfilters.add(filter);
@@ -199,6 +205,27 @@ public class RHardConstraints
 								constantrl.exceptionOccurred(exception);
 							}
 						});
+						
+//						INFMixedPropertyProvider prov = ((INFMixedPropertyProvider)((IService)service).getExternalComponentFeature(INFPropertyComponentFeature.class));
+//						((IService)service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+//						prov.getMethodNFPropertyValue(method, filter.getValueName()).addResultListener(new IResultListener<Object>()
+////						service.getMethodNFPropertyValue(method, filter.getValueName()).addResultListener(new IResultListener<Object>()
+//						{
+//							public void resultAvailable(Object result)
+//							{
+//								if (filter.getValue() == null)
+//								{
+//									filter.bind(result);
+//									boundconstantfilters.add(filter);
+//								}
+//								filter.filter(service).addResultListener(constantrl);
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								constantrl.exceptionOccurred(exception);
+//							}
+//						});
 					}
 					
 					return filterret;

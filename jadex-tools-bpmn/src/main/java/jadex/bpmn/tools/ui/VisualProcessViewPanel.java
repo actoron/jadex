@@ -11,10 +11,10 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VSubProcess;
+import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.ComponentTerminatedException;
@@ -406,7 +406,7 @@ public class VisualProcessViewPanel extends JPanel
 							}
 						}
 					}
-					else if(event.getType().endsWith(BpmnInterpreter.TYPE_THREAD))
+					else if(event.getType().endsWith(IInternalBpmnComponentFeature.TYPE_THREAD))
 					{
 						ProcessThreadInfo pti = (ProcessThreadInfo)event.getProperty("details");
 						if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
@@ -426,7 +426,7 @@ public class VisualProcessViewPanel extends JPanel
 							ptmodel.updateValue(pti);
 						}
 					}
-					else if(event.getType().endsWith(BpmnInterpreter.TYPE_ACTIVITY))
+					else if(event.getType().endsWith(IInternalBpmnComponentFeature.TYPE_ACTIVITY))
 					{
 						if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 						{

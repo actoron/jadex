@@ -1,12 +1,13 @@
 package jadex.bdi.tutorial;
 
+
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
@@ -63,7 +64,7 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 			// Search a translation agent.
 			while(ta==null)
 			{
-				IDF	dfservice	= (IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getServiceContainer(), IDF.class).get(this);
+				IDF	dfservice	= (IDF)SServiceProvider.getLocalService(getServiceContainer(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				
 				// Create a service description to search for.
 				IDFServiceDescription sd = dfservice.createDFServiceDescription(null, "translate english_german", null);

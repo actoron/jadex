@@ -53,7 +53,7 @@ public class ServiceSearchAgent
 	{
 		final Future<Void> done = new Future<Void>();
 		final ComposedEvaluator ce = new ComposedEvaluator();
-		ce.addEvaluator(new BasicEvaluator<Double>("fakecpuload")
+		ce.addEvaluator(new BasicEvaluator<Double>(agent.getExternalAccess(), "fakecpuload")
 		{
 			public double calculateEvaluation(Double propertyvalue)
 			{
@@ -61,7 +61,7 @@ public class ServiceSearchAgent
 			}
 		});
 		
-		ce.addEvaluator(new BasicEvaluator<Double>("fakereliability")
+		ce.addEvaluator(new BasicEvaluator<Double>(agent.getExternalAccess(), "fakereliability")
 		{
 			public double calculateEvaluation(Double propertyvalue)
 			{
@@ -69,7 +69,7 @@ public class ServiceSearchAgent
 			}
 		});
 		
-		ce.addEvaluator(new BasicEvaluator<Long>("fakefreemem", MemoryUnit.MB)
+		ce.addEvaluator(new BasicEvaluator<Long>(agent.getExternalAccess(), "fakefreemem", MemoryUnit.MB)
 		{
 			public double calculateEvaluation(Long propertyvalue)
 			{
@@ -77,7 +77,7 @@ public class ServiceSearchAgent
 			}
 		});
 		
-		ce.addEvaluator(new BasicEvaluator<Long>("fakenetworkbandwith", MemoryUnit.MB)
+		ce.addEvaluator(new BasicEvaluator<Long>(agent.getExternalAccess(), "fakenetworkbandwith", MemoryUnit.MB)
 		{
 			public double calculateEvaluation(Long propertyvalue)
 			{

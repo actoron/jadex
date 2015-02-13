@@ -1,6 +1,7 @@
 package jadex.bpmn.tools.ui;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.ICommand;
 import jadex.commons.ISteppable;
 
@@ -92,13 +93,13 @@ public class ExecutionControlPanel extends JPanel
 	 *  @param rs	The rule system.
 	 *  @return	The frame.
 	 */
-	public static JFrame createBpmnFrame(String title, BpmnInterpreter instance, ISteppable steppable)
+	public static JFrame createBpmnFrame(String title, IInternalAccess instance, ISteppable steppable)
 	{
 		JFrame f = new JFrame(title);
 		f.getContentPane().setLayout(new BorderLayout());
 		ProcessViewPanel vp = new ProcessViewPanel(instance.getExternalAccess(), null);
 		ExecutionControlPanel ep = new ExecutionControlPanel(steppable);
-		ActivityPanel ap = new ActivityPanel(instance.getModelElement(), steppable);
+		ActivityPanel ap = new ActivityPanel((MBpmnModel)instance.getModel().getRawModel(), steppable);
 		JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		sp.add(ap);
 		sp.add(vp);

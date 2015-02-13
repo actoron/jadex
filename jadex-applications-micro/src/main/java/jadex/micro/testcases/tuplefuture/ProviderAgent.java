@@ -24,7 +24,7 @@ public class ProviderAgent implements ITestService
 		Tuple2Future<String, Integer> ret = new Tuple2Future<String, Integer>();
 		ret.setSecondResult(Integer.valueOf(99));
 		ret.setFirstResult("hello");
-//		System.out.println("called method getSomeResults()");
+		System.out.println("called method getSomeResults()");
 		return ret;
 	}
 	
