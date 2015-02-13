@@ -3,6 +3,7 @@ package jadex.bdiv3;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
 import jadex.bdiv3.features.impl.BDIMonitoringComponentFeature;
+import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -13,6 +14,8 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -57,7 +60,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		Arrays.asList(
 			BDIAgentFeature.FACTORY, 
 			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class),
-			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BDIMonitoringComponentFeature.class)
+			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BDIMonitoringComponentFeature.class),
+			new ComponentFeatureFactory(IRequiredServicesFeature.class, BDIRequiredServicesComponentFeature.class)
 		));
 	
 	//-------- attributes --------

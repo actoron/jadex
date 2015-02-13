@@ -96,6 +96,8 @@ public class SComponentFactory
 			}
 		}
 
+		Map<Class<?>, IComponentFeatureFactory> odeps = new HashMap<Class<?>, IComponentFeatureFactory>();
+		
 		for(Collection<IComponentFeatureFactory> facs: facss)
 		{
 			IComponentFeatureFactory last = null;
@@ -105,7 +107,17 @@ public class SComponentFactory
 				if(facsmap.get(fac.getType())==fac)
 				{
 					dr.addNode(fac);
-					if(last!=null)
+					// If overridden old position is used as dependency!
+					if(odeps.containsKey(fac.getType()))
+					{
+						IComponentFeatureFactory odep = odeps.get(fac.getType());
+						if(odep!=null)
+						{
+							dr.addDependency(fac, odep);
+						}
+					}
+					// else order in current list
+					else if(last!=null)
 					{
 						dr.addDependency(fac, last);
 					}
@@ -121,6 +133,11 @@ public class SComponentFactory
 						dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
 					}
 					last = fac;
+				}
+				// Save original dependency of the feature
+				else if(!odeps.containsKey(fac.getType()))
+				{
+					odeps.put(fac.getType(), last);
 				}
 			}
 		}

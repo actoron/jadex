@@ -85,6 +85,8 @@ public class DependencyResolver<T>
 		
 		while(!nodes.isEmpty())
 		{
+			if(nodeps.size()==0)
+				System.out.println("herer");
 			T node = nodeps.iterator().next();
 			ret.add(node);
 			
