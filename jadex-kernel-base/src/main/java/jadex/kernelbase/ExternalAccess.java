@@ -606,7 +606,7 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				ia.getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

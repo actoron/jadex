@@ -623,7 +623,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		{
 			try
 			{
-				getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				getComponent().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

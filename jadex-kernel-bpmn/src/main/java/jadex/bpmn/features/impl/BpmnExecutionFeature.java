@@ -59,7 +59,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 	/**
 	 *  Execute the main activity of the feature.
 	 */
-	public IFuture<Void> body()
+	public IFuture<Void> init()
 	{
 		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
@@ -163,6 +163,14 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
             }
         } 
         
+        return IFuture.DONE;
+	}
+	
+	/**
+	 *  Execute the main activity of the feature.
+	 */
+	public IFuture<Void> body()
+	{
         started = true;
 		
 //		// Use step in case agent is started as suspended.
@@ -193,6 +201,9 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 	 */
 	protected boolean	executeCycle()
 	{
+		if(!started)
+			return false;
+		
 		BpmnComponentFeature bcf = (BpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
 
 		if(!bcf.isFinished() && bcf.isReady())

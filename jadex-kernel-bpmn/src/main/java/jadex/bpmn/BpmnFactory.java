@@ -3,12 +3,14 @@ package jadex.bpmn;
 import jadex.bpmn.features.impl.BpmnComponentFeature;
 import jadex.bpmn.features.impl.BpmnExecutionFeature;
 import jadex.bpmn.features.impl.BpmnMessageComponentFeature;
+import jadex.bpmn.features.impl.BpmnMonitoringComponentFeature;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -53,7 +55,8 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 		Arrays.asList(
 			BpmnComponentFeature.FACTORY,
 			new ComponentFeatureFactory(IExecutionFeature.class, BpmnExecutionFeature.class),
-			BpmnMessageComponentFeature.FACTORY
+			BpmnMessageComponentFeature.FACTORY,
+			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BpmnMonitoringComponentFeature.class)
 		));
 	
 	//-------- attributes --------
