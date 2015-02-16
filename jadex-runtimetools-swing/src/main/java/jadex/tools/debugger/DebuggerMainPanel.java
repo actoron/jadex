@@ -216,18 +216,14 @@ public class DebuggerMainPanel extends JSplitPane
 											
 											public void exceptionOccurred(Exception exception)
 											{
-												// Hack!!! keep tool reactive in case of error!?
-												step.setEnabled(true);
-												run.setEnabled(true);
+												error();
 											}
 										});
 									}
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										// Hack!!! keep tool reactive in case of error!?
-										step.setEnabled(true);
-										run.setEnabled(true);
+										error();
 									}
 								});
 							}
@@ -248,11 +244,11 @@ public class DebuggerMainPanel extends JSplitPane
 						{
 							public void customResultAvailable(final IComponentManagementService ces)
 							{
-								IFuture<Void> ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName(), getStepInfo());
-								ret.addResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result)
-									{
+//								IFuture<Void> ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName(), getStepInfo());
+//								ret.addResultListener(new IResultListener<Void>()
+//								{
+//									public void resultAvailable(Void result)
+//									{
 										IFuture<Void> ret = ces.resumeComponent(DebuggerMainPanel.this.desc.getName()); 
 										ret.addResultListener(new IResultListener<Void>()
 										{
@@ -280,12 +276,12 @@ public class DebuggerMainPanel extends JSplitPane
 										});
 									}
 									
-									public void exceptionOccurred(Exception exception)
-									{
-										error();
-									}
-								});
-							}
+//									public void exceptionOccurred(Exception exception)
+//									{
+//										error();
+//									}
+//								});
+//							}
 						});
 					}
 				});

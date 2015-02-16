@@ -29,12 +29,12 @@ public interface IComponentDescription
 	/** Predefined value "terminated" for slot state. */
 	public static final String  STATE_TERMINATED  = "terminated";
 	
-	/** The ready processing state. */
-	public static final String	PROCESSINGSTATE_READY	= "ready";
-	/** The running processing state. */
-	public static final String	PROCESSINGSTATE_RUNNING	= "running";
-	/** The idle processing state. */
-	public static final String	PROCESSINGSTATE_IDLE	= "idle";
+//	/** The ready processing state. */
+//	public static final String	PROCESSINGSTATE_READY	= "ready";
+//	/** The running processing state. */
+//	public static final String	PROCESSINGSTATE_RUNNING	= "running";
+//	/** The idle processing state. */
+//	public static final String	PROCESSINGSTATE_IDLE	= "idle";
 	
 	//-------- methods --------
 

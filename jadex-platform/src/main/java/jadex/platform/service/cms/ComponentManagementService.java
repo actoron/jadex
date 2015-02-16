@@ -19,6 +19,7 @@ import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -193,47 +194,6 @@ public class ComponentManagementService implements IComponentManagementService
 		this.initinfos.put(access.getInternalAccess().getComponentIdentifier(), new InitInfo(access, null, null));
 	}
     
-//	/**
-//	 *  Get the component instance from an adapter.
-//	 */
-//	public IComponentInterpreter getComponentInstance(IComponentAdapter adapter)
-//	{
-//		return ((StandaloneComponentAdapter)adapter).getComponentInstance();
-//	}
-
-//	/**
-//	 *  Invoke kill on adapter.
-//	 */
-//	public IFuture<Void> killComponent(PlatformComponent adapter)
-//	{
-//		Future<Void> ret = new Future<Void>();
-//		adapter.killComponent()
-//			.addResultListener(new ExceDelegationResultListener<Void>(ret));
-//		return ret;
-//	}
-//
-//	/**
-//	 *  Cancel the execution.
-//	 */
-//	public IFuture<Void> cancel(IComponentAdapter adapter)
-//	{
-//		Future<Void> ret = new Future<Void>();
-//		getExecutionService().cancel((StandaloneComponentAdapter)adapter)
-//			.addResultListener(new DelegationResultListener<Void>(ret));
-//		return ret;
-//	}
-//
-//	/**
-//	 *  Do a step.
-//	 */
-//	public IFuture<Void> doStep(IComponentAdapter adapter)
-//	{
-//		Future<Void> ret = new Future<Void>();
-//		((StandaloneComponentAdapter)adapter).doStep()
-//			.addResultListener(new DelegationResultListener<Void>(ret));
-//		return ret;
-//	}
-	
     //-------- IComponentManagementService interface --------
     
 	/**
@@ -1479,59 +1439,54 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IFuture<Void> suspendComponent(final IComponentIdentifier cid)
 	{
-		final Future<Void> ret = new Future<Void>();
+		IFuture<Void>	ret;
 		
 		if(isRemoteComponent(cid))
 		{
+			final Future<Void> fut = new Future<Void>();
+			ret	= fut;
 			getRemoteCMS(cid).addResultListener(createResultListener(
-				new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+				new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut)
 			{
 				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					rcms.suspendComponent(cid).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
+					rcms.suspendComponent(cid).addResultListener(createResultListener(new DelegationResultListener<Void>(fut)));
 				}
 			}));
+			return ret;
 		}
 		else
 		{
-			CMSComponentDescription desc;
-//			final IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
 			final IPlatformComponentAccess comp = components.get(cid);
-			if(comp==null)
+			if(comp!=null)
 			{
-				ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
-//				ret.setException(new RuntimeException("Component identifier not registered: "+cid));
-				return ret;
-			}
-			
-			// Suspend subcomponents
-			desc = (CMSComponentDescription)((PlatformComponent)comp).getComponentDescription();
-			IComponentIdentifier[] achildren = desc.getChildren();
-//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
-			for(int i=0; i<achildren.length; i++)
-			{
-//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-				IComponentDescription	cdesc	= getDescription(achildren[i]);
-				if(IComponentDescription.STATE_ACTIVE.equals(cdesc.getState()))
+				CMSComponentDescription desc = (CMSComponentDescription)((PlatformComponent)comp).getComponentDescription();
+				if(IComponentDescription.STATE_ACTIVE.equals(desc.getState()))
 				{
-					suspendComponent(achildren[i]);	// todo: cascading suspend with wait.
+					// Suspend subcomponents
+					IComponentIdentifier[] achildren = desc.getChildren();
+					for(int i=0; i<achildren.length; i++)
+					{
+						IComponentDescription	cdesc	= getDescription(achildren[i]);
+						if(IComponentDescription.STATE_ACTIVE.equals(cdesc.getState()))
+						{
+							suspendComponent(achildren[i]);	// todo: cascading suspend with wait.
+						}
+					}					
+					desc.setState(IComponentDescription.STATE_SUSPENDED);
+					notifyListenersChanged(cid, desc);
+					
+					ret	= IFuture.DONE;
+				}
+				else
+				{
+					ret	= new Future<Void>(new IllegalStateException("Component not active: "+cid));
 				}
 			}
-
-			if(!IComponentDescription.STATE_ACTIVE.equals(desc.getState())
-				/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
+			else
 			{
-				ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
-				return ret;
+				ret	= new Future<Void>(new ComponentNotFoundException("Component identifier not registered: "+cid));
 			}
-			
-			desc.setState(IComponentDescription.STATE_SUSPENDED);
-			// todo: fixme
-			ret.setException(new UnsupportedOperationException());
-//			cancel(adapter).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
-//					exeservice.cancel(adapter).addResultListener(new DelegationResultListener(ret));
-			
-			notifyListenersChanged(cid, desc);
 		}
 		
 		return ret;
@@ -1552,7 +1507,6 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IFuture<Void> resumeComponent(final IComponentIdentifier cid, final boolean initresume)
 	{
-//		System.out.println("resume: "+cid);
 		final Future<Void> ret = new Future<Void>();
 		
 		if(isRemoteComponent(cid))
@@ -1589,8 +1543,6 @@ public class ComponentManagementService implements IComponentManagementService
 							// Hack for startup.
 							if(initresume)
 							{
-								boolean	wakeup	= false;
-								Future<Map<String, Object>>	destroy	= null;
 								// Not killed during init.
 								if(!cfs.containsKey(cid))
 								{
@@ -1605,7 +1557,6 @@ public class ComponentManagementService implements IComponentManagementService
 											desc.setState(IComponentDescription.STATE_SUSPENDED);
 											changed	= true;
 										}
-										wakeup	= !suspend;
 									}
 									
 									adapter.body().addResultListener(new IResultListener<Void>()
@@ -1626,46 +1577,28 @@ public class ComponentManagementService implements IComponentManagementService
 								else if(initinfos.containsKey(cid))
 								{
 									removeInitInfo(cid);
-									destroy	= (Future<Map<String, Object>>)cfs.remove(cid);
+									cfs.remove(cid);
 								}									
-								
-								// Todo: suspend/resume in IInternalExecutionFeature?
-//								if(wakeup)
-//								{
-//									try
-//									{
-//										adapter.wakeup();
-//									}
-//									catch(ComponentTerminatedException e)
-//									{
-//										// Ignore when killed in mean time.
-//									}
-//								}
-//								if(destroy!=null)
-//								{
-//									destroyComponent(cid, destroy);
-//								}
 							}
-//							else
-//							{
-//								boolean	wakeup	= false;
-//								if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
-//								{
-//									wakeup	= true;
-//									desc.setState(IComponentDescription.STATE_ACTIVE);
-//									changed	= true;
-//								}
-//								if(wakeup)
-//								{
-//									adapter.wakeup();
-//								}
-//							}
+							else
+							{
+								boolean	wakeup	= false;
+								if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+								{
+									wakeup	= true;
+									desc.setState(IComponentDescription.STATE_ACTIVE);
+									changed	= true;
+								}
+								if(wakeup)
+								{
+									((IInternalExecutionFeature)adapter.getInternalAccess().getComponentFeature(IExecutionFeature.class)).wakeup();
+								}
+							}
 							
 							if(changed)
 								notifyListenersChanged(cid, desc);
 						
 							ret.setResult(null);
-//							ret.setResult(desc);
 						}
 					}
 				}));
@@ -1729,29 +1662,24 @@ public class ComponentManagementService implements IComponentManagementService
 		else
 		{
 			final PlatformComponent adapter = (PlatformComponent)components.get(cid);
-			if(adapter==null)
+			if(adapter!=null)
+			{
+				if(stepinfo!=null)
+				{
+					CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+					if(desc!=null)
+					{
+						desc.setStepInfo(stepinfo);
+					}
+				}
+				
+				((IInternalExecutionFeature)adapter.getComponentFeature(IExecutionFeature.class)).doStep()
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+			}
+			else
 			{
 				ret.setException(new ComponentNotFoundException("Component identifier not registered: "+cid));
-				return ret;
 			}
-			if(!IComponentDescription.STATE_SUSPENDED.equals(adapter.getComponentDescription().getState()))
-			{
-				ret.setException(new RuntimeException("Only suspended components can be stepped: "+cid+" "+adapter.getComponentDescription().getState()));
-				return ret;
-			}
-			
-			if(stepinfo!=null)
-			{
-				CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
-				if(desc!=null)
-				{
-					desc.setStepInfo(stepinfo);
-				}
-			}
-			
-			// todo:
-			ret.setException(new UnsupportedOperationException());
-			//doStep(adapter).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;

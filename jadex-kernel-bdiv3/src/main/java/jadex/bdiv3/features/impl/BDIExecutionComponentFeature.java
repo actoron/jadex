@@ -21,34 +21,24 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 	}
 	
 	/**
-	 *  Execute the executable.
-	 *  @return True, if the object wants to be executed again.
+	 *  Components with autonomous behavior may override this method
+	 *  to implement a recurring execution cycle.
+	 *  @return true, if the execution should continue, false, if the component may become idle. 
 	 */
-	public boolean execute()
+	protected boolean	executeCycle()
 	{
-		// todo: fixme
-//		assert isComponentThread();
+		assert isComponentThread();
 		
-		// Evaluate condition before executing step.
-//		boolean aborted = false;
-//		if(rulesystem!=null)
-//			aborted = rulesystem.processAllEvents(15);
-//		if(aborted)
-//			getCapability().dumpGoals();
-		
+		// Evaluate conditions in addition to executing steps.
+		boolean	again	= false;
 		BDIAgentFeature bdif = (BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class);
-		if(bdif.isInited() && bdif.getRuleSystem()!=null)
+		if(bdif.isInited() && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable())
+		{
 			bdif.getRuleSystem().processAllEvents();
+			again	= true;
+		}
 		
-//		if(steps!=null && steps.size()>0)
-//		{
-//			System.out.println(getComponent().getComponentIdentifier()+" steps: "+steps.size()+" "+steps.get(0));
-//		}
-		boolean ret = super.execute();
-		
-//		System.out.println(getComponentIdentifier()+" after step");
-
-		return ret || (bdif.isInited() && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable());
+		return again;
 	}
 
 	/**

@@ -16,6 +16,7 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
@@ -132,7 +133,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IFuture<Void>	body()
 	{
 		IExecutionFeature exe	= getComponentFeature(IExecutionFeature.class);
-		return exe.scheduleImmediate(new IComponentStep<Void>()
+		return exe.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

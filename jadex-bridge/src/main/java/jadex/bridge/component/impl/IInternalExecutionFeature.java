@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl;
 
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 
 
 /**
@@ -17,6 +18,16 @@ public interface IInternalExecutionFeature
 	
 	//-------- methods --------
 	
+	/**
+	 *  Trigger component execution.
+	 */
+	public void	wakeup();
+
+	/**
+	 *  Do a step of a suspended component.
+	 */
+	public IFuture<Void> doStep();
+
 	/**
 	 *  Block the current thread and allow execution on other threads.
 	 *  @param monitor	The monitor to wait for.

@@ -80,6 +80,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/** The blocked threads by monitor. */
 	protected Map<Object, Executor>	blocked; 
 	
+	/** The flag for a requested step (true when a step is allowed in stepwise execution). */
+	protected boolean	dostep;
+	
+	/** The future to be informed, when the requested step is finished. */
+	protected Future<Void> stepfuture;
+
+	
 	//-------- constructors --------
 	
 	/**
@@ -387,7 +394,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/**
 	 *  Trigger component execution.
 	 */
-	protected void	wakeup()
+	public void	wakeup()
 	{
 		SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IExecutionService>()
@@ -440,6 +447,32 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 			}
 		});
+	}
+	
+	/**
+	 *  Do a step of a suspended component.
+	 */
+	public IFuture<Void> doStep()
+	{
+		Future<Void> ret = new Future<Void>();
+		synchronized(this)
+		{
+			if(!IComponentDescription.STATE_SUSPENDED.equals(getComponent().getComponentDescription().getState()))
+			{
+				ret.setException(new IllegalStateException("Component not suspended: "+getComponent().getComponentIdentifier()));
+			}
+			else if(dostep || stepfuture!=null)
+			{
+				ret.setException(new RuntimeException("Only one step allowed at a time."));
+			}
+			
+			this.dostep	= true;		
+			this.stepfuture = ret;
+		}
+		
+		wakeup();
+		
+		return ret;
 	}
 
 	/**
@@ -584,7 +617,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	protected void	afterBlock()
 	{
 	}
-
 	
 	//-------- IExecutable interface --------
 	
@@ -736,11 +768,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				}
 //			}
 			
-		if(getComponent().getComponentIdentifier().getName().indexOf("B2_Sequence")!=-1)
-		{
-			System.out.println("seough");
-		}
-			
 		final Tuple2<IComponentStep<?>, Future<?>>	step;
 		synchronized(this)
 		{
@@ -752,8 +779,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					isteps	= null;
 				}
 			}
-			else if(steps!=null && IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()))
+			else if(steps!=null && (IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || dostep))
 			{
+				dostep	= false;
 				step	= steps.remove(0);
 				if(steps.isEmpty())
 				{
@@ -766,7 +794,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 		}
 		
-		boolean	again;
+		boolean	hasstep;
 		
 		if(step!=null)
 		{
@@ -881,12 +909,45 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			synchronized(this)
 			{
-				again	= isteps!=null || steps!=null;
+				hasstep	= isteps!=null || steps!=null;
 			}
 		}
 		else
 		{
-			again	= false;
+			hasstep	= false;
+		}
+		
+		boolean	cycle	= false;
+		if(IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || dostep || stepfuture!=null)
+		{
+			try
+			{
+				dostep	= false;
+				cycle	= executeCycle();
+			}
+			catch(Exception e)
+			{
+				// Todo: fail fast vs robust components.
+				
+				StringWriter	sw	= new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				getComponent().getLogger().severe("Component cycle failed:\n"+sw);
+			}				
+		}
+		
+		// In step mode, notify done step, if any.
+		Future<Void>	stepfut	= null;
+		synchronized(this)
+		{
+			if(stepfuture!=null && !dostep)
+			{
+				stepfut	= stepfuture;
+				stepfuture	= null;
+			}
+		}
+		if(stepfut!=null)
+		{
+			stepfut.setResult(null);
 		}
 		
 		// Reset execution state.
@@ -900,7 +961,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		executing	= false;
 		ISuspendable.SUSPENDABLE.set(null);
 
-		return again;
+		return hasstep || cycle;
+	}
+	
+	/**
+	 *  Components with autonomous behavior may override this method
+	 *  to implement a recurring execution cycle.
+	 *  @return true, if the execution should continue, false, if the component may become idle. 
+	 */
+	protected boolean	executeCycle()
+	{
+		return false;
 	}
 	
 	/**

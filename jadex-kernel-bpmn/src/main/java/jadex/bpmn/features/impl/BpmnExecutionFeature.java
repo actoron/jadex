@@ -11,7 +11,6 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -188,67 +187,53 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 	}
 	
 	/**
-	 *  Execute the executable.
-	 *  @return True, if the object wants to be executed again.
+	 *  Components with autonomous behavior may override this method
+	 *  to implement a recurring execution cycle.
+	 *  @return true, if the execution should continue, false, if the component may become idle. 
 	 */
-	public boolean execute()
+	protected boolean	executeCycle()
 	{
-		boolean ret = super.execute();
-		// Hack!
-		this.componentthread = Thread.currentThread();
-		
 		BpmnComponentFeature bcf = (BpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
 
-		try
+		if(!bcf.isFinished() && bcf.isReady())
 		{
-			if(!bcf.isFinished() && bcf.isReady())
+			if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
-				if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-				{
-					getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
-						getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
-						IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
-						System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
-				}
-				
-//				executeStep(pool, lane);
-				executeStep(null, null);
-				
-				if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-				{
-					getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
-						getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
-						IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
-						System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
-				}
+				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
+					getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
+					IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
+					System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 			}
 			
-//			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
+//			executeStep(pool, lane);
+			executeStep(null, null);
 			
-			// todo: started
-			if(!finishing && bcf.isFinished() && !getModel().isKeepAlive() && started 
-				&& getModel().getEventSubProcessStartEvents().isEmpty()) // keep alive also process with event subprocesses
+			if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
-//				System.out.println("terminating: "+getComponentIdentifier());
-				finishing = true;
-//				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
-				
-				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				cms.destroyComponent(getComponent().getComponentIdentifier()); // todo: listener?
+				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
+					getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
+					IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
+					System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 			}
-			
-//			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
-			
-			ret = ret || (!bcf.isFinished() && bcf.isReady());
-		}
-		catch(ComponentTerminatedException ate)
-		{
-			// Todo: fix kernel bug.
-			ate.printStackTrace();
 		}
 		
-		this.componentthread = null;
-		return ret;
+//		System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
+		
+		// todo: started
+		if(!finishing && bcf.isFinished() && !getModel().isKeepAlive() && started 
+			&& getModel().getEventSubProcessStartEvents().isEmpty()) // keep alive also process with event subprocesses
+		{
+//				System.out.println("terminating: "+getComponentIdentifier());
+			finishing = true;
+//				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
+			
+			IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			cms.destroyComponent(getComponent().getComponentIdentifier()); // todo: listener?
+		}
+		
+//			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
+		
+		return !bcf.isFinished() && bcf.isReady();
 	}
 	
 	/**
