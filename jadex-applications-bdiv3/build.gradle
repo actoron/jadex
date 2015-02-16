@@ -12,5 +12,5 @@ dependencies
 	compile 'de.huxhorn.sulky:de.huxhorn.sulky.3rdparty.jlayer:1.0'
 	
 	// Todo: provided?
-	compile 'com.google.code.findbugs:findbugs:2.0.2'	// For suppressing warnings for uninitialized fields
+	//compile 'com.google.code.findbugs:findbugs:2.0.2'	// For suppressing warnings for uninitialized fields
 }
