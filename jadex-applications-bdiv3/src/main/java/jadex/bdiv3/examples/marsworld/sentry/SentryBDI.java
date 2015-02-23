@@ -13,6 +13,7 @@ import jadex.bdiv3.examples.marsworld.BaseBDI;
 import jadex.bdiv3.examples.marsworld.SVector;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.producer.IProduceService;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
@@ -77,7 +78,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 		 */
 		// todo: support directly factadded etc.
 		@GoalCreationCondition(beliefs="movecapa.mytargets")
-		public static AnalyzeTarget checkCreate(SentryBDI outer, ISpaceObject target, IEvent event)
+		public static AnalyzeTarget checkCreate(SentryBDI outer, ISpaceObject target, ChangeEvent event)
 		{
 			if(target==null)// ||  outer.getMoveCapa().isMissionend())
 				return null;
