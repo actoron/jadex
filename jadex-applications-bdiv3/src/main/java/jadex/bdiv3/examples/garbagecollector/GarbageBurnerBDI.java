@@ -8,10 +8,10 @@ import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.commons.SUtil;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
-import jadex.rules.eca.IEvent;
 
 /**
  * 
@@ -57,7 +57,8 @@ public class GarbageBurnerBDI extends BaseAgentBDI
 		 */
 		// todo: support directly factadded etc.
 		@GoalCreationCondition(beliefs="garbages")
-		public static Burn checkCreate(GarbageBurnerBDI outer, ISpaceObject garbage, IEvent event)
+//		public static Burn checkCreate(GarbageBurnerBDI outer, ISpaceObject garbage, IEvent event)
+		public static Burn checkCreate(GarbageBurnerBDI outer, ISpaceObject garbage, ChangeEvent event)
 		{
 			return garbage==null? null: new Burn(outer, garbage);
 		}

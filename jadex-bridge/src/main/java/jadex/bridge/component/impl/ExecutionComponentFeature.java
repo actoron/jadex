@@ -768,6 +768,24 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				}
 //			}
 			
+//		boolean	cycle	= false;
+//		if(IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || dostep || stepfuture!=null)
+//		{
+//			try
+//			{
+//				dostep	= false;
+//				cycle	= executeCycle();
+//			}
+//			catch(Exception e)
+//			{
+//				// Todo: fail fast vs robust components.
+//				
+//				StringWriter	sw	= new StringWriter();
+//				e.printStackTrace(new PrintWriter(sw));
+//				getComponent().getLogger().severe("Component cycle failed:\n"+sw);
+//			}				
+//		}	
+			
 		final Tuple2<IComponentStep<?>, Future<?>>	step;
 		synchronized(this)
 		{
