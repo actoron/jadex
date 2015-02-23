@@ -19,6 +19,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IEvent;
@@ -90,11 +91,22 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 	/**
 	 *  Adopt a goal so that the agent tries pursuing it.
 	 */
-	public static void adoptGoal(RGoal rgoal, IInternalAccess ia)
+	public static void adoptGoal(RGoal rgoal, final IInternalAccess ia)
 	{
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 //		ip.scheduleStep(new AdoptGoalAction(rgoal));
-		ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal));
+		ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal))
+			.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ia.getLogger().warning("Exception during goal adoption:"+exception);
+			}
+		});
 	}
 	
 	/**

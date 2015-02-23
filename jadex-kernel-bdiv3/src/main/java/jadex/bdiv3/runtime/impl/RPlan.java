@@ -318,12 +318,18 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	 *  Set the processingState.
 	 *  @param processingState The processingState to set.
 	 */
+//	public Exception e = null;
 	public void setProcessingState(PlanProcessingState processingstate)
 	{
 //		if(getId().indexOf("Move")!=-1)
 //		{
 //			System.out.println("proc state: "+getId()+" "+processingstate);
 //			Thread.dumpStack();
+//		}
+//		if(processingstate.equals(PlanProcessingState.RUNNING))
+//		{
+//			System.out.println("proc state: "+getId()+" "+processingstate);
+////			e = new RuntimeException();
 //		}
 		this.processingstate = processingstate;
 		

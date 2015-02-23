@@ -37,7 +37,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 		grid.setPosition(garb.getId(), pos);
 		so.setProperty("garbage", null);
 		
-//		System.out.println("Agent dropped garbage: "+owner+" "+pos);
+//		System.out.println("Agent dropped garbage: "+owner+" "+pos+" "+garb.getId());
 		
 		return null;
 	}

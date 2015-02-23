@@ -7,6 +7,7 @@ import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.commons.SUtil;
@@ -48,6 +49,7 @@ public class GarbageBurnerBDI extends BaseAgentBDI
 		 */
 		public Burn(GarbageBurnerBDI outer, ISpaceObject garbage)
 		{
+//			System.out.println("create burn goal with: "+garbage);
 			this.outer = outer;
 			this.garbage = garbage;
 		}
@@ -56,10 +58,12 @@ public class GarbageBurnerBDI extends BaseAgentBDI
 		 * 
 		 */
 		// todo: support directly factadded etc.
-		@GoalCreationCondition(beliefs="garbages")
+//		@GoalCreationCondition(beliefs="garbages")
+		@GoalCreationCondition(rawevents=@RawEvent(value=ChangeEvent.FACTADDED, second="garbages"))
 //		public static Burn checkCreate(GarbageBurnerBDI outer, ISpaceObject garbage, IEvent event)
 		public static Burn checkCreate(GarbageBurnerBDI outer, ISpaceObject garbage, ChangeEvent event)
 		{
+//			System.out.println("event: "+event.getType());
 			return garbage==null? null: new Burn(outer, garbage);
 		}
 		

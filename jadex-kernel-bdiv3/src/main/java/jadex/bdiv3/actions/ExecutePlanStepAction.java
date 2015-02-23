@@ -33,6 +33,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	 */
 	public ExecutePlanStepAction(RPlan rplan, ICommand<Boolean> rescom)
 	{
+//		System.err.println("epsa: "+rplan);
+//		Thread.dumpStack();
 //		this.element = element;
 		this.rplan = rplan;
 		this.rescom = rescom;
@@ -141,10 +143,12 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 				RPLANS.set(null);
 			}
 		}
-		else
-		{
-			System.out.println("Plan proc state invalid: "+rplan.getProcessingState());
-		}
+		// Only needs to to something for waiting and new plans
+		// Should processing state be set back to ready in case the plan is not within a step?
+//		else
+//		{
+//			System.out.println("Plan proc state invalid: "+rplan.getProcessingState()+" "+rplan);
+//		}
 		
 		return IFuture.DONE;
 	}

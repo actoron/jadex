@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -50,13 +51,14 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 		 * 
 		 */
 		// todo: support directly factadded etc.
-		@GoalCreationCondition(beliefs="garbages")
+//		@GoalCreationCondition(beliefs="garbages")
+		@GoalCreationCondition(rawevents=@RawEvent(value=ChangeEvent.FACTADDED, second="garbages"))
 //		public static boolean checkCreate(GarbageCollectorBDI outer, ISpaceObject garbage, IEvent event)
 		public static boolean checkCreate(GarbageCollectorBDI outer, ISpaceObject garbage, ChangeEvent event)
 		{
 			boolean ret = outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.getPosition(), "burner")==null;
 //			if(ret)
-				System.out.println("collector creating new take goal: "+ret);
+//				System.out.println("collector creating new take goal for: "+garbage);
 			return ret;
 		}
 		

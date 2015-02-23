@@ -313,9 +313,9 @@ public class RuleSystem
 		{
 			IEvent event = pcman.removeEvent(0);
 			
-			if(event.getType().getType(0).indexOf("factadded")!=-1)// && event.getType().getType(1).indexOf("mybean")!=-1)
+//			if(event.getType().getType(0).indexOf("factadded")!=-1)// && event.getType().getType(1).indexOf("mybean")!=-1)
 //				&& event.getType().getType(1).indexOf("Ambu")!=-1)
-				System.out.println("proc ev: "+event);
+//				System.out.println("proc ev: "+event);
 				
 			List<IRule<?>> rules = rulebase.getRules(event.getType());
 			
