@@ -142,6 +142,7 @@ public class DebuggerMainPanel extends JSplitPane
 												String classname	= stok.nextToken();
 												try
 												{
+//													System.out.println("loading panel: "+classname+" "+cl);
 													Class<?> clazz	= SReflect.classForName(classname, cl);
 													IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
 													panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);

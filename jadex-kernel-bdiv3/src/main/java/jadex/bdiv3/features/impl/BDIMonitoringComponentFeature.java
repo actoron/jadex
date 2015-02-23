@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 
+ *  Overrides the monitoring feature to add the logic for current state.
  */
 public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 {

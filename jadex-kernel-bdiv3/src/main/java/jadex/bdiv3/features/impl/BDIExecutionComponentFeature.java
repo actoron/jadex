@@ -8,7 +8,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 
 /**
- * 
+ *  BDI execution feature adds rule engine behavior to the cycle.
  */
 public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 {
@@ -25,17 +25,17 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 	 *  to implement a recurring execution cycle.
 	 *  @return true, if the execution should continue, false, if the component may become idle. 
 	 */
-	protected boolean	executeCycle()
+	protected boolean executeCycle()
 	{
 		assert isComponentThread();
 		
 		// Evaluate conditions in addition to executing steps.
-		boolean	again	= false;
+		boolean	again = false;
 		BDIAgentFeature bdif = (BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class);
 		if(bdif.isInited() && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable())
 		{
 			bdif.getRuleSystem().processAllEvents();
-			again	= true;
+			again = true;
 		}
 		
 		return again;

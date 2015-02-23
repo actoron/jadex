@@ -112,13 +112,13 @@
 			<artifactId>jadex-kernel-gpmn</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+-->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-tools-bdi</artifactId>
 			<version>${project.version}</version>
 		</dependency>		
-		-->
+		
 			
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>

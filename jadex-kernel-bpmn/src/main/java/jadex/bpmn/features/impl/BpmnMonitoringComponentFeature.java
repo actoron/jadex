@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 
+ *  Overrides the monitoring feature to add the logic for current state.
  */
 public class BpmnMonitoringComponentFeature extends MonitoringComponentFeature
 {

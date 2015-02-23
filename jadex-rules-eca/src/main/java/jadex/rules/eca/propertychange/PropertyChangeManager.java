@@ -39,9 +39,12 @@ public abstract class PropertyChangeManager
 	/** Returns a new PropertyChangeManager instance **/ 
 	public static PropertyChangeManager createInstance()
 	{
-		if (SReflect.isAndroid()) {
+		if (SReflect.isAndroid()) 
+		{
 			return new PropertyChangeManagerAndroid();
-		} else {
+		} 
+		else 
+		{
 			return new PropertyChangeManagerDesktop();
 		}
 	}
@@ -49,13 +52,13 @@ public abstract class PropertyChangeManager
 	/**  
 	 *  Add a property change listener.
 	 */
-	public abstract void 	addPropertyChangeListener(Object object, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder);
+	public abstract void addPropertyChangeListener(Object object, IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder);
 	
 	/**
 	 *  Deregister a value for observation.
 	 *  if its a bean then remove the property listener.
 	 */
-	public abstract void	removePropertyChangeListener(Object object);
+	public abstract void removePropertyChangeListener(Object object);
 	
 	/**
 	 *  Add an event.
@@ -65,12 +68,19 @@ public abstract class PropertyChangeManager
 		events.add(event);
 	}
 
-
+	/**
+	 *  Test if events are available.
+	 *  @return True, if has events.
+	 */
 	public boolean hasEvents()
 	{
 		return events.size()>0;
 	}
 
+	/**
+	 *  Remove an event.
+	 *  @param index The index.
+	 */
 	public IEvent removeEvent(int index)
 	{
 		return events.remove(index);
