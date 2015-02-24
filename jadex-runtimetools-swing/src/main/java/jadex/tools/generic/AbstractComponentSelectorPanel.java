@@ -8,6 +8,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -74,7 +75,7 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 				{
 					public void customResultAvailable(IComponentDescription[] descs)
 					{
-//						System.out.println("descs: "+SUtil.arrayToString(descs)+" "+remotecb.isSelected());
+						System.out.println("descs for: "+getModelName()+" "+SUtil.arrayToString(descs)+" "+remotecb.isSelected());
 						Set<IComponentIdentifier> newcids = new HashSet<IComponentIdentifier>();
 						for(int i=0; i<descs.length; i++)
 						{

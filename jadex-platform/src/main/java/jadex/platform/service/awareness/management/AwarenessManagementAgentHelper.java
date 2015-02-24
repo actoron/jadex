@@ -18,6 +18,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -74,19 +75,19 @@ public class AwarenessManagementAgentHelper
 						{
 							SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
 								ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+							{
+								public void customResultAvailable(IComponentManagementService cms)
 								{
-									public void customResultAvailable(IComponentManagementService cms)
+									CreationInfo info = new CreationInfo(ia.getComponentIdentifier());
+									cms.createComponent(null, type, info, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 									{
-										CreationInfo info = new CreationInfo(ia.getComponentIdentifier());
-										cms.createComponent(null, type, info, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+										public void customResultAvailable(IComponentIdentifier result)
 										{
-											public void customResultAvailable(IComponentIdentifier result)
-											{
-												ret.setResult(null);
-											}
-										});
-									};
-								}));
+											ret.setResult(null);
+										}
+									});
+								};
+							}));
 						}
 
 						// Stop relay mechanism agent
@@ -95,18 +96,18 @@ public class AwarenessManagementAgentHelper
 							final IComponentIdentifier cid = found;
 							SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
 								ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+							{
+								public void customResultAvailable(IComponentManagementService cms)
 								{
-									public void customResultAvailable(IComponentManagementService cms)
+									cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
 									{
-										cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+										public void customResultAvailable(Map<String, Object> result)
 										{
-											public void customResultAvailable(Map<String, Object> result)
-											{
-												ret.setResult(null);
-											}
-										});
-									};
-								}));
+											ret.setResult(null);
+										}
+									});
+								};
+							}));
 						}
 
 						// No change required.
@@ -161,7 +162,8 @@ public class AwarenessManagementAgentHelper
 			@Classname("getDiscoveryInfos")
 			public IFuture<DiscoveryInfo[]> execute(IInternalAccess ia)
 			{
-				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
+				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+//				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 				return new Future<DiscoveryInfo[]>(agent.getDiscoveryInfos());
 			}
 		});

@@ -1,9 +1,11 @@
 package jadex.tools.awareness;
 
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.tools.generic.AbstractComponentPlugin;
 
 import javax.swing.Icon;
@@ -29,7 +31,10 @@ public class AwarenessComponentPlugin extends AbstractComponentPlugin
 	 */
 	public String getModelName()
 	{
-		return "jadex.platform.service.awareness.management.AwarenessManagement";
+		String ret = AwarenessManagementAgent.class.getName();
+		ret = ret.substring(0, ret.length()-5); // strip Agent
+		return ret;
+//		return "jadex.platform.service.awareness.management.AwarenessManagement";
 	}
 	
 	/**
@@ -44,11 +49,11 @@ public class AwarenessComponentPlugin extends AbstractComponentPlugin
 	/**
 	 *  Create the component panel.
 	 */
-	public IFuture createComponentPanel(IExternalAccess component)
+	public IFuture<IAbstractViewerPanel> createComponentPanel(IExternalAccess component)
 	{
 		AwarenessAgentPanel awap = new AwarenessAgentPanel();
 		awap.init(getJCC(), component);
-		return new Future(awap);
+		return new Future<IAbstractViewerPanel>(awap);
 	}
 	
 	/**

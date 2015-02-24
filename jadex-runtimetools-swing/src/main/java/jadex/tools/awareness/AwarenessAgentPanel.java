@@ -620,6 +620,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			
 			public void customExceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 				sprefresh.setValue(Integer.valueOf(0));
 			}
 		});

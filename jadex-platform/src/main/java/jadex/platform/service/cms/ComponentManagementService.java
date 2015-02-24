@@ -2516,20 +2516,20 @@ public class ComponentManagementService implements IComponentManagementService
 		// Otherwise search for matching descriptions.
 		else
 		{
-//			for(Iterator<IComponentAdapter> it=adapters.values().iterator(); it.hasNext(); )
-//			{
-//				CMSComponentDescription	test	= (CMSComponentDescription)((IComponentAdapter)it.next()).getDescription();
-//				if(adesc==null ||
-//					(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
-////						&& (adesc.getName().getParent()==null || adesc.getName().getParent().equals(test.getParent()))
-//					&& (adesc.getType()==null || adesc.getType().equals(test.getType()))
-//					&& (adesc.getState()==null || adesc.getState().equals(test.getState()))
-////						&& (adesc.getProcessingState()==null || adesc.getProcessingState().equals(test.getProcessingState()))
-//					&& (adesc.getModelName()==null || adesc.getModelName().equals(test.getModelName())))					
-//				{
-//					ret.add(test);
-//				}
-//			}
+			for(Iterator<IPlatformComponentAccess> it=components.values().iterator(); it.hasNext(); )
+			{
+				CMSComponentDescription	test = (CMSComponentDescription)it.next().getInternalAccess().getComponentDescription();
+				if(adesc==null ||
+					(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
+//						&& (adesc.getName().getParent()==null || adesc.getName().getParent().equals(test.getParent()))
+					&& (adesc.getType()==null || adesc.getType().equals(test.getType()))
+					&& (adesc.getState()==null || adesc.getState().equals(test.getState()))
+//						&& (adesc.getProcessingState()==null || adesc.getProcessingState().equals(test.getProcessingState()))
+					&& (adesc.getModelName()==null || adesc.getModelName().equals(test.getModelName())))					
+				{
+					ret.add(test);
+				}
+			}
 		}
 
 		//System.out.println("searched: "+ret);
