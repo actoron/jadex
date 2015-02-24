@@ -14,10 +14,14 @@ public abstract class OpcodeHelper
 
 	public static OpcodeHelper getInstance()
 	{
-		if (INSTANCE == null) {
-			if (SReflect.isAndroid()) {
+		if(INSTANCE == null) 
+		{
+			if(SReflect.isAndroid()) 
+			{
 				throw new Error("OpcodeHelper.getInstance() is not implemented for Android.");
-			} else {
+			} 
+			else 
+			{
 				INSTANCE = new AsmOpcodeHelper();
 			}
 		}
@@ -33,7 +37,5 @@ public abstract class OpcodeHelper
 	public abstract boolean isNative(int access);
 	
 	public abstract boolean isLoadConstant(int opcode);
-
-
 	
 }

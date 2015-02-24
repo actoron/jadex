@@ -11,16 +11,18 @@ import org.objectweb.asm.tree.MethodNode;
 
 public abstract class NodeHelper
 {
-
-
 	private static NodeHelper INSTANCE;
 
 	public static NodeHelper getInstance()
 	{
-		if (INSTANCE == null) {
-			if (SReflect.isAndroid()) {
+		if (INSTANCE == null) 
+		{
+			if (SReflect.isAndroid()) 
+			{
 				throw new Error("OpcodeHelper.getInstance() is not implemented for Android.");
-			} else {
+			} 
+			else 
+			{
 				INSTANCE = new AsmNodeHelper();
 			}
 		}
@@ -58,6 +60,4 @@ public abstract class NodeHelper
 	public abstract MethodNode createReturnConstantMethod(String methodName, int value);
 
 	public abstract FieldNode createField(int access, String name, String desc, String[] signature, Object initialValue);
-
-	
 }
