@@ -370,7 +370,10 @@ public class Executor implements Runnable
 				{
 					if(t instanceof Error)
 					{
-						throw (Error)t;
+//						if(t.getClass().getName().indexOf("Step")!=-1)
+//							throw new RuntimeException(t);
+//						else
+							throw (Error)t;
 					}
 					else if(t instanceof RuntimeException)
 					{

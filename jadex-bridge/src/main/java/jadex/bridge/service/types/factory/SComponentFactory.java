@@ -65,8 +65,8 @@ public class SComponentFactory
 	static
 	{
 		Collection<IComponentFeatureFactory>	def_features	= new ArrayList<IComponentFeatureFactory>();
-		def_features.add(new ComponentFeatureFactory(IMonitoringComponentFeature.class, MonitoringComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class, ExecutionComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(IMonitoringComponentFeature.class, MonitoringComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IArgumentsFeature.class, ArgumentsComponentFeature.class));
 		def_features.add(PropertiesComponentFeature.FACTORY);	// After args for logging
 		def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));

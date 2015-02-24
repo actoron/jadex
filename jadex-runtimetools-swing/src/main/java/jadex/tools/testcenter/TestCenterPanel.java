@@ -1380,7 +1380,7 @@ public class TestCenterPanel extends JSplitPanel
 			 */
 			protected void	testFinished(final Testcase result)
 			{
-//				System.out.println("finished: "+result);
+				System.out.println("finished: "+result);
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()

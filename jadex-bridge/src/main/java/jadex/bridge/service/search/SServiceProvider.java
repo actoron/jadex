@@ -397,8 +397,8 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)
 	{
-		if(scope==null && type.getName().indexOf("ICompo")!=-1)
-			System.out.println("gfdfgdfg");
+//		if(scope==null && type.getName().indexOf("ICompo")!=-1)
+//			System.out.println("gfdfgdfg");
 		
 		return provider.scheduleImmediate(new IComponentStep<T>()
 		{

@@ -1173,6 +1173,8 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
+//		if(cid.getParent()==null)
+//			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
 //		System.out.println("Terminating component1: "+cid.getName());
 		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
@@ -1220,6 +1222,22 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 //		else //if("Application".equals(getDescription(cid).getType()))
 //			System.out.println("no destroy: "+contains+", "+locked);
+		
+//		if(cid.getParent()==null)
+//		{
+//			ret.addResultListener(new IResultListener<Map<String,Object>>()
+//			{
+//				public void resultAvailable(Map<String, Object> result)
+//				{
+//					System.out.println("kill platorm finished: "+cid.getName());
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					System.out.println("kill platform exception: "+cid.getName()+" "+exception);
+//				}
+//			});
+//		}
 		
 		return ret;
 	}

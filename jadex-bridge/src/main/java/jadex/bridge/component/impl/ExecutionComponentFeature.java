@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.StepAborted;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -95,6 +96,24 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public ExecutionComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
+	}
+	
+	/**
+	 *  Shutdown the feature.
+	 */
+	public IFuture<Void>	shutdown()
+	{
+		// Should not wake up all blocked threads at the same time?!
+		// Could theoretically catch the threaddeath and do sth what is not guarded against concurrent access
+//		if(blocked!=null && blocked.size()>0)
+//			System.out.println("blocked: "+blocked.size());
+		while(blocked!=null && !blocked.isEmpty())
+		{
+			// Unblock throwing thread death as component already has been terminated.
+			unblock(blocked.keySet().iterator().next(), new StepAborted());
+//			unblock(blocked.keySet().iterator().next(), null);
+		}
+		return IFuture.DONE;
 	}
 	
 	//-------- IComponentFeature interface --------
@@ -817,16 +836,31 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(step!=null)
 		{
 			IFuture<?>	stepfut	= null;
+			Exception ex = null;
 			try
 			{
 				stepfut	= step.getFirstEntity().execute(component);
 			}
+			catch(StepAborted sa)
+			{
+				ex = new RuntimeException(sa);
+			}
 			catch(final Exception e)
+			{
+				ex = e;
+			}
+			// catch other/all throwables?
+//			catch(final Throwable e) 
+//			{
+//			}
+			
+			if(ex!=null)
 			{
 				// Todo: fail fast vs robust components.
 				
 				if(!step.getSecondEntity().hasResultListener())
 				{
+					final Exception fex = ex;
 					// Wait for delayed listener addition.
 					waitForDelay(1000, true)
 						.addResultListener(new IResultListener<Void>()
@@ -836,7 +870,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 							if(!step.getSecondEntity().hasResultListener())
 							{
 								StringWriter	sw	= new StringWriter();
-								e.printStackTrace(new PrintWriter(sw));
+								fex.printStackTrace(new PrintWriter(sw));
 								getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
 								
 								if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
@@ -854,7 +888,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					});
 				}
 				
-				step.getSecondEntity().setException(e);
+//				step.getSecondEntity().setException(e instanceof Exception? (Exception)e: new RuntimeException(e));
+				step.getSecondEntity().setException(ex);
 			}
 			
 			if(stepfut!=null)
