@@ -99,7 +99,7 @@ public class MEnvSpaceType
 	protected String classname;
 	
 	/** The properties. */
-	protected Map properties;
+	protected MultiCollection<String, Object> properties;
 	
 	//-------- methods --------
 	
@@ -146,8 +146,8 @@ public class MEnvSpaceType
 	public void addProperty(String key, Object value)
 	{
 		if(properties==null)
-			properties = new MultiCollection();
-		properties.put(key, value);
+			properties = new MultiCollection<String, Object>();
+		properties.add(key, value);
 	}
 	
 	/**
@@ -3143,6 +3143,8 @@ public class MEnvSpaceType
 	public static Object getProperty(Map map, String name)
 	{
 		Object tmp = map.get(name);
-		return (tmp instanceof List)? ((List)tmp).get(0): tmp; 
+		if(tmp instanceof List && ((List)tmp).size()==0)
+			tmp = null;
+		return tmp instanceof List? ((List)tmp).get(0): tmp; 
 	}
 }
