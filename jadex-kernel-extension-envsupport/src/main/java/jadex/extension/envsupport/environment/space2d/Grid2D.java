@@ -2,7 +2,6 @@ package jadex.extension.envsupport.environment.space2d;
 
 import jadex.commons.collection.MultiCollection;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
@@ -37,7 +36,7 @@ public class Grid2D extends Space2D
 	//-------- attributes --------
 	
 	/** All simobject id's accessible per position. */
-	protected MultiCollection objectsygridpos;
+	protected MultiCollection<IVector2, ISpaceObject> objectsygridpos;
 	
 	//-------- constructors --------
 	
@@ -107,7 +106,7 @@ public class Grid2D extends Space2D
 	 */
 	public Collection<ISpaceObject> getSpaceObjectsByGridPosition(IVector2 position, Object type)
 	{
-		Collection ret = null;
+		Collection<ISpaceObject> ret = null;
 		synchronized(monitor)
 		{
 			if(position!=null)
@@ -115,15 +114,15 @@ public class Grid2D extends Space2D
 				position = adjustPosition(position);
 				IVector2 fieldpos = new Vector2Int(position.getXAsInteger(), position.getYAsInteger());
 			
-				Collection simobjs = objectsygridpos.getCollection(fieldpos);
+				Collection<ISpaceObject> simobjs = objectsygridpos.get(fieldpos);
 				if(null == type)
 				{
 					ret = simobjs;
 				}
 				else
 				{
-					ArrayList tmp = new ArrayList();
-					for(Iterator objs = simobjs.iterator(); objs.hasNext();)
+					ArrayList<ISpaceObject> tmp = new ArrayList<ISpaceObject>();
+					for(Iterator<ISpaceObject> objs = simobjs.iterator(); objs.hasNext();)
 					{
 						ISpaceObject curobj = (ISpaceObject)objs.next();
 						if(type.equals(curobj.getType()))
@@ -226,7 +225,7 @@ public class Grid2D extends Space2D
 			IVector2 newpos = adjustPosition(pos);
 			if(newpos!=null)
 			{
-				objectsygridpos.put(new Vector2Int(newpos.getXAsInteger(), newpos.getYAsInteger()), obj);
+				objectsygridpos.add(new Vector2Int(newpos.getXAsInteger(), newpos.getYAsInteger()), obj);
 //				System.out.println("add: "+newpos+" "+obj);
 			}
 			
@@ -308,11 +307,11 @@ public class Grid2D extends Space2D
 		}		
 	}
 	
-	public Set<SpaceObject> getNearGridObjects(IVector2 position, int range, String types[])
+	public Set<ISpaceObject> getNearGridObjects(IVector2 position, int range, String types[])
 	{
 		synchronized(monitor)
 		{
-			Set ret = new HashSet();
+			Set<ISpaceObject> ret = new HashSet<ISpaceObject>();
 			
 			int sizex = areasize.getXAsInteger();
 			int sizey = areasize.getYAsInteger();
@@ -334,29 +333,26 @@ public class Grid2D extends Space2D
 				{
 					Vector2Int testpos = new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey);
 
-						Collection tmp = objectsygridpos.getCollection(testpos);
-						if(tmp != null)
+					Collection<ISpaceObject> tmp = objectsygridpos.get(testpos);
+					if(tmp != null)
+					{
+						if(types==null)
 						{
-							if(types==null)
+							ret.addAll(tmp);
+						}
+						else
+						{
+							for(Iterator<ISpaceObject> it=tmp.iterator(); it.hasNext(); )
 							{
-								ret.addAll(tmp);
-							}
-							else
-							{
-								for(Iterator it=tmp.iterator(); it.hasNext(); )
+								ISpaceObject obj = (ISpaceObject)it.next();
+								for(int z = 0; z<types.length; z++ )
 								{
-									ISpaceObject obj = (ISpaceObject)it.next();
-									for(int z = 0; z<types.length; z++ )
-									{
-										if(obj.getType().equals(types[z]))
-											ret.add(obj);
-									}
-
+									if(obj.getType().equals(types[z]))
+										ret.add(obj);
 								}
 							}
-						
+						}
 					}
-					
 				}
 			}
 			
@@ -371,11 +367,11 @@ public class Grid2D extends Space2D
 	 *  @param distance	The distance.
 	 *  @param type	The type (or null for all objects).
 	 */
-	public Set getNearObjects(IVector2 position, IVector1 distance, String type)
+	public Set<ISpaceObject> getNearObjects(IVector2 position, IVector1 distance, String type)
 	{
 		synchronized(monitor)
 		{
-			Set ret = new HashSet();
+			Set<ISpaceObject> ret = new HashSet<ISpaceObject>();
 			
 			int sizex = areasize.getXAsInteger();
 			int sizey = areasize.getYAsInteger();
@@ -399,7 +395,7 @@ public class Grid2D extends Space2D
 					Vector2Int testpos = new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey);
 					if(!getDistance(testpos, pos).greater(distance))
 					{
-						Collection tmp = objectsygridpos.getCollection(testpos);
+						Collection<ISpaceObject> tmp = objectsygridpos.get(testpos);
 						if(tmp != null)
 						{
 							if(type==null)
@@ -408,7 +404,7 @@ public class Grid2D extends Space2D
 							}
 							else
 							{
-								for(Iterator it=tmp.iterator(); it.hasNext(); )
+								for(Iterator<ISpaceObject> it=tmp.iterator(); it.hasNext(); )
 								{
 									ISpaceObject obj = (ISpaceObject)it.next();
 									if(obj.getType().equals(type))

@@ -31,12 +31,12 @@ public class MultiCollectionCodec extends AbstractCodec
 	 */
 	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
-		MultiCollection ret = null;
+		MultiCollection<Object, Object> ret = null;
 		try
 		{
 			if(MultiCollection.class.equals(clazz))
 			{
-				ret = new MultiCollection();
+				ret = new MultiCollection<Object, Object>();
 			}
 			else
 			{
@@ -63,7 +63,7 @@ public class MultiCollectionCodec extends AbstractCodec
 	 */
 	public Object decodeSubObjects(Object object, Class<?> clazz, IDecodingContext context)
 	{
-		Map map = (Map) BinarySerializer.decodeObject(context);
+		Map map = (Map)BinarySerializer.decodeObject(context);
 		String classname = context.readClassname();
 		Class type = SReflect.classForName0(classname, context.getClassloader());
 		if (type == null)

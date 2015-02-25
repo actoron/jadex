@@ -41,7 +41,7 @@ public class AsyncTreeModel
 	protected final List<INodeHandler> overlays;
 
 	/** The changed nodes (delayed update for improving perceived speed). */
-	protected MultiCollection changed;
+	protected MultiCollection<ITreeNode, ITreeNode> changed;
 
 	// -------- constructors --------
 
@@ -165,8 +165,8 @@ public class AsyncTreeModel
 	{
 		if(changed == null)
 		{
-			changed = new MultiCollection(new HashMap(), HashSet.class);
-			changed.put(node.getParent(), node);
+			changed = new MultiCollection<ITreeNode, ITreeNode>(new HashMap(), HashSet.class);
+			changed.add(node.getParent(), node);
 			// SwingUtilities.invokeLater(new Runnable()
 			// {
 			// public void run()
@@ -178,20 +178,20 @@ public class AsyncTreeModel
 				if (parents[i] == null || getAddedNode(parents[i].getId()) != null)
 				{
 					boolean skip = false;
-					Set set = (Set) changed.get(parents[i]);
+					Set<ITreeNode> set = (Set<ITreeNode>)changed.get(parents[i]);
 					int[] indices;
-					Object[] nodes;
+					ITreeNode[] nodes;
 					List<ITreeNode> path = null;
 					if (parents[i] != null)
 					{
 						int cnt = 0;
-						nodes = new Object[set.size()];
+						nodes = new ITreeNode[set.size()];
 						indices = new int[nodes.length];
-						Iterator it = set.iterator();
+						Iterator<ITreeNode> it = set.iterator();
 						for(int j = 0; j < nodes.length; j++)
 						{
 							nodes[cnt] = it.next();
-							if(getAddedNode(((ITreeNode) nodes[cnt]).getId()) != null)
+							if(getAddedNode(nodes[cnt].getId()) != null)
 							{
 								indices[cnt] = parents[i].getIndexOfChild((ITreeNode) nodes[cnt]);
 								if (indices[cnt] != -1)
@@ -208,7 +208,7 @@ public class AsyncTreeModel
 						{
 							if(cnt < nodes.length)
 							{
-								Object[] ntmp = new Object[cnt];
+								ITreeNode[] ntmp = new ITreeNode[cnt];
 								int[] itmp = new int[cnt];
 								System.arraycopy(nodes, 0, ntmp, 0, cnt);
 								System.arraycopy(indices, 0, itmp, 0, cnt);

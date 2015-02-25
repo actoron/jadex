@@ -22,13 +22,13 @@ public class ParameterElementFilter implements IFilter, Serializable
 	// -------- attributes ---------
 
 	/** The required attribute values. */
-	protected MultiCollection values;
+	protected MultiCollection<String, Object> values;
 
 	// -------- methods --------
 
 	public ParameterElementFilter()
 	{
-		this.values = new MultiCollection();
+		this.values = new MultiCollection<String, Object>();
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class ParameterElementFilter implements IFilter, Serializable
 	 */
 	public void addValue(String name, Object value)
 	{
-		values.put(name, value);
+		values.add(name, value);
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class ParameterElementFilter implements IFilter, Serializable
 
 		if(values.containsKey(name))
 		{
-			Collection vals = values.getCollection(name);
+			Collection<Object> vals = values.get(name);
 			if(vals.contains(value))
 			{
 				return true;
@@ -102,7 +102,7 @@ public class ParameterElementFilter implements IFilter, Serializable
 			ParameterElement probj = (ParameterElement)object;
 			// Check, that all properties match.
 
-			Iterator vkeys = values.keySet().iterator();
+			Iterator<String> vkeys = values.keySet().iterator();
 
 			// Check all values; ret is AND
 			ret = true;
@@ -117,7 +117,7 @@ public class ParameterElementFilter implements IFilter, Serializable
 				}
 
 				Object val = probj.getParameter(vkey);
-				Object[] vals = ((Collection)values.get(vkey)).toArray();
+				Object[] vals = values.get(vkey).toArray();
 
 				// Has to match at least one; ret is OR.
 				// included null values

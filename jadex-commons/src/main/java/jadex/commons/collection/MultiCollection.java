@@ -19,15 +19,15 @@ import java.util.Set;
  *  An MultiCollection is a map with the ability
  *  to store more than one element per key (an collection).
  */
-public class MultiCollection implements Map, Serializable, Cloneable
+public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializable, Cloneable
 {
 	//-------- attributes --------
 	
 	/** The map. */
-	protected Map map;
+	protected Map<K, Collection<V>> map;
 
 	/** The collection type. */
-	protected Class type;
+	protected Class<?> type;
 
 	//-------- constructors --------
 
@@ -36,7 +36,7 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 */
 	public	MultiCollection()
 	{
-		this(new HashMap(), ArrayList.class);
+		this(new HashMap<K, Collection<V>>(), ArrayList.class);
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 *  @param type	The collection type to use
 	 *    (requires public empty contstructor and has to implement java.util.Collection).
 	 */
-	public	MultiCollection(Map map, Class type)
+	public	MultiCollection(Map<K, Collection<V>> map, Class<?> type)
 	{
 		this.map	= map;
 		this.type	= type;
@@ -76,10 +76,10 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	public int size()
 	{
 		int	size	= 0;
-		for(Iterator i=map.keySet().iterator(); i.hasNext(); )
+		for(Iterator<K> i=map.keySet().iterator(); i.hasNext(); )
 		{
-			Object	key	= i.next();
-			Collection	coll	= (Collection)map.get(key);
+			K	key	= i.next();
+			Collection<V> coll = map.get(key);
 			size	+= coll.size();
 		}
 		return size;
@@ -133,9 +133,9 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 */
 	public boolean containsValue(Object value)
 	{
-		for(Iterator i=map.keySet().iterator(); i.hasNext(); )
+		for(Iterator<K> i=map.keySet().iterator(); i.hasNext(); )
 		{
-			if(((Collection)map.get(i.next())).contains(value))
+			if(map.get(i.next()).contains(value))
 			{
 				return true;
 			}
@@ -158,9 +158,10 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 * 
 	 * @see #containsKey(Object)
 	 */
-	public Object get(Object key)
+	public Collection<V> get(Object key)
 	{
-		return map.get(key);
+		Collection<V> ret = map.get(key);
+		return ret==null? Collections.EMPTY_LIST: ret;
 	}
 
 	// Modification Operations
@@ -187,19 +188,67 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 *            keys or values, and the specified key or value is
 	 *            <tt>null</tt>.
 	 */
-	public Object put(Object key, Object value)
+	public Collection<V> put(K key, Collection<V> value)
+//	public Object put(Object key, Object value)
 	{
-		Collection	col;
-		Object	o	= map.get(key);
-		if(o!=null)
-		{
-			col	= (Collection)o;
-		}
-		else
+		return map.put(key, value);
+//		Collection<V>	col;
+//		col	= map.get(key);
+//		if(col==null)
+//		{
+//			try
+//			{
+//				col	= (Collection<V>)type.newInstance();
+//			}
+//			catch(InstantiationException e)
+//			{
+//				StringWriter sw = new StringWriter();
+//				e.printStackTrace(new PrintWriter(sw));
+//				throw new RuntimeException(sw.toString());
+//			}
+//			catch(IllegalAccessException e)
+//			{
+//				StringWriter sw = new StringWriter();
+//				e.printStackTrace(new PrintWriter(sw));
+//				throw new RuntimeException(sw.toString());
+//			}
+//			map.put(key, col);
+//		}
+//		col.add(value);
+//		return col;
+	}
+
+	/**
+	 * Associates the specified value with the specified key in this map
+	 * (optional operation).  If the map previously contained a mapping for
+	 * this key, the old value is replaced by the specified value.  (A map
+	 * <tt>m</tt> is said to contain a mapping for a key <tt>k</tt> if and only
+	 * if {@link #containsKey(Object) m.containsKey(k)} would return
+	 * <tt>true</tt>.)) 
+	 *
+	 * @param key key with which the specified value is to be associated.
+	 * @param value value to be associated with the specified key.
+ 	 * @return The collection associated to the key.
+	 * 
+	 * @throws UnsupportedOperationException if the <tt>put</tt> operation is
+	 *	          not supported by this map.
+	 * @throws ClassCastException if the class of the specified key or value
+	 * 	          prevents it from being stored in this map.
+	 * @throws IllegalArgumentException if some aspect of this key or value
+	 *	          prevents it from being stored in this map.
+	 * @throws NullPointerException this map does not permit <tt>null</tt>
+	 *            keys or values, and the specified key or value is
+	 *            <tt>null</tt>.
+	 */
+	public Collection<V> add(K key, V value)
+	{
+		Collection<V> col;
+		col	= map.get(key);
+		if(col==null)
 		{
 			try
 			{
-				col	= (Collection)type.newInstance();
+				col	= (Collection<V>)type.newInstance();
 			}
 			catch(InstantiationException e)
 			{
@@ -218,8 +267,71 @@ public class MultiCollection implements Map, Serializable, Cloneable
 		col.add(value);
 		return col;
 	}
+	
+	/**
+	 * Associates the specified value with the specified key in this map
+	 * (optional operation).  If the map previously contained a mapping for
+	 * this key, the old value is replaced by the specified value.  (A map
+	 * <tt>m</tt> is said to contain a mapping for a key <tt>k</tt> if and only
+	 * if {@link #containsKey(Object) m.containsKey(k)} would return
+	 * <tt>true</tt>.)) 
+	 *
+	 * @param key key with which the specified value is to be associated.
+	 * @param value value to be associated with the specified key.
+ 	 * @return The collection associated to the key.
+	 * 
+	 * @throws UnsupportedOperationException if the <tt>put</tt> operation is
+	 *	          not supported by this map.
+	 * @throws ClassCastException if the class of the specified key or value
+	 * 	          prevents it from being stored in this map.
+	 * @throws IllegalArgumentException if some aspect of this key or value
+	 *	          prevents it from being stored in this map.
+	 * @throws NullPointerException this map does not permit <tt>null</tt>
+	 *            keys or values, and the specified key or value is
+	 *            <tt>null</tt>.
+	 */
+	public Collection<V> add(K key, Collection<V> value)
+	{
+		Collection<V> col;
+		col	= map.get(key);
+		if(col==null)
+		{
+			try
+			{
+				col	= (Collection<V>)type.newInstance();
+			}
+			catch(InstantiationException e)
+			{
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				throw new RuntimeException(sw.toString());
+			}
+			catch(IllegalAccessException e)
+			{
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				throw new RuntimeException(sw.toString());
+			}
+			map.put(key, col);
+		}
+		col.addAll(value);
+		return col;
+	}
 
-
+	/**
+	 *  Add all elements of another map.
+	 *  @param t The other map.
+	 */
+	public void addAll(Map<? extends K, ? extends V> t)
+	{
+		Iterator<? extends K> it = t.keySet().iterator();
+		while(it.hasNext())
+		{
+			K key	= it.next();
+			add(key, t.get(key));
+		}
+	}
+	
 	// Bulk Operations
 
 	/**
@@ -244,13 +356,14 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 *         this map does not permit <tt>null</tt> keys or values, and the
 	 *         specified map contains <tt>null</tt> keys or values.
 	 */
-	public void putAll(Map t)
+//	public void putAll(Map<? extends K, Collection<? extends V>> t)
+	public void putAll(Map<? extends K, ? extends Collection<V>> t)
 	{
-		Iterator	it	= t.keySet().iterator();
+		Iterator<? extends K> it = t.keySet().iterator();
 		while(it.hasNext())
 		{
-			Object	key	= it.next();
-			put(key, t.get(key));
+			K key	= it.next();
+			add(key, t.get(key));
 		}
 	}
 
@@ -277,7 +390,7 @@ public class MultiCollection implements Map, Serializable, Cloneable
      *
      * @return a set view of the keys contained in this map.
      */
-	public Set keySet()
+	public Set<K> keySet()
 	{
 		return map.keySet();
 	}
@@ -286,9 +399,9 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 * Unsupported Operation.
 	 * @throws UnsupportedOperationException
 	 */
-	public Collection values()
+	public Collection<Collection<V>> values()
 	{
-		throw new UnsupportedOperationException();
+		return map.values();
 	}
 
     /**
@@ -304,7 +417,7 @@ public class MultiCollection implements Map, Serializable, Cloneable
      *
      * @return a set view of the mappings contained in this map.
      */
-	public Set entrySet()
+	public Set<Map.Entry<K, Collection<V>>> entrySet()
 	{
 		return map.entrySet();
 	}
@@ -372,35 +485,35 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 * @throws NullPointerException if the key is <tt>null</tt> and this map
 	 *            does not not permit <tt>null</tt> keys (optional).
 	 */
-	public Object	remove(Object key)
+	public Collection<V> remove(Object key)
 	{
 		return map.remove(key);
 	}
 
 	//-------- additional multi collection methods --------
 
-	/**
-	 *  Get the values associated to a key as collection.
-	 *  @param key	The key.
-	 *  @return The collection of associated values.
-	 */
-	public Collection	getCollection(Object key)
-	{
-		Collection	ret	= (Collection)get(key);
-		if(ret==null)
-		{
-			ret	= Collections.EMPTY_LIST;
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get the values associated to a key as collection.
+//	 *  @param key	The key.
+//	 *  @return The collection of associated values.
+//	 */
+//	public Collection	getCollection(Object key)
+//	{
+//		Collection	ret	= (Collection)get(key);
+//		if(ret==null)
+//		{
+//			ret	= Collections.EMPTY_LIST;
+//		}
+//		return ret;
+//	}
 	
-	/**
-	 *  Directly store a collection entry.
-	 */
-	public void putCollection(Object key, Collection value)
-	{
-		map.put(key, value);
-	}
+//	/**
+//	 *  Directly store a collection entry.
+//	 */
+//	public void putCollection(Object key, Collection value)
+//	{
+//		map.put(key, value);
+//	}
 
 
 	/**
@@ -417,12 +530,12 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 *  @param type	The component type of the array.
 	 *  @return The array of values.
 	 */
-	public Object[]	getObjects(Class type)
+	public Object[]	getObjects(Class<?> type)
 	{
 		Object	ret	= Array.newInstance(type, 0);
-		for(Iterator i=map.keySet().iterator(); i.hasNext(); )
+		for(Iterator<K> i=map.keySet().iterator(); i.hasNext(); )
 		{
-			ret	= SUtil.joinArrays(ret, getCollection(i.next()).toArray());
+			ret	= SUtil.joinArrays(ret, get(i.next()).toArray());
 		}
 		return (Object[])ret;
 	}
@@ -441,9 +554,9 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 *  @param type	The component type of the array.
 	 *  @return The array of keys.
 	 */
-	public Object[]	getKeys(Class type)
+	public Object[]	getKeys(Class<?> type)
 	{
-		Set	keys	= keySet();
+		Set<K>	keys	= keySet();
 		return keys.toArray((Object[])Array.newInstance(type, keys.size()));
 	}
 
@@ -453,7 +566,7 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	 */
 	public void	removeObject(Object key, Object value)
 	{
-		Collection coll	= (Collection)map.get(key);
+		Collection<V> coll	= map.get(key);
 //		if(coll==null)
 //			throw new RuntimeException("Key does not exist!"+key);
 //		if(!coll.remove(value))

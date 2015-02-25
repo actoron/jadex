@@ -119,7 +119,7 @@ public class ComponentManagementService implements IComponentManagementService
 	protected Map<IComponentIdentifier, IFuture<Map<String, Object>>> cfs;
 	
 	/** The listeners. */
-	protected MultiCollection listeners;
+	protected MultiCollection<IComponentIdentifier, ICMSComponentListener> listeners;
 	
 //	/** The execution service (cached to avoid using futures). */
 //	protected IExecutionService	exeservice;
@@ -1748,7 +1748,7 @@ public class ComponentManagementService implements IComponentManagementService
      */
     public IFuture<Void> addComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
     {
-		listeners.put(comp, listener);
+		listeners.add(comp, listener);
 		return IFuture.DONE;
     }
     
@@ -2891,8 +2891,8 @@ public class ComponentManagementService implements IComponentManagementService
 			public void resultAvailable(IComponentDescription newdesc)
 			{
 				ICMSComponentListener[]	alisteners;
-				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
-				slisteners.addAll(listeners.getCollection(cid));
+				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.get(null));
+				slisteners.addAll(listeners.get(cid));
 				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				// todo: can be called after listener has (concurrently) deregistered
 				
@@ -2930,8 +2930,8 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				ICMSComponentListener[]	alisteners;
 				
-				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
-				slisteners.addAll(listeners.getCollection(cid));
+				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.get(null));
+				slisteners.addAll(listeners.get(cid));
 				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				// todo: can be called after listener has (concurrently) deregistered
 				
@@ -2989,8 +2989,8 @@ public class ComponentManagementService implements IComponentManagementService
 			public void resultAvailable(IComponentDescription newdesc)
 			{
 				ICMSComponentListener[]	alisteners;
-				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
-				slisteners.addAll(listeners.getCollection(cid));
+				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.get(null));
+				slisteners.addAll(listeners.get(cid));
 				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				// todo: can be called after listener has (concurrently) deregistered
 				
@@ -3057,19 +3057,7 @@ public class ComponentManagementService implements IComponentManagementService
 			public void customResultAvailable(IRemoteServiceManagementService rms)
 			{
 				rms.getServiceProxy(agent.getComponentIdentifier(), cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, null)
-					.addResultListener(createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						if(!(result instanceof IComponentManagementService))
-							System.out.println("aaaa");
-						super.customResultAvailable(result);
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						super.exceptionOccurred(exception);
-					}
-				}));
+					.addResultListener(createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
 			}
 		}));
 		

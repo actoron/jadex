@@ -34,7 +34,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	protected Map tasks;
 
 	/** The task listeners. */
-	protected MultiCollection tasklisteners;
+	protected MultiCollection<Object, IResultListener<?>> tasklisteners;
 
 	/** The fetcher. */
 	protected SimpleValueFetcher fetcher;
@@ -197,7 +197,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 		{
 			if(tasklisteners!=null && tasklisteners.containsKey(taskid))
 			{
-				Collection	listeners	= tasklisteners.getCollection(taskid);
+				Collection<IResultListener<?>>	listeners	= tasklisteners.get(taskid);
 				for(Iterator it=listeners.iterator(); it.hasNext(); )
 				{
 					if(e==null)
@@ -284,9 +284,9 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 			if(tasks.containsKey(taskid))
 			{				
 				if(tasklisteners==null)
-					tasklisteners	= new MultiCollection();
+					tasklisteners	= new MultiCollection<Object, IResultListener<?>>();
 				
-				tasklisteners.put(taskid, listener);
+				tasklisteners.add(taskid, listener);
 			}
 			else
 			{
@@ -343,10 +343,10 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 					
 					if(tasklisteners!=null && tasklisteners.containsKey(atasks[i].getProperty(IObjectTask.PROPERTY_ID)))
 					{
-						Collection	listeners	= tasklisteners.getCollection(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
-						for(Iterator it=listeners.iterator(); it.hasNext(); )
+						Collection<IResultListener<?>>	listeners	= tasklisteners.get(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
+						for(Iterator<IResultListener<?>> it=listeners.iterator(); it.hasNext(); )
 						{
-							((IResultListener)it.next()).exceptionOccurred(e);
+							it.next().exceptionOccurred(e);
 						}
 						tasklisteners.remove(atasks[i].getProperty(IObjectTask.PROPERTY_ID));				
 						if(tasklisteners.isEmpty())

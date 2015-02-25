@@ -54,13 +54,13 @@ public abstract class AReadContext<T> implements IContext
 	protected Object callcontext;
 	
 	/** The post processors. */
-	protected MultiCollection postprocessors;
+	protected MultiCollection<Integer, IPostProcessorCall> postprocessors;
 	
 	/** The map or array information. */
 	protected Map arrayinfos;
 	
 	/** The map of objects to link in bulk mode (object -> map of tags -> objects per tag). */
-	protected MultiCollection children;
+	protected MultiCollection<Object, Object> children;
 	
 	//-------- constructors --------
 	
@@ -70,7 +70,7 @@ public abstract class AReadContext<T> implements IContext
 	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, T parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
 	{
 		this(pathmanager, handler, parser, reporter, callcontext, classloader, null, new ArrayList(), 
-			null, null, new HashMap(), 0, new MultiCollection());
+			null, null, new HashMap(), 0, new MultiCollection<Integer, IPostProcessorCall>());
 	}
 	
 	/**
@@ -83,7 +83,7 @@ public abstract class AReadContext<T> implements IContext
 	 * @param readobjects
 	 */
 	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, T parser,  XMLReporter reporter, Object callcontext, ClassLoader classloader, Object root, List stack,
-		StackElement topse, String comment, Map readobjects, int readignore, MultiCollection postprocessors)
+		StackElement topse, String comment, Map readobjects, int readignore, MultiCollection<Integer, IPostProcessorCall> postprocessors)
 	{
 		this.pathmanager = pathmanager;
 		this.defaulthandler = handler;
@@ -354,7 +354,7 @@ public abstract class AReadContext<T> implements IContext
 	 *  Get the postprocessors.
 	 *  @return The postprocessors.
 	 */
-	public MultiCollection getPostProcessors()
+	public MultiCollection<Integer, IPostProcessorCall> getPostProcessors()
 	{
 		return postprocessors;
 	}
@@ -363,7 +363,7 @@ public abstract class AReadContext<T> implements IContext
 	 *  Set the postprocessors.
 	 *  @param postprocessors The postprocessors to set.
 	 */
-	public void setPostProcessors(MultiCollection postprocessors)
+	public void setPostProcessors(MultiCollection<Integer, IPostProcessorCall> postprocessors)
 	{
 		this.postprocessors = postprocessors;
 	}	
@@ -400,8 +400,8 @@ public abstract class AReadContext<T> implements IContext
 	public void addChild(Object key, Object value)
 	{
 		if(children==null)
-			children = new MultiCollection();
-		children.put(key, value);
+			children = new MultiCollection<Object, Object>();
+		children.add(key, value);
 	}
 	
 	/**

@@ -173,7 +173,7 @@ public class StarterPanel extends JLayeredPane
 	protected List reselems;
 	protected JCheckBox storeresults;
 	protected JComboBox selectavail;
-	protected MultiCollection resultsets;
+	protected MultiCollection<String, Object> resultsets;
 
 	/** The start button. */
 	protected JButton start;
@@ -221,7 +221,7 @@ public class StarterPanel extends JLayeredPane
 	public StarterPanel(final IControlCenter jcc)
 	{
 		this.jcc = jcc;
-		this.resultsets = new MultiCollection();
+		this.resultsets = new MultiCollection<String, Object>();
 		
 		this.closed = true;
 		this.lastdivloc = 0.5;
@@ -1632,7 +1632,7 @@ public class StarterPanel extends JLayeredPane
 			if(cid!=null)
 			{
 				String tmp = (String)model.getFullName();
-				resultsets.put(tmp, new Object[]{cid, res});
+				resultsets.add(tmp, new Object[]{cid, res});
 				if(fullname.equals(model.getFullName()))
 				{
 					selectavail.addItem(cid);

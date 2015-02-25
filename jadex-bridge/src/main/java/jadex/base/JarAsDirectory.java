@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -44,7 +45,7 @@ public class JarAsDirectory	extends File
 	protected File[] entries;
 	
 	/** The files for the entry paths (cached for easy access). */
-	protected Map	entryfiles;
+	protected Map<String, JarAsDirectory>	entryfiles;
 	
 	/** The refresh flag (normally only for root jar file but in remote case also for entries (partial jars). */
 	protected boolean refresh;
@@ -98,7 +99,7 @@ public class JarAsDirectory	extends File
 		File[]	ret;
 		if(entries!=null)
 		{
-			List	list	= new ArrayList();
+			List<File>	list	= new ArrayList<File>();
 			for(int i=0; i<entries.length; i++)
 			{
 				if(filter.accept(entries[i]))
@@ -119,7 +120,7 @@ public class JarAsDirectory	extends File
 		File[]	ret;
 		if(entries!=null)
 		{
-			List	list	= new ArrayList();
+			List<File>	list	= new ArrayList<File>();
 			for(int i=0; i<entries.length; i++)
 			{
 				if(filter.accept(entries[i].getParentFile(), entries[i].getName()))
@@ -222,10 +223,10 @@ public class JarAsDirectory	extends File
 			changed	= true;
 			this.lastmodified	= new File(jarpath).lastModified();
 			// Read entries into multi-collection (path->entries).
-			MultiCollection	entries	= createEntries();
+			MultiCollection<String, ZipEntry>	entries	= createEntries();
 			
 			// Recursively create files for entries.
-			this.entryfiles	= new HashMap();
+			this.entryfiles	= new HashMap<String, JarAsDirectory>();
 			this.entries	= createFiles("/", entries);
 			
 		}
@@ -236,13 +237,13 @@ public class JarAsDirectory	extends File
 	/**
 	 * 
 	 */
-	public MultiCollection createEntries()
+	public MultiCollection<String, ZipEntry> createEntries()
 	{
-		MultiCollection	entries	= new MultiCollection();
+		MultiCollection<String, ZipEntry>	entries	= new MultiCollection<String, ZipEntry>();
 		
 //		return entries;
 		
-		Set	contained	= new HashSet();
+		Set<String>	contained	= new HashSet<String>();
 		final String mypath = getAbsolutePath();
 		
 		JarFile jar = null;
@@ -266,7 +267,7 @@ public class JarAsDirectory	extends File
 				jar = new JarFile(mypath);
 			}
 			
-			Enumeration	e	= jar.entries();
+			Enumeration<JarEntry>	e	= jar.entries();
 			while(e.hasMoreElements())
 			{
 				ZipEntry	entry	= (ZipEntry)e.nextElement();
@@ -281,7 +282,7 @@ public class JarAsDirectory	extends File
 					}
 					if(!contained.contains(entry.getName()))
 					{
-						entries.put(dir, entry);
+						entries.add(dir, entry);
 						contained.add(entry.getName());
 					}
 					
@@ -336,11 +337,11 @@ public class JarAsDirectory	extends File
 	 *  Create the files for an entry.
 	 *  Recursive implementation for directory entries.
 	 */
-	public File[] createFiles(String key, MultiCollection entries)
+	public File[] createFiles(String key, MultiCollection<String, ZipEntry> entries)
 	{
-		Collection	col	= entries.getCollection(key);
+		Collection<ZipEntry> col	= entries.get(key);
 		JarAsDirectory[]	ret	= new JarAsDirectory[col.size()];
-		Iterator	it	= col.iterator();
+		Iterator<ZipEntry>	it	= col.iterator();
 		for(int i=0; it.hasNext(); i++)
 		{
 			ZipEntry	entry	= (ZipEntry)it.next();
@@ -387,7 +388,7 @@ public class JarAsDirectory	extends File
 	 *  Get the entryfiles.
 	 *  @return the entryfiles.
 	 */
-	public Map getEntryFiles()
+	public Map<String, JarAsDirectory> getEntryFiles()
 	{
 		return entryfiles;
 	}

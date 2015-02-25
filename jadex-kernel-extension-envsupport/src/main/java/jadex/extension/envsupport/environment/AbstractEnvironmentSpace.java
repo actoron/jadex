@@ -94,16 +94,16 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected Map perceptgenerators;
 
 	/** The percept processors. */
-	protected MultiCollection perceptprocessors;
+	protected MultiCollection<String, Object[]> perceptprocessors;
 	
 	/** Avatar mappings. */
-	protected MultiCollection avatarmappings;
+	protected MultiCollection<String, AvatarMapping> avatarmappings;
 
 	/** Initial avatar settings (cid -> [type, props]). */
 	protected Map initialavatars;
 
 	/** Data view mappings. */
-	protected MultiCollection	dataviewmappings;
+	protected MultiCollection<String, Map>	dataviewmappings;
 	
 	/** The environment processes. */
 	protected Map processes;
@@ -168,15 +168,15 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		super(null, new Object());
 		
 		this.views = new HashMap();
-		this.avatarmappings = new MultiCollection();
-		this.dataviewmappings = new MultiCollection();
+		this.avatarmappings = new MultiCollection<String, AvatarMapping>();
+		this.dataviewmappings = new MultiCollection<String, Map>();
 		this.actions = new HashMap();
 		this.processtypes = new HashMap();
 		this.tasktypes = new HashMap();
 		this.processes = new HashMap();
 		this.percepttypes = new HashMap();
 		this.perceptgenerators = new HashMap();
-		this.perceptprocessors = new MultiCollection();
+		this.perceptprocessors = new MultiCollection<String, Object[]>();
 		this.objecttypes = new HashMap();
 		this.objecttypesMeta = new HashMap();
 		this.spaceobjects = new HashMap();
@@ -1651,9 +1651,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			typeobjects.add(ret);
 						
 			// Create view(s) for the object if any.
-			if(dataviewmappings!=null && dataviewmappings.getCollection(ret.getType())!=null)
+			if(dataviewmappings!=null && dataviewmappings.get(ret.getType())!=null)
 			{
-				for(Iterator it=dataviewmappings.getCollection(ret.getType()).iterator(); it.hasNext(); )
+				for(Iterator it=dataviewmappings.get(ret.getType()).iterator(); it.hasNext(); )
 				{
 					try
 					{
@@ -1909,9 +1909,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			}
 
 			// Remove view(s) for the object if any.
-			if(dataviewmappings!=null && dataviewmappings.getCollection(objecttype)!=null)
+			if(dataviewmappings!=null && dataviewmappings.get(objecttype)!=null)
 			{
-				for(Iterator it=dataviewmappings.getCollection(objecttype).iterator(); it.hasNext(); )
+				for(Iterator it=dataviewmappings.get(objecttype).iterator(); it.hasNext(); )
 				{
 					Map	sourceview	= (Map)it.next();
 					removeDataView((String)MEnvSpaceType.getProperty(sourceview, "name")+"_"+id);
@@ -1985,7 +1985,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
-			this.avatarmappings.put(mapping.getComponentType(), mapping);			
+			this.avatarmappings.add(mapping.getComponentType(), mapping);			
 		}
 	}
 
@@ -2281,9 +2281,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					}
 				}
 			}
-			if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
+			if(componenttype!=null && avatarmappings.get(componenttype)!=null)
 			{
-				for(Iterator it=avatarmappings.getCollection(componenttype).iterator(); it.hasNext(); )
+				for(Iterator it=avatarmappings.get(componenttype).iterator(); it.hasNext(); )
 				{
 					AvatarMapping mapping = (AvatarMapping)it.next();
 					// Only create avatar if it has none
@@ -2359,7 +2359,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
-			dataviewmappings.put(objecttype, view);
+			dataviewmappings.add(objecttype, view);
 		}
 	}
 
@@ -2426,7 +2426,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
-			perceptprocessors.put(componenttype, new Object[]{percepttypes, proc});
+			perceptprocessors.add(componenttype, new Object[]{percepttypes, proc});
 		}
 	}
 	
@@ -2558,7 +2558,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //							String	componenttype = application.getComponentType(cid);
 					
 					// Possibly kill avatars of that component.
-					if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
+					if(componenttype!=null && avatarmappings.get(componenttype)!=null)
 					{
 						ISpaceObject[] avatars = getAvatars(desc);
 						if(avatars!=null)
@@ -2810,7 +2810,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected AvatarMapping getAvatarMapping(String componenttype, String avatartype)
 	{
 		AvatarMapping mapping = null;
-		for(Iterator it=avatarmappings.getCollection(componenttype).iterator(); mapping==null && it.hasNext(); )
+		for(Iterator<AvatarMapping> it=avatarmappings.get(componenttype).iterator(); mapping==null && it.hasNext(); )
 		{
 			AvatarMapping	test = (AvatarMapping)it.next();
 			if(avatartype.equals(test.getObjectType()))

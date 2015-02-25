@@ -32,13 +32,13 @@ public class MicroModel extends CacheableKernelModel
 	protected List<FieldInfo> parentinjections;
 
 	/** The argument injection targets. */
-	protected Map<String, Tuple2<FieldInfo, String>> argumentinjections;
+	protected MultiCollection<String, Tuple2<FieldInfo, String>> argumentinjections;
 
 	/** The result injection targets. */
 	protected Map<String, Tuple3<FieldInfo, String, String>> resultinjections;
 	
 	/** The service injection targets. */
-	protected Map<String, Object> serviceinjections;
+	protected MultiCollection<String, Object> serviceinjections;
 	
 	/** The feature injection targets. */
 	protected List<FieldInfo> featureinjections;
@@ -48,6 +48,9 @@ public class MicroModel extends CacheableKernelModel
 	
 	/** The agent methods for given annotations (if any). */
 	protected Map<Class<? extends Annotation>, MethodInfo>	agentmethods;
+	
+	/** The service value callbacks. */
+	protected Map<String, Object> servicecallbacks;
 	
 	/**
 	 *  Create a new model.
@@ -105,8 +108,8 @@ public class MicroModel extends CacheableKernelModel
 	public void addArgumentInjection(String name, FieldInfo field, String convert)
 	{
 		if(argumentinjections==null)
-			argumentinjections = new MultiCollection();
-		argumentinjections.put(name, new Tuple2<FieldInfo, String>(field, convert!=null && convert.length()==0? null: convert));
+			argumentinjections = new MultiCollection<String, Tuple2<FieldInfo, String>>();
+		argumentinjections.add(name, new Tuple2<FieldInfo, String>(field, convert!=null && convert.length()==0? null: convert));
 	}
 	
 	/**
@@ -170,8 +173,8 @@ public class MicroModel extends CacheableKernelModel
 	public void addServiceInjection(String name, FieldInfo field)
 	{
 		if(serviceinjections==null)
-			serviceinjections = new MultiCollection();
-		serviceinjections.put(name, field);
+			serviceinjections = new MultiCollection<String, Object>();
+		serviceinjections.add(name, field);
 	}
 	
 	/**
@@ -182,8 +185,8 @@ public class MicroModel extends CacheableKernelModel
 	public void addServiceInjection(String name, MethodInfo method)
 	{
 		if(serviceinjections==null)
-			serviceinjections = new MultiCollection();
-		serviceinjections.put(name, method);
+			serviceinjections = new MultiCollection<String, Object>();
+		serviceinjections.add(name, method);
 	}
 	
 	/**
@@ -192,7 +195,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public Object[] getServiceInjections(String name)
 	{
-		Collection col = serviceinjections==null? null: (Collection)serviceinjections.get(name);
+		Collection<Object> col = serviceinjections==null? null: serviceinjections.get(name);
 		return col==null? new Object[0]: (Object[])col.toArray(new Object[col.size()]);
 	}
 	

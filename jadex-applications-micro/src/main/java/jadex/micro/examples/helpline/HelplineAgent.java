@@ -48,7 +48,7 @@ public class HelplineAgent
 	protected IInternalAccess agent;
 	
 	/** The map of information. */
-	protected MultiCollection infos;
+	protected MultiCollection<String, InformationEntry> infos;
 	
 	//-------- methods --------
 	
@@ -59,14 +59,14 @@ public class HelplineAgent
 	public IFuture<Void>	agentCreated()
 	{
 //		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
-		this.infos = new MultiCollection();
+		this.infos = new MultiCollection<String, InformationEntry>();
 		Object ini = agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("infos");
 		if(ini!=null && SReflect.isIterable(ini))
 		{
 			for(Iterator it=SReflect.getIterator(ini); it.hasNext(); )
 			{
 				InformationEntry ie = (InformationEntry)it.next();
-				infos.put(ie.getName(), ie);
+				infos.add(ie.getName(), ie);
 			}
 		}
 //		addService(new HelplineService(this));
@@ -88,14 +88,13 @@ public class HelplineAgent
 	public void addInformation(final String name, final String info)
 	{
 //		SServiceProvider.getService(getServiceProvider(), IClockService.class)
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")
+		IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
 //			.addResultListener(createResultListener(new DefaultResultListener()
-			.addResultListener(new DefaultResultListener() // not needed as decoupled service
+		fut.addResultListener(new DefaultResultListener<IClockService>() // not needed as decoupled service
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IClockService cs)
 			{
-				IClockService cs = (IClockService)result;
-				infos.put(name, new InformationEntry(name, info, cs.getTime()));
+				infos.add(name, new InformationEntry(name, info, cs.getTime()));
 			}
 		});
 	}
@@ -107,7 +106,7 @@ public class HelplineAgent
 	 */
 	public Collection<InformationEntry> getInformation(String name)
 	{
-		Collection ret	= (Collection)infos.get(name); 
+		Collection<InformationEntry> ret	= infos.get(name); 
 		return ret!=null ? ret : Collections.EMPTY_LIST;
 	}
 

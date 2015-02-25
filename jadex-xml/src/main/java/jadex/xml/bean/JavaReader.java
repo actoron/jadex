@@ -171,7 +171,7 @@ public class JavaReader
 			TypeInfo ti_mc = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.commons.collection", "MultiCollection")}),
 				new ObjectInfo(MultiCollection.class), new MappingInfo(null, new SubobjectInfo[]{
 				new SubobjectInfo(new XMLInfo("entry"), new AccessInfo("entry", null, null, null,  
-					new BeanAccessInfo(MultiCollection.class.getMethod("putCollection", new Class[]{Object.class, Collection.class}), null, "", MapEntry.class.getMethod("getKey", new Class[0]))), 
+					new BeanAccessInfo(MultiCollection.class.getMethod("put", new Class[]{Object.class, Collection.class}), null, "", MapEntry.class.getMethod("getKey", new Class[0]))), 
 				new SubObjectConverter(entryconv, null), true, null)
 			}));
 			typeinfos.add(ti_mc);

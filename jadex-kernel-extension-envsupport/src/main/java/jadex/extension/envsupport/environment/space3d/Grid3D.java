@@ -36,7 +36,7 @@ public class Grid3D extends Space3D
 	//-------- attributes --------
 	
 	/** All simobject id's accessible per position. */
-	protected MultiCollection objectsygridpos;
+	protected MultiCollection<IVector3, ISpaceObject> objectsygridpos;
 	
 	//-------- constructors --------
 	
@@ -104,9 +104,9 @@ public class Grid3D extends Space3D
 	/**
 	 * Get all SimObjects from a specific type at a specific grid position
 	 */
-	public Collection getSpaceObjectsByGridPosition(IVector3 position, Object type)
+	public Collection<ISpaceObject> getSpaceObjectsByGridPosition(IVector3 position, Object type)
 	{
-		Collection ret = null;
+		Collection<ISpaceObject> ret = null;
 		synchronized(monitor)
 		{
 			if(position!=null)
@@ -114,7 +114,7 @@ public class Grid3D extends Space3D
 				position = adjustPosition(position);
 				IVector3 fieldpos = new Vector3Int(position.getXAsInteger(), position.getYAsInteger(), position.getZAsInteger());
 			
-				Collection simobjs = objectsygridpos.getCollection(fieldpos);
+				Collection<ISpaceObject> simobjs = objectsygridpos.get(fieldpos);
 				if(null == type)
 				{
 					ret = simobjs;
@@ -211,7 +211,7 @@ public class Grid3D extends Space3D
 			IVector3 newpos = adjustPosition(pos);
 			if(newpos!=null)
 			{
-				objectsygridpos.put(new Vector3Int(newpos.getXAsInteger(), newpos.getYAsInteger(), newpos.getZAsInteger()), obj);
+				objectsygridpos.add(new Vector3Int(newpos.getXAsInteger(), newpos.getYAsInteger(), newpos.getZAsInteger()), obj);
 //				System.out.println("add: "+newpos+" "+obj);
 			}
 			
@@ -271,11 +271,11 @@ public class Grid3D extends Space3D
 	 *  @param distance	The distance.
 	 *  @param type	The type (or null for all objects).
 	 */
-	public Set getNearObjects(IVector3 position, IVector1 distance, String type)
+	public Set<ISpaceObject> getNearObjects(IVector3 position, IVector1 distance, String type)
 	{
 		synchronized(monitor)
 		{
-			Set ret = new HashSet();
+			Set<ISpaceObject> ret = new HashSet<ISpaceObject>();
 			
 			int sizex = areasize.getXAsInteger();
 			int sizey = areasize.getYAsInteger();
@@ -306,7 +306,7 @@ public class Grid3D extends Space3D
 						Vector3Int testpos = new Vector3Int((i + sizex) % sizex, (j + sizey) % sizey, (k + sizez) % sizez);
 						if(!getDistance(testpos, pos).greater(distance))
 						{
-							Collection tmp = objectsygridpos.getCollection(testpos);
+							Collection<ISpaceObject> tmp = objectsygridpos.get(testpos);
 							if(tmp != null)
 							{
 								if(type==null)
@@ -315,7 +315,7 @@ public class Grid3D extends Space3D
 								}
 								else
 								{
-									for(Iterator it=tmp.iterator(); it.hasNext(); )
+									for(Iterator<ISpaceObject> it=tmp.iterator(); it.hasNext(); )
 									{
 										ISpaceObject obj = (ISpaceObject)it.next();
 										if(obj.getType().equals(type))

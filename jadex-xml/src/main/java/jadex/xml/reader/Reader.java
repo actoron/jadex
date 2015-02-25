@@ -591,7 +591,7 @@ public class Reader extends AReader
 						final StackElement	ftopse	= topse;
 						final StackElement[]	stack	= readcontext.getStack();	// Use snapshot of stack for error report, as stack isn't available in delayed post processors.
 						final int fi = i;
-						readcontext.getPostProcessors().put(Integer.valueOf(postprocs[i].getPass()), new IPostProcessorCall()
+						readcontext.getPostProcessors().add(Integer.valueOf(postprocs[i].getPass()), new IPostProcessorCall()
 						{
 							public void callPostProcessor() throws Exception
 							{

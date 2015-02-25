@@ -397,7 +397,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param distance
 	 * @return The near objects. 
 	 */
-	public Set getNearObjects(IVector2 position, IVector1 maxdist, final String type)
+	public Set<ISpaceObject> getNearObjects(IVector2 position, IVector1 maxdist, final String type)
 	{
 		synchronized(monitor)
 		{
@@ -444,7 +444,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param distance
 	 * @return The near objects. 
 	 */
-	public Set getNearObjects(IVector2 position, IVector1 maxdist, IFilter filter)
+	public Set<ISpaceObject> getNearObjects(IVector2 position, IVector1 maxdist, IFilter filter)
 	{
 		synchronized(monitor)
 		{
@@ -477,7 +477,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param distance
 	 * @return The near objects. 
 	 */
-	public Set getNearObjects(IVector2 position, IVector1 maxdist, final String type, final IFilter filter)
+	public Set<ISpaceObject> getNearObjects(IVector2 position, IVector1 maxdist, final String type, final IFilter filter)
 	{
 		synchronized(monitor)
 		{

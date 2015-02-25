@@ -143,9 +143,9 @@ public class BpmnXMLReader
 				}
 				catch(RuntimeException e)
 				{
-					Object	se	= new Tuple(((AReadContext)context).getStack());
-					MultiCollection	report	= (MultiCollection)context.getUserContext();
-					report.put(se, e.toString());
+					Tuple	se	= new Tuple(((AReadContext)context).getStack());
+					MultiCollection<Tuple, String>	report	= (MultiCollection<Tuple, String>)context.getUserContext();
+					report.add(se, e.toString());
 				}
 			}
 			
@@ -173,7 +173,7 @@ public class BpmnXMLReader
 				Tuple	stack	= new Tuple(info instanceof StackElement[] ? (StackElement[])info : ((AReadContext)context).getStack());
 				
 				Map	user	= (Map)context.getUserContext();
-				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
+				MultiCollection<Tuple, String>	report	= (MultiCollection<Tuple, String>)user.get(CONTEXT_ENTRIES);
 				String	pos;
 				if(stack.getEntities().length>0)
 				{
@@ -184,7 +184,7 @@ public class BpmnXMLReader
 				{
 					pos	= " (line 0, column 0)";			
 				}
-				report.put(stack, msg+pos);
+				report.add(stack, msg+pos);
 			}
 		});
 		
@@ -208,7 +208,7 @@ public class BpmnXMLReader
 	public static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root) throws Exception
 	{
 		Map	user	= new HashMap();
-		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
+		MultiCollection<Tuple, String>	report	= new MultiCollection<Tuple, String>(new IndexMap().getAsMap(), LinkedHashSet.class);
 		user.put(CONTEXT_ENTRIES, report);
 		user.put(SEQUENCE_EDGES, new HashMap<String, MSequenceEdge>());
 		MBpmnModel ret = (MBpmnModel)reader.read(manager, handler, rinfo.getInputStream(), classloader, user);
@@ -232,11 +232,11 @@ public class BpmnXMLReader
 		
 		if(!((ModelInfo)ret.getModelInfo()).checkName())
 		{
-			report.put(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Name '"+ret.getModelInfo().getName()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
+			report.add(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Name '"+ret.getModelInfo().getName()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
 		}
 		if(!((ModelInfo)ret.getModelInfo()).checkPackage())
 		{
-			report.put(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Package '"+ret.getModelInfo().getPackage()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
+			report.add(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Package '"+ret.getModelInfo().getPackage()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
 		}
 
 		if(report.size()>0)
@@ -251,7 +251,7 @@ public class BpmnXMLReader
 	/**
      *  Build the error report.
      */
-    public static IErrorReport buildReport(String modelname, String filename, MultiCollection entries)
+    public static IErrorReport buildReport(String modelname, String filename, MultiCollection<Tuple, String> entries)
     {
         return new AbstractErrorReportBuilder(modelname, filename,
             new String[]{"Component", "Configuration"}, entries, null)

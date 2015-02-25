@@ -38,10 +38,10 @@ public class CMSUpdateHandler
 	protected IRemoteChangeListener<?>	rcl;
 	
 	/** The local listeners for the remote CMSs (cms cid->listeners). */
-	protected MultiCollection	listeners;
+	protected MultiCollection<IComponentIdentifier, ICMSComponentListener>	listeners;
 	
 	/** The futures of listeners registered during ongoing installation (cms cid->futures). */
-	protected MultiCollection	futures;
+	protected MultiCollection<IComponentIdentifier, Future<Void>>	futures;
 	
 	//-------- constructors --------
 	
@@ -62,9 +62,9 @@ public class CMSUpdateHandler
 					{
 						if(listeners!=null && listeners.containsKey(event.getSource()))
 						{
-							Collection<?>	clis	= listeners.getCollection(event.getSource());
+							Collection<ICMSComponentListener>	clis	= listeners.get(event.getSource());
 //							System.out.println("cmshandler: "+CMSUpdateHandler.this+" "+event+" "+clis);
-							informListeners(event, (ICMSComponentListener[])clis.toArray(new ICMSComponentListener[clis.size()]));
+							informListeners(event, clis.toArray(new ICMSComponentListener[clis.size()]));
 							ret.setResult(null);
 						}
 						else
@@ -141,17 +141,17 @@ public class CMSUpdateHandler
 		Future<Void>	ret	= new Future<Void>();
 		if(listeners==null)
 		{
-			this.listeners	= new MultiCollection();
+			this.listeners	= new MultiCollection<IComponentIdentifier, ICMSComponentListener>();
 		}
 		
 		// Already registered
 		if(listeners.containsKey(cid))
 		{
-			listeners.put(cid, listener);
+			listeners.add(cid, listener);
 			// Ongoing registration.
 			if(futures!=null && futures.containsKey(cid))
 			{
-				futures.put(cid, ret);				
+				futures.add(cid, ret);				
 			}
 			// Registration already finished.
 			else
@@ -165,10 +165,10 @@ public class CMSUpdateHandler
 		{
 			if(futures==null)
 			{
-				this.futures	= new MultiCollection();
+				this.futures	= new MultiCollection<IComponentIdentifier, Future<Void>>();
 			}
-			futures.put(cid, ret);
-			listeners.put(cid, listener);
+			futures.add(cid, ret);
+			listeners.add(cid, listener);
 
 			SRemoteGui.installRemoteCMSListener(access, cid, rcl, buildId(cid))
 				.addResultListener(new SwingDefaultResultListener<Void>()
@@ -178,10 +178,10 @@ public class CMSUpdateHandler
 					assert SwingUtilities.isEventDispatchThread();
 					if(futures!=null)	// Todo: can be null?
 					{
-						Collection<?> coll	= futures.getCollection(cid);
-						for(Iterator<?> it=coll.iterator(); it.hasNext(); )
+						Collection<Future<Void>> coll	= futures.get(cid);
+						for(Iterator<Future<Void>> it=coll.iterator(); it.hasNext(); )
 						{
-							((Future<?>)it.next()).setResult(null);
+							it.next().setResult(null);
 						}
 						futures.remove(cid);
 						if(futures.isEmpty())
@@ -197,10 +197,10 @@ public class CMSUpdateHandler
 					
 					if(futures!=null)	// Todo: why can be null?
 					{
-						Collection<?> coll	= futures.getCollection(cid);
-						for(Iterator<?> it=coll.iterator(); it.hasNext(); )
+						Collection<Future<Void>> coll	= futures.get(cid);
+						for(Iterator<Future<Void>> it=coll.iterator(); it.hasNext(); )
 						{
-							((Future<?>)it.next()).setException(exception);
+							it.next().setException(exception);
 						}
 						futures.remove(cid);
 						if(futures.isEmpty())

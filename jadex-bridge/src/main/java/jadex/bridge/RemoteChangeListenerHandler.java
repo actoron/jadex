@@ -58,16 +58,16 @@ public abstract class RemoteChangeListenerHandler
 	protected IRemoteChangeListener	rcl;
 	
 	/** The added elements (if any). */
-	protected MultiCollection	added;
+	protected MultiCollection<String, Object>	added;
 	
 	/** The changed elements (if any). */
-	protected MultiCollection	changed;
+	protected MultiCollection<String, Object>	changed;
 	
 	/** The removed elements (if any). */
-	protected MultiCollection	removed;
+	protected MultiCollection<String, Object>	removed;
 	
 	/** The listed occurrences (if any). */
-	protected MultiCollection	occurred;
+	protected MultiCollection<String, Object>	occurred;
 	
 	/** The update timer (if any). */
 	protected Timer	timer;
@@ -85,10 +85,10 @@ public abstract class RemoteChangeListenerHandler
 		this.id	= id;
 		this.instance	= instance;
 		this.rcl	= rcl;
-		this.added	= new MultiCollection(new HashMap(), LinkedHashSet.class);
-		this.removed	= new MultiCollection(new HashMap(), LinkedHashSet.class);
-		this.changed	= new MultiCollection(new HashMap(), LinkedHashSet.class);
-		this.occurred	= new MultiCollection();
+		this.added	= new MultiCollection<String, Object>(new HashMap(), LinkedHashSet.class);
+		this.removed	= new MultiCollection<String, Object>(new HashMap(), LinkedHashSet.class);
+		this.changed	= new MultiCollection<String, Object>(new HashMap(), LinkedHashSet.class);
+		this.occurred	= new MultiCollection<String, Object>();
 	}
 	
 	//-------- methods --------
@@ -100,12 +100,12 @@ public abstract class RemoteChangeListenerHandler
 	 */
 	public void	elementAdded(String type, Object value)
 	{
-		if(!removed.containsKey(type) || !removed.getCollection(type).remove(value))
+		if(!removed.containsKey(type) || !removed.get(type).remove(value))
 		{
 			if(changed.containsKey(type))
-				changed.getCollection(type).remove(value);
+				changed.get(type).remove(value);
 			
-			added.put(type, value);
+			added.add(type, value);
 		}
 		
 		startTimer();
@@ -118,12 +118,12 @@ public abstract class RemoteChangeListenerHandler
 	 */
 	public void	elementRemoved(String type, Object value)
 	{
-		if(!added.containsKey(type) || !added.getCollection(type).remove(value))
+		if(!added.containsKey(type) || !added.get(type).remove(value))
 		{
 			if(changed.containsKey(type))
-				changed.getCollection(type).remove(value);
+				changed.get(type).remove(value);
 			
-			removed.put(type, value);
+			removed.add(type, value);
 		}
 		
 		startTimer();
@@ -136,18 +136,18 @@ public abstract class RemoteChangeListenerHandler
 	 */
 	public void	elementChanged(String type, Object value)
 	{
-		if(!removed.containsKey(type) || !removed.getCollection(type).remove(value))
+		if(!removed.containsKey(type) || !removed.get(type).remove(value))
 		{
-			if(added.containsKey(type) && added.getCollection(type).remove(value))
+			if(added.containsKey(type) && added.get(type).remove(value))
 			{
 				// Replace added element.
-				added.put(type, value);
+				added.add(type, value);
 			}
 			else
 			{
 				// Hack!!! Remove before add, because set does not replace.
-				changed.getCollection(type).remove(value);
-				changed.put(type, value);
+				changed.get(type).remove(value);
+				changed.add(type, value);
 			}
 		}
 		
@@ -161,7 +161,7 @@ public abstract class RemoteChangeListenerHandler
 	 */
 	public void	occurrenceAppeared(String type, Object value)
 	{
-		occurred.put(type, value);
+		occurred.add(type, value);
 		
 		startTimer();
 	}
@@ -200,12 +200,12 @@ public abstract class RemoteChangeListenerHandler
 									for(Iterator it=removed.keySet().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 									{
 										String	type	= (String)it.next();
-										for(Iterator it2=removed.getCollection(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
+										for(Iterator it2=removed.get(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
 										{
 											events.add(new ChangeEvent(null, type+EVENT_REMOVED, it2.next()));
 											it2.remove();
 										}
-										if(removed.getCollection(type).isEmpty())
+										if(removed.get(type).isEmpty())
 										{
 											it.remove();
 										}
@@ -216,12 +216,12 @@ public abstract class RemoteChangeListenerHandler
 									for(Iterator it=added.keySet().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 									{
 										String	type	= (String)it.next();
-										for(Iterator it2=added.getCollection(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
+										for(Iterator it2=added.get(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
 										{
 											events.add(new ChangeEvent(null, type+EVENT_ADDED, it2.next()));
 											it2.remove();
 										}
-										if(added.getCollection(type).isEmpty())
+										if(added.get(type).isEmpty())
 										{
 											it.remove();
 										}
@@ -232,12 +232,12 @@ public abstract class RemoteChangeListenerHandler
 									for(Iterator it=changed.keySet().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 									{
 										String	type	= (String)it.next();
-										for(Iterator it2=changed.getCollection(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
+										for(Iterator it2=changed.get(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
 										{
 											events.add(new ChangeEvent(null, type+EVENT_CHANGED, it2.next()));
 											it2.remove();
 										}
-										if(changed.getCollection(type).isEmpty())
+										if(changed.get(type).isEmpty())
 										{
 											it.remove();
 										}
@@ -248,12 +248,12 @@ public abstract class RemoteChangeListenerHandler
 									for(Iterator it=occurred.keySet().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 									{
 										String	type	= (String)it.next();
-										for(Iterator it2=occurred.getCollection(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
+										for(Iterator it2=occurred.get(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
 										{
 											events.add(new ChangeEvent(null, type+EVENT_OCCURRED, it2.next()));
 											it2.remove();
 										}
-										if(occurred.getCollection(type).isEmpty())
+										if(occurred.get(type).isEmpty())
 										{
 											it.remove();
 										}

@@ -681,7 +681,7 @@ public class MessageService extends BasicService implements IMessageService
 		// in order to decouple sending to different destinations.
 		
 		// Determine manager tasks
-		MultiCollection managers = new MultiCollection();
+		MultiCollection<SendManager, IComponentIdentifier> managers = new MultiCollection<SendManager, IComponentIdentifier>();
 		String recid = type.getReceiverIdentifier();
 		Object tmp	= msgcopy.get(recid);
 		if(SReflect.isIterable(tmp))
@@ -690,14 +690,14 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)it.next();
 				SendManager sm = getSendManager(cid); 
-				managers.put(sm, cid);
+				managers.add(sm, cid);
 			}
 		}
 		else
 		{
 			IComponentIdentifier cid = (IComponentIdentifier)tmp;
 			SendManager sm = getSendManager(cid); 
-			managers.put(sm, cid);
+			managers.add(sm, cid);
 		}
 		
 		byte[] cids	= codecids;
@@ -714,7 +714,7 @@ public class MessageService extends BasicService implements IMessageService
 		for(Iterator<?> it=managers.keySet().iterator(); it.hasNext();)
 		{
 			SendManager tm = (SendManager)it.next();
-			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
+			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.get(tm).toArray(new IComponentIdentifier[0]);
 			
 			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl, enccontext);
 			tm.addMessage(task).addResultListener(crl);

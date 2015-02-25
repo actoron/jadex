@@ -43,12 +43,12 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		MultiCollection ret = (MultiCollection)getReturnObject(object, clazz, clone);
-		MultiCollection map = (MultiCollection)object;
+		MultiCollection<Object, Object> ret = (MultiCollection<Object, Object>)getReturnObject(object, clazz, clone);
+		MultiCollection<Object, Object> map = (MultiCollection<Object, Object>)object;
 		
 		traversed.put(object, ret);
 		
-		Set keyset = map.keySet();
+		Set<Object> keyset = map.keySet();
 		Object[] keys = keyset.toArray(new Object[keyset.size()]);
 		for(int i=0; i<keys.length; i++)
 		{
@@ -57,14 +57,14 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 			Object newkey = traverser.doTraverse(key, keyclazz, traversed, processors, clone, targetcl, context);
 			if (newkey != Traverser.IGNORE_RESULT)
 			{
-				Collection vals = (Collection) map.get(key);
-				for (Object val : vals)
+				Collection<Object> vals = map.get(key);
+				for(Object val : vals)
 				{
-					Class valclazz = val!=null? val.getClass(): null;
+					Class<?> valclazz = val!=null? val.getClass(): null;
 					Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
 					
 					if(newval != Traverser.IGNORE_RESULT && (clone || newval!=val))
-						ret.put(newkey, newval);
+						ret.add(newkey, newval);
 				}
 			}
 		}
@@ -75,7 +75,7 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 	/**
 	 * 
 	 */
-	public Object getReturnObject(Object object, Class clazz, boolean clone)
+	public Object getReturnObject(Object object, Class<?> clazz, boolean clone)
 	{
 		Object ret = object;
 		
@@ -88,7 +88,7 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 			catch(Exception e)
 			{
 				// Using linked hash map as default to avoid loosing order if has order.
-				ret = new LinkedHashMap();
+				ret = new LinkedHashMap<Object, Object>();
 			}
 		}
 		

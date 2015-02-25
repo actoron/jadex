@@ -33,7 +33,7 @@ public class MEnvSpaceInstance	implements IExtensionInfo
 	protected MEnvSpaceType spacetype;
 	
 	/** The properties. */
-	protected Map properties;
+	protected MultiCollection<String, Object> properties;
 	
 	//-------- IExtensionInfo interface --------
 
@@ -77,8 +77,8 @@ public class MEnvSpaceInstance	implements IExtensionInfo
 	{
 //		System.out.println("addP: "+key+" "+value);
 		if(properties==null)
-			properties = new MultiCollection();
-		properties.put(key, value);
+			properties = new MultiCollection<String, Object>();
+		properties.add(key, value);
 	}
 	
 	/**
@@ -86,7 +86,7 @@ public class MEnvSpaceInstance	implements IExtensionInfo
 	 *  @param key The key.
 	 *  @return The value.
 	 */
-	public List getPropertyList(String key)
+	public List<Object> getPropertyList(String key)
 	{
 		return properties!=null? (List)properties.get(key):  null;
 	}

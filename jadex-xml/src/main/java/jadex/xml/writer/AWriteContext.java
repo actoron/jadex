@@ -2,6 +2,7 @@ package jadex.xml.writer;
 
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.IContext;
+import jadex.xml.IPreProcessor;
 import jadex.xml.Namespace;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public abstract class AWriteContext<T> implements IContext
 	protected List stack;
 	
 	/** The pre processors. */
-	protected MultiCollection preprocessors;
+	protected MultiCollection<Integer, IPreProcessor> preprocessors;
 	
 	/** The id counter. */
 	protected int id;
@@ -58,14 +59,14 @@ public abstract class AWriteContext<T> implements IContext
 	 */
 	public AWriteContext(IObjectWriterHandler handler, T writer, Object usercontext, Object rootobject, ClassLoader classloader)
 	{
-		this(handler, writer, usercontext, rootobject, classloader, new IdentityHashMap(), new ArrayList(), new MultiCollection());
+		this(handler, writer, usercontext, rootobject, classloader, new IdentityHashMap(), new ArrayList(), new MultiCollection<Integer, IPreProcessor>());
 	}
 		
 	/**
 	 *  Create a new write context.
 	 */
 	public AWriteContext(IObjectWriterHandler handler, T writer, Object usercontext, Object rootobject, ClassLoader classloader, 
-		Map writtenobs, List stack, MultiCollection preprocessors)
+		Map writtenobs, List stack, MultiCollection<Integer, IPreProcessor> preprocessors)
 	{
 		this.handler = handler;
 		this.writer = writer;
@@ -219,7 +220,7 @@ public abstract class AWriteContext<T> implements IContext
 	 *  Get the preprocessors.
 	 *  @return The preprocessors.
 	 */
-	public MultiCollection getPreProcessors()
+	public MultiCollection<Integer, IPreProcessor> getPreProcessors()
 	{
 		return this.preprocessors;
 	}
@@ -228,7 +229,7 @@ public abstract class AWriteContext<T> implements IContext
 	 *  Set the preprocessors.
 	 *  @param preprocessors The preprocessors to set.
 	 */
-	public void setPreProcessors(MultiCollection preprocessors)
+	public void setPreProcessors(MultiCollection<Integer, IPreProcessor> preprocessors)
 	{
 		this.preprocessors = preprocessors;
 	}

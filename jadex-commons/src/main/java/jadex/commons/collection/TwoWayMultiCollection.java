@@ -69,18 +69,18 @@ public class TwoWayMultiCollection	extends MultiCollection
 	 *            keys or values, and the specified key or value is
 	 *            <tt>null</tt>.
 	 */
-	public Object put(Object key, Object value)
+	public Collection<Object> add(Object key, Object value)
 	{
-		reverse._put(value, key);
-		return super.put(key, value);
+		reverse._add(value, key);
+		return super.add(key, value);
 	}
 
 	/**
 	 *  Internal put method, which doesn't affect the reverse collection.
 	 */
-	protected Object _put(Object key, Object value)
+	protected Object _add(Object key, Object value)
 	{
-		return super.put(key, value);
+		return super.add(key, value);
 	}
 
 	/**
@@ -124,9 +124,9 @@ public class TwoWayMultiCollection	extends MultiCollection
 	 * @throws NullPointerException if the key is <tt>null</tt> and this map
 	 *            does not not permit <tt>null</tt> keys (optional).
 	 */
-	public Object	remove(Object key)
+	public Collection<Object>	remove(Object key)
 	{
-		Collection	coll	= getCollection(key);
+		Collection	coll	= get(key);
 		for(Iterator i=coll.iterator(); i.hasNext(); )
 		{
 			reverse._remove(i.next(), key);

@@ -30,10 +30,10 @@ public abstract class AbstractErrorReportBuilder
 	protected String[] categories;
 	
 	/** The parse errors (tuple(elements) -> {error messages}). */
-	protected MultiCollection	entries;
+	protected MultiCollection<Tuple, String>	entries;
 	
 	/** The external documents for links in html error reports (id -> html text). */
-	protected Map	externals;
+	protected Map<String, String>	externals;
 		
 	//-------- constructors --------
 	
@@ -47,7 +47,7 @@ public abstract class AbstractErrorReportBuilder
 	 *  @param entries	The parse errors (tuple(stack elements) -> {error messages}).
 	 *  @param externals	The external documents for links in html error reports, if any (id -> html text).
 	 */
-	public AbstractErrorReportBuilder(String name, String filename, String[] categories, MultiCollection entries, Map externals)
+	public AbstractErrorReportBuilder(String name, String filename, String[] categories, MultiCollection<Tuple, String> entries, Map<String, String> externals)
 	{
 		this.name	= name;
 		this.filename	= filename;
@@ -119,7 +119,7 @@ public abstract class AbstractErrorReportBuilder
 		}
 		else
 		{
-			Collection	ret	= entries.getCollection(path);
+			Collection<String>	ret	= entries.get(path);
 			return (String[])ret.toArray(new String[ret.size()]);
 		}
 	}
@@ -187,14 +187,14 @@ public abstract class AbstractErrorReportBuilder
 			buf.append("\n");
 		}
 
-		Set[]	catels	= new Set[categories.length];
-		Set excludes	= new HashSet();
+		Set<Object>[]	catels	= new Set[categories.length];
+		Set<Object> excludes	= new HashSet<Object>();
 		for(int i=0; i<categories.length; i++)
 		{
 			catels[i]	= getOwnedElementErrors(categories[i]);
 			excludes.addAll(catels[i]);
 		}
-		Set	others	= getOtherErrors(excludes);
+		Set<Object>	others	= getOtherErrors(excludes);
 
 		
 		// Summaries.
@@ -220,9 +220,9 @@ public abstract class AbstractErrorReportBuilder
 	/**
 	 *  Get elements of the given owner type, which have errors or contain elements with errors.
 	 */
-	protected Set	getOwnedElementErrors(String category)
+	protected Set<Object>	getOwnedElementErrors(String category)
 	{
-		Set	errors	= SCollection.createLinkedHashSet();
+		Set<Object>	errors	= SCollection.createLinkedHashSet();
 		Tuple[]	elements	= getElements();			
 		for(int i=0; i<elements.length; i++)
 		{
@@ -248,9 +248,9 @@ public abstract class AbstractErrorReportBuilder
 	/**
 	 *  Get other errors, not in the given tags.
 	 */
-	protected Set	getOtherErrors(Set excludes)
+	protected Set<Object>	getOtherErrors(Set<Object> excludes)
 	{
-		Set	errors	= SCollection.createLinkedHashSet();
+		Set<Object>	errors	= SCollection.createLinkedHashSet();
 		Tuple[]	elements	= getElements();			
 		for(int i=0; i<elements.length; i++)
 		{
@@ -300,10 +300,10 @@ public abstract class AbstractErrorReportBuilder
 	 */
 	protected Tuple[]	getElementErrors(Object ancestor)
 	{
-		List	errors;
+		List<Tuple>	errors;
 		if(entries.containsKey(ancestor))
 		{
-			errors	=  Collections.singletonList(ancestor);
+			errors	=  (List)Collections.singletonList(ancestor);
 		}
 		else
 		{
@@ -330,14 +330,14 @@ public abstract class AbstractErrorReportBuilder
 	/**
 	 *  Generate overview HTML code for the given elements.
 	 */
-	protected void	generateOverview(StringBuffer buf, String type, Set elements)
+	protected void	generateOverview(StringBuffer buf, String type, Set<Object> elements)
 	{
 		if(!elements.isEmpty())
 		{
 			buf.append("<li>");
 			buf.append(type);
 			buf.append(" errors\n<ul>\n");
-			for(Iterator it=elements.iterator(); it.hasNext(); )
+			for(Iterator<Object> it=elements.iterator(); it.hasNext(); )
 			{
 				Object	obj	= it.next();
 				String name = getObjectName(obj);
@@ -354,14 +354,14 @@ public abstract class AbstractErrorReportBuilder
 	/**
 	 *  Generate detail HTML code for the given elements.
 	 */
-	protected void	generateDetails(StringBuffer buf, String type, Set elements)
+	protected void	generateDetails(StringBuffer buf, String type, Set<Object> elements)
 	{
 		if(!elements.isEmpty())
 		{
 			buf.append("<h4>");
 			buf.append(type);
 			buf.append(" details</h4>\n<ul>\n");
-			for(Iterator it=elements.iterator(); it.hasNext(); )
+			for(Iterator<Object> it=elements.iterator(); it.hasNext(); )
 			{
 				Object	obj	= it.next();
 				String name = getObjectName(obj);
