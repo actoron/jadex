@@ -747,8 +747,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					{
 						public void customResultAvailable(Object result)
 						{
-							if (result != null)
+//							System.out.println("model: "+model+" "+result);
+							if(result != null)
+							{
 								ret.setResult(result);
+							}
 							else
 							{
 								// FIXME: Blacklist? What if a new factory model is added later?
@@ -889,7 +892,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		final Future ret = new Future();
 		
 //		Collection kernels = kernellocationcache.getCollection(getModelExtension(model));
-		Tuple2<Object, Object> cachedkernels = getCacheKeyValueForModel(model, kernellocationcache);
+		Tuple2<String, Object> cachedkernels = getCacheKeyValueForModel(model, (Map) kernellocationcache);
 		final Object kernelsext = cachedkernels != null? cachedkernels.getFirstEntity(): null;
 		Collection kernels = cachedkernels != null? (Collection) cachedkernels.getSecondEntity() : null;
 		String cachedresult = null;
@@ -959,7 +962,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //			if(loc.toLowerCase().indexOf("multi")==-1)
 //				System.out.println("loc: "+loc+", "+getCacheKeyValueForModel((String)loc, kernellocationcache)+", "+kernellocationcache);
 
-			ret	= getCacheKeyValueForModel((String)loc, kernellocationcache)!=null;
+			ret	= getCacheKeyValueForModel((String)loc, (Map) kernellocationcache)!=null;
 			if(ret)
 			{
 				break;
@@ -1181,7 +1184,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				if (kernellocs != null && !kernellocs.isEmpty())
 				{
 //					System.out.println("searchPotentialURLs1: "+kernellocs+", "+kernellocationcache);
-					kernellocationcache.putAll(kernellocs);
+//					kernellocationcache.putAll(kernellocs);
+					kernellocationcache.addAll(kernellocs);
 					activekernelsdirty = true;
 //					System.out.println("searchPotentialURLs1b: "+kernellocs+", "+kernellocationcache);
 					ret.setResult(null);
@@ -1664,7 +1668,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected Object getCacheResultForModel(String model, Map map)
 	{
-		Tuple2<Object, Object> ret = getCacheKeyValueForModel(model, map);
+		Tuple2<String, Object> ret = getCacheKeyValueForModel(model, map);
 		return ret != null? ret.getSecondEntity() : null;
 	}
 	
@@ -1675,19 +1679,18 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param map The cache.
 	 *  @return A cache hit or null.
 	 */
-	protected Tuple2<Object, Object> getCacheKeyValueForModel(String model, Map map)
+	protected Tuple2<String, Object> getCacheKeyValueForModel(String model, Map<String, Object> map)
 	{
-		Tuple2<Object, Object> ret = null;
+		Tuple2<String, Object> ret = null;
 
 		if (model != null && map != null)
 		{
-			for (Object oentry : map.entrySet())
+			for (Map.Entry<String, Object> entry : map.entrySet())
 			{
-				Map.Entry entry = (Map.Entry) oentry;
-				String ext = (String) entry.getKey();
+				String ext = entry.getKey();
 				if (model.endsWith(ext))
 				{
-					ret = new Tuple2<Object, Object>(entry.getKey(), entry.getValue());
+					ret = new Tuple2<String, Object>(entry.getKey(), entry.getValue());
 					
 					break;
 				}
