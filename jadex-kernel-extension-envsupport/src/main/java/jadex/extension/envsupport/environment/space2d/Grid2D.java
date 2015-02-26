@@ -114,7 +114,7 @@ public class Grid2D extends Space2D
 				position = adjustPosition(position);
 				IVector2 fieldpos = new Vector2Int(position.getXAsInteger(), position.getYAsInteger());
 			
-				Collection<ISpaceObject> simobjs = objectsygridpos.get(fieldpos);
+				Collection<ISpaceObject> simobjs = objectsygridpos.getCollection(fieldpos);
 				if(null == type)
 				{
 					ret = simobjs;
@@ -333,7 +333,7 @@ public class Grid2D extends Space2D
 				{
 					Vector2Int testpos = new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey);
 
-					Collection<ISpaceObject> tmp = objectsygridpos.get(testpos);
+					Collection<ISpaceObject> tmp = objectsygridpos.getCollection(testpos);
 					if(tmp != null)
 					{
 						if(types==null)
@@ -395,7 +395,7 @@ public class Grid2D extends Space2D
 					Vector2Int testpos = new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey);
 					if(!getDistance(testpos, pos).greater(distance))
 					{
-						Collection<ISpaceObject> tmp = objectsygridpos.get(testpos);
+						Collection<ISpaceObject> tmp = objectsygridpos.getCollection(testpos);
 						if(tmp != null)
 						{
 							if(type==null)

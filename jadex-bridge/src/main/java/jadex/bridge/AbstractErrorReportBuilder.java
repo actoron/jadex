@@ -119,7 +119,7 @@ public abstract class AbstractErrorReportBuilder
 		}
 		else
 		{
-			Collection<String>	ret	= entries.get(path);
+			Collection<String>	ret	= entries.getCollection(path);
 			return (String[])ret.toArray(new String[ret.size()]);
 		}
 	}

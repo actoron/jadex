@@ -62,7 +62,7 @@ public class CMSUpdateHandler
 					{
 						if(listeners!=null && listeners.containsKey(event.getSource()))
 						{
-							Collection<ICMSComponentListener>	clis	= listeners.get(event.getSource());
+							Collection<ICMSComponentListener>	clis	= listeners.getCollection(event.getSource());
 //							System.out.println("cmshandler: "+CMSUpdateHandler.this+" "+event+" "+clis);
 							informListeners(event, clis.toArray(new ICMSComponentListener[clis.size()]));
 							ret.setResult(null);
@@ -178,7 +178,7 @@ public class CMSUpdateHandler
 					assert SwingUtilities.isEventDispatchThread();
 					if(futures!=null)	// Todo: can be null?
 					{
-						Collection<Future<Void>> coll	= futures.get(cid);
+						Collection<Future<Void>> coll	= futures.getCollection(cid);
 						for(Iterator<Future<Void>> it=coll.iterator(); it.hasNext(); )
 						{
 							it.next().setResult(null);
@@ -197,7 +197,7 @@ public class CMSUpdateHandler
 					
 					if(futures!=null)	// Todo: why can be null?
 					{
-						Collection<Future<Void>> coll	= futures.get(cid);
+						Collection<Future<Void>> coll	= futures.getCollection(cid);
 						for(Iterator<Future<Void>> it=coll.iterator(); it.hasNext(); )
 						{
 							it.next().setException(exception);

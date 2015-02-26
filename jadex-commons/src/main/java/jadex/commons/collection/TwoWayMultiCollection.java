@@ -126,7 +126,7 @@ public class TwoWayMultiCollection	extends MultiCollection
 	 */
 	public Collection<Object>	remove(Object key)
 	{
-		Collection	coll	= get(key);
+		Collection	coll	= getCollection(key);
 		for(Iterator i=coll.iterator(); i.hasNext(); )
 		{
 			reverse._remove(i.next(), key);

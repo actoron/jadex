@@ -144,7 +144,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 						Object[] procs = space.getProcesses().toArray();
 						for(int i = 0; i < procs.length; ++i)
 						{
-							ISpaceProcess process = (ISpaceProcess) procs[i];
+							ISpaceProcess process = (ISpaceProcess)procs[i];
 							process.start(clockservice, space);
 						}
 	

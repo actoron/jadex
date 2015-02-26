@@ -69,7 +69,7 @@ public class ParameterElementFilter implements IFilter, Serializable
 
 		if(values.containsKey(name))
 		{
-			Collection<Object> vals = values.get(name);
+			Collection<Object> vals = values.getCollection(name);
 			if(vals.contains(value))
 			{
 				return true;

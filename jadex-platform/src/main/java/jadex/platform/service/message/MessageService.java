@@ -714,7 +714,7 @@ public class MessageService extends BasicService implements IMessageService
 		for(Iterator<?> it=managers.keySet().iterator(); it.hasNext();)
 		{
 			SendManager tm = (SendManager)it.next();
-			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.get(tm).toArray(new IComponentIdentifier[0]);
+			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
 			
 			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl, enccontext);
 			tm.addMessage(task).addResultListener(crl);

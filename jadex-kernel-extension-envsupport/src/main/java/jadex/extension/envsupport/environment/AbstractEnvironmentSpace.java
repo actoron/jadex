@@ -2810,7 +2810,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected AvatarMapping getAvatarMapping(String componenttype, String avatartype)
 	{
 		AvatarMapping mapping = null;
-		for(Iterator<AvatarMapping> it=avatarmappings.get(componenttype).iterator(); mapping==null && it.hasNext(); )
+		for(Iterator<AvatarMapping> it=avatarmappings.getCollection(componenttype).iterator(); mapping==null && it.hasNext(); )
 		{
 			AvatarMapping	test = (AvatarMapping)it.next();
 			if(avatartype.equals(test.getObjectType()))

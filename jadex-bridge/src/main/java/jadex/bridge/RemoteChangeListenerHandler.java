@@ -100,10 +100,10 @@ public abstract class RemoteChangeListenerHandler
 	 */
 	public void	elementAdded(String type, Object value)
 	{
-		if(!removed.containsKey(type) || !removed.get(type).remove(value))
+		if(!removed.containsKey(type) || !removed.getCollection(type).remove(value))
 		{
 			if(changed.containsKey(type))
-				changed.get(type).remove(value);
+				changed.getCollection(type).remove(value);
 			
 			added.add(type, value);
 		}
@@ -118,10 +118,10 @@ public abstract class RemoteChangeListenerHandler
 	 */
 	public void	elementRemoved(String type, Object value)
 	{
-		if(!added.containsKey(type) || !added.get(type).remove(value))
+		if(!added.containsKey(type) || !added.getCollection(type).remove(value))
 		{
 			if(changed.containsKey(type))
-				changed.get(type).remove(value);
+				changed.getCollection(type).remove(value);
 			
 			removed.add(type, value);
 		}
@@ -136,9 +136,9 @@ public abstract class RemoteChangeListenerHandler
 	 */
 	public void	elementChanged(String type, Object value)
 	{
-		if(!removed.containsKey(type) || !removed.get(type).remove(value))
+		if(!removed.containsKey(type) || !removed.getCollection(type).remove(value))
 		{
-			if(added.containsKey(type) && added.get(type).remove(value))
+			if(added.containsKey(type) && added.getCollection(type).remove(value))
 			{
 				// Replace added element.
 				added.add(type, value);
@@ -146,7 +146,7 @@ public abstract class RemoteChangeListenerHandler
 			else
 			{
 				// Hack!!! Remove before add, because set does not replace.
-				changed.get(type).remove(value);
+				changed.getCollection(type).remove(value);
 				changed.add(type, value);
 			}
 		}
@@ -200,12 +200,12 @@ public abstract class RemoteChangeListenerHandler
 									for(Iterator it=removed.keySet().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 									{
 										String	type	= (String)it.next();
-										for(Iterator it2=removed.get(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
+										for(Iterator it2=removed.getCollection(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
 										{
 											events.add(new ChangeEvent(null, type+EVENT_REMOVED, it2.next()));
 											it2.remove();
 										}
-										if(removed.get(type).isEmpty())
+										if(removed.getCollection(type).isEmpty())
 										{
 											it.remove();
 										}
@@ -216,12 +216,12 @@ public abstract class RemoteChangeListenerHandler
 									for(Iterator it=added.keySet().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 									{
 										String	type	= (String)it.next();
-										for(Iterator it2=added.get(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
+										for(Iterator it2=added.getCollection(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
 										{
 											events.add(new ChangeEvent(null, type+EVENT_ADDED, it2.next()));
 											it2.remove();
 										}
-										if(added.get(type).isEmpty())
+										if(added.getCollection(type).isEmpty())
 										{
 											it.remove();
 										}
@@ -232,12 +232,12 @@ public abstract class RemoteChangeListenerHandler
 									for(Iterator it=changed.keySet().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 									{
 										String	type	= (String)it.next();
-										for(Iterator it2=changed.get(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
+										for(Iterator it2=changed.getCollection(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
 										{
 											events.add(new ChangeEvent(null, type+EVENT_CHANGED, it2.next()));
 											it2.remove();
 										}
-										if(changed.get(type).isEmpty())
+										if(changed.getCollection(type).isEmpty())
 										{
 											it.remove();
 										}
@@ -248,12 +248,12 @@ public abstract class RemoteChangeListenerHandler
 									for(Iterator it=occurred.keySet().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 									{
 										String	type	= (String)it.next();
-										for(Iterator it2=occurred.get(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
+										for(Iterator it2=occurred.getCollection(type).iterator(); events.size()<MAX_EVENTS && it2.hasNext(); )
 										{
 											events.add(new ChangeEvent(null, type+EVENT_OCCURRED, it2.next()));
 											it2.remove();
 										}
-										if(occurred.get(type).isEmpty())
+										if(occurred.getCollection(type).isEmpty())
 										{
 											it.remove();
 										}

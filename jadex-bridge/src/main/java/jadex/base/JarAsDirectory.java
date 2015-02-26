@@ -339,7 +339,7 @@ public class JarAsDirectory	extends File
 	 */
 	public File[] createFiles(String key, MultiCollection<String, ZipEntry> entries)
 	{
-		Collection<ZipEntry> col	= entries.get(key);
+		Collection<ZipEntry> col	= entries.getCollection(key);
 		JarAsDirectory[]	ret	= new JarAsDirectory[col.size()];
 		Iterator<ZipEntry>	it	= col.iterator();
 		for(int i=0; it.hasNext(); i++)

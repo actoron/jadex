@@ -2891,8 +2891,8 @@ public class ComponentManagementService implements IComponentManagementService
 			public void resultAvailable(IComponentDescription newdesc)
 			{
 				ICMSComponentListener[]	alisteners;
-				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.get(null));
-				slisteners.addAll(listeners.get(cid));
+				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
+				slisteners.addAll(listeners.getCollection(cid));
 				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				// todo: can be called after listener has (concurrently) deregistered
 				
@@ -2930,8 +2930,8 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				ICMSComponentListener[]	alisteners;
 				
-				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.get(null));
-				slisteners.addAll(listeners.get(cid));
+				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
+				slisteners.addAll(listeners.getCollection(cid));
 				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				// todo: can be called after listener has (concurrently) deregistered
 				
@@ -2989,8 +2989,8 @@ public class ComponentManagementService implements IComponentManagementService
 			public void resultAvailable(IComponentDescription newdesc)
 			{
 				ICMSComponentListener[]	alisteners;
-				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.get(null));
-				slisteners.addAll(listeners.get(cid));
+				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
+				slisteners.addAll(listeners.getCollection(cid));
 				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				// todo: can be called after listener has (concurrently) deregistered
 				

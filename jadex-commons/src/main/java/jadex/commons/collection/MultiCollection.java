@@ -161,7 +161,8 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 	public Collection<V> get(Object key)
 	{
 		Collection<V> ret = map.get(key);
-		return ret==null? Collections.EMPTY_LIST: ret;
+//		return ret==null? Collections.EMPTY_LIST: ret;
+		return ret;
 	}
 
 	// Modification Operations
@@ -492,20 +493,20 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 
 	//-------- additional multi collection methods --------
 
-//	/**
-//	 *  Get the values associated to a key as collection.
-//	 *  @param key	The key.
-//	 *  @return The collection of associated values.
-//	 */
-//	public Collection	getCollection(Object key)
-//	{
-//		Collection	ret	= (Collection)get(key);
-//		if(ret==null)
-//		{
-//			ret	= Collections.EMPTY_LIST;
-//		}
-//		return ret;
-//	}
+	/**
+	 *  Get the values associated to a key as collection.
+	 *  @param key	The key.
+	 *  @return The collection of associated values.
+	 */
+	public Collection<V>	getCollection(Object key)
+	{
+		Collection<V> ret	= get(key);
+		if(ret==null)
+		{
+			ret	= Collections.EMPTY_LIST;
+		}
+		return ret;
+	}
 	
 //	/**
 //	 *  Directly store a collection entry.

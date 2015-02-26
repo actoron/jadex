@@ -197,7 +197,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 		{
 			if(tasklisteners!=null && tasklisteners.containsKey(taskid))
 			{
-				Collection<IResultListener<?>>	listeners	= tasklisteners.get(taskid);
+				Collection<IResultListener<?>>	listeners	= tasklisteners.getCollection(taskid);
 				for(Iterator it=listeners.iterator(); it.hasNext(); )
 				{
 					if(e==null)
@@ -343,7 +343,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 					
 					if(tasklisteners!=null && tasklisteners.containsKey(atasks[i].getProperty(IObjectTask.PROPERTY_ID)))
 					{
-						Collection<IResultListener<?>>	listeners	= tasklisteners.get(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
+						Collection<IResultListener<?>>	listeners	= tasklisteners.getCollection(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
 						for(Iterator<IResultListener<?>> it=listeners.iterator(); it.hasNext(); )
 						{
 							it.next().exceptionOccurred(e);

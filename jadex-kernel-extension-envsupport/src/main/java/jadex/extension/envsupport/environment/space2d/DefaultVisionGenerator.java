@@ -58,7 +58,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	//-------- attributes --------
 	
 	/** The percept receiving component types. */
-	protected Map actiontypes;
+	protected MultiCollection<String, String> actiontypes;
 	
 	//-------- IPerceptGenerator --------
 		
@@ -265,8 +265,11 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			}
 		}
 		
-//		if(ret==null)
-//			System.out.println("No percept found for: "+componenttype+" "+objecttype+" "+actiontype);
+		if(ret==null)
+		{
+			if("garbage".equals(objecttype))
+				System.out.println("No percept found for: "+componenttype+" "+objecttype+" "+actiontype);
+		}
 		
 		return ret;
 	}
@@ -275,22 +278,22 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 *  Get the action types for a percept.
 	 *  @param pt The percept type.
 	 */
-	protected Set getActionTypes(PerceptType pt)
+	protected Set<String> getActionTypes(PerceptType pt)
 	{
 		if(actiontypes==null)
 		{
-			actiontypes = new MultiCollection(new HashMap(), HashSet.class);
+			actiontypes = new MultiCollection<String, String>(new HashMap(), HashSet.class);
 			Object[] percepttypes = getPerceptTypes();
 			for(int i=0; i<percepttypes.length; i++)
 			{
 				String[] per = (String[])percepttypes[i];
 				for(int j=1; j<per.length; j++)
 				{
-					actiontypes.put(per[0], per[j]);
+					actiontypes.add(per[0], per[j]);
 				}
 			}
 		}
-		Set ret = (Set)actiontypes.get(pt.getName());
+		Set<String> ret = (Set<String>)actiontypes.get(pt.getName());
 		return ret==null? Collections.EMPTY_SET: ret;
 	}
 	

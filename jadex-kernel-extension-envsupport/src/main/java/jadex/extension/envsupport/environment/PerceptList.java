@@ -24,7 +24,7 @@ public class PerceptList
 	protected IEnvironmentSpace	space;
 	
 	/** The scheduled percepts. */
-	protected Set	percepts;
+	protected Set<PerceptEntry>	percepts;
 	
 	//-------- constructors --------
 	
@@ -49,7 +49,7 @@ public class PerceptList
 	public void schedulePercept(String type, Object data, IComponentDescription component, ISpaceObject avatar, IPerceptProcessor processor)
 	{
 		if(percepts==null)
-			percepts	= new LinkedHashSet();
+			percepts	= new LinkedHashSet<PerceptEntry>();
 		
 		percepts.add(new PerceptEntry(type, data, component, avatar, processor));
 	}
@@ -58,17 +58,17 @@ public class PerceptList
 	 *  Set an ordering used for executing actions.
 	 *  @param comp	The comparator representing the ordering.
 	 */
-	public void	setOrdering(Comparator comp)
+	public void	setOrdering(Comparator<PerceptEntry> comp)
 	{
 		if(percepts!=null)
 		{
-			Set	tmp	= new TreeSet(comp);
+			Set<PerceptEntry>	tmp	= new TreeSet<PerceptEntry>(comp);
 			tmp.addAll(percepts);
 			percepts	= tmp;
 		}
 		else
 		{
-			percepts	= new TreeSet(comp);
+			percepts	= new TreeSet<PerceptEntry>(comp);
 		}
 	}
 	
@@ -76,11 +76,11 @@ public class PerceptList
 	 *  Process scheduled percepts. Should be called on environment thread only.
 	 *  @param filter	A filter to select only a subset of percepts (or null for all percepts).
 	 */
-	public void processPercepts(IFilter filter)
+	public void processPercepts(IFilter<PerceptEntry> filter)
 	{
 		if(percepts!=null && !(percepts.isEmpty()))
 		{
-			for(Iterator it=percepts.iterator(); it.hasNext(); )
+			for(Iterator<PerceptEntry> it=percepts.iterator(); it.hasNext(); )
 			{
 				PerceptEntry entry = (PerceptEntry)it.next();
 				try
