@@ -1,23 +1,28 @@
 package jadex.micro.features.impl;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.FieldInfo;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.MicroModel;
@@ -31,7 +36,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
@@ -97,6 +104,9 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> body()
 	{
+		// Invoke initial service calls.
+		invokeServices();
+		
 		return invokeMethod(getComponent(), AgentBody.class, null);
 	}
 
@@ -166,6 +176,144 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Execute initial service calls.
+	 */
+	protected void invokeServices()
+	{
+		MicroModel mm = (MicroModel)getComponent().getModel().getRawModel();
+		List<ServiceCallInfo> calls = mm.getServiceCalls();
+		if(calls!=null)
+		{
+			for(final ServiceCallInfo call: calls)
+			{
+				IFuture<IService> fut = getComponent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService(call.getRequiredName());
+				fut.addResultListener(new IResultListener<IService>()
+				{
+					public void resultAvailable(IService service)
+					{
+						MethodInfo mi = call.getServiceMethod();
+						Method method = null;
+						if(mi==null)
+						{
+							Class<?> iface = service.getServiceIdentifier().getServiceType().getType(getComponent().getClassLoader());
+							Method[] methods = iface.getMethods();
+							if(methods!=null)
+							{
+								for(Method m: methods)
+								{
+									if(m.getParameterTypes().length==0)
+									{
+										method = m;
+									}
+								}
+							}
+						}
+						else
+						{
+							method = mi.getMethod(getComponent().getClassLoader());
+						}
+						
+						if(method!=null)
+						{
+							try
+							{
+								Object ret = method.invoke(service, new Object[0]);
+								if(ret instanceof IIntermediateFuture)
+								{
+									IIntermediateFuture<Object> sfut = (IIntermediateFuture<Object>)ret;
+									sfut.addResultListener(new IntermediateDefaultResultListener<Object>()
+									{
+										public void intermediateResultAvailable(Object result)
+										{
+											handleCallback(call, result);
+										}
+										
+										public void finished()
+										{
+											// todo:?
+//											System.out.println("initial service call finished");
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											exception.printStackTrace();
+										}
+									});
+								}
+								else if(ret instanceof IFuture)
+								{
+									IFuture<Object> sfut = (IFuture<Object>)ret;
+									sfut.addResultListener(new IResultListener<Object>()
+									{
+										public void resultAvailable(Object result)
+										{
+											handleCallback(call, result);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											exception.printStackTrace();
+										}
+									});
+								}
+								else
+								{
+									handleCallback(call, ret);
+								}
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				});
+			}
+		}
+	}
+	
+	/**
+	 *  Handle the result by setting a variable or by calling
+	 *  a callback method.
+	 */
+	protected void handleCallback(ServiceCallInfo call, Object result)
+	{
+		try
+		{
+			if(call.getCallbackMethod()!=null)
+			{
+				Method m = call.getCallbackMethod().getMethod(getComponent().getClassLoader());
+				m.setAccessible(true);
+				m.invoke(getPojoAgent(), new Object[]{result});
+			}
+			else
+			{
+				Field f = call.getCallbackField().getField(getComponent().getClassLoader());
+				f.setAccessible(true);
+				Class<?> ft = f.getType();
+				if(SReflect.isSupertype(ft, result.getClass()))
+				{
+					f.set(getPojoAgent(), result);
+				}
+				else if(SReflect.isSupertype(Collection.class, ft))
+				{
+					Collection<Object> coll = (Collection<Object>)f.get(getPojoAgent());
+					coll.add(result);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**

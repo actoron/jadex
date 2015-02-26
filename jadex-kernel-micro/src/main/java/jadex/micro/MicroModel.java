@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
@@ -49,8 +50,8 @@ public class MicroModel extends CacheableKernelModel
 	/** The agent methods for given annotations (if any). */
 	protected Map<Class<? extends Annotation>, MethodInfo>	agentmethods;
 	
-	/** The service value callbacks. */
-	protected Map<String, Object> servicecallbacks;
+	/** The service value calls. */
+	protected List<ServiceCallInfo> servicecalls;
 	
 	/**
 	 *  Create a new model.
@@ -228,6 +229,35 @@ public class MicroModel extends CacheableKernelModel
 	public FieldInfo[] getFeatureInjections()
 	{
 		return featureinjections==null? new FieldInfo[0]: (FieldInfo[])featureinjections.toArray(new FieldInfo[featureinjections.size()]);
+	}
+	
+	/**
+	 *  Add an call field.
+	 *  @param name The name.
+	 *  @param field The field. 
+	 */
+	public void addServiceCall(ServiceCallInfo call)
+	{
+		if(servicecalls==null)
+			servicecalls = new ArrayList<ServiceCallInfo>();
+		servicecalls.add(call);
+	}
+	
+	/**
+	 *  Get the service call fields.
+	 *  @return The field or method infos.
+	 */
+	public List<ServiceCallInfo> getServiceCalls()
+	{
+		return servicecalls;
+	}
+	
+	/**
+	 *  Set the service calls.
+	 */
+	public void setServiceCalls(List<ServiceCallInfo> servicecalls)
+	{
+		this.servicecalls = servicecalls;
 	}
 	
 	/**

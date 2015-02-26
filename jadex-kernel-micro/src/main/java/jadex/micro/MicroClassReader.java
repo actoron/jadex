@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -43,6 +44,7 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceValue;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -797,6 +799,14 @@ public class MicroClassReader
 						}
 					}
 				}
+				
+				// todo: method name, parameters, intervals...
+				if(isAnnotationPresent(fields[i], AgentServiceValue.class, cl))
+				{
+					AgentServiceValue ser = getAnnotation(fields[i], AgentServiceValue.class, cl);
+					String reqname = ser.name();
+					micromodel.addServiceCall(new ServiceCallInfo(reqname, null, new FieldInfo(fields[i])));
+				}
 			}
 
 			// Find method injection targets by reflection (services)
@@ -828,6 +838,14 @@ public class MicroClassReader
 					micromodel.addServiceInjection(name, new MethodInfo(methods[i]));
 				}
 
+				// todo: method name, parameters, intervals...
+				if(isAnnotationPresent(methods[i], AgentServiceValue.class, cl))
+				{
+					AgentServiceValue ser = getAnnotation(methods[i], AgentServiceValue.class, cl);
+					String reqname = ser.name();
+					micromodel.addServiceCall(new ServiceCallInfo(reqname, null, new MethodInfo(methods[i])));
+				}
+				
 				if(isAnnotationPresent(methods[i], AgentCreated.class, cl))
 				{
 					checkMethodReturnType(AgentCreated.class, methods[i], cl);
