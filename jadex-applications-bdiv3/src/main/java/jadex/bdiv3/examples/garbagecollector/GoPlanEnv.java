@@ -7,7 +7,9 @@ import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.ISpaceAction;
@@ -43,7 +45,7 @@ public class GoPlanEnv
 	 *  The plan body.
 	 */
 	@PlanBody
-	public void body()
+	public void body(IGoal go)
 	{
 		Grid2D env = collector.getEnvironment();
 		IVector2 target = goal.getPosition();
@@ -76,7 +78,9 @@ public class GoPlanEnv
 				}
 			}
 
-//			System.out.println("Wants to go: "+dir+" "+mypos+" "+target+", "+this);
+//			if(((RGoal)go).isFinished())
+//				System.out.println("gggooooo");
+//			System.out.println("Wants to go: "+dir+" "+mypos+" "+target+", "+this+" "+((RGoal)go).getParent());
 			
 			Future<Void> fut = new Future<Void>();
 			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);

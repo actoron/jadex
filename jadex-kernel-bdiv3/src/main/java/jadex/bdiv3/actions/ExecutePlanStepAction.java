@@ -1,6 +1,7 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.IPlanBody;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
@@ -77,7 +78,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-//		System.out.println("execute candidate: "+rplan);
+//		if(!isReasonValid())
+//			System.out.println("executing invalid candidate: "+rplan);
 		
 //		if(rplan.toString().indexOf("Move")!=-1)
 //			System.out.println("plan exe: "+rplan);
@@ -89,6 +91,9 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		if(element instanceof RGoal)
 		{
 			RGoal rgoal = (RGoal)element;
+			
+//			System.out.println("executing candidate: "+rplan+" "+rgoal.getLifecycleState()+" "+rgoal.getProcessingState());
+			
 			if(!(RGoal.GoalLifecycleState.ACTIVE.equals(rgoal.getLifecycleState())
 				&& RGoal.GoalProcessingState.INPROCESS.equals(rgoal.getProcessingState())) && !rplan.aborted)
 			{
@@ -102,7 +107,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 			rescom.execute(null);
 //			rplan.continueAfterWait(rescom);
 		}
-		else if(RPlan.PlanLifecycleState.NEW.equals(rplan.getLifecycleState()))
+		// A new plan body must only be executed if it hasn't been aborted 
+		else if(!rplan.aborted && RPlan.PlanLifecycleState.NEW.equals(rplan.getLifecycleState()))
 		{
 			// Set plan as child of goal
 			if(element instanceof RGoal)
@@ -160,4 +166,20 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	{
 		return rplan;
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	protected boolean isReasonValid()
+//	{
+//		boolean ret = true;
+//		Object element = rplan.getReason();
+//		if(element instanceof RGoal)
+//		{
+//			RGoal rgoal = (RGoal)element;
+//			ret = IGoal.GoalLifecycleState.ACTIVE.equals(rgoal.getLifecycleState())
+//				&& IGoal.GoalProcessingState.INPROCESS.equals(rgoal.getProcessingState());
+//		}
+//		return ret;
+//	}
 }

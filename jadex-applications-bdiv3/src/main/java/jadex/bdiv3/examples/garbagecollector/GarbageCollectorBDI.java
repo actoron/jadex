@@ -13,6 +13,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -117,7 +118,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	/**
 	 *  The goal for picking up waste. Tries endlessly to pick up.
 	 */
-	@Goal(excludemode=ExcludeMode.Never, retrydelay=100)
+	@Goal(excludemode=ExcludeMode.Never, retrydelay=1000)
 	public class Pick
 	{
 		/**
@@ -128,7 +129,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 		{
 			boolean ret = !isDirty() && !hasGarbage();
 //			if(ret)
-//				System.out.println("drop: "+isDirty()+", "+hasGarbage());
+//				System.out.println("drop pick: "+isDirty()+", "+hasGarbage()+" "+myself.getProperty(Space2D.PROPERTY_POSITION));
 			return ret;
 			//!$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
 		}
