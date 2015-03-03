@@ -618,6 +618,8 @@ public class ComponentManagementService implements IComponentManagementService
 																		persistable!=null ? persistable.booleanValue() : false, moni,
 																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause, systemcomponent);
 																	
+//																	System.out.println("moni: "+moni+" "+lmodel.getFullName());
+																	
 																	// Use first configuration if no config specified.
 																	String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;

@@ -51,7 +51,9 @@ public class ComponentCreationInfo
 	 *  @param realtime	The real time flag.
 	 *  @param copy	The copy flag.
 	 */
-	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, IComponentDescription desc, LocalServiceRegistry registry, ProvidedServiceInfo[] infos, boolean realtime, boolean copy)
+	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, 
+		IComponentDescription desc, LocalServiceRegistry registry, ProvidedServiceInfo[] infos, 
+		boolean realtime, boolean copy)
 	{
 		this.model	= model;
 		this.config = config!=null ? config : model.getConfigurationNames().length>0 ? model.getConfigurationNames()[0] : null;

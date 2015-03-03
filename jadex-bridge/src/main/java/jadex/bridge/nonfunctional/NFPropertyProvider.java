@@ -303,7 +303,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		if(getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 		{
 			MonitoringEvent me = new MonitoringEvent(getInternalAccess().getComponentIdentifier(), getInternalAccess().getComponentDescription().getCreationTime(), 
-				MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
+				MonitoringEvent.TYPE_PROPERTY_ADDED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 			me.setProperty("propname", nfprop.getName());
 			getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
 		}

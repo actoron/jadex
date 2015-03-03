@@ -191,7 +191,8 @@ public class Startable
 	 */
 	public PublishEventLevel getMonitoring()
 	{
-		return monitoring==null? PublishEventLevel.OFF: monitoring;
+//		return monitoring==null? PublishEventLevel.OFF: monitoring;
+		return monitoring;
 	}
 
 	/**

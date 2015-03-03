@@ -48,7 +48,10 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	public MonitoringComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-		this.emitlevelsub = PublishEventLevel.OFF;
+		this.emitlevelsub = cinfo.getComponentDescription().getMonitoring();
+		if(emitlevelsub==null)
+			emitlevelsub = PublishEventLevel.OFF;
+//		System.out.println("mon is: "+cinfo.getComponentDescription().getName()+" "+emitlevelsub);
 	}
 	
 	/**

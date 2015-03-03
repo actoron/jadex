@@ -2,8 +2,9 @@ package jadex.bridge.nonfunctional;
 
 
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.component.INFPropertyComponentFeature;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.MethodInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -14,20 +15,29 @@ import jadex.commons.future.IResultListener;
  */
 public class NFPropertyRef<T, U> extends AbstractNFProperty<T, U>
 {
-	/** The value source. */
-	protected INFPropertyProvider source;
+//	/** The value source. */
+//	protected INFPropertyProvider source;
 	
 	/** The component of the ref. */
 	protected IExternalAccess comp;
 	
+	/** The service identifier. */
+	protected IServiceIdentifier sid;
+	
+	/** The method. */
+	protected MethodInfo method;
+	
 	/**
 	 *  Create a new property ref.
 	 */
-	public NFPropertyRef(INFPropertyProvider source, IExternalAccess comp, NFPropertyMetaInfo mi)
+//	public NFPropertyRef(INFPropertyProvider source, IExternalAccess comp, NFPropertyMetaInfo mi)
+	public NFPropertyRef(IExternalAccess comp, NFPropertyMetaInfo mi, IServiceIdentifier sid, MethodInfo method)
 	{
 //		super(new NFPropertyMetaInfo(CPULoadProperty.CPULOAD, double.class, null, true, -1, Target.Root));
 		super(mi);
-		this.source = source;
+//		this.source = source;
+		this.sid = sid;
+		this.method = method;
 		this.comp = comp;
 	}
 
@@ -43,7 +53,22 @@ public class NFPropertyRef<T, U> extends AbstractNFProperty<T, U>
 	public IFuture<T> getValue(U unit)
 	{
 		final Future<T> ret = new Future<T>();
-		IFuture<T> fut = source.getNFPropertyValue(getName(), unit);
+//		IFuture<T> fut = source.getNFPropertyValue(getName(), unit);
+		
+		IFuture<T> fut;
+		if(sid==null && method==null)
+		{
+			fut = SNFPropertyProvider.getNFPropertyValue(comp, getName(), unit);
+		}
+		else if(sid!=null && method==null)
+		{
+			fut = SNFPropertyProvider.getNFPropertyValue(comp, sid, getName(), unit);
+		}
+		else
+		{
+			fut = SNFPropertyProvider.getMethodNFPropertyValue(comp, sid, method, getName(), unit);
+		}
+		
 		fut.addResultListener(new IResultListener<T>()
 		{
 			public void resultAvailable(T result)
@@ -57,7 +82,21 @@ public class NFPropertyRef<T, U> extends AbstractNFProperty<T, U>
 //				SNFPropertyProvider.removeNFProperty(comp, name)
 				
 				// todo: remote case?
-				source.removeNFProperty(getName());
+//				source.removeNFProperty(getName());
+				
+				if(sid==null && method==null)
+				{
+					SNFPropertyProvider.removeNFProperty(comp, getName());
+				}
+				else if(sid!=null && method==null)
+				{
+					SNFPropertyProvider.removeNFProperty(comp, sid, getName());
+				}
+				else
+				{
+					SNFPropertyProvider.removeMethodNFProperty(comp, sid, method, getName());
+				}
+				
 				ret.setException(exception);
 			}
 		});

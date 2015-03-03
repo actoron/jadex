@@ -65,7 +65,9 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 					INFPropertyMetaInfo mi = getMetaInfo();
 					NFPropertyMetaInfo cmi = new NFPropertyMetaInfo(mi.getName(), mi.getType(), mi.getUnit(), mi.isDynamic(), mi.getUpdateRate(), mi.isRealtime(), Target.Root);
 //					((INFPropertyProvider)root.getExternalComponentFeature(INFPropertyComponentFeature.class)).addNFProperty(new NFPropertyRef<T, U>((INFPropertyProvider)comp.getExternalAccess().getExternalComponentFeature(INFPropertyComponentFeature.class), root, cmi)).addResultListener(new DelegationResultListener<Void>(ret));
-					SNFPropertyProvider.addNFProperty(comp.getExternalAccess(), new NFPropertyRef<T, U>(comp.getComponentFeature(INFPropertyComponentFeature.class).getComponentPropertyProvider(), root, cmi));
+					
+					NFPropertyRef<T, U> pr = new NFPropertyRef<T, U>(comp.getExternalAccess(), cmi, null, null);
+					SNFPropertyProvider.addNFProperty(root, pr).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}

@@ -38,9 +38,9 @@ public class PlatformTreeNode extends ComponentTreeNode
 	{
 		super(parent, model, tree, desc, cms, iconcache, access);
 		
-		proxy = new ViewTreeNode("platform", this, model, tree, null);
-		application = new ViewTreeNode("application", this, model, tree, null);
-		system = new ViewTreeNode("system", this, model, tree, null);
+		proxy = new ViewTreeNode("Platforms", this, model, tree, null);
+		application = new ViewTreeNode("Applications", this, model, tree, null);
+		system = new ViewTreeNode("System", this, model, tree, null);
 	}
 	
 	/**

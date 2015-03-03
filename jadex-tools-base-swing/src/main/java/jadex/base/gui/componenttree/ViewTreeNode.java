@@ -22,9 +22,9 @@ public class ViewTreeNode	extends AbstractSwingTreeNode
 	/** The service container icon. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"system", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/system.png"),
-		"application", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/bean2.png"),
-		"platform", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/cloud3.png"),
+		"System", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/system.png"),
+		"Applications", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/bean2.png"),
+		"Platforms", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/cloud3.png"),
 	});
 	
 	//-------- attributes --------
