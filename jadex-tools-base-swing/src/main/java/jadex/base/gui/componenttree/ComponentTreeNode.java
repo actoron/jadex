@@ -8,9 +8,7 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -109,7 +107,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		model.registerNode(this);
 		
 		// Add CMS listener for platform node.
-		if(parent==null)
+		if(desc.getName().getParent()==null)
 		{
 			addCMSListener(desc.getName());
 		}
@@ -235,16 +233,24 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		ISwingTreeNode	node	= getModel().getNode(desc.getName());
 		if(node==null)
 		{
-			boolean proxy = "jadex.platform.service.remote.Proxy".equals(desc.getModelName())
-				// Only create proxy nodes for local proxy components to avoid infinite nesting.
-				&& ((IActiveComponentTreeNode)getModel().getRoot()).getComponentIdentifier().getName().equals(desc.getName().getPlatformName());
+			boolean proxy = "jadex.platform.service.remote.Proxy".equals(desc.getModelName());
 			if(proxy)
 			{
-				node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, iconcache, access);
+				// Only create proxy nodes for local proxy components to avoid infinite nesting.
+				if(((IActiveComponentTreeNode)getModel().getRoot()).getComponentIdentifier().getName().equals(desc.getName().getPlatformName()))
+				{
+//					System.out.println("proxy for: "+desc.getName()+" from: "+getDescription().getName());
+					node = new ProxyComponentTreeNode(this, getModel(), getTree(), desc, cms, iconcache, access);
+				}
+				else
+				{
+//					System.out.println("creating pseudo: "+desc.getName()+" from: "+getDescription().getName());
+					node = new PseudoProxyComponentTreeNode(this, getModel(), getTree(), desc, cms, iconcache, access);
+				}
 			}
 			else
 			{
-				node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, iconcache, access);
+				node = new ComponentTreeNode(this, getModel(), getTree(), desc, cms, iconcache, access);
 			}
 		}
 		return node;
@@ -310,6 +316,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			propcomp	= new ComponentProperties();
 		}
 		propcomp.setDescription(desc);
+		System.out.println(desc.getName()+" "+getClass().getName());
 		return propcomp;
 	}
 
@@ -468,7 +475,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 														String id	= ProvidedServiceInfoNode.getId(scn, pros[i]);
 														ProvidedServiceInfoNode	sn	= (ProvidedServiceInfoNode)getModel().getNode(id);
 														if(sn==null)
-															sn	= new ProvidedServiceInfoNode(scn, getModel(), getTree(), pros[i], sis[i], ea);
+															sn	= new ProvidedServiceInfoNode(scn, getModel(), getTree(), pros[i], sis[i], ea, access);
 														subchildren.add(sn);
 													}
 													catch(Exception e)

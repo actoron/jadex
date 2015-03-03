@@ -92,7 +92,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 	/**
 	 * 
 	 */
-	protected void internalSetService(Class type)
+	protected void internalSetService(Class<?> type)
 	{
 		if(type==null)
 		{

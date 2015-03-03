@@ -74,7 +74,7 @@ public class StartScenario
 											{
 	//											System.out.println("started remote: "+result);
 												
-												IComponentIdentifier rrms = new ComponentIdentifier("rms@system.remote", 
+												IComponentIdentifier rrms = new ComponentIdentifier("rms@remote", 
 													new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 												
 												lcms.createComponent("proxy", "jadex.platform.service.remote.ProxyAgent.class", 

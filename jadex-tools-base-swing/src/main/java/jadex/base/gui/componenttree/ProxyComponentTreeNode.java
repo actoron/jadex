@@ -32,7 +32,7 @@ import javax.swing.UIDefaults;
  *  Node that represents a remote component and blends in the
  *  tree of components as virtual children of this node.
  */
-public class ProxyComponentTreeNode extends ComponentTreeNode 
+public class ProxyComponentTreeNode extends PlatformTreeNode 
 {
 	//-------- constants --------
 	

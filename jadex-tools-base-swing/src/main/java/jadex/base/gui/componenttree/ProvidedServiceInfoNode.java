@@ -5,8 +5,6 @@ import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.component.INFPropertyComponentFeature;
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
@@ -63,18 +61,23 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 	/** The external access. */
 	protected IExternalAccess ea;
 	
+	/** The platform external access. */
+	protected IExternalAccess platformea;
+
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
 	public ProvidedServiceInfoNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, 
-		ProvidedServiceInfo service, IServiceIdentifier sid, IExternalAccess ea)
+		ProvidedServiceInfo service, IServiceIdentifier sid, IExternalAccess ea, IExternalAccess platformea)
 	{
 		super(parent, model, tree);
 		this.service	= service;
 		this.sid = sid;
 		this.ea = ea;
+		this.platformea = platformea;
 //		if(service==null || service.getType().getTypeName()==null)
 //			System.out.println("service node: "+this);
 		model.registerNode(this);
@@ -214,6 +217,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						System.out.println("ex on: "+getId());
 //						exception.printStackTrace();
 					}
@@ -222,6 +226,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 				System.out.println("ex on: "+getId());
 //				exception.printStackTrace();
 			}
@@ -237,7 +242,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		
 		if(service.getType().getType(null)==null)
 		{
-			SServiceProvider.getService(ea, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(platformea, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 			{
 				public void customResultAvailable(ILibraryService ls)
@@ -247,7 +252,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 					{
 						public void customResultAvailable(ClassLoader cl)
 						{
-							Class type = service.getType().getType(cl);
+							Class<?> type = service.getType().getType(cl);
 	//						System.out.println("Found: "+service.getType().getTypeName()+" "+cl+" "+type);
 							ret.setResult(type);
 						}
@@ -300,7 +305,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		{
 			propcomp	= new ProvidedServiceInfoProperties();
 		}
-		propcomp.setService(service, sid, ea);
+		propcomp.setService(service, sid, platformea);
 		
 		return propcomp;
 	}

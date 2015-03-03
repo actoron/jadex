@@ -14,6 +14,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Map;
 
@@ -30,6 +31,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<String[]>()
 		{
+			@Classname("getNFPropertyNames0")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -46,6 +48,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<String[]>()
 		{
+			@Classname("getNFAllPropertyName1")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -63,6 +66,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Map<String, INFPropertyMetaInfo>>()
 		{
+			@Classname("getNFPropertyMetaInfos2")
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -80,6 +84,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<INFPropertyMetaInfo>()
 		{
+			@Classname("getNFPropertyMetaInfo3")
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -98,6 +103,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<T>()
 		{
+			@Classname("getNFPropertyValue4")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -118,6 +124,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<T>()
 		{
+			@Classname("getNFPropertyValue5")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -134,6 +141,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Void>()
 		{
+			@Classname("addNFProperty6")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -150,6 +158,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Void>()
 		{
+			@Classname("removeNFProperty7")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -165,6 +174,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Void>()
 		{
+			@Classname("shutdownNFPropertyProvider8")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -193,6 +203,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<String[]>()
 						{
+							@Classname("getNFPropertyNames9")
 							public IFuture<String[]> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -224,6 +235,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<String[]>()
 						{
+							@Classname("getNFAllPropertyNames10")
 							public IFuture<String[]> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -256,6 +268,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<Map<String, INFPropertyMetaInfo>>()
 						{
+							@Classname("getNFPropertyMetaInfos11")
 							public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -288,6 +301,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<INFPropertyMetaInfo>()
 						{
+							@Classname("getNFPropertyMetaInfo12")
 							public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -321,6 +335,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<T>()
 						{
+							@Classname("getNFPropertyValue13")
 							public IFuture<T> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -356,6 +371,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<T>()
 						{
+							@Classname("getNFPropertyValue14")
 							public IFuture<T> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -387,6 +403,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<Void>()
 						{
+							@Classname("addNFProperty15")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -418,6 +435,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<Void>()
 						{
+							@Classname("removeNFProperty16")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -448,6 +466,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<Void>()
 						{
+							@Classname("shutdownNFPropertyProvider17")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -481,6 +500,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
 						{
+							@Classname("getMethodNFPropertyMetaInfos18")
 							public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -513,6 +533,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<String[]>()
 						{
+							@Classname("getMethodNFPropertyNames19")
 							public IFuture<String[]> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -545,6 +566,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<String[]>()
 						{
+							@Classname("getMethodNFAllPropertyNames20")
 							public IFuture<String[]> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -576,6 +598,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<Map<String, INFPropertyMetaInfo>>()
 						{
+							@Classname("getMethodNFPropertyMetaInfos21")
 							public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -609,6 +632,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<INFPropertyMetaInfo>()
 						{
+							@Classname("getMethodNFPropertyMetaInfo22")
 							public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -643,6 +667,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<T>()
 						{
+							@Classname("getMethodNFPropertyValue23")
 							public IFuture<T> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -654,18 +679,18 @@ public class SNFPropertyProvider
 			}
 		});
 		
-		ret.addResultListener(new IResultListener<T>()
-		{
-			public void resultAvailable(T result)
-			{
-				System.out.println("t: "+result);
-			}
-
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("ex: "+exception);
-			}
-		});
+//		ret.addResultListener(new IResultListener<T>()
+//		{
+//			public void resultAvailable(T result)
+//			{
+//				System.out.println("t: "+result);
+//			}
+//
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception);
+//			}
+//		});
 		
 		return ret;
 	}
@@ -693,6 +718,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<T>()
 						{
+							@Classname("getMethodNFPropertyValue24")
 							public IFuture<T> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -725,6 +751,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<Void>()
 						{
+							@Classname("addMethodNFProperty25")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -757,6 +784,7 @@ public class SNFPropertyProvider
 					{
 						result.scheduleStep(new IComponentStep<Void>()
 						{
+							@Classname("removeMethodNFProperty26")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -780,6 +808,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<String[]>()
 		{
+			@Classname("getRequiredNFPropertyNames27")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -796,6 +825,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<String[]>()
 		{
+			@Classname("getRequiredNFAllPropertyNames28")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -813,6 +843,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Map<String, INFPropertyMetaInfo>>()
 		{
+			@Classname("getRequiredNFPropertyMetaInfos29")
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -830,6 +861,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<INFPropertyMetaInfo>()
 		{
+			@Classname("getRequiredNFPropertyMetaInfo30")
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -848,6 +880,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<T>()
 		{
+			@Classname("getRequiredNFPropertyValue31")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -868,6 +901,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<T>()
 		{
+			@Classname("getRequiredNFPropertyValue32")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -884,6 +918,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Void>()
 		{
+			@Classname("addRequiredNFProperty33")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -900,6 +935,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Void>()
 		{
+			@Classname("removeRequiredNFProperty34")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -915,6 +951,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Void>()
 		{
+			@Classname("shutdownRequiredNFPropertyProvider35")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -931,6 +968,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
 		{
+			@Classname("getRequiredMethodNFPropertyMetaInfos36")
 			public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -948,6 +986,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<String[]>()
 		{
+			@Classname("getRequiredMethodNFPropertyNames37")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -965,6 +1004,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<String[]>()
 		{
+			@Classname("getRequiredMethodNFAllPropertyNames38")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -981,6 +1021,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Map<String, INFPropertyMetaInfo>>()
 		{
+			@Classname("getRequiredMethodNFPropertyMetaInfos39")
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -999,6 +1040,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<INFPropertyMetaInfo>()
 		{
+			@Classname("getRequiredMethodNFPropertyMetaInfo40")
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -1018,6 +1060,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<T>()
 		{
+			@Classname("getRequiredMethodNFPropertyValue41")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -1039,6 +1082,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<T>()
 		{
+			@Classname("getRequiredMethodNFPropertyValue42")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -1056,6 +1100,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Void>()
 		{
+			@Classname("addRequiredMethodNFProperty43")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
@@ -1073,6 +1118,7 @@ public class SNFPropertyProvider
 	{
 		return component.scheduleStep(new IComponentStep<Void>()
 		{
+			@Classname("removeRequiredMethodNFProperty44")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);

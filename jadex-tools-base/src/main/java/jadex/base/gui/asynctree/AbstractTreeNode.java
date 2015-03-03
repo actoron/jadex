@@ -17,7 +17,7 @@ public abstract class AbstractTreeNode implements ITreeNode
 	// -------- attributes --------
 
 	/** The parent node. */
-	protected final ITreeNode parent;
+	protected ITreeNode parent;
 
 	/** The tree model. */
 	protected final AsyncTreeModel model;
@@ -69,14 +69,22 @@ public abstract class AbstractTreeNode implements ITreeNode
 	{
 		return parent;
 	}
+	
+	/**
+	 *  The dirty to set.
+	 *  @param dirty The dirty to set
+	 */
+	public void setParent(ITreeNode parent)
+	{
+		this.parent = parent;
+	}
 
 	/**
 	 * Get the child count.
 	 */
 	public int getChildCount()
 	{
-
-		if (children == null && !searching)
+		if(children == null && !searching)
 		{
 			searching = true;
 			// System.out.println("searchChildren: "+getId());
@@ -90,14 +98,13 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public ITreeNode getChild(int index)
 	{
-
-		if (children == null && !searching)
+		if(children == null && !searching)
 		{
 			searching = true;
 			// System.out.println("searchChildren: "+getId());
 			searchChildren();
 		}
-		return children == null ? null : (ITreeNode) children.get(index);
+		return children == null ? null : (ITreeNode)children.get(index);
 	}
 
 	/**
@@ -105,8 +112,7 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public int getIndexOfChild(ITreeNode child)
 	{
-
-		if (children == null && !searching)
+		if(children == null && !searching)
 		{
 			searching = true;
 			// System.out.println("searchChildren: "+getId());
@@ -120,7 +126,6 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public boolean isLeaf()
 	{
-
 		return getChildCount() == 0;
 	}
 
@@ -155,7 +160,6 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public List<ITreeNode> getCachedChildren()
 	{
-
 		// Conditional does not work with generic Collections.emptyMap() method?
 		return children != null ? children : (List<ITreeNode>) Collections.EMPTY_LIST;
 	}
@@ -166,7 +170,6 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public IFuture<List<ITreeNode>> getChildren()
 	{
-														// Starter.isShutdown();
 		if(childrenfuture == null)
 		{
 			childrenfuture = new Future<List<ITreeNode>>();
@@ -269,8 +272,11 @@ public abstract class AbstractTreeNode implements ITreeNode
 			for(int i = 0; newcs != null && i < newcs.size(); i++)
 			{
 				ITreeNode node = (ITreeNode) newcs.get(i);
-				if (i >= children.size() || !node.equals(children.get(i)))
+				if(i >= children.size() || !node.equals(children.get(i)))
 				{
+					// set parent to this
+					((AbstractTreeNode)node).setParent(this);
+					
 					children.add(i, node);
 					rems.remove(node);
 					model.addNode(node);
@@ -285,7 +291,7 @@ public abstract class AbstractTreeNode implements ITreeNode
 				model.deregisterNode(node);
 			}
 		
-			if (changed)
+			if(changed)
 				model.fireNodeChanged(AbstractTreeNode.this);
 
 			if(childrenfuture != null)
@@ -339,11 +345,13 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public void addChild(int index, ITreeNode node)
 	{
-
 		// Ignore when node already removed.
-		if (!model.isZombieNode(node.getId()))
+		if(!model.isZombieNode(node.getId()))
 		{
-			if (children == null)
+			// set parent to this
+			((AbstractTreeNode)node).setParent(this);
+			
+			if(children == null)
 				children = new ArrayList();
 			children.add(index, node);
 			model.addNode(node);
@@ -352,7 +360,8 @@ public abstract class AbstractTreeNode implements ITreeNode
 				dirty = true;
 			// if(node.getId().toString().startsWith("ANDTest@"))
 			// System.out.println("Node added: "+node+", "+children);
-		} else
+		} 
+		else
 		{
 			model.removeZombieNode(node);
 		}
@@ -361,12 +370,34 @@ public abstract class AbstractTreeNode implements ITreeNode
 	/**
 	 * Add a child and update the tree. 
 	 */
+	// not using addChild(getCachedChildren().size(), node) because
+	// could be overridden by subclass and cause loop
 	public void addChild(ITreeNode node)
 	{
-
-		// model.registerNode(node);
-
-		addChild(getCachedChildren().size(), node);
+		//// model.registerNode(node);
+		//addChild(getCachedChildren().size(), node);
+		
+		// Ignore when node already removed.
+		int index = getCachedChildren().size();
+		if(!model.isZombieNode(node.getId()))
+		{
+			// set parent to this
+			((AbstractTreeNode)node).setParent(this);
+			
+			if(children == null)
+				children = new ArrayList();
+			children.add(index, node);
+			model.addNode(node);
+			model.fireNodeAdded(this, node, index);
+			if (searching)
+				dirty = true;
+			// if(node.getId().toString().startsWith("ANDTest@"))
+			// System.out.println("Node added: "+node+", "+children);
+		} 
+		else
+		{
+			model.removeZombieNode(node);
+		}
 	}
 
 	/**

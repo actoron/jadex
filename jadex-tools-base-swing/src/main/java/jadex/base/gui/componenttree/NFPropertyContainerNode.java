@@ -186,6 +186,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 				System.out.println("ex on: "+getId());
 			}
 		}));

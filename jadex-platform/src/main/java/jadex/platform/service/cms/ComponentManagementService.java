@@ -530,22 +530,23 @@ public class ComponentManagementService implements IComponentManagementService
 																		if(bool!=null && bool.booleanValue())// || (props.get("system").toString().indexOf("true")!=-1))
 																		{
 																			systemcomponent = true;
+																			
 																			// is system component, now check whether parent is ok
-																			boolean insystem = false;
-																			
-																			while(pacid.getParent()!=null && !insystem)
-																			{
-																				insystem = pacid.getLocalName().equals("system");
-																				pacid = pacid.getParent();
-																			}
-																			
-																			if(!insystem)
-																			{
-//																				System.out.println("Relocating system component: "+name+" - "+modelname);
-																				logger.info("Relocating system component: "+name+" - "+modelname);
-																				ComponentIdentifier npa = new ComponentIdentifier("system", agent.getComponentIdentifier());
-																				cinfo.setParent(npa);
-																			}
+//																			boolean insystem = false;
+//																			
+//																			while(pacid.getParent()!=null && !insystem)
+//																			{
+//																				insystem = pacid.getLocalName().equals("system");
+//																				pacid = pacid.getParent();
+//																			}
+//																			
+//																			if(!insystem)
+//																			{
+////																				System.out.println("Relocating system component: "+name+" - "+modelname);
+//																				logger.info("Relocating system component: "+name+" - "+modelname);
+//																				ComponentIdentifier npa = new ComponentIdentifier("system", agent.getComponentIdentifier());
+//																				cinfo.setParent(npa);
+//																			}
 																		}
 																	}
 																	

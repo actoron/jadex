@@ -1,10 +1,8 @@
 package jadex.platform.service.awareness.management;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -54,7 +52,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.platform.service.awareness.RemotePlatformAgent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -824,53 +821,53 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		return (DiscoveryInfo)discovered.get(cid);
 	}
 	
-	/**
-	 *  Get the proxy holder component.
-	 *  (Creates it if it does not exist).
-	 */
-	protected IFuture<IComponentIdentifier> getProxyHolder()
-	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		
-		final ComponentIdentifier cid = new ComponentIdentifier("platforms", agent.getComponentIdentifier().getRoot());
-		
-		cms.getExternalAccess(cid).addResultListener(new IResultListener<IExternalAccess>()
-		{
-			public void resultAvailable(IExternalAccess exta)
-			{
-				ret.setResult(exta.getComponentIdentifier());
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				createProxyHolder().addResultListener((new DelegationResultListener<IComponentIdentifier>(ret)));
-			}
-		});
-		
-		return ret;
-	}
+//	/**
+//	 *  Get the proxy holder component.
+//	 *  (Creates it if it does not exist).
+//	 */
+//	protected IFuture<IComponentIdentifier> getProxyHolder()
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//		
+//		final ComponentIdentifier cid = new ComponentIdentifier("platforms", agent.getComponentIdentifier().getRoot());
+//		
+//		cms.getExternalAccess(cid).addResultListener(new IResultListener<IExternalAccess>()
+//		{
+//			public void resultAvailable(IExternalAccess exta)
+//			{
+//				ret.setResult(exta.getComponentIdentifier());
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				createProxyHolder().addResultListener((new DelegationResultListener<IComponentIdentifier>(ret)));
+//			}
+//		});
+//		
+//		return ret;
+//	}
 	
-	/**
-	 *  Create the platform proxy holder component.
-	 *  (Can be called multiple times).
-	 */
-	protected IFuture<IComponentIdentifier> createProxyHolder()
-	{
-		if(pcreatefut!=null)
-		{
-			return pcreatefut;
-		}
-		else
-		{
-			pcreatefut = new Future<IComponentIdentifier>();
-			CreationInfo	ci	= new CreationInfo(agent.getComponentIdentifier().getRoot());
-			ci.setDaemon(Boolean.TRUE);
-			cms.createComponent("platforms", RemotePlatformAgent.class.getName()+".class", ci, null)
-				.addResultListener(new DelegationResultListener<IComponentIdentifier>(pcreatefut));
-		}
-		
-		return pcreatefut;
-	}
+//	/**
+//	 *  Create the platform proxy holder component.
+//	 *  (Can be called multiple times).
+//	 */
+//	protected IFuture<IComponentIdentifier> createProxyHolder()
+//	{
+//		if(pcreatefut!=null)
+//		{
+//			return pcreatefut;
+//		}
+//		else
+//		{
+//			pcreatefut = new Future<IComponentIdentifier>();
+//			CreationInfo	ci	= new CreationInfo(agent.getComponentIdentifier().getRoot());
+//			ci.setDaemon(Boolean.TRUE);
+//			cms.createComponent("platforms", RemotePlatformAgent.class.getName()+".class", ci, null)
+//				.addResultListener(new DelegationResultListener<IComponentIdentifier>(pcreatefut));
+//		}
+//		
+//		return pcreatefut;
+//	}
 	
 //	int	cnt;
 	
@@ -905,13 +902,13 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		}
 		else
 		{
-			getProxyHolder().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-			{
-				public void customResultAvailable(IComponentIdentifier parent)
-				{
+//			getProxyHolder().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+//			{
+//				public void customResultAvailable(IComponentIdentifier parent)
+//				{
 					CreationInfo ci = new CreationInfo(args);
 					ci.setDaemon(true);
-					ci.setParent(parent);
+//					ci.setParent(parent);
 					
 //					System.out.println("create proxy: "+(++cnt));
 					
@@ -931,8 +928,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 								super.exceptionOccurred(exception);
 						}
 					})).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-				}
-			});
+//				}
+//			});
 		}
 		
 		return ret;

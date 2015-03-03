@@ -128,7 +128,7 @@ import java.util.logging.Level;
 })
 
 @ComponentTypes({
-	@ComponentType(name="system", clazz=SystemAgent.class),
+//	@ComponentType(name="system", clazz=SystemAgent.class),
 	@ComponentType(name="monitor", clazz=MonitoringAgent.class), //filename="jadex/platform/service/monitoring/MonitoringAgent.class"),
 	@ComponentType(name="kernel_component", clazz=KernelComponentAgent.class), //filename="jadex/micro/KernelComponentAgent.class"),
 	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
@@ -188,7 +188,7 @@ import java.util.logging.Level;
 		@NameValue(name="ssltcpport", value="0"),
 		@NameValue(name="platformname", value="null")
 	}, components={
-		@Component(name="system", type="system", daemon=Boolean3.TRUE),
+//		@Component(name="system", type="system", daemon=Boolean3.TRUE),
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
@@ -224,7 +224,7 @@ import java.util.logging.Level;
 		//@NameValue(name="platformname", value="null"),
 		//@NameValue(name="kernels", value="\"component,micro,application,bdi,bdiv3,bpmn,gpmn\"")
 	}, components={
-		@Component(name="system", type="system", daemon=Boolean3.TRUE),
+//		@Component(name="system", type="system", daemon=Boolean3.TRUE),
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),

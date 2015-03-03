@@ -21,7 +21,7 @@ public class ServiceContainerNode	extends AbstractSwingTreeNode
 	//-------- constants --------
 	
 	/** The node name (used as id suffix and displayed in the tree). */
-	public static final String	NAME	= "Services";
+	public static final String	NAME	= "services";
 	
 	/** The service container icon. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
