@@ -60,9 +60,9 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		State.LOCKED, SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_locked.png"),
-		State.UNCONNECTED, SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_noconnection.png"),
-		State.CONNECTED, SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_connection.png")
+		State.LOCKED, SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_locked3.png"),
+		State.UNCONNECTED, SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_noconnection3.png"),
+		State.CONNECTED, SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_connection3.png")
 	});
 	
 	//-------- attribute --------

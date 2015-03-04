@@ -40,6 +40,7 @@ public class ViewTreeNode	extends AbstractSwingTreeNode
 	public ViewTreeNode(String name, ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, List<? extends ITreeNode> children)
 	{
 		super(parent, model, tree);
+//		System.out.println("create view node: "+name+" "+parent);
 		this.name = name;
 		setChildren(children);
 		model.registerNode(this);
