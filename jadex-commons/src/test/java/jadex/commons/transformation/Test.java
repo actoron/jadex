@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -92,6 +93,8 @@ public abstract class Test extends TestCase
 			{	
 //			while(true)
 //			{
+				testCalendar();
+				
 				testException();
 
 				testCertificate(); 
@@ -178,7 +181,7 @@ public abstract class Test extends TestCase
 	/**
 	 *  Method for writing and reading an object.
 	 */
-	protected Object	doWriteAndRead(Object wo) throws Exception
+	protected Object doWriteAndRead(Object wo) throws Exception
 	{
 		return doWriteAndRead(wo, null);
 	}
@@ -186,12 +189,12 @@ public abstract class Test extends TestCase
 	/**
 	 *  Method for writing and reading an object.
 	 */
-	protected Object	doWriteAndRead(Object wo, Comparator comp) throws Exception
+	protected Object doWriteAndRead(Object wo, Comparator comp) throws Exception
 	{
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
 		
-//		System.out.println("written is:"+new String((byte[])written));
+		System.out.println("written is:"+new String((byte[])written));
 		
 		Object ro = doRead(written);
 		
@@ -250,6 +253,16 @@ public abstract class Test extends TestCase
 					+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void testCalendar() throws Exception
+	{
+//		System.out.println("test enum: "+(TestEnum.A instanceof Enum));
+		GregorianCalendar gc = new GregorianCalendar(1999, 12, 12, 12, 12);
+		doWriteAndRead(gc);
 	}
 	
 	/**

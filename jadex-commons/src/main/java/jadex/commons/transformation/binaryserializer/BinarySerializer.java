@@ -77,6 +77,7 @@ public class BinarySerializer
 		ENCODER_HANDLERS.add(new URICodec());
 		ENCODER_HANDLERS.add(new TupleCodec());
 		ENCODER_HANDLERS.add(new DateCodec());
+		ENCODER_HANDLERS.add(new CalendarCodec());
 		ENCODER_HANDLERS.add(new InetAddressCodec());
 		ENCODER_HANDLERS.add(new LoggingLevelCodec());
 		ENCODER_HANDLERS.add(new LogRecordCodec());

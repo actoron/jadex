@@ -38,6 +38,7 @@ import java.net.URL;
 import java.security.cert.CertificateFactory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -282,6 +283,26 @@ public class JavaReader
 			TypeInfo ti_date = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Date")}),
 				new ObjectInfo(Date.class), new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("time", null))}));
 			typeinfos.add(ti_date);	
+			
+			// java.util.Calendar
+			TypeInfo ti_calendar = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Calendar")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						Class<?> cl = SReflect.classForName((String)rawattributes.get("classname"), context.getClassLoader());
+						Calendar cal = (Calendar)cl.newInstance();
+						cal.setTime(new Date(Long.parseLong((String)rawattributes.get("time"))));
+						return cal;
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("time", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("classname", null, AccessInfo.IGNORE_READWRITE))
+				}
+			));
+//				new ObjectInfo(Date.class), new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("time", null))}));
+			typeinfos.add(ti_calendar);	
 			
 			// java.lang.String
 			TypeInfo ti_string = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "String")}),

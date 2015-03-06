@@ -30,6 +30,7 @@ import java.net.URI;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -90,6 +91,7 @@ public class JavaWriter
 	 *  - Array
 	 *  - java.util.Color
 	 *  - java.util.Date
+	 *  - java.util.Calendar
 	 *  - java.lang.Class
 	 *  - java.net.URL
 	 *  - java.logging.Level
@@ -226,6 +228,39 @@ public class JavaWriter
 				null
 			));
 			typeinfos.add(ti_date);
+			
+			// java.util.Calendar
+			// Ignores several redundant bean attributes for performance reasons.
+			IObjectStringConverter cconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, Object context)
+				{
+					String	ret	= val.getClass().getName();
+					return ret;
+				}
+			};
+			IObjectStringConverter c2conv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, Object context)
+				{
+					String	ret	= ""+((Date)val).getTime();
+					return ret;
+				}
+			};
+			TypeInfo ti_calendar = new TypeInfo(new XMLInfo(new QName("typeinfo:java.util", "Calendar")), new ObjectInfo(Calendar.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("time", null), new AttributeConverter(null, c2conv)),
+				new AttributeInfo(new AccessInfo("classname", AccessInfo.THIS), new AttributeConverter(null, cconv))},
+//				new AttributeInfo(new AccessInfo("hours", null, AccessInfo.IGNORE_READWRITE)),
+//				new AttributeInfo(new AccessInfo("minutes", null, AccessInfo.IGNORE_READWRITE)),
+//				new AttributeInfo(new AccessInfo("seconds", null, AccessInfo.IGNORE_READWRITE)),
+//				new AttributeInfo(new AccessInfo("month", null, AccessInfo.IGNORE_READWRITE)),
+//				new AttributeInfo(new AccessInfo("year", null, AccessInfo.IGNORE_READWRITE)),
+//				new AttributeInfo(new AccessInfo("date", null, AccessInfo.IGNORE_READWRITE))},
+				null
+			));
+			
+			typeinfos.add(ti_calendar);
 			
 			// java.sql.Timestamp
 			// Ignores several redundant bean attributes for performance reasons.

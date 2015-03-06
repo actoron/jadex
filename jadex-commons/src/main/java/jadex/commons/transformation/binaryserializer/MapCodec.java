@@ -38,7 +38,7 @@ public class MapCodec extends AbstractCodec
 			if(Collections.EMPTY_MAP.getClass().equals(clazz))
 				ret = Collections.EMPTY_MAP;
 			else
-				ret = (Map) clazz.newInstance();
+				ret = (Map)clazz.newInstance();
 		}
 		catch(Exception e)
 		{
@@ -90,7 +90,7 @@ public class MapCodec extends AbstractCodec
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
 	{
-		ec.writeVarInt(((Map) object).size());
+		ec.writeVarInt(((Map)object).size());
 		
 		Set entries = ((Map) object).entrySet();
 		for (Iterator<Map.Entry> it = entries.iterator(); it.hasNext(); )

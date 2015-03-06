@@ -149,13 +149,13 @@ public class Traverser
 	public Object traverse(Object object, Class<?> clazz, Map<Object, Object> traversed, 
 		List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
 	{
-		if (processors == null)
+		if(processors == null)
 		{
 			processors = getDefaultProcessors();
 		}
 		
 		Object obj = doTraverse(object, clazz, traversed, processors, clone, targetcl, context);
-		if (obj == IGNORE_RESULT)
+		if(obj == IGNORE_RESULT)
 		{
 			obj = null;
 		}
