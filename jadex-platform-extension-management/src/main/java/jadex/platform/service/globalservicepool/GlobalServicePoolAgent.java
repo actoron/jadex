@@ -11,6 +11,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -125,7 +126,9 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		}
 		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null);
 		info.setProvidedServiceInfos(new ProvidedServiceInfo[]{psi});
-		ser.addServiceType(servicetype, null, componentmodel, info, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret)
+		ser.addServiceType(servicetype,
+			new DefaultPoolStrategy(strategy.getWorkersPerProxy(), 35000, strategy.getWorkersPerProxy()),	// Is this correct???
+			componentmodel, info, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result) 
 			{
