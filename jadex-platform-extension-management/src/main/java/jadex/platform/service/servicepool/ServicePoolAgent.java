@@ -164,13 +164,14 @@ public class ServicePoolAgent implements IServicePoolService
 		// add service proxy
 		try
 		{
-		Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
-		return agent.addService(null, servicetype, service, pi, scope);
+			Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
+			return agent.addService(null, servicetype, service, pi, scope);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
-			throw new RuntimeException(e);
+			return new Future<Void>(e);
+//			throw new RuntimeException(e);
 		}
 	}
 	
