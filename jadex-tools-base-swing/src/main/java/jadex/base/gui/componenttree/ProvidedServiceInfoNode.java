@@ -80,6 +80,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		this.platformea = platformea;
 //		if(service==null || service.getType().getTypeName()==null)
 //			System.out.println("service node: "+this);
+//		System.out.println("ea: "+ea.getComponentIdentifier());
 		model.registerNode(this);
 	}
 	
