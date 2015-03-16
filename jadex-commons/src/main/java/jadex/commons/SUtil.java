@@ -1764,8 +1764,10 @@ public class SUtil
 		            					jarnames.add(jarname);
 		            				}
 		            				URL depurl = urlfile.toURI().toURL();
-		            				set.add(depurl);
-		            				collectManifestURLs(depurl, set, jarnames);
+		            				if(set.add(depurl))
+		            				{
+		            					collectManifestURLs(depurl, set, jarnames);
+		            				}
 		            			}
 		                    	catch (Exception e)
 		                    	{
