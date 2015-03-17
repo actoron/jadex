@@ -362,6 +362,10 @@ public class Executor implements Runnable
 			{
 				throw new RuntimeException(e);
 			}
+			finally
+			{
+				this.running = true;
+			}
 
 			if(throwables!=null)
 			{
@@ -384,9 +388,7 @@ public class Executor implements Runnable
 						throw new RuntimeException(t);
 					}
 				}
-			}
-			
-			this.running = true;
+			}			
 		}
 		
 //		System.out.println("Executor.blockThreadFinished "+Thread.currentThread());
