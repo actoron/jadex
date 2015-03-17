@@ -48,7 +48,7 @@ public class JCCTest //extends TestCase
 			.getServiceUpwards(platform, IComponentManagementService.class).get(sus, timeout);
 
 		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
-			new ComponentIdentifier("jcc", new ComponentIdentifier("system", platform.getComponentIdentifier()))).get(sus, timeout);
+			new ComponentIdentifier("jcc", platform.getComponentIdentifier())).get(sus, timeout);
 		
 		jcc.scheduleStep(new IComponentStep<Void>()
 		{
