@@ -28,6 +28,7 @@ import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -569,9 +570,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					if(!unblocked[0])
 					{
-						// Cannot use timeout exception as component would not be correctly entered.
-						// Todo: allow informing future about timeout.
-						unblock(monitor, null); //new TimeoutException());
+						unblock(monitor, new TimeoutException());
 					}
 				}
 				
@@ -581,25 +580,30 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			});
 		}
 		
-		exe.blockThread(monitor);
-		
-		unblocked[0]	= true;
-		
-		assert !IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState());
-		
-		synchronized(this)
+		try
 		{
-			if(executing)
-			{
-				System.err.println(getComponent().getComponentIdentifier()+": double execution");
-				new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
-			}
-			this.executing	= true;
+			exe.blockThread(monitor);
 		}
-
-		this.componentthread	= Thread.currentThread();
-		
-		afterBlock();
+		finally
+		{
+			unblocked[0]	= true;
+			
+			assert !IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState());
+			
+			synchronized(this)
+			{
+				if(executing)
+				{
+					System.err.println(getComponent().getComponentIdentifier()+": double execution");
+					new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
+				}
+				this.executing	= true;
+			}
+	
+			this.componentthread	= Thread.currentThread();
+			
+			afterBlock();
+		}
 	}
 	
 	/**
