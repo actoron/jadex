@@ -164,8 +164,17 @@ public class ServicePoolAgent implements IServicePoolService
 		servicetypes.put(servicetype, handler);
 
 		// add service proxy
-		Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
-		return agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, pi, scope);
+		try
+		{
+			Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
+			return agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, pi, scope);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return new Future<Void>(e);
+//			throw new RuntimeException(e);
+		}
 	}
 	
 	

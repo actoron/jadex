@@ -116,7 +116,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 				public void customResultAvailable(IMonitoringService monser)
 				{
 	//				if(context.getMethod().getName().indexOf("log")!=-1)
-	//					System.out.println("log");
+//						System.out.println("log");
 					
 	//				if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
 	//					System.out.println("end shut in mon: "+context.getObject());
@@ -152,6 +152,10 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 							}
 						});
 					}
+//					else
+//					{
+//						System.out.println("monitoring service not found");
+//					}
 					
 					context.invoke().addResultListener(new ReturnValueResultListener(ret, context));
 				}

@@ -1516,8 +1516,10 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		            					jarnames.add(jarname);
 		            				}
 		            				URL depurl = urlfile.toURI().toURL();
-		            				set.add(depurl.toURI());
-		            				collectManifestURLs(depurl.toURI(), set, jarnames);
+		            				if(set.add(depurl.toURI()))
+		            				{
+		            					collectManifestURLs(depurl.toURI(), set, jarnames);
+		            				}
 		            			}
 		                    	catch (Exception e)
 		                    	{
