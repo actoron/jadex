@@ -836,63 +836,52 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(step!=null)
 		{
 			IFuture<?>	stepfut	= null;
-			Exception ex = null;
+			Throwable ex = null;
 			try
 			{
 				stepfut	= step.getFirstEntity().execute(component);
 			}
-			catch(StepAborted sa)
+			catch(Throwable t)
 			{
-				ex = new RuntimeException(sa);
+				ex = t;
 			}
-			catch(final Exception e)
-			{
-				ex = e;
-			}
-			// catch other/all throwables?
-//			catch(final Throwable e) 
-//			{
-//			}
 			
 			if(ex!=null)
 			{
-				// Todo: fail fast vs robust components.
-				
-				if(!step.getSecondEntity().hasResultListener())
+				step.getSecondEntity().setException(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
+
+				// If no listener, print failed step to console for developer.
+				// Hard step failure with uncatched exception is shown also when no debug.
+				if(!(ex instanceof StepAborted) && !step.getSecondEntity().hasResultListener())
 				{
-					final Exception fex = ex;
-					// Wait for delayed listener addition.
-					if(DEBUG)
-					{
-						waitForDelay(3000, true)
-							.addResultListener(new IResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-								if(!step.getSecondEntity().hasResultListener())
+					final Throwable fex = ex;
+					// No wait for delayed listener addition for hard failures to print errors immediately.
+//					waitForDelay(3000, true)
+//						.addResultListener(new IResultListener<Void>()
+//					{
+//						public void resultAvailable(Void result)
+//						{
+//							if(!step.getSecondEntity().hasResultListener())
+//							{
+								// Todo: fail fast vs robust components.
+								StringWriter	sw	= new StringWriter();
+								fex.printStackTrace(new PrintWriter(sw));
+								getComponent().getLogger().severe("Component step failed: "+step.getFirstEntity()+"\n"+sw);
+								
+								if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
 								{
-									StringWriter	sw	= new StringWriter();
-									fex.printStackTrace(new PrintWriter(sw));
-									getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
-									
-									if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
-									{
-										stepadditions.get(step.getFirstEntity()).printStackTrace();
-									}
+									stepadditions.get(step.getFirstEntity()).printStackTrace();
 								}
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// shouldn't happen:
-								exception.printStackTrace();
-							}
-						});
-					}
+//							}
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							// shouldn't happen:
+//							exception.printStackTrace();
+//						}
+//					});
 				}
-				
-//				step.getSecondEntity().setException(e instanceof Exception? (Exception)e: new RuntimeException(e));
-				step.getSecondEntity().setException(ex);
 			}
 			
 			if(stepfut!=null)
