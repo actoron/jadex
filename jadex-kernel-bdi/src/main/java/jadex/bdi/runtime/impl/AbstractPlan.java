@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
@@ -33,7 +35,6 @@ import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.WaitqueueFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
@@ -41,8 +42,11 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SReflect;
@@ -69,7 +73,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	//-------- attributes --------
 
 	/** The bdi interpreter. */
-	protected BDIInterpreter interpreter;
+	protected IInternalAccess interpreter;
 	
 	/** The external access. */
 	// cached because requested from external thread
@@ -95,11 +99,11 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 			"_"+Thread.currentThread().hashCode();
 //		System.out.println("init: "+planinit+" "+getClass().hashCode());
 		
-		this.interpreter = (BDIInterpreter)((Object[])planinit.get(myadr))[0];
+		this.interpreter = (IInternalAccess)((Object[])planinit.get(myadr))[0];
 		this.rplan	= ((Object[])planinit.get(myadr))[1];
 		this.rcapa	= ((Object[])planinit.get(myadr))[2];
 		
-		this.state = interpreter.getState();
+		this.state = interpreter.getComponentFeature(IBDIAgentFeature.class).getState();
 		this.access	= new ExternalAccessFlyweight(state, rcapa);
 		
 		if(rplan==null || rcapa==null)
@@ -249,7 +253,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public Logger getLogger()
 	{
-		return BDIInterpreter.getInterpreter(state).getLogger(rcapa);
+		return BDIAgentFeature.getInterpreter(state).getLogger(rcapa);
 	}
 
 	
@@ -262,8 +266,8 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public void	startAtomic()
 	{
-		interpreter.startMonitorConsequences();
-		interpreter.startAtomic();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).startMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).startAtomic();
 	}
 
 	/**
@@ -276,8 +280,8 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public void	endAtomic()
 	{
-		interpreter.endAtomic();
-		interpreter.endMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).endAtomic();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).endMonitorConsequences();
 	}
 
 	/**
@@ -316,7 +320,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	{
 		Object rgoal = ((GoalFlyweight)subgoal).getHandle();
 		Object scope = ((GoalFlyweight)subgoal).getScope();
-		interpreter.startMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).startMonitorConsequences();
 		GoalLifecycleRules.adoptGoal(state, scope, rgoal);
 		state.addAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_subgoals, rgoal);
 		state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_parentplan, rplan);
@@ -336,7 +340,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 			state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_protected, Boolean.TRUE);
 		}
 	
-		interpreter.endMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).endMonitorConsequences();
 	}
 
 	/**
@@ -416,7 +420,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return interpreter.getAgentAdapter().getComponentIdentifier();
+		return interpreter.getComponentIdentifier();
 	}
 	
 	/**
@@ -425,7 +429,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IComponentDescription getComponentDescription()
 	{
-		return interpreter.getAgentAdapter().getDescription();
+		return interpreter.getComponentDescription();
 	}
 
 	/**
@@ -457,9 +461,10 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		// Problem: duplicate functionality here and in capability flyweight :-(
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 //			OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATING);
-		interpreter.startMonitorConsequences();
-		getInterpreter().killComponent();
-		interpreter.endMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).startMonitorConsequences();
+//		getInterpreter().killComponent();
+		interpreter.killComponent();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).endMonitorConsequences();
 	}
 
 	//-------- capability shortcut methods --------
@@ -524,7 +529,8 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IClockService getClock()
 	{
-		return (IClockService)interpreter.getClockService();
+		return SServiceProvider.getLocalService(interpreter, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		return (IClockService)interpreter.getClockService();
 	}
 
 	/**
@@ -541,14 +547,14 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		return getClock().getTime();
 	}
 	
-	/**
-	 *  Get the service container.
-	 *  @return The service container.
-	 */
-	public IRequiredServicesFeature/*hack to reduce compile errors*/ getServiceContainer()
-	{
-		return new ServiceContainerProxy(getInterpreter(), getRCapability()); 
-	}
+//	/**
+//	 *  Get the service container.
+//	 *  @return The service container.
+//	 */
+//	public IRequiredServicesFeature/*hack to reduce compile errors*/ getServiceContainer()
+//	{
+//		return new ServiceContainerProxy(getInterpreter(), getRCapability()); 
+//	}
 
 	//-------- goalbase shortcut methods --------
 	
@@ -560,9 +566,9 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	public void dispatchTopLevelGoal(IGoal goal)
 	{
 		Object rgoal = ((GoalFlyweight)goal).getHandle();
-		interpreter.startMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).startMonitorConsequences();
 		GoalLifecycleRules.adoptGoal(state, ((GoalFlyweight)goal).getScope(), rgoal);
-		interpreter.endMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).endMonitorConsequences();
 	}
 
 	/**
@@ -614,9 +620,9 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	{	
 		Object revent = ((MessageEventFlyweight)me).getHandle();
 		Object rcapa = ((MessageEventFlyweight)me).getScope();
-		interpreter.startMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).startMonitorConsequences();
 		IFuture	ret	= MessageEventRules.sendMessage(state, rcapa, revent, codecids);
-		interpreter.endMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).endMonitorConsequences();
 		return ret;
 	}
 
@@ -629,9 +635,9 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	{
 		Object revent = ((InternalEventFlyweight)event).getHandle();
 		Object rcapa = ((InternalEventFlyweight)event).getScope();
-		interpreter.startMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).startMonitorConsequences();
 		InternalEventRules.adoptInternalEvent(state, rcapa, revent);
-		interpreter.endMonitorConsequences();
+		interpreter.getComponentFeature(IBDIAgentFeature.class).endMonitorConsequences();
 	}
 
 	/**
@@ -743,7 +749,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	{
 		// Hack!!! Should be configurable.
 		IExpressionParser	exp_parser	= new JavaCCExpressionParser();
-		String[] imports	= getInterpreter().getModel(rcapa).getAllImports();
+		String[] imports	= getInterpreter().getComponentFeature(IBDIAgentFeature.class).getModel(rcapa).getAllImports();
 		
 		Map	params	= null;
 		if(paramnames!=null)
@@ -934,7 +940,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 *  @return The state.
 	 */
 	// todo: make package access
-	public BDIInterpreter getInterpreter()
+	public IInternalAccess getInterpreter()
 	{
 		return interpreter;
 	}

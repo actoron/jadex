@@ -1,9 +1,17 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.IAction;
@@ -21,8 +29,8 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
-
 import jadex.commons.beans.PropertyChangeListener;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -115,7 +123,7 @@ public class BeliefRules
 			state.setAttributeValue(rbelief, OAVBDIRuntimeModel.belief_has_fact, fact);
 			
 			// Set belief value as result
-			BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+			IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 			Object magent = state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.element_has_model);
 			Collection mbels = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefs);
 			
@@ -126,7 +134,8 @@ public class BeliefRules
 				if(result)
 				{
 					String name = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
-					BDIInterpreter.getInterpreter(state).setResultValue(name, fact);
+//					BDIAgentFeature.getInterpreter(state).setResultValue(name, fact);
+					BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(name, fact);
 				}
 			}
 			// case 2: check if agent belief references map to target belief
@@ -147,7 +156,8 @@ public class BeliefRules
 							if(belname.equals(tmp[0]) && scope.equals(tmp[1]))
 							{
 								String name = (String)state.getAttributeValue(mbelref, OAVBDIMetaModel.modelelement_has_name);
-								BDIInterpreter.getInterpreter(state).setResultValue(name, fact);
+//								BDIAgentFeature.getInterpreter(state).setResultValue(name, fact);
+								BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(name, fact);
 							}
 						}
 					}
@@ -208,7 +218,7 @@ public class BeliefRules
 	{
 		// Set beliefset value as result
 		Object	mbelset	= state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model);
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		Object magent = state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.element_has_model);
 		Collection mbelsets = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefsets);
 		
@@ -220,7 +230,8 @@ public class BeliefRules
 			{
 				String name = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
 				Collection facts = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
-				BDIInterpreter.getInterpreter(state).setResultValue(name, facts);
+//				BDIAgentFeature.getInterpreter(state).setResultValue(name, facts);
+				BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(name, facts);
 			}
 		}
 		// case 2: check if agent belief references map to target belief
@@ -242,7 +253,8 @@ public class BeliefRules
 						{
 							String name = (String)state.getAttributeValue(mbelref, OAVBDIMetaModel.modelelement_has_name);
 							Collection facts = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
-							BDIInterpreter.getInterpreter(state).setResultValue(name, facts);
+//							BDIAgentFeature.getInterpreter(state).setResultValue(name, facts);
+							BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(name, facts);
 						}
 					}
 				}
@@ -393,7 +405,7 @@ public class BeliefRules
 //			// todo: provide activation resp. variable bindings
 //			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, null);
 			
-			BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+			((IInternalExecutionFeature)BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class)).wakeup();
 		}
 	};
 	
@@ -485,7 +497,7 @@ public class BeliefRules
 				final ITimedObject[]	to	= new ITimedObject[1];
 				final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
 				
-				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
+				to[0] = new InterpreterTimedObject(BDIAgentFeature.getInternalAccess(state), new CheckedAction()
 				{
 					public boolean isValid()
 					{
@@ -502,13 +514,13 @@ public class BeliefRules
 						}
 						catch(Exception e)
 						{
-							String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
-							BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate parameter expression: "+name
+							String name = BDIAgentFeature.getInternalAccess(state).getComponentIdentifier().getName();
+							BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate parameter expression: "+name
 								+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
 						}
 		//					// changed *.class to *.TYPE due to javaflow bug
 						state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, 
-								BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+							SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 					}
 					
 					// Not possible because rparam is not in state any more
@@ -520,7 +532,7 @@ public class BeliefRules
 				
 		//			// changed *.class to *.TYPE due to javaflow bug
 				state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, 
-						BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+					SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 			}
 		}
 		
@@ -558,7 +570,7 @@ public class BeliefRules
 				final ITimedObject[]	to	= new ITimedObject[1];
 				final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
 				
-				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
+				to[0] = new InterpreterTimedObject(BDIAgentFeature.getInternalAccess(state), new CheckedAction()
 				{
 					public boolean isValid()
 					{
@@ -575,18 +587,18 @@ public class BeliefRules
 						}
 						catch(Exception e)
 						{
-							String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
-							BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate parameterset expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
+							String name = BDIAgentFeature.getInternalAccess(state).getComponentIdentifier().getName();
+							BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate parameterset expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
 						}
 						// changed *.class to *.TYPE due to javaflow bug
 						state.setAttributeValue(rparamset, OAVBDIRuntimeModel.typedelement_has_timer, 
-							BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+							SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 					}
 				});
 				
 				// changed *.class to *.TYPE due to javaflow bug
 				state.setAttributeValue(rparamset, OAVBDIRuntimeModel.typedelement_has_timer, 
-					BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+					SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 			}
 		}
 		

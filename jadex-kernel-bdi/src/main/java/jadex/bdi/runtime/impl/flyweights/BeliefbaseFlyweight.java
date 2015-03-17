@@ -1,12 +1,13 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MBeliefbaseFlyweight;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
@@ -34,7 +35,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public static BeliefbaseFlyweight getBeliefbaseFlyweight(IOAVState state, Object scope)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		BeliefbaseFlyweight ret = (BeliefbaseFlyweight)ip.getFlyweightCache(IBeliefbase.class, new Tuple(IBeliefbase.class, scope));
 		if(ret==null)
 		{

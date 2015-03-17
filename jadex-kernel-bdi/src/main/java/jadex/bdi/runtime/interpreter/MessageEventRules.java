@@ -1,8 +1,13 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.DefaultMessageAdapter;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IContentCodec;
@@ -109,7 +114,7 @@ public class MessageEventRules
 		if(rplan!=null)
 			state.removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_uservariables, rmessageevent);
 		// Hack!!! Only needed for external access!
-		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+		BDIAgentFeature.getInterpreter(state).getAgentAdapter().wakeup();
 	}*/
 	
 	/**
@@ -127,7 +132,7 @@ public class MessageEventRules
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_outbox, rmessageevent);
 		
 		// Hack!!! Only needed for external access!
-		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+		((IInternalExecutionFeature)BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class)).wakeup();
 		
 		return ret;
 	}
@@ -215,7 +220,7 @@ public class MessageEventRules
 				IMessageAdapter rawmsg = (IMessageAdapter)assignments.getVariableValue("?rawmsg");
 				Object mevent = assignments.getVariableValue("?mevent");
 				
-//				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
+//				String agentname = BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
 //				System.out.println("Agent has received msg: "+agentname+" "+rawmsg+" "+mevent);
 					
 				Object revent = createReceivedMessageEvent(state, mevent, rawmsg, rcapa, null);
@@ -337,7 +342,7 @@ public class MessageEventRules
 				// todo: fetch value from rete, currently not possible because rete does not cache function call results.
 				Object original = getInReplyMessageEvent(state, rawmsg, rcapa);
 				
-//				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
+//				String agentname = BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
 //				System.out.println("Agent has received conversation msg: "+agentname+" "+rawmsg+" "+mevent);
 					
 				Object revent = createReceivedMessageEvent(state, mevent, rawmsg, rcapa, original);
@@ -390,8 +395,8 @@ public class MessageEventRules
 				Object ragent = assignments.getVariableValue("?ragent");
 				Object rawmsg = assignments.getVariableValue("?rawmsg");
 
-				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
-				BDIInterpreter.getInterpreter(state).getLogger(ragent).severe("Agent has received msg and has found no template: "+agentname+" "+rawmsg);
+				String agentname = BDIAgentFeature.getInternalAccess(state).getComponentIdentifier().getLocalName();
+				BDIAgentFeature.getInterpreter(state).getLogger(ragent).severe("Agent has received msg and has found no template: "+agentname+" "+rawmsg);
 			
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_inbox, rawmsg);
 			}
@@ -510,9 +515,9 @@ public class MessageEventRules
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
 				Object ragent = assignments.getVariableValue("?ragent");
-				Logger logger = BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger();
+				Logger logger = BDIAgentFeature.getInternalAccess(state).getLogger();
 				IMessageAdapter message = (IMessageAdapter)assignments.getVariableValue("?msg");
-				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
+				String agentname = BDIAgentFeature.getInternalAccess(state).getComponentIdentifier().getLocalName();
 //				System.out.println("Agent has received msg: "+agentname+" "+message);
 				
 				// Find the event to which the message is a reply (if any).
@@ -612,9 +617,9 @@ public class MessageEventRules
 					state.setAttributeValue(revent, OAVBDIRuntimeModel.processableelement_has_state,
 						OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 					
-//					BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+//					BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 //					OAVTreeModel.createOAVFrame("Agent State", ip.getState(), 
-//						BDIInterpreter.getInterpreter(state).getAgent()).setVisible(true);
+//						BDIAgentFeature.getInterpreter(state).getAgent()).setVisible(true);
 //					RetePanel.createReteFrame("Agent Rules", 
 //						((RetePatternMatcherFunctionality)ip.getRuleSystem().getMatcherFunctionality()).getReteNode(), 
 //						((RetePatternMatcherState)ip.getRuleSystem().getMatcherState()).getReteMemory(), new Object());
@@ -647,7 +652,7 @@ public class MessageEventRules
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
-				final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
+				final IInternalAccess interpreter = BDIAgentFeature.getInternalAccess(state);
 				Object rcapa = assignments.getVariableValue("?rcapa");
 				Object rme = assignments.getVariableValue("?me");
 				final Future ret = (Future)state.getAttributeValue(rme, OAVBDIRuntimeModel.messageevent_has_sendfuture);
@@ -736,13 +741,13 @@ public class MessageEventRules
 				
 				final IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
-				SServiceProvider.getService(interpreter.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(interpreter, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(interpreter.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
 							IFuture	sent = ((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
-								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getResourceIdentifier(), null, codecids);
+								interpreter.getComponentIdentifier(), interpreter.getModel().getResourceIdentifier(), null, codecids);
 //								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getState().getTypeModel().getClassLoader(), codecids);
 							
 							// ret may be null for initial events.
@@ -1082,17 +1087,17 @@ public class MessageEventRules
 	{
 		// todo: is not the global value :-(
 		Collection coll = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents);
-		int smz = getStoredMessagesSize(BDIInterpreter.getInterpreter(state));
+		int smz = getStoredMessagesSize(BDIAgentFeature.getInternalAccess(state));
 		if(smz!=0 && coll!=null && coll.size()>smz)
 		{
-			BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Agent does not save conversation due " +
+			BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe("Agent does not save conversation due " +
 				"to too many outstanding messages. Increase buffer in properties - storedmessages.size");
 		}
 		else
 		{
 			state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents, rmevent);
 			coll = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents);
-//			System.out.println("+++"+BDIInterpreter.getInterpreter(state).getAgentAdapter()
+//			System.out.println("+++"+BDIAgentFeature.getInterpreter(state).getAgentAdapter()
 //				.getComponentIdentifier()+" has open conversations: "+coll.size()+" "+coll);
 //			Thread.dumpStack();
 		}
@@ -1103,9 +1108,10 @@ public class MessageEventRules
 	 *  0 indicates no maximum execution time.
 	 *  @return The max execution time.
 	 */
-	protected static int getStoredMessagesSize(BDIInterpreter interpreter)
+	protected static int getStoredMessagesSize(IInternalAccess interpreter)
 	{
-		Map	props	= interpreter.getProperties();
+		// todo: properties?
+		Map	props	= null;//interpreter.getProperties();
 		Number num	= props!=null ? (Number)props.get(MESSAGEEVENTS_MAX) : null;
 		return num!=null? num.intValue(): 0;
 	}
@@ -1122,7 +1128,7 @@ public class MessageEventRules
 //		if(!coll.remove(rmevent))
 //			throw new RuntimeException("Registration of message event not found: "+rmevent+" "+rscope);
 			
-//		System.out.println("+++"+BDIInterpreter.getInterpreter(state).getAgentAdapter()
+//		System.out.println("+++"+BDIAgentFeature.getInterpreter(state).getAgentAdapter()
 //			.getComponentIdentifier()+" has open conversations: "+coll.size()+" "+coll);
 	}
 	
@@ -1157,7 +1163,7 @@ public class MessageEventRules
 		if(coll==null)
 			return null;
 		
-//		System.out.println("+++"+BDIInterpreter.getInterpreter(state).getAgentAdapter()
+//		System.out.println("+++"+BDIAgentFeature.getInterpreter(state).getAgentAdapter()
 //			.getComponentIdentifier()+" has open conversations: "+coll.size()+" "+coll);	
 		
 		// Prefer the newest messages for finding replies.
@@ -1346,7 +1352,9 @@ public class MessageEventRules
 	public static IContentCodec[] getContentCodecs(Object rcapa, IOAVState state)
 	{
 		List ret	= null;
-		Map	rprops = BDIInterpreter.getInterpreter(state).getProperties(rcapa);
+		Map	rprops = null;
+		// todo:?
+		//Map	rprops = BDIAgentFeature.getInternalAccess(state).getProperties(rcapa);
 		if(rprops!=null)
 		{
 			for(Iterator it=rprops.keySet().iterator(); it.hasNext();)
@@ -1370,7 +1378,7 @@ public class MessageEventRules
 	public static MessageType getMessageEventType(IOAVState state, Object mme)
 	{
 		String	mtype	= (String)state.getAttributeValue(mme, OAVBDIMetaModel.messageevent_has_type);
-		BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
+		BDIInterpreter bdii = BDIAgentFeature.getInterpreter(state);
 		MessageType ret	= bdii.getMessageService().getMessageType(mtype);
 		return ret;
 	}

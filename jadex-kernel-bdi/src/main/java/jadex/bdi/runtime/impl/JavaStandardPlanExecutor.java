@@ -1,13 +1,12 @@
 package jadex.bdi.runtime.impl;
 
+import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -68,7 +67,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  @return	The created body.
 	 *  May throw any kind of exception, when the body creation fails
 	 */
-	public Object	createPlanBody(BDIInterpreter interpreter, Object rcapability, Object rplan) throws Exception
+	public Object	createPlanBody(IInternalAccess interpreter, Object rcapability, Object rplan) throws Exception
 	{
 		// Create plan body object.
 		// Hack!!! Not an elegant way by using a static hashtable!
@@ -76,7 +75,8 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		String refname= ""+Thread.currentThread()+"_"+Thread.currentThread().hashCode();
 		AbstractPlan.planinit.put(refname, new Object[]{interpreter, rplan, rcapability});
 
-		IOAVState state = interpreter.getState();
+		IBDIAgentFeature bdif = interpreter.getComponentFeature(IBDIAgentFeature.class);
+		IOAVState state = bdif.getState();
 		
 		Object	mplan	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
 		Object	mbody	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
@@ -87,7 +87,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		Object	body = null;
 		if(clname!=null)
 		{
-			Class clazz = SReflect.findClass(clname, interpreter.getModel(rcapability).getAllImports(), state.getTypeModel().getClassLoader());
+			Class clazz = SReflect.findClass(clname, bdif.getModel(rcapability).getAllImports(), state.getTypeModel().getClassLoader());
 			
 			if(clazz!=null)
 			{
@@ -96,7 +96,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 					body = clazz.newInstance();
 					if(!(body instanceof Plan))
 						throw new RuntimeException("User plan has wrong baseclass. Expected jadex.bdi.runtime.Plan for standard plan.");
-					interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, body);
+					bdif.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, body);
 				}
 				catch(Exception e)
 				{
@@ -109,7 +109,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		{
 			String methodname = (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_method);
 			body = new ServiceCallPlan(sername, methodname);
-			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, body);
+			bdif.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, body);
 		}
 		else 
 		{
@@ -132,7 +132,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  May throw any kind of exception, when the plan execution fails
 	 *  @return True, if the plan step was interrupted (interrupted flag).
 	 */
-	public boolean	executeStep(BDIInterpreter interpreter, Object rcapability, Object rplan, String steptype)	throws Exception
+	public boolean	executeStep(IInternalAccess interpreter, Object rcapability, Object rplan, String steptype)	throws Exception
 	{
 		// Get or create new a thread for the plan instance info.
 		boolean newthread = false;
@@ -230,7 +230,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  May throw any kind of exception, when the plan execution fails
 	 *  @return True, if plan was interrupted (micro plan step).
 	 */
-	public boolean	executePlanStep(BDIInterpreter interpreter, Object rcapability, Object rplan)	throws Exception
+	public boolean	executePlanStep(IInternalAccess interpreter, Object rcapability, Object rplan)	throws Exception
 	{
 		return executeStep(interpreter, rcapability, rplan, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY);
 	}
@@ -245,7 +245,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  May throw any kind of exception, when the execution fails
 	 *  @return True, if execution was interrupted (micro plan step).
 	 */
-	public boolean	executePassedStep(BDIInterpreter interpreter, Object rplan)	throws Exception
+	public boolean	executePassedStep(IInternalAccess interpreter, Object rplan)	throws Exception
 	{
 		assert tasks.containsKey(rplan);
 		return executeStep(interpreter, null, rplan, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED);
@@ -261,7 +261,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  May throw any kind of exception, when the execution fails
 	 *  @return True, if execution was interrupted (micro plan step).
 	 */
-	public boolean	executeFailedStep(BDIInterpreter interpreter, Object rplan)	throws Exception
+	public boolean	executeFailedStep(IInternalAccess interpreter, Object rplan)	throws Exception
 	{
 		assert tasks.containsKey(rplan);
 		return executeStep(interpreter, null, rplan, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);		
@@ -278,7 +278,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  May throw any kind of exception, when the execution fails
 	 *  @return True, if execution was interrupted (micro plan step).
 	 */
-	public boolean	executeAbortedStep(BDIInterpreter interpreter, Object rplan)	throws Exception
+	public boolean	executeAbortedStep(IInternalAccess interpreter, Object rplan)	throws Exception
 	{
 		assert tasks.containsKey(rplan);
 		return executeStep(interpreter, null, rplan, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED);
@@ -306,7 +306,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  Called on termination of a plan.
 	 *  Free all associated ressources, stop threads, etc.
 	 */
-	public void cleanup(BDIInterpreter interpreter, Object rplan)
+	public void cleanup(IInternalAccess interpreter, Object rplan)
 	{
 		PlanExecutionTask task = (PlanExecutionTask)tasks.get(rplan);
 		if(task!=null)
@@ -437,12 +437,12 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  @param rplan The planinstance.
 	 *  @param wa The wait abstraction.
 	 */
-	public void	eventWaitFor(BDIInterpreter interpreter, Object rplan)
+	public void	eventWaitFor(IInternalAccess interpreter, Object rplan)
 	{
-		if(interpreter.isAtomic())
+		if(interpreter.getComponentFeature(IBDIAgentFeature.class).isAtomic())
 			throw new RuntimeException("WaitFor not allowed in atomic block.");
 
-		Object	rbody	= interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
+		Object	rbody	= interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
 		if(rbody==null)
 			throw new RuntimeException("Plan body nulls. waitFor() calls from plan constructors not allowed.");
 
@@ -485,9 +485,10 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  0 indicates no maximum execution time.
 	 *  @return The max execution time.
 	 */
-	protected long getMaxExecutionTime(BDIInterpreter interpreter)
+	protected long getMaxExecutionTime(IInternalAccess interpreter)
 	{
-		Map	props	= interpreter.getProperties();
+		// todo: properties?
+		Map	props	= null;//interpreter.getProperties(); 
 		Number max = props!=null ? (Number)props.get(MAX_PLANSTEP_TIME) : null;
 		return max!=null? max.longValue(): 0;
 		
@@ -519,7 +520,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		//-------- attributes --------
 
 		/** The interpreter. */
-		protected BDIInterpreter interpreter;
+		protected IInternalAccess interpreter;
 
 		/** The capability. */
 		protected Object rcapability;
@@ -551,7 +552,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		 *  Create a new plan exeution thread.
 		 *  @param rplan The plan instance info.
 		 */
-		public PlanExecutionTask(BDIInterpreter interpreter, Object rcapability, Object rplan)
+		public PlanExecutionTask(IInternalAccess interpreter, Object rcapability, Object rplan)
 		{
 //			if(rcapability==null)
 //			{
@@ -588,10 +589,10 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			
 			// Save the execution thread for this task.
 			this.thread = Thread.currentThread();
-			interpreter.setPlanThread(thread);
+			interpreter.getComponentFeature(IBDIAgentFeature.class).setPlanThread(thread);
 			ClassLoader oldcl = thread.getContextClassLoader();
-			assert interpreter.getState().getTypeModel().getClassLoader()!=null;
-			thread.setContextClassLoader(interpreter.getState().getTypeModel().getClassLoader());
+			assert interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getTypeModel().getClassLoader()!=null;
+			thread.setContextClassLoader(interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getTypeModel().getClassLoader());
 
 			// Execute the plan (interrupted by pause() calls).
 			// While the plan is executing its plan steps
@@ -603,7 +604,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			boolean	interrupted	= false;	// Plan is interrupted, exit plan thread.
 			try
 			{
-				Object	tmp	= interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
+				Object	tmp	= interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
 				if(tmp==null)
 					tmp = createPlanBody(interpreter, rcapability, rplan);
 				pi = (Plan)tmp;
@@ -636,9 +637,9 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				// is necessary.
 				if(!aborted)
 				{
-					PlanRules.endPlanPart(interpreter.getState(), rcapability, rplan, false);
+					PlanRules.endPlanPart(interpreter.getComponentFeature(IBDIAgentFeature.class).getState(), rcapability, rplan, false);
 					// Hack!!! Should not change state?
-					interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
+					interpreter.getComponentFeature(IBDIAgentFeature.class).getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
 						this.throwable==null? OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED : OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
 					
 //					if(throwable!=null)
@@ -682,10 +683,10 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				}
 			}
 
-			PlanRules.endPlanPart(interpreter.getState(), rcapability, rplan, true);
+			PlanRules.endPlanPart(interpreter.getComponentFeature(IBDIAgentFeature.class).getState(), rcapability, rplan, true);
 
 			// Set plan processing state.
-			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);
+			interpreter.getComponentFeature(IBDIAgentFeature.class).getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);
 			
 			// Cleanup the plan execution thread.
 			tasks.remove(rplan);
@@ -695,7 +696,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			synchronized(monitor)
 			{
 //				System.out.println("finish1: "+rplan);
-				interpreter.setPlanThread(null);
+				interpreter.getComponentFeature(IBDIAgentFeature.class).setPlanThread(null);
 				thread.setContextClassLoader(oldcl);
 				monitor.notify();
 //				System.out.println("finish2: "+rplan);
@@ -725,14 +726,14 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				String planstate	= steptype;
 				
 				// Set processing state to "waiting"
-				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, procstate);
+				interpreter.getComponentFeature(IBDIAgentFeature.class).getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, procstate);
 
 				// Transfer execution from plan thread to agent thread using notify/wait pair.
 				this.exestate	= exestate;
 				monitor.notify();
 				try
 				{
-					interpreter.setPlanThread(null);
+					interpreter.getComponentFeature(IBDIAgentFeature.class).setPlanThread(null);
 //					System.out.println("givebackcontrol: "+rplan);
 					monitor.wait();
 				}
@@ -745,7 +746,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 
 				// Execution continues when the executors executeStep() transfers
 				// execution from agent thread to plan thread (using another notify/wait pair).
-				interpreter.setPlanThread(thread);
+				interpreter.getComponentFeature(IBDIAgentFeature.class).setPlanThread(thread);
 				
 				// When plan must be terminated unconditionally stop execution.
 				if(terminate)
@@ -756,7 +757,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				// When planstate has changed from body to aborted, leave body method
 				// by throwing an error, which is catched by plan execution task.
 				else if(planstate.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY) 
-					&& interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel
+					&& interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getAttributeValue(rplan, OAVBDIRuntimeModel
 					.plan_has_lifecyclestate).equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED))
 				{
 //					System.out.println("abort plan: "+rplan);
@@ -878,7 +879,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	public static IFuture<IPlanExecutor>	createPlanExecutor(IInternalAccess comp)
 	{
 		final Future<IPlanExecutor>	ret	= new Future<IPlanExecutor>();
-		SServiceProvider.getService((IServiceProvider)comp.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(comp, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, IPlanExecutor>(ret)
 		{
 			public void customResultAvailable(IThreadPoolService threadpool)

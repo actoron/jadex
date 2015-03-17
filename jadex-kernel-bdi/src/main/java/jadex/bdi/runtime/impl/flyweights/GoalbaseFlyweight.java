@@ -38,7 +38,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public static GoalbaseFlyweight getGoalbaseFlyweight(IOAVState state, Object scope)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		GoalbaseFlyweight ret = (GoalbaseFlyweight)ip.getFlyweightCache(IGoalbase.class, new Tuple(IGoalbase.class, scope));
 		if(ret==null)
 		{

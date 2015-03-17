@@ -1,11 +1,11 @@
 package jadex.bdi;
 
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.BDIErrorReportBuilder;
 import jadex.bdi.model.BDIParserHelper;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.OAVCapabilityModel;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
 import jadex.bdi.runtime.interpreter.GoalDeliberationRules;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
@@ -55,6 +55,7 @@ import jadex.rules.state.io.xml.OAVObjectReaderHandler;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.xml.StackElement;
 import jadex.xml.reader.AReader;
+import jadex.xml.stax.QName;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -67,8 +68,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import jadex.xml.stax.QName;
 
 /**
  *  Loader for reading agent XMLs into OAV representation.
@@ -128,10 +127,10 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 */
 	public OAVAgentModel	loadAgentModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		if(name.equals("helloagent.agent.xml"))
-			System.out.println("klapp");
+//		if(name.equals("helloagent.agent.xml"))
+//			System.out.println("klapp");
 		
-		return (OAVAgentModel)loadModel(name, FILE_EXTENSION_AGENT, imports, classloader, context);
+		return (OAVAgentModel)loadModel(name, FILE_EXTENSION_AGENT, imports, classloader, classloader, context);
 	}
 
 	/**
@@ -141,7 +140,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 */
 	public OAVCapabilityModel	loadCapabilityModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return (OAVCapabilityModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports, classloader, context);
+		return (OAVCapabilityModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports, classloader, classloader, context);
 	}
 
 	//-------- AbstractModelLoader methods --------
@@ -241,8 +240,13 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		{
 			// Failed: return dummy model containing error report. 
 			// Todo: capability or agent?
-			mi	= mi!=null ? mi : new ModelInfo(null, null, null, new BDIErrorReportBuilder(name, name, entries, null, state).buildErrorReport(), null, null, false, name, null, classloader, null, null, null, null, imports, null);
-			ret	=  new OAVCapabilityModel(state, null, mi, types, info.getLastModified(), entries);
+			ret	=  new OAVCapabilityModel(state, null, null, types, info.getLastModified(), entries);
+			mi	= mi!=null ? mi : new ModelInfo(null, null, null, new BDIErrorReportBuilder(name, name, entries, null, state).buildErrorReport(), 
+				null, null, false, 
+				name, null, classloader, 
+				null, null, 
+				null, null, imports, null, ret);
+			ret.setModelInfo(mi);
 		}
 		
 		return ret;
@@ -632,7 +636,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			Rulebase compressed	= new Rulebase();
 			
 			// Add basic BDI rules.
-			for(Iterator rules=BDIInterpreter.RULEBASE.getRules().iterator(); rules.hasNext(); )
+			for(Iterator rules=BDIAgentFeature.RULEBASE.getRules().iterator(); rules.hasNext(); )
 			{
 				IRule	rule	= (IRule)rules.next();
 				if(ALL_RULES || checkRule(rule, model.getTypes()))

@@ -39,7 +39,7 @@ public class ExpressionNoModel implements IExpression
 		this.state = state;
 		this.scope = scope;
 		this.expression = expression;
-		this.interpreter = BDIInterpreter.getInterpreter(state);
+		this.interpreter = BDIAgentFeature.getInterpreter(state);
 	}
 	
 	//-------- methods --------

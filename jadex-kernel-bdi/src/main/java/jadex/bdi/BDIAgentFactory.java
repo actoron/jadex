@@ -5,14 +5,16 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.OAVCapabilityModel;
 import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.ModelInfo;
@@ -27,6 +29,7 @@ import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
@@ -48,6 +51,8 @@ import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -79,6 +84,15 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	/** The capability icon. */
 	protected static final LazyResource	ICON_CAPABILITY = new LazyResource(BDIAgentFactory.class, "/jadex/bdi/images/bdi_capability.png");
 
+	/** The specific component features for micro agents. */
+	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = null;//Collections.unmodifiableCollection(
+//		Arrays.asList(null
+//			BDIAgentFeature.FACTORY, 
+//			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class),
+//			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BDIMonitoringComponentFeature.class),
+//			new ComponentFeatureFactory(IRequiredServicesFeature.class, BDIRequiredServicesComponentFeature.class)
+//		));
+	
 	//-------- attributes --------
 	
 	/** The model loader. */
@@ -104,6 +118,9 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	// Must not be saved as service properties because e.g. the plan executor cannot be transferred remotely
 	protected Map<String, Object> myprops;
 	
+	/** The standard + bdi component features. */
+	protected Collection<IComponentFeatureFactory>	features;
+	
 	//-------- constructors --------
 	
 	/**
@@ -128,6 +145,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		this.root	= new ComponentIdentifier(dummy);
 //		loader	= new OAVBDIModelLoader(getPropertyMap(), root);
 		loader	= new OAVBDIModelLoader(myprops, root);
+		
+		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BDI_FEATURES));
 	}
 	
 	/**
@@ -391,7 +410,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 					try
 					{
 //						System.out.println("loading bdi: "+filename);
-						OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl, 
+						OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl, cl, 
 							new Object[]{rid, root});
 						ret.setResult(loaded.getModelInfo());
 					}
@@ -410,7 +429,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 			{
 //				System.out.println("loading bdi: "+filename);
 				ClassLoader cl = getClass().getClassLoader();
-				OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl,
+				OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl, cl,
 					new Object[]{rid, root});
 				ret.setResult(loaded.getModelInfo());
 			}
@@ -694,5 +713,13 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		return ret;
 	}
 	
-	
+	/**
+	 *  Get the component features for a model.
+	 *  @param model The component model.
+	 *  @return The component features.
+	 */
+	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
+	{
+		return new Future<Collection<IComponentFeatureFactory>>(features);
+	}
 }

@@ -46,7 +46,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	public static WaitqueueFlyweight getWaitqueueFlyweight(IOAVState state, Object scope, Object rplan)
 	{
 		Tuple	key	= new Tuple(rplan, IWaitqueue.class);
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		WaitqueueFlyweight ret = (WaitqueueFlyweight)ip.getFlyweightCache(IWaitqueue.class, key);
 		if(ret==null)
 		{

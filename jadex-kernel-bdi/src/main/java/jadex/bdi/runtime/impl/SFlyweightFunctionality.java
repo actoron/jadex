@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IExternalCondition;
@@ -20,13 +22,13 @@ import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterSetFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
@@ -222,10 +224,10 @@ public class SFlyweightFunctionality
 	 * @param handle
 	 * @param interpreter
 	 */
-	public static void modified(IOAVState state, Object handle, BDIInterpreter interpreter)
+	public static void modified(IOAVState state, Object handle, IInternalAccess interpreter)
 	{
 		Object	fact = state.getAttributeValue(handle, OAVBDIRuntimeModel.belief_has_fact);
-		interpreter.getEventReificator().objectModified(handle, state.getType(handle), OAVBDIRuntimeModel.belief_has_fact, fact, fact);
+		interpreter.getComponentFeature(IBDIAgentFeature.class).getEventReificator().objectModified(handle, state.getType(handle), OAVBDIRuntimeModel.belief_has_fact, fact, fact);
 	}
 	
 	/**
@@ -954,7 +956,7 @@ public class SFlyweightFunctionality
 		if(mgoals==null || !mgoals.contains(mgoal))
 			state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal);
 		
-		BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(mgoal);
+		BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(mgoal);
 	}
 
 	/**
@@ -967,7 +969,7 @@ public class SFlyweightFunctionality
 		if(goals==null || !goals.contains(rgoal))
 			state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_goals, rgoal);
 
-		BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rgoal);
+		BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(rgoal);
 	}
 
 	/**
@@ -997,7 +999,7 @@ public class SFlyweightFunctionality
 		if(rbels==null || !rbels.contains(rbel))
 			state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rbel);
 		
-		BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbel);
+		BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(rbel);
 	}
 
 	/**
@@ -1021,7 +1023,7 @@ public class SFlyweightFunctionality
 		if(rbels==null || !rbels.contains(rbel))
 			state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rbel);
 
-		BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbel);
+		BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(rbel);
 	}
 
 	/**
@@ -1045,7 +1047,7 @@ public class SFlyweightFunctionality
 		if(rbels==null || !rbels.contains(rbel))
 			state.addAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbel);
 
-		BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbel);
+		BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(rbel);
 	}
 
 	/**
@@ -1200,7 +1202,7 @@ public class SFlyweightFunctionality
 			if(mgoals!=null && mgoals.contains(mgoal))
 				state.removeAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal);
 
-			BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(mgoal);
+			BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(mgoal);
 		}
 	}
 
@@ -1217,7 +1219,7 @@ public class SFlyweightFunctionality
 			if(goals!=null && goals.contains(rgoal))
 				state.removeAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_goals, rgoal);
 
-			BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(rgoal);
+			BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(rgoal);
 		}
 	}
 	
@@ -1247,7 +1249,7 @@ public class SFlyweightFunctionality
 				throw new RuntimeException("Unknown belief(set): "+belief);
 
 			state.removeAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds, rbel);
-			BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(rbel);
+			BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(rbel);
 		}
 	}
 	
@@ -1272,7 +1274,7 @@ public class SFlyweightFunctionality
 				throw new RuntimeException("Unknown beliefset: "+beliefset);
 
 			state.removeAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rbel);
-			BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(rbel);
+			BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(rbel);
 		}
 	}
 
@@ -1298,7 +1300,7 @@ public class SFlyweightFunctionality
 				throw new RuntimeException("Unknown beliefset: "+beliefset);
 
 			state.removeAttributeValue(wa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbel);
-			BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(rbel);
+			BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(rbel);
 		}
 	}
 	

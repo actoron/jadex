@@ -44,8 +44,8 @@ public abstract class ElementFlyweight implements IElement
 	public ElementFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		assert !(scope instanceof ElementFlyweight);
-//		assert !BDIInterpreter.getInterpreter(state).isExternalThread();
-		assert !BDIInterpreter.getInterpreter(state).getComponentAdapter().isExternalThread();
+//		assert !BDIAgentFeature.getInterpreter(state).isExternalThread();
+		assert !BDIAgentFeature.getInterpreter(state).getComponentAdapter().isExternalThread();
 //		if(handle==null && !(this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight))
 //			Thread.dumpStack();
 		assert handle!=null || this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight
@@ -56,7 +56,7 @@ public abstract class ElementFlyweight implements IElement
 		if(scope!=null)
 			state.addExternalObjectUsage(scope, this);
 		
-		this.interpreter = BDIInterpreter.getInterpreter(state);
+		this.interpreter = BDIAgentFeature.getInterpreter(state);
 		if(interpreter==null)
 			throw new RuntimeException("No interpreter");
 		setHandle(handle);
@@ -297,7 +297,7 @@ public abstract class ElementFlyweight implements IElement
 			state.addAttributeValue(scope, OAVBDIRuntimeModel.capability_has_listeners, le);
 		}			
 		state.addAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, handle);
-		BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(handle);
+		BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(handle);
 	}
 	
 	/**
@@ -340,7 +340,7 @@ public abstract class ElementFlyweight implements IElement
 				coll = state.getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
 				if(coll==null || coll.isEmpty())
 					state.removeAttributeValue(scope, OAVBDIRuntimeModel.capability_has_listeners, listener);
-				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(handle);
+				BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(handle);
 			}
 		}
 	}

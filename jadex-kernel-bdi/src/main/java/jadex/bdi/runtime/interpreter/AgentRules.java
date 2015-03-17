@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
@@ -7,8 +9,14 @@ import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.IValueFetcher;
@@ -75,7 +83,7 @@ public class AgentRules
 //			public void execute(IOAVState state, IVariableAssignments assignments)
 //			{
 //				final Object ragent	= assignments.getVariableValue("?ragent");
-//				final BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+//				final BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 //				
 //				// Init the external access
 //				ip.ea = new ExternalAccessFlyweight(state, ragent);
@@ -203,7 +211,7 @@ public class AgentRules
 //			public void execute(final IOAVState state, IVariableAssignments assignments)
 //			{
 //				final Object	ragent	= assignments.getVariableValue("?ragent");
-//				final BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
+//				final BDIInterpreter	bdii	= BDIAgentFeature.getInterpreter(state);
 //				
 //				initializeCapabilityInstance(state, ragent).addResultListener(
 //					bdii.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(bdii.inited)
@@ -264,7 +272,7 @@ public class AgentRules
 	 *  Should ensures that the agent is idle and then transfer its
 	 *  state to terminated.
 	 */
-	protected static Rule createTerminatingEndAgentRule()
+	public static Rule createTerminatingEndAgentRule()
 	{
 		// Terminating is finished when state==terminating and no more
 		// goals and plans to do.
@@ -323,7 +331,7 @@ public class AgentRules
 	 *  Terminate agent rule.
 	 *  Terminates the agent and removes it from the platform.
 	 */
-	protected static Rule createTerminateAgentRule()
+	public static Rule createTerminateAgentRule()
 	{
 		ObjectCondition ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
 		ragentcon.addConstraint(new BoundConstraint(null, new Variable("?ragent", OAVBDIRuntimeModel.agent_type)));
@@ -347,7 +355,7 @@ public class AgentRules
 	 *  Cleanup timers of a capability and its subcapabilities.
 	 *  @param rcapa The capability.
 	 */
-	protected static void cleanupCapability(IOAVState state, Object rcapa)
+	public static void cleanupCapability(IOAVState state, Object rcapa)
 	{
 		// Cleanup subcapabilities
 		Collection subcaps = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_subcapabilities);
@@ -369,9 +377,9 @@ public class AgentRules
 			for(Iterator it=plans.iterator(); it.hasNext(); )
 			{
 				Object rplan = it.next();
-				IPlanExecutor executor = BDIInterpreter.getInterpreter(state).getPlanExecutor(rplan);
+				IPlanExecutor executor = BDIAgentFeature.getInterpreter(state).getPlanExecutor(rplan);
 				if(executor!=null)
-					executor.cleanup(BDIInterpreter.getInterpreter(state), rplan);
+					executor.cleanup(BDIAgentFeature.getInternalAccess(state), rplan);
 				PlanRules.cleanupPlanWait(state, rcapa, rplan, true);
 			}
 		}
@@ -442,7 +450,7 @@ public class AgentRules
 	/**
 	 *  Execute an external action.
 	 */
-	protected static Rule createExecuteActionRule()
+	public static Rule createExecuteActionRule()
 	{
 		Variable	com	= new Variable("?step", OAVJavaType.java_object_type);
 		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
@@ -522,7 +530,7 @@ public class AgentRules
 				Object changeevent = assignments.getVariableValue("?changeevent");
 				Object ragent = assignments.getVariableValue("?ragent");
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_changeevents, changeevent);
-//				System.err.println("removing: "+changeevent+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier());
+//				System.err.println("removing: "+changeevent+", "+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier());
 			}
 		};
 		
@@ -583,7 +591,7 @@ public class AgentRules
 		// Hack? Add kernelprops to agent properties.
 		if(state.getType(mcapa).isSubtype(OAVBDIMetaModel.agent_type))
 		{
-			Map kernelprops = BDIInterpreter.getInterpreter(state).getKernelProperties();
+			Map kernelprops = BDIAgentFeature.getInterpreter(state).getKernelProperties();
 			for(Iterator it=kernelprops.keySet().iterator(); it.hasNext(); )
 			{
 				String name = (String)it.next();
@@ -714,14 +722,14 @@ public class AgentRules
 							BeliefRules.setBeliefValue(state, rbel, value);
 //							// changed *.class to *.TYPE due to javaflow bug
 							state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-								((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
+								((IClockService)BDIAgentFeature.getInterpreter(state).getAgentAdapter().getPlatform()
 								.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 						}
 					});
 					
 //					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-						((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
+						((IClockService)BDIAgentFeature.getInterpreter(state).getAgentAdapter().getPlatform()
 						.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 				}
 			}
@@ -820,12 +828,12 @@ public class AgentRules
 								Object values	= evaluateExpression(state, exp, fetcher);
 								BeliefRules.updateBeliefSet(state, rbelset, values);
 //								// changed *.class to *.TYPE due to javaflow bug
-								state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIInterpreter.getInterpreter(state)
+								state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIAgentFeature.getInterpreter(state)
 									.getAgentAdapter().getPlatform().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 							}
 						});
 //						// changed *.class to *.TYPE due to javaflow bug
-						state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIInterpreter.getInterpreter(state)
+						state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIAgentFeature.getInterpreter(state)
 							.getAgentAdapter().getPlatform().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 					}
 				}
@@ -1004,7 +1012,7 @@ public class AgentRules
 //					{
 //						// Use second future to start agent only when value has already been set.
 //						final Future	ret	= new Future();
-//						((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+//						((IFuture)val).addResultListener(BDIAgentFeature.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 //						{
 //							public void resultAvailable(Object result)
 //							{
@@ -1041,7 +1049,7 @@ public class AgentRules
 //		// Hack? Add kernelprops to agent properties.
 //		if(state.getType(mcapa).isSubtype(OAVBDIMetaModel.agent_type))
 //		{
-//			Map kernelprops = BDIInterpreter.getInterpreter(state).getKernelProperties();
+//			Map kernelprops = BDIAgentFeature.getInterpreter(state).getKernelProperties();
 //			for(Iterator it=kernelprops.keySet().iterator(); it.hasNext(); )
 //			{
 //				String name = (String)it.next();
@@ -1083,17 +1091,17 @@ public class AgentRules
 //					
 //					if(ser!=null)
 //					{
-//						BDIInterpreter.getInterpreter(state).addService(type, ser, proxytype);
+//						BDIAgentFeature.getInterpreter(state).addService(type, ser, proxytype);
 //					}
 //					else
 //					{
-//						BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+//						BDIAgentFeature.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
 //					}
 //				}
 //				catch(Exception e)
 //				{
 ////					e.printStackTrace();
-//					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_classname));
+//					BDIAgentFeature.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mpro, OAVBDIMetaModel.providedservice_has_classname));
 //				}
 				
 //				try
@@ -1105,16 +1113,16 @@ public class AgentRules
 //					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
 //					if(!direct.booleanValue())
 //					{
-//						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), val);
+//						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIAgentFeature.getInterpreter(state).getExternalAccess(), BDIAgentFeature.getInterpreter(state).getAgentAdapter(), val);
 ////						System.out.println("Created decoupled service: "+val);
 //					}
-//					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
+//					((IServiceContainer)BDIAgentFeature.getInterpreter(state).getServiceProvider()).addService(val);
 ////					System.out.println("Service: "+name+" "+val+" "+type);
 //				}
 //				catch(Exception e)
 //				{
 ////					e.printStackTrace();
-//					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+//					BDIAgentFeature.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
 //				}
 //			}
 //		}
@@ -1221,7 +1229,7 @@ public class AgentRules
 								mbel	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]);
 							if(mbel==null)
 								throw new RuntimeException("Cannot resolve plan trigger: "+ref);
-							BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(mbel);
+							BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(mbel);
 						}
 					}
 					
@@ -1236,7 +1244,7 @@ public class AgentRules
 							Object	mbel	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]);
 							if(mbel==null)
 								throw new RuntimeException("Cannot resolve plan trigger: "+ref);
-							BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(mbel);
+							BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(mbel);
 						}
 					}
 
@@ -1251,7 +1259,7 @@ public class AgentRules
 							Object	mbel	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]);
 							if(mbel==null)
 								throw new RuntimeException("Cannot resolve plan trigger: "+ref);
-							BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(mbel);
+							BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(mbel);
 						}
 					}
 
@@ -1267,7 +1275,7 @@ public class AgentRules
 							Object	mgoal	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_goals, scope[0]);
 							if(mgoal==null)
 								throw new RuntimeException("Cannot resolve plan trigger: "+ref);
-							BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(mgoal);
+							BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(mgoal);
 						}
 					}
 				}
@@ -1293,7 +1301,7 @@ public class AgentRules
 						if(state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_beliefs, mbel)==null)
 						{
 							initBelief(state, rcapa, mbel, fetcher).addResultListener(
-								BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(this));
+								BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class).createResultListener(this));
 						}
 						else
 						{
@@ -1315,7 +1323,7 @@ public class AgentRules
 			belsdone	= IFuture.DONE;
 		}
 
-		belsdone.addResultListener(BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+		belsdone.addResultListener(BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -1439,7 +1447,7 @@ public class AgentRules
 								Object caparef = it.next();
 								Object rsubcapa = state.getAttributeValue(caparef, OAVBDIRuntimeModel.capabilityreference_has_capability);
 								initializeCapabilityInstance(state, rsubcapa).addResultListener(
-									BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(this));
+									BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class).createResultListener(this));
 							}
 							else
 							{
@@ -1455,7 +1463,7 @@ public class AgentRules
 					subcapsdone	= IFuture.DONE;
 				}
 				
-				subcapsdone.addResultListener(BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				subcapsdone.addResultListener(BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -1653,7 +1661,7 @@ public class AgentRules
 //		System.out.println("iB "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+", "+rcapa);
 		final Future	ret	= new Future();
 		
-		Object agent = BDIInterpreter.getInterpreter(state).getAgent();
+		Object agent = BDIAgentFeature.getInterpreter(state).getAgent();
 		Map parents = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_initparents);
 		Map arguments = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_arguments);
 		if(fetcher==null)
@@ -1668,7 +1676,7 @@ public class AgentRules
 		// Set a value if the belief is static (or first value for update rate).
 		if(OAVBDIMetaModel.EVALUATIONMODE_STATIC.equals(evamode) || update!=null)
 		{
-			findValue(state, rcapa, rbel, parents, fetcher, arguments).addResultListener(BDIInterpreter.getInterpreter(state)
+			findValue(state, rcapa, rbel, parents, fetcher, arguments).addResultListener(BDIAgentFeature.getInternalAccess(state)
 				.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -1695,7 +1703,7 @@ public class AgentRules
 						if(isarg)
 						{
 							String name = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
-							BDIInterpreter.getInterpreter(state).addArgument(name, result);
+							BDIAgentFeature.getInterpreter(state).addArgument(name, result);
 						}
 					}
 					
@@ -1703,34 +1711,34 @@ public class AgentRules
 					{
 						final ITimedObject[]	to	= new ITimedObject[1];
 						final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-						to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
+						to[0] = new InterpreterTimedObject(BDIAgentFeature.getInternalAccess(state), new CheckedAction()
 						{
 							public void run()
 							{
 								final Object	exp = state.getAttributeValue(mbel, OAVBDIMetaModel.belief_has_fact);
 								try
 								{
-//									Object agent = BDIInterpreter.getInterpreter(state).getAgent();
+//									Object agent = BDIAgentFeature.getInterpreter(state).getAgent();
 //									String name = (String)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_name);
 									Object value = evaluateExpression(state, exp, fet);
 									if(value instanceof IFuture && IFuture.class.equals(state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_class)))
 									{
-										((IFuture)value).addResultListener(BDIInterpreter.getInterpreter(state)
+										((IFuture)value).addResultListener(BDIAgentFeature.getInternalAccess(state)
 											.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
 												BeliefRules.setBeliefValue(state, rbel, result, rcapa);
 												state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-														BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+													 SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 											}
 											
 											public void exceptionOccurred(Exception exception)
 											{
-												String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
-												BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
+												String name = BDIAgentFeature.getInternalAccess(state).getComponentIdentifier().getName();
+												BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
 												state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-														BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+													SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 											}
 										}));
 									}
@@ -1738,17 +1746,17 @@ public class AgentRules
 									{
 										BeliefRules.setBeliefValue(state, rbel, value, rcapa);
 										state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-												BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+											 SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 									}
 
-//									System.out.println("Updating belief: "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+" = "+value+", "+BDIInterpreter.getInterpreter(state).getClockService().getTime());
+//									System.out.println("Updating belief: "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+" = "+value+", "+BDIAgentFeature.getInterpreter(state).getClockService().getTime());
 								}
 								catch(Exception e)
 								{
-									String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
-									BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
+									String name = BDIAgentFeature.getInternalAccess(state).getComponentIdentifier().getName();
+									BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
 									state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-											BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+										 SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 								}
 							}
 							
@@ -1760,7 +1768,7 @@ public class AgentRules
 						
 				//			// changed *.class to *.TYPE due to javaflow bug
 						state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-							BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+							 SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 					}
 					
 					// Todo: why assigntos after setting value?
@@ -1908,7 +1916,7 @@ public class AgentRules
 				Object	val	= evaluateExpression(state, fact, fetcher);
 				if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_class)))
 				{
-					((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
+					((IFuture)val).addResultListener(BDIAgentFeature.getInternalAccess(state)
 						.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 				}
 				else
@@ -1927,7 +1935,7 @@ public class AgentRules
 						Object	val	= evaluateExpression(state, exp, fetcher);
 						if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_class)))
 						{
-							((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
+							((IFuture)val).addResultListener(BDIAgentFeature.getInternalAccess(state)
 								.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 						}
 						else
@@ -1960,7 +1968,7 @@ public class AgentRules
 //		System.out.println("iBs "+state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name)+", "+rcapa);
 		Future	ret	= new Future();
 		
-		Object agent = BDIInterpreter.getInterpreter(state).getAgent();
+		Object agent = BDIAgentFeature.getInterpreter(state).getAgent();
 		Map parents = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_initparents);
 		Map arguments = (Map)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_arguments);
 		if(fetcher==null)
@@ -1976,7 +1984,7 @@ public class AgentRules
 		if(OAVBDIMetaModel.EVALUATIONMODE_STATIC.equals(evamode) || update!=null)
 		{
 			findValues(state, rcapa, rbelset, parents, fetcher, arguments)
-				.addResultListener(BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				.addResultListener(BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -2005,7 +2013,8 @@ public class AgentRules
 						if(isarg)
 						{
 							String name = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
-							BDIInterpreter.getInterpreter(state).addArgument(name, result);
+							BDIAgentFeature.getInterpreter(state).addArgument(name, result);
+//							BDIAgentFeature.
 						}
 					}
 
@@ -2014,7 +2023,7 @@ public class AgentRules
 						final ITimedObject[]	to	= new ITimedObject[1];
 						
 						final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-						to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
+						to[0]	= new InterpreterTimedObject(BDIAgentFeature.getInternalAccess(state), new CheckedAction()
 						{
 							public void run()
 							{
@@ -2024,37 +2033,37 @@ public class AgentRules
 									Object values	= evaluateExpression(state, exp, fet);
 									if(values instanceof IFuture && IFuture.class.equals(state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_class)))
 									{
-										((IFuture)values).addResultListener(BDIInterpreter.getInterpreter(state)
+										((IFuture)values).addResultListener(BDIAgentFeature.getInternalAccess(state)
 											.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
 												BeliefRules.updateBeliefSet(state, rbelset, result, rcapa);
-												state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+												state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer,  SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 											}
 											public void exceptionOccurred(Exception exception)
 											{
-												String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
-												BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
-												state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+												String name = BDIAgentFeature.getInternalAccess(state).getComponentIdentifier().getName();
+												BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
+												state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer,  SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 											}
 										}));
 									}
 									else
 									{
 										BeliefRules.updateBeliefSet(state, rbelset, values, rcapa);
-										state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+										state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 									}
 								}
 								catch(Exception e)
 								{
-									String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
-									BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
-									state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+									String name = BDIAgentFeature.getInternalAccess(state).getComponentIdentifier().getName();
+									BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
+									state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer,  SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 								}
 							}
 						});
-						state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+						state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer,  SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(update.longValue(), to[0]));
 					}
 
 					registerAssignTos(state, rcapa, mbelset, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
@@ -2165,7 +2174,7 @@ public class AgentRules
 				Object	val	= evaluateExpression(state, fact, fetcher);
 				if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_class)))
 				{
-					((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
+					((IFuture)val).addResultListener(BDIAgentFeature.getInternalAccess(state)
 						.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 				}
 				else
@@ -2207,7 +2216,7 @@ public class AgentRules
 							Object	val	= evaluateExpression(state, factsexp, fetcher);
 							if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(factsexp, OAVBDIMetaModel.expression_has_class)))
 							{
-								((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
+								((IFuture)val).addResultListener(BDIAgentFeature.getInternalAccess(state)
 									.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 							}
 							else
@@ -2955,8 +2964,8 @@ public class AgentRules
 	 * /
 	public static void saveElement(final IOAVState state, final Object relem, IElement flyweight)
 	{
-		BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-		final Object ragent = BDIInterpreter.getInterpreter(state).getAgent();
+		BDIInterpreter interpreter = BDIAgentFeature.getInterpreter(state);
+		final Object ragent = BDIAgentFeature.getInterpreter(state).getAgent();
 		state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_temporaryobjects, relem);
 		interpreter.extaccesses.addEntry(flyweight, new Runnable()
 		{
@@ -2972,16 +2981,16 @@ public class AgentRules
 	 * /
 	public static void removeElement(IOAVState state, IElement flyweight)
 	{
-		BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter interpreter = BDIAgentFeature.getInterpreter(state);
 		Runnable action = interpreter.extaccesses.removeEntry(flyweight);
 		if(action!=null)
 			action.run();
 		
-//		Object ragent = BDIInterpreter.getInterpreter(state).getAgent();
+//		Object ragent = BDIAgentFeature.getInterpreter(state).getAgent();
 //		state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_temporaryobjects, relem);
 		
 		// Hack!!! Only needed for external access!
-		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+		BDIAgentFeature.getInterpreter(state).getAgentAdapter().wakeup();
 	}*/
 	
 	/**
@@ -3357,14 +3366,15 @@ public class AgentRules
 		activateEndState(state, ragent);
 		
 		// Hack! Make timeout explicit/configurable.
-		final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
+		final IBDIAgentFeature interpreter = BDIAgentFeature.getInterpreter(state);
+		final IInternalAccess ia = BDIAgentFeature.getInternalAccess(state);
 		Map	props	= interpreter.getProperties();
 		Long prop	= props!=null ? (Long)props.get(TERMINATION_TIMEOUT) : null;
 		long tt = prop!=null? prop.longValue(): 10000;
 //		System.out.println("Adding termination timeout: "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName()+", "+tt);
 		
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, interpreter.getClockService().createTimer(tt, 
-			new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer,  SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(tt, 
+			new InterpreterTimedObject(BDIAgentFeature.getInternalAccess(state), new CheckedAction()
 			{
 				public boolean isValid()
 				{
@@ -3378,10 +3388,10 @@ public class AgentRules
 //					{
 						// todo: cleanup? or in terminated action?
 //						System.out.println("Forcing termination (timeout): "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
-						BDIInterpreter.getInterpreter(state).getLogger(ragent).info("Forcing termination (timeout): "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
+						BDIAgentFeature.getInterpreter(state).getLogger(ragent).info("Forcing termination (timeout): "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
 						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 							OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
-						interpreter.getAgentAdapter().wakeup();
+						ia.getAgentAdapter().wakeup();
 //					}
 				}
 			})));
@@ -3396,7 +3406,7 @@ public class AgentRules
 	 */
 	public static Object getPropertyValue(IOAVState state, Object rcapa, String name)
 	{
-		Map	props	= BDIInterpreter.getInterpreter(state).getProperties(rcapa);
+		Map	props	= BDIAgentFeature.getInterpreter(state).getProperties(rcapa);
 		return props!=null ? props.get(name) : null;
 	}
 
@@ -3407,16 +3417,16 @@ public class AgentRules
 	protected static void cleanupAgent(IOAVState state, Object ragent)
 	{
 		Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
-		BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(state);
+		IBDIAgentFeature interpreter	= BDIAgentFeature.getInterpreter(state);
 		
-//				String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
+//				String name = BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
 //				if(name.indexOf("jcc")!=-1)
 //				System.out.println("Terminated agent: "+name);
 
 		// Todo: no more rules should trigger -> No dropping of agent object!? 
 //				state.dropObject(ragent);
 
-//				System.out.println("terminated: "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
+//				System.out.println("terminated: "+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 		
 		// Trigger pull beliefs if declared as result
 		// todo: currently updates all beliefs/sets, should only update pull beliefs
@@ -3424,7 +3434,9 @@ public class AgentRules
 		IArgument[] results = interpreter.getModel().getResults();
 		for(int i=0; i<results.length; i++)
 		{
-			interpreter.setResultValue(results[i].getName(), resultvals.get(results[i].getName()));
+//			interpreter.setResultValue(results[i].getName(), resultvals.get(results[i].getName()));
+			BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(results[i].getName(), resultvals.get(results[i].getName());
+//			interpreter.setResultValue(results[i].getName(), resultvals.get(results[i].getName()));
 		}
 		
 		// Cleanup timers.
@@ -3439,7 +3451,7 @@ public class AgentRules
 		{
 			for(Object action: actions)
 			{
-				((Future)((Object[])action)[1]).setException(new ComponentTerminatedException(interpreter.getComponentIdentifier()));			
+				((Future)((Object[])action)[1]).setException(new ComponentTerminatedException(BDIAgentFeature.getInternalAccess(state).getComponentIdentifier()));			
 			}
 		}
 		
@@ -3463,7 +3475,7 @@ public class AgentRules
 	{
 		// Collect results for agent.
 		Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
-		BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(state);
+		IBDIAgentFeature	interpreter	= BDIAgentFeature.getInterpreter(state);
 		IArgument[] results = interpreter.getModel().getResults();
 		Map res = new HashMap();
 		

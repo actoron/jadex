@@ -34,7 +34,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 */
 	public static MessageEventFlyweight getMessageEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		MessageEventFlyweight ret = (MessageEventFlyweight)ip.getFlyweightCache(IMessageEvent.class, new Tuple(IMessageEvent.class, handle));
 		if(ret==null)
 		{
