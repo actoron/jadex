@@ -321,6 +321,8 @@ public class AsyncTreeModel
 	{
 		synchronized(nodes)
 		{
+//			System.out.println("registered: "+node.getId());
+			
 			if(nodes.containsKey(node.getId()))
 				throw new RuntimeException("Node id already contained: " + node + ", " + node.getId());
 

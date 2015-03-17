@@ -29,14 +29,14 @@ public class PlatformTreeNode extends ComponentTreeNode
 		"platform", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/platform.png")
 	});
 	
-	/** The folder for proxies. */
-	protected ViewTreeNode proxy;
-	
-	/** The folder for applications. */
-	protected ViewTreeNode application;
-	
-	/** The folder for applications. */
-	protected ViewTreeNode system;
+//	/** The folder for proxies. */
+//	protected ViewTreeNode proxy;
+//	
+//	/** The folder for applications. */
+//	protected ViewTreeNode application;
+//	
+//	/** The folder for applications. */
+//	protected ViewTreeNode system;
 	
 	/** The real children. */
 	protected List<? extends ITreeNode> realchildren; 
@@ -49,9 +49,10 @@ public class PlatformTreeNode extends ComponentTreeNode
 	{
 		super(parent, model, tree, desc, cms, iconcache, access);
 		
-		proxy = new ViewTreeNode("Platforms", this, model, tree, null);
-		application = new ViewTreeNode("Applications", this, model, tree, null);
-		system = new ViewTreeNode("System", this, model, tree, null);
+//		System.out.println(getId());
+//		proxy = new ViewTreeNode("Platforms", this, model, tree, null);
+//		application = new ViewTreeNode("Applications", this, model, tree, null);
+//		system = new ViewTreeNode("System", this, model, tree, null);
 	}
 	
 	/**
@@ -93,21 +94,69 @@ public class PlatformTreeNode extends ComponentTreeNode
 		
 		if(chpr.size()>0)
 		{
+			ViewTreeNode proxy = getChildPlatforms();
 			proxy.setChildren(chpr);
 			childs.add(proxy);
 		}
 		if(chap.size()>0)
 		{
+			ViewTreeNode application = getChildApplications();
 			application.setChildren(chap);
 			childs.add(application);
 		}
 		if(chsy.size()>0)
 		{
+			ViewTreeNode system = getChildSystem();
 			system.setChildren(chsy);
 			childs.add(system);
 		}
 		
 		super.setChildren(childs);
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
+	protected ViewTreeNode getChildPlatforms()
+	{
+		return getChild("Platforms");
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
+	protected ViewTreeNode getChildApplications()
+	{
+		return getChild("Applications");
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
+	protected ViewTreeNode getChildSystem()
+	{
+		return getChild("System");
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
+	protected ViewTreeNode getChild(String name)
+	{
+		ViewTreeNode node = (ViewTreeNode)model.getNode(getId()+name);
+		if(node==null)
+		{
+			node = new ViewTreeNode(name, this, (AsyncSwingTreeModel)model, tree, null);
+		}
+		return node;
 	}
 	
 	/**
@@ -120,6 +169,7 @@ public class PlatformTreeNode extends ComponentTreeNode
 		
 		if(node instanceof ProxyComponentTreeNode || node instanceof PseudoProxyComponentTreeNode)
 		{
+			ViewTreeNode proxy = getChildPlatforms();
 			proxy.addChild(node);
 			if(proxy.getChildCount()==1)
 			{
@@ -132,6 +182,7 @@ public class PlatformTreeNode extends ComponentTreeNode
 			ComponentTreeNode n = (ComponentTreeNode)node;
 			if(n.getDescription().isSystemComponent())
 			{
+				ViewTreeNode system = getChildSystem();
 				system.addChild(node);
 				if(system.getChildCount()==1)
 					insertNode(system);
@@ -139,6 +190,7 @@ public class PlatformTreeNode extends ComponentTreeNode
 			}
 			else
 			{
+				ViewTreeNode application = getChildApplications();
 				application.addChild(node);
 				if(application.getChildCount()==1)
 					insertNode(application);
@@ -165,6 +217,7 @@ public class PlatformTreeNode extends ComponentTreeNode
 		
 		if(node instanceof ProxyComponentTreeNode || node instanceof PseudoProxyComponentTreeNode)
 		{
+			ViewTreeNode proxy = getChildPlatforms();
 			proxy.removeChild(node);
 			if(proxy.getChildCount()==0)
 //				childs.remove(proxy);
@@ -175,6 +228,7 @@ public class PlatformTreeNode extends ComponentTreeNode
 			ComponentTreeNode n = (ComponentTreeNode)node;
 			if(n.getDescription().isSystemComponent())
 			{
+				ViewTreeNode system = getChildSystem();
 				system.removeChild(node);
 				if(system.getChildCount()==0)
 					super.removeChild(system);
@@ -182,6 +236,7 @@ public class PlatformTreeNode extends ComponentTreeNode
 			}
 			else
 			{
+				ViewTreeNode application = getChildApplications();
 				application.removeChild(node);
 				if(application.getChildCount()==0)
 					super.removeChild(application);

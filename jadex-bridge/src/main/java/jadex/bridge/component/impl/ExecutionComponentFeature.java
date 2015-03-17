@@ -862,7 +862,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					final Exception fex = ex;
 					// Wait for delayed listener addition.
-					waitForDelay(1000, true)
+					waitForDelay(3000, true)
 						.addResultListener(new IResultListener<Void>()
 					{
 						public void resultAvailable(Void result)
