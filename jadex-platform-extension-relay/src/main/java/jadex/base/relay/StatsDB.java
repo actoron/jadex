@@ -2,6 +2,7 @@ package jadex.base.relay;
 
 import jadex.bridge.ComponentIdentifier;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -21,7 +22,7 @@ import java.util.NoSuchElementException;
 /**
  *  Database connector for reading and writing statistics via JavaDB.
  *  Can be invoked as main for executing sql on the DB.
- *  For example use the following to show properties of platforms froma given IP:
+ *  For example use the following to show properties of platforms from a given IP:
  *  select * from relay.properties where exists (select * from relay.platforminfo where hostip='127.0.0.1' AND relay.properties.id=relay.platforminfo.id)
  */
 public class StatsDB
@@ -54,7 +55,18 @@ public class StatsDB
 		StatsDB	ret	= null;
 		try
 		{
-			ret	= new StatsDB();
+			ret	= new StatsDB(openH2DB());
+			
+			// Migrate from derby to h2
+			if(new File(RelayHandler.SYSTEMDIR, "mydb").exists())
+			{
+				StatsDB	old	= new StatsDB(openDerbyDB());
+				ret.migrateFrom(old);
+				old.shutdown();
+				
+				new File(RelayHandler.SYSTEMDIR, "mydb").renameTo(new File(RelayHandler.SYSTEMDIR, "derbydb_bak"));
+			}
+			
 		}
 		catch(Exception e)
 		{
@@ -67,15 +79,15 @@ public class StatsDB
 	/**
 	 *  Create the db object.
 	 */
-	protected StatsDB()	throws Exception
+	protected StatsDB(Connection con)
 	{
-		con	= openDerbyDB();
+		this.con	= con;
 	}
 	
 	/**
 	 *  Create a derby db connection.
 	 */
-	protected Connection	openDerbyDB()	throws Exception
+	protected static Connection	openDerbyDB()	throws Exception
 	{
 		// Set up derby and create a database connection
 		System.setProperty("derby.system.home", RelayHandler.SYSTEMDIR.getAbsolutePath());		
@@ -108,25 +120,25 @@ public class StatsDB
 		else
 		{
 			rs.close();
-			// Add platform prefix column, if it doesn't exist.
-			rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
-			if(!rs.next())
-			{
-				Statement	stmt	= con.createStatement();
-				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
-				update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
-				
-				rs	= stmt.executeQuery("select ID, PLATFORM from relay.platforminfo");
-				while(rs.next())
-				{
-					int	param	= 1;
-					update.setString(param++, ComponentIdentifier.getPlatformPrefix(rs.getString("PLATFORM")));
-					update.setInt(param++, rs.getInt("ID"));
-					update.executeUpdate();
-				}
-				rs.close();
-				stmt.close();
-			}
+//			// Add platform prefix column, if it doesn't exist.
+//			rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
+//			if(!rs.next())
+//			{
+//				Statement	stmt	= con.createStatement();
+//				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
+//				update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
+//				
+//				rs	= stmt.executeQuery("select ID, PLATFORM from relay.platforminfo");
+//				while(rs.next())
+//				{
+//					int	param	= 1;
+//					update.setString(param++, ComponentIdentifier.getPlatformPrefix(rs.getString("PLATFORM")));
+//					update.setInt(param++, rs.getInt("ID"));
+//					update.executeUpdate();
+//				}
+//				rs.close();
+//				stmt.close();
+//			}
 			
 			// Update platform entries where disconnection was missed.
 			Statement	stmt	= con.createStatement();
@@ -153,7 +165,7 @@ public class StatsDB
 		}
 
 		// Create the properties table, if it doesn't exist.
-//			con.createStatement().execute("drop table RELAY.PROPERTIES");	// uncomment to create a fresh table.
+//		con.createStatement().execute("drop table RELAY.PROPERTIES");	// uncomment to create a fresh table.
 		meta	= con.getMetaData();
 		rs	= meta.getTables(null, "RELAY", "PROPERTIES", null);
 		if(!rs.next())
@@ -171,10 +183,10 @@ public class StatsDB
 	/**
 	 *  Create a derby db connection.
 	 */
-	protected Connection	openH2DB()	throws Exception
+	protected static Connection	openH2DB()	throws Exception
 	{
 		Class.forName("org.h2.Driver");
-		Connection	con	= DriverManager.getConnection("jdbc:h2:"+RelayHandler.SYSTEMDIR.getAbsolutePath()+"/h2db");
+		Connection	con	= DriverManager.getConnection("jdbc:h2:"+RelayHandler.SYSTEMDIR.getAbsolutePath()+"/relaystats;INIT=CREATE SCHEMA IF NOT EXISTS RELAY");
 
 		// Create the platform info table, if it doesn't exist.
 //		con.createStatement().execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
@@ -185,7 +197,7 @@ public class StatsDB
 			rs.close();
 			Statement	stmt	= con.createStatement();
 			stmt.execute("CREATE TABLE RELAY.PLATFORMINFO ("
-				+ "ID	INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
+				+ "ID	INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,"
 				+ "PLATFORM	VARCHAR(60)," 
 				+ "HOSTIP	VARCHAR(32),"
 				+ "HOSTNAME	VARCHAR(60),"
@@ -201,25 +213,6 @@ public class StatsDB
 		else
 		{
 			rs.close();
-			// Add platform prefix column, if it doesn't exist.
-			rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
-			if(!rs.next())
-			{
-				Statement	stmt	= con.createStatement();
-				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
-				update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
-				
-				rs	= stmt.executeQuery("select ID, PLATFORM from relay.platforminfo");
-				while(rs.next())
-				{
-					int	param	= 1;
-					update.setString(param++, ComponentIdentifier.getPlatformPrefix(rs.getString("PLATFORM")));
-					update.setInt(param++, rs.getInt("ID"));
-					update.executeUpdate();
-				}
-				rs.close();
-				stmt.close();
-			}
 			
 			// Update platform entries where disconnection was missed.
 			Statement	stmt	= con.createStatement();
@@ -411,16 +404,15 @@ public class StatsDB
 									rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 									rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
 	
-								// Todo: export properties (sqldump?)
-//								// Load properties of platform.
-//								Map<String, String>	props	= new HashMap<String, String>();
-//								pi.setProperties(props);
-//								ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
-//								while(rs2.next())
-//								{
-//									props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
-//								}
-//								rs2.close();
+								// Load properties of platform.
+								Map<String, String>	props	= new HashMap<String, String>();
+								pi.setProperties(props);
+								ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
+								while(rs2.next())
+								{
+									props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+								}
+								rs2.close();
 								
 								cursormoved	= false;
 								
@@ -570,6 +562,20 @@ public class StatsDB
 		}
 	}
 
+	/**
+	 *  Migrate from one database to another.
+	 */
+	protected void	migrateFrom(StatsDB old)
+	{
+		Iterator<PlatformInfo>	infos	= old.getAllPlatformInfos();
+		while(infos.hasNext())
+		{
+			PlatformInfo	info	= infos.next();
+			info.setDBId(null);
+			save(info);
+		}
+	}
+	
 	
 	//-------- main for testing --------
 	
@@ -580,6 +586,9 @@ public class StatsDB
 	 */
 	public static void	main(String[] args) throws Exception
 	{
+		// Hack!!! Let relay know we are running standalone.
+		System.setProperty("relay.standalone", "true");
+		
 		if(args.length>0)
 		{
 			String	sql	= null;
@@ -595,7 +604,7 @@ public class StatsDB
 				}
 			}
 			System.out.println("Executing: "+sql);
-			StatsDB	db	= new StatsDB();
+			StatsDB	db	= createDB();
 			Statement	stmt	= db.con.createStatement();
 			boolean query	= stmt.execute(sql);
 			if(query)
@@ -610,16 +619,16 @@ public class StatsDB
 		}
 		else
 		{
-			StatsDB	db	= new StatsDB();
-			Map<String, String>	props	= new HashMap<String, String>();
-			props.put("a", "b");
-			props.put("a1", "b2");
-			for(int i=1; i<5; i++)
-			{
-				PlatformInfo	pi	= new PlatformInfo("somid"+i, "hostip", "somename", "prot");
-				pi.setProperties(props);
-				db.save(pi);
-			}
+			StatsDB	db	= createDB();
+//			Map<String, String>	props	= new HashMap<String, String>();
+//			props.put("a", "b");
+//			props.put("a1", "b2");
+//			for(int i=1; i<5; i++)
+//			{
+//				PlatformInfo	pi	= new PlatformInfo("somid"+i, "hostip", "somename", "prot");
+//				pi.setProperties(props);
+//				db.save(pi);
+//			}
 	//		printPlatformInfos(db.getAllPlatformInfos());
 			
 	//		pi.reconnect("hostip", "other hostname");
