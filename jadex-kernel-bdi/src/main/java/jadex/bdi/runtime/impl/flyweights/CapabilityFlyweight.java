@@ -696,7 +696,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IResultListener createResultListener(IResultListener listener)
 	{
-		return getInterpreter().createResultListener(listener);
+		return getInterpreter().getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
 	/**
@@ -705,7 +705,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
 	{
-		return getInterpreter().createResultListener(listener);
+		return getInterpreter().getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
 //	/**

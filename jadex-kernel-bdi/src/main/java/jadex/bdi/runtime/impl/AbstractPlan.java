@@ -1008,7 +1008,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
-		return interpreter.createResultListener(listener);
+		return interpreter.getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
 	/**
@@ -1016,7 +1016,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener)
 	{
-		return interpreter.createResultListener(listener);
+		return interpreter.getComponentFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
 	//-------- static part -------

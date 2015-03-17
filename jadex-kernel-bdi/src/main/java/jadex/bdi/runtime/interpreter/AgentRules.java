@@ -82,7 +82,7 @@ public class AgentRules
 //				
 //				// Get the services.
 //				final boolean services[]	= new boolean[3];
-//				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
+//				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 //	//			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 //				{
 //					public void resultAvailable(Object result)
@@ -100,7 +100,7 @@ public class AgentRules
 //						}
 //					}
 //				}));
-//				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
+//				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 //	//			SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 //				{
 //					public void resultAvailable(Object result)
@@ -116,7 +116,7 @@ public class AgentRules
 //							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
 //					}
 //				}));
-//				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
+//				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 //	//			SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 //				{
 //					public void resultAvailable(Object result)
@@ -206,7 +206,7 @@ public class AgentRules
 //				final BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
 //				
 //				initializeCapabilityInstance(state, ragent).addResultListener(
-//					bdii.createResultListener(new DelegationResultListener(bdii.inited)
+//					bdii.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(bdii.inited)
 //					{
 //						public void customResultAvailable(Object result)
 //						{
@@ -1004,7 +1004,7 @@ public class AgentRules
 //					{
 //						// Use second future to start agent only when value has already been set.
 //						final Future	ret	= new Future();
-//						((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new IResultListener()
+//						((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 //						{
 //							public void resultAvailable(Object result)
 //							{
@@ -1293,7 +1293,7 @@ public class AgentRules
 						if(state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_beliefs, mbel)==null)
 						{
 							initBelief(state, rcapa, mbel, fetcher).addResultListener(
-								BDIInterpreter.getInterpreter(state).createResultListener(this));
+								BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(this));
 						}
 						else
 						{
@@ -1315,7 +1315,7 @@ public class AgentRules
 			belsdone	= IFuture.DONE;
 		}
 
-		belsdone.addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new DelegationResultListener(ret)
+		belsdone.addResultListener(BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -1439,7 +1439,7 @@ public class AgentRules
 								Object caparef = it.next();
 								Object rsubcapa = state.getAttributeValue(caparef, OAVBDIRuntimeModel.capabilityreference_has_capability);
 								initializeCapabilityInstance(state, rsubcapa).addResultListener(
-									BDIInterpreter.getInterpreter(state).createResultListener(this));
+									BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(this));
 							}
 							else
 							{
@@ -1455,7 +1455,7 @@ public class AgentRules
 					subcapsdone	= IFuture.DONE;
 				}
 				
-				subcapsdone.addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new DelegationResultListener(ret)
+				subcapsdone.addResultListener(BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -1669,7 +1669,7 @@ public class AgentRules
 		if(OAVBDIMetaModel.EVALUATIONMODE_STATIC.equals(evamode) || update!=null)
 		{
 			findValue(state, rcapa, rbel, parents, fetcher, arguments).addResultListener(BDIInterpreter.getInterpreter(state)
-				.createResultListener(new DelegationResultListener(ret)
+				.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -1716,7 +1716,7 @@ public class AgentRules
 									if(value instanceof IFuture && IFuture.class.equals(state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_class)))
 									{
 										((IFuture)value).addResultListener(BDIInterpreter.getInterpreter(state)
-											.createResultListener(new IResultListener()
+											.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
@@ -1909,7 +1909,7 @@ public class AgentRules
 				if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_class)))
 				{
 					((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
-						.createResultListener(new DelegationResultListener(ret)));
+						.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 				}
 				else
 				{
@@ -1928,7 +1928,7 @@ public class AgentRules
 						if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_class)))
 						{
 							((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
-								.createResultListener(new DelegationResultListener(ret)));
+								.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 						}
 						else
 						{
@@ -1976,7 +1976,7 @@ public class AgentRules
 		if(OAVBDIMetaModel.EVALUATIONMODE_STATIC.equals(evamode) || update!=null)
 		{
 			findValues(state, rcapa, rbelset, parents, fetcher, arguments)
-				.addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new DelegationResultListener(ret)
+				.addResultListener(BDIInterpreter.getInterpreter(state).getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -2025,7 +2025,7 @@ public class AgentRules
 									if(values instanceof IFuture && IFuture.class.equals(state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_class)))
 									{
 										((IFuture)values).addResultListener(BDIInterpreter.getInterpreter(state)
-											.createResultListener(new IResultListener()
+											.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
@@ -2166,7 +2166,7 @@ public class AgentRules
 				if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_class)))
 				{
 					((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
-						.createResultListener(new DelegationResultListener(ret)));
+						.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 				}
 				else
 				{
@@ -2208,7 +2208,7 @@ public class AgentRules
 							if(val instanceof IFuture && IFuture.class.equals(state.getAttributeValue(factsexp, OAVBDIMetaModel.expression_has_class)))
 							{
 								((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state)
-									.createResultListener(new DelegationResultListener(ret)));
+									.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 							}
 							else
 							{

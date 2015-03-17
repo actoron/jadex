@@ -737,7 +737,7 @@ public class MessageEventRules
 				final IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
 				SServiceProvider.getService(interpreter.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(interpreter.createResultListener(new IResultListener()
+					.addResultListener(interpreter.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
