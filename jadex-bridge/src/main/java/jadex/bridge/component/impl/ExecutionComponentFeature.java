@@ -862,30 +862,33 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					final Exception fex = ex;
 					// Wait for delayed listener addition.
-					waitForDelay(3000, true)
-						.addResultListener(new IResultListener<Void>()
+					if(DEBUG)
 					{
-						public void resultAvailable(Void result)
+						waitForDelay(3000, true)
+							.addResultListener(new IResultListener<Void>()
 						{
-							if(!step.getSecondEntity().hasResultListener())
+							public void resultAvailable(Void result)
 							{
-								StringWriter	sw	= new StringWriter();
-								fex.printStackTrace(new PrintWriter(sw));
-								getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
-								
-								if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+								if(!step.getSecondEntity().hasResultListener())
 								{
-									stepadditions.get(step.getFirstEntity()).printStackTrace();
+									StringWriter	sw	= new StringWriter();
+									fex.printStackTrace(new PrintWriter(sw));
+									getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+									
+									if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+									{
+										stepadditions.get(step.getFirstEntity()).printStackTrace();
+									}
 								}
 							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// shouldn't happen:
-							exception.printStackTrace();
-						}
-					});
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								// shouldn't happen:
+								exception.printStackTrace();
+							}
+						});
+					}
 				}
 				
 //				step.getSecondEntity().setException(e instanceof Exception? (Exception)e: new RuntimeException(e));
@@ -898,10 +901,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					stepfut.addResultListener(new DelegationResultListener(step.getSecondEntity()));
 		
-					if(!step.getSecondEntity().hasResultListener())
+					if(DEBUG && !step.getSecondEntity().hasResultListener())
 					{
 						// Wait for delayed listener addition.
-						waitForDelay(1000, true)
+						waitForDelay(3000, true)
 							.addResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
