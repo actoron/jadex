@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 
 /**
@@ -111,6 +112,7 @@ public class PlatformTreeNode extends ComponentTreeNode
 			childs.add(system);
 		}
 		
+//		System.out.println("childs: "+childs.size()+" "+childs);
 		super.setChildren(childs);
 	}
 	
@@ -151,6 +153,8 @@ public class PlatformTreeNode extends ComponentTreeNode
 	 */
 	protected ViewTreeNode getChild(String name)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		ViewTreeNode node = (ViewTreeNode)model.getNode(getId()+name);
 		if(node==null)
 		{
@@ -205,6 +209,8 @@ public class PlatformTreeNode extends ComponentTreeNode
 		
 //		if(cnt!=childs.size())
 //			setChildren(childs);
+		
+//		System.out.println("childs: "+getCachedChildren().size());
 	}
 	
 	/**

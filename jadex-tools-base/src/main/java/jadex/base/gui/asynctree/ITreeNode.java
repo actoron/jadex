@@ -56,9 +56,7 @@ public interface ITreeNode
 
 	/**
 	 * Refresh the node.
-	 * 
-	 * @param recurse
-	 *            Recursively refresh subnodes, if true.
+	 * @param recurse Recursively refresh subnodes, if true.
 	 */
 	public void refresh(boolean recurse);
 

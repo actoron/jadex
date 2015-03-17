@@ -9,25 +9,23 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
@@ -48,11 +46,8 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Proxy;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -142,7 +137,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	public BDIAgentFactory(Map<String, Object> props, IInternalAccess component)
 	{
 //		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
-		super(((IServiceProvider)component.getServiceContainer()).getId(), IComponentFactory.class, null);
+		super(component.getComponentIdentifier(), IComponentFactory.class, null);
 		this.myprops = props;
 		this.component	= component;
 	}
@@ -162,7 +157,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.component = component;
-		this.providerid = ((IServiceProvider)component.getServiceContainer()).getId();
+		this.providerid = component.getComponentIdentifier();
 		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null);
 		return startService();
 	}
@@ -181,8 +176,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 			{
 				public void customResultAvailable(Void result)
 				{
-					SServiceProvider.getService((IServiceProvider)component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(component.createResultListener(new DelegationResultListener(fut)
+					SServiceProvider.getService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(fut)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -230,7 +225,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		if(!shutdowned)
 		{
 			final Future<Void>	fut	= new Future<Void>();
-			component.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			component.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(fut)
 			{
 				public void customResultAvailable(ILibraryService libservice)
@@ -257,123 +252,123 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	
 	//-------- IAgentFactory interface --------
 	
-	/**
-	 * Create a component instance.
-	 * @param desc	The component description.
-	 * @param factory The component adapter factory.
-	 * @param modelinfo The component model.
-	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the component as name/value pairs.
-	 * @param parent The parent component (if any).
-	 * @param bindings	Optional bindings to override bindings from model.
-	 * @param pinfos	Optional provided service infos to override settings from model.
-	 * @param copy	Global flag for parameter copying.
-	 * @param realtime	Global flag for real time timeouts.
-	 * @param persist	Global flag for persistence support.
-	 * @param resultlistener	Optional listener to be notified when the component finishes.
-	 * @param init	Future to be notified when init of the component is completed.
-	 * @return An instance of a component and the corresponding adapter.
-	 */
-	@Excluded
-	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference final IComponentDescription desc, 
-		final IComponentAdapterFactory factory, final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, 
-		final IExternalAccess parent, @Reference final RequiredServiceBinding[] bindings, @Reference final ProvidedServiceInfo[] pinfos, final boolean copy, final boolean realtime, final boolean persist,
-		final IPersistInfo persistinfo, 
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, @Reference final LocalServiceRegistry registry)
-	{
-//		System.out.println("create: "+modelinfo.getFilename());
-		
-		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
-		
-		if(libservice!=null)
-		{
-			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
-				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
-			{
-				public void customResultAvailable(ClassLoader cl)
-				{
-					try
-					{
-				//		OAVAgentModel amodel = (OAVAgentModel)model;
-						OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
-							new Object[]{modelinfo.getResourceIdentifier(), root});
-						
-						// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-						OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
-				//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
-						tmodel.addTypeModel(amodel.getState().getTypeModel());
-						tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-						IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
-						state.addSubstate(amodel.getState());
-						
-//						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
-						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, pinfos, myprops, copy, realtime, resultlistener, init, registry);
-						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
-					}
-					catch(Exception e)
-					{
-						ret.setException(e);
-					}
-				}
-			});
-		}
-		
-		// For platform bootstrapping
-		else
-		{
-			try
-			{
-				ClassLoader cl = getClass().getClassLoader();
-		//		OAVAgentModel amodel = (OAVAgentModel)model;
-				OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
-					new Object[]{modelinfo.getResourceIdentifier(), root});
-				
-				// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-				OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
-		//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
-				tmodel.addTypeModel(amodel.getState().getTypeModel());
-				tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-				IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
-				state.addSubstate(amodel.getState());
-				
-//				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
-				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, pinfos, myprops, copy, realtime, resultlistener, init, registry);
-				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
-		}
-		
-		return ret;
-	}
-	
-	// Needed for gpmn factory
-	/**
-	 * Create a component instance.
-	 * @param adapter The component adapter.
-	 * @param model The component model.
-	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the agent as name/value pairs.
-	 * @param parent The parent component (if any).
-	 * @return An instance of a component.
-	 */
-	public Tuple2<IComponentInstance, IComponentAdapter> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
-		String config, Map<String, Object> arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, ProvidedServiceInfo[] pinfos, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> ret, LocalServiceRegistry registry)
-	{
-		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
-//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
-		tmodel.addTypeModel(amodel.getState().getTypeModel());
-		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
-		state.addSubstate(amodel.getState());
-		
-//		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, ret);
-		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, pinfos, myprops, copy, realtime, resultlistener, ret, registry);
-		return new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter());
-	}
+//	/**
+//	 * Create a component instance.
+//	 * @param desc	The component description.
+//	 * @param factory The component adapter factory.
+//	 * @param modelinfo The component model.
+//	 * @param config The name of the configuration (or null for default configuration) 
+//	 * @param arguments The arguments for the component as name/value pairs.
+//	 * @param parent The parent component (if any).
+//	 * @param bindings	Optional bindings to override bindings from model.
+//	 * @param pinfos	Optional provided service infos to override settings from model.
+//	 * @param copy	Global flag for parameter copying.
+//	 * @param realtime	Global flag for real time timeouts.
+//	 * @param persist	Global flag for persistence support.
+//	 * @param resultlistener	Optional listener to be notified when the component finishes.
+//	 * @param init	Future to be notified when init of the component is completed.
+//	 * @return An instance of a component and the corresponding adapter.
+//	 */
+//	@Excluded
+//	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference final IComponentDescription desc, 
+//		final IComponentAdapterFactory factory, final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, 
+//		final IExternalAccess parent, @Reference final RequiredServiceBinding[] bindings, @Reference final ProvidedServiceInfo[] pinfos, final boolean copy, final boolean realtime, final boolean persist,
+//		final IPersistInfo persistinfo, 
+//		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, @Reference final LocalServiceRegistry registry)
+//	{
+////		System.out.println("create: "+modelinfo.getFilename());
+//		
+//		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+//		
+//		if(libservice!=null)
+//		{
+//			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
+//				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
+//			{
+//				public void customResultAvailable(ClassLoader cl)
+//				{
+//					try
+//					{
+//				//		OAVAgentModel amodel = (OAVAgentModel)model;
+//						OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
+//							new Object[]{modelinfo.getResourceIdentifier(), root});
+//						
+//						// Create type model for agent instance (e.g. holding dynamically loaded java classes).
+//						OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
+//				//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
+//						tmodel.addTypeModel(amodel.getState().getTypeModel());
+//						tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+//						IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
+//						state.addSubstate(amodel.getState());
+//						
+////						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
+//						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, pinfos, myprops, copy, realtime, resultlistener, init, registry);
+//						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
+//					}
+//					catch(Exception e)
+//					{
+//						ret.setException(e);
+//					}
+//				}
+//			});
+//		}
+//		
+//		// For platform bootstrapping
+//		else
+//		{
+//			try
+//			{
+//				ClassLoader cl = getClass().getClassLoader();
+//		//		OAVAgentModel amodel = (OAVAgentModel)model;
+//				OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
+//					new Object[]{modelinfo.getResourceIdentifier(), root});
+//				
+//				// Create type model for agent instance (e.g. holding dynamically loaded java classes).
+//				OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
+//		//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
+//				tmodel.addTypeModel(amodel.getState().getTypeModel());
+//				tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+//				IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
+//				state.addSubstate(amodel.getState());
+//				
+////				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
+//				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, pinfos, myprops, copy, realtime, resultlistener, init, registry);
+//				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
+//		}
+//		
+//		return ret;
+//	}
+//	
+//	// Needed for gpmn factory
+//	/**
+//	 * Create a component instance.
+//	 * @param adapter The component adapter.
+//	 * @param model The component model.
+//	 * @param config The name of the configuration (or null for default configuration) 
+//	 * @param arguments The arguments for the agent as name/value pairs.
+//	 * @param parent The parent component (if any).
+//	 * @return An instance of a component.
+//	 */
+//	public Tuple2<IComponentInstance, IComponentAdapter> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
+//		String config, Map<String, Object> arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, ProvidedServiceInfo[] pinfos, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> ret, LocalServiceRegistry registry)
+//	{
+//		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
+//		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
+////		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
+//		tmodel.addTypeModel(amodel.getState().getTypeModel());
+//		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+//		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
+//		state.addSubstate(amodel.getState());
+//		
+////		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, ret);
+//		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, pinfos, myprops, copy, realtime, resultlistener, ret, registry);
+//		return new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter());
+//	}
 	
 	/**
 	 *  Load a  model.
@@ -563,7 +558,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	{
 		final Future<IMECapability>	ret	= new Future<IMECapability>();
 		
-		component.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IMECapability>(ret)
 		{
 			public void customResultAvailable(ILibraryService libservice)

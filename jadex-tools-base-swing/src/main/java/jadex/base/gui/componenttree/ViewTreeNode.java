@@ -1,6 +1,7 @@
 package jadex.base.gui.componenttree;
 
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -125,6 +126,17 @@ public class ViewTreeNode	extends AbstractSwingTreeNode
 		if(!ins)
 		{
 			super.addChild(node);
+		}
+//		System.out.println("cc: "+getCachedChildren().size());
+	}
+	
+	public void removeChild(ITreeNode node)
+	{
+		super.removeChild(node);
+//		System.out.println("cc: "+getCachedChildren().size());
+		if(getCachedChildren().size()==0)
+		{
+			((AbstractTreeNode)getParent()).removeChild(this);
 		}
 	}
 }
