@@ -139,7 +139,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 */
 	public double getDilation()
 	{
-		return ((ContinuousClock)clock).getDilation();
+		return clock instanceof ContinuousClock ? ((ContinuousClock)clock).getDilation() : 1;
 	}
 	
 	/**
