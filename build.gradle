@@ -173,7 +173,7 @@ subprojects
         from new File(projectDir, 'build/docs')
     }
 
-    javadocJar.onlyIf { calledWithTask("uploadArchives") }
+    javadocJar.onlyIf { calledWithTask("uploadArchives") || calledWithTask("install") }
 
 	//sourcesJar.onlyIf { calledWithTask("uploadArchives") }
 	

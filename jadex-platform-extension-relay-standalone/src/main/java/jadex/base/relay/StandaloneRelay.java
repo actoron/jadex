@@ -251,7 +251,7 @@ public class StandaloneRelay
 								{
 									handler.handleAwareness(new CounterInputStream(bin, contentlength));
 								}
-								if(path.startsWith("/offline"))
+								else if(path.startsWith("/offline"))
 								{
 									String	hostip	= ((InetSocketAddress)client.getRemoteSocketAddress()).getAddress().getHostAddress();
 									handler.handleOffline(hostip, new CounterInputStream(bin, contentlength));
