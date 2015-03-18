@@ -29,11 +29,17 @@ public class StatsDB
 {
 	//-------- attributes --------
 	
+	/** The peer id. */
+	protected String	peerid;
+	
 	/** The db connection (if any). */
 	protected Connection	con;
 	
-	/** The prepared insert statement. */
+	/** The prepared insert statement for new entries (without dbid). */
 	protected PreparedStatement	insert;
+	
+	/** The prepared insert statement for remote entries (with dbid). */
+	protected PreparedStatement	insert2;
 	
 	/** The prepared update statement. */
 	protected PreparedStatement	update;
@@ -50,17 +56,17 @@ public class StatsDB
 	 *  Create the db object.
 	 *  @return null, if creation fails.
 	 */
-	public static StatsDB	createDB()
+	public static StatsDB	createDB(String peerid)
 	{
 		StatsDB	ret	= null;
 		try
 		{
-			ret	= new StatsDB(openH2DB());
+			ret	= new StatsDB(peerid, openH2DB(peerid));
 			
 			// Migrate from derby to h2
 			if(new File(RelayHandler.SYSTEMDIR, "mydb").exists())
 			{
-				StatsDB	old	= new StatsDB(openDerbyDB());
+				StatsDB	old	= new StatsDB(peerid, openDerbyDB());
 				ret.migrateFrom(old);
 				old.shutdown();
 				
@@ -79,8 +85,9 @@ public class StatsDB
 	/**
 	 *  Create the db object.
 	 */
-	protected StatsDB(Connection con)
+	protected StatsDB(String peerid, Connection con)
 	{
+		this.peerid	= peerid;
 		this.con	= con;
 	}
 	
@@ -183,21 +190,23 @@ public class StatsDB
 	/**
 	 *  Create a derby db connection.
 	 */
-	protected static Connection	openH2DB()	throws Exception
+	protected static Connection	openH2DB(String peerid)	throws Exception
 	{
 		Class.forName("org.h2.Driver");
 		Connection	con	= DriverManager.getConnection("jdbc:h2:"+RelayHandler.SYSTEMDIR.getAbsolutePath()+"/relaystats;INIT=CREATE SCHEMA IF NOT EXISTS RELAY");
+		Statement	stmt	= con.createStatement();
 
 		// Create the platform info table, if it doesn't exist.
-//		con.createStatement().execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
+//		stmt.execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
 		DatabaseMetaData	meta	= con.getMetaData();
 		ResultSet	rs	= meta.getTables(null, "RELAY", "PLATFORMINFO", null);
 		if(!rs.next())
 		{
 			rs.close();
-			Statement	stmt	= con.createStatement();
+			
 			stmt.execute("CREATE TABLE RELAY.PLATFORMINFO ("
 				+ "ID	INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,"
+				+ "PEER VARCHAR(60) PRIMARY KEY,"
 				+ "PLATFORM	VARCHAR(60)," 
 				+ "HOSTIP	VARCHAR(32),"
 				+ "HOSTNAME	VARCHAR(60),"
@@ -208,19 +217,34 @@ public class StatsDB
 				+ "BYTES	DOUBLE,"
 				+ "TRANSTIME	DOUBLE,"
 				+ "PREFIX	VARCHAR(60))");
-			stmt.close();
 		}
 		else
 		{
 			rs.close();
 			
+			// Add peer column, if it doesn't exist.
+			rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PEER");
+			if(!rs.next())
+			{
+				rs.close();
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PEER VARCHAR(60)");
+				
+				// Update legacy platform entries without peer id.
+				stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET PEER='"+peerid+"' WHERE PEER IS NULL");
+				
+				// Include peer column in primary key constraint.
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PRIMARY KEY(PEER)");
+			}
+			else
+			{
+				rs.close();
+			}
+
 			// Update platform entries where disconnection was missed.
-			Statement	stmt	= con.createStatement();
 			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
 			
 			// Update platform entries where hostname is same as ip.
 			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
-			stmt.close();
 			
 			// Replace android platform names and-xxx to and_xxx
 			PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
@@ -239,17 +263,43 @@ public class StatsDB
 		}
 
 		// Create the properties table, if it doesn't exist.
-//			con.createStatement().execute("drop table RELAY.PROPERTIES");	// uncomment to create a fresh table.
+//		stmt.execute("drop table RELAY.PROPERTIES");	// uncomment to create a fresh table.
 		meta	= con.getMetaData();
 		rs	= meta.getTables(null, "RELAY", "PROPERTIES", null);
 		if(!rs.next())
 		{
+			rs.close();
 			con.createStatement().execute("CREATE TABLE RELAY.PROPERTIES ("
-				+ "ID	INTEGER CONSTRAINT PLATFORM_KEY REFERENCES RELAY.PLATFORMINFO(ID),"
+				+ "ID	INTEGER,"
+				+ "PEER VARCHAR(60),"
 				+ "NAME	VARCHAR(30)," 
-				+ "VALUE	VARCHAR(60))");
+				+ "VALUE	VARCHAR(60)),"
+				+ "FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
 		}
-		rs.close();
+		else
+		{
+			rs.close();
+			// Add peer column, if it doesn't exist.
+			rs	= meta.getColumns(null, "RELAY", "PROPERTIES", "PEER");
+			if(!rs.next())
+			{
+				rs.close();
+				stmt.execute("ALTER TABLE RELAY.PROPERTIES ADD PEER VARCHAR(60)");
+				
+				// Update legacy property entries without peer id.
+				stmt.executeUpdate("UPDATE RELAY.PROPERTIES SET PEER='"+peerid+"' WHERE PEER IS NULL");
+				
+				// Include peer column in foreing key constraint.
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO DROP CONSTRAINT PLATFORM_KEY");
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
+			}
+			else
+			{
+				rs.close();
+			}
+		}
+		
+		stmt.close();
 		
 		return con;
 	}
@@ -260,7 +310,7 @@ public class StatsDB
 	 *  Save (insert or update) a platform info object.
 	 *  @param pi The platform info.
 	 */
-	public void	save(PlatformInfo pi)
+	public synchronized void	save(PlatformInfo pi)
 	{
 		if(con!=null)
 		{
@@ -275,12 +325,13 @@ public class StatsDB
 					if(insert==null)
 					{
 						insert	= con.prepareStatement("INSERT INTO relay.platforminfo"
-							+ " (PLATFORM, HOSTIP, HOSTNAME, SCHEME, CONTIME, DISTIME, MSGS, BYTES, TRANSTIME, PREFIX)"
-							+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+							+ " (PEER, PLATFORM, HOSTIP, HOSTNAME, SCHEME, CONTIME, DISTIME, MSGS, BYTES, TRANSTIME, PREFIX)"
+							+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 							Statement.RETURN_GENERATED_KEYS);
 					}
 					
 					int	param	= 1;
+					insert.setString(param++, peerid);
 					insert.setString(param++, name);
 					insert.setString(param++, pi.getHostIP());
 					insert.setString(param++, pi.getHostName());
@@ -303,7 +354,7 @@ public class StatsDB
 					{
 						update	= con.prepareStatement("UPDATE relay.platforminfo"
 							+" SET PLATFORM=?, HOSTIP=?, HOSTNAME=?, SCHEME=?, CONTIME=?, DISTIME=?, MSGS=?, BYTES=?, TRANSTIME=?, PREFIX=?"
-							+" WHERE ID=?");
+							+" WHERE ID=? AND PEER=?");
 					}
 					
 					int	param	= 1;
@@ -318,7 +369,34 @@ public class StatsDB
 					update.setDouble(param++, pi.getTransferTime());
 					update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
 					update.setInt(param++, pi.getDBId().intValue());
-					update.executeUpdate();
+					update.setString(param++, peerid);
+					int	cnt	= update.executeUpdate();
+					
+					// Not updated -> new entry from remote
+					if(cnt==0)
+					{
+						if(insert2==null)
+						{
+							insert2	= con.prepareStatement("INSERT INTO relay.platforminfo"
+								+ " (ID, PEER, PLATFORM, HOSTIP, HOSTNAME, SCHEME, CONTIME, DISTIME, MSGS, BYTES, TRANSTIME, PREFIX)"
+								+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+						}
+						
+						param	= 1;
+						insert2.setInt(param++, pi.getDBId().intValue());
+						insert2.setString(param++, pi.getPeerId());
+						insert2.setString(param++, name);
+						insert2.setString(param++, pi.getHostIP());
+						insert2.setString(param++, pi.getHostName());
+						insert2.setString(param++, pi.getScheme());
+						insert2.setTimestamp(param++, pi.getConnectDate()!=null ? new Timestamp(pi.getConnectDate().getTime()) : null);
+						insert2.setTimestamp(param++, pi.getDisconnectDate()!=null ? new Timestamp(pi.getDisconnectDate().getTime()) : null);
+						insert2.setInt(param++, pi.getMessageCount());
+						insert2.setDouble(param++, pi.getBytes());
+						insert2.setDouble(param++, pi.getTransferTime());
+						insert2.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+						insert2.executeUpdate();
+					}
 				}
 				
 				// Rewrite properties (hack??? inefficient)
@@ -326,22 +404,24 @@ public class StatsDB
 				{
 					if(deleteprops==null)
 					{
-						deleteprops	= con.prepareStatement("DELETE FROM relay.properties WHERE ID=?");
+						deleteprops	= con.prepareStatement("DELETE FROM relay.properties WHERE ID=? AND PEER=?");
 					}
 					int	param	= 1;
 					deleteprops.setInt(param++, pi.getDBId().intValue());
+					deleteprops.setString(param++, pi.getPeerId());
 					deleteprops.executeUpdate();
 					
 					if(insertprops==null)
 					{
 						insertprops	= con.prepareStatement("INSERT INTO relay.properties"
-								+ " (ID, NAME, VALUE)"
-								+ " VALUES (?, ?, ?)");
+								+ " (ID, PEER, NAME, VALUE)"
+								+ " VALUES (?, ?, ?, ?)");
 					}
 					for(String propname: pi.getProperties().keySet())
 					{
 						param	= 1;
 						insertprops.setInt(param++, pi.getDBId());
+						insertprops.setString(param++, pi.getPeerId());
 						insertprops.setString(param++, propname);
 						insertprops.setString(param++, pi.getProperties().get(propname));
 						insertprops.executeUpdate();
@@ -400,7 +480,7 @@ public class StatsDB
 						{
 							try
 							{
-								PlatformInfo	pi	= new PlatformInfo(Integer.valueOf(rs.getInt("ID")), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+								PlatformInfo	pi	= new PlatformInfo(Integer.valueOf(rs.getInt("ID")), rs.getString("PEER"), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
 									rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 									rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
 	
@@ -480,7 +560,7 @@ public class StatsDB
 					+"from relay.platforminfo where id>="+startid+" AND id<="+endid+" "
 					+"group by hostip, prefix order by CONTIME desc");
 				
-				PreparedStatement	ps	= con.prepareStatement("select * from relay.properties where ID=?");
+//				PreparedStatement	ps	= con.prepareStatement("select * from relay.properties where ID=?");
 				
 				while(rs.next() && (limit==-1 || ret.size()<limit))
 				{
@@ -502,25 +582,26 @@ public class StatsDB
 					}
 					else
 					{
-						PlatformInfo	pi	= new PlatformInfo(rs.getInt("ID"), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+						PlatformInfo	pi	= new PlatformInfo(rs.getInt("ID"), null, rs.getString("PLATFORM"), rs.getString("HOSTIP"),
 								rs.getString("HOSTNAME"), null, rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 								rs.getInt("MSGS"), 0, 0);
 						map.put(rs.getString("HOSTIP"), pi);
 						ret.add(pi);
 						
-						// Load latest properties of platform.
-						Map<String, String>	props	= new HashMap<String, String>();
-						pi.setProperties(props);
-						ps.setInt(1, pi.getDBId());
-						ResultSet	rs2	= ps.executeQuery();
-						while(rs2.next())
-						{
-							props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
-						}
-						rs2.close();
+						// Removed for speed
+//						// Load latest properties of platform.
+//						Map<String, String>	props	= new HashMap<String, String>();
+//						pi.setProperties(props);
+//						ps.setInt(1, pi.getDBId());
+//						ResultSet	rs2	= ps.executeQuery();
+//						while(rs2.next())
+//						{
+//							props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+//						}
+//						rs2.close();
 					}
 				}
-				ps.close();
+//				ps.close();
 				rs.close();
 			}
 			catch(Exception e)
@@ -604,7 +685,7 @@ public class StatsDB
 				}
 			}
 			System.out.println("Executing: "+sql);
-			StatsDB	db	= createDB();
+			StatsDB	db	= createDB("test");
 			Statement	stmt	= db.con.createStatement();
 			boolean query	= stmt.execute(sql);
 			if(query)
@@ -619,7 +700,7 @@ public class StatsDB
 		}
 		else
 		{
-			StatsDB	db	= createDB();
+			StatsDB	db	= createDB("test");
 //			Map<String, String>	props	= new HashMap<String, String>();
 //			props.put("a", "b");
 //			props.put("a1", "b2");
@@ -635,9 +716,9 @@ public class StatsDB
 	//		pi.addMessage(123, 456);
 	//		
 	//		pi.disconnect();
-			printPlatformInfos(db.getPlatformInfos(5, -1, -1));
-			System.out.println("---");
 			printPlatformInfos(db.getPlatformInfos(-1, -1, -1));
+			System.out.println("---");
+			printPlatformInfos(db.getAllPlatformInfos());
 			
 			Statement	stmt	= db.con.createStatement();
 			printResultSet(stmt.executeQuery("select * from relay.platforminfo"));
@@ -659,6 +740,18 @@ public class StatsDB
 		for(int i=0; i<infos.length; i++)
 		{
 			System.out.println(infos[i]);
+		}		
+	}
+
+	/**
+	 *  Print out the contents of a result set.
+	 */
+	protected static void	printPlatformInfos(Iterator<PlatformInfo> infos)
+	{
+		System.out.println("Platform infos:");
+		while(infos.hasNext())
+		{
+			System.out.println(infos.next());
 		}		
 	}
 

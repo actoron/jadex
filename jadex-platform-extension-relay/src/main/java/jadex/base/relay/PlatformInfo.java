@@ -55,6 +55,9 @@ public final class PlatformInfo
 	/** The platform id. */
 	protected String	id;
 	
+	/** The peer id. */
+	protected String	peerid;
+	
 	/** The host ip. */
 	protected String	hostip;
 	
@@ -109,16 +112,17 @@ public final class PlatformInfo
 	 */
 	public PlatformInfo(String id, String hostip, String hostname, String protocol)
 	{
-		this(null, id, hostip, hostname, protocol, new Date(), null, 0, 0, 0);
+		this(null, null, id, hostip, hostname, protocol, new Date(), null, 0, 0, 0);
 	}
 	
 	/**
 	 *  Constructor used by db.
 	 */
-	public PlatformInfo(Integer dbid, String id, String hostip, String hostname, String protocol,
+	public PlatformInfo(Integer dbid, String peerid, String id, String hostip, String hostname, String protocol,
 		Date connect_time, Date disconnect_time, int msg_cnt, double bytes_received, double total_transmission_time)
 	{
 		this.dbid	= dbid;
+		this.peerid	= peerid;
 		
 		// Escape HTML code in strings to avoid cross-site scripting.
 		this.id	= id!=null ? SUtil.makeConform(id) : null;
@@ -317,10 +321,17 @@ public final class PlatformInfo
 	/**
 	 *  Get the db id
 	 */
-	@Exclude
 	public Integer	getDBId()
 	{
 		return dbid;
+	}
+	
+	/**
+	 *  Get the peer id
+	 */
+	public String	getPeerId()
+	{
+		return peerid;
 	}
 	
 	/**
@@ -402,10 +413,17 @@ public final class PlatformInfo
 	/**
 	 *  Set db id
 	 */
-	@Exclude
 	public void	setDBId(Integer dbid)
 	{
 		this.dbid	= dbid;
+	}
+	
+	/**
+	 *  Set the peer id
+	 */
+	public void	setPeerId(String peerid)
+	{
+		this.peerid	= peerid;
 	}
 	
 	/**
@@ -421,7 +439,7 @@ public final class PlatformInfo
 	 */
 	public String toString()
 	{
-		return "PlatformInfo(id="+getDBId()+", platform="+getId()+", host="+getHostName()+"("+getHostIP()+"), scheme="+getScheme()
+		return "PlatformInfo(id="+getDBId()+", peer="+getPeerId()+", platform="+getId()+", host="+getHostName()+"("+getHostIP()+"), scheme="+getScheme()
 			+ ", connected="+getConnectTime()+", disconnected="+getDisconnectTime()
 			+ ", messages="+getMessageCount()+"("+getByteCount()+"), rate="+getTransferRate()
 			+ ", properties="+properties+")";

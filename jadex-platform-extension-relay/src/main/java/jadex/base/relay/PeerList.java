@@ -1,7 +1,9 @@
 package jadex.base.relay;
 
+import jadex.commons.Base64;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.SUtil;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 import java.io.File;
@@ -19,6 +21,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 /**
  *  The peer list actively manages the list of
@@ -28,6 +31,9 @@ public class PeerList
 {
 	//-------- constants --------
 
+	/** The property for this relay's own id. */
+	public static final String	PROPERTY_ID	= "id";
+	
 	/** The property for this relay's own url. */
 	public static final String	PROPERTY_URL	= "url";
 	
@@ -44,6 +50,9 @@ public class PeerList
 	public static final long	DELAY_OFFLINE	= 30000;
 	
 	//-------- attributes --------
+	
+	/** The own peer id (generated on first use). */
+	protected String	id;
 	
 	/** The own url. */
 	protected String	url;
@@ -83,6 +92,19 @@ public class PeerList
 				InputStream	fis	= new FileInputStream(propsfile);
 				props.load(fis);
 				fis.close();
+				
+				if(props.getProperty(PROPERTY_ID)==null || props.getProperty(PROPERTY_ID).equals(""))
+				{
+					props.setProperty(PROPERTY_ID, UUID.randomUUID().toString());
+					OutputStream	fos	= new FileOutputStream(propsfile);
+					props.store(fos, " Relay peer properties.\n"
+						+" Specify settings below to enable load balancing and exchanging awareness information with other relay servers.\n"
+						+" '"+PROPERTY_ID+"' is this relay's own generated ID to differentiate entries from different peers in shared history information.\n"
+						+" Set '"+PROPERTY_URL+"' to this relay's own publically accessible URL, e.g., http://www.mydomain.com:8080/relay (required for enabling peer-to-peer behavior).\n"
+						+" Set '"+PROPERTY_PEERS+"' to a comma separated list of peer server urls to connect to at startup (optional, if this relay should only respond to connections from other peers).\n"
+						+" Set '"+PROPERTY_DEBUG+"=true' for enabling debugging output in html tooltips of peer relay table (optional).");
+					fos.close();
+				}
 			}
 			catch(Exception e)
 			{
@@ -93,15 +115,17 @@ public class PeerList
 		{
 			try
 			{
+				props.setProperty(PROPERTY_ID, UUID.randomUUID().toString());
 				props.setProperty(PROPERTY_URL, "");
 				props.setProperty(PROPERTY_PEERS, "");
 				props.setProperty(PROPERTY_DEBUG, "false");
 				OutputStream	fos	= new FileOutputStream(propsfile);
 				props.store(fos, " Relay peer properties.\n"
 					+" Specify settings below to enable load balancing and exchanging awareness information with other relay servers.\n"
-					+" Use '"+PROPERTY_URL+"' for this relay's own public URL.\n"
-					+" Use '"+PROPERTY_PEERS+"' for a comma separated list of peer server urls.\n"
-					+" Use '"+PROPERTY_DEBUG+"=true' for enabling debugging output in html tooltips of peer relay table.");
+					+" '"+PROPERTY_ID+"' is this relay's own generated ID to differentiate entries from different peers in shared history information.\n"
+					+" Set '"+PROPERTY_URL+"' to this relay's own publically accessible URL, e.g., http://www.mydomain.com:8080/relay (required for enabling peer-to-peer behavior).\n"
+					+" Set '"+PROPERTY_PEERS+"' to a comma separated list of peer server urls to connect to at startup (optional, if this relay should only respond to connections from other peers).\n"
+					+" Set '"+PROPERTY_DEBUG+"=true' for enabling debugging output in html tooltips of peer relay table (optional).");
 				fos.close();
 			}
 			catch(Exception e)
@@ -110,7 +134,8 @@ public class PeerList
 			}
 		}
 		
-		debug	= "true".equals(props.getProperty(PROPERTY_DEBUG));
+		this.debug	= "true".equals(props.getProperty(PROPERTY_DEBUG));
+		this.id	= props.getProperty(PROPERTY_ID);
 		
 		// Todo: check that specified url is valid and connects to this server.
 		this.url	= props.containsKey(PROPERTY_URL) && !"".equals(props.getProperty(PROPERTY_URL))
@@ -141,6 +166,14 @@ public class PeerList
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the peer id of this relay.
+	 */
+	public String	getId()
+	{
+		return id;
+	}
 	
 	/**
 	 *  Get the public url of this relay, if known.
