@@ -7,13 +7,14 @@
 %><%
 	response.setHeader("Content-Disposition", "attachment; filename=relay_statistics.csv");
 %>Relay Statistics of <%= InetAddress.getLocalHost().getHostName() %> (<%= PlatformInfo.TIME_FORMAT_LONG.get().format(new Date()) %>)
-ID;Platform;Host;IP;Scheme;Connected;Disconnected;Messages;Bytes;Transfer_Time 
+ID;Peer;Platform;Host;IP;Scheme;Connected;Disconnected;Messages;Bytes;Transfer_Time 
 <%
 	Iterator<PlatformInfo>	infos	= (Iterator<PlatformInfo>)request.getAttribute("platforms");
 	while(infos.hasNext())
 	{
 		PlatformInfo info	= infos.next();
 		%><%= info.getDBId()
+		%>;<%= info.getPeerId()
 		%>;<%= info.getId()
 		%>;<%= info.getHostName()
 		%>;<%= info.getHostIP()

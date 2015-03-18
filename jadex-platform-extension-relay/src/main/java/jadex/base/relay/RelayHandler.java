@@ -118,8 +118,8 @@ public class RelayHandler
 		CodecFactory	cfac	= new CodecFactory();
 		this.codecs	= cfac.getAllCodecs();
 		this.defcodecs	= cfac.getDefaultCodecs();
-		this.statsdb	= StatsDB.createDB();
 		this.peers	= new PeerList();
+		this.statsdb	= StatsDB.createDB(peers.getId());
 		
 		// Register communication classes with aliases
 		STransformation.registerClass(MessageEnvelope.class);
