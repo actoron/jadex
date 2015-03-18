@@ -560,7 +560,7 @@ public class StatsDB
 					+"from relay.platforminfo where id>="+startid+" AND id<="+endid+" "
 					+"group by hostip, prefix order by CONTIME desc");
 				
-				PreparedStatement	ps	= con.prepareStatement("select * from relay.properties where ID=?");
+//				PreparedStatement	ps	= con.prepareStatement("select * from relay.properties where ID=?");
 				
 				while(rs.next() && (limit==-1 || ret.size()<limit))
 				{
@@ -588,19 +588,20 @@ public class StatsDB
 						map.put(rs.getString("HOSTIP"), pi);
 						ret.add(pi);
 						
-						// Load latest properties of platform.
-						Map<String, String>	props	= new HashMap<String, String>();
-						pi.setProperties(props);
-						ps.setInt(1, pi.getDBId());
-						ResultSet	rs2	= ps.executeQuery();
-						while(rs2.next())
-						{
-							props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
-						}
-						rs2.close();
+						// Removed for speed
+//						// Load latest properties of platform.
+//						Map<String, String>	props	= new HashMap<String, String>();
+//						pi.setProperties(props);
+//						ps.setInt(1, pi.getDBId());
+//						ResultSet	rs2	= ps.executeQuery();
+//						while(rs2.next())
+//						{
+//							props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+//						}
+//						rs2.close();
 					}
 				}
-				ps.close();
+//				ps.close();
 				rs.close();
 			}
 			catch(Exception e)
