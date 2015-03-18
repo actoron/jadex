@@ -4067,6 +4067,8 @@ public class SUtil
 			if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
 			{
 				macs	= SNonAndroid.getMacAddresses();
+			} else {
+				macs = new String[0];
 			}
 		}
 		
