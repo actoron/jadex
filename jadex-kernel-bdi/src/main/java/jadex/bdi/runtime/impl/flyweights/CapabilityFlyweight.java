@@ -291,14 +291,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					object = BDIInterpreter.getInterpreter(getState())!=null? BDIInterpreter.getInterpreter(getState()).getLogger(getScope()): Logger.getAnonymousLogger();
+					object = BDIAgentFeature.getInterpreter(getState())!=null? BDIAgentFeature.getInterpreter(getState()).getLogger(getScope()): Logger.getAnonymousLogger();
 				}
 			};
 			return (Logger)invoc.object;
 		}
 		else
 		{
-			return BDIInterpreter.getInterpreter(getState())!=null? BDIInterpreter.getInterpreter(getState()).getLogger(getScope()): Logger.getAnonymousLogger();
+			return BDIAgentFeature.getInterpreter(getState())!=null? BDIAgentFeature.getInterpreter(getState()).getLogger(getScope()): Logger.getAnonymousLogger();
 		}
 	}
 
@@ -1207,7 +1207,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	 */
 //	protected RequiredServiceBinding getRequiredServiceBinding(String name)
 //	{
-//		Object agent = BDIInterpreter.getInterpreter(getState()).getAgent();
+//		Object agent = BDIAgentFeature.getInterpreter(getState()).getAgent();
 //		Map bindings = (Map)getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_bindings);
 //		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
 //	}

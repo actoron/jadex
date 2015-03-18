@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBeliefListener;
@@ -76,7 +77,7 @@ public class ListenerRules
 				Object ce = assignments.getVariableValue("?ce");
 				
 				IComponentListener lis	= (IComponentListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
-				ChangeEvent	ae	= new ChangeEvent(BDIInterpreter.getInterpreter(state).getAgentAdapter().getChildrenIdentifiers(), null,
+				ChangeEvent	ae	= new ChangeEvent(BDIAgentFeature.getInterpreter(state).getAgentAdapter().getChildrenIdentifiers(), null,
 					state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
@@ -484,12 +485,12 @@ public class ListenerRules
 							{
 								state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_listeners, lis);
 							}
-							BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(rgoal);
+							BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(rgoal);
 						}
 					}					
 				}
 				
-//				System.err.println("listener_goal rule: "+rgoal+", "+lis+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier());
+//				System.err.println("listener_goal rule: "+rgoal+", "+lis+", "+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier());
 			}
 		};
 		
@@ -570,7 +571,7 @@ public class ListenerRules
 							{
 								state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_listeners, lis);
 							}
-							BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(rplan);
+							BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(rplan);
 						}
 					}
 				}

@@ -3,7 +3,6 @@ package jadex.bdi.runtime.interpreter;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.IResultCommand;
 import jadex.commons.beans.PropertyChangeListener;
@@ -205,7 +204,7 @@ public class OAVBDIRuntimeModel
 	public static final OAVJavaType java_externalcondition_type;
 	
 	/** The service provider type. */
-	public static final OAVJavaType java_serviceprovider_type;
+//	public static final OAVJavaType java_serviceprovider_type;
 	
 	/** The result command type. */
 	public static final OAVJavaType java_resultcommand_type;
@@ -782,7 +781,7 @@ public class OAVBDIRuntimeModel
 		java_future_type	= createJavaType(Future.class, OAVJavaType.KIND_OBJECT);
 //		java_componentlistener_type = createJavaType(IComponentListener.class, OAVJavaType.KIND_OBJECT);
 		java_externalcondition_type	= createJavaType(IExternalCondition.class, OAVJavaType.KIND_BEAN);
-		java_serviceprovider_type	= createJavaType(IServiceProvider.class, OAVJavaType.KIND_OBJECT);
+//		java_serviceprovider_type	= createJavaType(IServiceProvider.class, OAVJavaType.KIND_OBJECT);
 		//java_planexecutor_type = createJavaType(IPlanExecutor.class);
 		//java_waitabstraction_type = bdirt_model_type.createJavaType(WaitAbstraction.class);
 		java_runnable_type = createJavaType(Runnable.class, OAVJavaType.KIND_OBJECT);

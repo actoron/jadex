@@ -1,6 +1,6 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bridge.IInternalAccess;
 
 
 /**
@@ -17,7 +17,7 @@ public interface IPlanExecutor
 	 *  @return	The created body.
 	 *  May throw any kind of exception, when the body creation fails
 	 */
-	public Object createPlanBody(BDIInterpreter interpreter, Object rplan, Object rcapability) throws Exception;
+	public Object createPlanBody(IInternalAccess interpreter, Object rplan, Object rcapability) throws Exception;
 
 	/**
 	 *  Execute a step of a plan.
@@ -27,7 +27,7 @@ public interface IPlanExecutor
 	 *  May throw any kind of exception, when the plan execution fails
 	 *  @return True, if plan was interrupted (micro plan step).
 	 */
-	public boolean	executePlanStep(BDIInterpreter interpreter, Object rcapability, Object rplan)	throws Exception;
+	public boolean	executePlanStep(IInternalAccess interpreter, Object rcapability, Object rplan)	throws Exception;
 
 	/**
 	 *  Execute a step of the plans passed() code.
@@ -39,7 +39,7 @@ public interface IPlanExecutor
 	 *  May throw any kind of exception, when the execution fails
 	 *  @return True, if execution was interrupted (micro plan step).
 	 */
-	public boolean	executePassedStep(BDIInterpreter interpreter, Object rplan)	throws Exception;
+	public boolean	executePassedStep(IInternalAccess interpreter, Object rplan)	throws Exception;
 
 	/**
 	 *  Execute a step of the plans failed() code.
@@ -51,7 +51,7 @@ public interface IPlanExecutor
 	 *  May throw any kind of exception, when the execution fails
 	 *  @return True, if execution was interrupted (micro plan step).
 	 */
-	public boolean	executeFailedStep(BDIInterpreter interpreter, Object rplan)	throws Exception;
+	public boolean	executeFailedStep(IInternalAccess interpreter, Object rplan)	throws Exception;
 
 	/**
 	 *  Execute a step of the plans aborted() code.
@@ -64,7 +64,7 @@ public interface IPlanExecutor
 	 *  May throw any kind of exception, when the execution fails
 	 *  @return True, if execution was interrupted (micro plan step).
 	 */
-	public boolean	executeAbortedStep(BDIInterpreter interpreter, Object rplan)	throws Exception;
+	public boolean	executeAbortedStep(IInternalAccess interpreter, Object rplan)	throws Exception;
 
 	/**
 	 *  Interrupt a plan step during execution (micro plan step).
@@ -88,7 +88,7 @@ public interface IPlanExecutor
 	 *  In this case the execution should be terminated
 	 *  (without further abort) and all resources be freed. 
 	 */
-	public void	cleanup(BDIInterpreter interpreter, Object rplan);
+	public void	cleanup(IInternalAccess interpreter, Object rplan);
 
 	/**
 	 *  Get the executing thread of a plan.
@@ -100,7 +100,7 @@ public interface IPlanExecutor
 	 *  Block a plan until an event matching the wait abstraction occurs.
 	 *  Only used for standard plans, which block during execution.
 	 */
-	public void eventWaitFor(BDIInterpreter interpreter, Object rplan);
+	public void eventWaitFor(IInternalAccess interpreter, Object rplan);
 	
 	/**
 	 *  Get the monitor of a plan.

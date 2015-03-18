@@ -54,7 +54,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public static ParameterSetFlyweight getParameterSetFlyweight(IOAVState state, Object scope, Object handle, String name, Object parameterelement)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		ParameterSetFlyweight ret = (ParameterSetFlyweight)ip.getFlyweightCache(IParameterSet.class, new Tuple(IParameterSet.class, parameterelement, name));
 		if(ret==null)
 		{

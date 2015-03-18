@@ -36,7 +36,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public static BeliefSetFlyweight getBeliefSetFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		BeliefSetFlyweight ret = (BeliefSetFlyweight)ip.getFlyweightCache(IBeliefSet.class, new Tuple(IBeliefSet.class, handle));
 		if(ret==null)
 		{

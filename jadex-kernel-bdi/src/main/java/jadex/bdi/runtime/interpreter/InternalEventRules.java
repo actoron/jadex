@@ -1,6 +1,9 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.rules.state.IOAVState;
 
 import java.util.Map;
@@ -63,6 +66,6 @@ public class InternalEventRules
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_internalevents, rinternalevent);
 		
 		// Hack!!! Only needed for external access!
-		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+		((IInternalExecutionFeature)BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class)).wakeup();
 	}
 }

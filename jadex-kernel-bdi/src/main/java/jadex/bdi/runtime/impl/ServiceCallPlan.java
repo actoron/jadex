@@ -6,6 +6,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
@@ -46,7 +47,7 @@ public class ServiceCallPlan extends Plan
 //		Object[]	args	= (Object[])getParameter("args").getValue();
 //		Object[] args = new Object[0];
 		
-		IIntermediateFuture<?>	services	= getServiceContainer().getRequiredServices(service);
+		IIntermediateFuture<?>	services	= getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(service);
 		// Todo: implement suspendable intermediate futures.
 //		while(!success && services.hasNextIntermediateResult(this))
 		Collection<?>	results	= services.get(this);

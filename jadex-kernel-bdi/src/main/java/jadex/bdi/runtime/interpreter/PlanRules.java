@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.BDIFailureException;
 import jadex.bdi.runtime.GoalFailureException;
@@ -10,6 +12,11 @@ import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -83,7 +90,7 @@ public class PlanRules
 	public static void adoptPlan(IOAVState state, Object rcapa, Object rplan)
 	{
 //		System.out.println("adoptPlan: Setting plan to ready: "
-//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//				+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //				+", "+rplan);
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_plans, rplan);
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
@@ -114,7 +121,7 @@ public class PlanRules
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, reason);
 //		state.addAttributeValue(rcap, OAVBDIRuntimeModel.capability_has_plans, rplan);
 //		System.out.println("instantiatePlan: Setting plan to ready: "
-//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//				+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //				+", "+rplan);
 //		
 		if(fetcher==null)
@@ -256,7 +263,7 @@ public class PlanRules
 					Object	mbelset	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]);
 					Object	rbelset	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);
 					state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds, rbelset);
-					BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbelset);
+					BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(rbelset);
 				}
 			}
 
@@ -271,7 +278,7 @@ public class PlanRules
 					Object	mbelset	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]);
 					Object	rbelset	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);
 					state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbelset);
-					BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbelset);
+					BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(rbelset);
 				}
 			}
 			
@@ -289,14 +296,14 @@ public class PlanRules
 					{
 						Object	rbelset	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);
 						state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbelset);
-						BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbelset);
+						BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(rbelset);
 					}
 					else
 					{
 						Object	mbel	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0]);
 						Object	rbel	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel);
 						state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds, rbel);
-						BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(rbel);
+						BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(rbel);
 					}
 				}
 			}
@@ -315,7 +322,7 @@ public class PlanRules
 					Object	mscope	= state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
 					Object	mgoal	= state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_goals, scope[0]);
 					state.addAttributeValue(wqwa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds, mgoal);
-					BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(mgoal);
+					BDIAgentFeature.getInterpreter(state).getEventReificator().addObservedElement(mgoal);
 				}
 			}
 			
@@ -366,7 +373,7 @@ public class PlanRules
 	public static void abortPlan(IOAVState state, Object rcapa, Object rplan)
 	{
 //		System.out.println("abortPlan: Setting plan to ready: "
-//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//				+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //				+", "+rplan);
 		String ps = (String)state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate);
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED);
@@ -482,7 +489,7 @@ public class PlanRules
 				try
 				{
 					// todo: get plan executor for capability
-					BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(state);
+					BDIInterpreter	interpreter	= BDIAgentFeature.getInterpreter(state);
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
 					interpreter.getPlanExecutor(rplan).createPlanBody(interpreter, rcapa, rplan); // Hack
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
@@ -533,7 +540,7 @@ public class PlanRules
 				Object	rplan	= assignments.getVariableValue("?rplan");
 				Object	rcapa	= assignments.getVariableValue("?rcapa");
 				
-				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 				boolean interrupted = false;
 
 				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
@@ -556,7 +563,7 @@ public class PlanRules
 					// todo: can cause nullpointer when killAgent is called
 //		     		System.out.println("executePlanStep: "+ip.getComponentIdentifier()+", "+rplan+", "+
 //		     			state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
-					interrupted = ip.getPlanExecutor(rplan).executePlanStep(ip, rcapa, rplan); // Hack
+					interrupted = ip.getPlanExecutor(rplan).executePlanStep(BDIAgentFeature.getInternalAccess(state), rcapa, rplan); // Hack
 //		     		System.out.println("executePlanStep finished: "+ip.getComponentIdentifier()+", "+rplan);
 				}
 				catch(Exception e)
@@ -578,14 +585,14 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
+//						AgentRules.BDIAgentFeature.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).warning(ip.getAgentAdapter().getComponentIdentifier()+
+						BDIAgentFeature.getInterpreter(state).getLogger(rcapa).warning(BDIAgentFeature.getInternalAccess(state).getComponentIdentifier()+
 							": Exception while executing: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+"\n"+sw);
 					}
 					else
 					{
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
+						BDIAgentFeature.getInterpreter(state).getLogger(rcapa).info(BDIAgentFeature.getInternalAccess(state).getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -594,7 +601,7 @@ public class PlanRules
 				if(interrupted)
 				{
 //					System.out.println("createPlanBodyExecutionRule: Setting plan to ready: "
-//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//							+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+", "+rplan);
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
 						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
@@ -642,13 +649,13 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				boolean interrupted = false;
-				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 				ip.setCurrentPlan(rplan);
 				try
 				{
 					// todo: get plan executor for capability
 					// todo: can cause nullpointer when killAgent is called
-					interrupted = ip.getPlanExecutor(rplan).executePassedStep(ip, rplan); // Hack
+					interrupted = ip.getPlanExecutor(rplan).executePassedStep(BDIAgentFeature.getInternalAccess(state), rplan); // Hack
 				}
 				catch(Exception e)
 				{
@@ -662,14 +669,14 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
+//						AgentRules.BDIAgentFeature.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
+						BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe(BDIAgentFeature.getInternalAccess(state).getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
+						BDIAgentFeature.getInterpreter(state).getLogger(rcapa).info(BDIAgentFeature.getInternalAccess(state).getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -678,7 +685,7 @@ public class PlanRules
 				if(interrupted)
 				{
 //					System.out.println("createPlanPassedExecutionRule: Setting plan to ready: "
-//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//							+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+", "+rplan);
 					assert !OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED
 						.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate));
@@ -728,13 +735,13 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				boolean interrupted = false;
-				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 				ip.setCurrentPlan(rplan);
 				try
 				{
 					// todo: get plan executor for capability
 					// todo: can cause nullpointer when killAgent is called
-					interrupted = ip.getPlanExecutor(rplan).executeFailedStep(ip, rplan); // Hack
+					interrupted = ip.getPlanExecutor(rplan).executeFailedStep(BDIAgentFeature.getInternalAccess(state), rplan); // Hack
 				}
 				catch(Exception e)
 				{
@@ -748,14 +755,14 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
+//						AgentRules.BDIAgentFeature.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
+						BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe(BDIAgentFeature.getInternalAccess(state).getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
+						BDIAgentFeature.getInterpreter(state).getLogger(rcapa).info(BDIAgentFeature.getInternalAccess(state).getComponentIdentifier()+
 								": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -764,7 +771,7 @@ public class PlanRules
 				if(interrupted)
 				{
 //					System.out.println("createPlanFailedExecutionRule: Setting plan to ready: "
-//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//							+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+", "+rplan);
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
 						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
@@ -813,13 +820,13 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				boolean interrupted = false;
-				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 				ip.setCurrentPlan(rplan);
 				try
 				{
 					// todo: get plan executor for capability
 					// todo: can cause nullpointer when killAgent is called
-					interrupted = ip.getPlanExecutor(rplan).executeAbortedStep(ip, rplan); // Hack
+					interrupted = ip.getPlanExecutor(rplan).executeAbortedStep(BDIAgentFeature.getInternalAccess(state), rplan); // Hack
 				}
 				catch(Exception e)
 				{
@@ -833,14 +840,14 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
+//						AgentRules.BDIAgentFeature.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
+						BDIAgentFeature.getInterpreter(state).getLogger(rcapa).severe(BDIAgentFeature.getInternalAccess(state).getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
+						BDIAgentFeature.getInterpreter(state).getLogger(rcapa).info(BDIAgentFeature.getInternalAccess(state).getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -849,7 +856,7 @@ public class PlanRules
 				if(interrupted)
 				{
 //					System.out.println("createPlanAbortedExecutionRule: Setting plan to ready: "
-//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//							+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+", "+rplan);
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
 						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
@@ -932,7 +939,7 @@ public class PlanRules
 				Object	rcapa	= assignments.getVariableValue("?rcapa");
 				Object	rgoal	= assignments.getVariableValue("?rgoal");
 //				System.out.println("createPlanInstanceGoalFinishedRule: Setting plan to ready: "
-//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//						+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //						+", "+rplan);
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rgoal);
@@ -1074,7 +1081,7 @@ public class PlanRules
 				Object	rcapa	= assignments.getVariableValue("?rcapa");
 				Object	rgoal	= assignments.getVariableValue("?rgoal");
 //				System.out.println("createPlanInstanceMaintainGoalFinishedRule: Setting plan to ready: "
-//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//						+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //						+", "+rplan);
 //				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 //				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rgoal);
@@ -1993,7 +2000,7 @@ public class PlanRules
 			EventProcessingRules.schedulePlanInstanceCandidate(state, change, rplan, rcapa);
 			
 //			System.out.println("PLAN_CHANGEWAIT: Setting plan to ready: "
-//					+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//					+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //					+", "+rplan);
 		}
 	};
@@ -2042,7 +2049,7 @@ public class PlanRules
 				OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 
 //			System.out.println("PLAN_EXTERNALCONDITIONWAIT: Setting plan to ready: "
-//					+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
+//					+BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //					+", "+rplan);
 			
 //			System.out.println("Plan reactivated from external condition: "+rplan);
@@ -2121,22 +2128,24 @@ public class PlanRules
 				// timer runs on other thread.
 				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
 				
-//				System.out.println("Create timer: "+timeout+", "+BDIInterpreter.getInterpreter(state).getName()+", "+System.currentTimeMillis());
-				ITimer timer = BDIInterpreter.getInterpreter(state).getClockService().createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), toa));
+//				System.out.println("Create timer: "+timeout+", "+BDIAgentFeature.getInterpreter(state).getName()+", "+System.currentTimeMillis());
+				IClockService cs = SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				ITimer timer = cs.createTimer(timeout, new InterpreterTimedObject(BDIAgentFeature.getInternalAccess(state), toa));
 				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
 				
-//				System.out.println("Timer created: "+BDIInterpreter.getInterpreter(state).getName()+", "+System.currentTimeMillis());
+//				System.out.println("Timer created: "+BDIAgentFeature.getInterpreter(state).getName()+", "+System.currentTimeMillis());
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, timer);
 			}
 			else if(timeout==TICK_TIMER)
 			{
 				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
 				
-//				System.out.println("Create tick timer: "+BDIInterpreter.getInterpreter(state).getName());
-				ITimer timer = BDIInterpreter.getInterpreter(state).getClockService().createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), toa));
+//				System.out.println("Create tick timer: "+BDIAgentFeature.getInterpreter(state).getName());
+				IClockService cs = SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				ITimer timer = cs.createTickTimer(new InterpreterTimedObject(BDIAgentFeature.getInternalAccess(state), toa));
 				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
 
-//				System.out.println("Tick timer created: "+BDIInterpreter.getInterpreter(state).getName());
+//				System.out.println("Tick timer created: "+BDIAgentFeature.getInterpreter(state).getName());
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, timer);
 			}
 		}
@@ -2149,8 +2158,8 @@ public class PlanRules
 	 */
 	public static void doWait(IOAVState state, Object rplan)
 	{
-		IPlanExecutor exe = BDIInterpreter.getInterpreter(state).getPlanExecutor(rplan);
-		exe.eventWaitFor(BDIInterpreter.getInterpreter(state), rplan);
+		IPlanExecutor exe = BDIAgentFeature.getInterpreter(state).getPlanExecutor(rplan);
+		exe.eventWaitFor(BDIAgentFeature.getInternalAccess(state), rplan);
 	}
 	
 	/**
@@ -2284,7 +2293,7 @@ public class PlanRules
 		{
 			for(Iterator it=coll.iterator(); it.hasNext(); )
 			{
-				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+				BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
 			}
 		}
 		coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds);
@@ -2292,7 +2301,7 @@ public class PlanRules
 		{
 			for(Iterator it=coll.iterator(); it.hasNext(); )
 			{
-				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+				BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
 			}
 		}
 		coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds);
@@ -2300,7 +2309,7 @@ public class PlanRules
 		{
 			for(Iterator it=coll.iterator(); it.hasNext(); )
 			{
-				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+				BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
 			}
 		}
 		coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goalfinisheds);
@@ -2308,7 +2317,7 @@ public class PlanRules
 		{
 			for(Iterator it=coll.iterator(); it.hasNext(); )
 			{
-				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+				BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
 			}
 		}
 		coll	= state.getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_goals);
@@ -2316,7 +2325,7 @@ public class PlanRules
 		{
 			for(Iterator it=coll.iterator(); it.hasNext(); )
 			{
-				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
+				BDIAgentFeature.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
 			}
 		}
 	}
@@ -2389,6 +2398,6 @@ class TimeoutAction extends CheckedAction
 //		System.out.println("Timer occurred: ");
 		to[0] = true;
 		EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
-		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+		((IInternalExecutionFeature)BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class)).wakeup();
 	}
 }

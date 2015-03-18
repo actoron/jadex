@@ -1,7 +1,11 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -58,7 +62,7 @@ public class GoalProcessingRules
 			}
 			
 			// Reset event processing.
-//			BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+//			BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 //			if(rgoal.equals(state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing)))
 //				state.setAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 			
@@ -1082,8 +1086,8 @@ public class GoalProcessingRules
 			{
 //				// changed *.class to *.TYPE due to javaflow bug
 				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_retrytimer,
-					BDIInterpreter.getInterpreter(state).getClockService().createTimer(retrydelay, 
-						new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
+					SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(retrydelay, 
+						new InterpreterTimedObject(BDIAgentFeature.getInternalAccess(state), new CheckedAction()
 				{
 					public void run()
 					{
@@ -1256,8 +1260,8 @@ public class GoalProcessingRules
 				if(recurdelay>0)
 				{
 //					// changed *.class to *.TYPE due to javaflow bug
-//					IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform().getService(IClockService.class);
-					IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform().getService(IClockService.TYPE);
+//					IClockService clock = (IClockService)BDIAgentFeature.getInterpreter(state).getAgentAdapter().getPlatform().getService(IClockService.class);
+					IClockService clock = (IClockService)BDIAgentFeature.getInterpreter(state).getAgentAdapter().getPlatform().getService(IClockService.TYPE);
 					state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_recurtimer, clock.createTimer(recurdelay, 
 						new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
 					{
@@ -1327,8 +1331,8 @@ public class GoalProcessingRules
 				if(recurdelay>0)
 				{
 					state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_recurtimer,
-						BDIInterpreter.getInterpreter(state).getClockService().createTimer(recurdelay, 
-							new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
+						SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(recurdelay, 
+							new InterpreterTimedObject(BDIAgentFeature.getInternalAccess(state), new CheckedAction()
 					{
 						public void run()
 						{

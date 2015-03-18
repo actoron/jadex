@@ -35,7 +35,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	 */
 	public static ExpressionbaseFlyweight getExpressionbaseFlyweight(IOAVState state, Object scope)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		ExpressionbaseFlyweight ret = (ExpressionbaseFlyweight)ip.getFlyweightCache(IExpressionbase.class, new Tuple(IExpressionbase.class, scope));
 		if(ret==null)
 		{

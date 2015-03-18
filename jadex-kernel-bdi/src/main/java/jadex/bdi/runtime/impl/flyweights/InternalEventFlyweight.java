@@ -31,7 +31,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	 */
 	public static InternalEventFlyweight getInternalEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		InternalEventFlyweight ret = (InternalEventFlyweight)ip.getFlyweightCache(IInternalEvent.class, new Tuple(IInternalEvent.class, handle));
 		if(ret==null)
 		{

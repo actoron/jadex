@@ -41,7 +41,7 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 	 */
 	public static PlanbaseFlyweight getPlanbaseFlyweight(IOAVState state, Object scope)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		PlanbaseFlyweight ret = (PlanbaseFlyweight)ip.getFlyweightCache(IPlanbase.class, new Tuple(IPlanbase.class, scope));
 		if(ret==null)
 		{

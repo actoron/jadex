@@ -42,7 +42,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public static EventbaseFlyweight getEventbaseFlyweight(IOAVState state, Object scope)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		EventbaseFlyweight ret = (EventbaseFlyweight)ip.getFlyweightCache(IEventbase.class, new Tuple(IEventbase.class, scope));
 		if(ret==null)
 		{

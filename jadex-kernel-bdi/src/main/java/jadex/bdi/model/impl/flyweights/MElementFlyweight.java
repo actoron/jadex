@@ -51,7 +51,7 @@ public class MElementFlyweight implements IMElement, IMEElement
 		if(scope!=null)
 			state.addExternalObjectUsage(scope, this);
 		
-		this.interpreter = BDIInterpreter.getInterpreter(state);
+		this.interpreter = BDIAgentFeature.getInterpreter(state);
 		setHandle(handle);
 	}
 	

@@ -1,6 +1,9 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -97,7 +100,7 @@ public class GoalLifecycleRules
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_goals, rgoal);
 		
 		// Hack!!! Only needed for external access!
-		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+		((IInternalExecutionFeature)BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class)).wakeup();
 	}
 	
 	/**
@@ -500,7 +503,7 @@ public class GoalLifecycleRules
 	protected static void exitActiveState(IOAVState state, Object rgoal)
 	{
 		// Reset eventprocessing to null to allow other elements being processed.
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		if(rgoal.equals(state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing)))
 			state.setAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.agent_has_eventprocessing, null);
 		

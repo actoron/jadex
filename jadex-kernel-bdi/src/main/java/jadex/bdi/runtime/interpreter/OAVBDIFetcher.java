@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IParameterElement;
@@ -14,7 +15,7 @@ import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
-import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.state.IOAVState;
@@ -32,7 +33,7 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 	protected IOAVState state;
 	
 	/** The agent adapter. */
-	protected IComponentAdapter adapter;
+	protected IInternalAccess agent;
 	
 	/** The capability. */
 	protected Object rcapa;
@@ -57,7 +58,7 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 	public OAVBDIFetcher(IOAVState state, Object rcapa)
 	{
 		this.state = state;
-		this.adapter = BDIInterpreter.getInterpreter(state).getAgentAdapter();
+		this.agent = BDIAgentFeature.getInternalAccess(state);
 		this.rcapa = rcapa;
 	}
 	
@@ -106,8 +107,8 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 			ret = EventbaseFlyweight.getEventbaseFlyweight(state, rcapa);
 		else if(name.equals("$expressionbase"))
 			ret = ExpressionbaseFlyweight.getExpressionbaseFlyweight(state, rcapa);
-		else if(name.equals("$properties"))
-			ret = BDIInterpreter.getInterpreter(state).getProperties();
+//		else if(name.equals("$properties"))
+//			ret = BDIAgentFeature.getInterpreter(state).getProperties();
 		else if(name.equals("$goal") && rgoal!=null)
 			ret = GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal);
 		else if(name.equals("$event") && rmessageevent!=null)

@@ -37,7 +37,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public static WaitAbstractionFlyweight getWaitAbstractionFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		WaitAbstractionFlyweight ret = (WaitAbstractionFlyweight)ip.getFlyweightCache(IWaitAbstraction.class, new Tuple(IWaitAbstraction.class, handle));
 		if(ret==null)
 		{

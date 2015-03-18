@@ -1,6 +1,8 @@
-package jadex.bdi.runtime.interpreter;
+package jadex.bdi.features.impl;
+
 
 import jadex.base.Starter;
+import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.OAVCapabilityModel;
@@ -18,6 +20,7 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.GoalDelegationHandler;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
+import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -104,7 +107,7 @@ import java.util.logging.SimpleFormatter;
  *  and performing the agent execution when
  *  being called from the platform.
  */
-public class BDIInterpreter	extends StatelessAbstractInterpreter
+public class BDIAgentFeature 
 {
 	//-------- static part --------
 	
@@ -128,8 +131,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The rule system. */
 	protected RuleSystem rulesystem;
 	
-	/** The platform adapter for the agent. */
-	protected IComponentAdapter	adapter;
+//	/** The platform adapter for the agent. */
+//	protected IComponentAdapter	adapter;
 	
 	/** The parent of the agent (if any). */
 	protected IExternalAccess	parent;
@@ -1363,7 +1366,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				{
 					if(!notified[0])
 					{
-						if(BDIInterpreter.getInterpreter(state)!=null)
+						if(BDIAgentFeature.getInterpreter(state)!=null)
 						{
 //							System.err.println("Waiting: "+state);
 							getAgentAdapter().getLogger().warning("Executing synchronized code (might lead to deadlocks): "+code);
@@ -1754,9 +1757,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Get the interpreter for an agent object.
 	 */
-	public static BDIInterpreter	getInterpreter(IOAVState state)
+//	public static BDIInterpreter	getInterpreter(IOAVState state)
+	public static IBDIAgentFeature getInterpreter(IOAVState state)
 	{
-		return (BDIInterpreter)interpreters.get(state);
+		return ((IInternalAccess)interpreters.get(state)).getComponentFeature(IBDIAgentFeature.class);
+	}
+	
+	public static IInternalAccess getInternalAccess(IOAVState state)
+	{
+		return (IInternalAccess)interpreters.get(state);
 	}
 
 	/** The (global) rulebase. */

@@ -2,7 +2,11 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.commons.future.IFuture;
 
 /**
  *  This timed object ensures that timed objects are executed
@@ -13,7 +17,7 @@ public class InterpreterTimedObject implements ITimedObject
 	//-------- attributes --------
 		
 	/** The component instance. */
-	protected BDIInterpreter interpreter;
+	protected IInternalAccess interpreter;
 	
 	/** The runnable. */
 	protected CheckedAction action;
@@ -23,7 +27,7 @@ public class InterpreterTimedObject implements ITimedObject
 	/**
 	 *  Create a new timed object.
 	 */
-	public InterpreterTimedObject(BDIInterpreter interpreter, CheckedAction action)
+	public InterpreterTimedObject(IInternalAccess interpreter, CheckedAction action)
 	{
 		this.interpreter = interpreter;
 		this.action = action;
@@ -41,7 +45,15 @@ public class InterpreterTimedObject implements ITimedObject
 //		System.out.println("timeEventOccurred: "+this+", "+System.currentTimeMillis());
 		try
 		{
-			interpreter.scheduleStep(action, null);
+			interpreter.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					if(action.isValid())
+						action.run();
+					return IFuture.DONE;
+				}
+			});
 		}
 		catch(ComponentTerminatedException e)
 		{
@@ -63,6 +75,6 @@ public class InterpreterTimedObject implements ITimedObject
 	 */
 	public String	toString()
 	{
-		return interpreter.getAgentAdapter().getComponentIdentifier().getLocalName() + ": " + action; 
+		return interpreter.getComponentIdentifier().getLocalName() + ": " + action; 
 	}
 }

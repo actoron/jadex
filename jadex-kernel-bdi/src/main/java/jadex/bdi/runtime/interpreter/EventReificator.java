@@ -1,9 +1,15 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -235,7 +241,7 @@ public class EventReificator implements IOAVStateListener
 //						synchronized(unrefs)
 //						{
 //							unrefs.add(fid);
-//							BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
+//							BDIInterpreter	bdii	= BDIAgentFeature.getInterpreter(state);
 //							if(bdii!=null)
 //								System.out.println("+ext.referenced plans("+bdii.getAgentAdapter().getComponentIdentifier().getLocalName()+"): "+unrefs);
 //						}
@@ -253,7 +259,7 @@ public class EventReificator implements IOAVStateListener
 //						synchronized(unrefs)
 //						{
 //							unrefs.remove(fid);
-//							BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
+//							BDIInterpreter	bdii	= BDIAgentFeature.getInterpreter(state);
 //							if(bdii!=null)
 //								System.out.println("-ext.referenced plans("+bdii.getAgentAdapter().getComponentIdentifier().getLocalName()+"): "+unrefs);
 //						}
@@ -346,7 +352,7 @@ public class EventReificator implements IOAVStateListener
 //		Collection componentlisteners = state.getAttributeValues(agent, OAVBDIRuntimeModel.agent_has_componentlisteners);
 //		if (componentlisteners != null && !componentlisteners.isEmpty())
 //		{
-//			BDIInterpreter bdiint = BDIInterpreter.getInterpreter(state);
+//			BDIInterpreter bdiint = BDIAgentFeature.getInterpreter(state);
 //			long time = bdiint.getClockService().getTime();
 //			ComponentChangeEvent event = new ComponentChangeEvent();
 //			event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
@@ -474,21 +480,22 @@ public class EventReificator implements IOAVStateListener
 	protected void fireComponentChangeEvent(IOAVState state, Object element, Object scope, String type, Object value)
 	{
 //		Collection componentlisteners = state.getAttributeValues(agent, OAVBDIRuntimeModel.agent_has_componentlisteners);
-		BDIInterpreter bdiint = BDIInterpreter.getInterpreter(state);
+		IInternalAccess bdiint = BDIAgentFeature.getInternalAccess(state);
 		
 //		if(componentlisteners != null && !componentlisteners.isEmpty())
 		
-		if(bdiint.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(bdiint.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
-//			BDIInterpreter bdiint = BDIInterpreter.getInterpreter(state);
-			long time = bdiint.getClockService().getTime();
+//			BDIInterpreter bdiint = BDIAgentFeature.getInterpreter(state);
+			IClockService cs = SServiceProvider.getLocalService(bdiint, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			long time = cs.getTime();//bdiint.getClockService().getTime();
 //			ComponentChangeEvent event = new ComponentChangeEvent();
 			MonitoringEvent event = new MonitoringEvent();
 			event.setLevel(PublishEventLevel.FINE);
 //			event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
-			event.setSourceIdentifier(bdiint.getAgentAdapter().getComponentIdentifier());
+			event.setSourceIdentifier(bdiint.getComponentIdentifier());
 			if(scope == null)
-				scope = bdiint.getAgent();
+				scope = BDIAgentFeature.getInterpreter(state).getAgent();
 			
 			event.setTime(time);
 			// todo:
@@ -640,7 +647,7 @@ public class EventReificator implements IOAVStateListener
 			}
 			
 //			bdiint.notifyListeners(event);
-			bdiint.publishEvent(event, PublishTarget.TOALL);
+			bdiint.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL);
 		}
 	}
 }

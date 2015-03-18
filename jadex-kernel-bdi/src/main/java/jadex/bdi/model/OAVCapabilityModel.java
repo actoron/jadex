@@ -497,6 +497,15 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		return modelinfo;
 	}
 	
+	/**
+	 *  The modelinfo to set.
+	 *  @param modelinfo The modelinfo to set
+	 */
+	public void setModelInfo(ModelInfo modelinfo)
+	{
+		this.modelinfo = modelinfo;
+	}
+	
 	//-------- error stuff --------
 	
 	/**

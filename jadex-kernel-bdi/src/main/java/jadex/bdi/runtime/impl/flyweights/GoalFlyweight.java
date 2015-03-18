@@ -36,7 +36,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public static GoalFlyweight getGoalFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		GoalFlyweight ret = (GoalFlyweight)ip.getFlyweightCache(IGoal.class, new Tuple(IGoal.class, handle));
 		if(ret==null)
 		{

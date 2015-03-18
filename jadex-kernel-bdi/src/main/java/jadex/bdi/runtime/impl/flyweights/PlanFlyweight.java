@@ -34,7 +34,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public static PlanFlyweight getPlanFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
 		PlanFlyweight ret = (PlanFlyweight)ip.getFlyweightCache(IPlan.class, new Tuple(IPlan.class, handle));
 		if(ret==null)
 		{
