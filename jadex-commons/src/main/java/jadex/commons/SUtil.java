@@ -82,7 +82,7 @@ import java.util.zip.ZipOutputStream;
 public class SUtil
 {
 	/** Directory were jadex stores files generated during runtime, to be used for later runs. */
-	public static final File	JADEXDIR	= new File("./.jadex");
+	public static final String	JADEXDIR	= "./.jadex/";
 	
 	/** Line separator. */
 	public static final String LF = System.getProperty("line.separator");
@@ -4607,7 +4607,7 @@ public class SUtil
 	 */
 	protected static void	saveHashCache()
 	{
-		File	cache	= new File(JADEXDIR, "hash.cache");
+		File	cache	= new File(JADEXDIR, "hash.cache"); // TODO: will not work for android, needs writable dir!
 		try
 		{
 			cache.getParentFile().mkdirs();

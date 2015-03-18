@@ -104,7 +104,8 @@ public class ThrowableCodec extends AbstractCodec
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException(e);
+				RuntimeException rte = new RuntimeException("No empty constructor found for class: " + clazz.getName(), e);
+				throw rte;
 			}
 		}
 		

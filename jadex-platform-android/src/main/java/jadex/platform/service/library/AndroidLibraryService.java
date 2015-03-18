@@ -1,7 +1,6 @@
 package jadex.platform.service.library;
 
 import jadex.android.commons.Logger;
-import jadex.android.exception.JadexAndroidError;
 import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
@@ -9,9 +8,8 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -23,14 +21,12 @@ import android.util.Log;
  * Library service for loading classpath elements on Android devices.
  */
 @Service(ILibraryService.class)
-@RequiredServices(
-{@RequiredService(name = "context", type = IContextService.class)})
+@RequiredServices({
+	@RequiredService(name="contextService", type=IContextService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+})
 public class AndroidLibraryService extends LibraryService
 {
 	private static final String LOG_TAG = "AndroidLibraryService";
-
-	@AgentService
-	private IContextService contextService;
 
 	private DelegationClassLoader androidBaseLoader;
 
