@@ -152,7 +152,7 @@ public class RelayHandler
 						{
 							AwarenessInfo	awainfo	= info.getAwarenessInfo();
 							awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-							sendAwarenessInfos(awainfo, defcodecs, false);
+							sendAwarenessInfos(awainfo, defcodecs, false, false);
 						}
 					}
 				}
@@ -342,7 +342,7 @@ public class RelayHandler
 			{
 //				System.out.println("Sending offline info: "+id);
 				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-				sendAwarenessInfos(awainfo, platform.getPreferredCodecs(), true);
+				sendAwarenessInfos(awainfo, platform.getPreferredCodecs(), true, false);
 			}
 			else if(platform!=null)
 			{
@@ -445,6 +445,7 @@ public class RelayHandler
 		// Update platform awareness info.
 		String	id	= info.getSender().getPlatformName();
 		PlatformInfo	platform	= platforms.get(id);
+		boolean	initial	= platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(info.getState());
 		if(platform!=null)
 		{
 			platform.setAwarenessInfo(info);
@@ -456,7 +457,7 @@ public class RelayHandler
 			}				
 		}
 		
-		sendAwarenessInfos(info, pcodecs, true);
+		sendAwarenessInfos(info, pcodecs, true, initial);
 	}
 	
 	/**
@@ -496,7 +497,7 @@ public class RelayHandler
 			if(awainfo!=null)
 			{
 				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-				sendAwarenessInfos(awainfo, platform.getPreferredCodecs(), true);
+				sendAwarenessInfos(awainfo, platform.getPreferredCodecs(), true, false);
 			}
 			else if(platform!=null)
 			{
@@ -539,7 +540,7 @@ public class RelayHandler
 		peer.updatePlatformInfo(info);
 		if(info.getAwarenessInfo()!=null)
 		{
-			sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false);
+			sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false, false);
 		}			
 	}
 	
@@ -579,7 +580,7 @@ public class RelayHandler
 			peer.updatePlatformInfo(info);
 			if(info.getAwarenessInfo()!=null)
 			{
-				sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false);
+				sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false, false);
 				old.remove(info.getId());
 			}
 		}
@@ -589,7 +590,7 @@ public class RelayHandler
 		{
 			AwarenessInfo	awainfo	= info.getAwarenessInfo();
 			awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-			sendAwarenessInfos(awainfo, pcodecs, false);
+			sendAwarenessInfos(awainfo, pcodecs, false, false);
 		}
 	}
 	
@@ -700,7 +701,7 @@ public class RelayHandler
 	/**
 	 *  Send awareness messages for a new or changed awareness info.
 	 */
-	protected void	sendAwarenessInfos(AwarenessInfo awainfo, ICodec[] pcodecs, boolean local)
+	protected void	sendAwarenessInfos(AwarenessInfo awainfo, ICodec[] pcodecs, boolean local, boolean initial)
 	{
 //		System.out.println("sending awareness infos: "+awainfo.getSender().getPlatformName()+", "+platforms.size());
 		
@@ -712,8 +713,6 @@ public class RelayHandler
 		// afterwards local detects remote is down and wants to send offline info for already reconnected platform)
 		if(platform==null || local)
 		{
-			boolean	initial	= local && platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(awainfo.getState());
-			
 			byte[]	propinfo	= null;
 			byte[]	nopropinfo	= null;
 			
