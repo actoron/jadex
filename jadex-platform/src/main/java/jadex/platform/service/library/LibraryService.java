@@ -31,6 +31,7 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -71,23 +72,18 @@ import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Logger;
 
 /**
  *  Library service for loading classpath elements.
  */
 @Service(ILibraryService.class)
-@RequiredServices({
-	@RequiredService(name="contextService", type=IContextService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
-})
 public class LibraryService	implements ILibraryService, IPropertiesProvider
 {
 	//-------- constants --------
 	
 	/** The (standard) Library service name. */
 	public static final String LIBRARY_SERVICE = "library_service";
-	
-	@AgentService(name="contextService")
-	protected IContextService contextService;
 	
 	/** The pseudo system classpath rid. */
 	public static final IResourceIdentifier SYSTEMCPRID;
@@ -975,8 +971,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		IContextService localService = SServiceProvider.getLocalService(component.getExternalAccess().getServiceProvider(), IContextService.class);
 		// use contextService to get private data dir on android
 		IFuture<File> future = localService.getFile(SUtil.JADEXDIR + "resources/"+name);
-//		IFuture<File> future2 = contextService.getFile(SUtil.JADEXDIR + "resources/"+name);
-		File file = future.get(new ThreadSuspendable());  
+		File file = future.get();
 		return file;
 	}
 	

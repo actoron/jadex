@@ -121,6 +121,8 @@ public class AndroidContextService extends BasicService implements AndroidContex
 			// workaround: try once more :(
 			filesDir = context.getFilesDir();
 		}
+		File result = new File(filesDir, name);
+		System.out.println("constructed file: " + result);
 		if (filesDir == null) {
 			// still null, so create directory
 			Logger.e("Context.getFilesDir() returned null. This is a known bug, trying to use custom path instead...");
@@ -128,10 +130,11 @@ public class AndroidContextService extends BasicService implements AndroidContex
 			if (!filesDir.exists()) {
 				filesDir.mkdirs();
 			}
-			File dataDir = new File(filesDir, name);
+			File dataDir = result;
 			return new Future<File>(dataDir);
 		} else {
-			return new Future<File>(context.getFileStreamPath(name));
+			return new Future<File>(result);
+//			return new Future<File>(context.getFileStreamPath(name));
 		}
 	}
 

@@ -21,9 +21,6 @@ import android.util.Log;
  * Library service for loading classpath elements on Android devices.
  */
 @Service(ILibraryService.class)
-@RequiredServices({
-	@RequiredService(name="contextService", type=IContextService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
-})
 public class AndroidLibraryService extends LibraryService
 {
 	private static final String LOG_TAG = "AndroidLibraryService";
