@@ -274,7 +274,7 @@ public class PeerList
 	 */
 	public PeerEntry	addPeer(String peerurl, boolean initial)
 	{
-		return addPeer(peerurl, null, 0, initial);
+		return addPeer(peerurl, null, -1, initial);
 	}
 	
 	/**
@@ -329,10 +329,14 @@ public class PeerList
 					new Thread(handler).start();
 				}
 				
-				// Start db synchronization.
-				if(peerid!=null && peerstate!=-1 && db!=null
-					&& db.getLatestEntry(peerid)<peerstate)
+				// DB synchronization.
+				if(peerid!=null && peerstate!=-1)
 				{
+					PeerHandler	handler	= handlers.get(peerurl);
+					if(handler!=null)
+					{
+						handler.setPeerState(peerid, peerstate);
+					}
 				}
 			}
 		}
@@ -379,6 +383,12 @@ public class PeerList
 		/** The peer. */
 		protected PeerEntry	peer;
 		
+		/** The peer id (null, if unknown). */
+		protected String	peerid;
+		
+		/** The latest known remote peer state (-1 for none). */
+		protected int	peerstate;
+		
 		/** The shutdown flag. */
 		protected boolean	shutdown;
 		
@@ -390,6 +400,8 @@ public class PeerList
 		public PeerHandler(PeerEntry peer)
 		{
 			this.peer = peer;
+			this.peerid	= null;
+			this.peerstate	= -1;
 		}
 		
 		//-------- methods --------
@@ -401,68 +413,99 @@ public class PeerList
 		{
 			while(!shutdown)
 			{
-				boolean	connected	= peer.isConnected();
-				try
+				// Perform DB synchronization, if required.
+				if(peerstate!=-1 && db!=null)
 				{
-					// Try to connect and add new peers, if any.
-//					peer.addDebugText("Pinging peer");
-					int	dbstate	= db!=null ? db.getLatestEntry(id) : -1;
-					String	servers	= conman.getPeerServers(peer.getUrl(), url, id, dbstate, !peer.isConnected());
-					peer.setConnected(true);
-					for(StringTokenizer stok=new StringTokenizer(servers, ","); stok.hasMoreTokens(); )
+					int	localstate	= db.getLatestEntry(peerid);
+					if(localstate<peerstate)
 					{
-						addPeer(stok.nextToken().trim(), false);
+						RelayHandler.getLogger().info("DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
+						// Todo: fetch update from remote peer
+						// conman.getDBUpdate(peer.getUrl(), localstate);
+						peerstate	= -1;
 					}
-				}
-				catch(IOException e)
-				{
-					peer.addDebugText("Exception pinging peer: "+e);
-					peer.setConnected(false);
 				}
 				
-				if(peer.isConnected())
-				{
-					if(connected!=peer.isConnected())
-					{
-						informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_ONLINE, peer));
-					}
-					
-					synchronized(this)
-					{
-						try
-						{
-							this.wait(DELAY_ONLINE);
-						}
-						catch(InterruptedException e)
-						{
-						}
-					}
-				}
-				else if(peer.isInitial())
-				{
-					if(connected!=peer.isConnected())
-					{
-						informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_OFFLINE, peer));
-					}
-
-					synchronized(this)
-					{
-						try
-						{
-							this.wait(DELAY_OFFLINE);
-						}
-						catch(InterruptedException e)
-						{
-						}
-					}
-				}
+				// Else ping remote peer
 				else
 				{
-					shutdown	= true;
-					peers.remove(peer.getUrl());
-					handlers.remove(peer.getUrl());
-					informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_REMOVED, peer));
+					boolean	connected	= peer.isConnected();
+					try
+					{
+						// Try to connect and add new peers, if any.
+	//					peer.addDebugText("Pinging peer");
+						int	dbstate	= db!=null ? db.getLatestEntry(id) : -1;
+						String	servers	= conman.getPeerServers(peer.getUrl(), url, id, dbstate, !peer.isConnected());
+						peer.setConnected(true);
+						for(StringTokenizer stok=new StringTokenizer(servers, ","); stok.hasMoreTokens(); )
+						{
+							addPeer(stok.nextToken().trim(), false);
+						}
+					}
+					catch(IOException e)
+					{
+						peer.addDebugText("Exception pinging peer: "+e);
+						peer.setConnected(false);
+					}
+					
+					if(peer.isConnected())
+					{
+						if(connected!=peer.isConnected())
+						{
+							informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_ONLINE, peer));
+						}
+						
+						synchronized(this)
+						{
+							try
+							{
+								this.wait(DELAY_ONLINE);
+							}
+							catch(InterruptedException e)
+							{
+							}
+						}
+					}
+					else if(peer.isInitial())
+					{
+						if(connected!=peer.isConnected())
+						{
+							informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_OFFLINE, peer));
+						}
+	
+						synchronized(this)
+						{
+							try
+							{
+								this.wait(DELAY_OFFLINE);
+							}
+							catch(InterruptedException e)
+							{
+							}
+						}
+					}
+					else
+					{
+						shutdown	= true;
+						peers.remove(peer.getUrl());
+						handlers.remove(peer.getUrl());
+						informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_REMOVED, peer));
+					}
 				}
+			}
+		}
+		
+		/**
+		 *  Set the peer state received from remote.
+		 *  Starts db synchronization, if necessary.
+		 */
+		public void	setPeerState(String peerid, int peerstate)
+		{
+			this.peerid	= peerid;
+			this.peerstate	= peerstate;
+			synchronized(this)
+			{
+				this.notify();
 			}
 		}
 		
