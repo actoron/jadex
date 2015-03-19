@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MGoalbaseFlyweight;
@@ -7,7 +9,6 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
@@ -38,7 +39,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public static GoalbaseFlyweight getGoalbaseFlyweight(IOAVState state, Object scope)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		GoalbaseFlyweight ret = (GoalbaseFlyweight)ip.getFlyweightCache(IGoalbase.class, new Tuple(IGoalbase.class, scope));
 		if(ret==null)
 		{
@@ -67,7 +68,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public boolean containsGoal(final IGoal goal)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -93,7 +94,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public IGoal[] getGoals(final String type)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -116,7 +117,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public IGoal[] getGoals()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -142,7 +143,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public IGoal createGoal(final String type)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -165,7 +166,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public void	dispatchTopLevelGoal(final IGoal goal)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -177,9 +178,9 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 		}
 		else
 		{
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			GoalLifecycleRules.adoptGoal(getState(), ((ElementFlyweight)goal).getScope(), ((ElementFlyweight)goal).getHandle());		
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -228,7 +229,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public void addGoalListener(final String type, final IGoalListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -254,7 +255,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public void removeGoalListener(final String type, final IGoalListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -280,7 +281,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

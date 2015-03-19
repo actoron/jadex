@@ -113,7 +113,7 @@ public class GoalProcessingRules
 	/**
 	 *  Create performgoal processing rule.
 	 */
-	protected static Rule createPerformgoalProcessingRule()
+	public static Rule createPerformgoalProcessingRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
@@ -134,7 +134,7 @@ public class GoalProcessingRules
 	 *  Create the performgoal finished rule.
 	 *  A perform goal is finished when not rebuild and last plan finished.
 	 */
-	protected static Rule createPerformgoalFinishedRule()
+	public static Rule createPerformgoalFinishedRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
@@ -205,7 +205,7 @@ public class GoalProcessingRules
 	/**
 	 *  Create achievegoal processing rule.
 	 */
-	protected static Rule createAchievegoalProcessingRule()
+	public static Rule createAchievegoalProcessingRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
@@ -226,7 +226,7 @@ public class GoalProcessingRules
 	 *  Create the achievegoal succeeded rule (for goals without target condition).
 	 *  The goal succeeds, when one plan succeeds.
 	 */
-	protected static Rule createAchievegoalSucceededRule()
+	public static Rule createAchievegoalSucceededRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
@@ -388,7 +388,7 @@ public class GoalProcessingRules
 	 *  !hastarget -> no more plans and last one failed
 	 *  no more plan = (!retry || (rebuild=false && apl==null)) (in case rebuild=true buildAPL will be called)
 	 */
-	protected static Rule createAchievegoalFailedRule()
+	public static Rule createAchievegoalFailedRule()
 	{
 		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
@@ -478,7 +478,7 @@ public class GoalProcessingRules
 	 *  Retry a goal when retry=true, posttoall=false, (rebuild=true || apl!=null), plan finished,
 	 *  (planstate=failed || targetcondition!=null)
 	 */
-	protected static Rule createAchievegoalRetryRule()
+	public static Rule createAchievegoalRetryRule()
 	{
 		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
@@ -521,7 +521,7 @@ public class GoalProcessingRules
 	/**
 	 *  Create querygoal processing rule.
 	 */
-	protected static Rule createQuerygoalProcessingRule()
+	public static Rule createQuerygoalProcessingRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		
@@ -541,7 +541,7 @@ public class GoalProcessingRules
 	/**
 	 *  Create the querygoal succeeded rule.
 	 */
-	protected static Rule createQuerygoalSucceededRule()
+	public static Rule createQuerygoalSucceededRule()
 	{
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.querygoal_type);
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
@@ -728,7 +728,7 @@ public class GoalProcessingRules
 	 *  recur=true -> never failed
 	 *  no more plan = (!retry || (rebuild=false && apl==null)) (in case rebuild=true buildAPL will be called)	
 	 */
-	protected static Rule createQuerygoalFailedRule()
+	public static Rule createQuerygoalFailedRule()
 	{
 		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
@@ -1195,7 +1195,7 @@ public class GoalProcessingRules
 	 *  Create the goal failed rule (when no plans available).
 	 *  (state = nocandidates, recur = false)
 	 */
-	protected static Rule createGoalFailedRule()
+	public static Rule createGoalFailedRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 
@@ -1296,7 +1296,7 @@ public class GoalProcessingRules
 	 *  @param state The state.
 	 *  @param rgoal The goal.
 	 */
-	protected static Rule createGoalRecurRule()
+	public static Rule createGoalRecurRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		

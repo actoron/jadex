@@ -96,7 +96,7 @@ public class ListenerRules
 	/**
 	 *  Create a rule to notify belief listeners, when a belief has changed.
 	 */
-	protected static Rule createBeliefChangedListenerRule()
+	public static Rule createBeliefChangedListenerRule()
 	{
 		Variable rbelief = new Variable("?rbelief", OAVBDIRuntimeModel.belief_type);
 		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
@@ -233,7 +233,7 @@ public class ListenerRules
 	/**
 	 *  Create a rule to notify belief listeners, when a fact is removed.
 	 */
-	protected static Rule createBeliefSetListenerRule()
+	public static Rule createBeliefSetListenerRule()
 	{
 		Variable rbeliefset = new Variable("?rbeliefset", OAVBDIRuntimeModel.beliefset_type);
 		Variable listenerentry = new Variable("?listenerentry", OAVBDIRuntimeModel.listenerentry_type);
@@ -290,7 +290,7 @@ public class ListenerRules
 	/**
 	 *  Create a rule to internal event listeners.
 	 */
-	protected static Rule createInternalEventListenerRule()
+	public static Rule createInternalEventListenerRule()
 	{
 		Variable revent = new Variable("?revent", OAVBDIRuntimeModel.internalevent_type);
 		Variable mevent = new Variable("?mevent", OAVBDIMetaModel.internalevent_type);
@@ -351,7 +351,7 @@ public class ListenerRules
 	/**
 	 *  Create a rule to message event listeners.
 	 */
-	protected static Rule createMessageEventListenerRule()
+	public static Rule createMessageEventListenerRule()
 	{
 		Variable revent = new Variable("?revent", OAVBDIRuntimeModel.messageevent_type);
 		Variable mevent = new Variable("?mevent", OAVBDIMetaModel.messageevent_type);
@@ -416,7 +416,7 @@ public class ListenerRules
 	/**
 	 *  Create a rule to notify goal listeners.
 	 */
-	protected static Rule createGoalListenerRule()
+	public static Rule createGoalListenerRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
@@ -502,7 +502,7 @@ public class ListenerRules
 	/**
 	 *  Create a rule to plan listeners.
 	 */
-	protected static Rule createPlanListenerRule()
+	public static Rule createPlanListenerRule()
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable mplan = new Variable("?mplan", OAVBDIMetaModel.plan_type);

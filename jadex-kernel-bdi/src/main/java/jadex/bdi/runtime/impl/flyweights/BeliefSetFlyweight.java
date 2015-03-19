@@ -1,11 +1,12 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MBeliefSetFlyweight;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
@@ -36,7 +37,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public static BeliefSetFlyweight getBeliefSetFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		BeliefSetFlyweight ret = (BeliefSetFlyweight)ip.getFlyweightCache(IBeliefSet.class, new Tuple(IBeliefSet.class, handle));
 		if(ret==null)
 		{
@@ -54,7 +55,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public void addFact(final Object fact)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -66,9 +67,9 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 		}
 		else
 		{
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			BeliefRules.addBeliefSetValue(getState(), getHandle(), fact, getScope());
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -78,7 +79,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public void removeFact(final Object fact)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -90,9 +91,9 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 		}
 		else
 		{
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			SFlyweightFunctionality.removeFact(getState(), getHandle(), fact, getScope());
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -102,7 +103,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public void addFacts(final Object[] facts)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -114,9 +115,9 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 		}
 		else
 		{
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			SFlyweightFunctionality.addFacts(getState(), getHandle(), facts, getScope());
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -125,7 +126,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public void removeFacts()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -147,7 +148,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public Object getFact(final Object oldval)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -171,7 +172,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public boolean containsFact(final Object fact)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -194,7 +195,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public Object[]	getFacts()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -218,7 +219,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public void updateFact(final Object newfact)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -230,9 +231,9 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 		}
 		else
 		{
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			SFlyweightFunctionality.updateFact(getState(), getHandle(), newfact, getScope());
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -243,7 +244,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public int size()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -269,21 +270,21 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public void modified(final Object fact)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
 				public void run()
 				{
-					getInterpreter().getEventReificator().objectModified(getHandle(), getState().getType(getHandle()), OAVBDIRuntimeModel.beliefset_has_facts, fact, fact);
+					getBDIFeature().getEventReificator().objectModified(getHandle(), getState().getType(getHandle()), OAVBDIRuntimeModel.beliefset_has_facts, fact, fact);
 				}
 			};
 		}
 		else
 		{
-			getInterpreter().startMonitorConsequences();
-			getInterpreter().getEventReificator().objectModified(getHandle(), getState().getType(getHandle()), OAVBDIRuntimeModel.beliefset_has_facts, fact, fact);
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
+			getBDIFeature().getEventReificator().objectModified(getHandle(), getState().getType(getHandle()), OAVBDIRuntimeModel.beliefset_has_facts, fact, fact);
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -308,7 +309,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public Class getClazz()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -358,7 +359,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public void addBeliefSetListener(final IBeliefSetListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -380,7 +381,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public void removeBeliefSetListener(final IBeliefSetListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -404,7 +405,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

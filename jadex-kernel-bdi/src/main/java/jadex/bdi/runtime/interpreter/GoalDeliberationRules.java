@@ -47,7 +47,7 @@ public class GoalDeliberationRules
 	 *  a) there is an inhibiting rgoal on type level
 	 *  b) there has no inhibition condition been specified.
 	 */
-	protected static Rule createAddTypeInhibitionLinkRule()
+	public static Rule createAddTypeInhibitionLinkRule()
 	{
 		Variable ringoal = new Variable("?ringoal", OAVBDIRuntimeModel.goal_type);
 		Variable rincapa = new Variable("?rincapa", OAVBDIRuntimeModel.capability_type);
@@ -111,7 +111,7 @@ public class GoalDeliberationRules
 	 *  Remove an inhibition entry (the inhibitor) to a goal when
 	 *  there was (=inactive or not(inprocess)) an inhibiting rgoal on type level
 	 */
-	protected static Rule createRemoveTypeInhibitionLinkRule()
+	public static Rule createRemoveTypeInhibitionLinkRule()
 	{
 		Variable ringoal = new Variable("?ringoal", OAVBDIRuntimeModel.goal_type);
 		Variable rincapa = new Variable("?rincapa", OAVBDIRuntimeModel.capability_type);
@@ -337,7 +337,7 @@ public class GoalDeliberationRules
 	/**
 	 *  Rule for activating a non-inhibited goal.
 	 */
-	protected static Rule createActivateGoalRule()
+	public static Rule createActivateGoalRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
@@ -388,7 +388,7 @@ public class GoalDeliberationRules
 	/**
 	 *  Rule for activating a non-inhibited goal.
 	 */
-	protected static Rule createDeactivateGoalRule()
+	public static Rule createDeactivateGoalRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -421,7 +421,7 @@ public class GoalDeliberationRules
 	 *  Create the goal exit active state rule.
 	 *  Stop goal processing, if necessary.
 	 */
-	protected static Rule createGoalExitActiveStateRule()
+	public static Rule createGoalExitActiveStateRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		

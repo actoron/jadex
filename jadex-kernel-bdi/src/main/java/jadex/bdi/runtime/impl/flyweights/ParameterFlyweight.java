@@ -1,10 +1,11 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MParameterFlyweight;
 import jadex.bdi.runtime.IParameter;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -56,7 +57,7 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 	 */
 	public static ParameterFlyweight getParameterFlyweight(IOAVState state, Object scope, Object handle, String name, Object parameterelement)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		ParameterFlyweight ret = (ParameterFlyweight)ip.getFlyweightCache(IParameter.class, new Tuple(IParameter.class, parameterelement, name));
 		if(ret==null)
 		{
@@ -88,7 +89,7 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 	 */
 	public void setValue(final Object value)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -140,9 +141,9 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 				throw new RuntimeException("Write access not allowed to parameter: "
 					+direction+" "+getName());
 			
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			BeliefRules.setParameterValue(getState(), getHandle(), value);
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -152,7 +153,7 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 	 */
 	public Object	getValue()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -195,7 +196,7 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 	 */
 	public String getName()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -220,7 +221,7 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

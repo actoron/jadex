@@ -1,11 +1,12 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MExpressionFlyweight;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.AgentRules;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
@@ -34,7 +35,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	 */
 	public static ExpressionFlyweight getExpressionFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		ExpressionFlyweight ret = (ExpressionFlyweight)ip.getFlyweightCache(IExpression.class, new Tuple(IExpression.class, handle));
 		if(ret==null)
 		{
@@ -52,7 +53,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	 */
 	public Object getValue()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -84,7 +85,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	// changed signature for javaflow, removed 2 final
 	public void setParameter(String name, Object value)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation(new Object[]{name, value})
 			{
@@ -108,7 +109,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	// changed signature for javaflow, removed final
 	public Object getParameter(String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -131,7 +132,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	 */
 	public Object	execute()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -159,7 +160,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	{
 		// todo: remove values after call
 		
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(new Object[]{name, value})
 			{
@@ -186,7 +187,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	{
 		// todo: remove values after call
 		
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -211,7 +212,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

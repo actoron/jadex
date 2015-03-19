@@ -1,10 +1,11 @@
 package jadex.bdi.runtime;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.runtime.impl.AbstractPlan;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.impl.flyweights.WaitAbstractionFlyweight;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
@@ -542,7 +543,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 			lis = new SyncResultListener();
 		}
 
-		if(!getInterpreter().isPlanThread())
+		if(!getBDIFeature().isPlanThread())
 			throw new RuntimeException("SyncResultListener may only be used from plan thread.");
 		
 		if(this.future!=null)
@@ -598,7 +599,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	 */
 	public Object getMonitor()
 	{
-		BDIInterpreter pi = BDIAgentFeature.getInterpreter(getState());
+		IBDIAgentFeature pi = BDIAgentFeature.getInterpreter(getState());
 		IPlanExecutor exe = pi==null? null: pi.getPlanExecutor(getRPlan());
 		return exe==null? null: exe.getMonitor(getRPlan());
 	}
@@ -700,7 +701,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		 */
 		public Object waitForResult(long timeout)
 		{
-			if(!getInterpreter().isPlanThread())
+			if(!getBDIFeature().isPlanThread())
 				throw new RuntimeException("SyncResultListener may only be used from plan thread.");
 			
 			if(!alreadyresumed)

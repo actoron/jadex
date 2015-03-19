@@ -1,9 +1,10 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MInternalEventFlyweight;
 import jadex.bdi.runtime.IInternalEvent;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
@@ -31,7 +32,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	 */
 	public static InternalEventFlyweight getInternalEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		InternalEventFlyweight ret = (InternalEventFlyweight)ip.getFlyweightCache(IInternalEvent.class, new Tuple(IInternalEvent.class, handle));
 		if(ret==null)
 		{
@@ -60,7 +61,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	 * /
 	public void addInternalEventListener(final IInternalEventListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -82,7 +83,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	 * /
 	public void removeInternalEventListener(final IInternalEventListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -106,7 +107,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

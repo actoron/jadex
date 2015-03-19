@@ -141,7 +141,7 @@ public class MessageEventRules
 	 *  Message matching rule.
 	 *  Dispatch a received message.
 	 */
-	protected static Rule createMessageMatchingRule()
+	public static Rule createMessageMatchingRule()
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -249,7 +249,7 @@ public class MessageEventRules
 	 *  Message conversation matching rule.
 	 *  Dispatch a received message.
 	 */
-	protected static Rule createMessageConversationMatchingRule()
+	public static Rule createMessageConversationMatchingRule()
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -376,7 +376,7 @@ public class MessageEventRules
 	 *  Message matching rule for the case that no match can be found.
 	 *  Dispatch a received message.
 	 */
-	protected static Rule createMessageNoMatchRule()
+	public static Rule createMessageNoMatchRule()
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable rawmsg = new Variable("?rawmsg", OAVBDIRuntimeModel.java_imessageadapter_type);
@@ -639,7 +639,7 @@ public class MessageEventRules
 	 *  Send message rule.
 	 *  Take message event, create a message map, and hand over to adapter.
 	 */
-	protected static Rule createSendMessageRule()
+	public static Rule createSendMessageRule()
 	{
 		ObjectCondition messagecon = new ObjectCondition(OAVBDIRuntimeModel.messageevent_type);
 		messagecon.addConstraint(new BoundConstraint(null, new Variable("?me", OAVBDIRuntimeModel.messageevent_type)));
@@ -1378,8 +1378,9 @@ public class MessageEventRules
 	public static MessageType getMessageEventType(IOAVState state, Object mme)
 	{
 		String	mtype	= (String)state.getAttributeValue(mme, OAVBDIMetaModel.messageevent_has_type);
-		BDIInterpreter bdii = BDIAgentFeature.getInterpreter(state);
-		MessageType ret	= bdii.getMessageService().getMessageType(mtype);
+		IInternalAccess bdii = BDIAgentFeature.getInternalAccess(state);
+		IMessageService ms = SServiceProvider.getLocalService(bdii, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		MessageType ret	= ms.getMessageType(mtype);
 		return ret;
 	}
 }

@@ -5,7 +5,9 @@ import java.util.logging.Logger;
 
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.interpreter.EventReificator;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
 
 
@@ -117,4 +119,38 @@ public interface IBDIAgentFeature
 	 *  Get an element from the cache.
 	 */
 	public Object getFlyweightCache(Class type, Object key);
+	
+	/**
+	 *  Invoke some code with agent behaviour synchronized on the agent.
+	 *  @param code The code to execute.
+	 *  The method will block the externally calling thread until the
+	 *  action has been executed on the agent thread.
+	 *  If the agent does not accept external actions (because of termination)
+	 *  the method will directly fail with a runtime exception.
+	 *  Note: 1.4 compliant code.
+	 *  Problem: Deadlocks cannot be detected and no exception is thrown.
+	 */
+	public void invokeSynchronized(final Runnable code);
+	
+	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 */
+	public <T> IFuture<T> scheduleStep(final Object step, final Object scope);
+	
+	/**
+	 *  Execute some code on the component's thread.
+	 *  Unlike scheduleStep(), the action will also be executed
+	 *  while the component is suspended.
+	 *  @param action	Code to be executed on the component's thread.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleImmediate(final IComponentStep step, final Object scope);
+	
+	/**
+	 *  Check if the agent thread is accessing.
+	 *  @return True, if access is ok.
+	 */ 
+	public boolean isPlanThread();
 }

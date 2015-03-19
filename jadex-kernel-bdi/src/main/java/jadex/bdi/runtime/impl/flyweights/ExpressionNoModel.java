@@ -1,10 +1,13 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.state.IOAVState;
 
@@ -25,7 +28,7 @@ public class ExpressionNoModel implements IExpression
 	protected Object scope;
 	
 	/** The interpreter. */
-	protected BDIInterpreter interpreter;
+	protected IInternalAccess interpreter;
 	
 	//-------- constructors --------
 	
@@ -39,7 +42,7 @@ public class ExpressionNoModel implements IExpression
 		this.state = state;
 		this.scope = scope;
 		this.expression = expression;
-		this.interpreter = BDIAgentFeature.getInterpreter(state);
+		this.interpreter = BDIAgentFeature.getInternalAccess(state);
 	}
 	
 	//-------- methods --------
@@ -50,7 +53,7 @@ public class ExpressionNoModel implements IExpression
 	 */
 	public Object getValue()
 	{
-		if(interpreter.isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -81,7 +84,7 @@ public class ExpressionNoModel implements IExpression
 	 */
 	public Object	execute()
 	{
-		if(interpreter.isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -106,7 +109,7 @@ public class ExpressionNoModel implements IExpression
 	 */
 	public Object execute(final String name, final Object value)
 	{
-		if(interpreter.isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -133,7 +136,7 @@ public class ExpressionNoModel implements IExpression
 	{
 		// todo: remove values after call
 		
-		if(interpreter.isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -214,7 +217,7 @@ public class ExpressionNoModel implements IExpression
 		 */
 		public AgentInvocation()
 		{
-			interpreter.invokeSynchronized(this);
+			interpreter.getComponentFeature(IBDIAgentFeature.class).invokeSynchronized(this);
 		}
 		
 		/**
@@ -223,7 +226,7 @@ public class ExpressionNoModel implements IExpression
 		public AgentInvocation(Object arg)
 		{
 			this.arg = arg;
-			interpreter.invokeSynchronized(this);
+			interpreter.getComponentFeature(IBDIAgentFeature.class).invokeSynchronized(this);
 		}
 		
 		/**
@@ -232,7 +235,15 @@ public class ExpressionNoModel implements IExpression
 		public AgentInvocation(Object[] args)
 		{
 			this.args = args;
-			interpreter.invokeSynchronized(this);
+			interpreter.getComponentFeature(IBDIAgentFeature.class).invokeSynchronized(this);
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isExternalThread()
+	{
+		return !BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class).isComponentThread();
 	}
 }

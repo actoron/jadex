@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MEventbaseFlyweight;
@@ -10,7 +12,6 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.AgentRules;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -42,7 +43,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public static EventbaseFlyweight getEventbaseFlyweight(IOAVState state, Object scope)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		EventbaseFlyweight ret = (EventbaseFlyweight)ip.getFlyweightCache(IEventbase.class, new Tuple(IEventbase.class, scope));
 		if(ret==null)
 		{
@@ -72,7 +73,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	public IFuture	sendMessage(IMessageEvent me, final byte[] codecids)
 	{
 		IFuture	ret;
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation	invoc	= new AgentInvocation(me)
 			{
@@ -97,7 +98,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	// changed signature for javaflow, removed final
 	public void dispatchInternalEvent(IInternalEvent event)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation(event)
 			{
@@ -109,9 +110,9 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 		}
 		else
 		{
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			InternalEventRules.adoptInternalEvent(getState(), getScope(), ((InternalEventFlyweight)event).getHandle());
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -121,7 +122,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public IMessageEvent createMessageEvent(String type)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(type)
 			{
@@ -146,7 +147,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public IMessageEvent createReply(final IMessageEvent event, final String msgeventtype)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(new Object[]{event, msgeventtype})
 			{
@@ -172,7 +173,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public IInternalEvent createInternalEvent(final String ref)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -246,7 +247,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public void addInternalEventListener(final String type, final IInternalEventListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation(new Object[]{type, listener})
 			{
@@ -271,7 +272,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public void removeInternalEventListener(final String type, final IInternalEventListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation(new Object[]{type, listener})
 			{
@@ -296,7 +297,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public void addMessageEventListener(final String type, final IMessageEventListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation(new Object[]{type, listener})
 			{
@@ -321,7 +322,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public void removeMessageEventListener(final String type, final IMessageEventListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation(new Object[]{type, listener})
 			{
@@ -347,7 +348,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public void registerMessageEvent(final IMessageEvent mevent)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -371,7 +372,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public void deregisterMessageEvent(final IMessageEvent mevent)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -410,7 +411,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 //	 */
 //	public IComponentIdentifier createComponentIdentifier(final String name, final IComponentIdentifier parent)
 //	{
-//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			AgentInvocation ai = new AgentInvocation()
 //			{
@@ -448,7 +449,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 //	 */
 //	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
 //	{
-//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			AgentInvocation ai = new AgentInvocation()
 //			{
@@ -473,7 +474,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

@@ -946,6 +946,16 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	}
 	
 	/**
+	 *  Get the bdi feature.
+	 *  @return The bdi feature.
+	 */
+	// todo: make package access
+	public IBDIAgentFeature getBDIFeature()
+	{
+		return interpreter.getComponentFeature(IBDIAgentFeature.class);
+	}
+	
+	/**
 	 *  Get the plan instance info.
 	 *  @return The plan instance info.
 	 */

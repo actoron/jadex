@@ -21,6 +21,16 @@ import jadex.bdi.runtime.impl.GoalDelegationHandler;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
+import jadex.bdi.runtime.interpreter.EventProcessingRules;
+import jadex.bdi.runtime.interpreter.EventReificator;
+import jadex.bdi.runtime.interpreter.ExternalAccessRules;
+import jadex.bdi.runtime.interpreter.GoalDeliberationRules;
+import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
+import jadex.bdi.runtime.interpreter.GoalProcessingRules;
+import jadex.bdi.runtime.interpreter.ListenerRules;
+import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -165,15 +175,15 @@ public class BDIAgentFeature
 	
 	/** The clock service. */
 	//hack???
-	protected IClockService	clockservice;
+//	protected IClockService	clockservice;
 	
 	/** The component management service. */
 	//hack???
-	protected IComponentManagementService	cms;
+//	protected IComponentManagementService	cms;
 	
 	/** The message service. */
 	//hack???
-	protected IMessageService	msgservice;
+//	protected IMessageService	msgservice;
 	
 	/** The subscriptions (subscription future -> subscription info). */
 	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>> subscriptions;
@@ -858,14 +868,14 @@ public class BDIAgentFeature
 	{
 //		System.err.println("Cleanup: "+getComponentIdentifier());
 
-		BDIInterpreter.interpreters.remove(state);
+		interpreters.remove(state);
 		
 		for(Iterator it=externalthreads.iterator(); it.hasNext(); )
 		{
 			Throwable[]	exception	= (Throwable[])it.next();
 			synchronized(exception)
 			{
-				exception[0] = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
+				exception[0] = new ComponentTerminatedException(getInternalAccess().getComponentIdentifier());
 				exception[0].fillInStackTrace();
 				exception.notify();
 				it.remove();
@@ -1276,32 +1286,32 @@ public class BDIAgentFeature
 		return this.state;
 	}
 
-	/**
-	 *  Get the cached clock service.
-	 */
-	// hack!!! to avoid dealing with futures.
-	public IClockService	getClockService()
-	{
-		return clockservice;
-	}
-
-	/**
-	 *  Get the cached component management service.
-	 */
-	// hack!!! to avoid dealing with futures.
-	public IComponentManagementService	getCMS()
-	{
-		return cms;
-	}
-
-	/**
-	 *  Get the cached message service.
-	 */
-	// hack!!! to avoid dealing with futures.
-	public IMessageService	getMessageService()
-	{
-		return msgservice;
-	}
+//	/**
+//	 *  Get the cached clock service.
+//	 */
+//	// hack!!! to avoid dealing with futures.
+//	public IClockService	getClockService()
+//	{
+//		return clockservice;
+//	}
+//
+//	/**
+//	 *  Get the cached component management service.
+//	 */
+//	// hack!!! to avoid dealing with futures.
+//	public IComponentManagementService	getCMS()
+//	{
+//		return cms;
+//	}
+//
+//	/**
+//	 *  Get the cached message service.
+//	 */
+//	// hack!!! to avoid dealing with futures.
+//	public IMessageService	getMessageService()
+//	{
+//		return msgservice;
+//	}
 	
 	/**
 	 *  Invoke some code with agent behaviour synchronized on the agent.
@@ -1885,14 +1895,14 @@ public class BDIAgentFeature
 		RULEBASE.addRule(ExternalAccessRules.createExternalAccessFactRemovedTriggeredRule());
 	}
 
-	/**
-	 *  Get the component adapter.
-	 *  @return The component adapter.
-	 */
-	public IComponentAdapter	getComponentAdapter()
-	{
-		return adapter;
-	}
+//	/**
+//	 *  Get the component adapter.
+//	 *  @return The component adapter.
+//	 */
+//	public IComponentAdapter	getComponentAdapter()
+//	{
+//		return adapter;
+//	}
 
 	/**
 	 *  Get the model info.

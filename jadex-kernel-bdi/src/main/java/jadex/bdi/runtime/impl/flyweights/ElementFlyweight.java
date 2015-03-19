@@ -1,8 +1,11 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.runtime.IElement;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
@@ -27,7 +30,7 @@ public abstract class ElementFlyweight implements IElement
 	private Object scope;
 	
 	/** The interpreter. */
-	private BDIInterpreter interpreter;
+	private IInternalAccess interpreter;
 	
 	/** Flag to indicate if the flyweight was already cleaned up. */
 	private boolean	cleanedup;
@@ -45,7 +48,8 @@ public abstract class ElementFlyweight implements IElement
 	{
 		assert !(scope instanceof ElementFlyweight);
 //		assert !BDIAgentFeature.getInterpreter(state).isExternalThread();
-		assert !BDIAgentFeature.getInterpreter(state).getComponentAdapter().isExternalThread();
+		assert BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class).isComponentThread();
+//		assert !BDIAgentFeature.getInterpreter(state).getComponentAdapter().isExternalThread();
 //		if(handle==null && !(this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight))
 //			Thread.dumpStack();
 		assert handle!=null || this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight
@@ -56,7 +60,7 @@ public abstract class ElementFlyweight implements IElement
 		if(scope!=null)
 			state.addExternalObjectUsage(scope, this);
 		
-		this.interpreter = BDIAgentFeature.getInterpreter(state);
+		this.interpreter = BDIAgentFeature.getInternalAccess(state);
 		if(interpreter==null)
 			throw new RuntimeException("No interpreter");
 		setHandle(handle);
@@ -156,7 +160,7 @@ public abstract class ElementFlyweight implements IElement
 	 *  Get the interpreter.
 	 *  @return The interpreter.
 	 */
-	public BDIInterpreter getInterpreter()
+	public IInternalAccess getInterpreter()
 	{
 		return interpreter;
 	}
@@ -243,7 +247,7 @@ public abstract class ElementFlyweight implements IElement
 			string	= string.substring(0, string.length()-9);
 		return string+"("+handle+")";
 		
-//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			AgentInvocation	invoc	= new AgentInvocation()
 //			{
@@ -345,6 +349,14 @@ public abstract class ElementFlyweight implements IElement
 		}
 	}
 	
+	/**
+	 *  Get the BDI agent feature.
+	 */
+	public IBDIAgentFeature getBDIFeature()
+	{
+		return getInterpreter().getComponentFeature(IBDIAgentFeature.class);
+	}
+	
 	//-------- inner classes --------
 
 	/**
@@ -407,7 +419,7 @@ public abstract class ElementFlyweight implements IElement
 		public AgentInvocation(Object arg)
 		{
 			this.arg = arg;
-			getInterpreter().invokeSynchronized(this);
+			getBDIFeature().invokeSynchronized(this);
 		}
 		
 		/**
@@ -416,10 +428,16 @@ public abstract class ElementFlyweight implements IElement
 		public AgentInvocation(Object[] args)
 		{
 			this.args = args;
-			getInterpreter().invokeSynchronized(this);
+			getBDIFeature().invokeSynchronized(this);
 		}
 	}
 
-	
+	/**
+	 * 
+	 */
+	protected boolean isExternalThread()
+	{
+		return !BDIAgentFeature.getInternalAccess(state).getComponentFeature(IExecutionFeature.class).isComponentThread();
+	}
 	
 }

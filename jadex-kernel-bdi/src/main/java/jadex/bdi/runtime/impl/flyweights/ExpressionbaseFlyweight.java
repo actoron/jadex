@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MExpressionbaseFlyweight;
@@ -7,7 +9,6 @@ import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IExpressionbase;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.AgentRules;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
@@ -35,7 +36,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	 */
 	public static ExpressionbaseFlyweight getExpressionbaseFlyweight(IOAVState state, Object scope)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		ExpressionbaseFlyweight ret = (ExpressionbaseFlyweight)ip.getFlyweightCache(IExpressionbase.class, new Tuple(IExpressionbase.class, scope));
 		if(ret==null)
 		{
@@ -56,7 +57,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	// changed signature for javaflow, removed final
 	public IExpression	getExpression(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -92,7 +93,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	 */
 	public IExpression	createExpression(final String expression, final String[] paramnames, final Class[] paramtypes)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -207,7 +208,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

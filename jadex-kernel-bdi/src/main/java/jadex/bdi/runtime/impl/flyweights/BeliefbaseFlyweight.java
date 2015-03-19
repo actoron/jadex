@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import java.text.SimpleDateFormat;
+
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
@@ -34,7 +36,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 *  @return The flyweight.
 	 */
 	public static BeliefbaseFlyweight getBeliefbaseFlyweight(IOAVState state, Object scope)
-	{
+	{		
 		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		BeliefbaseFlyweight ret = (BeliefbaseFlyweight)ip.getFlyweightCache(IBeliefbase.class, new Tuple(IBeliefbase.class, scope));
 		if(ret==null)
@@ -53,7 +55,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public IBelief getBelief(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -76,7 +78,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public IBeliefSet getBeliefSet(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -103,7 +105,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public boolean containsBelief(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -130,7 +132,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public boolean containsBeliefSet(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -153,7 +155,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public String[] getBeliefNames()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -176,7 +178,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public String[] getBeliefSetNames()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -322,7 +324,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

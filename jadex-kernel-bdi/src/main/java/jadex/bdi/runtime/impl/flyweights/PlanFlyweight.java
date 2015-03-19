@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MPlanFlyweight;
 import jadex.bdi.runtime.IElement;
@@ -7,7 +9,6 @@ import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IWaitqueue;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.commons.Tuple;
@@ -34,7 +35,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public static PlanFlyweight getPlanFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		PlanFlyweight ret = (PlanFlyweight)ip.getFlyweightCache(IPlan.class, new Tuple(IPlan.class, handle));
 		if(ret==null)
 		{
@@ -52,7 +53,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public String	getLifecycleState()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -75,7 +76,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public IWaitqueue getWaitqueue()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -98,7 +99,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public IElement getReason()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -121,7 +122,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public Object getBody()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -146,7 +147,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 		// what about when the plan is handling a goal.
 		// is the goal properly executed?
 		
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -167,7 +168,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public void startPlan()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -191,7 +192,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public void addPlanListener(final IPlanListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -215,7 +216,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	{
 		// Todo: safe removal when plan is already finished.
 		
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -239,7 +240,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

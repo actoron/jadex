@@ -1431,7 +1431,7 @@ public class PlanRules
 	/**
 	 *  Trigger plan creation on fact added event.
 	 */
-	protected static Rule createPlanInstanceFactAddedTriggerRule()
+	public static Rule createPlanInstanceFactAddedTriggerRule()
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -1466,7 +1466,7 @@ public class PlanRules
 	/**
 	 *  Trigger plan creation on fact removed event.
 	 */
-	protected static Rule createPlanInstanceFactRemovedTriggerRule()
+	public static Rule createPlanInstanceFactRemovedTriggerRule()
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -1501,7 +1501,7 @@ public class PlanRules
 	/**
 	 *  Add event to waitqueue of running plan on fact added event.
 	 */
-	protected static Rule createPlanWaitqueueFactAddedTriggerRule()
+	public static Rule createPlanWaitqueueFactAddedTriggerRule()
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -1544,7 +1544,7 @@ public class PlanRules
 	/**
 	 *  Add event to waitqueue of running plan on fact added event.
 	 */
-	protected static Rule createPlanWaitqueueFactRemovedTriggerRule()
+	public static Rule createPlanWaitqueueFactRemovedTriggerRule()
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -1587,7 +1587,7 @@ public class PlanRules
 	/**
 	 *  Add event to waitqueue of running plan on fact added event.
 	 */
-	protected static Rule createPlanWaitqueueFactChangedTriggerRule()
+	public static Rule createPlanWaitqueueFactChangedTriggerRule()
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -1629,7 +1629,7 @@ public class PlanRules
 	/**
 	 *  Trigger plan continuation on external condition.
 	 */
-	protected static Rule createPlanInstanceExternalConditionTriggerRule()
+	public static Rule createPlanInstanceExternalConditionTriggerRule()
 	{
 		Variable cond	= new Variable("?cond", OAVBDIRuntimeModel.java_externalcondition_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
@@ -1662,7 +1662,7 @@ public class PlanRules
 	/**
 	 *  Trigger plan creation on fact changed event.
 	 */
-	protected static Rule createPlanFactChangedTriggerRule()
+	public static Rule createPlanFactChangedTriggerRule()
 	{
 		Variable	mplan	= new Variable("?mplan", OAVBDIMetaModel.plan_type);
 		Variable	trigger	= new Variable("?trigger", OAVBDIMetaModel.plantrigger_type);
@@ -1721,7 +1721,7 @@ public class PlanRules
 	/**
 	 *  Trigger plan creation on fact added event.
 	 */
-	protected static Rule createPlanFactAddedTriggerRule()
+	public static Rule createPlanFactAddedTriggerRule()
 	{
 		Variable	mplan	= new Variable("?mplan", OAVBDIMetaModel.plan_type);
 		Variable	trigger	= new Variable("?trigger", OAVBDIMetaModel.plantrigger_type);
@@ -1775,7 +1775,7 @@ public class PlanRules
 	/**
 	 *  Trigger plan creation on fact removed event.
 	 */
-	protected static Rule createPlanFactRemovedTriggerRule()
+	public static Rule createPlanFactRemovedTriggerRule()
 	{
 		Variable	mplan	= new Variable("?mplan", OAVBDIMetaModel.plan_type);
 		Variable	trigger	= new Variable("?trigger", OAVBDIMetaModel.plantrigger_type);
@@ -1829,7 +1829,7 @@ public class PlanRules
 	/**
 	 *  Trigger plan creation on goal finished event.
 	 */
-	protected static Rule createPlanGoalFinishedTriggerRule()
+	public static Rule createPlanGoalFinishedTriggerRule()
 	{
 		Variable mplan = new Variable("?mplan", OAVBDIMetaModel.plan_type);
 		Variable trigger = new Variable("?trigger", OAVBDIMetaModel.plantrigger_type);

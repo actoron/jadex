@@ -1,10 +1,11 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IWaitAbstraction;
 import jadex.bdi.runtime.IWaitqueue;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
@@ -46,7 +47,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	public static WaitqueueFlyweight getWaitqueueFlyweight(IOAVState state, Object scope, Object rplan)
 	{
 		Tuple	key	= new Tuple(rplan, IWaitqueue.class);
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		WaitqueueFlyweight ret = (WaitqueueFlyweight)ip.getFlyweightCache(IWaitqueue.class, key);
 		if(ret==null)
 		{
@@ -78,7 +79,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	 */
 	public Object[] getElements()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -102,7 +103,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	 */
 	public Object removeNextElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -124,7 +125,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	 */
 	public void removeElement(final Object element)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -146,7 +147,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	 */
 	public IWaitAbstraction addGoal(final IGoal goal)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -190,7 +191,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	 */
 	public int	size()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -215,7 +216,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	 */
 	public boolean	isEmpty()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

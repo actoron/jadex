@@ -1,10 +1,11 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MMessageEventFlyweight;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.service.types.message.MessageType;
@@ -34,7 +35,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 */
 	public static MessageEventFlyweight getMessageEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		MessageEventFlyweight ret = (MessageEventFlyweight)ip.getFlyweightCache(IMessageEvent.class, new Tuple(IMessageEvent.class, handle));
 		if(ret==null)
 		{
@@ -51,7 +52,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 */
 	public Object getMessage()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -74,7 +75,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 */
 	public MessageType getMessageType()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -100,7 +101,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 * /
 	public IMessageEvent createReply(final String msgeventtype)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -138,7 +139,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 */
 	public void addMessageEventListener(final IMessageEventListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -160,7 +161,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 */
 	public void removeMessageEventListener(final IMessageEventListener listener)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -184,7 +185,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

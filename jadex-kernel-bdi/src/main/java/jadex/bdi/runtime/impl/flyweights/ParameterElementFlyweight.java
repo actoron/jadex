@@ -39,7 +39,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	 */
 	public IParameter[]	getParameters()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -62,7 +62,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	 */
 	public IParameterSet[]	getParameterSets()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -86,7 +86,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	 */
 	public IParameter getParameter(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -114,7 +114,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	 */
 	public IParameterSet getParameterSet(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -142,7 +142,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	 */
 	public boolean hasParameter(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -168,7 +168,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	 */
 	public boolean hasParameterSet(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

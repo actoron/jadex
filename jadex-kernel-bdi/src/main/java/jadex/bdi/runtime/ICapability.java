@@ -28,11 +28,11 @@ public interface ICapability	extends IElement
 	 */
 	public IExternalAccess getExternalAccess();
 
-	/**
-	 *  Get the parent (if any).
-	 *  @return The parent.
-	 */
-	public IExternalAccess getParentAccess();
+//	/**
+//	 *  Get the parent (if any).
+//	 *  @return The parent.
+//	 */
+//	public IExternalAccess getParentAccess();
 
 	/**
 	 *  Get the belief base.

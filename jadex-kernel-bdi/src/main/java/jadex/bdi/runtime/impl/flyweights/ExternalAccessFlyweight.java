@@ -7,6 +7,8 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -45,7 +47,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	protected boolean	valid;	
 	
 	/** The service provider. */
-	protected IServiceProvider provider;
+//	protected IInternalAccess provider;
 	
 	/** The component identifier. */
 	protected IComponentIdentifier	cid;
@@ -64,8 +66,8 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	public ExternalAccessFlyweight(IOAVState state, Object scope)
 	{
 		super(state, scope, scope);
-		this.provider = getInterpreter().getServiceProvider();
-		this.cid = getInterpreter().getAgentAdapter().getComponentIdentifier();
+//		this.provider = getInterpreter().getServiceProvider();
+		this.cid = getInterpreter().getComponentIdentifier();
 		this.parent = getInterpreter().getParent().getComponentIdentifier();
 	}
 
@@ -98,14 +100,14 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 		return cid;
 	}
 	
-	/**
-	 *  Get the service provider.
-	 *  @return The service provider.
-	 */
-	public IServiceProvider getServiceProvider()
-	{
-		return provider;
-	}
+//	/**
+//	 *  Get the service provider.
+//	 *  @return The service provider.
+//	 */
+//	public IServiceProvider getServiceProvider()
+//	{
+//		return provider;
+//	}
 	
 	/**
 	 *  Schedule a step of the agent.
@@ -115,7 +117,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	 */
 	public IFuture scheduleStep(IComponentStep step)
 	{
-		return getInterpreter().scheduleStep(step, getHandle());
+		return getBDIFeature().scheduleStep(step, getHandle());
 	}
 	
 	/**
@@ -126,7 +128,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	 */
 	public IFuture scheduleImmediate(IComponentStep step)
 	{
-		return getInterpreter().scheduleImmediate(step, getHandle());
+		return getBDIFeature().scheduleImmediate(step, getHandle());
 	}
 	
 	/**
@@ -140,7 +142,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService((IServiceProvider)getInterpreter().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getInterpreter(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(getInterpreter().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -171,7 +173,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService((IServiceProvider)getInterpreter().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getInterpreter(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(getInterpreter().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -200,21 +202,22 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		if(getInterpreter().getAgentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			try
 			{
-				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				getInterpreter().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run() 
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						getInterpreter().createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+						return IFuture.DONE;
 					}
-				});
+				}); 
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(getInterpreter().getAgentAdapter().getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(getInterpreter().getComponentIdentifier(), new Runnable()
 				{
 					public void run()
 					{
@@ -238,15 +241,15 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	{
 		final Future ret = new Future();
 		
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			try
 			{
-				getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+				getInterpreter().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run()
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
+						Object cs = getState().getAttributeValue(getBDIFeature().getAgent(), OAVBDIRuntimeModel.agent_has_state);
 						if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 						{
 							getInterpreter().killComponent().addResultListener(new DelegationResultListener(ret));
@@ -255,6 +258,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 						{
 							ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
 						}
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -265,13 +269,13 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 		}
 		else
 		{
-			Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
+			Object cs = getState().getAttributeValue(getBDIFeature().getAgent(), OAVBDIRuntimeModel.agent_has_state);
 			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 			{
 				//	System.out.println("set to terminating");
-				getInterpreter().startMonitorConsequences();
+				getBDIFeature().startMonitorConsequences();
 				getInterpreter().killComponent().addResultListener(new DelegationResultListener(ret));
-				getInterpreter().endMonitorConsequences();
+				getBDIFeature().endMonitorConsequences();
 			}
 			else
 			{
@@ -350,7 +354,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	{
 		final Future ret = new Future();
 		
-		if(!getInterpreter().isPlanThread())
+		if(!getBDIFeature().isPlanThread())
 		{
 			try
 			{
@@ -409,7 +413,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -605,7 +609,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 		// No NoTimeoutFuture needed as is already created internally.
 		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
 		
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			try
 			{
@@ -648,7 +652,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 		// No NoTimeoutFuture needed as is already created internally.
 		final SubscriptionIntermediateDelegationFuture<Tuple2<String, Object>> ret = new SubscriptionIntermediateDelegationFuture<Tuple2<String, Object>>();
 		
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			try
 			{

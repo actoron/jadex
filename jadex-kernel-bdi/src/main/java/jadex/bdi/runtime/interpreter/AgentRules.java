@@ -511,7 +511,7 @@ public class AgentRules
 	/**
 	 *  Cleanup rule for removing change events.
 	 */
-	protected static Rule createRemoveChangeEventRule()
+	public static Rule createRemoveChangeEventRule()
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable changeevent = new Variable("?changeevent", OAVBDIRuntimeModel.changeevent_type);

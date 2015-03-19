@@ -161,7 +161,7 @@ public class EventProcessingRules
 	 *  of an unprocessed processable element and set the APL to building finished,
 	 *  when no more found.
 	 */
-	protected static Rule[]	createBuildRPlanAPLRules()
+	public static Rule[]	createBuildRPlanAPLRules()
 	{
 		Variable	rpe	= new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
 		Variable	apl	= new Variable("?apl", OAVBDIRuntimeModel.apl_type);
@@ -399,7 +399,7 @@ public class EventProcessingRules
 	/**
 	 *  Create the metalevel reasoning for goal rule.
 	 */
-	protected static Rule createMetaLevelReasoningForGoalRule()
+	public static Rule createMetaLevelReasoningForGoalRule()
 	{
 		Variable mmetagoal = new Variable("?mmetagoal", OAVBDIMetaModel.metagoal_type);
 		Variable mgoaltrigger = new Variable("?mgoaltrigger", OAVBDIMetaModel.metagoaltrigger_type);
@@ -461,7 +461,7 @@ public class EventProcessingRules
 	/**
 	 *  Create the metalevel reasoning for internal event rule.
 	 */
-	protected static Rule createMetaLevelReasoningForInternalEventRule()
+	public static Rule createMetaLevelReasoningForInternalEventRule()
 	{
 		Variable mmetagoal = new Variable("?mmetagoal", OAVBDIMetaModel.metagoal_type);
 		Variable mgoaltrigger = new Variable("?mgoaltrigger", OAVBDIMetaModel.metagoaltrigger_type);
@@ -523,7 +523,7 @@ public class EventProcessingRules
 	/**
 	 *  Create the metalevel reasoning for message event rule.
 	 */
-	protected static Rule createMetaLevelReasoningForMessageEventRule()
+	public static Rule createMetaLevelReasoningForMessageEventRule()
 	{
 		Variable mmetagoal = new Variable("?mmetagoal", OAVBDIMetaModel.metagoal_type);
 		Variable mgoaltrigger = new Variable("?mgoaltrigger", OAVBDIMetaModel.metagoaltrigger_type);
@@ -658,7 +658,7 @@ public class EventProcessingRules
 	/**
 	 *  Create the metalevel reasoning finished rule.
 	 */
-	protected static Rule createMetaLevelReasoningFinishedRule()
+	public static Rule createMetaLevelReasoningFinishedRule()
 	{
 		Variable mmetagoal = new Variable("?mmetagoal", OAVBDIMetaModel.metagoal_type);
 		Variable rmetagoal = new Variable("?rmetagoal", OAVBDIRuntimeModel.goal_type);
@@ -766,7 +766,7 @@ public class EventProcessingRules
 	/**
 	 *  Create the select candidates for goal rule.
 	 */
-	protected static Rule createSelectCandidatesForGoalRule()
+	public static Rule createSelectCandidatesForGoalRule()
 	{
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
@@ -889,7 +889,7 @@ public class EventProcessingRules
 	/**
 	 *  Create the select candidates for internal event rule.
 	 */
-	protected static Rule createSelectCandidatesForInternalEventRule()
+	public static Rule createSelectCandidatesForInternalEventRule()
 	{
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
@@ -983,7 +983,7 @@ public class EventProcessingRules
 	/**
 	 *  Create the select candidates for message event rule.
 	 */
-	protected static Rule createSelectCandidatesForMessageEventRule()
+	public static Rule createSelectCandidatesForMessageEventRule()
 	{
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
 		Variable mpe = new Variable("?mpe", OAVBDIMetaModel.processableelement_type);
@@ -1120,7 +1120,7 @@ public class EventProcessingRules
 	/**
 	 *  Create dispatch message event from waitqueue rule.
 	 */
-	protected static Rule createDispatchMessageEventFromWaitqueueRule()
+	public static Rule createDispatchMessageEventFromWaitqueueRule()
 	{
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.messageevent_type);
 		Variable orig = new Variable("?orig", OAVBDIRuntimeModel.messageevent_type);
@@ -1174,7 +1174,7 @@ public class EventProcessingRules
 	/**
 	 *  Create dispatch internal event from waitqueue rule.
 	 */
-	protected static Rule createDispatchInternalEventFromWaitqueueRule()
+	public static Rule createDispatchInternalEventFromWaitqueueRule()
 	{
 //		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.processableelement_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.internalevent_type);
@@ -1262,7 +1262,7 @@ public class EventProcessingRules
 	/**
 	 *  Rule to schedule a plan waiting for a fact added event already contained in the waitqueue.
 	 */
-	protected static Rule createDispatchFactAddedFromWaitqueueRule()
+	public static Rule createDispatchFactAddedFromWaitqueueRule()
 	{
 		Variable change = new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 		Variable rbelset = new Variable("?rbelset", OAVBDIRuntimeModel.beliefset_type);
@@ -1305,7 +1305,7 @@ public class EventProcessingRules
 	/**
 	 *  Rule to schedule a plan waiting for a fact removed event already contained in the waitqueue.
 	 */
-	protected static Rule createDispatchFactRemovedFromWaitqueueRule()
+	public static Rule createDispatchFactRemovedFromWaitqueueRule()
 	{
 		Variable change = new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 		Variable rbelset = new Variable("?rbelset", OAVBDIRuntimeModel.beliefset_type);
@@ -1348,7 +1348,7 @@ public class EventProcessingRules
 	/**
 	 *  Rule to schedule a plan waiting for a fact added event already contained in the waitqueue.
 	 */
-	protected static Rule createDispatchFactChangedFromWaitqueueRule()
+	public static Rule createDispatchFactChangedFromWaitqueueRule()
 	{
 		Variable change = new Variable("?change", OAVBDIRuntimeModel.changeevent_type);
 		Variable rbelset = new Variable("?rbelset", OAVBDIRuntimeModel.beliefset_type);

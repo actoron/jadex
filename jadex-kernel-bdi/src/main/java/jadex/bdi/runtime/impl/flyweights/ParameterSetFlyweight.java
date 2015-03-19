@@ -1,10 +1,11 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MParameterSetFlyweight;
 import jadex.bdi.runtime.IParameterSet;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -54,7 +55,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public static ParameterSetFlyweight getParameterSetFlyweight(IOAVState state, Object scope, Object handle, String name, Object parameterelement)
 	{
-		BDIInterpreter ip = BDIAgentFeature.getInterpreter(state);
+		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		ParameterSetFlyweight ret = (ParameterSetFlyweight)ip.getFlyweightCache(IParameterSet.class, new Tuple(IParameterSet.class, parameterelement, name));
 		if(ret==null)
 		{
@@ -72,7 +73,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public void addValue(final Object value)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -122,9 +123,9 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 				throw new RuntimeException("Write access not allowed to parameter set: "
 					+direction+" "+getName());
 
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			BeliefRules.addParameterSetValue(getState(), getHandle(), value);
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -134,7 +135,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public void removeValue(final Object value)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -177,9 +178,9 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			if(!hasHandle())
 				throw new RuntimeException("Value not contained: "+value);
 			
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			BeliefRules.removeParameterSetValue(getState(), getHandle(), value);
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -191,7 +192,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		if(values==null)
 			return;
 	
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -243,10 +244,10 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 				throw new RuntimeException("Write access not allowed to parameter set: "
 					+direction+" "+getName());
 
-			getInterpreter().startMonitorConsequences();
+			getBDIFeature().startMonitorConsequences();
 			for(int i=0; i<values.length; i++)
 				BeliefRules.addParameterSetValue(getState(), getHandle(), values[i]);
-			getInterpreter().endMonitorConsequences();
+			getBDIFeature().endMonitorConsequences();
 		}
 	}
 
@@ -255,7 +256,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public void removeValues()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -308,10 +309,10 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 				if(vals!=null)
 				{
 					Object[]	avals	= vals.toArray();
-					getInterpreter().startMonitorConsequences();
+					getBDIFeature().startMonitorConsequences();
 					for(int i=0; i<avals.length; i++)
 						BeliefRules.removeParameterSetValue(getState(), getHandle(), avals[i]);
-					getInterpreter().endMonitorConsequences();
+					getBDIFeature().endMonitorConsequences();
 				}				
 			}
 		}
@@ -323,7 +324,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 * /
 	public Object	getValue(final Object oldval)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -381,7 +382,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public boolean containsValue(final Object value)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -434,7 +435,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public Object[]	getValues()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -484,7 +485,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public int size()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -532,7 +533,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public String getName()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -557,7 +558,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

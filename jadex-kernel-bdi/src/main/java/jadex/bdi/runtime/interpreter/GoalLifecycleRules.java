@@ -469,7 +469,7 @@ public class GoalLifecycleRules
 	 *  Create the goal drop rule.
 	 *  Drop a dropping goal when all plans are removed.
 	 */
-	protected static Rule createGoalDropRule()
+	public static Rule createGoalDropRule()
 	{
 		Variable	rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable	rplans	= new Variable("$?rplans", OAVBDIRuntimeModel.plan_type, true, false);

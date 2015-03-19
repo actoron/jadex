@@ -26,7 +26,7 @@ public class ExternalAccessRules
 	/**
 	 *  Trigger external access (on goal finished).
 	 */
-	protected static Rule createExternalAccessGoalTriggeredRule()
+	public static Rule createExternalAccessGoalTriggeredRule()
 	{
 		Variable ea	= new Variable("?ea", OAVBDIRuntimeModel.externalaccess_type);
 		Variable wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -62,7 +62,7 @@ public class ExternalAccessRules
 	/**
 	 *  Trigger external access (on message events).
 	 */
-	protected static Rule createExternalAccessMessageEventTriggeredRule()
+	public static Rule createExternalAccessMessageEventTriggeredRule()
 	{
 		Variable ea	= new Variable("?ea", OAVBDIRuntimeModel.externalaccess_type);
 		Variable wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -97,7 +97,7 @@ public class ExternalAccessRules
 	/**
 	 *  Trigger external access (on events).
 	 */
-	protected static Rule createExternalAccessEventTriggeredRule()
+	public static Rule createExternalAccessEventTriggeredRule()
 	{
 		Variable ea	= new Variable("?ea", OAVBDIRuntimeModel.externalaccess_type);
 		Variable wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -135,7 +135,7 @@ public class ExternalAccessRules
 	/**
 	 *  Trigger plan creation on fact changed event.
 	 */
-	protected static Rule createExternalAccessFactChangedTriggeredRule()
+	public static Rule createExternalAccessFactChangedTriggeredRule()
 	{
 		Variable ea	= new Variable("?ea", OAVBDIRuntimeModel.externalaccess_type);
 		Variable wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -164,7 +164,7 @@ public class ExternalAccessRules
 	/**
 	 *  Trigger plan creation on fact added event.
 	 */
-	protected static Rule createExternalAccessFactAddedTriggeredRule()
+	public static Rule createExternalAccessFactAddedTriggeredRule()
 	{
 		Variable ea	= new Variable("?ea", OAVBDIRuntimeModel.externalaccess_type);
 		Variable wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -193,7 +193,7 @@ public class ExternalAccessRules
 	/**
 	 *  Trigger plan creation on fact removed event.
 	 */
-	protected static Rule createExternalAccessFactRemovedTriggeredRule()
+	public static Rule createExternalAccessFactRemovedTriggeredRule()
 	{
 		Variable ea	= new Variable("?ea", OAVBDIRuntimeModel.externalaccess_type);
 		Variable wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);

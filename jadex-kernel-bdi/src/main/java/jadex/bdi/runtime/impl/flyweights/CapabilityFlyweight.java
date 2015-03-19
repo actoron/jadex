@@ -1,6 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
 import jadex.base.Starter;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.IBDIInternalAccess;
@@ -13,18 +14,20 @@ import jadex.bdi.runtime.IExpressionbase;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.impl.ServiceContainerProxy;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -72,7 +75,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public CapabilityFlyweight(IOAVState state, Object scope)
 	{
 		super(state, scope, scope);
-		this.model	= getInterpreter().getModel(scope);
+		this.model	= getBDIFeature().getModel(scope);
 	}
 	
 	//-------- methods concerning beliefs --------
@@ -83,7 +86,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IExternalAccess getExternalAccess()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -100,28 +103,28 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}
 	}
 
-	/**
-	 *  Get the parent (if any).
-	 *  @return The parent.
-	 */
-	public IExternalAccess getParentAccess()
-	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getParent();
-				}
-			};
-			return (IExternalAccess)invoc.object;
-		}
-		else
-		{
-			return getInterpreter().getParent();
-		}
-	}
+//	/**
+//	 *  Get the parent (if any).
+//	 *  @return The parent.
+//	 */
+//	public IExternalAccess getParentAccess()
+//	{
+//		if(isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					object = getInterpreter().getParent();
+//				}
+//			};
+//			return (IExternalAccess)invoc.object;
+//		}
+//		else
+//		{
+//			return getInterpreter().getParent();
+//		}
+//	}
 
 	/**
 	 *  Get the belief base.
@@ -129,7 +132,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IBeliefbase getBeliefbase()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -152,7 +155,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IGoalbase getGoalbase()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -175,7 +178,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IPlanbase getPlanbase()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -198,7 +201,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IEventbase getEventbase()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -221,7 +224,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IExpressionbase getExpressionbase()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -244,7 +247,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	 */
 //	public IPropertybase getPropertybase()
 //	{
-//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			AgentInvocation invoc = new AgentInvocation()
 //			{
@@ -285,7 +288,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public Logger getLogger()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -308,7 +311,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public String getAgentName()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -341,7 +344,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public String getConfigurationName()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -376,61 +379,61 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		return getInterpreter().getComponentDescription();
 	}
 	
-	/**
-	 *  Get the platform specific agent object.
-	 *  Allows to do platform specific things.
-	 *  @return The agent object.
-	 */
-	public Object getPlatformComponent()
-	{
-		return getInterpreter().getAgentAdapter();
-	}
+//	/**
+//	 *  Get the platform specific agent object.
+//	 *  Allows to do platform specific things.
+//	 *  @return The agent object.
+//	 */
+//	public Object getPlatformComponent()
+//	{
+//		return getInterpreter().getAgentAdapter();
+//	}
 
-	/**
-	 *  Get the service provider
-	 *  @return The service provider.
-	 */
-	public IServiceProvider getServiceProvider()
-	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getServiceProvider();
-				}
-			};
-			return (IServiceProvider)invoc.object;
-		}
-		else
-		{
-			return getInterpreter().getServiceProvider();
-		}
-	}
+//	/**
+//	 *  Get the service provider
+//	 *  @return The service provider.
+//	 */
+//	public IServiceProvider getServiceProvider()
+//	{
+//		if(isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					object = getInterpreter().getServiceProvider();
+//				}
+//			};
+//			return (IServiceProvider)invoc.object;
+//		}
+//		else
+//		{
+//			return getInterpreter().getServiceProvider();
+//		}
+//	}
 	
-	/**
-	 *  Get the service container.
-	 *  @return The service container.
-	 */
-	public IInternalAccess getServiceContainer()
-	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = new ServiceContainerProxy(getInterpreter(), getHandle());
-				}
-			};
-			return (IServiceContainer)invoc.object;
-		}
-		else
-		{
-			return new ServiceContainerProxy(getInterpreter(), getHandle());
-		}
-	}
+//	/**
+//	 *  Get the service container.
+//	 *  @return The service container.
+//	 */
+//	public IInternalAccess getServiceContainer()
+//	{
+//		if(isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					object = new ServiceContainerProxy(getInterpreter(), getHandle());
+//				}
+//			};
+//			return (IServiceContainer)invoc.object;
+//		}
+//		else
+//		{
+//			return new ServiceContainerProxy(getInterpreter(), getHandle());
+//		}
+//	}
 	
 	/**
 	 *  Get the current time.
@@ -443,20 +446,23 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public long getTime()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
-					longint = getInterpreter().getClockService().getTime();
+					IClockService cs = SServiceProvider.getLocalService(getInterpreter(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					longint = cs.getTime();
 				}
 			};
 			return invoc.longint;
 		}
 		else
 		{
-			return getInterpreter().getClockService().getTime();
+			IClockService cs = SServiceProvider.getLocalService(getInterpreter(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			return cs.getTime();
+//			return getInterpreter().getClockService().getTime();
 		}
 	}
 	
@@ -473,20 +479,20 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step, final boolean realtime)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
-					object = getInterpreter().waitForDelay(delay, step, realtime);
+					object = getInterpreter().getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step, realtime);
 				}
 			};
 			return (IFuture<T>)invoc.object;
 		}
 		else
 		{
-			return getInterpreter().waitForDelay(delay, step, realtime);
+			return getInterpreter().getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step, realtime);
 		}
 	}
 
@@ -503,20 +509,20 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IFuture<Void> waitForDelay(final long delay, final boolean realtime)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
-					object = getInterpreter().waitForDelay(delay, realtime);
+					object = getInterpreter().getComponentFeature(IExecutionFeature.class).waitForDelay(delay, realtime);
 				}
 			};
 			return (IFuture<Void>)invoc.object;
 		}
 		else
 		{
-			return getInterpreter().waitForDelay(delay, realtime);
+			return getInterpreter().getComponentFeature(IExecutionFeature.class).waitForDelay(delay, realtime);
 		}
 	}
 
@@ -526,7 +532,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public ClassLoader getClassLoader()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -549,13 +555,13 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IFuture killAgent()
 	{
 		IFuture ret = null;
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
-					Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
+					Object cs = getState().getAttributeValue(getBDIFeature().getAgent(), OAVBDIRuntimeModel.agent_has_state);
 					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
 						object = getInterpreter().killComponent();
@@ -570,13 +576,13 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}
 		else
 		{
-			Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
+			Object cs = getState().getAttributeValue(getBDIFeature().getAgent(), OAVBDIRuntimeModel.agent_has_state);
 			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 			{
 				//	System.out.println("set to terminating");
-				getInterpreter().startMonitorConsequences();
+				getBDIFeature().startMonitorConsequences();
 				ret = getInterpreter().killComponent();
-				getInterpreter().endMonitorConsequences();
+				getBDIFeature().endMonitorConsequences();
 			}
 			else
 			{
@@ -593,7 +599,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	public IFuture addComponentListener(IComponentListener listener)
 //	{
 //		final Future ret = new Future();
-//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			new AgentInvocation(listener)
 //			{
@@ -619,7 +625,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	public IFuture removeComponentListener(IComponentListener listener)
 //	{
 //		final Future ret = new Future();
-//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			new AgentInvocation(listener)
 //			{
@@ -655,23 +661,24 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		// No NoTimeoutFuture needed as is already created internally.
 		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
 		
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			try
 			{
-				getInterpreter().getComponentAdapter().invokeLater(new Runnable() 
+				getInterpreter().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
-					public void run() 
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 						fut.addResultListener(lis);
+						return IFuture.DONE;
 					}
 				});
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(getInterpreter().getComponentAdapter().getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(getInterpreter().getComponentIdentifier(), new Runnable()
 				{
 					public void run()
 					{
@@ -714,7 +721,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	 */
 //	public IApplicationContext getApplicationContext()
 //	{
-//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			AgentInvocation invoc = new AgentInvocation()
 //			{
@@ -753,7 +760,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -795,7 +802,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public String[]	getSubcapabilityNames()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -845,7 +852,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public ICapability	getSubcapability(final String name)
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -895,7 +902,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		
 		final Future ret = new Future();
 		
-		SServiceProvider.getService((IServiceProvider)getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getInterpreter(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -905,7 +912,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						getInterpreter().scheduleStep(step, getHandle()).addResultListener(new DelegationResultListener(ret));
+						getBDIFeature().scheduleStep(step, getHandle()).addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}
@@ -929,20 +936,20 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public Map getArguments()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
-					object = getInterpreter().getArguments();
+					object = getInterpreter().getComponentFeature(IArgumentsFeature.class).getArguments();
 				}
 			};
 			return (Map)invoc.object;
 		}
 		else
 		{
-			return getInterpreter().getArguments();
+			return getInterpreter().getComponentFeature(IArgumentsFeature.class).getArguments();
 		}
 	}
 	
@@ -952,20 +959,20 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public Map getResults()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
-					object = getInterpreter().getResults();
+					object = getInterpreter().getComponentFeature(IArgumentsFeature.class).getResults();
 				}
 			};
 			return (Map)invoc.object;
 		}
 		else
 		{
-			return getInterpreter().getResults();
+			return getInterpreter().getComponentFeature(IArgumentsFeature.class).getResults();
 		}
 	}
 	
@@ -976,10 +983,10 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public void setResultValue(final String name, final Object value)
 	{
-		if(!getHandle().equals(getInterpreter().getAgent()))
+		if(!getHandle().equals(getBDIFeature().getAgent()))
 			throw new RuntimeException("Set result only allowed in agent, not in capabilities.");
 		
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -1049,7 +1056,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public String getConfiguration()
 	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -1068,7 +1075,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	
 	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
 	{
-		return getInterpreter().getRequiredServicePropertyProvider(sid);
+		return getInterpreter().getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(sid);
 	}
 	
 	/**
@@ -1076,7 +1083,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
 	{
-		return getInterpreter().hasRequiredServicePropertyProvider(sid);
+		return getInterpreter().getComponentFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(sid);
 	}
 	
 	/**
@@ -1085,7 +1092,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public boolean isComponentThread()
 	{
-		return !getInterpreter().getComponentAdapter().isExternalThread();
+		return !isExternalThread();
 	}
 	
 //	/**
@@ -1112,7 +1119,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	 */
 //	public IFuture getRequiredService(final String name, final boolean rebind)
 //	{
-//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			AgentInvocation invoc = new AgentInvocation()
 //			{
@@ -1159,7 +1166,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	 */
 //	public IIntermediateFuture getRequiredServices(final String name, final boolean rebind)
 //	{
-//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			AgentInvocation invoc = new AgentInvocation()
 //			{
@@ -1218,12 +1225,12 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt)
 	{
-		return getInterpreter().publishEvent(event, pt);
+		return getInterpreter().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(event, pt);
 	}
 	
 	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi) 
 	{
-		return getInterpreter().hasEventTargets(pt, pi);
+		return getInterpreter().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(pt, pi);
 	}
 
 }
