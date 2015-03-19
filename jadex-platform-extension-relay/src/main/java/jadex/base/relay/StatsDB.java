@@ -440,7 +440,7 @@ public class StatsDB
 	 *  Get all saved platform infos for direct data export (sorted by id, oldest first).
 	 *  @return All stored platform infos.
 	 */
-	public Iterator<PlatformInfo>	getAllPlatformInfos()
+	public Iterator<PlatformInfo>	getAllPlatformInfos(final boolean properties)
 	{
 		Iterator<PlatformInfo>	ret;
 		
@@ -448,6 +448,8 @@ public class StatsDB
 		{
 			try
 			{
+				final PreparedStatement	ps	= properties ? con.prepareStatement("select * from relay.properties where ID=?") : null;
+
 				final ResultSet	rs	= con.createStatement().executeQuery("select * from relay.platforminfo order by id asc");
 				ret	= new Iterator<PlatformInfo>()
 				{
@@ -464,6 +466,10 @@ public class StatsDB
 								if(!hasnext)
 								{
 									rs.close();
+									if(ps!=null)
+									{
+										ps.close();
+									}
 								}
 							}
 							catch(SQLException e)
@@ -484,16 +490,20 @@ public class StatsDB
 									rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 									rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
 	
-								// Load properties of platform.
-								Map<String, String>	props	= new HashMap<String, String>();
-								pi.setProperties(props);
-								ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
-								while(rs2.next())
+								// Load latest properties of platform.
+								if(properties)
 								{
-									props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+									Map<String, String>	props	= new HashMap<String, String>();
+									pi.setProperties(props);
+									ps.setInt(1, pi.getDBId());
+									ResultSet	rs2	= ps.executeQuery();
+									while(rs2.next())
+									{
+										props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+									}
+									rs2.close();
 								}
-								rs2.close();
-								
+
 								cursormoved	= false;
 								
 								return pi;
@@ -648,7 +658,7 @@ public class StatsDB
 	 */
 	protected void	migrateFrom(StatsDB old)
 	{
-		Iterator<PlatformInfo>	infos	= old.getAllPlatformInfos();
+		Iterator<PlatformInfo>	infos	= old.getAllPlatformInfos(true);
 		while(infos.hasNext())
 		{
 			PlatformInfo	info	= infos.next();
@@ -718,7 +728,7 @@ public class StatsDB
 	//		pi.disconnect();
 			printPlatformInfos(db.getPlatformInfos(-1, -1, -1));
 			System.out.println("---");
-			printPlatformInfos(db.getAllPlatformInfos());
+			printPlatformInfos(db.getAllPlatformInfos(true));
 			
 			Statement	stmt	= db.con.createStatement();
 			printResultSet(stmt.executeQuery("select * from relay.platforminfo"));

@@ -128,7 +128,8 @@ public class RelayServlet extends HttpServlet
 				}
 				else if("/export".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
-					request.setAttribute("platforms", handler.getStatisticsDB().getAllPlatformInfos());
+					// Todo: properties
+					request.setAttribute("platforms", handler.getStatisticsDB().getAllPlatformInfos(false));
 					view	= "/WEB-INF/jsp/csv.jsp";
 				}
 				else if("/servers".equals(request.getServletPath()))
