@@ -18,6 +18,9 @@ public class PeerEntry
 {
 	//-------- attributes --------
 	
+//	/** The id of the peer. */
+//	protected String	id;	
+	
 	/** The URL of the peer. */
 	protected String	url;
 	
@@ -27,7 +30,7 @@ public class PeerEntry
 	/** Is this peer connected? */
 	protected boolean	connected;
 	
-	/** The platform infos received from the peer (platform id->info). */
+	/** The current platform infos received from the peer (platform id->info). */
 	protected Map<String, PlatformInfo>	infos;
 	
 	/** Have initial platform infos been sent already? */
@@ -64,6 +67,22 @@ public class PeerEntry
 		return url;
 	}
 	
+//	/**
+//	 *  Get the peer id, if known.
+//	 */
+//	public String	getId()
+//	{
+//		return id;
+//	}
+//	
+//	/**
+//	 *  Set the peer id.
+//	 */
+//	public void	setId(String id)
+//	{
+//		this.id	= id;
+//	}
+
 	/**
 	 *  Set the sent state of the peer.
 	 */

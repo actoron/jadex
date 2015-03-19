@@ -210,7 +210,7 @@ public class StandaloneRelay
 						if(get && "/servers".equals(path))
 						{
 							// Todo: handle peer url and initial flag.
-							String	serverurls	= handler.handleServersRequest("http://"+host+path, null, false);
+							String	serverurls	= handler.handleServersRequest("http://"+host+path, null, null, -1, false);
 							
 							PrintWriter	pw	= new PrintWriter(new OutputStreamWriter(client.getOutputStream(), Charset.forName("UTF-8")));
 							pw.print("HTTP/1.0 200 OK\r\n");

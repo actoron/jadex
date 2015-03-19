@@ -35,14 +35,17 @@ public class StatsDB
 	/** The db connection (if any). */
 	protected Connection	con;
 	
-	/** The prepared insert statement for new entries (without dbid). */
+	/** The prepared insert statement for new platform entries (without dbid). */
 	protected PreparedStatement	insert;
 	
-	/** The prepared insert statement for remote entries (with dbid). */
+	/** The prepared insert statement for remote platform entries (with dbid). */
 	protected PreparedStatement	insert2;
 	
-	/** The prepared update statement. */
+	/** The prepared update statement for platform entries. */
 	protected PreparedStatement	update;
+	
+	/** The prepared get latest entry query statement. */
+	protected PreparedStatement	getlatest;
 	
 	/** The prepared delete properties statement. */
 	protected PreparedStatement	deleteprops;
@@ -636,6 +639,46 @@ public class StatsDB
 	}
 	
 	/**
+	 *  Get the latest id for a peer.
+	 *  @return The latest id or 0 if no entry for that peer or -1 in case of db error.
+	 */
+	public int	getLatestEntry(String peerid)
+	{
+		int	ret;
+		
+		try
+		{
+			if(getlatest==null)
+			{
+				getlatest	= con.prepareStatement("SELECT MAX(ID) FROM relay.platforminfo"
+					+ " WHERE PEER=? and DISTIME IS NOT NULL");
+			}
+			
+			getlatest.setString(1, peerid);
+			ResultSet	rs	= getlatest.executeQuery();
+			if(rs.next())
+			{
+				ret	= rs.getInt(1);
+			}
+			else
+			{
+				ret	= 0;
+			}
+			rs.close();
+		}
+		catch(Exception e)
+		{
+			// Ignore errors and let relay work without stats.
+			RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
+			List<PlatformInfo> list = Collections.emptyList();
+			
+			ret	= -1;
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Close the database connection on exit.
 	 */
 	public void shutdown()
@@ -666,7 +709,6 @@ public class StatsDB
 			save(info);
 		}
 	}
-	
 	
 	//-------- main for testing --------
 	
@@ -726,9 +768,14 @@ public class StatsDB
 	//		pi.addMessage(123, 456);
 	//		
 	//		pi.disconnect();
+			
+			System.out.println("Latest: "+db.getLatestEntry("test"));
+			System.out.println("---");
+			
 			printPlatformInfos(db.getPlatformInfos(-1, -1, -1));
 			System.out.println("---");
-			printPlatformInfos(db.getAllPlatformInfos(true));
+			
+			printPlatformInfos(db.getAllPlatformInfos(false));
 			
 			Statement	stmt	= db.con.createStatement();
 			printResultSet(stmt.executeQuery("select * from relay.platforminfo"));

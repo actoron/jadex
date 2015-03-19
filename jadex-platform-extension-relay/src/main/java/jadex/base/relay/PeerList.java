@@ -1,9 +1,7 @@
 package jadex.base.relay;
 
-import jadex.commons.Base64;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
-import jadex.commons.SUtil;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 import java.io.File;
@@ -19,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -30,6 +26,18 @@ import java.util.UUID;
 public class PeerList
 {
 	//-------- constants --------
+	
+	/** The event for an added peer. */
+	public static final String	EVENT_ADDED	= "added";
+
+	/** The event for a removed peer. */
+	public static final String	EVENT_REMOVED	= "removed";
+
+	/** The event when a peer becomes online. */
+	public static final String	EVENT_ONLINE	= "online";
+	
+	/** The event when a peer becomes offline. */
+	public static final String	EVENT_OFFLINE	= "offline";
 
 	/** The property for this relay's own id. */
 	public static final String	PROPERTY_ID	= "id";
@@ -60,11 +68,14 @@ public class PeerList
 	/** The known peers (url -> peer entry). */
 	protected Map<String, PeerEntry>	peers;
 	
-	/** Timer for polling relay peers. */
-	protected volatile Timer	timer;
+	/** The peer handlers for polling relay peers (url -> peer handler). */
+	protected Map<String, PeerHandler>	handlers;
 	
 	/** The connection manager. */
 	protected RelayConnectionManager	conman;
+	
+	/** The connection history db (if any). */
+	protected StatsDB	db;
 	
 	/** Change listeners. */
 	protected List<IChangeListener<PeerEntry>>	listeners;
@@ -80,6 +91,7 @@ public class PeerList
 	public PeerList()
 	{
 		this.peers	= Collections.synchronizedMap(new HashMap<String, PeerEntry>());
+		this.handlers	= Collections.synchronizedMap(new HashMap<String, PeerHandler>());
 		this.listeners	= Collections.synchronizedList(new ArrayList<IChangeListener<PeerEntry>>());
 		this.conman	= new RelayConnectionManager();
 		
@@ -158,14 +170,22 @@ public class PeerList
 	 */
 	public void	dispose()
 	{
-		if(timer!=null)
+		for(PeerHandler handler: handlers.values().toArray(new PeerHandler[0]))
 		{
-			timer.cancel();
+			handler.shutdown();
 		}
 		conman.dispose();
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Set the stats db to allow history replication between peers.
+	 */
+	public void	setDB(StatsDB db)
+	{
+		this.db	= db;
+	}
 	
 	/**
 	 *  Get the peer id of this relay.
@@ -248,11 +268,38 @@ public class PeerList
 	}
 	
 	/**
-	 *  Add a peer that requested a connection.
+	 *  Add a peer found in a servers list.
+	 *  @param peerurl	The remote peer url.
+	 *  @param initial	Denotes an initial peer as specified in the properties of this relay. Initial peers are not removed when they are offline.
 	 */
 	public PeerEntry	addPeer(String peerurl, boolean initial)
 	{
-		PeerEntry	peer;
+		return addPeer(peerurl, null, 0, initial);
+	}
+	
+	/**
+	 *  Add a that requested a connection.
+	 *  Also called for the continuous pings sent by connected peers.
+	 *  @param peerurl	The remote peer url.
+	 *  @param peerid	Contains the id of the remote peer.
+	 *  @param peerstate	Contains id of the latest history entry of that peer to enable synchronization.
+	 */
+	public PeerEntry	addPeer(String peerurl, String peerid, int peerstate)
+	{
+		return addPeer(peerurl, peerid, peerstate, false);
+	}
+	
+	/**
+	 *  Add a peer found in a servers list or a peer that requested a connection.
+	 *  Also called for the continuous pings sent by connected peers.
+	 *  @param peerurl	The remote peer url.
+	 *  @param peerid	If called from remote peer, contains the id of that peer.
+	 *  @param peerstate	If called from remote peer, contains id of the latest history entry of that peer to enable synchronization.
+	 *  @param initial	Denotes an initial peer as specified in the properties of this relay. Initial peers are not removed when they are offline.
+	 */
+	protected PeerEntry	addPeer(String peerurl, String peerid, int peerstate, boolean initial)
+	{
+		PeerEntry	peer	= null;
 		if("".equals(url))
 		{
 			throw new RuntimeException("No peer connections allowed, if local URL not set.");
@@ -260,27 +307,33 @@ public class PeerList
 		else
 		{
 			peerurl	= RelayConnectionManager.relayAddress(peerurl);
-			peer	= peers.get(peerurl);
-			if(!url.equals(peerurl) && peer==null)
+			if(!url.equals(peerurl))
 			{
-				peer	= new PeerEntry(peerurl, initial, debug);
-				peers.put(peerurl, peer);
-				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "added", peer));
-	
-				// Create timer on demand.
-				if(timer==null)
+				boolean	added	= false;
+				synchronized(this)
 				{
-					synchronized(this)
+					peer	= peers.get(peerurl);
+					if(peer==null)
 					{
-						if(timer==null)
-						{
-							this.timer	= new Timer(true);
-						}
+						added	= true;
+						peer	= new PeerEntry(peerurl, initial, debug);
+						peers.put(peerurl, peer);
 					}
 				}
 				
-				// Periodically test connection to peer.
-				timer.schedule(new PeerTimerTask(peer), 0);		
+				if(added)
+				{
+					informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_ADDED, peer));
+					PeerHandler	handler	= new PeerHandler(peer);
+					handlers.put(peerurl, handler);
+					new Thread(handler).start();
+				}
+				
+				// Start db synchronization.
+				if(peerid!=null && peerstate!=-1 && db!=null
+					&& db.getLatestEntry(peerid)<peerstate)
+				{
+				}
 			}
 		}
 		return peer;
@@ -317,21 +370,24 @@ public class PeerList
 	//-------- helper classes --------
 	
 	/**
-	 *  Timer task to periodically ping remote peers.
+	 *  Handler to periodically ping remote peer and synchronize history db.
 	 */
-	public class PeerTimerTask extends TimerTask
+	public class PeerHandler implements Runnable
 	{
 		//-------- attributes --------
 		
 		/** The peer. */
 		protected PeerEntry	peer;
 		
+		/** The shutdown flag. */
+		protected boolean	shutdown;
+		
 		//-------- constructors --------
 		
 		/**
 		 *  Create a timer task.
 		 */
-		public PeerTimerTask(PeerEntry peer)
+		public PeerHandler(PeerEntry peer)
 		{
 			this.peer = peer;
 		}
@@ -339,48 +395,86 @@ public class PeerList
 		//-------- methods --------
 
 		/**
-		 *  Execute the timer task.
+		 *  Execute the handler.
 		 */
 		public void run()
 		{
-			boolean	connected	= peer.isConnected();
-			try
+			while(!shutdown)
 			{
-				// Try to connect and add new peers, if any.
-//				peer.addDebugText("Pinging peer");
-				String	servers	= conman.getPeerServers(peer.getUrl(), url, !peer.isConnected());
-				peer.setConnected(true);
-				for(StringTokenizer stok=new StringTokenizer(servers, ","); stok.hasMoreTokens(); )
+				boolean	connected	= peer.isConnected();
+				try
 				{
-					addPeer(stok.nextToken().trim(), false);
+					// Try to connect and add new peers, if any.
+//					peer.addDebugText("Pinging peer");
+					int	dbstate	= db!=null ? db.getLatestEntry(id) : -1;
+					String	servers	= conman.getPeerServers(peer.getUrl(), url, id, dbstate, !peer.isConnected());
+					peer.setConnected(true);
+					for(StringTokenizer stok=new StringTokenizer(servers, ","); stok.hasMoreTokens(); )
+					{
+						addPeer(stok.nextToken().trim(), false);
+					}
+				}
+				catch(IOException e)
+				{
+					peer.addDebugText("Exception pinging peer: "+e);
+					peer.setConnected(false);
+				}
+				
+				if(peer.isConnected())
+				{
+					if(connected!=peer.isConnected())
+					{
+						informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_ONLINE, peer));
+					}
+					
+					synchronized(this)
+					{
+						try
+						{
+							this.wait(DELAY_ONLINE);
+						}
+						catch(InterruptedException e)
+						{
+						}
+					}
+				}
+				else if(peer.isInitial())
+				{
+					if(connected!=peer.isConnected())
+					{
+						informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_OFFLINE, peer));
+					}
+
+					synchronized(this)
+					{
+						try
+						{
+							this.wait(DELAY_OFFLINE);
+						}
+						catch(InterruptedException e)
+						{
+						}
+					}
+				}
+				else
+				{
+					shutdown	= true;
+					peers.remove(peer.getUrl());
+					handlers.remove(peer.getUrl());
+					informListeners(new ChangeEvent<PeerEntry>(PeerList.this, EVENT_REMOVED, peer));
 				}
 			}
-			catch(IOException e)
+		}
+		
+		/**
+		 *  Shutdown the handler.
+		 */
+		public void	shutdown()
+		{
+			shutdown	= true;
+			synchronized(this)
 			{
-				peer.addDebugText("Exception pinging peer: "+e);
-				peer.setConnected(false);
-			}
-			
-			if(peer.isConnected())
-			{
-				timer.schedule(new PeerTimerTask(peer), DELAY_ONLINE);
-				if(connected!=peer.isConnected())
-				{
-					informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "online", peer));
-				}
-			}
-			else if(peer.isInitial())
-			{
-				timer.schedule(new PeerTimerTask(peer), DELAY_OFFLINE);
-				if(connected!=peer.isConnected())
-				{
-					informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "offline", peer));
-				}
-			}
-			else
-			{
-				peers.remove(peer.getUrl());
-				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "removed", peer));
+				this.notify();
 			}
 		}
 	}

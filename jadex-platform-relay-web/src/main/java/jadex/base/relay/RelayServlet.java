@@ -136,8 +136,23 @@ public class RelayServlet extends HttpServlet
 				{
 					String	requesturl	= request.getRequestURL().toString();
 					String	peerurl	= request.getParameter("peerurl");
+					String	peerid	= request.getParameter("peerid");
+					String	sdbstate	= request.getParameter("peerstate");
 					String	initial	= request.getParameter("initial");
-					String	serverurls	= handler.handleServersRequest(requesturl, peerurl, "true".equals(initial));
+					
+					int	dbstate	= -1;
+					if(sdbstate!=null)
+					{
+						try
+						{
+							dbstate	= Integer.valueOf(sdbstate);
+						}
+						catch(NumberFormatException e)
+						{
+						}
+					}
+					
+					String	serverurls	= handler.handleServersRequest(requesturl, peerurl, peerid, dbstate, "true".equals(initial));
 					request.setAttribute("peers", serverurls);					
 					view	= "/WEB-INF/jsp/servers.jsp";
 				}

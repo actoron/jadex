@@ -120,6 +120,10 @@ public class RelayHandler
 		this.defcodecs	= cfac.getDefaultCodecs();
 		this.peers	= new PeerList();
 		this.statsdb	= StatsDB.createDB(peers.getId());
+		if(statsdb!=null)
+		{
+			peers.setDB(statsdb);
+		}
 		
 		// Register communication classes with aliases
 		STransformation.registerClass(MessageEnvelope.class);
@@ -128,7 +132,7 @@ public class RelayHandler
 		{
 			public void changeOccurred(ChangeEvent<PeerEntry> event)
 			{
-				if("online".equals(event.getType()))
+				if(PeerList.EVENT_ONLINE.equals(event.getType()))
 				{
 					RelayHandler.getLogger().info("Peer added: "+event.getValue().getUrl());
 					if(!event.getValue().isSent())
@@ -137,7 +141,7 @@ public class RelayHandler
 						sendPlatformInfos(event.getValue(), getCurrentPlatforms());
 					}
 				}
-				else if("offline".equals(event.getType()) || "removed".equals(event.getType()))
+				else if(PeerList.EVENT_OFFLINE.equals(event.getType()) || PeerList.EVENT_REMOVED.equals(event.getType()))
 				{
 					RelayHandler.getLogger().info("Peer removed: "+event.getValue().getUrl());
 
@@ -523,8 +527,8 @@ public class RelayHandler
 	 */
 	public void handlePlatform(InputStream in) throws Exception
 	{
-		// Read target id (= peer url).
-		String	id	= readString(in);
+		// Read peer url.
+		String	peerurl	= readString(in);
 		
 		// Read total message length.
 		byte[]	len	= readData(in, 4);
@@ -535,7 +539,7 @@ public class RelayHandler
 		PlatformInfo	info	= (PlatformInfo)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 		
-		PeerEntry	peer	= peers.addPeer(id, false);
+		PeerEntry	peer	= peers.addPeer(peerurl, false);
 		
 		peer.updatePlatformInfo(info);
 		if(info.getAwarenessInfo()!=null)
@@ -549,8 +553,8 @@ public class RelayHandler
 	 */
 	public void handlePlatforms(InputStream in) throws Exception
 	{
-		// Read target id (= peer url).
-		String	id	= readString(in);
+		// Read peer url.
+		String	peerurl	= readString(in);
 		
 		// Read total message length.
 		byte[]	len	= readData(in, 4);
@@ -561,7 +565,7 @@ public class RelayHandler
 		PlatformInfo[]	infos	= (PlatformInfo[])MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 		
-		PeerEntry	peer	= peers.addPeer(id, false);
+		PeerEntry	peer	= peers.addPeer(peerurl, false);
 		
 		// Remember previously connected platforms.
 		Map<String, PlatformInfo>	old	= new LinkedHashMap<String, PlatformInfo>();
@@ -624,13 +628,14 @@ public class RelayHandler
 	 *  Also updates the known peers, if necessary.
 	 *  @param requesturl	Public URL of this relay server as known from the received request.
 	 *  @param peerurl	URL of a remote peer if sent as part of the request (or null).
+	 *  @param peerstate	Latest DB id if sent as part of the request (or -1).
 	 *  @param initial	True when remote peer recovers from failure (or false).
 	 */
-	public String	handleServersRequest(String requesturl, String peerurl, boolean initial)
+	public String	handleServersRequest(String requesturl, String peerurl, String peerid, int peerstate, boolean initial)
 	{
 		if(peerurl!=null)
 		{
-			PeerEntry	peer	= peers.addPeer(peerurl, false);
+			PeerEntry	peer	= peers.addPeer(peerurl, peerid, peerstate);
 
 			// Send own awareness infos to new peer.
 			if(initial)
