@@ -660,7 +660,7 @@ public class StatsDB
 	 *  Get the latest id for a peer.
 	 *  @return The latest id or 0 if no entry for that peer or -1 in case of db error.
 	 */
-	public int	getLatestEntry(String peerid)
+	public synchronized int	getLatestEntry(String peerid)
 	{
 		int	ret;
 		

@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -452,7 +454,9 @@ public class PeerList
 					}
 					catch(IOException e)
 					{
-						peer.addDebugText(connected ? 2 : 3, "Exception pinging peer: "+e);
+						StringWriter	sw	= new StringWriter();
+						e.printStackTrace(new PrintWriter(sw));
+						peer.addDebugText(connected ? 2 : 3, "Exception pinging peer: "+sw);
 						peer.setConnected(false);
 					}
 					
