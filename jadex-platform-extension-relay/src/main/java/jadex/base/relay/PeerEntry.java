@@ -36,8 +36,8 @@ public class PeerEntry
 	/** Have initial platform infos been sent already? */
 	protected boolean	sent;
 	
-	/**	Flag to enable debug text being generated (set debug=true in peer.properties). */
-	protected boolean	debug;
+	/**	Flag to enable debug text being generated (set debug=true or 0..3 in peer.properties). */
+	protected int	debug;
 	
 	/** Debug information as multi-line xml text. */
 	protected String	debugtext;
@@ -47,7 +47,7 @@ public class PeerEntry
 	/**
 	 *  Create a new peer entry.
 	 */
-	public PeerEntry(String url, boolean initial, boolean debug)
+	public PeerEntry(String url, boolean initial, int debug)
 	{
 		this.url	= url;
 		this.initial	= initial;
@@ -89,7 +89,7 @@ public class PeerEntry
 	public void	setSent(boolean sent)
 	{
 		this.sent	= sent;
-		addDebugText("set sent to "+sent);
+		addDebugText(2, "set sent to "+sent);
 	}
 	
 	/**
@@ -99,7 +99,7 @@ public class PeerEntry
 	{
 		if(this.connected!=connected)
 		{
-			addDebugText("Peer "+(connected?"online":"offline"));
+			addDebugText(1, "Peer "+(connected?"online":"offline"));
 		}
 		this.connected	= connected;
 		if(!connected)
@@ -143,12 +143,12 @@ public class PeerEntry
 		if(info.getDisconnectDate()!=null || info.getAwarenessInfo()!=null
 			&& AwarenessInfo.STATE_OFFLINE.equals(info.getAwarenessInfo().getState()))
 		{
-			addDebugText("Remove platform "+info.getId());
+			addDebugText(3, "Remove platform "+info.getId());
 			infos.remove(info.getId());
 		}
 		else
 		{
-			addDebugText("Add/update platform "+info.getId());
+			addDebugText(3, "Add/update platform "+info.getId());
 			infos.put(info.getId(), info);
 		}
 	}
@@ -166,7 +166,7 @@ public class PeerEntry
 	 */
 	public void	clearPlatformInfos()
 	{
-		addDebugText("Clear platforms");
+		addDebugText(2, "Clear platforms");
 		infos.clear();
 	}
 	
@@ -224,9 +224,9 @@ public class PeerEntry
 	/**
 	 *  Add a debug message.
 	 */
-	public synchronized void	addDebugText(String msg)
+	public synchronized void	addDebugText(int level, String msg)
 	{
-		if(debug)
+		if(debug>=level)
 		{
 			debugtext += new Date().toString()+": "+msg+"&#xD;";
 		}

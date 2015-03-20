@@ -663,9 +663,9 @@ public class RelayHandler
 					{
 						peerinfo	= MapSendTask.encodeMessage(info, defcodecs, getClass().getClassLoader(), null);
 					}
-					peer.addDebugText("Sending platform info to peer "+info.getId());
+					peer.addDebugText(3, "Sending platform info to peer "+info.getId());
 					new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfo", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-					peer.addDebugText("Sent platform info to peer "+info.getId());
+					peer.addDebugText(3, "Sent platform info to peer "+info.getId());
 				}
 			}
 		}
@@ -675,7 +675,7 @@ public class RelayHandler
 			{
 				if(peer.isConnected())
 				{
-					peer.addDebugText("Error sending platform info to peer: "+peer.getUrl()+"platforminfo, "+e);
+					peer.addDebugText(3, "Error sending platform info to peer: "+peer.getUrl()+"platforminfo, "+e);
 				}
 			}
 			getLogger().warning("Error sending platform info to peer: "+e);
@@ -689,14 +689,14 @@ public class RelayHandler
 	{
 		try
 		{
-			peer.addDebugText("Sending platform infos to peer: "+infos.length);
+			peer.addDebugText(3, "Sending platform infos to peer: "+infos.length);
 			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader(), null);
 			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-			peer.addDebugText("Sent platform infos.");
+			peer.addDebugText(3, "Sent platform infos.");
 		}
 		catch(IOException e)
 		{
-			peer.addDebugText("Error sending platform infos to peer: "+peer.getUrl()+"platforminfos, "+e);
+			peer.addDebugText(3, "Error sending platform infos to peer: "+peer.getUrl()+"platforminfos, "+e);
 			getLogger().warning("Error sending platform infos to peer: "+peer.getUrl()+"platforminfos, "+e);
 		}					
 	}

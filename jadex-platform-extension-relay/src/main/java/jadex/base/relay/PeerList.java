@@ -80,8 +80,8 @@ public class PeerList
 	/** Change listeners. */
 	protected List<IChangeListener<PeerEntry>>	listeners;
 
-	/**	Flag to enable debug text being generated (set debug=true in peer.properties). */
-	protected boolean	debug;
+	/**	Flag to enable debug text being generated (set debug=true or 0..3 in peer.properties). */
+	protected int	debug;
 
 	//-------- constructors --------
 	
@@ -114,7 +114,7 @@ public class PeerList
 						+" '"+PROPERTY_ID+"' is this relay's own generated ID to differentiate entries from different peers in shared history information.\n"
 						+" Set '"+PROPERTY_URL+"' to this relay's own publically accessible URL, e.g., http://www.mydomain.com:8080/relay (required for enabling peer-to-peer behavior).\n"
 						+" Set '"+PROPERTY_PEERS+"' to a comma separated list of peer server urls to connect to at startup (optional, if this relay should only respond to connections from other peers).\n"
-						+" Set '"+PROPERTY_DEBUG+"=true' for enabling debugging output in html tooltips of peer relay table (optional).");
+						+" Set '"+PROPERTY_DEBUG+"=true' or '"+PROPERTY_DEBUG+"=0..3' for enabling debugging output in html tooltips of peer relay table (optional, 0 means off, 3 is fine grained debug about single platforms).");
 					fos.close();
 				}
 			}
@@ -130,14 +130,14 @@ public class PeerList
 				props.setProperty(PROPERTY_ID, UUID.randomUUID().toString());
 				props.setProperty(PROPERTY_URL, "");
 				props.setProperty(PROPERTY_PEERS, "");
-				props.setProperty(PROPERTY_DEBUG, "false");
+				props.setProperty(PROPERTY_DEBUG, "0");
 				OutputStream	fos	= new FileOutputStream(propsfile);
 				props.store(fos, " Relay peer properties.\n"
 					+" Specify settings below to enable load balancing and exchanging awareness information with other relay servers.\n"
 					+" '"+PROPERTY_ID+"' is this relay's own generated ID to differentiate entries from different peers in shared history information.\n"
 					+" Set '"+PROPERTY_URL+"' to this relay's own publically accessible URL, e.g., http://www.mydomain.com:8080/relay (required for enabling peer-to-peer behavior).\n"
 					+" Set '"+PROPERTY_PEERS+"' to a comma separated list of peer server urls to connect to at startup (optional, if this relay should only respond to connections from other peers).\n"
-					+" Set '"+PROPERTY_DEBUG+"=true' for enabling debugging output in html tooltips of peer relay table (optional).");
+					+" Set '"+PROPERTY_DEBUG+"=true' or '"+PROPERTY_DEBUG+"=0..3' for enabling debugging output in html tooltips of peer relay table (optional, 0 means off, 3 is fine grained debug about single platforms).");
 				fos.close();
 			}
 			catch(Exception e)
@@ -146,7 +146,14 @@ public class PeerList
 			}
 		}
 		
-		this.debug	= "true".equals(props.getProperty(PROPERTY_DEBUG));
+		try
+		{
+			this.debug	= "true".equals(props.getProperty(PROPERTY_DEBUG)) ? 3 : Integer.parseInt(props.getProperty(PROPERTY_DEBUG));
+		}
+		catch(Exception e)
+		{
+			this.debug	= 0;
+		}
 		this.id	= props.getProperty(PROPERTY_ID);
 		
 		// Todo: check that specified url is valid and connects to this server.
@@ -419,7 +426,7 @@ public class PeerList
 					int	localstate	= db.getLatestEntry(peerid);
 					if(localstate<peerstate)
 					{
-						peer.addDebugText("DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
+						peer.addDebugText(2, "DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
 						RelayHandler.getLogger().info("DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
 						// Todo: fetch update from remote peer
 						// conman.getDBUpdate(peer.getUrl(), localstate);
@@ -445,7 +452,7 @@ public class PeerList
 					}
 					catch(IOException e)
 					{
-						peer.addDebugText("Exception pinging peer: "+e);
+						peer.addDebugText(2, "Exception pinging peer: "+e);
 						peer.setConnected(false);
 					}
 					
