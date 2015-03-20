@@ -419,6 +419,7 @@ public class PeerList
 					int	localstate	= db.getLatestEntry(peerid);
 					if(localstate<peerstate)
 					{
+						peer.addDebugText("DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
 						RelayHandler.getLogger().info("DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
 						// Todo: fetch update from remote peer
 						// conman.getDBUpdate(peer.getUrl(), localstate);
