@@ -64,4 +64,26 @@ public interface IFuture<E>
 	 *  @param listener The listener.
 	 */
 	public void addResultListener(IResultListener<E> listener);
+	
+	/**
+	 * Add an OnSuccessListener, which is only called on success.
+	 * Exceptions will be handled by DefaultResultListener.
+	 * @param listener The listener.
+	 */
+	public void addOnSuccessListener(IOnSuccessListener<E> listener);
+	
+	/**
+	 * Add an OnSuccessListener, which is only called on success.
+	 * @param listener The listener.
+	 * @param defaultExceptionHandling Use default exception handling. If false, exceptions will be ignored
+	 * unless other listeners are registered.
+	 */
+	public void addOnSuccessListener(IOnSuccessListener<E> listener, boolean defaultExceptionHandling);
+	
+	/**
+	 * Add an OnExceptionListener, which is only called on exceptions.
+	 * @param listener The listener.
+	 */
+	public void addOnExceptionListener(IOnExceptionListener listener);
+
 }
