@@ -4,6 +4,7 @@ import jadex.android.AndroidContextManager;
 import jadex.android.service.JadexPlatformManager;
 import jadex.base.test.impl.BrokenComponentTest;
 import jadex.bridge.ErrorReport;
+import jadex.bridge.service.BasicService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
@@ -124,8 +125,24 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			Log.i(LOG_TAG, "JadexInstrumentor creating JUnit ComponentTest classes...");
 			
 			if (testClassesArg != null) {
-				Test requestedTest = createTest(testClassesArg, sourceDir, jadexCl);
-				suite.addTest(requestedTest);
+				if (testClassesArg.contains("#")) {
+					testClassesArg = testClassesArg.split("#")[1];
+					
+					try {
+						jadexCl.loadClass(testClassesArg);
+					} catch (Exception e) {
+						try {
+							jadexCl.loadClass(testClassesArg + "Agent");
+							testClassesArg = testClassesArg + "Agent";
+						} catch (Exception e2) {
+							
+						}
+					}
+				}
+				System.out.println("Creating testsuite just for: " + testClassesArg);
+//				Test requestedTest = createTest(testClassesArg, sourceDir, jadexCl);
+				IndividualTest test = new IndividualTest(testClassesArg, sourceDir);
+				suite.addTest(test);
 			} else {
 				for (String testSuiteName : ACTIVATED_TESTS) {
 					suite.addTest(createTest(testSuiteName, sourceDir, jadexCl));
