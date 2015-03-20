@@ -42,7 +42,7 @@ import java.util.List;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.bridge.service.BasicService.getScaledLocalDefaultTimeout(1.5)")})
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.bridge.service.BasicService.getScaledLocalDefaultTimeout(1+12.0/15.0*2)")})
 public class InitiatorAgent extends TestAgent
 {
 	/**

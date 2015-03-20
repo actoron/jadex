@@ -118,13 +118,13 @@ public class ProviderAgent implements ITestService
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		long to = sc.getTimeout();
 	
-		long wait = to>0? to*3: 0;
-//		System.out.println("waiting: "+wait+", "+System.currentTimeMillis());
+		long wait = (to>0? to+2000: 0);
+		System.out.println("waiting: "+wait+", "+System.currentTimeMillis());
 		agent.waitForDelay(wait, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				System.out.println("done waiting: "+System.currentTimeMillis());
+				System.out.println("done waiting: "+System.currentTimeMillis());
 				ret.setResultIfUndone(null);
 				return IFuture.DONE;
 			}
