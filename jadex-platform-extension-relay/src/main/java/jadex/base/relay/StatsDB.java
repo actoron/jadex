@@ -3,6 +3,8 @@ package jadex.base.relay;
 import jadex.bridge.ComponentIdentifier;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -80,7 +82,10 @@ public class StatsDB
 		catch(Exception e)
 		{
 			// Ignore errors and let relay work without stats.
-			RelayHandler.getLogger().warning("Warning: Could not connect to relay stats DB: "+ e);
+			StringWriter	sw	= new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			RelayHandler.getLogger().warning("Warning: Could not connect to relay stats DB: "+ sw.toString());
+			
 		}
 		return ret;
 	}
@@ -208,8 +213,8 @@ public class StatsDB
 			rs.close();
 			
 			stmt.execute("CREATE TABLE RELAY.PLATFORMINFO ("
-				+ "ID	INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,"
-				+ "PEER VARCHAR(60) PRIMARY KEY,"
+				+ "ID	INTEGER NOT NULL AUTO_INCREMENT,"
+				+ "PEER VARCHAR(60),"
 				+ "PLATFORM	VARCHAR(60)," 
 				+ "HOSTIP	VARCHAR(32),"
 				+ "HOSTNAME	VARCHAR(60),"
@@ -219,7 +224,9 @@ public class StatsDB
 				+ "MSGS	INTEGER,"
 				+ "BYTES	DOUBLE,"
 				+ "TRANSTIME	DOUBLE,"
-				+ "PREFIX	VARCHAR(60))");
+				+ "PREFIX	VARCHAR(60),"
+				+ "PRIMARY KEY (ID, PEER)"
+				+ ")");
 		}
 		else
 		{
@@ -276,8 +283,9 @@ public class StatsDB
 				+ "ID	INTEGER,"
 				+ "PEER VARCHAR(60),"
 				+ "NAME	VARCHAR(30)," 
-				+ "VALUE	VARCHAR(60)),"
-				+ "FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
+				+ "VALUE	VARCHAR(60),"
+				+ "FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)"
+				+ ")");
 		}
 		else
 		{
@@ -489,7 +497,17 @@ public class StatsDB
 						{
 							try
 							{
-								PlatformInfo	pi	= new PlatformInfo(Integer.valueOf(rs.getInt("ID")), rs.getString("PEER"), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+								String	peer	= null;
+								try
+								{
+									peer	= rs.getString("PEER");
+								}
+								catch(Exception e)
+								{
+									// Ignore missing peer column from old databases
+								}
+								
+								PlatformInfo	pi	= new PlatformInfo(Integer.valueOf(rs.getInt("ID")), peer, rs.getString("PLATFORM"), rs.getString("HOSTIP"),
 									rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 									rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
 	

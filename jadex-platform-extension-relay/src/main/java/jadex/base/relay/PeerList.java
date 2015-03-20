@@ -452,7 +452,7 @@ public class PeerList
 					}
 					catch(IOException e)
 					{
-						peer.addDebugText(2, "Exception pinging peer: "+e);
+						peer.addDebugText(connected ? 2 : 3, "Exception pinging peer: "+e);
 						peer.setConnected(false);
 					}
 					
