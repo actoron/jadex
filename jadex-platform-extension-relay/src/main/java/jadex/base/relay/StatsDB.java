@@ -511,7 +511,7 @@ public class StatsDB
 									rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 									rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
 	
-								// Load latest properties of platform.
+								// Load latest properties of platform. (for migration from derby, no peer required)
 								if(properties)
 								{
 									Map<String, String>	props	= new HashMap<String, String>();
@@ -564,19 +564,84 @@ public class StatsDB
 	}
 	
 	/**
+	 *  Get platform infos for history synchronization
+	 *  @param peerid	The peer id;
+	 *  @param startid	Start id;
+	 *  @param cnt	The number of entries to retrieve;
+	 *  @return Up to cnt platform infos (less means no more available).
+	 */
+	public PlatformInfo[]	getPlatformInfosForSync(String peerid, int startid, int cnt)
+	{
+		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
+		
+		if(con!=null)
+		{
+			ResultSet	rs	= null;
+			try
+			{
+				PreparedStatement	ps	= con.prepareStatement("SELECT * FROM RELAY.PROPERTIES WHERE PEER=? AND ID=?");
+
+				PreparedStatement	qpls	= con.prepareStatement(
+					"SELECT * FROM RELAY.PLATFORMINFO "
+					+ "WHERE PEER=? AND ID>=? "
+					+ "ORDER BY ID ASC ");
+				
+				qpls.setString(1, peerid);
+				qpls.setInt(2, startid);
+				rs	= qpls.executeQuery();
+				
+				while(rs.next() && ret.size()<cnt)
+				{
+					PlatformInfo	pi	= new PlatformInfo(rs.getInt("ID"), rs.getString("PEER"), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+						rs.getString("HOSTNAME"), null, rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
+						rs.getInt("MSGS"), 0, 0);
+					ret.add(pi);
+						
+					// Load latest properties of platform.
+					Map<String, String>	props	= new HashMap<String, String>();
+					pi.setProperties(props);
+					ps.setString(1, pi.getPeerId());
+					ps.setInt(2, pi.getDBId());
+					ResultSet	rs2	= ps.executeQuery();
+					while(rs2.next())
+					{
+						props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+					}
+					rs2.close();
+				}
+				qpls.close();
+				rs.close();
+			}
+			catch(Exception e)
+			{
+				if(rs!=null)
+				{
+					try
+					{
+						rs.close();
+					}
+					catch(SQLException sqle)
+					{
+						// ignore
+					}
+				}
+				e.printStackTrace();
+				// Ignore errors and let relay work without stats.
+				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
+			}
+		}
+		return ret.toArray(new PlatformInfo[ret.size()]);
+	}
+
+	/**
 	 *  Get cumulated platform infos per ip to use for display (sorted by recency, newest first).
 	 *  @param limit	Limit the number of results (-1 for no limit);
 	 *  @param startid	Start id (-1 for all entries);
 	 *  @param endid	End id (-1 for all entries);
 	 *  @return Up to limit platform infos.
 	 */
-	public PlatformInfo[]	getPlatformInfos(int limit, int startid, int endid)
+	public PlatformInfo[]	getPlatformInfos(int limit)
 	{
-		if(endid==-1)
-		{
-			endid	= Integer.MAX_VALUE;
-		}
-		
 		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
 		
 		if(con!=null)
@@ -588,7 +653,7 @@ public class StatsDB
 				rs	= con.createStatement().executeQuery(
 					"select max(id) as ID, prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
 					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
-					+"from relay.platforminfo where id>="+startid+" AND id<="+endid+" "
+					+"from relay.platforminfo "
 					+"group by hostip, prefix order by CONTIME desc");
 				
 //				PreparedStatement	ps	= con.prepareStatement("select * from relay.properties where ID=?");
@@ -655,7 +720,7 @@ public class StatsDB
 		}
 		return ret.toArray(new PlatformInfo[ret.size()]);
 	}
-	
+
 	/**
 	 *  Get the latest id for a peer.
 	 *  @return The latest id or 0 if no entry for that peer or -1 in case of db error.
@@ -688,8 +753,6 @@ public class StatsDB
 		{
 			// Ignore errors and let relay work without stats.
 			RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
-			List<PlatformInfo> list = Collections.emptyList();
-			
 			ret	= -1;
 		}
 		
@@ -790,7 +853,7 @@ public class StatsDB
 			System.out.println("Latest: "+db.getLatestEntry("test"));
 			System.out.println("---");
 			
-			printPlatformInfos(db.getPlatformInfos(-1, -1, -1));
+			printPlatformInfos(db.getPlatformInfos(-1));
 			System.out.println("---");
 			
 			printPlatformInfos(db.getAllPlatformInfos(false));

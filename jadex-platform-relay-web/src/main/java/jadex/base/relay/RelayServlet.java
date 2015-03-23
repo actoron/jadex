@@ -90,13 +90,11 @@ public class RelayServlet extends HttpServlet
 			// Render status page.
 			if(id==null)
 			{
-				String	view;
+				String	view	= null;
 				// todo: add request property
 				if("/history".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
 					int	cnt	= 20;
-					int	startid	= -1;
-					int	endid	= -1;
 					try
 					{
 						cnt	= Integer.parseInt(request.getParameter("cnt"));
@@ -104,26 +102,12 @@ public class RelayServlet extends HttpServlet
 					catch(RuntimeException e)
 					{
 					}
-					try
-					{
-						startid	= Integer.parseInt(request.getParameter("startid"));
-					}
-					catch(RuntimeException e)
-					{
-					}
-					try
-					{
-						endid	= Integer.parseInt(request.getParameter("endid"));
-					}
-					catch(RuntimeException e)
-					{
-					}
-					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(cnt, startid, endid));
+					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(cnt));
 					view	= "/WEB-INF/jsp/history.jsp";
 				}
 				else if("/history_all".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
-					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(-1, -1, -1));
+					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(-1));
 					view	= "/WEB-INF/jsp/history.jsp";
 				}
 				else if("/export".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
@@ -131,6 +115,63 @@ public class RelayServlet extends HttpServlet
 					// Todo: properties
 					request.setAttribute("platforms", handler.getStatisticsDB().getAllPlatformInfos(false));
 					view	= "/WEB-INF/jsp/csv.jsp";
+				}
+				else if("/sync".equals(request.getServletPath()))
+				{
+					String	peerid	= request.getParameter("peerid");
+					String	sstartid	= request.getParameter("startid");
+					String	scnt	= request.getParameter("scnt");
+					int	startid	= -1;
+					int	cnt	= -1;
+					try
+					{
+						startid	= Integer.valueOf(sstartid);
+						cnt	= Integer.valueOf(scnt);
+					}
+					catch(Exception e)
+					{
+					}
+					
+					if(peerid!=null && startid!=-1 && cnt!=-1)
+					{
+						PlatformInfo[]	pi	= handler.getStatisticsDB().getPlatformInfosForSync(peerid, startid, cnt);
+						
+//			        	response.setContentLength((int)file.length());
+//			            response.setDateHeader("Last-Modified", file.lastModified());
+//			            response.setDateHeader("Expires", System.currentTimeMillis() + MAXAGE*1000);
+//			            response.addHeader("Cache-Control", "max-age="+MAXAGE);
+//			            String	mimetype	= URLConnection.guessContentTypeFromName(file.getName());
+//			        	if(mimetype!=null)
+//			        	{
+//			        		response.setContentType(mimetype);
+//			        	}
+//			        	
+//						// Copy file content to output stream.
+//			        	FileInputStream	in	= null;
+//			        	try
+//			        	{
+//				        	in	= new FileInputStream(file);
+//							byte[]	buf	= new byte[8192];  
+//							int	len;
+//							while((len=in.read(buf)) != -1)
+//							{
+//								response.getOutputStream().write(buf, 0, len);
+//							}
+//			        	}
+//			        	finally
+//			        	{
+//			        		if(in!=null)
+//			        		{
+//			        			in.close();
+//			        		}
+//			        	}
+					}
+					else
+					{
+						// Set content length to avoid error page being sent.
+						response.setStatus(400);
+						response.setContentLength(0);
+					}
 				}
 				else if("/servers".equals(request.getServletPath()))
 				{
@@ -166,8 +207,12 @@ public class RelayServlet extends HttpServlet
 					request.setAttribute("refresh", "30");
 					view	= "/WEB-INF/jsp/status.jsp";
 				}
-				RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
-				rd.forward(request, response);
+				
+				if(view!=null)
+				{
+					RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
+					rd.forward(request, response);
+				}
 			}
 			
 			// Handle platform connection.
