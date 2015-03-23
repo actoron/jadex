@@ -599,6 +599,16 @@ public class RelayHandler
 	}
 	
 	/**
+	 *  Send requested db entries.
+	 */
+	public void handleSyncRequest(String peerid, int startid, int cnt, OutputStream out) throws Exception
+	{
+		PlatformInfo[]	pi	= getStatisticsDB().getPlatformInfosForSync(peerid, startid, cnt);
+		byte[]	entries	= MapSendTask.encodeMessage(pi, defcodecs, getClass().getClassLoader(), null);
+		out.write(entries);
+	}
+
+	/**
 	 *  Get the current platforms
 	 */
 	public PlatformInfo[]	getCurrentPlatforms()

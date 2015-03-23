@@ -120,54 +120,19 @@ public class RelayServlet extends HttpServlet
 				{
 					String	peerid	= request.getParameter("peerid");
 					String	sstartid	= request.getParameter("startid");
-					String	scnt	= request.getParameter("scnt");
+					String	scnt	= request.getParameter("cnt");
 					int	startid	= -1;
 					int	cnt	= -1;
 					try
 					{
 						startid	= Integer.valueOf(sstartid);
 						cnt	= Integer.valueOf(scnt);
+						response.setHeader("Content-Disposition", "attachment; filename=relay_dbentries.ser");
+						handler.handleSyncRequest(peerid, startid, cnt, response.getOutputStream());
 					}
 					catch(Exception e)
 					{
-					}
-					
-					if(peerid!=null && startid!=-1 && cnt!=-1)
-					{
-						PlatformInfo[]	pi	= handler.getStatisticsDB().getPlatformInfosForSync(peerid, startid, cnt);
-						
-//			        	response.setContentLength((int)file.length());
-//			            response.setDateHeader("Last-Modified", file.lastModified());
-//			            response.setDateHeader("Expires", System.currentTimeMillis() + MAXAGE*1000);
-//			            response.addHeader("Cache-Control", "max-age="+MAXAGE);
-//			            String	mimetype	= URLConnection.guessContentTypeFromName(file.getName());
-//			        	if(mimetype!=null)
-//			        	{
-//			        		response.setContentType(mimetype);
-//			        	}
-//			        	
-//						// Copy file content to output stream.
-//			        	FileInputStream	in	= null;
-//			        	try
-//			        	{
-//				        	in	= new FileInputStream(file);
-//							byte[]	buf	= new byte[8192];  
-//							int	len;
-//							while((len=in.read(buf)) != -1)
-//							{
-//								response.getOutputStream().write(buf, 0, len);
-//							}
-//			        	}
-//			        	finally
-//			        	{
-//			        		if(in!=null)
-//			        		{
-//			        			in.close();
-//			        		}
-//			        	}
-					}
-					else
-					{
+						e.printStackTrace();
 						// Set content length to avoid error page being sent.
 						response.setStatus(400);
 						response.setContentLength(0);
