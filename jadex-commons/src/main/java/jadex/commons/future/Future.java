@@ -479,56 +479,21 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		}
 	}
 	
-	/**
-	 * Add an OnSuccessListener, which is only called on success.
-	 * Exceptions will be handled by DefaultResultListener.
-	 * @param listener The listener.
-	 */
-	public void addOnSuccessListener(final IOnSuccessListener<E> listener) {
-		addOnSuccessListener(listener, true);
+	public void addExceptionListener(final IOnExceptionListener listener) {
+		IOnSuccessListener<E> emptySuccessListener = SResultListener.ignoreResults();
+		addResultListener(SResultListener.resultListener(emptySuccessListener, listener));
 	}
 	
-	/**
-	 * Add an OnSuccessListener, which is only called on success.
-	 * @param listener The listener.
-	 * @param defaultExceptionHandling Use default exception handling. If false, exceptions will be ignored
-	 * unless other listeners are registered.
-	 */
-	public void addOnSuccessListener(final IOnSuccessListener<E> listener, final boolean defaultExceptionHandling) {
-		addResultListener(new DefaultResultListener<E>() {
-
-			@Override
-			public void resultAvailable(E result) {
-				listener.resultAvailable(result);
-			}
-
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				if (defaultExceptionHandling) {
-					super.exceptionOccurred(exception);
-				}
-			}
-		});
+	public void addResultListener(final IOnSuccessListener<E> sucListener) {
+		addResultListener(SResultListener.resultListener(sucListener));
 	}
 	
-	/**
-	 * Add an OnExceptionListener, which is only called on exceptions.
-	 * @param listener The listener.
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void addOnExceptionListener(final IOnExceptionListener listener) {
-		addResultListener(new IResultListener() {
-
-			@Override
-			public void resultAvailable(Object result) {
-				// listener cannot handle result
-			}
-
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				listener.exceptionOccurred(exception);
-			}
-		});
+	public void addResultListener(final IOnSuccessListener<E> sucListener, final boolean defaultExceptionHandling) {
+		addResultListener(SResultListener.resultListener(sucListener, true));
+	}
+	
+	public void addResultListener(final IOnSuccessListener<E> sucListener, final IOnExceptionListener exListener) {
+		addResultListener(SResultListener.resultListener(sucListener, exListener));
 	}
 	
     /**
