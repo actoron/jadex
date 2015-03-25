@@ -4,7 +4,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.HttpConnectionManager;
 import jadex.commons.SUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
@@ -210,6 +212,40 @@ public class RelayConnectionManager	extends HttpConnectionManager
 			}			
 		}
 	}
+	
+	public byte[] getDBEntries(String peeraddress, String peerid, int startid, int cnt)	throws IOException
+	{
+		byte[]	ret;
+		HttpURLConnection	con	= null;
+		peeraddress	= httpAddress(peeraddress);
+		try
+		{
+			con	= openConnection(peeraddress+"sync"
+				+ "?peerid="+URLEncoder.encode(peerid, "UTF-8")
+				+ "&startid="+startid
+				+ "&cnt="+cnt);
+			
+			InputStream	is	= con.getInputStream();
+			ByteArrayOutputStream	baos = new ByteArrayOutputStream();
+			int	read;
+			byte[]	buf	= new byte[8192];
+			while((read=is.read(buf))!=-1)
+			{
+				baos.write(buf, 0, read);
+			}
+			baos.flush();
+			ret	= baos.toByteArray();
+		}
+		finally
+		{
+			if(con!=null)
+			{
+				remove(con);
+			}
+		}
+		return ret;
+	}
+
 	
 	//-------- helper methods --------
 	

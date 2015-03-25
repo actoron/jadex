@@ -2,12 +2,13 @@ package jadex.base.relay;
 
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.platform.service.message.MapSendTask;
+import jadex.platform.service.message.transport.codecs.CodecFactory;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -53,6 +54,9 @@ public class PeerList
 	/** The property for the debug flag. */
 	public static final String	PROPERTY_DEBUG	= "debug";
 	
+	/** The property for the db synchronization flag. */
+	public static final String	PROPERTY_DBSYNC	= "dbsync";
+	
 	/** Delay between two pings when a peer is connected. */
 	public static final long	DELAY_ONLINE	= 30000;
 	
@@ -81,6 +85,9 @@ public class PeerList
 	
 	/** Change listeners. */
 	protected List<IChangeListener<PeerEntry>>	listeners;
+
+	/**	Flag to enable db synchronization (set debug=true in peer.properties). */
+	protected boolean	dbsync;
 
 	/**	Flag to enable debug text being generated (set debug=true or 0..3 in peer.properties). */
 	protected int	debug;
@@ -116,6 +123,7 @@ public class PeerList
 						+" '"+PROPERTY_ID+"' is this relay's own generated ID to differentiate entries from different peers in shared history information.\n"
 						+" Set '"+PROPERTY_URL+"' to this relay's own publically accessible URL, e.g., http://www.mydomain.com:8080/relay (required for enabling peer-to-peer behavior).\n"
 						+" Set '"+PROPERTY_PEERS+"' to a comma separated list of peer server urls to connect to at startup (optional, if this relay should only respond to connections from other peers).\n"
+						+" Set '"+PROPERTY_DBSYNC+"' to true, if synchronization with other relay history DBs is desired (optional).\n"
 						+" Set '"+PROPERTY_DEBUG+"=true' or '"+PROPERTY_DEBUG+"=0..3' for enabling debugging output in html tooltips of peer relay table (optional, 0 means off, 3 is fine grained debug about single platforms).");
 					fos.close();
 				}
@@ -132,6 +140,7 @@ public class PeerList
 				props.setProperty(PROPERTY_ID, UUID.randomUUID().toString());
 				props.setProperty(PROPERTY_URL, "");
 				props.setProperty(PROPERTY_PEERS, "");
+				props.setProperty(PROPERTY_DBSYNC, "false");
 				props.setProperty(PROPERTY_DEBUG, "0");
 				OutputStream	fos	= new FileOutputStream(propsfile);
 				props.store(fos, " Relay peer properties.\n"
@@ -139,6 +148,7 @@ public class PeerList
 					+" '"+PROPERTY_ID+"' is this relay's own generated ID to differentiate entries from different peers in shared history information.\n"
 					+" Set '"+PROPERTY_URL+"' to this relay's own publically accessible URL, e.g., http://www.mydomain.com:8080/relay (required for enabling peer-to-peer behavior).\n"
 					+" Set '"+PROPERTY_PEERS+"' to a comma separated list of peer server urls to connect to at startup (optional, if this relay should only respond to connections from other peers).\n"
+					+" Set '"+PROPERTY_DBSYNC+"' to true, if synchronization with other relay history DBs is desired (optional).\n"
 					+" Set '"+PROPERTY_DEBUG+"=true' or '"+PROPERTY_DEBUG+"=0..3' for enabling debugging output in html tooltips of peer relay table (optional, 0 means off, 3 is fine grained debug about single platforms).");
 				fos.close();
 			}
@@ -157,6 +167,7 @@ public class PeerList
 			this.debug	= 0;
 		}
 		this.id	= props.getProperty(PROPERTY_ID);
+		this.dbsync	= "true".equals(props.getProperty(PROPERTY_DBSYNC));
 		
 		// Todo: check that specified url is valid and connects to this server.
 		this.url	= props.containsKey(PROPERTY_URL) && !"".equals(props.getProperty(PROPERTY_URL))
@@ -423,16 +434,32 @@ public class PeerList
 			while(!shutdown)
 			{
 				// Perform DB synchronization, if required.
-				if(peerstate!=-1 && db!=null)
+				if(dbsync && peerstate!=-1 && db!=null)
 				{
 					int	localstate	= db.getLatestEntry(peerid);
 					if(localstate<peerstate)
 					{
-						peer.addDebugText(2, "DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
-						RelayHandler.getLogger().info("DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
-						// Todo: fetch update from remote peer
-						// conman.getDBUpdate(peer.getUrl(), localstate);
-						peerstate	= -1;
+						try
+						{
+							peer.addDebugText(2, "DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
+							RelayHandler.getLogger().info("Start DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
+							// Fetch update from remote peer
+							byte[]	infos	= conman.getDBEntries(peer.getUrl(), peerid, localstate+1, 1000);	// Hack!!! Update (only) 1000 entries per 30 seconds!?
+							PlatformInfo[]	pinfos	= (PlatformInfo[])MapSendTask.decodeMessage(infos, new CodecFactory().getAllCodecs(), getClass().getClassLoader(), null);	// Hack!!! Use codec factory from relay handler?
+							for(PlatformInfo info: pinfos)
+							{
+								db.save(info);
+							}
+							peerstate	= -1;
+							RelayHandler.getLogger().info("Finished DB synchronization with: "+peer.getUrl()+", local="+localstate+", remote="+peerstate);
+						}
+						catch(Exception e)
+						{
+							StringWriter	sw	= new StringWriter();
+							e.printStackTrace(new PrintWriter(sw));
+							peer.addDebugText(2, "Exception fetching DB update: "+sw);
+							RelayHandler.getLogger().warning("Exception fetching DB update: "+sw);
+						}
 					}
 				}
 				
@@ -452,7 +479,7 @@ public class PeerList
 							addPeer(stok.nextToken().trim(), false);
 						}
 					}
-					catch(IOException e)
+					catch(Exception e)
 					{
 						StringWriter	sw	= new StringWriter();
 						e.printStackTrace(new PrintWriter(sw));

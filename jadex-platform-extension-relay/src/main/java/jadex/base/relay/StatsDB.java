@@ -55,6 +55,9 @@ public class StatsDB
 	/** The prepared insert properties statement. */
 	protected PreparedStatement	insertprops;
 	
+	/** The latest entries (cached for speed). */
+	protected Map<String, Integer>	latest;
+	
 	//-------- constructors --------
 	
 	/**
@@ -95,6 +98,7 @@ public class StatsDB
 	 */
 	protected StatsDB(String peerid, Connection con)
 	{
+		this.latest	= new HashMap<String, Integer>();
 		this.peerid	= peerid;
 		this.con	= con;
 	}
@@ -438,6 +442,12 @@ public class StatsDB
 						insertprops.executeUpdate();
 					}
 				}
+				
+				// Remove latest entry cache as new platform info might be the new latest, but may be not.
+				if(pi.getPeerId()!=null && latest.containsKey(pi.getPeerId()))
+				{
+					latest.remove(pi.getPeerId());
+				}
 			}
 			catch(Exception e)
 			{
@@ -729,31 +739,40 @@ public class StatsDB
 	{
 		int	ret;
 		
-		try
+		if(latest.containsKey(peerid))
 		{
-			if(getlatest==null)
-			{
-				getlatest	= con.prepareStatement("SELECT MAX(ID) FROM relay.platforminfo"
-					+ " WHERE PEER=? and DISTIME IS NOT NULL");
-			}
-			
-			getlatest.setString(1, peerid);
-			ResultSet	rs	= getlatest.executeQuery();
-			if(rs.next())
-			{
-				ret	= rs.getInt(1);
-			}
-			else
-			{
-				ret	= 0;
-			}
-			rs.close();
+			ret	= latest.get(peerid).intValue();
 		}
-		catch(Exception e)
+		else
 		{
-			// Ignore errors and let relay work without stats.
-			RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
-			ret	= -1;
+			try
+			{
+				if(getlatest==null)
+				{
+					getlatest	= con.prepareStatement("SELECT MAX(ID) FROM relay.platforminfo"
+						+ " WHERE PEER=? and DISTIME IS NOT NULL");
+				}
+				
+				getlatest.setString(1, peerid);
+				ResultSet	rs	= getlatest.executeQuery();
+				if(rs.next())
+				{
+					ret	= rs.getInt(1);
+				}
+				else
+				{
+					ret	= 0;
+				}
+				rs.close();
+				
+				latest.put(peerid, new Integer(ret));
+			}
+			catch(Exception e)
+			{
+				// Ignore errors and let relay work without stats.
+				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
+				ret	= -1;
+			}
 		}
 		
 		return ret;
