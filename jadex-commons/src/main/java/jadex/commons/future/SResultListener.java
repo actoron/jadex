@@ -236,5 +236,96 @@ public class SResultListener {
     	};
     }
     
+    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IOnSuccessListener<E> firstSuccessListener, final IOnSuccessListener<F> secondSuccessListener) {
+    	return tuple2Result(firstSuccessListener, secondSuccessListener, true);
+	}
+    
+    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IOnSuccessListener<E> firstSuccessListener, final IOnSuccessListener<F> secondSuccessListener, final boolean defaultExceptionHandling) {
+    	return tuple2Result(firstSuccessListener, secondSuccessListener, new IOnExceptionListener() {
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				if (defaultExceptionHandling) {
+					new DefaultResultListener<E>() {
+						@Override
+						public void resultAvailable(E result) {
+						}
+					}.exceptionOccurred(exception);
+				}
+			}
+		});
+    }
+    
+    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IOnSuccessListener<E> firstSuccessListener, final IOnSuccessListener<F> secondSuccessListener, final IOnExceptionListener exListener) {
+    	return new DefaultTuple2ResultListener<E, F>() {
+
+			@Override
+			public void firstResultAvailable(E result) {
+				firstSuccessListener.resultAvailable(result);
+			}
+
+			@Override
+			public void secondResultAvailable(F result) {
+				secondSuccessListener.resultAvailable(result);
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				exListener.exceptionOccurred(exception);
+			}
+		};
+    }
+    
+    public static <E> IIntermediateResultListener<E> intermediate(final IOnSuccessListener<E> intermediateListener) {
+		return intermediate(intermediateListener, null, true);
+    }
+    
+    public static <E> IIntermediateResultListener<E> intermediate(final IOnSuccessListener<E> intermediateListener, final IOnSuccessListener<Void> finishedListener) {
+		return intermediate(intermediateListener, finishedListener, true);
+    }
+    
+    public static <E> IIntermediateResultListener<E> intermediate(final IOnSuccessListener<E> intermediateListener, final IOnSuccessListener<Void> finishedListener, final boolean defaultExceptionHandling) {
+		return new IntermediateDefaultResultListener<E>() {
+
+			@Override
+			public void intermediateResultAvailable(E result) {
+				intermediateListener.resultAvailable(result);
+			}
+
+			@Override
+			public void finished() {
+				finishedListener.resultAvailable(null);
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				if (defaultExceptionHandling) {
+					super.exceptionOccurred(exception);
+				}
+			}
+		};
+    }
+    
+    public static <E> IIntermediateResultListener<E> intermediate(final IOnSuccessListener<E> intermediateListener, final IOnSuccessListener<Void> finishedListener, final IOnExceptionListener exListener) {
+		return new IntermediateDefaultResultListener<E>() {
+
+			@Override
+			public void intermediateResultAvailable(E result) {
+				intermediateListener.resultAvailable(result);
+			}
+
+			@Override
+			public void finished() {
+				if (finishedListener != null) {
+					finishedListener.resultAvailable(null);
+				}
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				exListener.exceptionOccurred(exception);
+			}
+		};
+    }
+    
  
 }
