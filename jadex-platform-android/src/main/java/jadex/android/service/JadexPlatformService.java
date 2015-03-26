@@ -12,11 +12,15 @@ import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 import android.content.Intent;
@@ -39,7 +43,26 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	public JadexPlatformService()
 	{
 		jadexPlatformManager = JadexPlatformManager.getInstance();
-		platformKernels = JadexPlatformManager.DEFAULT_KERNELS;
+		
+		// make sure default kernels all exist in classpath
+		ArrayList<String> kernelList = new ArrayList<String>();
+		ClassLoader myCL = getClass().getClassLoader();
+		if (SReflect.classForName0("jadex.component.ComponentComponentFactory", myCL) != null) {
+			kernelList.add(JadexPlatformManager.KERNEL_COMPONENT);
+		}
+		if (SReflect.classForName0("jadex.micro.MicroAgentFactory", myCL) != null) {
+			kernelList.add(JadexPlatformManager.KERNEL_MICRO);
+		}
+		if (SReflect.classForName0("jadex.bpmn.BpmnFactory", myCL) != null) {
+			kernelList.add(JadexPlatformManager.KERNEL_BPMN);
+		}
+		if (SReflect.classForName0("jadex.bdiv3.BDIAgentFactory", myCL) != null) {
+			kernelList.add(JadexPlatformManager.KERNEL_MICRO);
+		}
+		
+		int size = kernelList.size();
+		platformKernels = kernelList.toArray(new String[size]);
+		System.out.println("Starting with " + Arrays.toString(platformKernels));
 	}
 
 	@Override

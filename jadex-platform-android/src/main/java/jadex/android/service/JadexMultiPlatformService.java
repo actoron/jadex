@@ -150,10 +150,10 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		return jadexPlatformManager.getService(platformId, serviceClazz, scope);
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform()
-	{
-		return startJadexPlatform(DEFAULT_KERNELS);
-	}
+//	public IFuture<IExternalAccess> startJadexPlatform()
+//	{
+//		return startJadexPlatform();
+//	}
 
 	public final IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
 	{
@@ -168,33 +168,37 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
 	{
 		onPlatformStarting();
-		IFuture<IExternalAccess> fut;
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+		
+		IFuture<IExternalAccess> internalFut;
 		if (useSharedPlatform) {
 			Logger.i("Using shared Platform - options will be ignored!");
-			fut = jadexPlatformManager.startSharedJadexPlatform();
+			internalFut = jadexPlatformManager.startSharedJadexPlatform();
 		} else {
-			fut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
+			internalFut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
 		}
-		fut.addResultListener(new DefaultResultListener<IExternalAccess>()
-		{
-			public void resultAvailable(final IExternalAccess result)
-			{
+		
+		internalFut.addResultListener(new DefaultResultListener<IExternalAccess>() {
+			@Override
+			public void resultAvailable(final IExternalAccess result) {
 				// new thread to reset IComponentIdentifier.LOCAL which is set to the platform now
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
 						JadexMultiPlatformService.this.onPlatformStarted(result);
+						ret.setResult(result);
 					}
 				}).start();
 			}
 			
-			public void exceptionOccurred(Exception exception)
-			{
+			@Override
+			public void exceptionOccurred(Exception exception) {
 				exception.printStackTrace();
 				super.exceptionOccurred(exception);
 			}
 		});
-		return fut;
+		
+		return ret;
 	}
 
 	/**
