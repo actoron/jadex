@@ -163,11 +163,11 @@ public class StatsDB
 			Statement	stmt	= con.createStatement();
 			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
 			
-			// Update platform entries where hostname is same as ip.
+			// Update legacy platform entries where hostname is same as ip.
 			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
 			stmt.close();
 			
-			// Replace android platform names and-xxx to and_xxx
+			// Replace legacy android platform names and-xxx to and_xxx
 			PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
 			rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
 			while(rs.next())
@@ -218,7 +218,7 @@ public class StatsDB
 			
 			stmt.execute("CREATE TABLE RELAY.PLATFORMINFO ("
 				+ "ID	INTEGER NOT NULL AUTO_INCREMENT,"
-				+ "PEER VARCHAR(60),"
+				+ "PEER VARCHAR(60) NOT NULL,"
 				+ "PLATFORM	VARCHAR(60)," 
 				+ "HOSTIP	VARCHAR(32),"
 				+ "HOSTNAME	VARCHAR(60),"
@@ -236,7 +236,7 @@ public class StatsDB
 		{
 			rs.close();
 			
-			// Add peer column, if it doesn't exist.
+			// Add peer column, if it doesn't exist. (legacy for broken migrations from derby)
 			rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PEER");
 			if(!rs.next())
 			{
@@ -247,33 +247,31 @@ public class StatsDB
 				stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET PEER='"+peerid+"' WHERE PEER IS NULL");
 				
 				// Include peer column in primary key constraint.
-				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PRIMARY KEY(PEER)");
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ALTER COLUMN PEER SET NOT NULL");
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO DROP PRIMARY KEY");
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PRIMARY KEY(ID, PEER)");
 			}
 			else
 			{
+				// Add primary key, if it does not exist. (legacy for broken migrations from derby)
+				rs.close();
+				
+				rs	= meta.getPrimaryKeys(null, "RELAY", "PLATFORMINFO");
+				boolean	pks	= rs.next(); 
+				if(!pks || !rs.next())	// None or only one pk column
+				{
+					stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ALTER COLUMN PEER SET NOT NULL");
+					if(pks)
+					{
+						stmt.execute("ALTER TABLE RELAY.PLATFORMINFO DROP PRIMARY KEY");
+					}
+					stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PRIMARY KEY(ID, PEER)");
+				}
 				rs.close();
 			}
 
 			// Update platform entries where disconnection was missed.
 			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
-			
-			// Update platform entries where hostname is same as ip.
-			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
-			
-			// Replace android platform names and-xxx to and_xxx
-			PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
-			rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
-			while(rs.next())
-			{
-				int	param	= 1;
-				String	name	= "and_"+rs.getString("PLATFORM").substring(4);
-				update.setString(param++, name);
-				update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
-				update.setInt(param++, rs.getInt("ID"));
-				update.executeUpdate();
-			}
-			rs.close();
-			update.close();
 		}
 
 		// Create the properties table, if it doesn't exist.
@@ -284,8 +282,8 @@ public class StatsDB
 		{
 			rs.close();
 			con.createStatement().execute("CREATE TABLE RELAY.PROPERTIES ("
-				+ "ID	INTEGER,"
-				+ "PEER VARCHAR(60),"
+				+ "ID	INTEGER NOT NULL,"
+				+ "PEER VARCHAR(60) NOT NULL,"
 				+ "NAME	VARCHAR(30)," 
 				+ "VALUE	VARCHAR(60),"
 				+ "FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)"
@@ -294,7 +292,7 @@ public class StatsDB
 		else
 		{
 			rs.close();
-			// Add peer column, if it doesn't exist.
+			// Add peer column, if it doesn't exist. (legacy for broken migrations from derby)
 			rs	= meta.getColumns(null, "RELAY", "PROPERTIES", "PEER");
 			if(!rs.next())
 			{
@@ -305,11 +303,20 @@ public class StatsDB
 				stmt.executeUpdate("UPDATE RELAY.PROPERTIES SET PEER='"+peerid+"' WHERE PEER IS NULL");
 				
 				// Include peer column in foreing key constraint.
-				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO DROP CONSTRAINT PLATFORM_KEY");
-				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
+				stmt.execute("ALTER TABLE RELAY.PROPERTIES ALTER COLUMN PEER SET NOT NULL");
+				stmt.execute("ALTER TABLE RELAY.PROPERTIES DROP CONSTRAINT PLATFORM_KEY");
+				stmt.execute("ALTER TABLE RELAY.PROPERTIES ADD FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
 			}
 			else
 			{
+				// Add foreign key, if it does not exist. (legacy for broken migrations from derby)
+				rs.close();
+				
+				rs	= meta.getImportedKeys(null, "RELAY", "PROPERTIES");
+				if(!rs.next() || !rs.next())	// None or only one fk column
+				{
+					stmt.execute("ALTER TABLE RELAY.PROPERTIES ADD FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
+				}
 				rs.close();
 			}
 		}
@@ -925,6 +932,23 @@ public class StatsDB
 				System.out.print(rs.getMetaData().getColumnName(i)+": "+rs.getString(i)+", ");
 			}
 			System.out.println();
+		}		
+	}
+	
+	/**
+	 *  Print out the contents of a result set.
+	 */
+	protected static void	logResultSet(ResultSet rs) throws Exception
+	{
+		while(rs.next())
+		{
+			int	cnt	= rs.getMetaData().getColumnCount();
+			String	col	= "";
+			for(int i=1; i<=cnt; i++)
+			{
+				col	+= rs.getMetaData().getColumnName(i)+": "+rs.getString(i)+", ";
+			}
+			RelayHandler.getLogger().info(col);
 		}		
 	}
 }
