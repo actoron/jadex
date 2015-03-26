@@ -29,7 +29,7 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 
 	public IFuture<IExternalAccess> startJadexPlatform()
 	{
-		return service.startJadexPlatform();
+		return service.startJadexPlatform(service.getPlatformKernels());
 	}
 
 	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)

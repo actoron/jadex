@@ -88,10 +88,13 @@ public interface IJadexMultiPlatformBinder
 	 * 
 	 * @return IFuture<IExternalAccess> The external platform access
 	 */
-	public IFuture<IExternalAccess> startJadexPlatform();
+//	public IFuture<IExternalAccess> startJadexPlatform();
 
 	/**
 	 * Starts a Jadex Platform.
+	 * @param kernels
+	 *            String array of kernel Identifiers (see constants in
+	 *            {@link JadexPlatformManager}).
 	 * 
 	 * @return IFuture<IExternalAccess> The external platform access
 	 */
