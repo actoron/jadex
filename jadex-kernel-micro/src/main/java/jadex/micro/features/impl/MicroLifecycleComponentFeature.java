@@ -380,6 +380,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 			
 			try
 			{
+				method.setAccessible(true);
 				Object res = method.invoke(component.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent(), iargs);
 				if(res instanceof IFuture)
 				{

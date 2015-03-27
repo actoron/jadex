@@ -932,6 +932,19 @@ public class BDIClassReader extends MicroClassReader
 			MTrigger mtr = buildPlanTrigger(bdimodel, p.trigger(), cl, pubs);
 			MTrigger wmtr = buildPlanTrigger(bdimodel, p.waitqueue(), cl, pubs);
 			
+			// Check if external plan has a trigger defined
+			if(mtr==null && !Object.class.equals(body.value()))
+			{
+				Class<?> bcl = body.value();
+				Plan pl = getAnnotation(bcl, Plan.class, cl);
+				mtr = buildPlanTrigger(bdimodel, pl.trigger(), cl, pubs);
+				
+				if(wmtr==null)
+				{
+					wmtr = buildPlanTrigger(bdimodel, pl.waitqueue(), cl, pubs);
+				}
+			}
+			
 			if(ci==null)
 				ci = Object.class.equals(body.value())? null: new ClassInfo(body.value().getName());
 //			Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.equals(sp.mapper())? null: sp.mapper());
