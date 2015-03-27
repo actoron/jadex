@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IInternalAccess;
@@ -53,7 +54,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		String	pname	= rplan.getModelElement().getName();
 		String	capaname	= pname.indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 			? null : pname.substring(0, pname.lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		final Object agent	= ia.getComponentFeature(IBDIAgentFeature.class).getCapabilityObject(capaname);
+		final Object agent	= ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname);
 
 		internalInvokePart(agent, 0).addResultListener(new IResultListener<Object>()
 		{
@@ -301,7 +302,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		if(ptypes==null)
 			return null;
 		
-		return ia.getComponentFeature(IBDIAgentFeature.class)
+		return ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
 			.getInjectionValues(ptypes, null, rplan.getModelElement(), null, rplan, null, null);
 	}
 

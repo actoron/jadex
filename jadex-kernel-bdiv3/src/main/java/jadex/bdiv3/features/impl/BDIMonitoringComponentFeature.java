@@ -56,7 +56,7 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 		}
 		
 		// Goals of this capability.
-		Collection<RGoal> goals = getComponent().getComponentFeature(IBDIAgentFeature.class).getCapability().getGoals();
+		Collection<RGoal> goals = ((BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapability().getGoals();
 		if(goals!=null)
 		{
 			for(RGoal goal: goals)
@@ -70,7 +70,7 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 		}
 		
 		// Plans of this capability.
-		Collection<RPlan> plans	= getComponent().getComponentFeature(IBDIAgentFeature.class).getCapability().getPlans();
+		Collection<RPlan> plans	= ((BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapability().getPlans();
 		if(plans!=null)
 		{
 			for(RPlan plan: plans)

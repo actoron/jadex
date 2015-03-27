@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
@@ -43,7 +44,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 	{
 		Object[] ret = null;
 		
-		BDIModel model = agent.getComponentFeature(IBDIAgentFeature.class).getBDIModel();
+		BDIModel model = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
 		final MGoal mgoal = model.getCapability().getGoal(goal.getClass().getName());
 		MethodInfo mi = mgoal.getServiceParameterMapping(sername==null? "": sername);
 		
@@ -93,7 +94,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 	 */
 	public void handleServiceResult(T goal, Method m, Object result)
 	{
-		RGoal rgoal = agent.getComponentFeature(IBDIAgentFeature.class).getCapability().getRGoal(goal);
+		RGoal rgoal = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getRGoal(goal);
 		final MGoal mgoal = rgoal.getMGoal();
 		MethodInfo mi = mgoal.getServiceParameterMapping(sername==null? "": sername);
 		

@@ -2,6 +2,7 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -56,7 +57,7 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 		
 		// Find fitting MServiceCall
 		String mn = method.toString();
-		MServiceCall msc = agent.getComponentFeature(IBDIAgentFeature.class).getBDIModel().getCapability().getService(mn);
+		MServiceCall msc = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getService(mn);
 		final RServiceCall sc = new RServiceCall(msc, new InvocationInfo(args));
 		sc.addListener(new ExceptionDelegationResultListener<Void, Object>(ret)
 		{

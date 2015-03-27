@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
@@ -274,7 +275,7 @@ public class MBelief extends MElement
 	{
 		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		return getValue(agent.getComponentFeature(IBDIAgentFeature.class).getCapabilityObject(capaname), agent.getClassLoader());
+		return getValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), agent.getClassLoader());
 	}
 
 	/**
@@ -322,7 +323,7 @@ public class MBelief extends MElement
 	{
 		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		return setValue(agent.getComponentFeature(IBDIAgentFeature.class).getCapabilityObject(capaname), value, agent.getClassLoader());
+		return setValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), value, agent.getClassLoader());
 	}
 
 	/**

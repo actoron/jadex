@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
@@ -66,7 +67,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 		if(goalname==null)
 			throw new RuntimeException("No method-goal mapping found: "+method.getName()+" "+goalnames);
 		
-		final IBDIAgentFeature	bdif	= agent.getComponentFeature(IBDIAgentFeature.class);
+		final BDIAgentFeature	bdif	= (BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
 		MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
 		final MGoal mgoal = mcapa.getGoal(goalname);
 		

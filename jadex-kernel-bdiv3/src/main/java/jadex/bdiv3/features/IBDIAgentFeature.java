@@ -90,34 +90,34 @@ public interface IBDIAgentFeature
 	
 	// internal methods?
 	
-	/**
-	 *  Get the rulesystem.
-	 *  @return The rulesystem.
-	 */
-	public RuleSystem getRuleSystem();
-	
-	/**
-	 *  Get the bdimodel.
-	 *  @return the bdimodel.
-	 */
-	public BDIModel getBDIModel();
-
-	/**
-	 *  Get the state.
-	 *  @return the state.
-	 */
-	public RCapability getCapability();
-	
-	/**
-	 *  Get a capability pojo object.
-	 */
-	public Object	getCapabilityObject(String name);
-	
-	/**
-	 *  Get parameter values for injection into method and constructor calls.
-	 */
-	public Object[] getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe);
-
-	public Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs);
+//	/**
+//	 *  Get the rulesystem.
+//	 *  @return The rulesystem.
+//	 */
+//	public RuleSystem getRuleSystem();
+//	
+//	/**
+//	 *  Get the bdimodel.
+//	 *  @return the bdimodel.
+//	 */
+//	public BDIModel getBDIModel();
+//
+//	/**
+//	 *  Get the state.
+//	 *  @return the state.
+//	 */
+//	public RCapability getCapability();
+//	
+//	/**
+//	 *  Get a capability pojo object.
+//	 */
+//	public Object	getCapabilityObject(String name);
+//	
+//	/**
+//	 *  Get parameter values for injection into method and constructor calls.
+//	 */
+//	public Object[] getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe);
+//
+//	public Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs);
 
 }

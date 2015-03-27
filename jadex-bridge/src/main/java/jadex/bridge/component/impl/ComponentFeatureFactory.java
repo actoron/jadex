@@ -52,9 +52,6 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	 */
 	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs)
 	{
-		if(type==null)
-			System.out.println("argl");
-		
 		this.type = type;
 		this.impl = impl;
 		this.pres = pres==null? null: (Set)SUtil.arrayToSet(pres);

@@ -3,6 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.annotation.GoalAPLBuild;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
@@ -258,7 +259,7 @@ public class APL
 		final Future<List<Object>> ret = new Future<List<Object>>();
 		
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		IBDIAgentFeature bdif = ia.getComponentFeature(IBDIAgentFeature.class);
+		BDIAgentFeature bdif = (BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
 		
 //		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		
@@ -357,7 +358,7 @@ public class APL
 				{
 					m.setAccessible(true);
 					
-					Object[] params = ia.getComponentFeature(IBDIAgentFeature.class)
+					Object[] params = ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
 						.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element);
 					if(params==null)
 						System.out.println("Invalid parameter assignment");

@@ -4,6 +4,7 @@ import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MGoal;
@@ -251,7 +252,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 					}
 				});
 				rule.setEvents(events);
-				ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
+				((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().getRulebase().addRule(rule);
 			}
 		}
 		
@@ -355,14 +356,14 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 		
 		if(PlanLifecycleState.BODY.equals(lifecyclestate))
 		{
-			ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANADOPTED, getModelElement().getName()}), this));
+			((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANADOPTED, getModelElement().getName()}), this));
 			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_CREATION);
 		}
 		else if(PlanLifecycleState.PASSED.equals(lifecyclestate) 
 			|| PlanLifecycleState.FAILED.equals(lifecyclestate) 
 			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
 		{
-			ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANFINISHED, getModelElement().getName()}), this));
+			((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANFINISHED, getModelElement().getName()}), this));
 			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL);
 		}
 		else
@@ -854,7 +855,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 
 		final Future<E> ret = new BDIFuture<E>();
 		
-		BDIModel bdim = ia.getComponentFeature(IBDIAgentFeature.class).getBDIModel();
+		BDIModel bdim = ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
@@ -1045,7 +1046,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 					
 //					rule.addEvent(et);
 					rule.setEvents(ets);
-					ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
+					((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().getRulebase().addRule(rule);
 				}
 			});
 		}
@@ -1212,7 +1213,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 				{
 					rule.addEvent(new EventType(ev));
 				}
-				ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().getRulebase().addRule(rule);
+				((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().getRulebase().addRule(rule);
 			}
 		});
 		return ret;
@@ -1443,7 +1444,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 			{
 //				System.out.println("rem rule: "+rulename);
 //				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-				ia.getComponentFeature(IBDIAgentFeature.class).getRuleSystem().getRulebase().removeRule(rulename);
+				((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().getRulebase().removeRule(rulename);
 			}
 			if(timer!=null)
 			{

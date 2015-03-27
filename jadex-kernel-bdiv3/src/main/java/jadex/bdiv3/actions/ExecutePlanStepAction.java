@@ -1,6 +1,7 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.IPlanBody;
 import jadex.bdiv3.runtime.impl.RGoal;
@@ -118,7 +119,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 			}
 			
 //			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-			ia.getComponentFeature(IBDIAgentFeature.class).getCapability().addPlan(rplan);
+			((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().addPlan(rplan);
 			rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 			IPlanBody body = rplan.getBody();
 			try
@@ -129,7 +130,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 					public void resultAvailable(Void result)
 					{
 						RPLANS.set(null);
-						ia.getComponentFeature(IBDIAgentFeature.class).getCapability().removePlan(rplan);
+						((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().removePlan(rplan);
 						Object reason = rplan.getReason();
 						if(reason instanceof RProcessableElement)
 						{

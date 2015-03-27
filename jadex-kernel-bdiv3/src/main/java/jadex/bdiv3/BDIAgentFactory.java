@@ -2,6 +2,7 @@ package jadex.bdiv3;
 
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
+import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
 import jadex.bdiv3.features.impl.BDIMonitoringComponentFeature;
 import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
 import jadex.bridge.ComponentIdentifier;
@@ -59,6 +60,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
 			BDIAgentFeature.FACTORY, 
+			BDILifecycleAgentFeature.FACTORY,
 			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class),
 			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BDIMonitoringComponentFeature.class),
 			new ComponentFeatureFactory(IRequiredServicesFeature.class, BDIRequiredServicesComponentFeature.class)

@@ -4,6 +4,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -92,7 +93,7 @@ public class ServiceCallPlan
 					
 					List<Object> ar = new ArrayList<Object>();
 					ar.add(myargs);
-					Object[] meargs = agent.getComponentFeature(IBDIAgentFeature.class)
+					Object[] meargs = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class))
 						.getInjectionValues(m.getParameterTypes(), null, null, null, rplan, null, ar);
 					
 					Object	res	= m.invoke(proxy, meargs);
