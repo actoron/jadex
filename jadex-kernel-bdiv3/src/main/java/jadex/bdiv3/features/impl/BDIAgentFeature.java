@@ -346,7 +346,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public static void writeField(Object val, String fieldname, Object obj, IInternalAccess agent)
 	{
-		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
+//		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
 		
 		// This is the case in inner classes
 		if(agent==null)

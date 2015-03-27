@@ -1,6 +1,7 @@
 package jadex.micro.features.impl;
 
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
@@ -11,7 +12,9 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -19,6 +22,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -71,11 +75,11 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 		
 		Map<String, Object>	args	= getComponent().getComponentFeature(IArgumentsFeature.class).getArguments();
 		Map<String, Object>	results	= getComponent().getComponentFeature(IArgumentsFeature.class).getResults();
-		MicroModel	model	= (MicroModel)getComponent().getModel().getRawModel();
+		final MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
 
 		// Inject agent fields.
 		FieldInfo[] fields = model.getAgentInjections();
-		Object	agent	= getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		final Object agent = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
 		for(int i=0; i<fields.length; i++)
 		{
 			try
@@ -174,21 +178,36 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 			}
 		}
 		
-		// Inject required services
-		injectServices(agent, model, getComponent()).addResultListener(new IResultListener<Void>()
+		// Inject parent
+		injectParent(agent, model).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				if(!ret.isDone())
-					ret.setResult(null);
-			}
+				// Inject required services
+				injectServices(agent, model, getComponent()).addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						if(!ret.isDone())
+							ret.setResult(null);
+					}
 
+					public void exceptionOccurred(Exception exception)
+					{
+						if(!ret.isDone())
+							ret.setException(exception);
+					}
+				});
+			}
+			
 			public void exceptionOccurred(Exception exception)
 			{
 				if(!ret.isDone())
 					ret.setException(exception);
 			}
 		});
+		
+		
 		
 		return ret;
 	}
@@ -423,50 +442,50 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 		return ret;
 	}
 	
-//	/**
-//	 *  Inject the parent to the annotated fields.
-//	 */
-//	protected IFuture<Void> injectParent(final Object agent, final MicroModel model)
-//	{
-//		Future<Void> ret = new Future<Void>();
-//		FieldInfo[]	pis	= model.getParentInjections();
-//		
-//		if(pis.length>0)
-//		{
-//			CounterResultListener<Void> lis = new CounterResultListener<Void>(pis.length, 
-//				new DelegationResultListener<Void>(ret));
-//	
-//			for(int i=0; i<pis.length; i++)
-//			{
-//				final Future<Void>	fut	= new Future<Void>();
-//				fut.addResultListener(lis);
-//				
-//				final Field	f	= pis[i].getField(getComponent().getClassLoader());
-//				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
-//					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(fut)
-//				{
-//					public void customResultAvailable(IExternalAccess exta)
-//					{
-//						if(IExternalAccess.class.equals(f.getType()))
-//						{
-//							try
-//							{
-//								f.setAccessible(true);
-//								f.set(agent, exta);
-//								fut.setResult(null);
-//							}
-//							catch(Exception e)
-//							{
-//								exceptionOccurred(e);
-//							}
-//						}
-//						else if(getComponent().getComponentDescription().isSynchronous())
-//						{
-//							exta.scheduleStep(new IComponentStep<Void>()
-//							{
-//								public IFuture<Void> execute(IInternalAccess ia)
-//								{
+	/**
+	 *  Inject the parent to the annotated fields.
+	 */
+	protected IFuture<Void> injectParent(final Object agent, final MicroModel model)
+	{
+		Future<Void> ret = new Future<Void>();
+		FieldInfo[]	pis	= model.getParentInjections();
+		
+		if(pis.length>0)
+		{
+			CounterResultListener<Void> lis = new CounterResultListener<Void>(pis.length, 
+				new DelegationResultListener<Void>(ret));
+	
+			for(int i=0; i<pis.length; i++)
+			{
+				final Future<Void>	fut	= new Future<Void>();
+				fut.addResultListener(lis);
+				
+				final Field	f	= pis[i].getField(getComponent().getClassLoader());
+				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
+					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(fut)
+				{
+					public void customResultAvailable(IExternalAccess exta)
+					{
+						if(IExternalAccess.class.equals(f.getType()))
+						{
+							try
+							{
+								f.setAccessible(true);
+								f.set(agent, exta);
+								fut.setResult(null);
+							}
+							catch(Exception e)
+							{
+								exceptionOccurred(e);
+							}
+						}
+						else if(getComponent().getComponentDescription().isSynchronous())
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
 //									if(SReflect.isSupertype(f.getType(), ia.getClass()))
 //									{
 //										try
@@ -482,46 +501,47 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 //									else if(ia instanceof IPojoMicroAgent)
 //									{
 //										Object	pagent	= ((IPojoMicroAgent)ia).getPojoAgent();
-//										if(SReflect.isSupertype(f.getType(), pagent.getClass()))
-//										{
-//											try
-//											{
-//												f.setAccessible(true);
-//												f.set(agent, pagent);
-//											}
-//											catch(Exception e)
-//											{
-//												exceptionOccurred(e);
-//											}
-//										}
-//										else
-//										{
-//											throw new RuntimeException("Incompatible types for parent injection: "+pagent+", "+f);													
-//										}
+										Object pagent = ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+										if(SReflect.isSupertype(f.getType(), pagent.getClass()))
+										{
+											try
+											{
+												f.setAccessible(true);
+												f.set(agent, pagent);
+											}
+											catch(Exception e)
+											{
+												exceptionOccurred(e);
+											}
+										}
+										else
+										{
+											throw new RuntimeException("Incompatible types for parent injection: "+pagent+", "+f);													
+										}
 //									}
 //									else
 //									{
 //										throw new RuntimeException("Incompatible types for parent injection: "+ia+", "+f);													
 //									}
-//									return IFuture.DONE;
-//								}
-//							}).addResultListener(new DelegationResultListener<Void>(fut));
-//						}
-//						else
-//						{
-//							exceptionOccurred(new RuntimeException("Non-external parent injection for non-synchronous subcomponent not allowed: "+f));
-//						}
-//					}
-//				});
-//			}
-//		}
-//		else
-//		{
-//			ret.setResult(null);
-//		}
-//
-//		return	ret;
-//	}
+									return IFuture.DONE;
+								}
+							}).addResultListener(new DelegationResultListener<Void>(fut));
+						}
+						else
+						{
+							exceptionOccurred(new RuntimeException("Non-external parent injection for non-synchronous subcomponent not allowed: "+f));
+						}
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+
+		return	ret;
+	}
 	
 	//-------- helper methods --------
 	

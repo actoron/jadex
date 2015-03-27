@@ -5,6 +5,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.StepAborted;
@@ -22,6 +23,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
@@ -29,6 +31,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -43,9 +46,11 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -87,8 +92,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/** The future to be informed, when the requested step is finished. */
 	protected Future<Void> stepfuture;
-
 	
+	/** The parent adapter (cached for speed). */
+	protected IInternalExecutionFeature parenta;
+
+	/** The synchronous subcomponents that want to be executed (if any). */
+	protected Set<IInternalExecutionFeature> subcomponents;
+
 	//-------- constructors --------
 	
 	/**
@@ -113,6 +123,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Unblock throwing thread death as component already has been terminated.
 			unblock(blocked.keySet().iterator().next(), new StepAborted());
 //			unblock(blocked.keySet().iterator().next(), null);
+		}
+		
+		if(parenta!=null)
+		{
+			parenta.removeSubcomponent(this);
 		}
 		return IFuture.DONE;
 	}
@@ -416,57 +431,95 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public void	wakeup()
 	{
-		SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener<IExecutionService>()
+		if(getComponent().getComponentDescription().isSynchronous())
 		{
-			public void resultAvailable(IExecutionService exe)
+			// Add to parent and wake up parent.
+			if(parenta==null)
 			{
-				// Hack!!! service is foudn before it is started, grrr.
-				if(((IService)exe).isValid().get(null).booleanValue())	// Hack!!! service is raw
+				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
+					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
-					if(bootstrap)
+					public void resultAvailable(IExternalAccess exta)
 					{
-						// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-						available	= true;
+						exta.scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								parenta	= (IInternalExecutionFeature)ia.getComponentFeature(IExecutionFeature.class);
+								parenta.addSubcomponent(ExecutionComponentFeature.this);
+								parenta.wakeup();
+								return IFuture.DONE;
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				});
+			}
+			else
+			{
+				parenta.addSubcomponent(this);
+				parenta.wakeup();
+			}
+		}
+		else
+		{
+			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener<IExecutionService>()
+			{
+				public void resultAvailable(IExecutionService exe)
+				{
+					// Hack!!! service is foudn before it is started, grrr.
+					if(((IService)exe).isValid().get(null).booleanValue())	// Hack!!! service is raw
+					{
+						if(bootstrap)
+						{
+							// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+							available	= true;
+						}
+						else
+						{
+							exe.execute(ExecutionComponentFeature.this);
+						}
 					}
 					else
 					{
-						exe.execute(ExecutionComponentFeature.this);
+						exceptionOccurred(null);
 					}
 				}
-				else
+				
+				public void exceptionOccurred(Exception exception)
 				{
-					exceptionOccurred(null);
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// Happens during platform bootstrapping -> execute on platform rescue thread.
-				if(!bootstrap)
-				{
-					bootstrap	= true;
-					Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+					// Happens during platform bootstrapping -> execute on platform rescue thread.
+					if(!bootstrap)
 					{
-						public void run()
+						bootstrap	= true;
+						Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
 						{
-							boolean	again	= true;
-							while(!available && again)
+							public void run()
 							{
-								again	= execute();
+								boolean	again	= true;
+								while(!available && again)
+								{
+									again	= execute();
+								}
+								bootstrap	= false;
+								
+								if(again)
+								{					
+									// Bootstrapping finished -> do real kickoff
+									wakeup();
+								}
 							}
-							bootstrap	= false;
-							
-							if(again)
-							{					
-								// Bootstrapping finished -> do real kickoff
-								wakeup();
-							}
-						}
-					});
+						});
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 	
 	/**
@@ -527,6 +580,35 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	//-------- IInternalExecutionFeature --------
 	
 	/**
+	 *  Add a synchronous subcomponent that will run on its parent's thread.
+	 */
+	public void	addSubcomponent(IInternalExecutionFeature sub)
+	{
+		synchronized(this)
+		{
+			if(subcomponents==null)
+			{
+				subcomponents	= new HashSet<IInternalExecutionFeature>();
+			}
+			subcomponents.add(sub);
+		}
+	}
+
+	/**
+	 *  Remove a synchronous subcomponent.
+	 */
+	public void	removeSubcomponent(IInternalExecutionFeature sub)
+	{
+		synchronized(this)
+		{
+			if(subcomponents!=null)
+			{
+				subcomponents.remove(sub);
+			}
+		}
+	}
+	
+	/**
 	 *  Block the current thread and allow execution on other threads.
 	 *  @param monitor	The monitor to wait for.
 	 */
@@ -537,72 +619,79 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			throw new RuntimeException("Can only block current component thread: "+componentthread+", "+Thread.currentThread());
 		}
 		
-		// Retain listener notifications for new component thread.
-		assert notifications==null;
-		notifications	= FutureHelper.removeStackedListeners();
-		
-		Executor	exe	= Executor.EXECUTOR.get();
-		if(exe==null)
+		if(parenta!=null)
 		{
-			throw new RuntimeException("Cannot block: no executor");
+			parenta.block(monitor, timeout);
 		}
-		
-		beforeBlock();
-		
-		this.executing	= false;
-		this.componentthread	= null;
-		
-		if(blocked==null)
+		else
 		{
-			blocked	= new HashMap<Object, Executor>();
-		}
-		blocked.put(monitor, exe);
-		
-		// Flag to check if unblocked before timeout
-		final boolean[]	unblocked	= new boolean[1];
-		
-		if(timeout!=Timeout.NONE)
-		{
-			waitForDelay(timeout)
-				.addResultListener(new IResultListener<Void>()
-			{
-				public void resultAvailable(Void result)
-				{
-					if(!unblocked[0])
-					{
-						unblock(monitor, new TimeoutException());
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
-		}
-		
-		try
-		{
-			exe.blockThread(monitor);
-		}
-		finally
-		{
-			unblocked[0]	= true;
+			// Retain listener notifications for new component thread.
+			assert notifications==null;
+			notifications	= FutureHelper.removeStackedListeners();
 			
-			assert !IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState());
-			
-			synchronized(this)
+			Executor	exe	= Executor.EXECUTOR.get();
+			if(exe==null)
 			{
-				if(executing)
-				{
-					System.err.println(getComponent().getComponentIdentifier()+": double execution");
-					new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
-				}
-				this.executing	= true;
+				throw new RuntimeException("Cannot block: no executor");
 			}
-	
-			this.componentthread	= Thread.currentThread();
 			
-			afterBlock();
+			beforeBlock();
+			
+			this.executing	= false;
+			this.componentthread	= null;
+			
+			if(blocked==null)
+			{
+				blocked	= new HashMap<Object, Executor>();
+			}
+			blocked.put(monitor, exe);
+			
+			// Flag to check if unblocked before timeout
+			final boolean[]	unblocked	= new boolean[1];
+			
+			if(timeout!=Timeout.NONE)
+			{
+				waitForDelay(timeout)
+					.addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						if(!unblocked[0])
+						{
+							unblock(monitor, new TimeoutException());
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
+			}
+			
+			try
+			{
+				exe.blockThread(monitor);
+			}
+			finally
+			{
+				unblocked[0]	= true;
+				
+				assert !IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState());
+				
+				synchronized(this)
+				{
+					if(executing)
+					{
+						System.err.println(getComponent().getComponentIdentifier()+": double execution");
+						new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
+					}
+					this.executing	= true;
+				}
+		
+				this.componentthread	= Thread.currentThread();
+				
+				afterBlock();
+			}
 		}
 	}
 	
@@ -618,13 +707,20 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			throw new RuntimeException("Can only unblock from component thread: "+componentthread+", "+Thread.currentThread());
 		}
 		
-		Executor exe = blocked.remove(monitor);
-		if(blocked.isEmpty())
+		if(parenta!=null)
 		{
-			blocked	= null;
+			parenta.unblock(monitor, exception);
 		}
-				
-		exe.switchThread(monitor, exception);
+		else
+		{
+			Executor exe = blocked.remove(monitor);
+			if(blocked.isEmpty())
+			{
+				blocked	= null;
+			}
+					
+			exe.switchThread(monitor, exception);
+		}
 	}
 	
 	/**
@@ -1010,7 +1106,34 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		executing	= false;
 		ISuspendable.SUSPENDABLE.set(null);
 
-		return hasstep || cycle;
+		// Execute the subcomponents
+		boolean ret = hasstep || cycle;
+		IInternalExecutionFeature[] subs = null;
+		synchronized(this)
+		{
+			if(subcomponents!=null)
+			{
+				subs = subcomponents.toArray(new IInternalExecutionFeature[subcomponents.size()]);
+				subcomponents	= null;
+			}
+		}
+		if(subs!=null)
+		{
+			for(IInternalExecutionFeature sub: subs)
+			{
+//				System.out.println("execute1: "+sub.getComponentIdentifier());
+				this.componentthread = Thread.currentThread();
+				boolean	again = ((IInternalExecutionFeature)sub).execute();
+				this.componentthread = null;
+				if(again)
+				{
+					addSubcomponent(sub);
+				}
+				ret	= again || ret;
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**

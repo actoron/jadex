@@ -1,6 +1,9 @@
 package jadex.bridge.component.impl;
 
+import java.util.HashSet;
+
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 
 
@@ -40,4 +43,20 @@ public interface IInternalExecutionFeature
 	 *  @param monitor	The monitor to notify.
 	 */
 	public void	unblock(Object monitor, Throwable exception);
+	
+	/**
+	 *  Execute the executable.
+	 *  @return True, if the object wants to be executed again.
+	 */
+	public boolean execute();
+	
+	/**
+	 *  Add a synchronous subcomponent that will run on its parent's thread.
+	 */
+	public void addSubcomponent(IInternalExecutionFeature sub);
+
+	/**
+	 *  Remove a synchronous subcomponent.
+	 */
+	public void removeSubcomponent(IInternalExecutionFeature sub);
 }
