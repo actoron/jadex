@@ -314,7 +314,7 @@ public class StandaloneRelay
 		
 		if(status)
 		{
-			PeerEntry[]	peers	= handler.getCurrentPeers();
+			PeerHandler[]	peers	= handler.getCurrentPeers();
 			PlatformInfo[]	platforms	= handler.getCurrentPlatforms();
 			
 			StringBuffer	buf	= new StringBuffer();
@@ -323,7 +323,7 @@ public class StandaloneRelay
 			if(peers!=null && peers.length>0)
 			{
 				buf.append("<h2>Connected Peers</h2>\n<ul>\n");
-				for(PeerEntry pe: peers)
+				for(PeerHandler pe: peers)
 				{
 					buf.append("<li><a href=\"");
 					buf.append(pe.getUrl());

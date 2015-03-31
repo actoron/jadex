@@ -102,17 +102,14 @@ public final class PlatformInfo
 	public PlatformInfo()
 	{
 		// bean constructor.
-		
-		// dummy db id to avoid saving remote platform infos
-		this.dbid	= Integer.valueOf(-1);
 	}
 	
 	/**
 	 *  Create a platform info.
 	 */
-	public PlatformInfo(String id, String hostip, String hostname, String protocol)
+	public PlatformInfo(String id, String peerid, String hostip, String hostname, String protocol)
 	{
-		this(null, null, id, hostip, hostname, protocol, new Date(), null, 0, 0, 0);
+		this(null, peerid, id, hostip, hostname, protocol, new Date(), null, 0, 0, 0);
 	}
 	
 	/**

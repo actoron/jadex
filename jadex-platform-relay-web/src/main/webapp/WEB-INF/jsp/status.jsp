@@ -11,7 +11,7 @@
 <%@ page import="java.util.*" %>
 <%
 	PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
-	PeerEntry[]	peers	= (PeerEntry[])request.getAttribute("peers");
+	PeerHandler[]	peers	= (PeerHandler[])request.getAttribute("peers");
 	String	url	= RelayConnectionManager.httpAddress((String)request.getAttribute("url"));
 	String	host	= new URL(url).getHost();
 	StringBuffer markers	= new StringBuffer();

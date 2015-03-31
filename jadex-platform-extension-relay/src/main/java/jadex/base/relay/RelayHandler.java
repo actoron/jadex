@@ -4,8 +4,6 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.message.ICodec;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;
@@ -24,7 +22,6 @@ import jadex.platform.service.message.transport.httprelaymtp.SRelay;
 import jadex.xml.bean.JavaReader;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,6 +85,9 @@ public class RelayHandler
 	
 	//-------- attributes --------
 	
+	/** The settings loaded from file. */
+	protected RelayServerSettings	settings;
+	
 	/** The relay map (id -> queue for pending requests). */
 	protected Map<String, IBlockingQueue<Message>>	map;
 	
@@ -106,6 +106,9 @@ public class RelayHandler
 	/** The statistics database (if any). */
 	protected StatsDB	statsdb;
 	
+	/** The connection manager for communicating with remote peers. */
+	protected RelayConnectionManager	conman;
+	
 	//-------- constructors --------
 
 	/**
@@ -118,50 +121,24 @@ public class RelayHandler
 		CodecFactory	cfac	= new CodecFactory();
 		this.codecs	= cfac.getAllCodecs();
 		this.defcodecs	= cfac.getDefaultCodecs();
-		this.peers	= new PeerList();
-		this.statsdb	= StatsDB.createDB(peers.getId());
-		if(statsdb!=null)
+		this.settings	= new RelayServerSettings();
+		try
 		{
-			peers.setDB(statsdb);
+			settings.loadSettings(new File(RelayHandler.SYSTEMDIR, "peer.properties"), true);
 		}
+		catch(Exception e)
+		{
+			getLogger().warning("Could not load relay settings: "+e);
+		}
+		this.peers	= new PeerList(this);
+		this.statsdb	= StatsDB.createDB(settings.getId());
+		this.conman	= new RelayConnectionManager();
 		
 		// Register communication classes with aliases
 		STransformation.registerClass(MessageEnvelope.class);
 		
-		peers.addChangeListener(new IChangeListener<PeerEntry>()
-		{
-			public void changeOccurred(ChangeEvent<PeerEntry> event)
-			{
-				if(PeerList.EVENT_ONLINE.equals(event.getType()))
-				{
-					RelayHandler.getLogger().info("Peer added: "+event.getValue().getUrl());
-					if(!event.getValue().isSent())
-					{
-						event.getValue().setSent(true);
-						sendPlatformInfos(event.getValue(), getCurrentPlatforms());
-					}
-				}
-				else if(PeerList.EVENT_OFFLINE.equals(event.getType()) || PeerList.EVENT_REMOVED.equals(event.getType()))
-				{
-					RelayHandler.getLogger().info("Peer removed: "+event.getValue().getUrl());
-
-					// Send offline infos for previous platforms.
-					PlatformInfo[]	infos	= event.getValue().getPlatformInfos();
-					event.getValue().clearPlatformInfos();
-					event.getValue().setSent(false);
-					for(PlatformInfo info: infos)
-					{
-						// Test if platform is already connected to another peer.
-						if(info.getAwarenessInfo()!=null && !peers.checkPlatform(info.getId()))
-						{
-							AwarenessInfo	awainfo	= info.getAwarenessInfo();
-							awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-							sendAwarenessInfos(awainfo, defcodecs, false, false);
-						}
-					}
-				}
-			}
-		});
+		// Add initial peers.
+		peers.addPeers(settings.getInitialPeers(), true);
 	}
 	
 	/**
@@ -202,17 +179,34 @@ public class RelayHandler
 		}
 		
 		this.peers.dispose();
+		
+		this.conman.dispose();
 	}
 	
 	//-------- methods --------
 	
-
 	/**
-	 *  Get the public url of the relay, if known.
+	 *  Get the settings.
 	 */
-	public String	getUrl()
+	public RelayServerSettings	getSettings()
 	{
-		return peers.getUrl();
+		return settings;
+	}
+	
+	/**
+	 *  Get the connection manager.
+	 */
+	public RelayConnectionManager	getConnectionManager()
+	{
+		return conman;
+	}
+	
+	/**
+	 *  Get the peer list.
+	 */
+	public PeerList getPeerList()
+	{
+		return peers;
 	}
 	
 	/**
@@ -224,7 +218,7 @@ public class RelayHandler
 		PlatformInfo	info	= platforms.get(id);
 		if(info==null)
 		{
-			info	= new PlatformInfo(id, hostip, hostname, protocol);
+			info	= new PlatformInfo(id, settings.getId(), hostip, hostname, protocol);
 			platforms.put(id, info);
 		}
 		else
@@ -366,7 +360,7 @@ public class RelayHandler
 	public void handleMessage(InputStream in, String protocol) throws Exception
 	{
 		String	targetid	= readString(in);
-		boolean	sent	= false;
+//		boolean	sent	= false;
 		
 		// Only send message when request is not https or target is also connected via https.
 		PlatformInfo	targetpi	= platforms.get(targetid);
@@ -375,45 +369,45 @@ public class RelayHandler
 			IBlockingQueue<Message>	queue	= map.get(targetid);
 			if(queue!=null)
 			{
-				long	start	= System.currentTimeMillis();
-				try
-				{
+//				long	start	= System.currentTimeMillis();
+//				try
+//				{
 					Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
 //					System.out.println("queing message to: "+targetid);
 					queue.enqueue(msg);
 					msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
-					sent	= true;
-//					System.out.println("message sent to: "+targetid+", "+(System.currentTimeMillis()-start));
-				}
-				catch(Exception e)
-				{
-					try
-					{
-						// timeout or platform just disconnected
-						System.out.println("message not sent to: "+targetid+", "+(System.currentTimeMillis()-start)+", "+e);
-	
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						byte[] buffer = new byte[8192];
-						int length = 0;
-						while((length=in.read(buffer))!=-1)
-						{
-							baos.write(buffer, 0, length);
-						}
-						System.out.println("message: "+new String(baos.toByteArray(), "UTF-8"));
-						//					e.printStackTrace();
-					}
-					catch(Exception e2)
-					{
-						
-					}
-				}
+//					sent	= true;
+////					System.out.println("message sent to: "+targetid+", "+(System.currentTimeMillis()-start));
+//				}
+//				catch(Exception e)
+//				{
+//					try
+//					{
+//						// timeout or platform just disconnected
+//						System.out.println("message not sent to: "+targetid+", "+(System.currentTimeMillis()-start)+", "+e);
+//	
+//						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//						byte[] buffer = new byte[8192];
+//						int length = 0;
+//						while((length=in.read(buffer))!=-1)
+//						{
+//							baos.write(buffer, 0, length);
+//						}
+//						System.out.println("message: "+new String(baos.toByteArray(), "UTF-8"));
+//						//					e.printStackTrace();
+//					}
+//					catch(Exception e2)
+//					{
+//						
+//					}
+//				}
 			}
 		}
 		
-		if(!sent)
-		{
-			throw new RuntimeException("message not sent: "+targetid+", "+targetpi);
-		}
+//		if(!sent)
+//		{
+//			throw new RuntimeException("message not sent: "+targetid+", "+targetpi);
+//		}
 	}
 	
 	/**
@@ -539,7 +533,7 @@ public class RelayHandler
 		PlatformInfo	info	= (PlatformInfo)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 		
-		PeerEntry	peer	= peers.addPeer(peerurl, false);
+		PeerHandler	peer	= peers.addPeer(peerurl);
 		
 		peer.updatePlatformInfo(info);
 		if(info.getAwarenessInfo()!=null)
@@ -565,7 +559,7 @@ public class RelayHandler
 		PlatformInfo[]	infos	= (PlatformInfo[])MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 		
-		PeerEntry	peer	= peers.addPeer(peerurl, false);
+		PeerHandler	peer	= peers.addPeer(peerurl);
 		
 		// Remember previously connected platforms.
 		Map<String, PlatformInfo>	old	= new LinkedHashMap<String, PlatformInfo>();
@@ -628,7 +622,7 @@ public class RelayHandler
 	/**
 	 *  Get the current peers.
 	 */
-	public PeerEntry[]	getCurrentPeers()
+	public PeerHandler[]	getCurrentPeers()
 	{
 		return peers.getPeers();
 	}
@@ -645,7 +639,7 @@ public class RelayHandler
 	{
 		if(peerurl!=null)
 		{
-			PeerEntry	peer	= peers.addPeer(peerurl, peerid, peerstate);
+			PeerHandler	peer	= peers.addPeer(peerurl, peerid, peerstate);
 
 			// Send own awareness infos to new peer.
 			if(initial)
@@ -665,7 +659,7 @@ public class RelayHandler
 		try
 		{
 			byte[]	peerinfo	= null;
-			for(PeerEntry peer: peers.getPeers())
+			for(PeerHandler peer: peers.getPeers())
 			{
 //				if(peer.isConnected())
 				{
@@ -674,14 +668,14 @@ public class RelayHandler
 						peerinfo	= MapSendTask.encodeMessage(info, defcodecs, getClass().getClassLoader(), null);
 					}
 					peer.addDebugText(3, "Sending platform info to peer "+info.getId());
-					new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfo", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+					conman.postMessage(peer.getUrl()+"platforminfo", new ComponentIdentifier(settings.getUrl()), new byte[][]{peerinfo});
 					peer.addDebugText(3, "Sent platform info to peer "+info.getId());
 				}
 			}
 		}
 		catch(IOException e)
 		{
-			for(PeerEntry peer: peers.getPeers())
+			for(PeerHandler peer: peers.getPeers())
 			{
 				if(peer.isConnected())
 				{
@@ -695,13 +689,13 @@ public class RelayHandler
 	/**
 	 *  Send platform infos to a peer relay server.
 	 */
-	public void	sendPlatformInfos(PeerEntry peer, PlatformInfo[] infos)
+	public void	sendPlatformInfos(PeerHandler peer, PlatformInfo[] infos)
 	{
 		try
 		{
 			peer.addDebugText(3, "Sending platform infos to peer: "+infos.length);
 			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader(), null);
-			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+			conman.postMessage(RelayConnectionManager.httpAddress(peer.getUrl())+"platforminfos", new ComponentIdentifier(settings.getUrl()), new byte[][]{peerinfo});
 			peer.addDebugText(3, "Sent platform infos.");
 		}
 		catch(IOException e)
@@ -719,6 +713,7 @@ public class RelayHandler
 	protected void	sendAwarenessInfos(AwarenessInfo awainfo, ICodec[] pcodecs, boolean local, boolean initial)
 	{
 //		System.out.println("sending awareness infos: "+awainfo.getSender().getPlatformName()+", "+platforms.size());
+		pcodecs	= pcodecs!=null ? pcodecs : defcodecs;
 		
 		String	id	= awainfo.getSender().getPlatformName();
 		PlatformInfo	platform	= platforms.get(id);
@@ -817,8 +812,8 @@ public class RelayHandler
 			// Send awareness infos from connected peers.
 			if(initial)
 			{
-				PeerEntry[] apeers = peers.getPeers();
-				for(PeerEntry peer: apeers)
+				PeerHandler[] apeers = peers.getPeers();
+				for(PeerHandler peer: apeers)
 				{
 					if(peer.isConnected())
 					{

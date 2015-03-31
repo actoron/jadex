@@ -168,7 +168,7 @@ public class RelayServlet extends HttpServlet
 					infos.addAll(Arrays.asList(handler.getCurrentPlatforms()));
 					request.setAttribute("platforms", infos.toArray(new PlatformInfo[0]));
 					request.setAttribute("peers", handler.getCurrentPeers());
-					request.setAttribute("url", "".equals(handler.getUrl()) ? request.getRequestURL().toString() : handler.getUrl());
+					request.setAttribute("url", handler.getSettings().isUrlSpecified() ? handler.getSettings().getUrl() : request.getRequestURL().toString());
 					request.setAttribute("refresh", "30");
 					view	= "/WEB-INF/jsp/status.jsp";
 				}
@@ -304,7 +304,7 @@ public class RelayServlet extends HttpServlet
 		cnt = addMarkers(infos, markers, colors, positions, cnt);
 
 		// Add markers for remotely connected platforms
-		PeerEntry[]	peers	= handler.getCurrentPeers();
+		PeerHandler[]	peers	= handler.getCurrentPeers();
 		if(peers.length>0)
 		{
 			for(int j=0; j<peers.length && markers.length()+250<2048; j++)	// hack!!! make sure url length stays below 2048 character limit. 

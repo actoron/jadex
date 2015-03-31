@@ -50,12 +50,12 @@ public class RelayConnectionManager	extends HttpConnectionManager
 			con	= openConnection(address + "ping");
 			con.connect();
 			int	code	= con.getResponseCode();
-			if(code!=HttpURLConnection.HTTP_OK)
-				throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
 			while(con.getInputStream().read(RESPONSE_BUF)!=-1)
 			{
 			}
 			con.getInputStream().close();
+			if(code!=HttpURLConnection.HTTP_OK)
+				throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
 		}
 		finally
 		{
@@ -299,5 +299,13 @@ public class RelayConnectionManager	extends HttpConnectionManager
 			address	= "relay-https://" + address.substring(13);
 		}
 		return address;
+	}
+	
+	/**
+	 *  Test if two addresses refer to the same server.
+	 */
+	public static boolean	isSameServer(String address1, String address2)
+	{
+		return secureAddress(httpAddress(address1)).equals(secureAddress(httpAddress(address2)));
 	}
 }

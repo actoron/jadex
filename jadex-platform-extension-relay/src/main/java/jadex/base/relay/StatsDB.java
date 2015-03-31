@@ -80,7 +80,6 @@ public class StatsDB
 				
 				new File(RelayHandler.SYSTEMDIR, "mydb").renameTo(new File(RelayHandler.SYSTEMDIR, "derbydb_bak"));
 			}
-			
 		}
 		catch(Exception e)
 		{
@@ -391,7 +390,7 @@ public class StatsDB
 					update.setDouble(param++, pi.getTransferTime());
 					update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
 					update.setInt(param++, pi.getDBId().intValue());
-					update.setString(param++, peerid);
+					update.setString(param++, pi.getPeerId());
 					int	cnt	= update.executeUpdate();
 					
 					// Not updated -> new entry from remote
@@ -442,7 +441,7 @@ public class StatsDB
 					for(String propname: pi.getProperties().keySet())
 					{
 						param	= 1;
-						insertprops.setInt(param++, pi.getDBId());
+						insertprops.setInt(param++, pi.getDBId().intValue());
 						insertprops.setString(param++, pi.getPeerId());
 						insertprops.setString(param++, propname);
 						insertprops.setString(param++, pi.getProperties().get(propname));
@@ -740,6 +739,7 @@ public class StatsDB
 
 	/**
 	 *  Get the latest id for a peer.
+	 *  Only considers completed (immutable platform infos), i.e., that have a disconnection time set.
 	 *  @return The latest id or 0 if no entry for that peer or -1 in case of db error.
 	 */
 	public synchronized int	getLatestEntry(String peerid)
