@@ -166,6 +166,8 @@ public class PeerList
 	protected PeerHandler	addPeer(String peerurl, String peerid, int peerstate, boolean initial)
 	{
 		PeerHandler	peer	= null;
+		peerurl	= RelayConnectionManager.httpAddress(peerurl);
+		
 		if(!handler.getSettings().isUrlSpecified())
 		{
 			throw new RuntimeException("No peer connections allowed, if public URL not set.");
@@ -174,7 +176,7 @@ public class PeerList
 		// Add/update peer if not server itself
 		else if(!RelayConnectionManager.isSameServer(handler.getSettings().getUrl(), peerurl))
 		{
-			synchronized(this)
+			synchronized(peers)
 			{
 				peer	= peers.get(peerurl);
 				if(peer==null)
