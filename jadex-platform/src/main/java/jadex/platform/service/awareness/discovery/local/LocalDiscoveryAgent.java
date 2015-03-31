@@ -277,18 +277,21 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 					{
 						byte[] awadata = SUtil.readFile(file);
 						final AwarenessInfo awainfo = (AwarenessInfo) BinarySerializer.objectFromByteArray(awadata, null, null, agent.getClassLoader(), null);
-						IFuture<IAwarenessManagementService> msfut = agent.getRequiredService("management");
-						msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
+						if(!awainfo.getSender().equals(agent.getComponentIdentifier()))
 						{
-							public void resultAvailable(IAwarenessManagementService ms)
+							IFuture<IAwarenessManagementService> msfut = agent.getRequiredService("management");
+							msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
 							{
-								ms.addAwarenessInfo(awainfo);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-							}
-						});
+								public void resultAvailable(IAwarenessManagementService ms)
+								{
+									ms.addAwarenessInfo(awainfo);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+								}
+							});
+						}
 					}
 				}
 				catch (Exception e)
