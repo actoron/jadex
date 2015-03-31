@@ -64,4 +64,43 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 //     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
 //     */
 //    public E getNextIntermediateResult(ISuspendable sus);
+    
+	/**
+	 * Add an functional result listener, which called on intermediate results.
+	 * Exceptions will be handled by IntermediateDefaultResultListener.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 */
+	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener);
+    
+	/**
+	 * Add an functional result listener, which called on intermediate results.
+	 * Exceptions will be handled by IntermediateDefaultResultListener.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive.
+	 */
+	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener);
+    
+	/**
+	 * Add an functional result listener, which called on intermediate results.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive.
+	 * @param defaultExceptionHandling Use default exception handling. If false,
+	 *        exceptions will be ignored.
+	 */
+	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener, boolean defaultExceptionHandling);
+    
+	/**
+	 * Add an functional result listener, which called on intermediate results.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive.
+	 * @param exceptionListener The listener that is called on exceptions.
+	 */
+    public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener, IFunctionalExceptionListener exceptionListener);
 }

@@ -66,31 +66,37 @@ public interface IFuture<E>
 	public void addResultListener(IResultListener<E> listener);
 	
 	/**
-	 * Add an OnSuccessListener, which is only called on success.
+	 * Add an functional result listener, which is only called on success.
 	 * Exceptions will be handled by DefaultResultListener.
+	 * 
 	 * @param listener The listener.
 	 */
 	public void addResultListener(IFunctionalResultListener<E> listener);
-	
+
 	/**
-	 * Add an OnSuccessListener, which is only called on success.
+	 * Add an functional result listener, which is only called on success.
+	 * 
 	 * @param listener The listener.
-	 * @param defaultExceptionHandling Use default exception handling. If false, exceptions will be ignored
-	 * unless other listeners are registered.
+	 * @param defaultExceptionHandling Use default exception handling. If false,
+	 *        exceptions will be ignored.
 	 */
 	public void addResultListener(IFunctionalResultListener<E> listener, boolean defaultExceptionHandling);
-	
+
 	/**
-	 * Add an OnExceptionListener, which is only called on exceptions.
+	 * Add a result listener by combining an OnSuccessListener and an
+	 * OnExceptionListener.
+	 * 
+	 * @param sucListener The listener that is called on success.
+	 * @param exListener The listener that is called on exceptions.
+	 */
+	public void addResultListener(IFunctionalResultListener<E> sucListener, IFunctionalExceptionListener exListener);
+
+	/**
+	 * Add an Exception listener, which is only called on exceptions.
+	 * 
 	 * @param listener The listener.
 	 */
 	public void addExceptionListener(IFunctionalExceptionListener listener);
 
-	/**
-	 *  Add a result listener by combining an OnSuccessListener and an OnExceptionListener.
-	 *  @param sucListener The listener called on success.
-	 *  @param exListener The listener called on exceptions.
-	 */
-	public void addResultListener(IFunctionalResultListener<E> sucListener, IFunctionalExceptionListener exListener);
 
 }

@@ -345,8 +345,95 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	}
     }
     
-	
-    /**
+	/**
+	 * Add an functional result listener, which called on intermediate results.
+	 * Exceptions will be handled by IntermediateDefaultResultListener.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 */
+	public void addIntermediateResultListener(final IFunctionalResultListener<E> intermediateListener)
+	{
+		IFunctionalResultListener<Void> ignoreListener = SResultListener.ignoreResults();
+		addIntermediateResultListener(intermediateListener, ignoreListener);
+	}
+
+	/**
+	 * Add an functional result listener, which called on intermediate results.
+	 * Exceptions will be handled by IntermediateDefaultResultListener.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive.
+	 */
+	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener)
+	{
+		addIntermediateResultListener(intermediateListener, finishedListener, true);
+	}
+
+	/**
+	 * Add an functional result listener, which called on intermediate results.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive.
+	 * @param defaultExceptionHandling Use default exception handling. If false,
+	 *        exceptions will be ignored.
+	 */
+	public void addIntermediateResultListener(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener, final boolean defaultExceptionHandling)
+	{
+		addResultListener(new IntermediateDefaultResultListener<E>()
+		{
+			public void intermediateResultAvailable(E result)
+			{
+				intermediateListener.resultAvailable(result);
+			}
+
+			public void finished()
+			{
+				finishedListener.resultAvailable(null);
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				if(defaultExceptionHandling)
+				{
+					super.exceptionOccurred(exception);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Add an functional result listener, which called on intermediate results.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive.
+	 * @param exceptionListener The listener that is called on exceptions.
+	 */
+	public void addIntermediateResultListener(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener,
+		final IFunctionalExceptionListener exceptionListener)
+	{
+		addResultListener(new IntermediateDefaultResultListener<E>()
+		{
+			public void intermediateResultAvailable(E result)
+			{
+				intermediateListener.resultAvailable(result);
+			}
+
+			public void finished()
+			{
+				finishedListener.resultAvailable(null);
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				exceptionListener.exceptionOccurred(exception);
+			}
+		});
+	}
+
+	/**
      *  Check if there are more results for iteration for the given caller.
      *  If there are currently no unprocessed results and future is not yet finished,
      *  the caller is blocked until either new results are available and true is returned
@@ -725,4 +812,5 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 			}
 		}
 	}
+	
 }

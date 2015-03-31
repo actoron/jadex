@@ -1,5 +1,6 @@
 package jadex.commons.future;
 
+
 /**
  * Static helper class for creating result listeners.
  */
@@ -43,64 +44,6 @@ public class SResultListener {
         return (IFunctionalExceptionListener) EMPTY_EXCEPTION_LISTENER;
     }
     
-    /**
-     * Creates an {@link IResultListener} that delegates results to the given SuccessListener
-     * and uses default exception handling.
-     * 
-     * @param sucListener The SuccessListener.
-     * @return {@link IResultListener}
-     */
-	public static <E> IResultListener<E> resultListener(final IFunctionalResultListener<E> sucListener) {
-		return resultListener(sucListener, true);
-	}
-	
-	/**
-     * Creates an {@link IResultListener} that delegates results to the given SuccessListener.
-     * 
-     * @param sucListener The SuccessListener.
-     * @param defaultExceptionHandling Specifies whether to use a default handling for exceptions or not.
-     * @return {@link IResultListener}
-     */
-	public static <E> IResultListener<E> resultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling) {
-		return new DefaultResultListener<E>() {
-
-			@Override
-			public void resultAvailable(E result) {
-				sucListener.resultAvailable(result);
-			}
-
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				if (defaultExceptionHandling) {
-					super.exceptionOccurred(exception);
-				}
-			}
-		};
-	}
-	
-	/**
-     * Creates an {@link IResultListener} that delegates results to the given SuccessListener
-     * and Exceptions to the given ExceptionListener.
-     * 
-     * @param sucListener The SuccessListener.
-     * @param exListener The ExceptionListener.
-     * @return {@link IResultListener}
-     */
-	public static <E> IResultListener<E> resultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener) {
-		return new IResultListener<E>() {
-
-			@Override
-			public void resultAvailable(E result) {
-				sucListener.resultAvailable(result);
-			}
-
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				exListener.exceptionOccurred(exception);
-			}
-		};
-	}
-	
 	/**
      * Creates an {@link IResultListener} that delegates all results to a given Future.
      * 
@@ -202,7 +145,7 @@ public class SResultListener {
      * @return {@link CounterResultListener}
      */
     public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, boolean defaultExceptionHandling) {
-    	return new CounterResultListener<E>(num, resultListener(countReachedListener, defaultExceptionHandling));
+    	return new CounterResultListener<E>(num, createResultListener(countReachedListener, defaultExceptionHandling));
     }
     
     /**
@@ -214,7 +157,7 @@ public class SResultListener {
      * @return {@link CounterResultListener}
      */
     public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalExceptionListener exListener) {
-    	return new CounterResultListener<E>(num, resultListener(countReachedListener, exListener));
+    	return new CounterResultListener<E>(num, createResultListener(countReachedListener, exListener));
     }
 
     /**
@@ -227,7 +170,7 @@ public class SResultListener {
      * @return {@link CounterResultListener}
      */
     public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, final IOnIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exListener) {
-    	return new CounterResultListener<E>(num, resultListener(countReachedListener, exListener)) {
+    	return new CounterResultListener<E>(num, createResultListener(countReachedListener, exListener)) {
 
 			@Override
 			public void intermediateResultAvailable(E result) {
@@ -236,96 +179,73 @@ public class SResultListener {
     	};
     }
     
-    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IFunctionalResultListener<E> firstSuccessListener, final IFunctionalResultListener<F> secondSuccessListener) {
-    	return tuple2Result(firstSuccessListener, secondSuccessListener, true);
+	/**
+	 * Creates an {@link IResultListener} that delegates results to the given
+	 * SuccessListener and uses default exception handling.
+	 * 
+	 * @param sucListener The SuccessListener.
+	 * @return {@link IResultListener}
+	 */
+	static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener)
+	{
+		return createResultListener(sucListener, true);
 	}
-    
-    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IFunctionalResultListener<E> firstSuccessListener, final IFunctionalResultListener<F> secondSuccessListener, final boolean defaultExceptionHandling) {
-    	return tuple2Result(firstSuccessListener, secondSuccessListener, new IFunctionalExceptionListener() {
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				if (defaultExceptionHandling) {
-					new DefaultResultListener<E>() {
-						@Override
-						public void resultAvailable(E result) {
-						}
-					}.exceptionOccurred(exception);
-				}
-			}
-		});
-    }
-    
-    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IFunctionalResultListener<E> firstSuccessListener, final IFunctionalResultListener<F> secondSuccessListener, final IFunctionalExceptionListener exListener) {
-    	return new DefaultTuple2ResultListener<E, F>() {
+
+	/**
+	 * Creates an {@link IResultListener} that delegates results to the given
+	 * SuccessListener.
+	 * 
+	 * @param sucListener The SuccessListener.
+	 * @param defaultExceptionHandling Specifies whether to use a default
+	 *        handling for exceptions or not.
+	 * @return {@link IResultListener}
+	 */
+	static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling)
+	{
+		return new DefaultResultListener<E>()
+		{
 
 			@Override
-			public void firstResultAvailable(E result) {
-				firstSuccessListener.resultAvailable(result);
+			public void resultAvailable(E result)
+			{
+				sucListener.resultAvailable(result);
 			}
 
 			@Override
-			public void secondResultAvailable(F result) {
-				secondSuccessListener.resultAvailable(result);
-			}
-
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				exListener.exceptionOccurred(exception);
-			}
-		};
-    }
-    
-    public static <E> IIntermediateResultListener<E> intermediate(final IFunctionalResultListener<E> intermediateListener) {
-		return intermediate(intermediateListener, null, true);
-    }
-    
-    public static <E> IIntermediateResultListener<E> intermediate(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener) {
-		return intermediate(intermediateListener, finishedListener, true);
-    }
-    
-    public static <E> IIntermediateResultListener<E> intermediate(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener, final boolean defaultExceptionHandling) {
-		return new IntermediateDefaultResultListener<E>() {
-
-			@Override
-			public void intermediateResultAvailable(E result) {
-				intermediateListener.resultAvailable(result);
-			}
-
-			@Override
-			public void finished() {
-				finishedListener.resultAvailable(null);
-			}
-			
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				if (defaultExceptionHandling) {
+			public void exceptionOccurred(Exception exception)
+			{
+				if(defaultExceptionHandling)
+				{
 					super.exceptionOccurred(exception);
 				}
 			}
 		};
-    }
-    
-    public static <E> IIntermediateResultListener<E> intermediate(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener, final IFunctionalExceptionListener exListener) {
-		return new IntermediateDefaultResultListener<E>() {
+	}
+
+	/**
+	 * Creates an {@link IResultListener} that delegates results to the given
+	 * SuccessListener and Exceptions to the given ExceptionListener.
+	 * 
+	 * @param sucListener The SuccessListener.
+	 * @param exListener The ExceptionListener.
+	 * @return {@link IResultListener}
+	 */
+	static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener)
+	{
+		return new IResultListener<E>()
+		{
 
 			@Override
-			public void intermediateResultAvailable(E result) {
-				intermediateListener.resultAvailable(result);
+			public void resultAvailable(E result)
+			{
+				sucListener.resultAvailable(result);
 			}
 
 			@Override
-			public void finished() {
-				if (finishedListener != null) {
-					finishedListener.resultAvailable(null);
-				}
-			}
-			
-			@Override
-			public void exceptionOccurred(Exception exception) {
+			public void exceptionOccurred(Exception exception)
+			{
 				exListener.exceptionOccurred(exception);
 			}
 		};
-    }
-    
- 
+	}
 }

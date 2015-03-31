@@ -111,6 +111,78 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
     }
     
     /**
+     * Uses two functional result listeners to create a Tuple2ResultListener and add it.
+     * The first listener is called upon reception of the first result, the second is called
+     * for the second result.
+     * Exceptions will become visible as strack trace.
+     * 
+     * @param firstListener Listener for the first available result.
+     * @param secondListener Listener for the second available result.
+     */
+	public void addTuple2ResultListener(IFunctionalResultListener<E> firstListener, IFunctionalResultListener<F> secondListener)
+	{
+		addTuple2ResultListener(firstListener, secondListener, true);
+	}
+
+    /**
+     * Uses two functional result listeners to create a Tuple2ResultListener and add it.
+     * The first listener is called upon reception of the first result, the second is called
+     * for the second result.
+     * 
+     * @param firstListener Listener for the first available result.
+     * @param secondListener Listener for the second available result.
+     * @param defaultExceptionHandling Flag whether exceptions should be printed to console.
+     */
+	public void addTuple2ResultListener(final IFunctionalResultListener<E> firstListener, final IFunctionalResultListener<F> secondListener, final boolean defaultExceptionHandling)
+	{
+		addResultListener(new DefaultTuple2ResultListener<E, F>() {
+
+			public void firstResultAvailable(E result) {
+				firstListener.resultAvailable(result);
+			}
+
+			public void secondResultAvailable(F result) {
+				secondListener.resultAvailable(result);
+			}
+
+			public void exceptionOccurred(Exception exception) {
+				if (defaultExceptionHandling) {
+					exception.printStackTrace();
+				}
+			}
+		});
+	}
+
+    /**
+     * Uses two functional result listeners to create a Tuple2ResultListener and add it.
+     * The first listener is called upon reception of the first result, the second is called
+     * for the second result.
+     * 
+     * Additionally, a given exception listener is called when exceptions occur.
+     * 
+     * @param firstListener Listener for the first available result.
+     * @param secondListener Listener for the second available result.
+     * @param exceptionListener Listener for exceptions.
+     */
+	public void addTuple2ResultListener(final IFunctionalResultListener<E> firstListener, final IFunctionalResultListener<F> secondListener, final IFunctionalExceptionListener exceptionListener)
+	{
+		addResultListener(new DefaultTuple2ResultListener<E, F>() {
+
+			public void firstResultAvailable(E result) {
+				firstListener.resultAvailable(result);
+			}
+
+			public void secondResultAvailable(F result) {
+				secondListener.resultAvailable(result);
+			}
+
+			public void exceptionOccurred(Exception exception) {
+				exceptionListener.exceptionOccurred(exception);
+			}
+		});
+	}
+
+	/**
      *  Set the result. 
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.

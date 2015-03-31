@@ -478,22 +478,52 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 			}
 		}
 	}
+
 	
-	public void addExceptionListener(final IFunctionalExceptionListener listener) {
+	/**
+	 * Add an functional result listener, which is only called on success.
+	 * Exceptions will be handled by DefaultResultListener.
+	 * 
+	 * @param listener The listener.
+	 */
+	public void addResultListener(final IFunctionalResultListener<E> sucListener)
+	{
+		addResultListener(SResultListener.createResultListener(sucListener));
+	}
+
+	/**
+	 * Add an functional result listener, which is only called on success.
+	 * 
+	 * @param listener The listener.
+	 * @param defaultExceptionHandling Use default exception handling. If false,
+	 *        exceptions will be ignored unless other listeners are registered.
+	 */
+	public void addResultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling)
+	{
+		addResultListener(SResultListener.createResultListener(sucListener, true));
+	}
+
+	/**
+	 * Add a result listener by combining an OnSuccessListener and an
+	 * OnExceptionListener.
+	 * 
+	 * @param sucListener The listener that is called on success.
+	 * @param exListener The listener that is called on exceptions.
+	 */
+	public void addResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener)
+	{
+		addResultListener(SResultListener.createResultListener(sucListener, exListener));
+	}
+
+	/**
+	 * Add an Exception listener, which is only called on exceptions.
+	 * 
+	 * @param listener The listener.
+	 */
+	public void addExceptionListener(final IFunctionalExceptionListener listener)
+	{
 		IFunctionalResultListener<E> emptySuccessListener = SResultListener.ignoreResults();
-		addResultListener(SResultListener.resultListener(emptySuccessListener, listener));
-	}
-	
-	public void addResultListener(final IFunctionalResultListener<E> sucListener) {
-		addResultListener(SResultListener.resultListener(sucListener));
-	}
-	
-	public void addResultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling) {
-		addResultListener(SResultListener.resultListener(sucListener, true));
-	}
-	
-	public void addResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener) {
-		addResultListener(SResultListener.resultListener(sucListener, exListener));
+		addResultListener(SResultListener.createResultListener(emptySuccessListener, listener));
 	}
 	
     /**
