@@ -8,7 +8,7 @@ public class SResultListener {
 	/**
 	 * Constant with an no-op success listener.
 	 */
-	private final static IOnSuccessListener<? extends Object> EMPTY_SUCCESS_LISTENER = new IOnSuccessListener<Object>() {
+	private final static IFunctionalResultListener<? extends Object> EMPTY_SUCCESS_LISTENER = new IFunctionalResultListener<Object>() {
 		@Override
 		public void resultAvailable(Object result) {
 		}
@@ -17,7 +17,7 @@ public class SResultListener {
 	/**
 	 * Constant with an no-op exception listener.
 	 */
-	private final static IOnExceptionListener EMPTY_EXCEPTION_LISTENER = new IOnExceptionListener() {
+	private final static IFunctionalExceptionListener EMPTY_EXCEPTION_LISTENER = new IFunctionalExceptionListener() {
 		
 		@Override
 		public void exceptionOccurred(Exception exception) {
@@ -27,20 +27,20 @@ public class SResultListener {
 	/**
 	 * Returns a SuccessListener that ignores all results.
 	 * 
-	 * @return {@link IOnSuccessListener}
+	 * @return {@link IFunctionalResultListener}
 	 */
     @SuppressWarnings("unchecked")
-    public static final <E> IOnSuccessListener<E> ignoreResults() {
-        return (IOnSuccessListener<E>) EMPTY_SUCCESS_LISTENER;
+    public static final <E> IFunctionalResultListener<E> ignoreResults() {
+        return (IFunctionalResultListener<E>) EMPTY_SUCCESS_LISTENER;
     }
     
     /**
 	 * Returns an OnExceptionListener that ignores all results.
 	 * 
-	 * @return {@link IOnExceptionListener}
+	 * @return {@link IFunctionalExceptionListener}
 	 */
-    public static final IOnExceptionListener ignoreExceptions() {
-        return (IOnExceptionListener) EMPTY_EXCEPTION_LISTENER;
+    public static final IFunctionalExceptionListener ignoreExceptions() {
+        return (IFunctionalExceptionListener) EMPTY_EXCEPTION_LISTENER;
     }
     
     /**
@@ -50,7 +50,7 @@ public class SResultListener {
      * @param sucListener The SuccessListener.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> resultListener(final IOnSuccessListener<E> sucListener) {
+	public static <E> IResultListener<E> resultListener(final IFunctionalResultListener<E> sucListener) {
 		return resultListener(sucListener, true);
 	}
 	
@@ -61,7 +61,7 @@ public class SResultListener {
      * @param defaultExceptionHandling Specifies whether to use a default handling for exceptions or not.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> resultListener(final IOnSuccessListener<E> sucListener, final boolean defaultExceptionHandling) {
+	public static <E> IResultListener<E> resultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling) {
 		return new DefaultResultListener<E>() {
 
 			@Override
@@ -86,7 +86,7 @@ public class SResultListener {
      * @param exListener The ExceptionListener.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> resultListener(final IOnSuccessListener<E> sucListener, final IOnExceptionListener exListener) {
+	public static <E> IResultListener<E> resultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener) {
 		return new IResultListener<E>() {
 
 			@Override
@@ -130,7 +130,7 @@ public class SResultListener {
      * @param exListener The ExceptionListener.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> delegateSuccess(final Future<E> delegate, final IOnExceptionListener exListener) {
+	public static <E> IResultListener<E> delegateSuccess(final Future<E> delegate, final IFunctionalExceptionListener exListener) {
 		return delegateSuccess(delegate, false, exListener);
 	}
 	
@@ -143,7 +143,7 @@ public class SResultListener {
      * @param exListener The ExceptionListener.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> delegateSuccess(final Future<E> delegate, boolean undone, final IOnExceptionListener exListener) {
+	public static <E> IResultListener<E> delegateSuccess(final Future<E> delegate, boolean undone, final IFunctionalExceptionListener exListener) {
 		return new DelegationResultListener<E>(delegate, undone) {
 			@Override
 			public void exceptionOccurred(Exception exception) {
@@ -160,7 +160,7 @@ public class SResultListener {
      * @param sucListener The SuccessListener.
      * @return {@link IResultListener}
      */
-    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, final IOnSuccessListener<E> sucListener) {
+    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, final IFunctionalResultListener<E> sucListener) {
     	return delegateExceptions(delegate, false, sucListener);
     }
     
@@ -173,7 +173,7 @@ public class SResultListener {
      * @param sucListener The SuccessListener.
      * @return {@link IResultListener}
      */
-    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, boolean undone, final IOnSuccessListener<E> sucListener) {
+    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, boolean undone, final IFunctionalResultListener<E> sucListener) {
     	return new ExceptionDelegationResultListener<E, T>(delegate, undone) {
 			@Override
 			public void customResultAvailable(E result) {
@@ -189,7 +189,7 @@ public class SResultListener {
      * @param countReachedListener Listener to be called when the given number is reached.
      * @return {@link CounterResultListener}
      */
-    public static <E> CounterResultListener<E> countResults(int num, IOnSuccessListener<Void> countReachedListener) {
+    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener) {
     	return countResults(num, countReachedListener, true);
     }
     
@@ -201,7 +201,7 @@ public class SResultListener {
      * @param countReachedListener Listener to be called when the given number is reached.
      * @return {@link CounterResultListener}
      */
-    public static <E> CounterResultListener<E> countResults(int num, IOnSuccessListener<Void> countReachedListener, boolean defaultExceptionHandling) {
+    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, boolean defaultExceptionHandling) {
     	return new CounterResultListener<E>(num, resultListener(countReachedListener, defaultExceptionHandling));
     }
     
@@ -213,7 +213,7 @@ public class SResultListener {
      * @param exListener Listener to be called for exceptions.
      * @return {@link CounterResultListener}
      */
-    public static <E> CounterResultListener<E> countResults(int num, IOnSuccessListener<Void> countReachedListener, IOnExceptionListener exListener) {
+    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalExceptionListener exListener) {
     	return new CounterResultListener<E>(num, resultListener(countReachedListener, exListener));
     }
 
@@ -226,7 +226,7 @@ public class SResultListener {
      * @param exListener Listener to be called for exceptions.
      * @return {@link CounterResultListener}
      */
-    public static <E> CounterResultListener<E> countResults(int num, IOnSuccessListener<Void> countReachedListener, final IOnIntermediateResultListener<E> intermediateListener, IOnExceptionListener exListener) {
+    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, final IOnIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exListener) {
     	return new CounterResultListener<E>(num, resultListener(countReachedListener, exListener)) {
 
 			@Override
@@ -236,12 +236,12 @@ public class SResultListener {
     	};
     }
     
-    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IOnSuccessListener<E> firstSuccessListener, final IOnSuccessListener<F> secondSuccessListener) {
+    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IFunctionalResultListener<E> firstSuccessListener, final IFunctionalResultListener<F> secondSuccessListener) {
     	return tuple2Result(firstSuccessListener, secondSuccessListener, true);
 	}
     
-    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IOnSuccessListener<E> firstSuccessListener, final IOnSuccessListener<F> secondSuccessListener, final boolean defaultExceptionHandling) {
-    	return tuple2Result(firstSuccessListener, secondSuccessListener, new IOnExceptionListener() {
+    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IFunctionalResultListener<E> firstSuccessListener, final IFunctionalResultListener<F> secondSuccessListener, final boolean defaultExceptionHandling) {
+    	return tuple2Result(firstSuccessListener, secondSuccessListener, new IFunctionalExceptionListener() {
 			@Override
 			public void exceptionOccurred(Exception exception) {
 				if (defaultExceptionHandling) {
@@ -255,7 +255,7 @@ public class SResultListener {
 		});
     }
     
-    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IOnSuccessListener<E> firstSuccessListener, final IOnSuccessListener<F> secondSuccessListener, final IOnExceptionListener exListener) {
+    public static <E, F> ITuple2ResultListener<E, F> tuple2Result(final IFunctionalResultListener<E> firstSuccessListener, final IFunctionalResultListener<F> secondSuccessListener, final IFunctionalExceptionListener exListener) {
     	return new DefaultTuple2ResultListener<E, F>() {
 
 			@Override
@@ -275,15 +275,15 @@ public class SResultListener {
 		};
     }
     
-    public static <E> IIntermediateResultListener<E> intermediate(final IOnSuccessListener<E> intermediateListener) {
+    public static <E> IIntermediateResultListener<E> intermediate(final IFunctionalResultListener<E> intermediateListener) {
 		return intermediate(intermediateListener, null, true);
     }
     
-    public static <E> IIntermediateResultListener<E> intermediate(final IOnSuccessListener<E> intermediateListener, final IOnSuccessListener<Void> finishedListener) {
+    public static <E> IIntermediateResultListener<E> intermediate(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener) {
 		return intermediate(intermediateListener, finishedListener, true);
     }
     
-    public static <E> IIntermediateResultListener<E> intermediate(final IOnSuccessListener<E> intermediateListener, final IOnSuccessListener<Void> finishedListener, final boolean defaultExceptionHandling) {
+    public static <E> IIntermediateResultListener<E> intermediate(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener, final boolean defaultExceptionHandling) {
 		return new IntermediateDefaultResultListener<E>() {
 
 			@Override
@@ -305,7 +305,7 @@ public class SResultListener {
 		};
     }
     
-    public static <E> IIntermediateResultListener<E> intermediate(final IOnSuccessListener<E> intermediateListener, final IOnSuccessListener<Void> finishedListener, final IOnExceptionListener exListener) {
+    public static <E> IIntermediateResultListener<E> intermediate(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener, final IFunctionalExceptionListener exListener) {
 		return new IntermediateDefaultResultListener<E>() {
 
 			@Override

@@ -479,20 +479,20 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		}
 	}
 	
-	public void addExceptionListener(final IOnExceptionListener listener) {
-		IOnSuccessListener<E> emptySuccessListener = SResultListener.ignoreResults();
+	public void addExceptionListener(final IFunctionalExceptionListener listener) {
+		IFunctionalResultListener<E> emptySuccessListener = SResultListener.ignoreResults();
 		addResultListener(SResultListener.resultListener(emptySuccessListener, listener));
 	}
 	
-	public void addResultListener(final IOnSuccessListener<E> sucListener) {
+	public void addResultListener(final IFunctionalResultListener<E> sucListener) {
 		addResultListener(SResultListener.resultListener(sucListener));
 	}
 	
-	public void addResultListener(final IOnSuccessListener<E> sucListener, final boolean defaultExceptionHandling) {
+	public void addResultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling) {
 		addResultListener(SResultListener.resultListener(sucListener, true));
 	}
 	
-	public void addResultListener(final IOnSuccessListener<E> sucListener, final IOnExceptionListener exListener) {
+	public void addResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener) {
 		addResultListener(SResultListener.resultListener(sucListener, exListener));
 	}
 	

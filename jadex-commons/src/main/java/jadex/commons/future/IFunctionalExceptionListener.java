@@ -5,7 +5,7 @@ package jadex.commons.future;
  */
 // @Reference
 // @FunctionalInterface // this is a functional interface in java 8
-public interface IOnExceptionListener
+public interface IFunctionalExceptionListener
 {
 	
 	/**
