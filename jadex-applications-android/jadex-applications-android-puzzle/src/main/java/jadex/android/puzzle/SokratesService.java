@@ -78,7 +78,7 @@ public class SokratesService extends JadexPlatformService
 			}
 			else
 			{
-				result = SokratesService.this.startJadexPlatform();
+				result = SokratesService.this.startPlatform();
 			}
 			return result;
 		}
