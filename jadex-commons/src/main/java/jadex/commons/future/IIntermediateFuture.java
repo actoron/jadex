@@ -65,8 +65,15 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 //     */
 //    public E getNextIntermediateResult(ISuspendable sus);
     
+    /**
+	 * Add a result listener.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 */
+	public void addIntermediateResultListener(IIntermediateResultListener<E> intermediateListener);
+    
 	/**
-	 * Add an functional result listener, which called on intermediate results.
+	 * Add a functional result listener, which called on intermediate results.
 	 * Exceptions will be handled by IntermediateDefaultResultListener.
 	 * 
 	 * @param intermediateListener The intermediate listener.
@@ -74,7 +81,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener);
     
 	/**
-	 * Add an functional result listener, which called on intermediate results.
+	 * Add a functional result listener, which called on intermediate results.
 	 * Exceptions will be handled by IntermediateDefaultResultListener.
 	 * 
 	 * @param intermediateListener The intermediate listener.
@@ -84,7 +91,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener);
     
 	/**
-	 * Add an functional result listener, which called on intermediate results.
+	 * Add a functional result listener, which called on intermediate results.
 	 * 
 	 * @param intermediateListener The intermediate listener.
 	 * @param finishedListener The finished listener, called when no more
@@ -95,7 +102,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener, boolean defaultExceptionHandling);
     
 	/**
-	 * Add an functional result listener, which called on intermediate results.
+	 * Add a functional result listener, which called on intermediate results.
 	 * 
 	 * @param intermediateListener The intermediate listener.
 	 * @param finishedListener The finished listener, called when no more

@@ -1,8 +1,12 @@
 package jadex.commons.gui.future;
 
 
+import java.awt.Component;
+
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFunctionalExceptionListener;
+import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IUndoneResultListener;
 
@@ -22,8 +26,38 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	/** Flag if undone methods should be used. */
 	protected boolean undone;
 	
+	/** Custom result listener */
+	protected IFunctionalResultListener<E>	customResultListener;
+	
+	/** Custom result listener */
+	protected IFunctionalExceptionListener	customExceptionListener;
+	
 	//-------- constructors --------
 	
+	/**
+	 * Create a new listener with functional interfaces.
+	 * @param fut The Delegate.
+	 * @param customResultListener The listener.
+	 */
+	public SwingDelegationResultListener(Future<E> fut, final IFunctionalResultListener<E> customResultListener)
+	{
+		this(fut, customResultListener, null);
+	}
+
+	/**
+	 * Create a new listener with functional interfaces.
+	 * 
+	 * @param fut The Delegate.
+	 * @param customResultListener The custom result listener.
+	 * @param customExceptionListener The listener that is called on exceptions.
+	 */
+	public SwingDelegationResultListener(Future<E> fut, final IFunctionalResultListener<E> customResultListener, IFunctionalExceptionListener customExceptionListener)
+	{
+		this(fut);
+		this.customResultListener = customResultListener;
+		this.customExceptionListener = customExceptionListener;
+	}
+
 	/**
 	 *  Create a new listener.
 	 */
@@ -125,13 +159,17 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	 */
 	public void customResultAvailable(E result)
 	{
-		if(undone)
-		{
-			future.setResultIfUndone(result);
-		}
-		else
-		{
-			future.setResult(result);
+		if (customResultListener != null) {
+			customResultListener.resultAvailable(result);
+		} else {
+			if(undone)
+			{
+				future.setResultIfUndone(result);
+			}
+			else
+			{
+				future.setResult(result);
+			}
 		}
 	}
 	
@@ -142,13 +180,17 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	public void customExceptionOccurred(Exception exception)
 	{
 //		System.err.println("Problem: "+exception);
-		if(undone)
-		{
-			future.setExceptionIfUndone(exception);
-		}
-		else
-		{
-			future.setException(exception);
+		if (customExceptionListener != null) {
+			customExceptionListener.exceptionOccurred(exception);
+		} else {
+			if(undone)
+			{
+				future.setExceptionIfUndone(exception);
+			}
+			else
+			{
+				future.setException(exception);
+			}
 		}
 	}
 
