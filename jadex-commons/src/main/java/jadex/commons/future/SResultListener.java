@@ -1,6 +1,5 @@
 package jadex.commons.future;
 
-
 /**
  * Static helper class for creating result listeners.
  */
@@ -51,7 +50,8 @@ public class SResultListener {
      * @return {@link IResultListener}
      */
 	public static <E> IResultListener<E> delegate(final Future<E> delegate) {
-		return delegate(delegate, false);
+//		return delegate(delegate, false);
+		return new DelegationResultListener<E>(delegate);
 	}
 	
 	/**
@@ -62,49 +62,44 @@ public class SResultListener {
      * @return {@link IResultListener}
      */
 	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone) {
-		return new DelegationResultListener<E>(delegate, undone);
+		return delegate(delegate, undone);
 	}
 	
 	/**
-     * Creates an {@link IResultListener} that delegates successful results to a given Future
-     * and exceptions to a given ExceptionListener.
-     * 
-     * @param delegate The future used for success delegation.
-     * @param exListener The ExceptionListener.
-     * @return {@link IResultListener}
-     */
-	public static <E> IResultListener<E> delegateSuccess(final Future<E> delegate, final IFunctionalExceptionListener exListener) {
-		return delegateSuccess(delegate, false, exListener);
-	}
-	
-	/**
-     * Creates an {@link IResultListener} that delegates successful results to a given Future
-     * and exceptions to a given ExceptionListener.
+     * Creates an {@link IResultListener} that delegates all results to a given Future.
      * 
      * @param delegate The future used for success delegation.
      * @param undone Flag if undone methods should be used.
-     * @param exListener The ExceptionListener.
+     * @param customResultListener Custom result listener that overwrites the delegation behaviour.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> delegateSuccess(final Future<E> delegate, boolean undone, final IFunctionalExceptionListener exListener) {
-		return new DelegationResultListener<E>(delegate, undone) {
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				exListener.exceptionOccurred(exception);
-			}
-		};
+	public static <E> IResultListener<E> delegate(final Future<E> delegate, IFunctionalResultListener<E> customResultListener) {
+		return delegate(delegate, false, customResultListener);
 	}
+	
+	/**
+     * Creates an {@link IResultListener} that delegates all results to a given Future.
+     * 
+     * @param delegate The future used for success delegation.
+     * @param undone Flag if undone methods should be used.
+     * @param customResultListener Custom result listener that overwrites the delegation behaviour.
+     * @return {@link IResultListener}
+     */
+	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone, IFunctionalResultListener<E> customResultListener) {
+		return new DelegationResultListener<E>(delegate, undone, customResultListener);
+	}
+	
     
 	/**
      * Creates an {@link IResultListener} that delegates exceptions to a given Future
      * and results to a given SuccessListener.
      * 
      * @param delegate The future used for exception delegation.
-     * @param sucListener The SuccessListener.
+     * @param customResultListener The SuccessListener.
      * @return {@link IResultListener}
      */
-    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, final IFunctionalResultListener<E> sucListener) {
-    	return delegateExceptions(delegate, false, sucListener);
+    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, final IFunctionalResultListener<E> customResultListener) {
+    	return delegateExceptions(delegate, false, customResultListener);
     }
     
 	/**
@@ -113,16 +108,11 @@ public class SResultListener {
      * 
      * @param delegate The future used for exception delegation.
      * @param undone Flag if undone methods should be used.
-     * @param sucListener The SuccessListener.
+     * @param customResultListener The SuccessListener.
      * @return {@link IResultListener}
      */
-    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, boolean undone, final IFunctionalResultListener<E> sucListener) {
-    	return new ExceptionDelegationResultListener<E, T>(delegate, undone) {
-			@Override
-			public void customResultAvailable(E result) {
-				sucListener.resultAvailable(result);
-			}
-		};
+    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, boolean undone, final IFunctionalResultListener<E> customResultListener) {
+    	return new ExceptionDelegationResultListener<E, T>(delegate, undone, customResultListener);
     }
     
     /**
@@ -133,19 +123,7 @@ public class SResultListener {
      * @return {@link CounterResultListener}
      */
     public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener) {
-    	return countResults(num, countReachedListener, true);
-    }
-    
-    /**
-     * Creates an {@link CounterResultListener}.
-     * 
-     * @param num The number of sub callbacks.
-     * @param defaultExceptionHandling Whether to use default exception handling.
-     * @param countReachedListener Listener to be called when the given number is reached.
-     * @return {@link CounterResultListener}
-     */
-    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, boolean defaultExceptionHandling) {
-    	return new CounterResultListener<E>(num, createResultListener(countReachedListener, defaultExceptionHandling));
+    	return new CounterResultListener<E>(num, countReachedListener);
     }
     
     /**
@@ -157,7 +135,7 @@ public class SResultListener {
      * @return {@link CounterResultListener}
      */
     public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalExceptionListener exListener) {
-    	return new CounterResultListener<E>(num, createResultListener(countReachedListener, exListener));
+    	return new CounterResultListener<E>(num, countReachedListener, exListener);
     }
 
     /**
@@ -169,14 +147,8 @@ public class SResultListener {
      * @param exListener Listener to be called for exceptions.
      * @return {@link CounterResultListener}
      */
-    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, final IOnIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exListener) {
-    	return new CounterResultListener<E>(num, createResultListener(countReachedListener, exListener)) {
-
-			@Override
-			public void intermediateResultAvailable(E result) {
-				intermediateListener.intermediateResultAvailable(result);
-			}
-    	};
+    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalResultListener<E> intermediateListener, IFunctionalExceptionListener exListener) {
+    	return new CounterResultListener<E>(num, countReachedListener, intermediateListener, exListener);
     }
     
 	/**
@@ -186,7 +158,7 @@ public class SResultListener {
 	 * @param sucListener The SuccessListener.
 	 * @return {@link IResultListener}
 	 */
-	static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener)
+	public static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener)
 	{
 		return createResultListener(sucListener, true);
 	}
@@ -200,7 +172,7 @@ public class SResultListener {
 	 *        handling for exceptions or not.
 	 * @return {@link IResultListener}
 	 */
-	static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling)
+	public static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling)
 	{
 		return new DefaultResultListener<E>()
 		{
@@ -230,7 +202,7 @@ public class SResultListener {
 	 * @param exListener The ExceptionListener.
 	 * @return {@link IResultListener}
 	 */
-	static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener)
+	public static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener)
 	{
 		return new IResultListener<E>()
 		{

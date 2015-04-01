@@ -16,6 +16,9 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 	
 	/** Flag if undone methods should be used. */
 	protected boolean undone;
+
+	/** Custom functional result listener */
+	protected IFunctionalResultListener<E>	customResultListener;
 	
 //	protected DebugException	ex;
 	
@@ -28,6 +31,28 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 	{
 		this(future, false);
 	}
+
+	/**
+	 * Create a new listener.
+	 * @param future The delegation target.
+	 * @param customResultListener Custom result listener that overwrites the delegation behaviour.
+	 */
+	public DelegationResultListener(Future<E> future, IFunctionalResultListener<E> customResultListener)
+	{
+		this(future, false, customResultListener);
+	}
+
+	/**
+	 * Create a new listener.
+	 * @param future The delegation target.
+	 * @param undone use undone methods.
+	 * @param customResultListener Custom result listener that overwrites the delegation behaviour.
+	 */
+	public DelegationResultListener(Future<E> future, boolean undone, IFunctionalResultListener<E> customResultListener)
+	{
+		this(future, undone);
+		this.customResultListener = customResultListener;
+	}
 	
 	/**
 	 *  Create a new listener.
@@ -38,7 +63,7 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 //		this.ex	= new DebugException();
 		this.undone = undone;
 	}
-	
+
 	//-------- methods --------
 	
 	/**
@@ -92,13 +117,17 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 	 */
 	public void customResultAvailable(E result)
 	{
-		if(undone)
-		{
-			future.setResultIfUndone(result);
-		}
-		else
-		{
-			future.setResult(result);
+		if (customResultListener != null) {
+			customResultListener.resultAvailable(result);
+		} else {
+			if(undone)
+			{
+				future.setResultIfUndone(result);
+			}
+			else
+			{
+				future.setResult(result);
+			}
 		}
 	}
 

@@ -346,12 +346,22 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     }
     
 	/**
-	 * Add an functional result listener, which called on intermediate results.
-	 * Exceptions will be handled by IntermediateDefaultResultListener.
+	 * Add an result listener, which called on intermediate results.
 	 * 
 	 * @param intermediateListener The intermediate listener.
 	 */
-	public void addIntermediateResultListener(final IFunctionalResultListener<E> intermediateListener)
+	public void addIntermediateResultListener(IIntermediateResultListener<E> intermediateListener)
+	{
+		addResultListener(intermediateListener);
+	}
+    
+	/**
+	 * Add an functional result listener, which called on intermediate results.
+	 * Exceptions will be handled by IntermediateDefaultResultListener.
+	 * 
+	 * @param intermediateListener The functional intermediate listener.
+	 */
+	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener)
 	{
 		IFunctionalResultListener<Void> ignoreListener = SResultListener.ignoreResults();
 		addIntermediateResultListener(intermediateListener, ignoreListener);
@@ -361,7 +371,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 * Add an functional result listener, which called on intermediate results.
 	 * Exceptions will be handled by IntermediateDefaultResultListener.
 	 * 
-	 * @param intermediateListener The intermediate listener.
+	 * @param intermediateListener The functional intermediate listener.
 	 * @param finishedListener The finished listener, called when no more
 	 *        intermediate results will arrive.
 	 */

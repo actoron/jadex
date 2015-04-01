@@ -25,8 +25,38 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	
 	/** The undone flag. */
 	protected boolean undone;
+
+	/** Listener that is called on intermediate results. */
+	protected IFunctionalResultListener<E>	intermediateResultListener;
 	
 	//-------- constructors --------
+	
+	/**
+	 *  Create a new counter listener.
+	 *  @param num The number of sub callbacks.
+	 */
+	public CounterResultListener(int num, IFunctionalResultListener<Void> countReachedListener)
+	{
+		this(num, false, countReachedListener);
+	}
+	
+	/**
+	 *  Create a new counter listener.
+	 *  @param num The number of sub callbacks.
+	 */
+	public CounterResultListener(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalExceptionListener exListener)
+	{
+		this(num, false, countReachedListener, exListener);
+	}
+	
+	/**
+	 *  Create a new counter listener.
+	 *  @param num The number of sub callbacks.
+	 */
+	public CounterResultListener(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalResultListener<E> intermediateResultListener, IFunctionalExceptionListener exListener)
+	{
+		this(num, false, countReachedListener, intermediateResultListener, exListener);
+	}
 	
 	/**
 	 *  Create a new counter listener.
@@ -35,6 +65,34 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	public CounterResultListener(int num, IResultListener<Void> delegate)
 	{
 		this(num, false, delegate);
+	}
+	
+	/**
+	 *  Create a new counter listener.
+	 *  @param num The number of sub callbacks.
+	 */
+	public CounterResultListener(int num, boolean ignorefailures, IFunctionalResultListener<Void> countReachedListener)
+	{
+		this(num, ignorefailures, SResultListener.createResultListener(countReachedListener));
+	}
+	
+	/**
+	 *  Create a new counter listener.
+	 *  @param num The number of sub callbacks.
+	 */
+	public CounterResultListener(int num, boolean ignorefailures, IFunctionalResultListener<Void> countReachedListener, IFunctionalExceptionListener exListener)
+	{
+		this(num, ignorefailures, SResultListener.createResultListener(countReachedListener, exListener));
+	}
+	
+	/**
+	 *  Create a new counter listener.
+	 *  @param num The number of sub callbacks.
+	 */
+	public CounterResultListener(int num, boolean ignorefailures, IFunctionalResultListener<Void> countReachedListener, IFunctionalResultListener<E> intermediateResultListener, IFunctionalExceptionListener exListener)
+	{
+		this(num, ignorefailures, SResultListener.createResultListener(countReachedListener, exListener));
+		this.intermediateResultListener = intermediateResultListener;
 	}
 	
 	/**
@@ -169,6 +227,9 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	 */
 	public void intermediateResultAvailable(E result)
 	{
+		if (intermediateResultListener != null) {
+			intermediateResultListener.resultAvailable(result);
+		}
 	}
 	
 	/**
