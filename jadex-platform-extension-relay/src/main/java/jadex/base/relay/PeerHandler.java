@@ -267,7 +267,6 @@ public class PeerHandler implements Runnable
 						{
 							handler.getStatisticsDB().save(info);
 						}
-						peerstate	= -1;
 						RelayHandler.getLogger().info("Finished DB synchronization with: "+getUrl()+", local="+localstate+", remote="+peerstate);
 					}
 					catch(Exception e)
@@ -278,6 +277,7 @@ public class PeerHandler implements Runnable
 						RelayHandler.getLogger().warning("Exception fetching DB update: "+sw);
 					}
 				}
+				peerstate	= -1;
 			}
 			
 			// Else ping remote peer
