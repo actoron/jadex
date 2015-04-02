@@ -258,7 +258,7 @@ public class NIOTCPTransport implements ITransport
 			Exception	ex	= null;
 			try
 			{
-				res	= con.get(null);
+				res	= con.get();
 			}
 			catch(Exception e)
 			{

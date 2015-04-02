@@ -344,7 +344,8 @@ public class SNonAndroid
 		});
 		
 //		disposed.get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
-		disposed.get(new ThreadSuspendable(), 30000);
+//		disposed.get(new ThreadSuspendable(), 30000);
+		disposed.get(30000);
 		
 //		// Another bug not releasing the last drawn window.
 //		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676

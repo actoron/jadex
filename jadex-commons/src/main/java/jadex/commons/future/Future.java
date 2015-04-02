@@ -161,7 +161,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public E get()
 	{
-		return get(ISuspendable.SUSPENDABLE.get());
+		return get(ISuspendable.SUSPENDABLE.get(), -1);
 	}
 
 	/**
@@ -174,21 +174,21 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		return get(ISuspendable.SUSPENDABLE.get(), timeout);
 	}
 	
-    /**
-     *  Get the result - blocking call.
-     *  @return The future result.
-     */
-    public E get(ISuspendable caller)
-    {
-    	return get(caller, -1);
-    }
+//    /**
+//     *  Get the result - blocking call.
+//     *  @return The future result.
+//     */
+//    public E get(ISuspendable caller)
+//    {
+//    	return get(caller, -1);
+//    }
 
     /**
      *  Get the result - blocking call.
      *  @param timeout The timeout in millis.
      *  @return The future result.
      */
-    public E get(ISuspendable caller, long timeout)
+    protected E get(ISuspendable caller, long timeout)
     {
     	boolean suspend = false;
     	synchronized(this)

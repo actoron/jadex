@@ -377,7 +377,7 @@ public class RelayHandler
 					Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
 //					System.out.println("queing message to: "+targetid);
 					queue.enqueue(msg);
-					msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
+					msg.getFuture().get(30000);	// todo: how to set a useful timeout value!?
 					sent	= true;
 //					System.out.println("message sent to: "+targetid+", "+(System.currentTimeMillis()-start));
 				}

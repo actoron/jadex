@@ -62,7 +62,7 @@ public class JadexMavenRunner
 		Set<URL>	urls	= new HashSet<URL>();
 		for(int i=0; i<rids.length; i++)
 		{
-			Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rids[i], true).get(null);
+			Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rids[i], true).get();
 			for(IResourceIdentifier rid: dependencies.getSecondEntity().keySet())
 			{
 				urls.add(SUtil.toURL(rid.getLocalIdentifier().getUri()));

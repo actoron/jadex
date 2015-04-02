@@ -794,7 +794,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		// Only need to check, when proxy already created
 		if(dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null)
 		{
-			IComponentIdentifier	proxy	= dif.getProxy().get(null);
+			IComponentIdentifier	proxy	= dif.getProxy().get();
 			cms.getComponentDescription(proxy)
 				.addResultListener(new IResultListener<IComponentDescription>()
 			{

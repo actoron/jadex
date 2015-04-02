@@ -44,8 +44,8 @@ public class RSHelloTest //extends TestCase
 //		
 		IFuture<Void> publishService = pservice.publishService(getClass().getClassLoader(), hello, pi);
 //		
-		ThreadSuspendable sus = new ThreadSuspendable();
-		publishService.get(sus);
+//		ThreadSuspendable sus = new ThreadSuspendable();
+		publishService.get();
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
 		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
@@ -53,7 +53,7 @@ public class RSHelloTest //extends TestCase
 //				"-conf", "jadex/platform/Platform.component.xml",
 				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
-		extAcc = fut.get(sus);
+		extAcc = fut.get();
 	}
 
 //	protected void setUp() throws Exception
@@ -102,13 +102,13 @@ public class RSHelloTest //extends TestCase
 	{
 		try
 		{
-		ThreadSuspendable sus = new ThreadSuspendable();
+//		ThreadSuspendable sus = new ThreadSuspendable();
 
 		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc, IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 
-		IHelloService hs = fut.get(sus);
+		IHelloService hs = fut.get();
 
-		String xmlHello = hs.sayXMLHello().get(sus);
+		String xmlHello = hs.sayXMLHello().get();
 
 		Assert.assertEquals(hello.sayXMLHello(), xmlHello);
 		System.out.println("Response: " + xmlHello);

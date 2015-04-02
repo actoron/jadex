@@ -264,7 +264,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		IFuture<Boolean>	ret;
 		
-		if(isLoadable(model, imports, rid).get(null).booleanValue())
+		if(isLoadable(model, imports, rid).get().booleanValue())
 		{
 			final Future<Boolean>	fut	= new Future<Boolean>();
 			ret	= fut;

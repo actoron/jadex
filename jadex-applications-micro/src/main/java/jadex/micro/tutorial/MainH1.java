@@ -21,8 +21,7 @@ public class MainH1
 		IFuture<IExternalAccess>	platfut	= Starter.createPlatform(args);
 		
 		// Wait until the platform has started and retrieve the platform access.
-		ThreadSuspendable	sus	= new ThreadSuspendable();
-		IExternalAccess	platform	= platfut.get(sus);
+		IExternalAccess	platform	= platfut.get();
 		System.out.println("Started platform: "+platform.getComponentIdentifier());
 	}
 }

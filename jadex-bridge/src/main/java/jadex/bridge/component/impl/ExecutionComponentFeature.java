@@ -474,7 +474,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				public void resultAvailable(IExecutionService exe)
 				{
 					// Hack!!! service is foudn before it is started, grrr.
-					if(((IService)exe).isValid().get(null).booleanValue())	// Hack!!! service is raw
+					if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 					{
 						if(bootstrap)
 						{

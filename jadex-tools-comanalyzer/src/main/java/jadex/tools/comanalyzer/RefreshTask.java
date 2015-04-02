@@ -165,7 +165,7 @@ public class RefreshTask extends TimerTask
 			}
 		});
 		
-		updated.get(new ThreadSuspendable());
+		updated.get();
 
 		// end measuring time, add duration to durationlist
 		addExecutionDuration(System.currentTimeMillis() - start);

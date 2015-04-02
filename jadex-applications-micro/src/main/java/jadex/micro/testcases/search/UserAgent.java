@@ -40,9 +40,9 @@ public class UserAgent
     
     public static void main(String[] args)
 	{
-    	ThreadSuspendable sus = new ThreadSuspendable();
-		IExternalAccess plat = Starter.createPlatform(new String[]{"-gui", "false"}).get(sus);
-		IComponentManagementService cms = SServiceProvider.getService(plat, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+//    	ThreadSuspendable sus = new ThreadSuspendable();
+		IExternalAccess plat = Starter.createPlatform(new String[]{"-gui", "false"}).get();
+		IComponentManagementService cms = SServiceProvider.getService(plat, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		final Future<Void> fut = new Future<Void>();
 		
@@ -73,8 +73,8 @@ public class UserAgent
 			});
 		}
 		
-		fut.get(sus);
+		fut.get();
 		
-		cms.createComponent(UserAgent.class.getName()+".class", null).get(sus);
+		cms.createComponent(UserAgent.class.getName()+".class", null).get();
 	}
 }

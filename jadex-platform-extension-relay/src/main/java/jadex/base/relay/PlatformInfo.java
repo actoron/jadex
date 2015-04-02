@@ -190,7 +190,7 @@ public final class PlatformInfo
 	{
 		if(hostnamefut!=null)
 		{
-			this.hostname	= hostnamefut.get(new ThreadSuspendable());
+			this.hostname	= hostnamefut.get();
 			this.hostnamefut	= null;
 		}
 		return hostname;

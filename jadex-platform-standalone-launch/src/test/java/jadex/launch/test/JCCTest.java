@@ -40,15 +40,15 @@ public class JCCTest //extends TestCase
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"});
 		
 		long timeout	= BasicService.getLocalDefaultTimeout();
-		ISuspendable	sus	= 	new ThreadSuspendable();
+//		ISuspendable	sus	= 	new ThreadSuspendable();
 		
-		IExternalAccess	platform	= fut.get(sus, timeout);
+		IExternalAccess	platform	= fut.get(timeout);
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.getServiceUpwards(platform, IComponentManagementService.class).get(sus, timeout);
+			.getServiceUpwards(platform, IComponentManagementService.class).get(timeout);
 
 		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
-			new ComponentIdentifier("jcc", platform.getComponentIdentifier())).get(sus, timeout);
+			new ComponentIdentifier("jcc", platform.getComponentIdentifier())).get(timeout);
 		
 		jcc.scheduleStep(new IComponentStep<Void>()
 		{
@@ -69,9 +69,9 @@ public class JCCTest //extends TestCase
 				});
 				return ret;
 			}
-		}).get(sus, timeout*10);
+		}).get(timeout*10);
 		
-		platform.killComponent().get(sus, timeout);
+		platform.killComponent().get(timeout);
 		
 		fut	= null;
 		platform	= null;

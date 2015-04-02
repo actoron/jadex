@@ -90,11 +90,11 @@ public class TesterAgent implements ITestService
 						ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 						final String name =  TesterAgent.class.getName()+".class";
 						
-						IComponentIdentifier ida = cms.createComponent(name, ci).getFirstResult(sus);
-						IComponentIdentifier idb = cms.createComponent(name, ci).getFirstResult(sus);
+						IComponentIdentifier ida = cms.createComponent(name, ci).getFirstResult();
+						IComponentIdentifier idb = cms.createComponent(name, ci).getFirstResult();
 					
-						IComponentDescription desca = cms.getComponentDescription(ida).get(sus);
-						IComponentDescription descb = cms.getComponentDescription(ida).get(sus);
+						IComponentDescription desca = cms.getComponentDescription(ida).get();
+						IComponentDescription descb = cms.getComponentDescription(ida).get();
 					
 						System.out.println("chain a: "+ida+" "+desca.getCause().getOrigin());
 						System.out.println("chain b: "+idb+" "+descb.getCause().getOrigin());

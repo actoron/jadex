@@ -188,7 +188,7 @@ public class ComponentStartTest extends	TestCase
 		try
 		{
 			System.out.println("starting: "+filename);
-			IComponentIdentifier	cid	= cms.createComponent(null, filename, null, null).get(new ThreadSuspendable());
+			IComponentIdentifier	cid	= cms.createComponent(null, filename, null, null).get();
 			try
 			{
 //				if(comp.getFilename().indexOf("Heatbugs")!=-1)
@@ -196,7 +196,7 @@ public class ComponentStartTest extends	TestCase
 					System.out.println("killing: "+filename);
 //					SyncExecutionService.DEBUG	= true;
 //				}
-				cms.destroyComponent(cid).get(new ThreadSuspendable());
+				cms.destroyComponent(cid).get();
 				System.out.println("killed: "+filename);
 			}
 			catch(ComponentTerminatedException cte)
@@ -240,8 +240,8 @@ public class ComponentStartTest extends	TestCase
 		{
 			"-gui", "false"
 		};
-		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(pargs).get(new ThreadSuspendable());
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp, IComponentManagementService.class).get(new ThreadSuspendable());
+		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(pargs).get();
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp, IComponentManagementService.class).get();
 		dorun(cms, "jadex/micro/testcases/blocking/ShutdownAgent.class");
 //		dorun(cms, "jadex/micro/benchmarks/MessagePerformanceAgent.class");
 //		dorun(cms, "jadex/micro/examples/ping/PingScenario.application.xml");

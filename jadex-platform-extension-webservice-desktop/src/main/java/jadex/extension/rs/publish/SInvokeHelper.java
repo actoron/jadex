@@ -408,7 +408,7 @@ public class SInvokeHelper
 												done.setResultIfUndone(null);
 											}
 										});
-										done.get(new ThreadSuspendable());
+										done.get();
 									}
 									else
 									{
@@ -466,7 +466,7 @@ public class SInvokeHelper
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)
 			{
-				ret = ((IFuture<?>)ret).get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
+				ret = ((IFuture<?>)ret).get(BasicService.getLocalDefaultTimeout());
 			}
 			System.out.println("call finished: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
 			

@@ -50,7 +50,7 @@ public class WebServiceToJadexWrapperInvocationHandler implements InvocationHand
 			ret = m.invoke(service, args);
 			if(ret instanceof IFuture)
 			{
-				ret = ((IFuture)ret).get(new ThreadSuspendable());
+				ret = ((IFuture)ret).get();
 			}
 		}
 		catch(Exception e)

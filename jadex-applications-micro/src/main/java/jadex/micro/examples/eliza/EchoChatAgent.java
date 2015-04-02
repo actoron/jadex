@@ -89,18 +89,18 @@ public class EchoChatAgent
 	public static void main(String[] args)
 	{
 		ThreadSuspendable sus = new ThreadSuspendable();
-		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get(sus);
-		IComponentManagementService cms = SServiceProvider.getService(pl, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get();
+		IComponentManagementService cms = SServiceProvider.getService(pl, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		for(int i=0; i<10000; i++)
 		{
 			System.out.print(".");
 			if(i%100==0)
 				System.out.println("\n "+i+": ");
-			IComponentIdentifier cid = cms.createComponent(EchoChatAgent.class.getName()+".class", null).getFirstResult(sus);
+			IComponentIdentifier cid = cms.createComponent(EchoChatAgent.class.getName()+".class", null).getFirstResult();
 			try
 			{
-				cms.destroyComponent(cid).get(sus);
+				cms.destroyComponent(cid).get();
 			}
 			catch(Exception e)
 			{

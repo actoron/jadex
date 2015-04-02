@@ -87,7 +87,7 @@ public class JadexdocServlet extends HttpServlet
 	{
 		int	timeout	= 30000;
 		ThreadSuspendable	sus	= new ThreadSuspendable();
-		platform.get(sus, timeout).killComponent().get(sus, timeout);
+		platform.get(timeout).killComponent().get(timeout);
 	}
 	
 	//-------- methods --------
@@ -103,7 +103,7 @@ public class JadexdocServlet extends HttpServlet
 			long	timeout	= 30000;
 			ThreadSuspendable	sus	= new ThreadSuspendable();
 			String	type	= request.getParameter("type");
-			byte[]	icon	= SComponentFactory.getFileTypeIcon(platform.get(sus, timeout), type).get(sus, timeout);
+			byte[]	icon	= SComponentFactory.getFileTypeIcon(platform.get(timeout), type).get(timeout);
 		    response.setContentType(URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(icon)));
 		    response.getOutputStream().write(icon);
 		}
@@ -155,10 +155,9 @@ public class JadexdocServlet extends HttpServlet
 //				else
 				{
 					long	timeout	= 30000;
-					ThreadSuspendable	sus	= new ThreadSuspendable();
-					if(model!=null && model.get(sus, timeout)!=null)
+					if(model!=null && model.get(timeout)!=null)
 					{
-						IModelInfo	mi	= model.get(sus, timeout);
+						IModelInfo	mi	= model.get(timeout);
 						title	= mi.getName() + " (" + mi.getType() + ")";
 						view	= "/WEB-INF/jsp/jadexdoc/model.jsp";
 					}

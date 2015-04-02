@@ -136,13 +136,12 @@ public class ComponentTestSuite extends TestSuite
 		
 		// Tests must be available after constructor execution.
 		// Todo: get rid of thread suspendable!?
-		ISuspendable	ts	= new ThreadSuspendable();
 		
 //		System.out.println("start platform");
-		platform	= (IExternalAccess)Starter.createPlatform(args).get(ts);
+		platform	= (IExternalAccess)Starter.createPlatform(args).get();
 //		System.out.println("end platform");
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get(ts);
-		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(platform, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get();
+		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(platform, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		// Only works with x-rid hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
 //		final IResourceIdentifier	rid	= null;
@@ -150,14 +149,14 @@ public class ComponentTestSuite extends TestSuite
 		try
 		{
 			URL url = root.toURI().toURL();
-			rid	= libsrv.addURL(null, url).get(ts);
+			rid	= libsrv.addURL(null, url).get();
 		}
 		catch(Exception e)
 		{
 			throw new RuntimeException(e);
 		}
 		
-		this.classloader	= libsrv.getClassLoader(null).get(ts);
+		this.classloader	= libsrv.getClassLoader(null).get();
 		
 		// Scan for test cases.
 		Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + path);
@@ -176,15 +175,15 @@ public class ComponentTestSuite extends TestSuite
 				try
 				{
 //					System.out.println("Check: "+abspath);
-					if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get(ts)).booleanValue())
+					if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue())
 					{
 //						System.out.println("Loadable: "+abspath);
 //						if(abspath.indexOf("INeg")!=-1)
 //							System.out.println("test");
-						if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get(ts)).booleanValue())
+						if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get()).booleanValue())
 						{
 //							System.out.println("Startable: "+abspath);
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get(ts);
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get();
 							boolean istest = false;
 							if(model!=null && model.getReport()==null)
 							{
@@ -192,7 +191,7 @@ public class ComponentTestSuite extends TestSuite
 								for(int i=0; !istest && i<results.length; i++)
 								{
 									if(results[i].getName().equals("testresults") && Testcase.class.equals(
-										results[i].getClazz().getType(libsrv.getClassLoader(rid).get(ts), model.getAllImports())))
+										results[i].getClazz().getType(libsrv.getClassLoader(rid).get(), model.getAllImports())))
 									{
 										istest	= true;
 									}
@@ -415,7 +414,7 @@ public class ComponentTestSuite extends TestSuite
 	{
 		try
 		{
-			platform.killComponent().get(new ThreadSuspendable());
+			platform.killComponent().get();
 		}
 		catch(Exception e)
 		{

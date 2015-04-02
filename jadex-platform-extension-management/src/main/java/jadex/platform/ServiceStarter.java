@@ -163,7 +163,7 @@ public class ServiceStarter implements Daemon
 	{
 		if(platform==null)
 		{
-			platform = Starter.createPlatform(args).get(new ThreadSuspendable());
+			platform = Starter.createPlatform(args).get();
 		}		
 	}
 

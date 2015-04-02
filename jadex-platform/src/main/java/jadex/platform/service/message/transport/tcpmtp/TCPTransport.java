@@ -376,13 +376,13 @@ public class TCPTransport implements ITransport
 				{
 					public IFuture<Void> execute(Void args)
 					{
-						if(fut.get(null).send(task.getProlog(), task.getData(), task))
+						if(fut.get().send(task.getProlog(), task.getData(), task))
 						{
 							return IFuture.DONE;
 						}
 						else
 						{
-							return new Future<Void>(new RuntimeException("Send failed: "+fut.get(null)));
+							return new Future<Void>(new RuntimeException("Send failed: "+fut.get()));
 						}
 					}
 				});

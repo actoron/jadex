@@ -95,7 +95,7 @@ public class MultiPlatformsTest //extends TestCase
 			}
 			try
 			{
-				platforms[i]	= futures.get(i).get(sus, timeout);
+				platforms[i]	= futures.get(i).get(timeout);
 			}
 			catch(RuntimeException e)
 			{
@@ -112,7 +112,7 @@ public class MultiPlatformsTest //extends TestCase
 			{
 				System.out.println("Killing platform "+i);
 			}
-			platforms[i].killComponent().get(sus, timeout);
+			platforms[i].killComponent().get(timeout);
 		}
 		
 		if(memtimer!=null)

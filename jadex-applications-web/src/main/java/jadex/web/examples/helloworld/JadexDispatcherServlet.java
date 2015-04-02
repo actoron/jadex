@@ -44,8 +44,7 @@ public class JadexDispatcherServlet extends HttpServlet
 			"-extensions", "null",
 			"-welcome", "false"
 		};
-		ThreadSuspendable	sus	= new ThreadSuspendable();
-		this.platform	= Starter.createPlatform(args).get(sus, 30000);
+		this.platform	= Starter.createPlatform(args).get(30000);
 	}
 	
 	/**
@@ -54,8 +53,7 @@ public class JadexDispatcherServlet extends HttpServlet
 	public void destroy()
 	{
 		int	timeout	= 30000;
-		ThreadSuspendable	sus	= new ThreadSuspendable();
-		platform.killComponent().get(sus, timeout);
+		platform.killComponent().get(timeout);
 	}	
 	
 	//-------- methods --------

@@ -60,9 +60,8 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			"-component", "jadex/web/examples/puzzle/agent/Sokrates.agent.xml"
 		};
 		int	timeout	= 30000;
-		ThreadSuspendable	sus	= new ThreadSuspendable();
-		platform	= Starter.createPlatform(args).get(sus, timeout);
-		puzzle	= SServiceProvider.getService(platform, IPuzzleService.class).get(sus, timeout);
+		platform	= Starter.createPlatform(args).get(timeout);
+		puzzle	= SServiceProvider.getService(platform, IPuzzleService.class).get(timeout);
 	}
 	
 	/**
@@ -71,8 +70,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 	public void destroy()
 	{
 		int	timeout	= 30000;
-		ThreadSuspendable	sus	= new ThreadSuspendable();
-		platform.killComponent().get(sus, timeout);
+		platform.killComponent().get(timeout);
 	}
 	
 	//-------- methods --------
@@ -99,8 +97,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		{
 			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";
 			int	timeout	= 30000;
-			ThreadSuspendable	sus	= new ThreadSuspendable();
-			SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(sus, timeout);
+			SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(timeout);
 			request.setAttribute("highscore", entries.toArray(new HighscoreEntry[entries.size()]));
 		}
 		RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
@@ -142,8 +139,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			if(board.isSolution())
 			{
 				int	timeout	= 30000;
-				ThreadSuspendable	sus	= new ThreadSuspendable();
-				SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(sus, timeout);
+				SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(timeout);
 				int	hint_count	= ((Integer)session.getAttribute("hint_count")).intValue();
 				HighscoreEntry	entry	= new HighscoreEntry("dummy", board.getSize(), hint_count);
 				if(entries.isEmpty() ||	entry.compareTo(entries.last())<0)
@@ -173,7 +169,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			ThreadSuspendable	sus	= new ThreadSuspendable();
 			try
 			{
-				Move	move	= puzzle.hint(board, timeout).get(sus, timeout+500);
+				Move	move	= puzzle.hint(board, timeout).get(timeout+500);
 				hint	= move.getStart();
 			}
 			catch(Exception e)
@@ -189,10 +185,9 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			session.setAttribute("player", player);
 			HighscoreEntry	entry	= new HighscoreEntry(player, board.getSize(), hint_count);
 			int	timeout	= 30000;
-			ThreadSuspendable	sus	= new ThreadSuspendable();
 			try
 			{
-				puzzle.addHighscore(entry).get(sus, timeout);
+				puzzle.addHighscore(entry).get(timeout);
 			}
 			catch(Exception e)
 			{
@@ -200,11 +195,11 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			}
 			
 			// Save platform settings in case of server crash
-			ISettingsService	settings	= SServiceProvider.getService(platform, ISettingsService.class).get(sus, timeout);
-			settings.saveProperties().get(sus, timeout);
+			ISettingsService	settings	= SServiceProvider.getService(platform, ISettingsService.class).get(timeout);
+			settings.saveProperties().get(timeout);
 			
 			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";
-			SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(sus, timeout);
+			SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(timeout);
 			request.setAttribute("highscore", entries.toArray(new HighscoreEntry[entries.size()]));
 		}
 		RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);

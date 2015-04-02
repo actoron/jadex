@@ -2,7 +2,6 @@ package jadex.tools.debugger.bdi;
 
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;

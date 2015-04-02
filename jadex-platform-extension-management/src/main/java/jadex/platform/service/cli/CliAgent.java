@@ -222,10 +222,10 @@ public class CliAgent implements ICliService, IInternalCliService
 				{
 					public void run()
 					{
-						ThreadSuspendable sus = new ThreadSuspendable();
+//						ThreadSuspendable sus = new ThreadSuspendable();
 						final Tuple2<String, Integer> consess = new Tuple2<String, Integer>(SUtil.createUniqueId("consess"), Integer.valueOf(0));
 						System.out.println("Jadex shell (type 'h' for help)");
-						System.out.println(getShell(consess).getShellPrompt().get(sus));
+						System.out.println(getShell(consess).getShellPrompt().get());
 						// redirect System.in
 						try{SUtil.getOutForSystemIn();}catch(Exception e){}
 //						System.out.println("sysin: "+System.in+" "+System.in.getClass());
@@ -302,7 +302,7 @@ public class CliAgent implements ICliService, IInternalCliService
 											
 											return ret;
 										}
-									}).get(new ThreadSuspendable());
+									}).get();
 								}
 								else
 								{

@@ -874,7 +874,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			DiscoveryInfo dif = (DiscoveryInfo)list.get(row);
 			final boolean	create	= ((Boolean)val).booleanValue();
 			final IComponentIdentifier	cid	= dif.getComponentIdentifier();
-			final IComponentIdentifier	proxy	=  dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null ? dif.getProxy().get(null) : null;
+			final IComponentIdentifier	proxy	=  dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null ? dif.getProxy().get() : null;
 			if(create && dif.getProxy()==null || !create && proxy!=null)
 			{
 				// Ask user if platform should be added to excludes list.

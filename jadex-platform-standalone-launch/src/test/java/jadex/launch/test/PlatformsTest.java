@@ -107,7 +107,7 @@ public class PlatformsTest //extends TestCase
 			}
 			
 			long start = System.currentTimeMillis();
-			IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(args).get(sus, timeout);
+			IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(args).get(timeout);
 			starttimes[i] = System.currentTimeMillis()-start;
 //			System.out.println("Started platform: "+i);
 			
@@ -121,7 +121,7 @@ public class PlatformsTest //extends TestCase
 			}
 			
 			final Future<Void>	fut	= new Future<Void>();
-			IComponentManagementService cms = SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get(sus, timeout);
+			IComponentManagementService cms = SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get(timeout);
 			cms.addComponentListener(platform.getComponentIdentifier(), new ICMSComponentListener()
 			{
 				public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
@@ -137,7 +137,7 @@ public class PlatformsTest //extends TestCase
 				{
 					return IFuture.DONE;
 				}
-			}).get(sus, timeout);
+			}).get(timeout);
 			
 //			// Test CTRL-C shutdown behavior.
 //			Timer	timer	= new Timer();
@@ -150,8 +150,8 @@ public class PlatformsTest //extends TestCase
 //			}, 3000);
 			
 			start = System.currentTimeMillis();
-			platform.killComponent().get(sus, timeout);
-			fut.get(sus, timeout);
+			platform.killComponent().get(timeout);
+			fut.get(timeout);
 			shutdowntimes[i] = System.currentTimeMillis()-start;
 //			System.out.println("Stopped platform: "+i);
 		}

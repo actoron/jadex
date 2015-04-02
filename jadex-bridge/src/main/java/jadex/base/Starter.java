@@ -229,7 +229,7 @@ public class Starter
 //			e.printStackTrace();
 //		}
 		
-		createPlatform(args).get(new ThreadSuspendable());
+		createPlatform(args).get();
 		
 //		IExternalAccess access	= createPlatform(args).get();
 //				Runtime.getRuntime().addShutdownHook(new Thread()
@@ -376,7 +376,7 @@ public class Starter
 			
 //			System.out.println("Using config file: "+configfile);
 			
-			final IModelInfo model	= cfac.loadModel(configfile, null, null).get(null);	// No execution yet, can only work if method is synchronous.
+			final IModelInfo model	= cfac.loadModel(configfile, null, null).get();	// No execution yet, can only work if method is synchronous.
 			
 			if(model.getReport()!=null)
 			{
@@ -459,7 +459,7 @@ public class Starter
 					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
 					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUri()));
 					
-					String ctype	= cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get(null);
+					String ctype	= cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get();
 					IComponentIdentifier caller = sc==null? null: sc.getCaller();
 					Cause cause = sc==null? null: sc.getCause();
 					if(cause==null)

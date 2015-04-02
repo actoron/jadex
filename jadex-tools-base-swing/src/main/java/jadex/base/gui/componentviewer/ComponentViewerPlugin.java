@@ -559,7 +559,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				{
 					if(viewable.isDone() && viewable.getException()==null)
 					{
-						ret = viewable.get(null).booleanValue();
+						ret = viewable.get().booleanValue();
 //						System.out.println("isVis result: "+node.getId()+" "+ret+" "+sid);
 					}
 				}
@@ -601,7 +601,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				{
 					if(viewable.isDone() && viewable.getException()==null)
 					{
-						ret = viewable.get(null).booleanValue();
+						ret = viewable.get().booleanValue();
 //						System.out.println("isVis result: "+node.getId()+" "+ret);
 					}
 				}

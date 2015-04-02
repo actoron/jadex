@@ -275,7 +275,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					else
 					{
 						logger.warning("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
-						ret = fut.get(new ThreadSuspendable());
+						ret = fut.get();
 					}
 				}
 			}

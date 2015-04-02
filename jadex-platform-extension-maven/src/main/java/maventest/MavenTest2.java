@@ -37,8 +37,8 @@ public class MavenTest2
 			try
 			{
 				System.out.println("\nDependencies for: "+files[i]);
-				IResourceIdentifier	rid	= mh.getResourceIdentifier(MavenDependencyResolverService.getUrl(files[i])).get(null);
-				Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rid, true).get(null);
+				IResourceIdentifier	rid	= mh.getResourceIdentifier(MavenDependencyResolverService.getUrl(files[i])).get();
+				Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rid, true).get();
 				printDependencies(rid, dependencies.getSecondEntity(), 0, new ArrayList<Boolean>());
 			}
 			catch(Exception e)
@@ -54,7 +54,7 @@ public class MavenTest2
 			{
 				System.out.println("\nDependencies for: "+gids[i]);
 				IResourceIdentifier	rid	= new ResourceIdentifier(null, new GlobalResourceIdentifier(gids[i], null, null));
-				Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rid, true).get(null);
+				Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rid, true).get();
 				printDependencies(rid, dependencies.getSecondEntity(), 0, new ArrayList<Boolean>());
 			}
 			catch(Exception e)

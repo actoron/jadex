@@ -37,16 +37,16 @@ public class MainH3
 		IFuture<IExternalAccess>	platfut	= Starter.createPlatform(newargs);
 		
 		// Wait until the platform has started and retrieve the platform access.
-		ThreadSuspendable	sus	= new ThreadSuspendable();
-		IExternalAccess	platform	= platfut.get(sus);
+//		ThreadSuspendable	sus	= new ThreadSuspendable();
+		IExternalAccess	platform	= platfut.get();
 		System.out.println("Started platform: "+platform.getComponentIdentifier());
 		
 		// Get the CMS service from the platform
 		IComponentManagementService	cms	= SServiceProvider.getService(platform,
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		// Start the chat component
-		IComponentIdentifier	cid	= cms.createComponent(null, ChatD2Agent.class.getName()+".class", null, null).get(sus);
+		IComponentIdentifier	cid	= cms.createComponent(null, ChatD2Agent.class.getName()+".class", null, null).get();
 		System.out.println("Started chat component: "+cid);
 	}
 }
