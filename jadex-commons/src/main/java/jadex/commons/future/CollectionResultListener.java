@@ -39,14 +39,15 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 	 */
 	public CollectionResultListener(int num, IFunctionalResultListener<Collection<E>> resultDelegate)
 	{
-		this(num, false, SResultListener.createResultListener(resultDelegate));
+		this(num, resultDelegate, null);
 	}
 	
 	/**
 	 *  Create a new collection listener.
 	 *  @param num The expected number of results.
 	 *  @param resultDelegate	The functional delegate result listener.
-	 *  @param exceptionDelegate The functional delegate exception listener.
+	 * @param exceptionDelegate The functional delegate exception listener.
+	 *        Passing <code>null</code> enables default exception logging.
 	 */
 	public CollectionResultListener(int num, IFunctionalResultListener<Collection<E>> resultDelegate, IFunctionalExceptionListener exceptionDelegate)
 	{
@@ -64,12 +65,14 @@ public class CollectionResultListener<E> implements IResultListener<E>, IUndoneR
 	}
 	
 	/**
-	 *  Create a new collection listener.
-	 *  @param num The expected number of results.
-	 *  @param ignorefailures When set to true failures will be 
-	 *  	tolerated and just not be added to the result collection.
-	 *  @param resultDelegate	The functional delegate result listener.
-	 *  @param exceptionDelegate The functional delegate exception listener.
+	 * Create a new collection listener.
+	 * 
+	 * @param num The expected number of results.
+	 * @param ignorefailures When set to true failures will be tolerated and
+	 *        just not be added to the result collection.
+	 * @param resultDelegate The functional delegate result listener.
+	 * @param exceptionDelegate The functional delegate exception listener.
+	 *        Passing <code>null</code> enables default exception logging.
 	 */
 	public CollectionResultListener(int num, boolean ignorefailes, IFunctionalResultListener<Collection<E>> resultDelegate, IFunctionalExceptionListener exceptionDelegate)
 	{

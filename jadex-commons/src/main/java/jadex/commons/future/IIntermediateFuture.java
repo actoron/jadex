@@ -74,7 +74,7 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
-	 * Exceptions will be handled by IntermediateDefaultResultListener.
+	 * Exceptions will be logged.
 	 * 
 	 * @param intermediateListener The intermediate listener.
 	 */
@@ -82,11 +82,12 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
     
 	/**
 	 * Add a functional result listener, which called on intermediate results.
-	 * Exceptions will be handled by IntermediateDefaultResultListener.
+	 * Exceptions will be logged.
 	 * 
 	 * @param intermediateListener The intermediate listener.
 	 * @param finishedListener The finished listener, called when no more
-	 *        intermediate results will arrive.
+	 *        intermediate results will arrive. If <code>null</code>, the finish
+	 *        event will be ignored.
 	 */
 	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener);
     
@@ -95,19 +96,10 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 * 
 	 * @param intermediateListener The intermediate listener.
 	 * @param finishedListener The finished listener, called when no more
-	 *        intermediate results will arrive.
-	 * @param defaultExceptionHandling Use default exception handling. If false,
-	 *        exceptions will be ignored.
-	 */
-	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener, boolean defaultExceptionHandling);
-    
-	/**
-	 * Add a functional result listener, which called on intermediate results.
-	 * 
-	 * @param intermediateListener The intermediate listener.
-	 * @param finishedListener The finished listener, called when no more
-	 *        intermediate results will arrive.
-	 * @param exceptionListener The listener that is called on exceptions.
+	 *        intermediate results will arrive. If <code>null</code>, the finish
+	 *        event will be ignored.
+	 * @param exListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
 	 */
     public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener, IFunctionalExceptionListener exceptionListener);
 }

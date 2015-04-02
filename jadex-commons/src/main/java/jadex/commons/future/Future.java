@@ -486,21 +486,9 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 * 
 	 * @param listener The listener.
 	 */
-	public void addResultListener(final IFunctionalResultListener<E> sucListener)
+	public void addResultListener(IFunctionalResultListener<E> sucListener)
 	{
-		addResultListener(SResultListener.createResultListener(sucListener));
-	}
-
-	/**
-	 * Add an functional result listener, which is only called on success.
-	 * 
-	 * @param listener The listener.
-	 * @param defaultExceptionHandling Use default exception handling. If false,
-	 *        exceptions will be ignored unless other listeners are registered.
-	 */
-	public void addResultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling)
-	{
-		addResultListener(SResultListener.createResultListener(sucListener, true));
+		addResultListener(sucListener, null);
 	}
 
 	/**
@@ -508,24 +496,14 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 * OnExceptionListener.
 	 * 
 	 * @param sucListener The listener that is called on success.
-	 * @param exListener The listener that is called on exceptions.
+	 * @param exListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
 	 */
-	public void addResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener)
+	public void addResultListener(IFunctionalResultListener<E> sucListener, IFunctionalExceptionListener exListener)
 	{
 		addResultListener(SResultListener.createResultListener(sucListener, exListener));
 	}
 
-	/**
-	 * Add an Exception listener, which is only called on exceptions.
-	 * 
-	 * @param listener The listener.
-	 */
-	public void addExceptionListener(final IFunctionalExceptionListener listener)
-	{
-		IFunctionalResultListener<E> emptySuccessListener = SResultListener.ignoreResults();
-		addResultListener(SResultListener.createResultListener(emptySuccessListener, listener));
-	}
-	
     /**
      *  Add a result listener.
      *  @param listener The listener.

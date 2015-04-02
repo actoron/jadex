@@ -1,25 +1,37 @@
 package jadex.commons.future;
 
+import java.util.logging.Logger;
+
+import jadex.commons.DebugException;
+
 /**
  * Static helper class for creating result listeners.
  */
 public class SResultListener {
+	
+	/** The logger. */
+	private static Logger logger;
+	
+	/** Get the logger. */
+	private static Logger getLogger() {
+		if (logger != null) {
+			logger = Logger.getLogger("s-result-listener");
+		}
+		return logger;
+	}
 
 	/**
-	 * Constant with an no-op success listener.
+	 * Constant with a no-op success listener.
 	 */
 	private final static IFunctionalResultListener<? extends Object> EMPTY_SUCCESS_LISTENER = new IFunctionalResultListener<Object>() {
-		@Override
 		public void resultAvailable(Object result) {
 		}
 	};
 	
 	/**
-	 * Constant with an no-op exception listener.
+	 * Constant with a no-op exception listener.
 	 */
 	private final static IFunctionalExceptionListener EMPTY_EXCEPTION_LISTENER = new IFunctionalExceptionListener() {
-		
-		@Override
 		public void exceptionOccurred(Exception exception) {
 		}
 	};
@@ -41,6 +53,28 @@ public class SResultListener {
 	 */
     public static final IFunctionalExceptionListener ignoreExceptions() {
         return (IFunctionalExceptionListener) EMPTY_EXCEPTION_LISTENER;
+    }
+    
+    /**
+	 * Returns an OnExceptionListener that logs exceptions to console.
+	 * 
+	 * @return {@link IFunctionalExceptionListener}
+	 */
+    public static final IFunctionalExceptionListener printExceptions() {
+        return new IFunctionalExceptionListener()
+		{
+        	Exception debugException = Future.DEBUG ? new DebugException() : null;
+
+			public void exceptionOccurred(Exception exception)
+			{
+				if(Future.DEBUG)
+				{
+					debugException.printStackTrace();
+					exception.printStackTrace();
+				}
+				getLogger().severe("Exception occurred: "+this+", "+exception);
+			}
+		};
     }
     
 	/**
@@ -174,24 +208,11 @@ public class SResultListener {
 	 */
 	public static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling)
 	{
-		return new DefaultResultListener<E>()
-		{
-
-			@Override
-			public void resultAvailable(E result)
-			{
-				sucListener.resultAvailable(result);
-			}
-
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-				if(defaultExceptionHandling)
-				{
-					super.exceptionOccurred(exception);
-				}
-			}
-		};
+		if (defaultExceptionHandling) {
+			return createResultListener(sucListener, printExceptions());
+		} else {
+			return createResultListener(sucListener, ignoreExceptions());
+		}
 	}
 
 	/**
@@ -199,24 +220,21 @@ public class SResultListener {
 	 * SuccessListener and Exceptions to the given ExceptionListener.
 	 * 
 	 * @param sucListener The SuccessListener.
-	 * @param exListener The ExceptionListener.
+	 * @param exListener The ExceptionListener. If <code>null</code>, exceptions are logged.
 	 * @return {@link IResultListener}
 	 */
-	public static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exListener)
+	public static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final IFunctionalExceptionListener exceptionListener)
 	{
+		final IFunctionalExceptionListener innerExceptionListener = (exceptionListener == null) ? printExceptions() : exceptionListener;
 		return new IResultListener<E>()
 		{
-
-			@Override
 			public void resultAvailable(E result)
 			{
 				sucListener.resultAvailable(result);
 			}
-
-			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				exListener.exceptionOccurred(exception);
+				innerExceptionListener.exceptionOccurred(exception);
 			}
 		};
 	}

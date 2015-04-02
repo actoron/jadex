@@ -117,9 +117,12 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 	 */
 	public void customResultAvailable(E result)
 	{
-		if (customResultListener != null) {
+		if(customResultListener != null)
+		{
 			customResultListener.resultAvailable(result);
-		} else {
+		}
+		else
+		{
 			if(undone)
 			{
 				future.setResultIfUndone(result);
