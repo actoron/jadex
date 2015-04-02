@@ -255,6 +255,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		final Future<T> ret = new Future<T>();
 		
+//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 		{

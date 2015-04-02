@@ -133,27 +133,21 @@ public abstract class DiscoveryAgent
 		
 //		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
 		
-		SServiceProvider.getServiceUpwards(agent, IMessageService.class)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+		final IMessageService msgser = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
 		{
-			public void customResultAvailable(final IMessageService msgser)
+			public void customResultAvailable(ICodec[] result)
 			{
-				msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
+				defaultcodecs = result;
+				msgser.getAllCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<Byte, ICodec>, Void>(ret)
 				{
-					public void customResultAvailable(ICodec[] result)
+					public void customResultAvailable(Map<Byte, ICodec> result)
 					{
-						defaultcodecs = result;
-						msgser.getAllCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<Byte, ICodec>, Void>(ret)
-						{
-							public void customResultAvailable(Map<Byte, ICodec> result)
-							{
-								allcodecs = result;
-							}
-						}));
+						allcodecs = result;
+						ret.setResult(null);
 					}
 				}));
-				ret.setResult(null);
-			}	
+			}
 		}));
 		
 		return ret;

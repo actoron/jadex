@@ -124,8 +124,8 @@ public class ComponentManagementService implements IComponentManagementService
 //	/** The execution service (cached to avoid using futures). */
 //	protected IExecutionService	exeservice;
 	
-	/** The message service (cached to avoid using futures). */
-	protected IMessageService	msgservice;
+//	/** The message service (cached to avoid using futures). */
+//	protected IMessageService	msgservice;
 	
 	/** The init adapters and descriptions, i.e. adapters and desc of initing components, 
 	 *  are only visible for the component and child components in their init. */
@@ -156,8 +156,8 @@ public class ComponentManagementService implements IComponentManagementService
 	    i.e. if destroy is called during init it wait till lock is away). */
 	protected Map<IComponentIdentifier, LockEntry> lockentries;
 	
-	/** The time service. */
-	protected IClockService clockservice;
+//	/** The time service. */
+//	protected IClockService clockservice;
 	
 	/** Flag to enable unique id generation. */
 	protected boolean uniqueids;
@@ -613,10 +613,12 @@ public class ComponentManagementService implements IComponentManagementService
 																	
 //																	Cause cause = new Cause(curcause, cid.getName());
 																	Cause cause = curcause;
+																	// todo: how to do platform init so that clock is always available?
+																	IClockService cs = getClockService0();
 																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
 																		daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,
 																		persistable!=null ? persistable.booleanValue() : false, moni,
-																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause, systemcomponent);
+																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), cs!=null? cs.getTime(): System.currentTimeMillis(), creator, cause, systemcomponent);
 																	
 //																	System.out.println("moni: "+moni+" "+lmodel.getFullName());
 																	
@@ -2390,14 +2392,16 @@ public class ComponentManagementService implements IComponentManagementService
 						
 			if(desc!=null)
 			{
-				if(msgservice==null)
+				IMessageService ms = getMessageService0();
+				
+				if(ms==null)
 				{
 					ret.setResult(desc);
 				}
 				else
 				{
 					final CMSComponentDescription	fdesc	= desc;
-					msgservice.updateComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
+					ms.updateComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier rcid)
 						{
@@ -2682,46 +2686,42 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				public void customResultAvailable(Void result)
 				{
-									SServiceProvider.getService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(createResultListener(new IResultListener<IMessageService>()
+//					SServiceProvider.getService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//						.addResultListener(createResultListener(new IResultListener<IMessageService>()
+//					{
+//						public void resultAvailable(IMessageService result)
+//						{
+//							msgservice	= result;
+//							cont();
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							cont();
+//						}
+//						
+//						protected void cont()
+//						{
+//							SServiceProvider.getService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//								.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+//							{
+//								public void customResultAvailable(IClockService result)
+//								{
+//									clockservice	= result;
+							
+									// add root adapter and register root component
+									getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
 									{
-										public void resultAvailable(IMessageService result)
+										public void customResultAvailable(String[] addresses)
 										{
-											msgservice	= result;
-											cont();
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											cont();
-										}
-										
-										protected void cont()
-										{
-											SServiceProvider.getService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
-											{
-												public void customResultAvailable(IClockService result)
-												{
-													clockservice	= result;
-											
-													// add root adapter and register root component
-													getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
-													{
-														public void customResultAvailable(String[] addresses)
-														{
-															((ComponentIdentifier)agent.getComponentIdentifier()).setAddresses(addresses);
-															initinfos.remove(agent.getComponentIdentifier());
-															components.put(agent.getComponentIdentifier(), access);
-															ret.setResult(null);
-														}
-													}));
-												}
-											});	
+											((ComponentIdentifier)agent.getComponentIdentifier()).setAddresses(addresses);
+											initinfos.remove(agent.getComponentIdentifier());
+											components.put(agent.getComponentIdentifier(), access);
+											ret.setResult(null);
 										}
 									}));
-	//							}
-	//						}));
+//								}
+//							});	
 //						}
 //					}));
 				}
@@ -2762,7 +2762,7 @@ public class ComponentManagementService implements IComponentManagementService
 		this.factories	= null;
 		this.localtypes	= null;
 //		this.marshalservice	= null;
-		this.msgservice	= null;
+//		this.msgservice	= null;
 		
 		/*final Future ret = new Future();
 		final  long shutdowntime = 10000; // todo: shutdowntime and MAX_SHUTDOWM_TIME
@@ -3027,13 +3027,15 @@ public class ComponentManagementService implements IComponentManagementService
 	{
 		final Future<IComponentDescription> ret = new Future<IComponentDescription>();
 		
-		if(msgservice==null)
+		IMessageService ms = getMessageService0();
+		
+		if(ms==null)
 		{
 			ret.setResult(origdesc);
 		}
 		else
 		{
-			msgservice.updateComponentIdentifier(origdesc.getName())
+			ms.updateComponentIdentifier(origdesc.getName())
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
 			{
 				public void customResultAvailable(IComponentIdentifier newcid)
@@ -3084,14 +3086,51 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected IFuture<String[]> getAddresses()
 	{
-		if(msgservice!=null)
+		IMessageService ms = getMessageService0();
+		if(ms!=null)
 		{
-			return msgservice.getAddresses();
+			return ms.getAddresses();
 		}
 		else
 		{
 			return new Future<String[]>((String[])null);
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected IClockService getClockService0()
+	{
+		IClockService ret = null;
+		
+		try
+		{
+			ret = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		}
+		catch(ServiceNotFoundException e)
+		{
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IMessageService getMessageService0()
+	{
+		IMessageService ret = null;
+		
+		try
+		{
+			ret = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		}
+		catch(ServiceNotFoundException e)
+		{
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -3254,7 +3293,4 @@ public class ComponentManagementService implements IComponentManagementService
 			this.killfuture = killfuture;
 		}
 	}
-	
-	
-
 }
