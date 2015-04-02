@@ -74,10 +74,13 @@ public class RelayServlet extends HttpServlet
 		{
 			// somebody is checking, if the server is available, just return an empty http ok.
 			
-//			// Hack: disable platform connection (only db sync)
-//			// Set content length to avoid error page being sent.
-//			response.setStatus(403);
-//			response.setContentLength(0);
+			// ..or disable platform connection
+			if(handler.getSettings().isNoConnections())
+			{
+				// Set content length to avoid error page being sent.
+				response.setStatus(403);
+				response.setContentLength(0);
+			}
 		}
 		else if(request.getServletPath().startsWith("/resources"))
 		{

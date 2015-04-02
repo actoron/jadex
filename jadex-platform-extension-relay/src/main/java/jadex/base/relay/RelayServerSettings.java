@@ -30,6 +30,9 @@ public class RelayServerSettings
 	/** The property for the db synchronization flag. */
 	public static final String	PROPERTY_DBSYNC	= "dbsync";
 
+	/** The property for the flag for disabling platform connections. */
+	public static final String	PROPERTY_NOCONNECTIONS	= "no_connections";
+
 	//-------- attributes --------
 	
 	/** The properties holding the settings. */
@@ -105,6 +108,14 @@ public class RelayServerSettings
 	}
 	
 	/**
+	 *  Get the no connections flag.
+	 */
+	public boolean	isNoConnections()
+	{
+		return "true".equals(props.getProperty(PROPERTY_NOCONNECTIONS));
+	}
+	
+	/**
 	 *  Load settings.
 	 *  @param file	The file name to load.
 	 *  @param create	Flag to indicate that the file should be created, if it does not exist.
@@ -138,6 +149,7 @@ public class RelayServerSettings
 			+" Set '"+PROPERTY_URL+"' to this relay's own publically accessible URL, e.g., http://www.mydomain.com:8080/relay (required for enabling peer-to-peer behavior).\n"
 			+" Set '"+PROPERTY_PEERS+"' to a comma separated list of peer server urls to connect to at startup (optional, if this relay should only respond to connections from other peers).\n"
 			+" Set '"+PROPERTY_DBSYNC+"' to true, if synchronization with other relay history DBs is desired (optional).\n"
+			+" Set '"+PROPERTY_NOCONNECTIONS+"' to true, if you want to prevent platforms from connecting to this relay, e.g. use this relay only to find other peers or for db sync of old history entries (optional).\n"
 			+" Set '"+PROPERTY_DEBUG+"=true' or '"+PROPERTY_DEBUG+"=0..3' for enabling debugging output in html tooltips of peer relay table (optional, 0 means off, 3 is fine grained debug about single platforms).");
 		fos.close();
 	}
