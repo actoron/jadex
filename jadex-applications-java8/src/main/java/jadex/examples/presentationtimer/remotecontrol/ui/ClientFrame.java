@@ -1,6 +1,5 @@
 package jadex.examples.presentationtimer.remotecontrol.ui;
 
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.SResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
@@ -12,21 +11,22 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.util.function.Consumer;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 
 public class ClientFrame extends JFrame
 {
 	
-	private JList<ICountdownService>				list;
+	private JList<CDListItem>				list;
 
 	private JLabel									timeLabel;
 
@@ -38,7 +38,7 @@ public class ClientFrame extends JFrame
 
 	private ITerminableIntermediateFuture<String>	timeFut;
 
-	private ICountdownService	selectedElement;
+	private CDListItem	selectedElement;
 	
 	public ClientFrame()
 	{
@@ -46,51 +46,69 @@ public class ClientFrame extends JFrame
 		{
 			this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		}
-		this.setSize(new Dimension(600,300));
+		this.setSize(new Dimension(600,450));
+		this.setResizable(false);
 		
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		
 		contentPane.add(new JPanel() 
 		{{
-			add(new JList<ICountdownService>() 
-			{{
-				setBorder(new TitledBorder("Available Countdown Services: "));
-				listmodel = new CDListModel();
-				setModel(listmodel);
-				setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-				setCellRenderer(new CDListCellRenderer());
-				list = this;
-			}});
+			setLayout(new BorderLayout());
+			add(new JScrollPane() {{
+				setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				setViewportView(new JList<CDListItem>() 
+				{{
+					setBorder(new TitledBorder("Available Countdown Services: "));
+					listmodel = new CDListModel();
+					setModel(listmodel);
+					setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+					setCellRenderer(new CDListCellRenderer());
+					list = this;
+				}});
+			}}, BorderLayout.CENTER);
+			add(new JPanel() {{
+					add(new JLabel("searching..."));
+//					add(new JButton("Abort search"));
+				}}, BorderLayout.PAGE_END);
 		}}, BorderLayout.CENTER);
+		
 		
 		contentPane.add(new JPanel() 
 		{{
-			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-			add(new JLabel("currentTime") 
-			{{
-				timeLabel = this;
-			}});
-			add(new JLabel("currentState") 
-			{{
-				stateLabel = this;
-			}});
+			setLayout(new BorderLayout());
+			add(new JPanel() {{
+				setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+				add(Box.createGlue());
+				add(new JLabel("currentTime") 
+				{{
+					timeLabel = this;
+					setAlignmentX(CENTER_ALIGNMENT);
+					setFont(getFont().deriveFont(20.0f));
+				}});
+				add(new JLabel("currentState") 
+				{{
+					stateLabel = this;
+					setAlignmentX(CENTER_ALIGNMENT);
+				}});
+				add(Box.createGlue());
+			}}, BorderLayout.CENTER);
 			add(new JPanel() 
 			{{
 				setLayout(new FlowLayout());
 				add(new JButton("Start") 
 				{{
-					addActionListener(action -> {if (selectedElement != null) selectedElement.start();});
+					addActionListener(action -> {if (selectedElement != null) selectedElement.getService().start();});
 				}});
 				add(new JButton("Stop") 
 				{{
-					addActionListener(action -> {if (selectedElement != null) selectedElement.stop();});
+					addActionListener(action -> {if (selectedElement != null) selectedElement.getService().stop();});
 				}});
 				add(new JButton("Reset")
 				{{
-					addActionListener(action -> {if (selectedElement != null) selectedElement.reset();});
+					addActionListener(action -> {if (selectedElement != null) selectedElement.getService().reset();});
 				}});
-			}});
+			}}, BorderLayout.PAGE_END);
 		}}, BorderLayout.LINE_END);
 		
 		this.setLocationRelativeTo(null);
@@ -108,8 +126,9 @@ public class ClientFrame extends JFrame
 					stateFut = null;
 				}
 			} else if (!selEvent.getValueIsAdjusting()) {
-				ICountdownService element = list.getSelectedValue();
+				CDListItem element = list.getSelectedValue();
 				selectedElement = element;
+				ICountdownService service = element.getService();
 				
 				if (stateFut != null && !timeFut.isDone()) {
 					stateFut.terminate();
@@ -119,17 +138,21 @@ public class ClientFrame extends JFrame
 				}
 				
 				System.out.println("Subscribing");
-				element.getTime().addResultListener(timeString -> timeLabel.setText(timeString));
-				element.getState().addResultListener(state -> stateLabel.setText(state.toString()));
+				service.getTime().addResultListener(timeString -> timeLabel.setText(timeString));
+				service.getState().addResultListener(state -> stateLabel.setText(state.toString()));
 				
-				stateFut = element.registerForState();
-				timeFut = element.registerForTime();
+				stateFut = service.registerForState();
+				timeFut = service.registerForTime();
 				
 				stateFut.addIntermediateResultListener(new SwingIntermediateResultListener<State>(
-					state -> stateLabel.setText(state.toString())
+					state -> stateLabel.setText(state.toString()),
+					SResultListener.ignoreResults(),
+					ex -> {if (stateFut != null) stateFut.terminate();} // exception occurs when terminating subscription
 					));
 				timeFut.addIntermediateResultListener(new SwingIntermediateResultListener<String>(
-					timeString -> timeLabel.setText(timeString)
+					timeString -> timeLabel.setText(timeString),
+					SResultListener.ignoreResults(),
+					ex -> {if (timeFut != null) timeFut.terminate();}
 					));
 				
 			}

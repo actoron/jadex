@@ -1,7 +1,6 @@
 package jadex.examples.presentationtimer.display.ui;
 
 import jadex.examples.presentationtimer.common.ICountdownGUIService;
-import jadex.examples.presentationtimer.common.ICountdownService;
 import jadex.examples.presentationtimer.common.ICountdownService.ICountdownListener;
 import jadex.examples.presentationtimer.common.State;
 import jadex.examples.presentationtimer.display.Main;

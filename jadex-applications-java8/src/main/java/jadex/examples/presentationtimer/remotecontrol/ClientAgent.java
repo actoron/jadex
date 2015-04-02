@@ -1,20 +1,18 @@
 package jadex.examples.presentationtimer.remotecontrol;
 
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.examples.presentationtimer.common.ICountdownService;
 import jadex.examples.presentationtimer.common.ICountdownService.ICountdownListener;
 import jadex.examples.presentationtimer.common.State;
+import jadex.examples.presentationtimer.remotecontrol.ui.CDListItem;
 import jadex.examples.presentationtimer.remotecontrol.ui.CDListModel;
 import jadex.examples.presentationtimer.remotecontrol.ui.ClientFrame;
 import jadex.micro.annotation.Agent;
@@ -24,6 +22,8 @@ import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+
+import javax.swing.SwingUtilities;
 
 
 @Agent
@@ -55,10 +55,13 @@ public class ClientAgent
 		clientFrame.setVisible(true);
 		CDListModel listmodel = clientFrame.getListmodel();
 		
-		searchCdServices().addIntermediateResultListener(new SwingIntermediateResultListener<ICountdownService>(cdService -> {
+		searchCdServices().addIntermediateResultListener(cdService -> {
 			System.out.println("Service found: " + cdService + " of class: " + cdService.getClass().getName());
-			listmodel.addElement(cdService);
-		}));
+			CDListItem item = new CDListItem(cdService);
+			item.setStatus(cdService.getState().get());
+			item.setTime(cdService.getTime().get());
+			SwingUtilities.invokeLater(()-> listmodel.addElement(item));
+		});
 		
 	}
 	SubscriptionIntermediateFuture<ICountdownService> subscription = new SubscriptionIntermediateFuture<ICountdownService>();

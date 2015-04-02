@@ -156,11 +156,12 @@ public class CountDownView extends JFrame {
 		timer = new Timer();
 		timer.scheduleAtFixedRate(createCountDownTask(countDownTime), 1000, 1000);
 		state.isRunning = true;
+		state.isInfo = false;
+		state.isWarn = false;
 		informStatus(state);
 	}
 	
 	private void stopCountDown() {
-		// TODO Auto-generated method stub
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
