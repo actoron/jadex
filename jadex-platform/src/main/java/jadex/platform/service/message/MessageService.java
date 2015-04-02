@@ -536,6 +536,17 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		});
 
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex msg send: "+exception);
+//			}
+//		});
+		
 		return ret;
 	}
 

@@ -380,6 +380,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 			
 			try
 			{
+				// It is now allowed to use protected/private agent created, body, terminate methods
 				method.setAccessible(true);
 				Object res = method.invoke(component.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent(), iargs);
 				if(res instanceof IFuture)

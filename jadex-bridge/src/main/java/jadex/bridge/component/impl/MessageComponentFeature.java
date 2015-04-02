@@ -9,6 +9,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.MessageConversationFilter;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
@@ -72,10 +73,20 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		
 		IMessageService ms = SServiceProvider.getLocalService(getComponent(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 //		System.err.println("send msg1: "+getComponentIdentifier()+" "+me.get(SFipa.CONTENT));
-		ms.sendMessage(me, mt, getComponent().getComponentIdentifier(),
-			getComponent().getModel().getResourceIdentifier(), null, codecids)
-			.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
-		
+		IFuture<Void> res = ms.sendMessage(me, mt, getComponent().getComponentIdentifier(),
+			getComponent().getModel().getResourceIdentifier(), null, codecids);
+		res.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+//		res.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("ok send: "+me.get(SFipa.RECEIVERS));
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception);
+//			}
+//		});
 		return ret;
 	}
 	

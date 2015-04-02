@@ -10,7 +10,15 @@ public interface ISuspendable
 	//-------- constants --------
 	
 	/** The component suspendable for a component thread. */
-	public static final ThreadLocal<ISuspendable>	SUSPENDABLE	= new ThreadLocal<ISuspendable>();
+	public static final ThreadLocal<ISuspendable>	SUSPENDABLE	= new ThreadLocal<ISuspendable>()
+	{
+		public void set(ISuspendable value) 
+		{
+			if(value instanceof ThreadSuspendable)
+				System.out.println("setting: "+value);
+			super.set(value);
+		}
+	};
 	
 	//-------- methods --------
 	

@@ -48,7 +48,7 @@ public class ScanTest
 			}
 		};
 
-		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+//		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		
 		SReflect.asyncScanForClasses(ScanTest.class.getClassLoader(), filefilter, classfilter, -1, true)
 			.addResultListener(new IIntermediateResultListener<Class<?>>()

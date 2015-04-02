@@ -195,9 +195,16 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	{
 	    	if(!isDone())
 	    	{
+	    		ISuspendable sus = ISuspendable.SUSPENDABLE.get();
+	    		if(sus!=null && caller!=null && sus!=caller)
+	    		{
+	    			throw new RuntimeException("More than one suspendable element.");
+	    		}
+	    		
 	    	   	if(caller==null)
 	    	   	{
-	    	   		throw new RuntimeException("No suspendable element.");
+	    	   		caller = new ThreadSuspendable();
+//	    	   		throw new RuntimeException("No suspendable element.");
 	    	   	}
 	     
 	    	   	if(callers==null)

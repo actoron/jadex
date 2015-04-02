@@ -111,7 +111,7 @@ public class ComponentStartTest extends	TestCase
 		
 		// Start the component.
 //		System.out.println("starting: "+this);
-		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+//		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		final Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
 		Timer	t	= new Timer(true);
 		t.schedule(new TimerTask()
@@ -172,7 +172,7 @@ public class ComponentStartTest extends	TestCase
 				throw e;
 			}
 		}
-		ISuspendable.SUSPENDABLE.set(null);
+//		ISuspendable.SUSPENDABLE.set(null);
 		
 		// Remove references to Jadex resources to aid GC cleanup.
 		cms	= null;

@@ -379,12 +379,12 @@ public class RemoteServiceManagementAgent
 										{
 											public void resultAvailable(Void res)
 											{
-//												System.out.println("result: "+result+", "+getComponentIdentifier()+", "+reply.get(SFipa.RECEIVERS));
+//												System.out.println("result: "+result+", "+agent.getComponentIdentifier()+", "+reply.get(SFipa.RECEIVERS));
 											}
 											
 											public void exceptionOccurred(Exception exception)
 											{
-//												System.out.println("exception: "+result+", "+exception+", "+getComponentIdentifier()+", "+reply.get(SFipa.RECEIVERS));
+//												System.out.println("exception: "+result+", "+exception+", "+agent.getComponentIdentifier()+", "+reply.get(SFipa.RECEIVERS));
 //												exception.printStackTrace();v
 												// Could not send message -> terminate future, if terminable.
 												if(result instanceof RemoteIntermediateResultCommand

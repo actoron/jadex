@@ -96,7 +96,6 @@ public class ComponentTest extends TestCase
 	 */
 	public void runBare()
 	{
-		
 		if(suite.isAborted())
 		{
 			return;
@@ -105,7 +104,7 @@ public class ComponentTest extends TestCase
 //		System.out.println("starting: "+filename);
 		
 		// Start the component.
-		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+//		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
 		Timer	t	= new Timer(true);
 		t.schedule(new TimerTask()

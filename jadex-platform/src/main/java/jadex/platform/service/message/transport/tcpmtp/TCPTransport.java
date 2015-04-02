@@ -8,6 +8,7 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
@@ -20,9 +21,12 @@ import jadex.platform.service.cms.PlatformComponent;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.channels.SelectableChannel;
+import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -271,6 +275,7 @@ public class TCPTransport implements ITransport
 		{
 			logger.warning("Exception during shutdown: "+e);
 		}
+		
 		connections = null; // Help gc
 		if(timer!=null)
 		{

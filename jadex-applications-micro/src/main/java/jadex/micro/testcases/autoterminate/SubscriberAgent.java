@@ -54,10 +54,12 @@ public class SubscriberAgent
 				
 				if("platform".equals(agent.getConfiguration()))
 				{
+//					System.out.println("destroy platform: "+agent.getComponentIdentifier().getRoot());
 					cms.destroyComponent(agent.getComponentIdentifier().getRoot());
 				}
 				else
 				{
+//					System.out.println("destroy comp: "+agent.getComponentIdentifier());
 					agent.killComponent();
 				}
 			}

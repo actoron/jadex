@@ -140,7 +140,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			: "Test remote offline automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller());
 		reports.add(report);
 		
-//		System.out.println("test: "+report.getDescription()+", "+BasicService.DEFAULT_LOCAL);
+//		System.out.println("test: "+report.getDescription()+", "+BasicService.getLocalDefaultTimeout());
 		
 		waitForRealtimeDelay(BasicService.getLocalDefaultTimeout(),
 			new IComponentStep<Void>()
@@ -176,6 +176,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			}
 		});
 		
+		// sending ping every second
 		waitForRealtimeDelay(1000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)

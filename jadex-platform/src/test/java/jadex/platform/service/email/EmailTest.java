@@ -19,7 +19,7 @@ public class EmailTest
 			"-gui", "false"
 		};
 		
-		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+//		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		IExternalAccess	exta	= Starter.createPlatform(args).get();
 		IComponentManagementService	cms	= SServiceProvider.getService(exta,
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();

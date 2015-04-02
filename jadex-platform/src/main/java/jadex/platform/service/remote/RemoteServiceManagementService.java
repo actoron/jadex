@@ -923,6 +923,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 																		timer.schedule(tt, to);
 																	}
 																}
+																
+//																public void exceptionOccurred(Exception exception)
+//																{
+//																	System.out.println("msg send ex: "+exception);
+//																	super.exceptionOccurred(exception);
+//																}
 															});
 														}
 													});
