@@ -1,19 +1,15 @@
 package jadex.platform;
 
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IContextService;
-import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
-import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.Boolean3;
@@ -39,13 +35,14 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.platform.sensor.SensorHolderAgent;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
-import jadex.platform.service.deployment.DeploymentService;
+import jadex.platform.service.deployment.DeploymentAgent;
 import jadex.platform.service.df.DirectoryFacilitatorAgent;
+import jadex.platform.service.marshal.MarshalAgent;
 import jadex.platform.service.message.MessageAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
 import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.settings.SettingsService;
-import jadex.platform.service.simulation.SimulationService;
+import jadex.platform.service.simulation.SimulationAgent;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -129,7 +126,10 @@ import java.util.logging.Level;
 	
 	@Argument(name="df", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="clock", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="message", clazz=boolean.class, defaultvalue="true")
+	@Argument(name="message", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="simul", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="deployment", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="marshal", clazz=boolean.class, defaultvalue="true")
 })
 
 @ComponentTypes({
@@ -155,7 +155,10 @@ import java.util.logging.Level;
 	@ComponentType(name="sensor", clazz=SensorHolderAgent.class), //filename="jadex/platform/sensor/SensorHolderAgent.class")
 	@ComponentType(name="df", clazz=DirectoryFacilitatorAgent.class),
 	@ComponentType(name="clock", clazz=ClockAgent.class),
-	@ComponentType(name="message", clazz=MessageAgent.class)
+	@ComponentType(name="message", clazz=MessageAgent.class),
+	@ComponentType(name="simulation", clazz=SimulationAgent.class),
+	@ComponentType(name="deployment", clazz=DeploymentAgent.class),
+	@ComponentType(name="marshal", clazz=MarshalAgent.class)
 })
 
 @ProvidedServices({
@@ -173,7 +176,7 @@ import java.util.logging.Level;
 	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null ? jadex.platform.service.persistence.PersistenceComponentManagementService.create($args.platformaccess, $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids) : new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)")),
 //	@ProvidedService(type=IDF.class, implementation=@Implementation(DirectoryFacilitatorService.class)),
 //	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(SimulationService.class)),
-	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(DeploymentService.class)),
+//	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(DeploymentService.class)),
 	@ProvidedService(type=IPersistenceService.class, implementation=@Implementation(expression="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null ? $component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.cms.IComponentManagementService.class) : null")),
 })
 
@@ -197,6 +200,7 @@ import java.util.logging.Level;
 		@NameValue(name="platformname", value="null")
 	}, components={
 //		@Component(name="system", type="system", daemon=Boolean3.TRUE),
+//		@Component(name="marshal", type="marshal", daemon=Boolean3.TRUE, number="$args.marshal? 1 : 0"),
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
@@ -224,6 +228,8 @@ import java.util.logging.Level;
 			@NameValue(name="binarymessages", value="$args.binarymessages"),
 			@NameValue(name="strictcom", value="$args.strictcom"),
 		}),
+		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
+		@Component(name="deployment", type="deployment", daemon=Boolean3.TRUE, number="$args.deployment? 1 : 0"),
 		
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
@@ -252,6 +258,7 @@ import java.util.logging.Level;
 		//@NameValue(name="kernels", value="\"component,micro,application,bdi,bdiv3,bpmn,gpmn\"")
 	}, components={
 //		@Component(name="system", type="system", daemon=Boolean3.TRUE),
+//		@Component(name="marshal", type="marshal", daemon=Boolean3.TRUE, number="$args.marshal? 1 : 0"),
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
@@ -280,6 +287,8 @@ import java.util.logging.Level;
 			@NameValue(name="binarymessages", value="$args.binarymessages"),
 			@NameValue(name="strictcom", value="$args.strictcom"),
 		}),
+		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
+		@Component(name="deployment", type="deployment", daemon=Boolean3.TRUE, number="$args.deployment? 1 : 0"),
 		
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
