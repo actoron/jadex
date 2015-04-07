@@ -69,8 +69,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/** The properties. */
 	protected Map<String, Object> fproperties;
 	
-	/** The library service. */
-	protected ILibraryService libservice;
+//	/** The library service. */
+//	protected ILibraryService libservice;
 	
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
@@ -132,25 +132,25 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		return startService();
 	}
 	
-	/**
-	 *  Start the service.
-	 */
-	public IFuture<Void> startService()
-	{
-		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
-		{
-			public void customResultAvailable(ILibraryService result)
-			{
-				libservice = result;
-				libservice.addLibraryServiceListener(libservicelistener);
-				MicroAgentFactory.super.startService()
-					.addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
-		return ret;
-	}
+//	/**
+//	 *  Start the service.
+//	 */
+//	public IFuture<Void> startService()
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+//		{
+//			public void customResultAvailable(ILibraryService result)
+//			{
+//				libservice = result;
+//				libservice.addLibraryServiceListener(libservicelistener);
+//				MicroAgentFactory.super.startService()
+//					.addResultListener(new DelegationResultListener<Void>(ret));
+//			}
+//		});
+//		return ret;
+//	}
 	
 	/**
 	 *  Shutdown the service.
@@ -159,15 +159,18 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public synchronized IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		libservice.removeLibraryServiceListener(libservicelistener)
-			.addResultListener(new DelegationResultListener<Void>(ret)
+		if(libservicelistener!=null)
 		{
-			public void customResultAvailable(Void result)
+			getLibraryService().removeLibraryServiceListener(libservicelistener)
+				.addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				MicroAgentFactory.super.shutdownService()
-					.addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
+				public void customResultAvailable(Void result)
+				{
+					MicroAgentFactory.super.shutdownService()
+						.addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
 			
 		return ret;
 	}
@@ -195,6 +198,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		}
 		else
 		{
+			ILibraryService libservice = getLibraryService();
 			if(libservice!=null)
 			{
 				libservice.getClassLoader(rid)
@@ -272,6 +276,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			{
 				public void resultAvailable(final IModelInfo mi) 
 				{
+					ILibraryService libservice = getLibraryService();
 					if(libservice!=null)
 					{
 						libservice.getClassLoader(rid)
@@ -491,5 +496,13 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
 			throw new RuntimeException("No micro agent file: "+clname);
 		return ret;
+	}
+	
+	/**
+	 *  Get the library service
+	 */
+	protected ILibraryService getLibraryService()
+	{
+		return internalaccess==null? null: SServiceProvider.getLocalService(internalaccess, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 }

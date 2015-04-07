@@ -862,76 +862,104 @@ public class ComponentManagementService implements IComponentManagementService
 	protected IFuture<String>	resolveFilename(final String modelname, final CreationInfo cinfo, final IResourceIdentifier rid)
 	{
 		final Future<String>	ret	= new Future<String>();
-		SServiceProvider.getService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<ILibraryService, String>(ret)
+		
+		try
 		{
-			public void customResultAvailable(ILibraryService libservice)
+			// Hack for platform init
+			ILibraryService libservice = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			libservice.getClassLoader(rid).addResultListener(createResultListener(new ExceptionDelegationResultListener<ClassLoader, String>(ret)
 			{
-				libservice.getClassLoader(rid).addResultListener(createResultListener(new ExceptionDelegationResultListener<ClassLoader, String>(ret)
+				public void customResultAvailable(ClassLoader cl)
 				{
-					public void customResultAvailable(ClassLoader cl)
+					String	filename	= modelname;
+					
+					if(cinfo.getParent()!=null)
 					{
-						String	filename	= modelname;
-						
-						if(cinfo.getParent()!=null)
+						// Try to find file for local type.
+						String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
+						filename	= null;
+						IInternalAccess pad = getParentComponent(cinfo);
+						IExternalAccess parent = pad.getExternalAccess();
+						final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
+						for(int i=0; filename==null && i<subcomps.length; i++)
 						{
-							// Try to find file for local type.
-							String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
-							filename	= null;
-							IInternalAccess pad = getParentComponent(cinfo);
-							IExternalAccess parent = pad.getExternalAccess();
-							final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
-							for(int i=0; filename==null && i<subcomps.length; i++)
+							if(subcomps[i].getName().equals(localtype))
 							{
-								if(subcomps[i].getName().equals(localtype))
-								{
-									filename = subcomps[i].getFilename();
-									cinfo.setLocalType(localtype);
-								}
-							}
-							if(filename==null)
-							{
-								filename	= modelname;
-							}
-							
-							// Try to find local type for file
-							if(cinfo.getLocalType()==null && subcomps.length>0)
-							{
-								Tuple	key	= new Tuple(parent.getModel().getFullName(), filename);
-								if(localtypes.containsKey(key))
-								{
-									cinfo.setLocalType((String)localtypes.get(key));
-								}
-								else
-								{
-									ResourceInfo	info	= SUtil.getResourceInfo0(filename, cl);
-									if(info!=null)
-									{
-										for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
-										{
-											ResourceInfo	info1	= SUtil.getResourceInfo0(subcomps[i].getFilename(), cl);
-											if(info1!=null)
-											{
-												if(info.getFilename().equals(info1.getFilename()))
-												{
-													cinfo.setLocalType(subcomps[i].getName());
-												}
-												info1.cleanup();
-											}
-										}
-										info.cleanup();
-									}
-									localtypes.put(key, cinfo.getLocalType());
-					//				System.out.println("Local type: "+cinfo.getLocalType()+", "+pad.getComponentIdentifier());
-								}
+								filename = subcomps[i].getFilename();
+								cinfo.setLocalType(localtype);
 							}
 						}
+						if(filename==null)
+						{
+							filename	= modelname;
+						}
 						
-						ret.setResult(filename);
+						// Try to find local type for file
+						if(cinfo.getLocalType()==null && subcomps.length>0)
+						{
+							Tuple	key	= new Tuple(parent.getModel().getFullName(), filename);
+							if(localtypes.containsKey(key))
+							{
+								cinfo.setLocalType((String)localtypes.get(key));
+							}
+							else
+							{
+								ResourceInfo	info	= SUtil.getResourceInfo0(filename, cl);
+								if(info!=null)
+								{
+									for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
+									{
+										ResourceInfo	info1	= SUtil.getResourceInfo0(subcomps[i].getFilename(), cl);
+										if(info1!=null)
+										{
+											if(info.getFilename().equals(info1.getFilename()))
+											{
+												cinfo.setLocalType(subcomps[i].getName());
+											}
+											info1.cleanup();
+										}
+									}
+									info.cleanup();
+								}
+								localtypes.put(key, cinfo.getLocalType());
+				//				System.out.println("Local type: "+cinfo.getLocalType()+", "+pad.getComponentIdentifier());
+							}
+						}
 					}
-				}));
+					
+					ret.setResult(filename);
+				}
+			}));
+		}
+		catch(ServiceNotFoundException s)
+		{
+			// Hack for platform init
+			String	filename	= modelname;
+			
+			if(cinfo.getParent()!=null)
+			{
+				// Try to find file for local type.
+				String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
+				filename	= null;
+				IInternalAccess pad = getParentComponent(cinfo);
+				IExternalAccess parent = pad.getExternalAccess();
+				final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
+				for(int i=0; filename==null && i<subcomps.length; i++)
+				{
+					if(subcomps[i].getName().equals(localtype))
+					{
+						filename = subcomps[i].getFilename();
+						cinfo.setLocalType(localtype);
+					}
+				}
+				if(filename==null)
+				{
+					filename	= modelname;
+				}
 			}
-		}));
+			
+			ret.setResult(filename);
+		}
 		
 		return ret;
 	}

@@ -394,7 +394,6 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 							}
 							else
 							{
-								lis2.resultAvailable(null);
 								sfut.addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(final Object result)
@@ -412,7 +411,8 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature
 												catch(Throwable t)
 												{
 													t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
-													throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+													lis2.exceptionOccurred(t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t));
+//													throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
 												}
 												return IFuture.DONE;
 											}

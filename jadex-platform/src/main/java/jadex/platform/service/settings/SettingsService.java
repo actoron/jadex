@@ -3,6 +3,7 @@ package jadex.platform.service.settings;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -77,15 +78,8 @@ public class SettingsService implements ISettingsService
 		this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 		
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(access, IContextService.class)
-			.addResultListener(new DefaultResultListener<IContextService>()
-		{
-			public void resultAvailable(IContextService result)
-			{
-				contextService = result;
-				loadProperties().addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
+		contextService = SServiceProvider.getLocalService(access, IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		loadProperties().addResultListener(new DelegationResultListener<Void>(ret));
 		
 		return ret;
 	}
