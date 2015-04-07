@@ -22,7 +22,6 @@ public class RSChartTest
 	public void setUp() throws Exception
 	{
 		new SReflectSub().setIsAndroid(false);
-		ThreadSuspendable sus = new ThreadSuspendable();
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
 		{
 				"-gui", "false",
@@ -34,17 +33,16 @@ public class RSChartTest
 				"-component", "jadex/webservice/examples/rs/chart/ChartProvider.component.xml"
 		});
 
-		extAcc = fut.get(sus);
+		extAcc = fut.get();
 	}
 	
 	@Test
 	public void testAccessRestService() throws InterruptedException
 	{
-		ThreadSuspendable sus = new ThreadSuspendable();
 		IFuture<IChartService> fut = SServiceProvider.getService(extAcc, IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		IChartService hs = fut.get(sus);
+		IChartService hs = fut.get();
 		double[][] data = new double[][] {{30, 50, 20, 90}, {55, 88, 11, 14}};
-		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get(sus);
+		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get();
 		
 		
 //		RestTemplate rt = new RestTemplate();

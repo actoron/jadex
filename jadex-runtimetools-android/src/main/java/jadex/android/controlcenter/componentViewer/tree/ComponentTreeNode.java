@@ -9,7 +9,6 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -333,7 +332,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 										{
 											ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
 											if(scn==null)
-												scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), (IServiceContainer)ea.getServiceProvider());
+												scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), ea);
 	//										System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 											children.add(0, scn);
 													
@@ -381,7 +380,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 												
 												for(int i=0; i<reqs.length; i++)
 												{
-													String nid = ea.getServiceProvider().getId()+"."+reqs[i].getName();
+													String nid = ea.getComponentIdentifier()+"."+reqs[i].getName();
 													RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
 													if(sn==null)
 														sn	= new RequiredServiceNode(scn, getModel(), reqs[i], nid);

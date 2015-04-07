@@ -187,7 +187,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 		
 		if(cid==null)
 		{
-			SServiceProvider.getService(access.getServiceProvider(), desc.getName(), IProxyAgentService.class)
+			SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(IProxyAgentService pas)

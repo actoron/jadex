@@ -256,9 +256,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		spdelay.setEnabled(false);
 		cbfast.setEnabled(false);
 
-		ThreadSuspendable sus = new ThreadSuspendable();
-
-		AwarenessSettingsData settings = helper.getSettings().get(sus);
+		AwarenessSettingsData settings = helper.getSettings().get();
 
 		cbautoCreate.setValue(settings.autocreate);
 		cbautoDelete.setValue(settings.autodelete);
@@ -415,7 +413,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 						final Boolean create = (info.getProxy() == null);
 
 						final IComponentIdentifier proxy = info.getProxy() != null && info.getProxy().isDone() && info.getProxy().getException() == null ? info
-								.getProxy().get(null) : null;
+								.getProxy().get() : null;
 						if (create && info.getProxy() == null || !create && proxy != null)
 						{
 							// setting changed -> create or

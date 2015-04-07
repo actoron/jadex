@@ -88,8 +88,7 @@ public class RSHelloTest
 		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
 				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
-		ThreadSuspendable sus = new ThreadSuspendable();
-		extAcc = fut.get(sus);
+		extAcc = fut.get();
 	}
 
     @After
@@ -102,13 +101,11 @@ public class RSHelloTest
     @Test
 	public void testAccessRestService() throws InterruptedException
 	{
-		ThreadSuspendable sus = new ThreadSuspendable();
-
 		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc, IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 
-		IHelloService hs = fut.get(sus);
+		IHelloService hs = fut.get();
 		
-		String xmlHello = hs.getXMLHello().get(sus);
+		String xmlHello = hs.getXMLHello().get();
 
 		assertEquals(hello.sayXMLHello(), xmlHello);
 		System.out.println("Response: " + xmlHello);

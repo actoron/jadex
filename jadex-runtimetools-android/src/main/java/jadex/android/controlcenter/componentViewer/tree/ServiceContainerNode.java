@@ -6,8 +6,7 @@ import jadex.android.controlcenter.componentViewer.properties.ServicePropertyAct
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IExternalAccess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ public class ServiceContainerNode	extends AbstractTreeNode implements IAndroidTr
 	//-------- attributes --------
 	
 	/** The service container. */
-	protected IServiceContainer container;
+	protected IExternalAccess access;
 	
 	/** Flag to indicate a broken service container (i.e. remote lookup failed due to class not found). */
 	protected boolean	broken;
@@ -35,10 +34,10 @@ public class ServiceContainerNode	extends AbstractTreeNode implements IAndroidTr
 	/**
 	 *  Create a new service container node.
 	 */
-	public ServiceContainerNode(ITreeNode parent, AsyncTreeModel model, IServiceContainer container)
+	public ServiceContainerNode(ITreeNode parent, AsyncTreeModel model, IExternalAccess access)
 	{
 		super(parent, model);
-		this.container = container;
+		this.access = access;
 		model.registerNode(this);
 	}
 	
@@ -72,12 +71,12 @@ public class ServiceContainerNode	extends AbstractTreeNode implements IAndroidTr
 	}
 	
 	/**
-	 *  Get the container.
-	 *  @return The container.
+	 *  Get the external access.
+	 *  @return The access.
 	 */
-	public IServiceContainer getContainer()
+	public IExternalAccess getAccess()
 	{
-		return container;
+		return access;
 	}
 
 	/**
@@ -124,7 +123,7 @@ public class ServiceContainerNode	extends AbstractTreeNode implements IAndroidTr
 	{
 		ArrayList<PropertyItem> props = new ArrayList<PropertyItem>();
 		props.add(new PropertyItem("Name", getId()));
-		props.add(new PropertyItem("Type", ((IServiceProvider)container).getType()));
+		props.add(new PropertyItem("Type", access.getLocalType()));
 		
 		return props.toArray(new PropertyItem[props.size()]);
 	}

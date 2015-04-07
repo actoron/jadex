@@ -6,6 +6,7 @@ import jadex.android.controlcenter.preference.LongClickablePreference;
 import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -106,7 +107,7 @@ public class SecuritySettings extends AServiceSettings
 		case OPTIONS_ADD_REMOTE_PW:
 
 			final AlertDialog.Builder builder = new AlertDialog.Builder(platformPasswordsCat.getContext());
-			SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId).getServiceProvider(),
+			SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId),
 					IAwarenessManagementService.class).addResultListener(new DefaultResultListener<IAwarenessManagementService>()
 			{
 				public void resultAvailable(IAwarenessManagementService result)
@@ -309,7 +310,7 @@ public class SecuritySettings extends AServiceSettings
 			}
 		});
 
-		subscribtion = secService.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents();
+		subscribtion = secService.subscribeToEvents();
 		subscribtion.addResultListener(refreshListener);
 		refresh();
 	}
