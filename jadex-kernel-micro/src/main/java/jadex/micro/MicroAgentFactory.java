@@ -8,6 +8,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -105,6 +106,16 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				return IFuture.DONE;
 			}
 		};
+		ILibraryService ls = getLibraryService();
+		if(ls!=null)
+		{
+			System.out.println("library listener on: "+this);
+			ls.addLibraryServiceListener(libservicelistener);
+		}
+		else
+		{
+			System.out.println("no library listener on: "+this);
+		}
 		
 		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}

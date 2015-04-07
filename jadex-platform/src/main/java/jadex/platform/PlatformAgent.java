@@ -293,7 +293,8 @@ import java.util.logging.Level;
 //		@Component(name="marshal", type="marshal", daemon=Boolean3.TRUE, number="$args.marshal? 1 : 0"),
 		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={
 			@NameValue(name="libpath", value="$args.libpath"),
-			@NameValue(name="baseclassloader", value="$args.baseclassloader")
+			@NameValue(name="baseclassloader", value="$args.baseclassloader"),
+			@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
 		}),
 		@Component(name="context", type="context", daemon=Boolean3.TRUE, number="$args.context? 1 : 0", arguments={
 			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
@@ -312,7 +313,6 @@ import java.util.logging.Level;
 		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
@@ -339,11 +339,6 @@ import java.util.logging.Level;
 			@NameValue(name="networkpass", value="$args.networkpass"),
 			@NameValue(name="virtualnames", value="$args.virtualnames"),
 			@NameValue(name="validityduration", value="$args.validityduration")
-		}),
-		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={
-			@NameValue(name="libpath", value="$args.libpath"),
-			@NameValue(name="baseclassloader", value="$args.baseclassloader"),
-			@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
 		}),
 		
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),

@@ -53,8 +53,8 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	/** The provider. */
 	protected IInternalAccess provider;
 	
-	/** The library service. */
-	protected ILibraryService libservice;
+//	/** The library service. */
+//	protected ILibraryService libservice;
 	
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
@@ -110,8 +110,6 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 		{
 			public void customResultAvailable(Void result)
 			{
-				libservice = SServiceProvider.getLocalService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-
 				loader = new ComponentModelLoader(null);
 				
 				libservicelistener = new ILibraryServiceListener()
@@ -129,7 +127,16 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 					}
 				};
 				
-				libservice.addLibraryServiceListener(libservicelistener);
+				ILibraryService ls = getLibraryService();
+				if(ls!=null)
+				{
+					System.out.println("library listener on: "+this);
+					ls.addLibraryServiceListener(libservicelistener);
+				}
+				else
+				{
+					System.out.println("no library listener on: "+this);
+				}
 				
 				ret.setResult(null);
 			}
@@ -145,7 +152,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	public synchronized IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		libservice.removeLibraryServiceListener(libservicelistener)
+		getLibraryService().removeLibraryServiceListener(libservicelistener)
 			.addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -170,9 +177,9 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
-		if(libservice!=null)
+		if(getLibraryService()!=null)
 		{
-			libservice.getClassLoader(rid).addResultListener(
+			getLibraryService().getClassLoader(rid).addResultListener(
 				new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
 			{
 				public void customResultAvailable(ClassLoader cl)
@@ -305,5 +312,13 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
 	{
 		return new Future<Collection<IComponentFeatureFactory>>(features);
+	}
+	
+	/**
+	 *  Get the library service
+	 */
+	protected ILibraryService getLibraryService()
+	{
+		return internalaccess==null? null: SServiceProvider.getLocalService(internalaccess, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 }

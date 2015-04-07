@@ -151,6 +151,38 @@
 		
 		<!-- Optionally provide alternative context service implementation.  -->
 		<argument name="contextserviceclass" class="String">null</argument>
+		
+		
+		<!-- Flag if df component and service should be started.  -->
+		<argument name="df" class="boolean">true</argument>
+		
+		<!-- Flag if clock component and service should be started.  -->
+		<argument name="clock" class="boolean">true</argument>
+		
+		<!-- Flag if message component and service should be started.  -->
+		<argument name="message" class="boolean">true</argument>
+		
+		<!-- Flag if simulation component and service should be started.  -->
+		<argument name="simul" class="boolean">true</argument>
+		
+		<!-- Flag if deployment component and service should be started.  -->
+		<argument name="deployment" class="boolean">true</argument>
+		
+		<!-- Flag if marshal component and service should be started.  -->
+		<argument name="marshal" class="boolean">true</argument>
+		
+		<!-- Flag if security component and service should be started.  -->
+		<argument name="security" class="boolean">true</argument>
+		
+		<!-- Flag if library component and service should be started.  -->
+		<argument name="library" class="boolean">true</argument>
+		
+		<!-- Flag if settings component and service should be started.  -->
+		<argument name="settings" class="boolean">true</argument>
+		
+		<!-- Flag if context component and service should be started.  -->
+		<argument name="context" class="boolean">true</argument>
+		
 	</arguments>
 	
 	<componenttypes>
@@ -176,6 +208,16 @@
 		<componenttype filename="jadex/platform/sensor/SensorHolderAgent.class" name="sensor"/>
 		
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
+		
+		<componenttype filename="jadex/platform/service/df/DirectoryFacilitatorAgent.class" name="df"/>
+		<componenttype filename="jadex/platform/service/clock/ClockAgent.class" name="clock"/>
+		<componenttype filename="jadex/platform/service/message/MessageAgent.class" name="message"/>
+		<componenttype filename="jadex/platform/service/simulation/SimulationAgent.class" name="simulation"/>
+		<componenttype filename="jadex/platform/service/deployment/DeploymentAgent.class" name="deployment"/>
+		<componenttype filename="jadex/platform/service/security/SecurityAgent.class" name="security"/>
+		<componenttype filename="jadex/platform/service/library/Library.component.xml" name="library"/>
+		<componenttype filename="jadex/platform/service/settings/SettingsAgent.class" name="settings"/>
+		<componenttype filename="jadex/platform/service/context/ContextAgent.class" name="context"/>
 	</componenttypes>
 	
 	<services>
@@ -202,7 +244,7 @@
 				new jadex.platform.service.marshal.MarshalService($component)
 			</implementation>
 		</providedservice>
-		<providedservice class="jadex.bridge.service.types.context.IContextService">
+		<!--  <providedservice class="jadex.bridge.service.types.context.IContextService">
 			<implementation>
 				$args.contextserviceclass!=null
 					? jadex.commons.SReflect.classForName0($args.contextserviceclass, jadex.commons.SReflect.class.getClassLoader()).newInstance()
@@ -210,10 +252,10 @@
 						? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})
 						: jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})
 			</implementation>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
+		</providedservice>-->
+		<!--<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
 			<implementation class="jadex.platform.service.settings.SettingsService"/>
-		</providedservice>
+		</providedservice>-->
 		<providedservice class="jadex.bridge.service.types.execution.IExecutionService">
 			<implementation proxytype="raw">
 				//new jadex.platform.service.execution.AsyncExecutionService($component)
@@ -222,34 +264,34 @@
 				? new jadex.platform.service.execution.SyncExecutionService($component)
 				: new jadex.platform.service.execution.AsyncExecutionService($component)
 			</implementation>
-		</providedservice>
-			<providedservice class="jadex.bridge.service.types.library.IDependencyService">
+		 </providedservice>
+		<!-- <providedservice class="jadex.bridge.service.types.library.IDependencyService">
 			<implementation>
 				$args.maven_dependencies ? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance()
 					: new jadex.platform.service.library.BasicDependencyService()
 			</implementation>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.library.ILibraryService">
-			<implementation> <!-- proxytype="raw" -->
+		</providedservice>-->
+		<!-- <providedservice class="jadex.bridge.service.types.library.ILibraryService">
+			<implementation> <!- - proxytype="raw" - ->
 				jadex.commons.SReflect.isAndroid() ? jadex.platform.service.library.AndroidLibraryService.class.newInstance() :
 				$args.libpath==null ? new jadex.platform.service.library.LibraryService() :
 					new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath),
 						$args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))
 			</implementation>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.clock.IClockService">
+		</providedservice> -->
+		<!-- <providedservice class="jadex.bridge.service.types.clock.IClockService">
 			<implementation proxytype="raw">
 				$args.simulation==null || !$args.simulation.booleanValue()
 				? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, "system_clock", System.currentTimeMillis(), 100), $component, $args.simulation)
 				: new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component, $args.simulation)
 			</implementation>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.security.ISecurityService">
+		</providedservice> -->
+		<!-- <providedservice class="jadex.bridge.service.types.security.ISecurityService">
 			<implementation>
 				new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames, $args.validityduration)
 			</implementation>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.message.IMessageService">
+		</providedservice> -->
+		<!-- <providedservice class="jadex.bridge.service.types.message.IMessageService">
 			<implementation proxytype="raw">
 				new jadex.platform.service.message.MessageService($component.getExternalAccess(), $component.getLogger(),
 					new jadex.platform.service.message.transport.ITransport[]
@@ -270,7 +312,7 @@
 					$args.strictcom
 				)
 			</implementation>
-		</providedservice>
+		</providedservice>-->
 		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService" name="cms">
 			<implementation>
 				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
@@ -278,15 +320,15 @@
 					: new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
 			</implementation>
 		</providedservice>
-		<providedservice class="jadex.bridge.service.types.df.IDF">
+		<!-- <providedservice class="jadex.bridge.service.types.df.IDF">
 			<implementation class="jadex.platform.service.df.DirectoryFacilitatorService"/>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.simulation.ISimulationService">
+		</providedservice>-->
+		<!-- <providedservice class="jadex.bridge.service.types.simulation.ISimulationService">
 			<implementation class="jadex.platform.service.simulation.SimulationService"/>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.deployment.IDeploymentService">
+		</providedservice> -->
+		<!-- <providedservice class="jadex.bridge.service.types.deployment.IDeploymentService">
 			<implementation class="jadex.platform.service.deployment.DeploymentService"/>		
-		</providedservice>
+		</providedservice>-->
 		<!-- <providedservice name="publish_ws" class="jadex.bridge.service.types.publish.IPublishService">
 			<implementation>
 				Boolean.TRUE.equals($args.wspublish) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null
@@ -332,7 +374,21 @@
 			</arguments>
 			
 			<components>
-			    <component name="system" type="system" daemon="true"/>
+				<component name="library" type="library" daemon="true" number="Boolean.TRUE.equals($args.library)? 1: 0">
+					<arguments>
+						<argument name="libpath">$args.libpath</argument>
+						<argument name="baseclassloader">$args.baseclassloader</argument>
+						<argument name="maven_dependencies">$args.maven_dependencies</argument>
+					</arguments>
+				</component>
+				<component name="context" type="context" daemon="true" number="Boolean.TRUE.equals($args.context)? 1: 0">
+					<arguments>
+						<argument name="contextserviceclass">$args.contextserviceclass</argument>
+					</arguments>
+				</component>
+				<component name="settings" type="settings" daemon="true" number="Boolean.TRUE.equals($args.settings)? 1: 0"/>
+				
+				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
 			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="kernels" type="kernel_multi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;multi&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_component" type="kernel_component" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;component&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
@@ -344,7 +400,42 @@
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<!-- <component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdiv3&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/> -->
-				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
+				
+				<component name="clock" type="clock" daemon="true" number="Boolean.TRUE.equals($args.clock)? 1: 0">
+					<arguments>
+						<argument name="simulation">$args.simulation</argument>
+					</arguments>
+				</component>
+				<component name="message" type="message" daemon="true" number="Boolean.TRUE.equals($args.message)? 1: 0">
+					<arguments>
+						<argument name="localtransport">$args.localtransport</argument>
+						<argument name="tcptransport">$args.tcptransport</argument>
+						<argument name="niotcptransport">$args.niotcptransport</argument>
+						<argument name="ssltcptransport">$args.ssltcptransport</argument>
+						<argument name="relaytransport">$args.relaytransport</argument>
+						<argument name="tcpport">$args.tcpport</argument>
+						<argument name="niotcpport">$args.niotcpport</argument>
+						<argument name="ssltcpport">$args.ssltcpport</argument>
+						<argument name="relayaddress">$args.relayaddress</argument>
+						<argument name="relaysecurity">$args.relaysecurity</argument>
+						<argument name="binarymessages">$args.binarymessages</argument>
+						<argument name="strictcom">$args.strictcom</argument>
+					</arguments>
+				</component>
+				<component name="simulation" type="simulation" daemon="true" number="Boolean.TRUE.equals($args.simul)? 1: 0"/>
+				<component name="deployment" type="deployment" daemon="true" number="Boolean.TRUE.equals($args.deployment)? 1: 0"/>
+				<component name="security" type="security" daemon="true" number="Boolean.TRUE.equals($args.security)? 1: 0">
+					<arguments>
+						<argument name="usepass">$args.usepass</argument>
+						<argument name="printpass">$args.printpass</argument>
+						<argument name="trustedlan">$args.trustedlan</argument>
+						<argument name="networkname">$args.networkname</argument>
+						<argument name="networkpass">$args.networkpass</argument>
+						<argument name="virtualnames">$args.virtualnames</argument>
+						<argument name="validityduration">$args.validityduration</argument>
+					</arguments>
+				</component>
+				
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
@@ -374,6 +465,21 @@
 		<!-- Fixed name and port.  Dynamically loads kernels as required.-->
 		<configuration name="fixed">
 			<components>
+				<component name="library" type="library" daemon="true" number="Boolean.TRUE.equals($args.library)? 1: 0">
+					<arguments>
+						<argument name="libpath">$args.libpath</argument>
+						<argument name="baseclassloader">$args.baseclassloader</argument>
+						<argument name="maven_dependencies">$args.maven_dependencies</argument>
+					</arguments>
+				</component>
+				<component name="context" type="context" daemon="true" number="Boolean.TRUE.equals($args.context)? 1: 0">
+					<arguments>
+						<argument name="contextserviceclass">$args.contextserviceclass</argument>
+					</arguments>
+				</component>
+				<component name="settings" type="settings" daemon="true" number="Boolean.TRUE.equals($args.settings)? 1: 0"/>
+				
+				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
 			  	<component name="system" type="system" daemon="true"/>
 			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="kernels" type="kernel_multi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;multi&quot;)!=-1? 1 : 0"/>
@@ -381,7 +487,7 @@
 				<component name="kernel_application" type="kernel_application" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;applications&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;micro&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;v3&quot;)!=-1 ? 1 : 0"/>
-								<!-- <component type="kernel_bdi" daemon="true"/> -->
+				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdi&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
