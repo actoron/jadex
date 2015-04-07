@@ -117,15 +117,14 @@ import java.util.logging.Level;
 	@Argument(name="kernels", clazz=String.class, defaultvalue="\"multi\""),
 	
 	@Argument(name="maven_dependencies", clazz=boolean.class, defaultvalue="false"),
-	
-	@Argument(name="monitoringcomp", clazz=boolean.class, defaultvalue="true"),
-	
+		
 	@Argument(name="sensors", clazz=boolean.class, defaultvalue="false"),
 	
 	@Argument(name="threadpoolclass", clazz=String.class, defaultvalue="null"),
 
 	@Argument(name="contextserviceclass", clazz=String.class, defaultvalue="null"),
 	
+	@Argument(name="monitoringcomp", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="df", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="clock", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="message", clazz=boolean.class, defaultvalue="true"),
