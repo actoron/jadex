@@ -241,7 +241,7 @@ public class CMSUpdateHandler
 	 */
 	public IFuture<IComponentManagementService> getLocalCMS()
 	{
-		IFuture<IComponentManagementService> ret = SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class,
+		IFuture<IComponentManagementService> ret = SServiceProvider.getService(access, IComponentManagementService.class,
 				RequiredServiceInfo.SCOPE_PLATFORM);
 		return ret;
 	}
@@ -325,7 +325,7 @@ public class CMSUpdateHandler
 	protected IFuture<Void> installLocalCMSListener(final ICMSComponentListener listener)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 				new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{
 					public void customResultAvailable(IComponentManagementService cms)
@@ -349,7 +349,7 @@ public class CMSUpdateHandler
 	protected IFuture<Void> removeLocalCMSListener(final ICMSComponentListener listener)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 				new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{
 					public void customResultAvailable(IComponentManagementService cms)

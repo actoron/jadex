@@ -11,7 +11,7 @@ import jadex.micro.annotation.RequiredServices;
 @RequiredServices({
 	@RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-public class AndroidBDIAgent extends BDIAgent
+public abstract class AndroidBDIAgent implements IBDIAgent
 {
 	@AgentArgument
 	public Context androidContext;

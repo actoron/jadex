@@ -1,8 +1,8 @@
 package jadex.bdiv3;
 
-import java.util.Map;
+import jadex.bridge.IInternalAccess;
 
-import jadex.bridge.service.IServiceProvider;
+import java.util.Map;
 
 public class BDIClassGeneratorFactoryAndroid extends BDIClassGeneratorFactory
 {
@@ -22,12 +22,9 @@ public class BDIClassGeneratorFactoryAndroid extends BDIClassGeneratorFactory
 	}
 
 	@Override
-	public BDIAgentFactory createBDIAgentFactory(IServiceProvider provider, Map properties)
+	public BDIAgentFactory createBDIAgentFactory(IInternalAccess provider, Map properties)
 	{
 		System.err.println("Requested BDIAgentFactory on Android!");
 		throw new Error("Requested BDIAgentFactory on Android!");
 	}
-	
-	
-
 }

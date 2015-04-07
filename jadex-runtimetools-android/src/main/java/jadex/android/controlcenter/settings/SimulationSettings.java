@@ -9,6 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.RemoteChangeListenerHandler;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -326,7 +327,7 @@ public class SimulationSettings extends AServiceSettings {
 	public IFuture<IExternalAccess> getComponentForService() {
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 
-		SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId).getServiceProvider(),
+		SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId),
 				IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 				new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret) {
 					public void customResultAvailable(IComponentManagementService cms) {
@@ -390,10 +391,11 @@ public class SimulationSettings extends AServiceSettings {
 		public void changeOccurred(ChangeEvent event) {
 			// Code in component result listener as clock runs on its own
 			// thread.
-			simservice.isExecuting().addResultListener(instance.createResultListener(new IResultListener() {
-				public void resultAvailable(Object result) {
+			
+			simservice.isExecuting().addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Boolean>() {
+				public void resultAvailable(Boolean result) {
 					try {
-						boolean executing = ((Boolean) result).booleanValue();
+						boolean executing = result.booleanValue();
 						IClockService cs = simservice.getClockService();
 						elementChanged("clock",
 								new ClockState(cs.getClockType(), cs.getTime(), cs.getTick(), cs.getStarttime(), cs.getDelta(),

@@ -358,10 +358,9 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	public synchronized void shutdownJadexPlatform(IComponentIdentifier platformID)
 	{
 		Log.d("jadex-android", "Starting platform shutdown: " + platformID.toString());
-		ThreadSuspendable sus = new ThreadSuspendable();
 		// long start = System.currentTimeMillis();
 		// long timeout = 4500;
-		runningPlatforms.get(platformID).killComponent().get(sus);
+		runningPlatforms.get(platformID).killComponent().get();
 		runningPlatforms.remove(platformID);
 		Log.d("jadex-android", "Platform shutdown completed: " + platformID.toString());
 	}
