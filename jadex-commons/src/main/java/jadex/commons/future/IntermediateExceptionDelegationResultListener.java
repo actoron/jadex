@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /**
  * 
  */
-public abstract class IntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>, 
+public class IntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>, 
 	IFutureCommandListener, IUndoneIntermediateResultListener<E>
 {
 	//-------- attributes --------
@@ -18,9 +18,31 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 	/** The undone flag. */
 	protected boolean undone;
 	
+	/** Custom functional result listener */
+	protected IFunctionalResultListener<E>	intermediateResultListener;
+	
+	/** Custom functional finished listener */
+	protected IFunctionalResultListener<Void>	finishedListener;
+	
 //	protected DebugException	ex;
 	
 	//-------- constructors --------
+	
+	/**
+	 * Create a new listener.
+	 * 
+	 * @param future The delegation target.
+	 * @param intermediateResultListener Functional intermediate result
+	 *        Listener. Can be <code>null</code>.
+	 * @param finishedListener Functional finished listener. Can be
+	 *        <code>null</code>.
+	 */
+	public IntermediateExceptionDelegationResultListener(Future<T> future, IFunctionalResultListener<E> intermediateResultListener, IFunctionalResultListener<Void> finishedListener)
+	{
+		this(future);
+		this.intermediateResultListener = intermediateResultListener;
+		this.finishedListener = finishedListener;
+	}
 	
 	/**
 	 *  Create a new listener.
@@ -91,7 +113,12 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.
 	 */
-	public abstract void intermediateResultAvailable(E result);
+	public void intermediateResultAvailable(E result) {
+		if(intermediateResultListener != null)
+		{
+			intermediateResultListener.resultAvailable(result);
+		}
+	}
 	
 	/**
      *  Declare that the future is finished.
@@ -100,7 +127,12 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 	 *  intermediateResultAvailable method was called for all
 	 *  intermediate results before.
      */
-    public abstract void finished();
+    public void finished() {
+		if(finishedListener != null)
+		{
+			finishedListener.resultAvailable(null);
+		}
+    }
 	
 	/**
 	 *  Called when the result is available.

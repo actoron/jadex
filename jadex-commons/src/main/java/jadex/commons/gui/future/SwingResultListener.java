@@ -1,10 +1,14 @@
 package jadex.commons.gui.future;
 
 import jadex.commons.SReflect;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFunctionalExceptionListener;
+import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 
 import java.util.logging.Logger;
 
@@ -26,6 +30,42 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	
 	//-------- constructors --------
 
+	/**
+	 * Create a new listener with functional interfaces.
+	 * 
+	 * @param listener The listener.
+	 * @param exceptionListener The listener that is called on exceptions.
+	 */
+	public SwingResultListener(final IFunctionalResultListener<E> listener)
+	{
+		this(listener, null);
+	}
+	
+	/**
+	 * Create a new listener with functional interfaces.
+	 * 
+	 * @param listener The listener.
+	 * @param exceptionListener The listener that is called on exceptions.
+	 */
+	public SwingResultListener(final IFunctionalResultListener<E> listener, final IFunctionalExceptionListener exceptionListener)
+	{
+		this(new DefaultResultListener<E>()
+		{
+			public void resultAvailable(E result)
+			{
+				listener.resultAvailable(result);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				if (exceptionListener != null) {
+					exceptionListener.exceptionOccurred(exception);
+				} else {
+					super.exceptionOccurred(exception);
+				}
+			}
+		});
+	}
+	
 	/**
 	 *  Create a new listener.
 	 */

@@ -19,15 +19,46 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	
 	/** Flag if undone methods should be used. */
 	protected boolean undone;
+
+	/** Custom functional result listener */
+	protected IFunctionalResultListener<E>	customIntermediateResultListener;
 	
 	//-------- constructors --------
+	
+
+	/**
+	 * Create a new listener.
+	 * 
+	 * @param future The delegation target.
+	 * @param undone use undone methods.
+	 * @param customResultListener Custom result listener that overwrites the
+	 *        delegation behaviour.
+	 */
+	public IntermediateDelegationResultListener(IntermediateFuture<E> future, IFunctionalResultListener<E> customIntermediateResultListener)
+	{
+		this(future, false, customIntermediateResultListener);
+	}
+
+	/**
+	 * Create a new listener.
+	 * 
+	 * @param future The delegation target.
+	 * @param undone use undone methods.
+	 * @param customResultListener Custom result listener that overwrites the
+	 *        delegation behaviour. Can be null
+	 */
+	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone, IFunctionalResultListener<E> customIntermediateResultListener)
+	{
+		this(future, undone);
+		this.customIntermediateResultListener = customIntermediateResultListener;
+	}
 	
 	/**
 	 *  Create a new listener.
 	 */
 	public IntermediateDelegationResultListener(IntermediateFuture<E> future)
 	{
-		this.future = future;
+		this(future, false);
 	}
 	
 	/**
@@ -156,13 +187,20 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customIntermediateResultAvailable(E result)
 	{
-		if(undone)
+		if(customIntermediateResultListener != null)
 		{
-			future.addIntermediateResultIfUndone(result);
+			customIntermediateResultListener.resultAvailable(result);
 		}
 		else
 		{
-			future.addIntermediateResult(result);
+			if(undone)
+			{
+				future.addIntermediateResultIfUndone(result);
+			}
+			else
+			{
+				future.addIntermediateResult(result);
+			}
 		}
 	}
 	

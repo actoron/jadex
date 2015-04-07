@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /**
  *  Result listener that delegates calls to a future.
  */
-public abstract class ExceptionDelegationResultListener<E, T> implements IResultListener<E>, IFutureCommandListener, IUndoneResultListener<E>
+public class ExceptionDelegationResultListener<E, T> implements IResultListener<E>, IFutureCommandListener, IUndoneResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -16,6 +16,9 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	
 	/** Flag if undone methods should be used. */
 	protected boolean undone;
+
+	/** Custom functional result listener */
+	protected IFunctionalResultListener<E>	customResultListener;
 	
 //	protected DebugException	ex;
 	
@@ -26,8 +29,33 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	 */
 	public ExceptionDelegationResultListener(Future<T> future)
 	{
-		this.future = future;
-//		this.ex	= new DebugException();
+		this(future, false);
+	}
+	
+	/**
+	 * Create a new listener.
+	 * 
+	 * @param future The delegation target.
+	 * @param customResultListener Custom result listener that handles the
+	 *        result.
+	 */
+	public ExceptionDelegationResultListener(Future<T> future, IFunctionalResultListener<E> customResultListener)
+	{
+		this(future, false, customResultListener);
+	}
+
+	/**
+	 * Create a new listener.
+	 * 
+	 * @param future The delegation target.
+	 * @param undone use undone methods.
+	 * @param customResultListener Custom result listener that handles the
+	 *        result.
+	 */
+	public ExceptionDelegationResultListener(Future<T> future, boolean undone, IFunctionalResultListener<E> customResultListener)
+	{
+		this(future, undone);
+		this.customResultListener = customResultListener;
 	}
 	
 	/**
@@ -91,7 +119,11 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public abstract void customResultAvailable(E result);
+	public void customResultAvailable(E result) {
+		if (customResultListener != null) {
+			customResultListener.resultAvailable(result);
+		}
+	}
 
 	/**
 	 *  Called when an exception occurred.

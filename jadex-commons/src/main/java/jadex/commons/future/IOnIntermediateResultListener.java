@@ -5,12 +5,12 @@ package jadex.commons.future;
  */
 // @Reference
 // @FunctionalInterface // this is a functional interface in java 8
-public interface IOnSuccessListener<E>
+public interface IOnIntermediateResultListener<E>
 {
 	/**
-	 *  Called when the result is available.
+	 *  Called when an intermediate result is available.
 	 *  @param result The result.
 	 */
-	public void resultAvailable(E result);
+	public void intermediateResultAvailable(E result);
 	
 }

@@ -478,59 +478,32 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 			}
 		}
 	}
+
 	
 	/**
-	 * Add an OnSuccessListener, which is only called on success.
+	 * Add an functional result listener, which is only called on success.
 	 * Exceptions will be handled by DefaultResultListener.
+	 * 
 	 * @param listener The listener.
 	 */
-	public void addOnSuccessListener(final IOnSuccessListener<E> listener) {
-		addOnSuccessListener(listener, true);
+	public void addResultListener(IFunctionalResultListener<E> sucListener)
+	{
+		addResultListener(sucListener, null);
 	}
-	
+
 	/**
-	 * Add an OnSuccessListener, which is only called on success.
-	 * @param listener The listener.
-	 * @param defaultExceptionHandling Use default exception handling. If false, exceptions will be ignored
-	 * unless other listeners are registered.
+	 * Add a result listener by combining an OnSuccessListener and an
+	 * OnExceptionListener.
+	 * 
+	 * @param sucListener The listener that is called on success.
+	 * @param exListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
 	 */
-	public void addOnSuccessListener(final IOnSuccessListener<E> listener, final boolean defaultExceptionHandling) {
-		addResultListener(new DefaultResultListener<E>() {
-
-			@Override
-			public void resultAvailable(E result) {
-				listener.resultAvailable(result);
-			}
-
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				if (defaultExceptionHandling) {
-					super.exceptionOccurred(exception);
-				}
-			}
-		});
+	public void addResultListener(IFunctionalResultListener<E> sucListener, IFunctionalExceptionListener exListener)
+	{
+		addResultListener(SResultListener.createResultListener(sucListener, exListener));
 	}
-	
-	/**
-	 * Add an OnExceptionListener, which is only called on exceptions.
-	 * @param listener The listener.
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void addOnExceptionListener(final IOnExceptionListener listener) {
-		addResultListener(new IResultListener() {
 
-			@Override
-			public void resultAvailable(Object result) {
-				// listener cannot handle result
-			}
-
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				listener.exceptionOccurred(exception);
-			}
-		});
-	}
-	
     /**
      *  Add a result listener.
      *  @param listener The listener.
