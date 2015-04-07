@@ -31,10 +31,35 @@
 	content="PSu8atqC7qDGHNZBfqQjVV8xM13xwyOUQs-4BmycCXc" />
 */ %>
 <LINK rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/resources/colibri.css" media="all" />
+<!-- 
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/prototype.js' defer='defer'></script>
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/effects.js' defer='defer'></script>
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/scriptaculous.js' defer='defer'></script>
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/accordion.js' defer='defer'></script>
+ -->
+<%	if(request.getParameter("title")!=null && request.getParameter("title").toLowerCase().indexOf("history")!=-1) { %>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="<%= request.getContextPath() %>/resources/markercluster/MarkerCluster.css" />
+	<link rel="stylesheet" href="<%= request.getContextPath() %>/resources/markercluster/MarkerCluster.Default.css" />
+	<script src="<%= request.getContextPath() %>/resources/markercluster/leaflet.markercluster.js"></script>
+	<link rel="stylesheet" href="<%= request.getContextPath() %>/resources/map.css" />
+	
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	
+	<script type="text/javascript">
+		$(function() {
+			$("#mapcontainer").resizable({
+				helper: "ui-resizable-helper"
+			});
+		});
+	</script>
+<%	} %>
+
 </HEAD>
 <BODY id="body"
 	onload="createAccordion({div:'xwikinav', no:0, height:150});"

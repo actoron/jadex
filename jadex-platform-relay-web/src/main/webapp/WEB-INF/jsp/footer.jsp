@@ -2,7 +2,6 @@
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="jadex.bridge.VersionInfo"%>
-
 							</DIV>
 							<DIV class="clearfloats"></DIV>
 						</DIV>
@@ -97,5 +96,5 @@
 			</P>
 		</DIV>
 	</DIV>
-</BODY>
+ </BODY>
 </HTML>

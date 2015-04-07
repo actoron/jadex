@@ -14,40 +14,71 @@
 <%
 if(infos.length>0)
 {
-	StringBuffer markers	= new StringBuffer();
-	Set<String> positions	= new HashSet<String>();
-	for(int i=0; i<infos.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
+	Map<String, String> markers	= new LinkedHashMap<String, String>();
+	for(int i=0; i<infos.length; i++) 
 	{
 		if(infos[i].getPosition()!=null)
 		{
-			if(i<9 && !positions.contains(infos[i].getPosition()))
+			String	marker	= markers.get(infos[i].getPosition());
+			if(marker==null)
 			{
-				// Add labelled markers for first 1..9 entries
-				markers.append("&markers=");
-				markers.append("label:");
-				markers.append(i+1);
-				markers.append("|");
-				markers.append(infos[i].getPosition());
-			}
-			else if(i==9)
-			{
-				// Add unlabelled markers for each unique position of remaining entries
-				markers.append("&markers=");
-				markers.append(infos[i].getPosition());
-				positions.add(infos[i].getPosition());
+				marker	= "<h3>"+infos[i].getLocation()+"</h3>";
 			}
 			else
 			{
-				// Add unlabelled markers for each unique position of remaining entries
-				markers.append("|");
-				markers.append(infos[i].getPosition());
-				positions.add(infos[i].getPosition());
+				marker	+= "<br/>";
 			}
+			marker	+= (i+1)+": "+infos[i].getId()+" ("+infos[i].getHostName()+")";
+			markers.put(infos[i].getPosition(), marker);
 		}
 	}
-	if(markers.length()>0)
+	
+	if(markers.size()>0)
 	{ %>
-		<img class="map" src="http://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%= markers %>"/>
+		<!-- map styles: examples.map-i86nkdio, examples.map-qfyrx5r8 -->
+		<div id="mapcontainer">
+			<div id="map">Please wait while the history is loading...</div>
+		</div>
+		<script type="text/javascript">
+			var addressPoints = [
+		    <% for(Map.Entry<String, String> marker: markers.entrySet()) { %>       
+				[<%= marker.getKey()%>, "<%= marker.getValue() %>"],
+			<% } %>
+			];
+			var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png', {
+					minZoom: 2,
+					maxZoom: 18,
+					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+				}),
+				latlng = L.latLng(53.550556, 9.993333);
+	
+			var map = L.map('map', {center: latlng, zoom: 13, layers: [tiles]});
+	
+			var markers = L.markerClusterGroup({ chunkedLoading: true });
+			
+			for (var i = 0; i < addressPoints.length; i++) {
+				var a = addressPoints[i];
+				var title = a[2];
+				var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
+				marker.bindPopup(title);
+				markers.addLayer(marker);
+			}
+	
+			map.addLayer(markers);
+			map.fitBounds(markers.getBounds());
+			
+			$("#mapcontainer").on("resizestop", function(event, ui)
+			{
+				var mapwidth	= $("#mapcontainer").outerWidth(true); // Map size with margins, padding, etc.
+				var parentwidth	= $("#mapcontainer").parent().width();
+				if(mapwidth>parentwidth)
+				{
+					var gap	= mapwidth - $("#mapcontainer").width(); // Calc. size of margins, padding, etc.
+					$("#mapcontainer").width(parentwidth-gap);			
+				}
+				map.invalidateSize();
+			});
+		</script>
 <%	}
 } %>
 

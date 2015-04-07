@@ -82,7 +82,7 @@ public class RelayServlet extends HttpServlet
 				response.setContentLength(0);
 			}
 		}
-		else if(request.getServletPath().startsWith("/resources"))
+		else if(request.getServletPath().startsWith("/resources") || request.getServletPath().equals("/robots.txt"))
 		{
 			// serve images etc. (hack? url mapping doesn't support excludes and we want the relay servlet to react to the wepapp root url.
 			serveResource(request, response);
@@ -102,7 +102,7 @@ public class RelayServlet extends HttpServlet
 				// todo: add request property
 				if("/history".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
-					int	cnt	= 20;
+					int	cnt	= -1;	// 20
 					try
 					{
 						cnt	= Integer.parseInt(request.getParameter("cnt"));
