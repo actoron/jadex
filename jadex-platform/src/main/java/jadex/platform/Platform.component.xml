@@ -204,8 +204,8 @@
 		<componenttype filename="jadex/extension/rs/publish/RSPublishAgent.class" name="rspublish"/>
 		<componenttype filename="jadex/extension/ws/publish/WSPublishAgent.class" name="wspublish"/>
 		<componenttype filename="jadex/platform/service/cli/CliAgent.class" name="cli"/>
-		<componenttype filename="jadex/platform/service/monitoring/MonitoringAgent.class" name="monitor"/>
-		<componenttype filename="jadex/platform/sensor/SensorHolderAgent.class" name="sensor"/>
+		<componenttype filename="jadex/platform/service/monitoring/Monitoring.component.xml" name="monitor"/>
+		<componenttype filename="jadex/platform/sensor/SensorHolder.component.xml" name="sensor"/>
 		
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
 		
@@ -216,8 +216,8 @@
 		<componenttype filename="jadex/platform/service/deployment/DeploymentAgent.class" name="deployment"/>
 		<componenttype filename="jadex/platform/service/security/SecurityAgent.class" name="security"/>
 		<componenttype filename="jadex/platform/service/library/Library.component.xml" name="library"/>
-		<componenttype filename="jadex/platform/service/settings/SettingsAgent.class" name="settings"/>
-		<componenttype filename="jadex/platform/service/context/ContextAgent.class" name="context"/>
+		<componenttype filename="jadex/platform/service/settings/Settings.component.xml" name="settings"/>
+		<componenttype filename="jadex/platform/service/context/Context.component.xml" name="context"/>
 	</componenttypes>
 	
 	<services>

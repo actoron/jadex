@@ -415,6 +415,16 @@ public class ModelInfo extends Startable implements IModelInfo
 	{
 		this.nfproperties = nfproperties;
 	}
+	
+	/**
+	 *  Add a non functional property.
+	 */
+	public void addNFProperty(NFPropertyInfo pi)
+	{
+		if(nfproperties==null)
+			nfproperties = new ArrayList<NFPropertyInfo>();
+		nfproperties.add(pi);
+	}
 
 	/**
 	 *  Return the resource identifier.

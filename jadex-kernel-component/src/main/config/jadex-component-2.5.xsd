@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>A component type specifies the interface, the structure and content of a component.</xs:documentation>
@@ -59,6 +60,7 @@
 					<xs:element name="componenttypes" type="componenttypes" minOccurs="0"/>
 					<xs:element name="services" type="services" minOccurs="0"/>
 					<xs:element name="properties" type="properties" minOccurs="0"/>
+					<xs:element name="nfproperties" type="nfproperties" minOccurs="0"/>
 					<xs:element name="configurations" type="configurations" minOccurs="0"/>
 					<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
 				</xs:all>
@@ -319,7 +321,7 @@ In this section, specifications for extensions as required
 		<xs:complexContent>
 			<xs:extension base="startabletype">
 				<xs:sequence>
-					<xs:element name="arguments" minOccurs="0" type="argumentstype"/>
+					<xs:element name="arguments" type="argumentstype" minOccurs="0"/>
 					<xs:element name="requiredservices" minOccurs="0">
 						<xs:complexType>
 							<xs:sequence>
@@ -347,7 +349,6 @@ In this section, specifications for extensions as required
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="argument" mixed="true">
 		<xs:annotation>
 			<xs:documentation>A single argument value. Arguments are passed as name / value pairs, where the name is supplied as attribute while the value is given as the text content of the element.</xs:documentation>
@@ -503,9 +504,18 @@ In this section, specifications for extensions as required
 		<xs:complexContent>
 			<xs:restriction base="jadex:component">
 				<xs:sequence>
-					<xs:element name="arguments" minOccurs="0" type="argumentstype"/>
+					<xs:element name="arguments" type="argumentstype" minOccurs="0"/>
 				</xs:sequence>
 			</xs:restriction>
 		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="nfproperties">
+		<xs:sequence>
+			<xs:element name="nfproperty" type="nfproperty" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="nfproperty">
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="class" type="xs:string" use="required"/>
 	</xs:complexType>
 </xs:schema>

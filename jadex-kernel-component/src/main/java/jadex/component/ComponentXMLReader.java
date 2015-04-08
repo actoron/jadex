@@ -12,6 +12,7 @@ import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.NFPropertyInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -309,7 +310,8 @@ public class ComponentXMLReader
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "providedservice")}), new AccessInfo(new QName(uri, "providedservice"), "providedService")),
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "requiredservice")}), new AccessInfo(new QName(uri, "requiredservice"), "requiredService")),
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "subcomponentType")),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null))//, new BeanAccessInfo(putprop, null, "map", getname))),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), "property", null, null)),//, new BeanAccessInfo(putprop, null, "map", getname))),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "nfproperties"), new QName(uri, "nfproperty")}), new AccessInfo(new QName(uri, "nfproperty"), "NFProperty")),
 			}), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class), 
@@ -414,19 +416,24 @@ public class ComponentXMLReader
 //			}, null)));
 					
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "initialstep")), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
-				new MappingInfo(null, null, "value", new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
-				}, null), null, new BeanObjectReaderHandler()));
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "endstep")), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
-				new MappingInfo(null, null, "value", new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
-				}, null), null, new BeanObjectReaderHandler()));
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
-				new MappingInfo(null, null, "value", new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
-				}, null), null, new BeanObjectReaderHandler()));
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null), null, new BeanObjectReaderHandler()));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "nfproperty")), new ObjectInfo(NFPropertyInfo.class), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null), null, new BeanObjectReaderHandler()));
 		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
