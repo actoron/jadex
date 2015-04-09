@@ -1,7 +1,10 @@
 package jadex.bridge.service.types.address;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 
 /**
@@ -40,4 +43,10 @@ public interface ITransportAddressService
 	 *  @return The transport component identifiers.
 	 */
 	public IFuture<ITransportComponentIdentifier[]> getTransportComponentIdentifiers(IComponentIdentifier[] component); 
+
+	/**
+	 *  Get direct access to the map of the addresses.
+	 *  @return The map.
+	 */
+	public @Reference(local=true, remote=false) IFuture<Map<String, String[]>> getTransportAddresses();
 }

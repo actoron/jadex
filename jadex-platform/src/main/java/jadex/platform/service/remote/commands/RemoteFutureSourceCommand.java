@@ -2,7 +2,7 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
@@ -27,7 +27,7 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 	/**
 	 *  Create a new remote intermediate result command.
 	 */
-	public RemoteFutureSourceCommand(ITransportComponentIdentifier realreceiver, Object cmd, String callid, boolean isref, 
+	public RemoteFutureSourceCommand(IComponentIdentifier realreceiver, Object cmd, String callid, boolean isref, 
 		String methodname, Map<String, Object> nonfunc)
 	{
 		super(realreceiver, cmd, null, callid, isref, methodname, nonfunc);

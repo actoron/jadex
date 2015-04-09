@@ -168,8 +168,9 @@ public class MessageService extends BasicService implements IMessageService
 	/** The execution service. */
 	protected IExecutionService exeservice;
 
-	/** The address service. */
-	protected ITransportAddressService addrservice;
+//	/** The address service. */
+//	protected ITransportAddressService addrservice;
+	protected Map<String, String[]> taddresses;
 	
 	/** The awareness service. */
 //	protected IAwarenessManagementService ams;

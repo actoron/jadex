@@ -3,7 +3,7 @@ package jadex.platform.service.remote.commands;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.ServiceInvocationContext;
@@ -29,7 +29,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	//-------- attributes --------
 	
 	/** The sending component. */
-	protected ITransportComponentIdentifier sender;
+	protected IComponentIdentifier sender;
 	
 	/** The result. */
 	protected Object result;
@@ -66,7 +66,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	/**
 	 *  Create a new remote result command.
 	 */
-	public RemoteResultCommand(ITransportComponentIdentifier sender, Object result, Exception exception, String callid, 
+	public RemoteResultCommand(IComponentIdentifier sender, Object result, Exception exception, String callid, 
 		boolean isref, String methodname, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
@@ -269,7 +269,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 *  Get the sender.
 	 *  @return the sender.
 	 */
-	public ITransportComponentIdentifier getSender()
+	public IComponentIdentifier getSender()
 	{
 		return sender;
 	}
@@ -278,7 +278,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 *  Set the sender.
 	 *  @param sender The sender to set.
 	 */
-	public void setSender(ITransportComponentIdentifier sender)
+	public void setSender(IComponentIdentifier sender)
 	{
 		this.sender = sender;
 	}

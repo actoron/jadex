@@ -2,16 +2,12 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.security.DefaultAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -26,7 +22,7 @@ import java.util.Map;
 public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implements IRemoteCommand
 {
 	/** The receiver (for processing the command in rmipreprocessor, will not be transferred). */
-	protected ITransportComponentIdentifier receiver;
+	protected IComponentIdentifier receiver;
 	
 	/** The non-functional properties. */
 	protected Map<String, Object> nonfunc;
@@ -66,12 +62,12 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 		final Future<Void>	ret	= new Future<Void>();
 
 		// Hack needed for rmi preprocessor
-		ITransportAddressService tas = SServiceProvider.getLocalService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		tas.getTransportComponentIdentifier(target).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Void>(ret)
-		{
-			public void customResultAvailable(ITransportComponentIdentifier result)
-			{
-				receiver = result;
+//		ITransportAddressService tas = SServiceProvider.getLocalService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		tas.getTransportComponentIdentifier(target).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+//		{
+//			public void customResultAvailable(IComponentIdentifier result)
+//			{
+				receiver = target;
 				
 				component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new IResultListener<ISecurityService>()
@@ -94,8 +90,8 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 						}
 					}
 				});
-			}
-		});
+//			}
+//		});
 		
 		return ret;
 	}
@@ -113,7 +109,7 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	 *  Get the receiver (rms of other side).
 	 *  @return the receiver.
 	 */
-	public ITransportComponentIdentifier getReceiver()
+	public IComponentIdentifier getReceiver()
 	{
 		return receiver;
 	}
@@ -121,7 +117,7 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	/**
 	 *  Get the sender component (if other than rms).
 	 */
-	public ITransportComponentIdentifier getSender()
+	public IComponentIdentifier getSender()
 	{
 		return null;
 	}

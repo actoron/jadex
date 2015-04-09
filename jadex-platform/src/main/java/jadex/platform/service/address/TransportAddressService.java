@@ -9,6 +9,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,8 +28,9 @@ public class TransportAddressService implements ITransportAddressService
 	 */
 	public IFuture<Void> addPlatformAddresses(ITransportComponentIdentifier platform)
 	{
+		// Must be synchronized due to direct access via getMap()
 		if(addresses==null)
-			addresses = new HashMap<String, String[]>();
+			addresses = Collections.synchronizedMap(new HashMap<String, String[]>());
 		addresses.put(platform.getName(), platform.getAddresses());
 		
 		System.out.println("added: "+platform.getName()+" "+SUtil.arrayToString(platform.getAddresses()));
@@ -135,4 +137,12 @@ public class TransportAddressService implements ITransportAddressService
 		return ret;
 	}
 
+	/**
+	 *  Get direct access to the map of the addresses.
+	 *  @return The map.
+	 */
+	public IFuture<Map<String, String[]>> getTransportAddresses()
+	{
+		return new Future<Map<String, String[]>>(Collections.unmodifiableMap(addresses));
+	}
 }

@@ -106,12 +106,12 @@ public interface IMessageService extends IService
 	 */
 	public IFuture<Void>	refreshAddresses();
 	
-	/**
-	 *  Update component identifier with current addresses.
-	 *  @param cid The component identifier.
-	 *  @return The component identifier.
-	 */
-	public IFuture<ITransportComponentIdentifier> updateComponentIdentifier(ITransportComponentIdentifier cid);
+//	/**
+//	 *  Update component identifier with current addresses.
+//	 *  @param cid The component identifier.
+//	 *  @return The component identifier.
+//	 */
+//	public IFuture<ITransportComponentIdentifier> updateComponentIdentifier(ITransportComponentIdentifier cid);
 	
 	/**
 	 *  Get addresses of all transports.

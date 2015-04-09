@@ -1753,7 +1753,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		if(sender!=null)
 		{
-			SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IResourceIdentifier>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms) 
