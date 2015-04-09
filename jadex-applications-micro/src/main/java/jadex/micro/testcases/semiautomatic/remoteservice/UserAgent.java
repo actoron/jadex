@@ -1,8 +1,8 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -65,7 +65,7 @@ public class UserAgent
 					{
 						IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 
-						IComponentIdentifier platid = new ComponentIdentifier("remote", 
+						IComponentIdentifier platid = new TransportComponentIdentifier("remote", 
 							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
 						// Search for remote service

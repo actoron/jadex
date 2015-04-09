@@ -31,6 +31,7 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.sensor.SensorHolderAgent;
+import jadex.platform.service.address.TransportAddressAgent;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.context.ContextAgent;
@@ -134,8 +135,9 @@ import java.util.logging.Level;
 	@Argument(name="security", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="library", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="settings", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="context", clazz=boolean.class, defaultvalue="true")
+	@Argument(name="context", clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
+	@Argument(name="address", clazz=boolean.class, defaultvalue="true")
 })
 
 @ComponentTypes({
@@ -171,6 +173,7 @@ import java.util.logging.Level;
 	@ComponentType(name="settings", clazz=SettingsAgent.class),
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
+	@ComponentType(name="address", clazz=TransportAddressAgent.class),
 })
 
 @ProvidedServices({
@@ -236,6 +239,7 @@ import java.util.logging.Level;
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		
+		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
 			@NameValue(name="localtransport", value="$args.localtransport"),
@@ -314,6 +318,7 @@ import java.util.logging.Level;
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		
+		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
 			@NameValue(name="localtransport", value="$args.localtransport"),

@@ -1,6 +1,7 @@
 package jadex.platform.service.message;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IEncodingContext;
@@ -45,7 +46,7 @@ public abstract class AbstractSendTask implements ISendTask
 	protected IEncodingContext encodingcontext;
 	
 	/** The managed receivers. */
-	protected IComponentIdentifier[] receivers;
+	protected ITransportComponentIdentifier[] receivers;
 
 	/** The transports to be tried. */
 	protected List<ITransport> transports;
@@ -71,7 +72,7 @@ public abstract class AbstractSendTask implements ISendTask
 	/**
 	 *  Create a new task.
 	 */
-	public AbstractSendTask(IComponentIdentifier[] receivers, 
+	public AbstractSendTask(ITransportComponentIdentifier[] receivers, 
 		ITransport[] transports, ICodec[] codecs, Map<String, Object> nonfunc)
 	{
 		codecs = codecs==null? new ICodec[0]: codecs;

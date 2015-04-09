@@ -4,12 +4,14 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
@@ -75,12 +77,12 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		if (!DISCOVERY_DIR.exists())
+		if(!DISCOVERY_DIR.exists())
 		{
 			DISCOVERY_DIR.mkdir();
 		}
 		
-		if (!(DISCOVERY_DIR.isDirectory() && DISCOVERY_DIR.canRead() && DISCOVERY_DIR.canWrite()))
+		if(!(DISCOVERY_DIR.isDirectory() && DISCOVERY_DIR.canRead() && DISCOVERY_DIR.canWrite()))
 		{
 			agent.getLogger().warning("Discovery directory not accessible: " + DISCOVERY_DIR.getAbsolutePath());
 			agent.killComponent();
@@ -216,10 +218,12 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 		final String awa = "Local";
 //		IFuture<IMessageService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
 //		IMessageService cms = fut.get();
-		IMessageService	cms	= SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		IMessageService	cms	= SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		
-		IFuture<IComponentIdentifier> fut2 = cms.updateComponentIdentifier(agent.getComponentIdentifier().getRoot());
-		IComponentIdentifier root = fut2.get();
+//		IFuture<IComponentIdentifier> fut2 = cms.updateComponentIdentifier(agent.getComponentIdentifier().getRoot());
+		IFuture<ITransportComponentIdentifier> fut2 = tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
+		ITransportComponentIdentifier root = fut2.get();
 		long leasetime = (Long) agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("leasetime");
 		AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
 		byte[] data = BinarySerializer.objectToByteArray(info, null, null, null, agent.getClassLoader());
@@ -241,7 +245,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 			
 			lastpostedfile = outfile;
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 			if (fos != null)
 			{

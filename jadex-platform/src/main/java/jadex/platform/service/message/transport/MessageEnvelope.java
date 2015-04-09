@@ -1,6 +1,7 @@
 package jadex.platform.service.message.transport;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.annotations.Alias;
@@ -22,7 +23,7 @@ public class MessageEnvelope
 	protected Map<String, Object> message;
 	
 	/** The receivers. */
-	protected Collection<IComponentIdentifier> receivers;
+	protected Collection<ITransportComponentIdentifier> receivers;
 	
 	/** The message type. */
 	protected String message_type;
@@ -40,7 +41,7 @@ public class MessageEnvelope
 	/**
 	 *  Create a new message envelope.
 	 */
-	public MessageEnvelope(Map<String, Object> message, Collection<IComponentIdentifier> receivers, String message_type)
+	public MessageEnvelope(Map<String, Object> message, Collection<ITransportComponentIdentifier> receivers, String message_type)
 	{
 		this.message = message;
 		this.receivers = receivers;
@@ -78,9 +79,9 @@ public class MessageEnvelope
 	/**
 	 * Get the receivers.
 	 */
-	public void setReceivers(IComponentIdentifier[] receivers)
+	public void setReceivers(ITransportComponentIdentifier[] receivers)
 	{
-		this.receivers = new ArrayList<IComponentIdentifier>();
+		this.receivers = new ArrayList<ITransportComponentIdentifier>();
 		if(receivers!=null)
 		{
 			for(int i=0; i<receivers.length; i++)
@@ -93,10 +94,10 @@ public class MessageEnvelope
 	/**
 	 *  Add a receiver.
 	 */
-	public void addReceiver(IComponentIdentifier receiver)
+	public void addReceiver(ITransportComponentIdentifier receiver)
 	{
 		if(receivers==null)
-			receivers = new ArrayList<IComponentIdentifier>();
+			receivers = new ArrayList<ITransportComponentIdentifier>();
 		receivers.add(receiver);
 	}
 

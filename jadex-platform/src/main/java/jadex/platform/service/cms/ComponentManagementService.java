@@ -35,6 +35,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -449,10 +450,10 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			else
 			{
-				getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], IComponentIdentifier>(inited)
-				{
-					public void customResultAvailable(final String[] addresses)
-					{
+//				getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], IComponentIdentifier>(inited)
+//				{
+//					public void customResultAvailable(final String[] addresses)
+//					{
 						// Load the model with fitting factory.
 						getResourceIdentifier(cinfo).addResultListener(createResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, IComponentIdentifier>(inited)
 						{
@@ -593,7 +594,7 @@ public class ComponentManagementService implements IComponentManagementService
 
 																	String paname = pacid.getName().replace('@', '.');
 																	
-																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname, addresses);
+																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
 																	access.getServiceRegistry().addExcludedComponent(cid);
@@ -848,8 +849,8 @@ public class ComponentManagementService implements IComponentManagementService
 								}));
 							}
 						}));
-					}
-				}));
+//					}
+//				}));
 			}
 		}
 		return inited;
@@ -2420,26 +2421,26 @@ public class ComponentManagementService implements IComponentManagementService
 						
 			if(desc!=null)
 			{
-				IMessageService ms = getMessageService0();
-				
-				if(ms==null)
-				{
+//				IMessageService ms = getMessageService0();
+//				
+//				if(ms==null)
+//				{
 					ret.setResult(desc);
-				}
-				else
-				{
-					final CMSComponentDescription	fdesc	= desc;
-					ms.updateComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
-					{
-						public void customResultAvailable(IComponentIdentifier rcid)
-						{
-							// addresses required for communication across platforms.
-							// ret.setName(refreshComponentIdentifier(aid));
-							fdesc.setName(rcid);
-							ret.setResult(fdesc);
-						}
-					});
-				}
+//				}
+//				else
+//				{
+//					final CMSComponentDescription	fdesc	= desc;
+//					ms.updateComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
+//					{
+//						public void customResultAvailable(IComponentIdentifier rcid)
+//						{
+//							// addresses required for communication across platforms.
+//							// ret.setName(refreshComponentIdentifier(aid));
+//							fdesc.setName(rcid);
+//							ret.setResult(fdesc);
+//						}
+//					});
+//				}
 			}
 			else
 			{
@@ -2477,33 +2478,35 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IFuture<IComponentIdentifier[]> getComponentIdentifiers()
 	{
-		final Future<IComponentIdentifier[]> fut = new Future<IComponentIdentifier[]>();
+		return new Future<IComponentIdentifier[]>((IComponentIdentifier[])components.keySet().toArray(new IComponentIdentifier[components.size()]));
 		
-		getAddresses().addResultListener(createResultListener(
-			new ExceptionDelegationResultListener<String[], IComponentIdentifier[]>(fut)
-		{
-			public void customResultAvailable(String[] addresses)
-			{
-				IComponentIdentifier[] ret;
-				
-				ret = (IComponentIdentifier[])components.keySet().toArray(new IComponentIdentifier[components.size()]);
-				
-				if(ret.length>0)
-				{
-					if(!Arrays.equals(ret[0].getAddresses(), addresses))
-					{
-						// addresses required for inter-platform comm.
-						for(int i=0; i<ret.length; i++)
-							ret[i] = new ComponentIdentifier(ret[i].getName(), addresses);
-//							ret[i] = refreshComponentIdentifier(ret[i]); // Hack!
-					}
-				}
-				
-				fut.setResult(ret);
-			}
-		}));
-		
-		return fut;
+//		final Future<IComponentIdentifier[]> fut = new Future<IComponentIdentifier[]>();
+//		
+//		getAddresses().addResultListener(createResultListener(
+//			new ExceptionDelegationResultListener<String[], IComponentIdentifier[]>(fut)
+//		{
+//			public void customResultAvailable(String[] addresses)
+//			{
+//				IComponentIdentifier[] ret;
+//				
+//				ret = (IComponentIdentifier[])components.keySet().toArray(new IComponentIdentifier[components.size()]);
+//				
+//				if(ret.length>0)
+//				{
+//					if(!Arrays.equals(ret[0].getAddresses(), addresses))
+//					{
+//						// addresses required for inter-platform comm.
+//						for(int i=0; i<ret.length; i++)
+//							ret[i] = new ComponentIdentifier(ret[i].getName(), addresses);
+////							ret[i] = refreshComponentIdentifier(ret[i]); // Hack!
+//					}
+//				}
+//				
+//				fut.setResult(ret);
+//			}
+//		}));
+//		
+//		return fut;
 	}
 	
 	/**
@@ -2640,18 +2643,55 @@ public class ComponentManagementService implements IComponentManagementService
 		return fut;
 	}
 	
+//	/**
+//	 *  Create a component identifier that is allowed on the platform.
+//	 *  @param name The base name.
+//	 *  @return The component identifier.
+//	 */
+//	public IComponentIdentifier generateComponentIdentifier(String localname, String platformname, String[] addresses)
+//	{
+//		ComponentIdentifier ret = null;
+//
+//		if(platformname==null)
+//			platformname = agent.getComponentIdentifier().getName();
+//		ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
+//		
+//		if(uniqueids || components.containsKey(ret) || initinfos.containsKey(ret))
+//		{
+//			String key = localname+"@"+platformname;
+//			
+//			do
+//			{
+//				Integer cnt = cidcounts.get(key);
+//				if(cnt==null)
+//				{
+//					cidcounts.put(key, Integer.valueOf(1));
+//					ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
+//				}
+//				else
+//				{
+//					cidcounts.put(key, Integer.valueOf(cnt.intValue()+1));
+//					ret = new ComponentIdentifier(localname+cnt+"@"+platformname, addresses); // Hack?!
+//				}
+//			}
+//			while(components.containsKey(ret) || initinfos.containsKey(ret) || cfs.containsKey(ret));
+//		}
+//		
+//		return ret;
+//	}
+	
 	/**
 	 *  Create a component identifier that is allowed on the platform.
 	 *  @param name The base name.
 	 *  @return The component identifier.
 	 */
-	public IComponentIdentifier generateComponentIdentifier(String localname, String platformname, String[] addresses)
+	public IComponentIdentifier generateComponentIdentifier(String localname, String platformname)
 	{
 		ComponentIdentifier ret = null;
 
 		if(platformname==null)
 			platformname = agent.getComponentIdentifier().getName();
-		ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
+		ret = new ComponentIdentifier(localname+"@"+platformname);
 		
 		if(uniqueids || components.containsKey(ret) || initinfos.containsKey(ret))
 		{
@@ -2663,12 +2703,12 @@ public class ComponentManagementService implements IComponentManagementService
 				if(cnt==null)
 				{
 					cidcounts.put(key, Integer.valueOf(1));
-					ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
+					ret = new ComponentIdentifier(localname+"@"+platformname);
 				}
 				else
 				{
 					cidcounts.put(key, Integer.valueOf(cnt.intValue()+1));
-					ret = new ComponentIdentifier(localname+cnt+"@"+platformname, addresses); // Hack?!
+					ret = new ComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
 				}
 			}
 			while(components.containsKey(ret) || initinfos.containsKey(ret) || cfs.containsKey(ret));
@@ -2714,6 +2754,10 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				public void customResultAvailable(Void result)
 				{
+					initinfos.remove(agent.getComponentIdentifier());
+					components.put(agent.getComponentIdentifier(), access);
+					
+					ret.setResult(null);
 //					SServiceProvider.getService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //						.addResultListener(createResultListener(new IResultListener<IMessageService>()
 //					{
@@ -2738,16 +2782,16 @@ public class ComponentManagementService implements IComponentManagementService
 //									clockservice	= result;
 							
 									// add root adapter and register root component
-									getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
-									{
-										public void customResultAvailable(String[] addresses)
-										{
-											((ComponentIdentifier)agent.getComponentIdentifier()).setAddresses(addresses);
-											initinfos.remove(agent.getComponentIdentifier());
-											components.put(agent.getComponentIdentifier(), access);
-											ret.setResult(null);
-										}
-									}));
+//									getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+//									{
+//										public void customResultAvailable(String[] addresses)
+//										{
+//											((ComponentIdentifier)agent.getComponentIdentifier()).setAddresses(addresses);
+//											initinfos.remove(agent.getComponentIdentifier());
+//											components.put(agent.getComponentIdentifier(), access);
+//											ret.setResult(null);
+//										}
+//									}));
 //								}
 //							});	
 //						}
@@ -2917,10 +2961,10 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected void notifyListenersChanged(final IComponentIdentifier cid, final IComponentDescription origdesc)
 	{
-		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new DefaultResultListener<IComponentDescription>()
-		{
-			public void resultAvailable(IComponentDescription newdesc)
-			{
+//		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new DefaultResultListener<IComponentDescription>()
+//		{
+//			public void resultAvailable(IComponentDescription newdesc)
+//			{
 				ICMSComponentListener[]	alisteners;
 				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
 				slisteners.addAll(listeners.getCollection(cid));
@@ -2933,7 +2977,8 @@ public class ComponentManagementService implements IComponentManagementService
 				for(int i=0; i<alisteners.length; i++)
 				{
 					final ICMSComponentListener lis = alisteners[i];
-					lis.componentChanged(newdesc).addResultListener(createResultListener(new IResultListener<Void>()
+//					lis.componentChanged(newdesc).addResultListener(createResultListener(new IResultListener<Void>()
+					lis.componentChanged(origdesc).addResultListener(createResultListener(new IResultListener<Void>()
 					{
 						public void resultAvailable(Void result)
 						{
@@ -2946,8 +2991,8 @@ public class ComponentManagementService implements IComponentManagementService
 						}
 					}));
 				}
-			}
-		}));
+//			}
+//		}));
 	}
 	
 	/**
@@ -2955,10 +3000,10 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected void notifyListenersRemoved(final IComponentIdentifier cid, final IComponentDescription origdesc, final Map results)
 	{
-		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new IResultListener<IComponentDescription>()
-		{
-			public void resultAvailable(IComponentDescription newdesc)
-			{
+//		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new IResultListener<IComponentDescription>()
+//		{
+//			public void resultAvailable(IComponentDescription newdesc)
+//			{
 				ICMSComponentListener[]	alisteners;
 				
 				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
@@ -2975,7 +3020,8 @@ public class ComponentManagementService implements IComponentManagementService
 					final ICMSComponentListener lis = alisteners[i];
 					try
 					{
-						lis.componentRemoved(newdesc, results).addResultListener(createResultListener(new IResultListener<Void>()
+//						lis.componentRemoved(newdesc, results).addResultListener(createResultListener(new IResultListener<Void>()
+						lis.componentRemoved(origdesc, results).addResultListener(createResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
@@ -2993,13 +3039,13 @@ public class ComponentManagementService implements IComponentManagementService
 						removeComponentListener(cid, lis);
 					}
 				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				resultAvailable(origdesc);
-			}
-		}));
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				resultAvailable(origdesc);
+//			}
+//		}));
 	}
 	
 	/**
@@ -3015,10 +3061,10 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected void notifyListenersAdded(final IComponentIdentifier cid, final IComponentDescription origdesc)
 	{
-		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new DefaultResultListener<IComponentDescription>()
-		{
-			public void resultAvailable(IComponentDescription newdesc)
-			{
+//		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new DefaultResultListener<IComponentDescription>()
+//		{
+//			public void resultAvailable(IComponentDescription newdesc)
+//			{
 				ICMSComponentListener[]	alisteners;
 				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
 				slisteners.addAll(listeners.getCollection(cid));
@@ -3031,7 +3077,8 @@ public class ComponentManagementService implements IComponentManagementService
 				for(int i=0; i<alisteners.length; i++)
 				{
 					final ICMSComponentListener lis = alisteners[i];
-					lis.componentAdded(newdesc).addResultListener(createResultListener(new IResultListener<Void>()
+//					lis.componentAdded(newdesc).addResultListener(createResultListener(new IResultListener<Void>()
+					lis.componentAdded(origdesc).addResultListener(createResultListener(new IResultListener<Void>()
 					{
 						public void resultAvailable(Void result)
 						{
@@ -3044,39 +3091,39 @@ public class ComponentManagementService implements IComponentManagementService
 						}
 					}));
 				}
-			}
-		}));
+//			}
+//		}));
 	}
 	
-	/**
-	 *  Update a component description according to another one.
-	 */
-	protected IFuture<IComponentDescription> updateComponentDescription(final CMSComponentDescription origdesc)
-	{
-		final Future<IComponentDescription> ret = new Future<IComponentDescription>();
-		
-		IMessageService ms = getMessageService0();
-		
-		if(ms==null)
-		{
-			ret.setResult(origdesc);
-		}
-		else
-		{
-			ms.updateComponentIdentifier(origdesc.getName())
-				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
-			{
-				public void customResultAvailable(IComponentIdentifier newcid)
-				{
-					CMSComponentDescription newdesc = (CMSComponentDescription)((CMSComponentDescription)origdesc).clone();
-					newdesc.setName(newcid);
-					ret.setResult(newdesc);
-				}
-			}));
-		}
-			
-		return ret;
-	}
+//	/**
+//	 *  Update a component description according to another one.
+//	 */
+//	protected IFuture<IComponentDescription> updateComponentDescription(final CMSComponentDescription origdesc)
+//	{
+//		final Future<IComponentDescription> ret = new Future<IComponentDescription>();
+//		
+//		IMessageService ms = getMessageService0();
+//		
+//		if(ms==null)
+//		{
+//			ret.setResult(origdesc);
+//		}
+//		else
+//		{
+//			ms.updateComponentIdentifier(origdesc.getName())
+//				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
+//			{
+//				public void customResultAvailable(IComponentIdentifier newcid)
+//				{
+//					CMSComponentDescription newdesc = (CMSComponentDescription)((CMSComponentDescription)origdesc).clone();
+//					newdesc.setName(newcid);
+//					ret.setResult(newdesc);
+//				}
+//			}));
+//		}
+//			
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the remote component management system for a specific component id.
@@ -3126,7 +3173,7 @@ public class ComponentManagementService implements IComponentManagementService
 	}
 	
 	/**
-	 * 
+	 *  Get the clock service without exception if not found.
 	 */
 	protected IClockService getClockService0()
 	{
@@ -3144,7 +3191,7 @@ public class ComponentManagementService implements IComponentManagementService
 	}
 	
 	/**
-	 * 
+	 *  Get the message service without exception if not found.
 	 */
 	protected IMessageService getMessageService0()
 	{

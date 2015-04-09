@@ -4,12 +4,14 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -147,7 +149,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	protected Timer	timer;
 	
 	/** The root component id. */
-	protected IComponentIdentifier root;
+	protected ITransportComponentIdentifier root;
 	
 	/** The includes list. */
 	protected List<String>	includes;
@@ -155,8 +157,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	/** The excludes list. */
 	protected List<String>	excludes;
 	
-	/** The platforms creation future. */
-	protected Future<IComponentIdentifier> pcreatefut;
+//	/** The platforms creation future. */
+//	protected Future<IComponentIdentifier> pcreatefut;
 	
 	/** The cms, cached for speed. */
 	protected IComponentManagementService	cms;
@@ -281,10 +283,22 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	@AgentBody
 	public IFuture<Void> executeBody()
+//	public IFuture<Void> created()
 	{
-		root = agent.getComponentIdentifier().getRoot();
+		final Future<Void> ret = new Future<Void>();
+		
 		startRemoveBehaviour();
-		return new Future<Void>(); // never kill by return
+		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Void>(ret)
+		{
+			public void customResultAvailable(ITransportComponentIdentifier tcid)
+			{
+				root = tcid;
+//				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -338,7 +352,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			info.setState(AwarenessInfo.STATE_ONLINE);
 //		System.out.println("received: "+getComponentIdentifier()+" "+info.getSender());
 		
-		IComponentIdentifier sender = info.getSender();
+		ITransportComponentIdentifier sender = info.getSender();
 		boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
 //			boolean	initial	= false;	// Initial discovery of component.
 		DiscoveryInfo dif;
@@ -978,7 +992,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 *  @param excludes	The list of excludes.
 	 *  @return true when a proxy should be created.
 	 */
-	public static boolean	isIncluded(IComponentIdentifier cid, String[] includes, String[] excludes)
+	public static boolean	isIncluded(ITransportComponentIdentifier cid, String[] includes, String[] excludes)
 	{
 		boolean	included	= includes.length==0;
 		String[]	cidnames	= null;
@@ -1017,7 +1031,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	/**
 	 *  Extract names for matching to includes/excludes list.
 	 */
-	protected static String[]	extractNames(IComponentIdentifier cid)
+	protected static String[]	extractNames(ITransportComponentIdentifier cid)
 	{
 		Set<String>	ret	= new LinkedHashSet<String>();
 		ret.add(cid.getName());

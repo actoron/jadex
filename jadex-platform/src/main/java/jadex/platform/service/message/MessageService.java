@@ -1,6 +1,5 @@
 package jadex.platform.service.message;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -12,9 +11,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceTerminatedException;
+import jadex.bridge.TransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.impl.IInternalMessageFeature;
@@ -25,6 +26,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -165,6 +167,9 @@ public class MessageService extends BasicService implements IMessageService
 	
 	/** The execution service. */
 	protected IExecutionService exeservice;
+
+	/** The address service. */
+	protected ITransportAddressService addrservice;
 	
 	/** The awareness service. */
 //	protected IAwarenessManagementService ams;
@@ -277,7 +282,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 * 
 	 */
-	public IInputConnection getParticipantInputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant, Map<String, Object> nonfunc)
+	public IInputConnection getParticipantInputConnection(int conid, ITransportComponentIdentifier initiator, ITransportComponentIdentifier participant, Map<String, Object> nonfunc)
 	{
 		return initInputConnection(conid, initiator, participant, nonfunc);
 	}
@@ -285,7 +290,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 * 
 	 */
-	public IOutputConnection getParticipantOutputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant, Map<String, Object> nonfunc)
+	public IOutputConnection getParticipantOutputConnection(int conid, ITransportComponentIdentifier initiator, ITransportComponentIdentifier participant, Map<String, Object> nonfunc)
 	{
 		return initOutputConnection(conid, initiator, participant, nonfunc);
 	}
@@ -293,7 +298,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual output connection.
 	 */
-	public OutputConnection internalCreateOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
+	public OutputConnection internalCreateOutputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc)
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
@@ -308,7 +313,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual output connection.
 	 */
-	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
+	public IFuture<IOutputConnection> createOutputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc)
 	{
 		return new Future<IOutputConnection>(internalCreateOutputConnection(sender, receiver, nonfunc));
 	}
@@ -316,7 +321,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual input connection.
 	 */
-	public InputConnection internalCreateInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
+	public InputConnection internalCreateInputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc)
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
@@ -331,7 +336,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual input connection.
 	 */
-	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
+	public IFuture<IInputConnection> createInputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc)
 	{
 		return new Future<IInputConnection>(internalCreateInputConnection(sender, receiver, nonfunc));
 	}
@@ -375,166 +380,174 @@ public class MessageService extends BasicService implements IMessageService
 //			disclistener.resultAvailable(null);
 //		}
 		
-
+		final IComponentIdentifier loc = IComponentIdentifier.LOCAL.get();
+		
 //		System.err.println("send msg2: "+osender+" "+origmsg.get(SFipa.CONTENT));
 		final Map<String, Object> msg = new HashMap<String, Object>(origmsg);
 		
-		final IComponentIdentifier sender = internalUpdateComponentIdentifier(osender);
-		
-		final IComponentIdentifier loc = IComponentIdentifier.LOCAL.get();
-//		System.out.println("on0: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
-
-		libservice.getClassLoader(rid)
-			.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+//		final IComponentIdentifier sender = internalUpdateComponentIdentifier(osender);
+		addrservice.getTransportComponentIdentifier(osender).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Void>(ret)
 		{
-			public void customResultAvailable(final ClassLoader cl)
+			public void customResultAvailable(final ITransportComponentIdentifier sender)
 			{
-//				System.err.println("send msg3: "+sender+" "+msg.get(SFipa.CONTENT));
-//				System.out.println("on1: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
-				
-				if(loc!=null && IComponentIdentifier.LOCAL.get()!=null && !loc.equals(IComponentIdentifier.LOCAL.get()))
+//				System.out.println("on0: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+
+				libservice.getClassLoader(rid)
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
-					logger.severe("Component thread backswitch failed. Should be: "+loc+" but is "+IComponentIdentifier.LOCAL.get());
-				}
+					public void customResultAvailable(final ClassLoader cl)
+					{
+//						System.err.println("send msg3: "+sender+" "+msg.get(SFipa.CONTENT));
+//						System.out.println("on1: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+						
+						if(loc!=null && IComponentIdentifier.LOCAL.get()!=null && !loc.equals(IComponentIdentifier.LOCAL.get()))
+						{
+							logger.severe("Component thread backswitch failed. Should be: "+loc+" but is "+IComponentIdentifier.LOCAL.get());
+						}
+							
+//						IComponentIdentifier sender = adapter.getComponentIdentifier();
+						if(sender==null)
+						{
+							ret.setException(new RuntimeException("Sender must not be null: "+msg));
+							return;
+						}
 					
-//				IComponentIdentifier sender = adapter.getComponentIdentifier();
-				if(sender==null)
-				{
-					ret.setException(new RuntimeException("Sender must not be null: "+msg));
-					return;
-				}
-			
-				// Replace own component identifiers.
-				// Now done just before send
-//				String[] params = type.getParameterNames();
-//				for(int i=0; i<params.length; i++)
-//				{
-//					Object o = msg.get(params[i]);
-//					if(o instanceof IComponentIdentifier)
-//					{
-//						msg.put(params[i], updateComponentIdentifier((IComponentIdentifier)o));
-//					}
-//				}
-//				String[] paramsets = type.getParameterSetNames();
-//				for(int i=0; i<paramsets.length; i++)
-//				{
-//					Object o = msg.get(paramsets[i]);
-//					
-//					if(SReflect.isIterable(o))
-//					{
-//						List rep = new ArrayList();
-//						for(Iterator it=SReflect.getIterator(o); it.hasNext(); )
+						// Replace own component identifiers.
+						// Now done just before send
+//						String[] params = type.getParameterNames();
+//						for(int i=0; i<params.length; i++)
 //						{
-//							Object item = it.next();
-//							if(item instanceof IComponentIdentifier)
+//							Object o = msg.get(params[i]);
+//							if(o instanceof IComponentIdentifier)
 //							{
-//								rep.add(updateComponentIdentifier((IComponentIdentifier)item));
-//							}
-//							else
-//							{
-//								rep.add(item);
+//								msg.put(params[i], updateComponentIdentifier((IComponentIdentifier)o));
 //							}
 //						}
-//						msg.put(paramsets[i], rep);
-//					}
-//					else if(o instanceof IComponentIdentifier)
-//					{
-//						msg.put(paramsets[i], updateComponentIdentifier((IComponentIdentifier)o));
-//					}
-//				}
-				
-				// Automatically add optional meta information.
-				String senid = type.getSenderIdentifier();
-				if(msg.get(senid)==null)
-					msg.put(senid, sender);
-				
-				final String idid = type.getIdIdentifier();
-				if(msg.get(idid)==null)
-					msg.put(idid, SUtil.createUniqueId(sender.getLocalName()));
-
-				final String sd = type.getTimestampIdentifier();
-				if(msg.get(sd)==null)
-				{
-					msg.put(sd, ""+clockservice.getTime());
-				}
-				
-				final String ridid = type.getResourceIdIdentifier();
-				if(msg.get(ridid)==null && rid!=null && rid.getGlobalIdentifier()!=null && !ResourceIdentifier.isJadexRid(rid))
-				{
-					msg.put(ridid, rid);
-				}
-				
-//				final String realrecid = type.getRealReceiverIdentifier();
-//				if(msg.get(realrecid)==null && realrec!=null)
-//				{
-//					msg.put(realrecid, realrec);
-//				}
-				
-				// Check receivers.
-				Object tmp = msg.get(type.getReceiverIdentifier());
-				if(tmp==null || SReflect.isIterable(tmp) &&	!SReflect.getIterator(tmp).hasNext())
-				{
-					ret.setException(new RuntimeException("Receivers must not be empty: "+msg));
-					return;
-				}
-//				cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//						String[] paramsets = type.getParameterSetNames();
+//						for(int i=0; i<paramsets.length; i++)
 //						{
-//							public void customResultAvailable(IExternalAccess exta)
+//							Object o = msg.get(paramsets[i]);
+//							
+//							if(SReflect.isIterable(o))
 //							{
-////								System.out.println("msgservice calling doSendMessage()");
-////								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
-//								
-////								System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
-//								IEncodingContext enccont = new EncodingContext(new Date());
-//								doSendMessage(msg, type, exta, cl, ret, codecids, enccont);
+//								List rep = new ArrayList();
+//								for(Iterator it=SReflect.getIterator(o); it.hasNext(); )
+//								{
+//									Object item = it.next();
+//									if(item instanceof IComponentIdentifier)
+//									{
+//										rep.add(updateComponentIdentifier((IComponentIdentifier)item));
+//									}
+//									else
+//									{
+//										rep.add(item);
+//									}
+//								}
+//								msg.put(paramsets[i], rep);
 //							}
-//							public void exceptionOccurred(Exception exception)
+//							else if(o instanceof IComponentIdentifier)
 //							{
-//								super.exceptionOccurred(exception);
+//								msg.put(paramsets[i], updateComponentIdentifier((IComponentIdentifier)o));
 //							}
-//						});
-				
-//				System.out.println("Getting final release date: " + msg);
-				getReleaseDate(type, msg).addResultListener(new ExceptionDelegationResultListener<Date, Void>(ret)
-				{
-					public void customResultAvailable(Date result)
-					{
-//						System.out.println("Got final release date: " + String.valueOf(result));
-						final Date freleasedate = result;
-//						final Date freleasedate = null;
+//						}
 						
-						// External access of sender required for content encoding etc.
-//						SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-//							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+						// Automatically add optional meta information.
+						String senid = type.getSenderIdentifier();
+						if(msg.get(senid)==null)
+							msg.put(senid, sender);
+						
+						final String idid = type.getIdIdentifier();
+						if(msg.get(idid)==null)
+							msg.put(idid, SUtil.createUniqueId(sender.getLocalName()));
+
+						final String sd = type.getTimestampIdentifier();
+						if(msg.get(sd)==null)
+						{
+							msg.put(sd, ""+clockservice.getTime());
+						}
+						
+						final String ridid = type.getResourceIdIdentifier();
+						if(msg.get(ridid)==null && rid!=null && rid.getGlobalIdentifier()!=null && !ResourceIdentifier.isJadexRid(rid))
+						{
+							msg.put(ridid, rid);
+						}
+						
+//						final String realrecid = type.getRealReceiverIdentifier();
+//						if(msg.get(realrecid)==null && realrec!=null)
 //						{
-//							public void customResultAvailable(IComponentManagementService cms)
-//							{
-//								String	smsg	= "MessageService.sendMessage("+msg+")";
-//								ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-//								next.setProperty("debugsource", smsg);
+//							msg.put(realrecid, realrec);
+//						}
+						
+						// Check receivers.
+						Object tmp = msg.get(type.getReceiverIdentifier());
+						if(tmp==null || SReflect.isIterable(tmp) &&	!SReflect.getIterator(tmp).hasNext())
+						{
+							ret.setException(new RuntimeException("Receivers must not be empty: "+msg));
+							return;
+						}
+//						cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//								{
+//									public void customResultAvailable(IExternalAccess exta)
+//									{
+////										System.out.println("msgservice calling doSendMessage()");
+////										System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+//										
+////										System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
+//										IEncodingContext enccont = new EncodingContext(new Date());
+//										doSendMessage(msg, type, exta, cl, ret, codecids, enccont);
+//									}
+//									public void exceptionOccurred(Exception exception)
+//									{
+//										super.exceptionOccurred(exception);
+//									}
+//								});
+						
+//						System.out.println("Getting final release date: " + msg);
+						getReleaseDate(type, msg).addResultListener(new ExceptionDelegationResultListener<Date, Void>(ret)
+						{
+							public void customResultAvailable(Date result)
+							{
+//								System.out.println("Got final release date: " + String.valueOf(result));
+								final Date freleasedate = result;
+//								final Date freleasedate = null;
 								
-								cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-								{
-									public void customResultAvailable(IExternalAccess exta)
-									{
-//										System.out.println("msgservice calling doSendMessage()");
-//										System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+								// External access of sender required for content encoding etc.
+//								SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+//									.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//								{
+//									public void customResultAvailable(IComponentManagementService cms)
+//									{
+//										String	smsg	= "MessageService.sendMessage("+msg+")";
+//										ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+//										next.setProperty("debugsource", smsg);
 										
-//										System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
-										IEncodingContext enccont = new EncodingContext(freleasedate);
-										doSendMessage(msg, type, exta, cl, ret, codecids, enccont);
-									}
-									public void exceptionOccurred(Exception exception)
-									{
-										super.exceptionOccurred(exception);
-									}
-								});
-//							}
-//						});
+										cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+										{
+											public void customResultAvailable(IExternalAccess exta)
+											{
+//												System.out.println("msgservice calling doSendMessage()");
+//												System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+												
+//												System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
+												IEncodingContext enccont = new EncodingContext(freleasedate);
+												doSendMessage(msg, type, exta, cl, ret, codecids, enccont);
+											}
+											public void exceptionOccurred(Exception exception)
+											{
+												super.exceptionOccurred(exception);
+											}
+										});
+//									}
+//								});
+							}
+						});
 					}
 				});
 			}
 		});
+		
+		
+//	
 
 //		ret.addResultListener(new IResultListener<Void>()
 //		{
@@ -553,10 +566,10 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Extracted method to be callable from listener.
 	 */
-	protected void doSendMessage(Map<String, Object> msg, MessageType type, IExternalAccess comp, 
-		ClassLoader cl, Future<Void> ret, byte[] codecids, IEncodingContext enccontext)
+	protected void doSendMessage(Map<String, Object> msg, final MessageType type, IExternalAccess comp, 
+		final ClassLoader cl, Future<Void> ret, byte[] codecids, final IEncodingContext enccontext)
 	{
-		Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
+		final Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
 
 		// Conversion via platform specific codecs
 		// Hack?! Preprocess content to enhance component identifiers.
@@ -568,12 +581,12 @@ public class MessageService extends BasicService implements IMessageService
 				List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
-				return internalUpdateComponentIdentifier((IComponentIdentifier)object);
+				return internalUpdateComponentIdentifier((ITransportComponentIdentifier)object);
 			}
 			
 			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
-				return object instanceof IComponentIdentifier;
+				return object instanceof ITransportComponentIdentifier;
 			}
 		});
 		
@@ -714,22 +727,32 @@ public class MessageService extends BasicService implements IMessageService
 		byte[] cids	= codecids;
 		if(cids==null || cids.length==0)
 			cids = codecfactory.getDefaultCodecIds();
-		ICodec[] codecs = getMessageCodecs(cids);
+		final ICodec[] codecs = getMessageCodecs(cids);
 //		ICodec[] codecs = new ICodec[cids.length];
 //		for(int i=0; i<codecs.length; i++)
 //		{
 //			codecs[i] = codecfactory.getCodec(cids[i]);
 //		}
 		
-		CounterResultListener<Void> crl = new CounterResultListener<Void>(managers.size(), false, new DelegationResultListener<Void>(ret));
+		final CounterResultListener<Void> crl = new CounterResultListener<Void>(managers.size(), false, new DelegationResultListener<Void>(ret));
 		for(Iterator<?> it=managers.keySet().iterator(); it.hasNext();)
 		{
-			SendManager tm = (SendManager)it.next();
+			final SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
 			
-			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl, enccontext);
-			tm.addMessage(task).addResultListener(crl);
-//			task.getSendManager().addMessage(task).addResultListener(crl);
+			addrservice.getTransportComponentIdentifiers(recs).addResultListener(new IResultListener<ITransportComponentIdentifier[]>()
+			{
+				public void resultAvailable(ITransportComponentIdentifier[] trecs)
+				{
+					MapSendTask task = new MapSendTask(msgcopy, type, trecs, getTransports(), codecs, cl, enccontext);
+					tm.addMessage(task).addResultListener(crl);
+//					task.getSendManager().addMessage(task).addResultListener(crl);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			});
 		}
 		
 //		sendmsg.addMessage(msgcopy, type, receivers, ret);
@@ -1123,42 +1146,58 @@ public class MessageService extends BasicService implements IMessageService
 											}
 											else
 											{
-												SServiceProvider.getService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-													.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+												SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+													.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, Void>(ret)
 												{
-													public void customResultAvailable(IClockService result)
+													public void customResultAvailable(ITransportAddressService result)
 													{
-														clockservice = result;
-														SServiceProvider.getService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-															.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+														addrservice = result;
+														
+														addrservice.addPlatformAddresses(new TransportComponentIdentifier(component.getComponentIdentifier().getRoot().getName(), internalGetAddresses()))
+															.addResultListener(new DelegationResultListener<Void>(ret)
 														{
-															public void customResultAvailable(ILibraryService result)
+															public void customResultAvailable(Void result) 
 															{
-																libservice = result;
-																libservice.getClassLoader(component.getModel().getResourceIdentifier())
-																	.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+																SServiceProvider.getService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+																	.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 																{
-																	public void customResultAvailable(ClassLoader result)
+																	public void customResultAvailable(IClockService result)
 																	{
-																		classloader = result;
-																		startStreamSendAliveBehavior();
-																		startStreamCheckAliveBehavior();
-																		ret.setResult(null);
-//																		SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//																		.addResultListener(new IResultListener<IAwarenessManagementService>()
-//																		{
-//																			public void resultAvailable(IAwarenessManagementService result)
-//																			{
-//																				ams = result;
-//																				ret.setResult(null);
-//																			};
-//																			
-//																			public void exceptionOccurred(
-//																					Exception exception)
-//																			{
-//																				ret.setResult(null);
-//																			}
-//																		});
+																		clockservice = result;
+																		SServiceProvider.getService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+																			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+																		{
+																			public void customResultAvailable(ILibraryService result)
+																			{
+																				libservice = result;
+																				libservice.getClassLoader(component.getModel().getResourceIdentifier())
+																					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+																				{
+																					public void customResultAvailable(ClassLoader result)
+																					{
+																						classloader = result;
+																						startStreamSendAliveBehavior();
+																						startStreamCheckAliveBehavior();
+																						ret.setResult(null);
+				//																		SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				//																		.addResultListener(new IResultListener<IAwarenessManagementService>()
+				//																		{
+				//																			public void resultAvailable(IAwarenessManagementService result)
+				//																			{
+				//																				ams = result;
+				//																				ret.setResult(null);
+				//																			};
+				//																			
+				//																			public void exceptionOccurred(
+				//																					Exception exception)
+				//																			{
+				//																				ret.setResult(null);
+				//																			}
+				//																		});
+																					}
+																				});
+																			}
+																		});
 																	}
 																});
 															}
@@ -1343,12 +1382,12 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param cid The component identifier.
 	 *  @return The component identifier.
 	 */
-	public IComponentIdentifier internalUpdateComponentIdentifier(IComponentIdentifier cid)
+	public ITransportComponentIdentifier internalUpdateComponentIdentifier(ITransportComponentIdentifier cid)
 	{
-		ComponentIdentifier ret = null;
+		TransportComponentIdentifier ret = null;
 		if(cid.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
 		{
-			ret = new ComponentIdentifier(cid.getName(), internalGetAddresses());
+			ret = new TransportComponentIdentifier(cid.getName(), internalGetAddresses());
 //			System.out.println("Rewritten cid: "+ret+" :"+SUtil.arrayToString(ret.getAddresses()));
 		}
 		return ret==null? cid: ret;
@@ -1357,21 +1396,20 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Announce that addresses of transports might have changed.
 	 */
-	public IFuture<Void>	refreshAddresses()
+	public IFuture<Void> refreshAddresses()
 	{
 		addresses	= null;
 		return IFuture.DONE;
 	}
-
 	
 	/**
 	 *  Update component identifier.
 	 *  @param cid The component identifier.
 	 *  @return The component identifier.
 	 */
-	public IFuture<IComponentIdentifier> updateComponentIdentifier(IComponentIdentifier cid)
+	public IFuture<ITransportComponentIdentifier> updateComponentIdentifier(ITransportComponentIdentifier cid)
 	{
-		return new Future<IComponentIdentifier>(internalUpdateComponentIdentifier(cid));
+		return new Future<ITransportComponentIdentifier>(internalUpdateComponentIdentifier(cid));
 	}
 	
 	//-------- internal methods --------
@@ -2151,7 +2189,7 @@ public class MessageService extends BasicService implements IMessageService
 //			}
 			
 			// Announce receiver to message awareness
-			IComponentIdentifier sender = (IComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
+			ITransportComponentIdentifier sender = (ITransportComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
 			announceComponentIdentifier(sender);
 			
 			// Content decoding works as follows:
@@ -2375,8 +2413,8 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Create local input connection side after receiving a remote init output message.
 	 *  May be called multiple times and does nothing, if connection already exists.
 	 */
-	protected IInputConnection	initInputConnection(final int conid, final IComponentIdentifier initiator, 
-		final IComponentIdentifier participant, final Map<String, Object> nonfunc)
+	protected IInputConnection	initInputConnection(final int conid, final ITransportComponentIdentifier initiator, 
+		final ITransportComponentIdentifier participant, final Map<String, Object> nonfunc)
 	{
 		boolean	created;
 		InputConnectionHandler ich	= null;
@@ -2450,8 +2488,8 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Create local output connection side after receiving a remote init input message.
 	 *  May be called multiple times and does nothing, if connection already exists.
 	 */
-	protected IOutputConnection	initOutputConnection(final int conid, final IComponentIdentifier initiator, 
-		final IComponentIdentifier participant, final Map<String, Object> nonfunc)
+	protected IOutputConnection	initOutputConnection(final int conid, final ITransportComponentIdentifier initiator, 
+		final ITransportComponentIdentifier participant, final Map<String, Object> nonfunc)
 	{
 		boolean	created;
 		OutputConnectionHandler och;
@@ -2621,7 +2659,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Announce a component identifier to message awareness.
 	 */
-	protected void announceComponentIdentifier(final IComponentIdentifier cid)
+	protected void announceComponentIdentifier(final ITransportComponentIdentifier cid)
 	{
 		// Search for mws only every 5 seconds.
 		if(System.currentTimeMillis()-mwstime>5000)
@@ -2656,12 +2694,15 @@ public class MessageService extends BasicService implements IMessageService
 		}
 	}
 	
+	/**
+	 *  Get the release date from a message.
+	 */
 	protected IFuture<Date> getReleaseDate(MessageType type, final Map<String, Object> msg)
 	{
 		final Future<Date> ret = new Future<Date>();
 		Object tmp = msg.get(type.getReceiverIdentifier());
 		
-		if (tmp instanceof IComponentIdentifier)
+		if(tmp instanceof IComponentIdentifier)
 		{
 			tmp = new IComponentIdentifier[] { (IComponentIdentifier) tmp };
 		}
@@ -2680,7 +2721,7 @@ public class MessageService extends BasicService implements IMessageService
 				public void customResultAvailable(Collection<Date> result)
 				{
 					Date releasedate = null;
-					for (Date date : result)
+					for(Date date : result)
 					{
 						if (date != null && (releasedate == null || releasedate.after(date)))
 						{
@@ -2689,7 +2730,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					
 					// Unknown platform date, assume oldest chain.
-					if (releasedate == null)
+					if(releasedate == null)
 					{
 						releasedate = new Date(1);
 					}
@@ -2700,7 +2741,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
 			{
-				final IComponentIdentifier rec = (IComponentIdentifier)it.next();
+				final ITransportComponentIdentifier rec = (ITransportComponentIdentifier)it.next();
 				if(rec==null)
 				{
 					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));

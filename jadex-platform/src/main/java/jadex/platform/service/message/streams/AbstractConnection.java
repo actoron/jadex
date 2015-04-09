@@ -1,10 +1,10 @@
 package jadex.platform.service.message.streams;
 
-import java.util.Map;
-
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IConnection;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.future.IResultListener;
+
+import java.util.Map;
 
 /**
  *  Abstract base class for connections.
@@ -26,10 +26,10 @@ public abstract class AbstractConnection implements IConnection
 	protected int id;
 	
 	/** The connection initiator. */
-	protected IComponentIdentifier initiator;
+	protected ITransportComponentIdentifier initiator;
 
 	/** The participant. */
-	protected IComponentIdentifier participant;
+	protected ITransportComponentIdentifier participant;
 
 	/** The input flag. */
 	protected boolean input;
@@ -45,8 +45,8 @@ public abstract class AbstractConnection implements IConnection
 	/**
 	 *  Create a new input connection.
 	 */
-	public AbstractConnection(IComponentIdentifier sender, 
-		IComponentIdentifier receiver, int id, boolean input, boolean initiator, IAbstractConnectionHandler ch)
+	public AbstractConnection(ITransportComponentIdentifier sender, 
+		ITransportComponentIdentifier receiver, int id, boolean input, boolean initiator, IAbstractConnectionHandler ch)
 	{
 		this.initiator = sender;
 		this.participant = receiver;
@@ -91,7 +91,7 @@ public abstract class AbstractConnection implements IConnection
 	 *  Get the initiator.
 	 *  @return The initiator.
 	 */
-	public IComponentIdentifier getInitiator()
+	public ITransportComponentIdentifier getInitiator()
 	{
 		return initiator;
 	}
@@ -100,7 +100,7 @@ public abstract class AbstractConnection implements IConnection
 	 *  Get the participant.
 	 *  @return The participant.
 	 */
-	public IComponentIdentifier getParticipant()
+	public ITransportComponentIdentifier getParticipant()
 	{
 		return participant;
 	}

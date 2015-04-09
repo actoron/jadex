@@ -1,6 +1,7 @@
 package jadex.platform.service.message;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IEncodingContext;
@@ -42,7 +43,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Create a new manager send task.
 	 */
-	public MapSendTask(Map<String, Object> message, MessageType messagetype, IComponentIdentifier[] receivers, 
+	public MapSendTask(Map<String, Object> message, MessageType messagetype, ITransportComponentIdentifier[] receivers, 
 		ITransport[] transports, ICodec[] codecs, ClassLoader classloader, IEncodingContext encodingcontext)//, SendManager manager)
 	{
 		super(receivers, transports, codecs, (Map<String, Object>)message.get(SFipa.X_NONFUNCTIONAL));

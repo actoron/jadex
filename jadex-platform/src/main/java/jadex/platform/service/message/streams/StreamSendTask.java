@@ -1,6 +1,7 @@
 package jadex.platform.service.message.streams;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.MessageType;
@@ -141,7 +142,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Create a new manager send task.
 	 */
-	public StreamSendTask(byte type, Object message, int streamid, IComponentIdentifier[] receivers, 
+	public StreamSendTask(byte type, Object message, int streamid, ITransportComponentIdentifier[] receivers, 
 		ITransport[] transports, ICodec[] codecs, Integer seqnumber, Map<String, Object> nonfunc)
 	{
 		super(receivers, transports, codecs, nonfunc);

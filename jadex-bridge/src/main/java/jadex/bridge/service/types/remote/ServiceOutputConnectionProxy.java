@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -23,10 +24,10 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	protected int conid;
 	
 	/** The initiator id. */
-	protected IComponentIdentifier	initiator;
+	protected ITransportComponentIdentifier	initiator;
 	
 	/** The participant id. */
-	protected IComponentIdentifier	participant;
+	protected ITransportComponentIdentifier	participant;
 
 	/** The non-functional properties. */
 	protected Map<String, Object> nonfunc;
@@ -81,7 +82,7 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	 *  Get the initiator id.
 	 *  @return The initiator id.
 	 */
-	public IComponentIdentifier getInitiator()
+	public ITransportComponentIdentifier getInitiator()
 	{
 		return initiator;
 	}
@@ -90,7 +91,7 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	 *  Set the initiator.
 	 *  @param initiator The initiator to set.
 	 */
-	public void setInitiator(IComponentIdentifier initiator)
+	public void setInitiator(ITransportComponentIdentifier initiator)
 	{
 		this.initiator = initiator;
 	}
@@ -99,7 +100,7 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	 *  Get the participant id.
 	 *  @return The participant id.
 	 */
-	public IComponentIdentifier getParticipant()
+	public ITransportComponentIdentifier getParticipant()
 	{
 		return participant;
 	}
@@ -108,7 +109,7 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	 *  Set the participant.
 	 *  @param participant The participant to set.
 	 */
-	public void setParticipant(IComponentIdentifier participant)
+	public void setParticipant(ITransportComponentIdentifier participant)
 	{
 		this.participant = participant;
 	}

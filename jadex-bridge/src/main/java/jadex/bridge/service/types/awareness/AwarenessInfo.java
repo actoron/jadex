@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.awareness;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.VersionInfo;
 import jadex.commons.SUtil;
 
@@ -47,7 +48,7 @@ public class AwarenessInfo
 	//-------- attributes --------
 	
 	/** The sending component's identifier. */
-	protected IComponentIdentifier	sender;
+	protected ITransportComponentIdentifier	sender;
 
 	/** The component state. */
 	protected String state;
@@ -87,7 +88,7 @@ public class AwarenessInfo
 	/**
 	 *  Create a new awareness info.
 	 */
-	public AwarenessInfo(IComponentIdentifier sender, String state, long delay, 
+	public AwarenessInfo(ITransportComponentIdentifier sender, String state, long delay, 
 		String[] includes, String[] excludes, String masterid, String mechsrc)
 	{
 		this.sender = sender;
@@ -115,7 +116,7 @@ public class AwarenessInfo
 	 *  Get the sender.
 	 *  @return the sender.
 	 */
-	public IComponentIdentifier getSender()
+	public ITransportComponentIdentifier getSender()
 	{
 		return sender;
 	}
@@ -124,7 +125,7 @@ public class AwarenessInfo
 	 *  Set the sender.
 	 *  @param sender The sender to set.
 	 */
-	public void setSender(IComponentIdentifier sender)
+	public void setSender(ITransportComponentIdentifier sender)
 	{
 		this.sender = sender;
 	}

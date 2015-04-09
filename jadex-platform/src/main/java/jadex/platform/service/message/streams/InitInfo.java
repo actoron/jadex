@@ -1,6 +1,6 @@
 package jadex.platform.service.message.streams;
 
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.transformation.annotations.Alias;
 
 import java.util.Map;
@@ -12,10 +12,10 @@ import java.util.Map;
 public class InitInfo
 {
 	/** The initiator. */
-	protected IComponentIdentifier initiator;
+	protected ITransportComponentIdentifier initiator;
 	
 	/** The participant. */
-	protected IComponentIdentifier participant;
+	protected ITransportComponentIdentifier participant;
 	
 	/** The non-functional properties. */
 	protected Map<String, Object> nonfunc;
@@ -30,8 +30,8 @@ public class InitInfo
 	/**
 	 *  Create a new init info.
 	 */
-	public InitInfo(IComponentIdentifier initiator,
-		IComponentIdentifier participant, Map<String, Object> nonfunc)
+	public InitInfo(ITransportComponentIdentifier initiator,
+		ITransportComponentIdentifier participant, Map<String, Object> nonfunc)
 	{
 		this.initiator = initiator;
 		this.participant = participant;
@@ -42,7 +42,7 @@ public class InitInfo
 	 *  Get the initiator.
 	 *  @return the initiator.
 	 */
-	public IComponentIdentifier getInitiator()
+	public ITransportComponentIdentifier getInitiator()
 	{
 		return initiator;
 	}
@@ -51,7 +51,7 @@ public class InitInfo
 	 *  Set the initiator.
 	 *  @param initiator The initiator to set.
 	 */
-	public void setInitiator(IComponentIdentifier initiator)
+	public void setInitiator(ITransportComponentIdentifier initiator)
 	{
 		this.initiator = initiator;
 	}
@@ -60,7 +60,7 @@ public class InitInfo
 	 *  Get the participant.
 	 *  @return the participant.
 	 */
-	public IComponentIdentifier getParticipant()
+	public ITransportComponentIdentifier getParticipant()
 	{
 		return participant;
 	}
@@ -69,7 +69,7 @@ public class InitInfo
 	 *  Set the participant.
 	 *  @param participant The participant to set.
 	 */
-	public void setParticipant(IComponentIdentifier participant)
+	public void setParticipant(ITransportComponentIdentifier participant)
 	{
 		this.participant = participant;
 	}

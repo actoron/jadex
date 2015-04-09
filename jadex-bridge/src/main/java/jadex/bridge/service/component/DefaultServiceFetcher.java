@@ -631,7 +631,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			{
 				if(name.indexOf("@")==-1)
 				{
-					ret.setResult(new ComponentIdentifier(name, parent, parent.getAddresses()));
+					ret.setResult(new ComponentIdentifier(name, parent));//, parent.getAddresses()));
 //					ret.setResult(cms.createComponentIdentifier(name, parent, parent.getAddresses()));
 				}
 				else

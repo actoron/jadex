@@ -3,6 +3,7 @@ package jadex.platform.service.message.streams;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.message.ICodec;
@@ -401,7 +402,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	protected AbstractSendTask createTask(String type, Object content, boolean usecodecs, Integer seqnumber, Map<String, Object> nonfunc)
 	{
 		return new StreamSendTask(getMessageType(type), content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
-			getConnectionId(), getConnection().isInitiatorSide()? new IComponentIdentifier[]{getConnection().getParticipant()}: new IComponentIdentifier[]{getConnection().getInitiator()}, 
+			getConnectionId(), getConnection().isInitiatorSide()? new ITransportComponentIdentifier[]{getConnection().getParticipant()}: new ITransportComponentIdentifier[]{getConnection().getInitiator()}, 
 			getTransports(), usecodecs? getCodecs(): null, seqnumber, nonfunc); 
 	}
 	

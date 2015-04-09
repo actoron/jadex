@@ -9,7 +9,9 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.TransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
@@ -20,6 +22,7 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -429,6 +432,37 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final IComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
 	{
+		final Future<Collection<T>> ret = new Future<Collection<T>>();
+		
+		SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, Collection<T>>(ret)
+		{
+			public void customResultAvailable(ITransportAddressService tas)
+			{
+				tas.getTransportComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Collection<T>>(ret)
+				{
+					public void customResultAvailable(ITransportComponentIdentifier tcid)
+					{
+						getServiceProxies(caller, tcid, service, scope, filter).addResultListener(new DelegationResultListener<Collection<T>>(ret));
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get all service proxies from a remote component.
+	 *  (called from arbitrary components)
+	 *  @param caller	The component that started the search.
+	 *  @param cid	The remote provider id.
+	 *  @param service	The service type.
+	 *  @param scope	The search scope. 
+	 *  @return The service proxy.
+	 */
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final ITransportComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
+	{
 //		final Future<T>	ret	= new Future<T>();
 //		
 //		getServiceProxies(cid, SServiceProvider.getSearchManager(true, scope),
@@ -443,7 +477,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //		
 //		return ret;
 		
-		final IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+		final ITransportComponentIdentifier rrms = new TransportComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".0.getServiceProxies");
 		
 		final TerminableIntermediateDelegationFuture<T> future = new TerminableIntermediateDelegationFuture<T>()
@@ -572,6 +606,34 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
+		SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IExternalAccess>(ret)
+		{
+			public void customResultAvailable(ITransportAddressService tas)
+			{
+				tas.getTransportComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IExternalAccess>(ret)
+				{
+					public void customResultAvailable(ITransportComponentIdentifier tcid)
+					{
+						getExternalAccessProxy(tcid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get an external access proxy from a remote component.
+	 *  (called from arbitrary components)
+	 *  @param cid Component target id.
+	 *  @return External access of remote component. 
+	 */
+	public IFuture<IExternalAccess> getExternalAccessProxy(final ITransportComponentIdentifier cid)
+	{
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+		
 		component.scheduleStep(new IComponentStep<Object>()
 		{
 			@Classname("getExternalAccessProxy")
@@ -585,7 +647,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					{
 						// Hack! create remote rms cid with "rms" assumption.
 //						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
-						IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+						ITransportComponentIdentifier rrms = new TransportComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
@@ -1303,7 +1365,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		Set<TypeInfo> typeinfoswrite = JavaWriter.getTypeInfos();
 		
 		// Component identifier enhancement now done in MessageService sendMessage
-		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "ComponentIdentifier")};
+		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "TransportComponentIdentifier")};
 		final IComponentIdentifier root = component.getComponentIdentifier().getRoot();
 		IPreProcessor cidpp = new IPreProcessor()
 		{
@@ -1316,7 +1378,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					if(src.getPlatformName().equals(root.getLocalName()))
 					{
 						String[] addresses = ((MessageService)msgservice).internalGetAddresses();
-						ret = new ComponentIdentifier(src.getName(), addresses);
+						ret = new TransportComponentIdentifier(src.getName(), addresses);
 //						System.out.println("Rewritten cid: "+ret);
 					}
 					
@@ -1530,7 +1592,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
-				return ComponentIdentifier.class.equals(clazz);
+				return TransportComponentIdentifier.class.equals(clazz);
 			}
 			
 			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser,
@@ -1543,7 +1605,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					if(src.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
 					{
 						String[] addresses = ((MessageService)msgservice).internalGetAddresses();
-						ret = new ComponentIdentifier(src.getName(), addresses);
+						ret = new TransportComponentIdentifier(src.getName(), addresses);
 					}
 					
 					return ret==null? src: ret;

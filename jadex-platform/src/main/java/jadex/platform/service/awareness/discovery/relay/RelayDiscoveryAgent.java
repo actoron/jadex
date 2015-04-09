@@ -1,9 +1,9 @@
 package jadex.platform.service.awareness.discovery.relay;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.TimeoutResultListener;
+import jadex.bridge.TransportComponentIdentifier;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
@@ -166,7 +166,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 								{
 									if(addresses[i].startsWith(SRelay.ADDRESS_SCHEMES[j]))
 									{
-										receivers.add(new ComponentIdentifier("__relay"+i,
+										receivers.add(new TransportComponentIdentifier("__relay"+i,
 											new String[]{addresses[i].endsWith("/") ? addresses[i]+"awareness" : addresses[i]+"/awareness"}));
 									}
 								}

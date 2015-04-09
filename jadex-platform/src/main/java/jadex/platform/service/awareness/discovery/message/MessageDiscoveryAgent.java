@@ -5,6 +5,8 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.TransportComponentIdentifier;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
@@ -111,10 +113,10 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 	 *  Announce a potentially new component identifier.
 	 *  @param cid The component identifier.
 	 */
-	public IFuture<Void> announceComponentIdentifier(IComponentIdentifier ccid)
+	public IFuture<Void> announceComponentIdentifier(ITransportComponentIdentifier ccid)
 	{
 		// Only handle platforms
-		IComponentIdentifier cid = ccid.getRoot();
+		ITransportComponentIdentifier cid = (ITransportComponentIdentifier)ccid.getRoot();
 		
 		// Ignore self messages
 		if(!getMicroAgent().getComponentIdentifier().getRoot().equals(cid))
@@ -129,7 +131,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 	 *  Refresh a component identifier.
 	 *  @param cid The component identifier.
 	 */
-	public void refreshComponentIdentifier(IComponentIdentifier cid, long time)
+	public void refreshComponentIdentifier(ITransportComponentIdentifier cid, long time)
 	{
 		// Do not start another check if already contained
 		boolean contained	= announcements.containsKey(cid);
@@ -154,9 +156,9 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 	/**
 	 *  Perform continuous announcements until no ping answers are received any longer.
 	 */
-	protected void performAnnouncements(final IComponentIdentifier cid)
+	protected void performAnnouncements(final ITransportComponentIdentifier cid)
 	{
-		AwarenessInfo info = new AwarenessInfo(cid.getRoot(), AwarenessInfo.STATE_ONLINE, getDelay(), 
+		AwarenessInfo info = new AwarenessInfo((ITransportComponentIdentifier)cid.getRoot(), AwarenessInfo.STATE_ONLINE, getDelay(), 
 			null, null, null, SReflect.getInnerClassName(this.getClass()));
 		announceAwareness(info);
 		
@@ -173,7 +175,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 				{
 //					System.out.println("pinging: "+cid);
 					Map<String, Object> msg = new HashMap<String, Object>();
-					ComponentIdentifier rec = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+					TransportComponentIdentifier rec = new TransportComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 					msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rec});
 					msg.put(SFipa.CONTENT, "ping");
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);

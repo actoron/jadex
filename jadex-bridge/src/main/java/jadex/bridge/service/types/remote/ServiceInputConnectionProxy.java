@@ -1,14 +1,14 @@
 package jadex.bridge.service.types.remote;
 
-import java.io.OutputStream;
-import java.util.Map;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
+
+import java.io.OutputStream;
+import java.util.Map;
 
 /**
  * 
@@ -22,10 +22,10 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	protected int conid;
 	
 	/** The initiator id. */
-	protected IComponentIdentifier	initiator;
+	protected ITransportComponentIdentifier	initiator;
 	
 	/** The participant id. */
-	protected IComponentIdentifier	participant;
+	protected ITransportComponentIdentifier	participant;
 	
 	/** The non-functional properties. */
 	protected Map<String, Object> nonfunc;
@@ -79,7 +79,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 *  Get the initiator id.
 	 *  @return The initiator id.
 	 */
-	public IComponentIdentifier getInitiator()
+	public ITransportComponentIdentifier getInitiator()
 	{
 		return initiator;
 	}
@@ -88,7 +88,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 *  Set the initiator.
 	 *  @param initiator The initiator to set.
 	 */
-	public void setInitiator(IComponentIdentifier initiator)
+	public void setInitiator(ITransportComponentIdentifier initiator)
 	{
 		this.initiator = initiator;
 	}
@@ -97,7 +97,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 *  Get the participant id.
 	 *  @return The participant id.
 	 */
-	public IComponentIdentifier getParticipant()
+	public ITransportComponentIdentifier getParticipant()
 	{
 		return participant;
 	}
@@ -106,7 +106,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 *  Set the participant.
 	 *  @param participant The participant to set.
 	 */
-	public void setParticipant(IComponentIdentifier participant)
+	public void setParticipant(ITransportComponentIdentifier participant)
 	{
 		this.participant = participant;
 	}

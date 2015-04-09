@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.IFilter;
@@ -46,12 +47,12 @@ public interface IMessageService extends IService
 	/**
 	 *  Create a virtual output connection.
 	 */
-	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
+	public IFuture<IOutputConnection> createOutputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc);
 
 	/**
 	 *  Create a virtual input connection.
 	 */
-	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
+	public IFuture<IInputConnection> createInputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc);
 			
 	/**
 	 *  Add a message listener.
@@ -100,7 +101,7 @@ public interface IMessageService extends IService
 	 *  @param cid The component identifier.
 	 *  @return The component identifier.
 	 */
-	public IFuture<IComponentIdentifier> updateComponentIdentifier(IComponentIdentifier cid);
+	public IFuture<ITransportComponentIdentifier> updateComponentIdentifier(ITransportComponentIdentifier cid);
 	
 	/**
 	 *  Get addresses of all transports.

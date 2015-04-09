@@ -47,12 +47,6 @@ public interface IComponentIdentifier
 	public String getPlatformPrefix();
 	
 	/**
-	 *  Get the addresses.
-	 *  @return The addresses.
-	 */
-	public String[] getAddresses();
-	
-	/**
 	 *  Get the parent identifier.
 	 *  @return The parent identifier (if any).
 	 */

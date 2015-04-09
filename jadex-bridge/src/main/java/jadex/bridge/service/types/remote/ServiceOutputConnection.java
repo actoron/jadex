@@ -1,9 +1,9 @@
 package jadex.bridge.service.types.remote;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.ICommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -135,7 +135,7 @@ public class ServiceOutputConnection implements IOutputConnection
 	/**
 	 * 
 	 */
-	public IComponentIdentifier getInitiator()
+	public ITransportComponentIdentifier getInitiator()
 	{
 		if(con!=null)
 			return con.getInitiator();
@@ -146,7 +146,7 @@ public class ServiceOutputConnection implements IOutputConnection
 	/**
 	 * 
 	 */
-	public IComponentIdentifier getParticipant()
+	public ITransportComponentIdentifier getParticipant()
 	{
 		if(con!=null)
 			return con.getParticipant();

@@ -4,10 +4,12 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
@@ -61,6 +63,7 @@ import java.util.TimerTask;
 @RequiredServices(
 {
 	@RequiredService(name="ms", type=IMessageService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="tas", type=ITransportAddressService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="threadpool", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="management", type=IAwarenessManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
@@ -508,15 +511,15 @@ public abstract class DiscoveryAgent
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
 //		System.out.println("awa: "+awa);
-		IFuture<IMessageService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
-		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
+		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tas");
+		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportAddressService, AwarenessInfo>(ret)
 		{
-			public void customResultAvailable(IMessageService cms)
+			public void customResultAvailable(ITransportAddressService tas)
 			{
-				cms.updateComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-					new ExceptionDelegationResultListener<IComponentIdentifier, AwarenessInfo>(ret)
+				tas.getTransportComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+					new ExceptionDelegationResultListener<ITransportComponentIdentifier, AwarenessInfo>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier root)
+					public void customResultAvailable(ITransportComponentIdentifier root)
 					{
 						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), 
 							getExcludes(), null, awa);
@@ -535,15 +538,15 @@ public abstract class DiscoveryAgent
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
-		IFuture<IMessageService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
-		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
+		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tas");
+		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportAddressService, AwarenessInfo>(ret)
 		{
-			public void customResultAvailable(IMessageService cms)
+			public void customResultAvailable(ITransportAddressService tas)
 			{
-				cms.updateComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-					new ExceptionDelegationResultListener<IComponentIdentifier, AwarenessInfo>(ret)
+				tas.getTransportComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+					new ExceptionDelegationResultListener<ITransportComponentIdentifier, AwarenessInfo>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier root)
+					public void customResultAvailable(ITransportComponentIdentifier root)
 					{
 						AwarenessInfo info = new AwarenessInfo(root, state, getDelay(), getIncludes(), 
 							getExcludes(), masterid, awa);

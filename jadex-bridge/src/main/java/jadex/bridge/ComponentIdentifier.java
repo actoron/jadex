@@ -15,9 +15,6 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	/** The component name. */
 	protected String name;
 	
-	/** Attribute for slot addresses. */
-	protected String[]	addresses;
-
 //	/** Attribute for slot resolvers. */
 //	protected IComponentIdentifier[]	resolvers;
 
@@ -32,21 +29,21 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 //		this(null, (String[])null);
 	}
 
-	/**
-	 *  Create a new component identifier with a given global name.
-	 *  @param name A global name (e.g. "cms@lars").
-	 */
-	public ComponentIdentifier(String name)
-	{
-		this(name, (String[])null);
-	}
+//	/**
+//	 *  Create a new component identifier with a given global name.
+//	 *  @param name A global name (e.g. "cms@lars").
+//	 */
+//	public ComponentIdentifier(String name)
+//	{
+//		this(name, (String[])null);
+//	}
 
 	/**
 	 *  Create a new component identifier with a global name and given addresses.
 	 *  @param name A global name (e.g. "cms@lars").
 	 *  @param addresses A list of transport addresses.
 	 */
-	public ComponentIdentifier(String name, String[] addresses)
+	public ComponentIdentifier(String name)//, String[] addresses)
 	{
 		if(name==null)
 			throw new IllegalArgumentException("Name must not null.");
@@ -57,8 +54,19 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 			throw new IllegalArgumentException("Invalid component identifier: "+name);			
 		}
 		this.name = name;
-		this.addresses	= addresses;
+//		this.addresses	= addresses;
 	}
+	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The local name.
+//	 *  @param parent The parent.
+//	 *  @param addresses The addresses.
+//	 */
+//	public ComponentIdentifier(String name, IComponentIdentifier parent)
+//	{
+//		this(name, parent, parent.getAddresses());
+//	}
 	
 	/**
 	 *  Create component identifier.
@@ -66,20 +74,9 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 *  @param parent The parent.
 	 *  @param addresses The addresses.
 	 */
-	public ComponentIdentifier(String name, IComponentIdentifier parent)
+	public ComponentIdentifier(String name, IComponentIdentifier parent)//, String[] addresses)
 	{
-		this(name, parent, parent.getAddresses());
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The local name.
-	 *  @param parent The parent.
-	 *  @param addresses The addresses.
-	 */
-	public ComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses)
-	{
-		this(name+"@"+parent.getName().replace('@', '.'), addresses);
+		this(name+"@"+parent.getName().replace('@', '.'));//, addresses);
 	}
 	
 	/**
@@ -88,7 +85,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public ComponentIdentifier(IComponentIdentifier cid)
 	{
-		this(cid.getName(), cid.getAddresses());
+		this(cid.getName());//, cid.getAddresses());
 	}
 	
 //	/**
@@ -124,24 +121,6 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	public void	setName(String name)
 	{
 		this.name = name;
-	}
-	
-	/**
-	 *  Get the addresses of this ComponentIdentifier.
-	 * @return addresses
-	 */
-	public String[] getAddresses()
-	{
-		return addresses;
-	}
-
-	/**
-	 *  Set the addresses of this ComponentIdentifier.
-	 * @param addresses the value to be set
-	 */
-	public void setAddresses(String[] addresses)
-	{
-		this.addresses	= addresses;
 	}
 	
 //	/**
@@ -277,13 +256,13 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 			String paname = name.substring(at+1, idx);
 			String pfname = name.substring(idx+1);
 //			ret = new ComponentIdentifier(paname+"@"+pfname, getAddresses(), getResolvers());
-			ret = new ComponentIdentifier(paname+"@"+pfname, getAddresses());
+			ret = new ComponentIdentifier(paname+"@"+pfname);//, getAddresses());
 		}
 		else if(at!=-1)
 		{
 			String paname = name.substring(at+1);
 //			ret = new ComponentIdentifier(paname, getAddresses(), getResolvers());
-			ret = new ComponentIdentifier(paname, getAddresses());
+			ret = new ComponentIdentifier(paname);//, getAddresses());
 		}
 		// else at root.
 		return ret;
@@ -296,7 +275,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	public IComponentIdentifier getRoot()
 	{
 //		return new ComponentIdentifier(getPlatformName(), getAddresses(), getResolvers());
-		return new ComponentIdentifier(getPlatformName(), getAddresses());
+		return new ComponentIdentifier(getPlatformName());//, getAddresses());
 	}
 
 	//--------- methods --------
@@ -307,7 +286,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public Object clone()
 	{
-		ComponentIdentifier clone = new ComponentIdentifier(getName(), getAddresses());
+		ComponentIdentifier clone = new ComponentIdentifier(getName());//, getAddresses());
 
 //		// Deep copy of resolvers.
 //		ComponentIdentifier[] res = getResolvers();
