@@ -20,7 +20,7 @@ import java.util.Map;
 public class TransportAddressService implements ITransportAddressService
 {
 	/** The managed addresses. */
-	protected Map<String, String[]> addresses;
+	protected Map<String, String[]> addresses = Collections.synchronizedMap(new HashMap<String, String[]>());
 	
 	/**
 	 *  Set the addresses of a platform.
@@ -29,8 +29,8 @@ public class TransportAddressService implements ITransportAddressService
 	public IFuture<Void> addPlatformAddresses(ITransportComponentIdentifier platform)
 	{
 		// Must be synchronized due to direct access via getMap()
-		if(addresses==null)
-			addresses = Collections.synchronizedMap(new HashMap<String, String[]>());
+//		if(addresses==null)
+//			addresses = Collections.synchronizedMap(new HashMap<String, String[]>());
 		addresses.put(platform.getName(), platform.getAddresses());
 		
 		System.out.println("added: "+platform.getName()+" "+SUtil.arrayToString(platform.getAddresses()));
@@ -43,8 +43,8 @@ public class TransportAddressService implements ITransportAddressService
 	 */
 	public IFuture<Void> removePlatformAddresses(ITransportComponentIdentifier platform)
 	{
-		if(addresses!=null)
-			addresses.remove(platform.getName());
+//		if(addresses!=null)
+		addresses.remove(platform.getName());
 		return Future.DONE;
 	}
 	

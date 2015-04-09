@@ -172,7 +172,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Create a new remote service management service.
 	 */
-	public RemoteServiceManagementService(IExternalAccess component, ITransportComponentIdentifier rms,
+	public RemoteServiceManagementService(IExternalAccess component, 
 		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice)//, boolean binarymode)
 	{
 		super(component.getComponentIdentifier(), IRemoteServiceManagementService.class, null);
@@ -180,7 +180,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //		System.out.println("binary: "+binarymode);
 		
 		this.component = component;
-		this.rms = rms;
 		this.rrm = new RemoteReferenceModule(this, libservice, marshal);
 		this.waitingcalls = new HashMap<String, WaitingCallInfo>();
 		this.processingcalls = new HashMap<String, Object>();
@@ -693,10 +692,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Get the rms component identifier.
 	 *  @return The rms component identifier.
 	 */
-	public ITransportComponentIdentifier getRMSComponentIdentifier()
+	public IComponentIdentifier getRMSComponentIdentifier()
 	{
-		return rms;
-//		return component.getComponentIdentifier();
+		return component.getComponentIdentifier();
 	}
 	
 	/**
