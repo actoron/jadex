@@ -113,6 +113,19 @@ public class RelayServlet extends HttpServlet
 					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(cnt));
 					view	= "/WEB-INF/jsp/history.jsp";
 				}
+				else if("/history.json".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
+				{
+					int	cnt	= -1;
+					try
+					{
+						cnt	= Integer.parseInt(request.getParameter("cnt"));
+					}
+					catch(RuntimeException e)
+					{
+					}
+					
+					handler.getStatisticsDB().writePlatformInfos(response.getOutputStream(), cnt);
+				}
 				else if("/history_all".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
 					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(-1));

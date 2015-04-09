@@ -8,6 +8,7 @@
 <%@ page import="java.util.*" %>
 <%
 	PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
+	long	start	= System.nanoTime();
 %>
 
 
@@ -46,8 +47,8 @@ if(infos.length>0)
 			<% } %>
 			];
 			var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png', {
-					minZoom: 2,
-					maxZoom: 18,
+					minZoom: 0,
+					maxZoom: 19,
 					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
 				}),
 				latlng = L.latLng(53.550556, 9.993333);
@@ -119,7 +120,9 @@ if(infos.length>0)
 				<td class="number">
 					<%= infos[i].getMessageCount() %>
 			</tr>
-	<%	} %>
+	<%	} 
+		System.out.println("took c: "+((System.nanoTime()-start)/1000000)+" ms");
+	%>
 </table>
 
 <jsp:include page="footer.jsp" flush="true"/>

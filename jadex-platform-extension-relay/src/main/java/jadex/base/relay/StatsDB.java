@@ -3,6 +3,7 @@ package jadex.base.relay;
 import jadex.bridge.ComponentIdentifier;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -234,6 +235,13 @@ public class StatsDB
 		else
 		{
 			rs.close();
+			
+			// Add indices.
+//			stmt.execute("CREATE INDEX IDX_HOSTNAME ON RELAY.PLATFORMINFO(HOSTNAME)");
+//			stmt.execute("CREATE INDEX IDX_CONTIME ON RELAY.PLATFORMINFO(CONTIME)");
+//			stmt.execute("CREATE INDEX IDX_DISTIME ON RELAY.PLATFORMINFO(DISTIME)");
+//			stmt.execute("CREATE INDEX IDX_ID ON RELAY.PLATFORMINFO(ID)");
+//			stmt.execute("CREATE INDEX IDX_PEER ON RELAY.PLATFORMINFO(PEER)");
 			
 			// Add peer column, if it doesn't exist. (legacy for broken migrations from derby)
 			rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PEER");
@@ -658,6 +666,7 @@ public class StatsDB
 	 */
 	public PlatformInfo[]	getPlatformInfos(int limit)
 	{
+		long start	= System.nanoTime();
 		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
 		
 		if(con!=null)
@@ -674,6 +683,8 @@ public class StatsDB
 				
 //				PreparedStatement	ps	= con.prepareStatement("select * from relay.properties where ID=?");
 				
+				System.out.println("took a: "+((System.nanoTime()-start)/1000000)+" ms");
+				
 				while(rs.next() && (limit==-1 || ret.size()<limit))
 				{
 					if(map.containsKey(rs.getString("HOSTIP")))
@@ -681,7 +692,20 @@ public class StatsDB
 						PlatformInfo	pi	= map.get(rs.getString("HOSTIP"));
 						if(pi.getId().indexOf(rs.getString("PLATFORM"))==-1)
 						{
-							pi.setId(pi.getId()+", "+rs.getString("PLATFORM"));
+							String	platform	= rs.getString("PLATFORM");
+							if(platform.length()>16)
+							{
+								String pre	= rs.getString("PLATFORM").substring(0, 13);
+								if(pi.getId().indexOf(pre)==-1)
+								{
+									pi.setId(pi.getId()+", "+pre+"...");									
+								}
+							}
+							else
+							{
+								pi.setId(pi.getId()+", "+platform);
+							}
+							
 							if(pi.getConnectDate()==null || rs.getTimestamp("CONTIME")!=null && rs.getTimestamp("CONTIME").getTime()>pi.getConnectDate().getTime())
 							{
 								pi.setConnectDate(rs.getTimestamp("CONTIME"));
@@ -734,7 +758,74 @@ public class StatsDB
 				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
 			}
 		}
+		System.out.println("took b: "+((System.nanoTime()-start)/1000000)+" ms");
 		return ret.toArray(new PlatformInfo[ret.size()]);
+	}
+
+	/**
+	 *  Write platform infos as JSON to the provided output stream. 
+	 *  Cumulated per ip/platform to use for display (sorted by recency, newest first).
+	 *  @param limit	Limit the number of results (-1 for no limit);
+	 */
+	public void	writePlatformInfos(OutputStream out, int limit)
+	{
+		if(con!=null)
+		{
+			ResultSet	rs	= null;
+			try
+			{
+				rs	= con.createStatement().executeQuery(
+					"select max(id) as ID, prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
+					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
+					+"from relay.platforminfo "
+					+"group by hostip, prefix order by CONTIME desc");
+				
+				out.write("{\"data\":[".getBytes("UTF-8"));
+				
+				for(int i=0; rs.next() && (limit==-1 || i<limit); i++)
+				{
+					if(i==0)
+					{
+						out.write("[\"".getBytes("UTF-8"));
+					}
+					else
+					{
+						out.write(",[\"".getBytes("UTF-8"));
+					}
+					out.write(rs.getString("PLATFORM").getBytes("UTF-8"));
+					out.write("\",\"".getBytes("UTF-8"));
+					out.write(rs.getString("HOSTIP").getBytes("UTF-8"));
+					out.write("\",\"".getBytes("UTF-8"));
+					out.write(PlatformInfo.TIME_FORMAT_LONG.get().format(rs.getTimestamp("CONTIME")).getBytes("UTF-8"));
+					out.write("\",\"".getBytes("UTF-8"));
+					out.write(PlatformInfo.TIME_FORMAT_LONG.get().format(rs.getTimestamp("DISTIME")).getBytes("UTF-8"));
+					out.write("\",\"".getBytes("UTF-8"));
+					out.write(Integer.toString(rs.getInt("MSGS")).getBytes("UTF-8"));
+					out.write("\"]".getBytes("UTF-8"));
+				}
+				rs.close();
+				
+				out.write("]}".getBytes("UTF-8"));
+
+			}
+			catch(Exception e)
+			{
+				if(rs!=null)
+				{
+					try
+					{
+						rs.close();
+					}
+					catch(SQLException sqle)
+					{
+						// ignore
+					}
+				}
+				e.printStackTrace();
+				// Ignore errors and let relay work without stats.
+				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
+			}
+		}
 	}
 
 	/**
