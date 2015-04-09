@@ -3,6 +3,8 @@ package jadex.base.gui;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.TransportComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -38,7 +40,7 @@ public class ComponentIdentifierPanel extends JPanel
 	protected IExternalAccess access;
 	
 	/** The component identifier.*/
-	protected IComponentIdentifier cid;
+	protected ITransportComponentIdentifier cid;
 
 	/** The name textfield. */
 	protected JTextField tfname; 
@@ -67,7 +69,7 @@ public class ComponentIdentifierPanel extends JPanel
 	public ComponentIdentifierPanel(IComponentIdentifier cid, final IExternalAccess access)
 	{
 		this.access = access;
-		this.cid = cid!=null? cid: new ComponentIdentifier();//cms.createComponentIdentifier(null, false, null);
+		this.cid	= cid!=null? new TransportComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new TransportComponentIdentifier(); 
 		this.editable	= true;
 
 		// Initialize component.
@@ -88,18 +90,8 @@ public class ComponentIdentifierPanel extends JPanel
 		{
 			public void tableChanged(TableModelEvent e)
 			{
-				//System.out.println("event: "+e);
-				SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IComponentManagementService cms = (IComponentManagementService)result;
-//						ComponentIdentifierPanel.this.cid = cms.createComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), false, taddresses.getEntries());
-						ComponentIdentifierPanel.this.cid = new ComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), taddresses.getEntries());
-						cidChanged();
-					}
-				});
+				ComponentIdentifierPanel.this.cid = new TransportComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), taddresses.getEntries());
+				cidChanged();
 			}
 		});
 		
@@ -184,9 +176,7 @@ public class ComponentIdentifierPanel extends JPanel
 	 */
 	public void setComponentIdentifier(IComponentIdentifier cid)
 	{
-//		System.out.println("set cid: "+cid+", "+(cid!=null ? SUtil.arrayToString(cid.getAddresses()):"[]"));
-		this.cid	= cid!=null? cid: new ComponentIdentifier(); 
-//		this.cid	= aid!=null ? aid : cms.createComponentIdentifier(null, false, null);
+		this.cid	= cid!=null? new TransportComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new TransportComponentIdentifier();
 		refresh();
 	}
 
@@ -246,19 +236,10 @@ public class ComponentIdentifierPanel extends JPanel
 		
 		protected void	update()
 		{
-			SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
-			{
-				public void customResultAvailable(Object result)
-				{
-					IComponentManagementService cms = (IComponentManagementService)result;
-					nameediting	= true;
-//					ComponentIdentifierPanel.this.cid	= cms.createComponentIdentifier(tfname.getText(), false, cid.getAddresses());
-					ComponentIdentifierPanel.this.cid	= new ComponentIdentifier(tfname.getText(), cid.getAddresses());
-					cidChanged();
-					nameediting	= false;
-				}
-			});
+			nameediting	= true;
+			ComponentIdentifierPanel.this.cid	= new TransportComponentIdentifier(tfname.getText(), ComponentIdentifierPanel.this.cid.getAddresses());
+			cidChanged();
+			nameediting	= false;
 		}
 	}
-	
 }

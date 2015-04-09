@@ -1,6 +1,7 @@
 package jadex.base.gui.jtable;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.SReflect;
 
 import java.awt.Component;
@@ -23,22 +24,22 @@ public class ComponentIdentifiersRenderer extends DefaultTableCellRenderer
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-		IComponentIdentifier aid;
+		IComponentIdentifier cid;
 		Iterator it = null;
 		if(SReflect.isIterable(value))
 		{
 			it = SReflect.getIterator(value);
-			aid = (IComponentIdentifier)it.next();
+			cid = (IComponentIdentifier)it.next();
 		}
 		else
 		{
-			aid = (IComponentIdentifier)value;
+			cid = (IComponentIdentifier)value;
 		}
 		
-		String content = aid.getName();
-		String tooltip = "<b>" + aid.getName() + "</b>";
-		String[] addresses = aid.getAddresses();
-		for(int i = 0;i<addresses.length; i++)
+		String content = cid.getName();
+		String tooltip = "<b>" + cid.getName() + "</b>";
+		String[] addresses = cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
+		for(int i=0; addresses!=null && i<addresses.length; i++)
 		{
 			tooltip += "<br>" + addresses[i];
 		}
@@ -47,11 +48,11 @@ public class ComponentIdentifiersRenderer extends DefaultTableCellRenderer
 		{
 			while(it.hasNext())
 			{
-				aid = (IComponentIdentifier)it.next();
-				content += ", " + aid.getName();
-				tooltip += "<br><b>" + aid.getName() + "</b>";
-				addresses = aid.getAddresses();
-				for(int j = 0; j < addresses.length; j++)
+				cid = (IComponentIdentifier)it.next();
+				content += ", " + cid.getName();
+				tooltip += "<br><b>" + cid.getName() + "</b>";
+				addresses = cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
+				for(int j=0; addresses!=null && j<addresses.length; j++)
 				{
 					tooltip += "<br>" + addresses[j];
 				}

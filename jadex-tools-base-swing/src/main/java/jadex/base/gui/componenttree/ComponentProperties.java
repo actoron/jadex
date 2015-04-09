@@ -1,6 +1,7 @@
 package jadex.base.gui.componenttree;
 
 import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;
@@ -70,9 +71,9 @@ public class ComponentProperties	extends	PropertiesPanel
 		getCheckBox("Persistable").setSelected(desc.isPersistable());
 		
 		JTable	list	= (JTable)getComponent("Addresses");
-		String[]	addresses	= desc.getName().getAddresses();
+		String[]	addresses	= desc.getName() instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)desc.getName()).getAddresses() : null;
 		DefaultTableModel	dtm	= new DefaultTableModel();
-		dtm.addColumn("Addresses", addresses!=null?addresses:SUtil.EMPTY_STRING_ARRAY);
+		dtm.addColumn("Addresses", addresses!=null ? addresses : SUtil.EMPTY_STRING_ARRAY);
 		list.setModel(dtm);
 	}
 }

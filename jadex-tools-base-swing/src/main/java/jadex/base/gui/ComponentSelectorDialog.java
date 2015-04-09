@@ -373,7 +373,7 @@ public class ComponentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				addSelectedAgent(new ComponentIdentifier("@"+access.getComponentIdentifier().getPlatformName(), (String[])null), list);
+				addSelectedAgent(new ComponentIdentifier("@"+access.getComponentIdentifier().getPlatformName()), list);
 			}
 		});
 		remove.addActionListener(new ActionListener()
@@ -504,7 +504,7 @@ public class ComponentSelectorDialog
 						{
 							// Use clone to keep original aid unchanged.
 							IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-							addSelectedAgent(new ComponentIdentifier(id.getName(), id.getAddresses()), list);
+							addSelectedAgent(id, list);
 							comptree.getModel().fireNodeChanged(node);
 						}
 					};
@@ -573,7 +573,7 @@ public class ComponentSelectorDialog
 			IComponentIdentifier cid = getSelectedObject();
 			if(cid!=null)
 			{
-				addSelectedAgent(new ComponentIdentifier(cid.getName(), cid.getAddresses()), list);
+				addSelectedAgent(cid, list);
 			}
 		}
 	}
