@@ -1,6 +1,7 @@
 package jadex.base.gui.jtable;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 
 import java.awt.Component;
 
@@ -25,7 +26,7 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 		if(cid!=null)
 		{
 			setText(cid.getName());
-			String[] addresses = cid.getAddresses();
+			String[] addresses = cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
 			String tooltip = "<b>" + cid.getName() + "</b>";
 			if(addresses!=null)
 			{
