@@ -345,7 +345,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
 						IComponentIdentifier	cid	= (IComponentIdentifier)value;
 						this.setText(cid.getName());
-						this.setToolTipText(SUtil.arrayToString(cid.getAddresses()));
+						// todo?
+//						this.setToolTipText(SUtil.arrayToString(cid.getAddresses()));
 						return this;
 					}
 				};

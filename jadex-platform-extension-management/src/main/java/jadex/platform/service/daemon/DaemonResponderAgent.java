@@ -48,7 +48,7 @@ public class DaemonResponderAgent
 	@AgentBody
 	public IFuture<Void> start()
 	{
-		agent.getLogger().info("Sending message "+content+" to "+cid+", "+SUtil.arrayToString(cid.getAddresses()));
+		agent.getLogger().info("Sending message "+content+" to "+cid);//+", "+SUtil.arrayToString(cid.getAddresses()));
 		
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 		msg.put(SFipa.RECEIVERS, cid);

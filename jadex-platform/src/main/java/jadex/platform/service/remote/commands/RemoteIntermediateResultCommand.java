@@ -2,6 +2,7 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
@@ -45,7 +46,7 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	/**
 	 *  Create a new remote intermediate result command.
 	 */
-	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref, 
+	public RemoteIntermediateResultCommand(ITransportComponentIdentifier realreceiver, Object result, String callid, boolean isref, 
 		String methodname, boolean finished, Map<String, Object> nonfunc, IFuture<?> orig, int cnt)
 	{
 		super(realreceiver, result, null, callid, isref, methodname, nonfunc);

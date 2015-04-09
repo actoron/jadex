@@ -44,16 +44,26 @@ public interface IMessageService extends IService
 	 */
 	public void deliverMessage(Object msg);
 	
+//	/**
+//	 *  Create a virtual output connection.
+//	 */
+//	public IFuture<IOutputConnection> createOutputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc);
+//
+//	/**
+//	 *  Create a virtual input connection.
+//	 */
+//	public IFuture<IInputConnection> createInputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc);
+		
 	/**
 	 *  Create a virtual output connection.
 	 */
-	public IFuture<IOutputConnection> createOutputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc);
+	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
 
 	/**
 	 *  Create a virtual input connection.
 	 */
-	public IFuture<IInputConnection> createInputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc);
-			
+	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
+	
 	/**
 	 *  Add a message listener.
 	 *  @param listener The change listener.

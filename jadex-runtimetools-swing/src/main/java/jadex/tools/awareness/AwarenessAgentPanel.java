@@ -6,6 +6,7 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.commons.Properties;
 import jadex.commons.Property;

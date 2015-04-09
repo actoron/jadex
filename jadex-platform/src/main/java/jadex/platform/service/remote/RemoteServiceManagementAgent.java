@@ -358,10 +358,10 @@ public class RemoteServiceManagementAgent
 									{
 										final Map reply = mt.createReply(msg);
 										
-										if((""+result).indexOf("RemoteSearchCommand")!=-1 && (""+result).indexOf("IServiceCallService")!=-1)
-										{
-											System.out.println("sdhkl");
-										}
+//										if((""+result).indexOf("RemoteSearchCommand")!=-1 && (""+result).indexOf("IServiceCallService")!=-1)
+//										{
+//											System.out.println("sdhkl");
+//										}
 										
 //										if(rid[0]!=null && rid[0].getGlobalIdentifier()!=null)
 //										{

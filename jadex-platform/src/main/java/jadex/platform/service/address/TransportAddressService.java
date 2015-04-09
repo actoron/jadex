@@ -5,7 +5,6 @@ import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.TransportComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.address.ITransportAddressService;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -56,7 +55,14 @@ public class TransportAddressService implements ITransportAddressService
 		Future<String[]> ret = new Future<String[]>();
 		if(addresses==null || !addresses.containsKey(component.getName()))
 		{
-			ret.setException(new RuntimeException("Not contained: "+component.getName()));
+			if(component instanceof TransportComponentIdentifier)
+			{
+				ret.setResult(((ITransportComponentIdentifier)component).getAddresses());
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Not contained: "+component.getName()));
+			}
 		}
 		else
 		{
@@ -75,7 +81,14 @@ public class TransportAddressService implements ITransportAddressService
 		Future<ITransportComponentIdentifier> ret = new Future<ITransportComponentIdentifier>();
 		if(addresses==null || !addresses.containsKey(component.getName()))
 		{
-			ret.setException(new RuntimeException("Not contained: "+component.getName()));
+			if(component instanceof TransportComponentIdentifier)
+			{
+				ret.setResult((ITransportComponentIdentifier)component);
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Not contained: "+component.getName()));
+			}
 		}
 		else
 		{
@@ -99,8 +112,15 @@ public class TransportAddressService implements ITransportAddressService
 			{
 				if(addresses==null || !addresses.containsKey(components[i].getName()))
 				{
-					ret.setException(new RuntimeException("Not contained: "+components[i].getName()));
-					break;
+					if(components[i] instanceof TransportComponentIdentifier)
+					{
+						res[i] = ((ITransportComponentIdentifier)components[i]);
+					}
+					else
+					{
+						ret.setException(new RuntimeException("Not contained: "+components[i].getName()));
+						break;
+					}
 				}
 				else
 				{

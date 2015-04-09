@@ -298,6 +298,39 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual output connection.
 	 */
+	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, final Map<String, Object> nonfunc)
+	{
+		final Future<IOutputConnection> ret = new Future<IOutputConnection>();
+		addrservice.getTransportComponentIdentifiers(new IComponentIdentifier[]{sender, receiver}).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier[], IOutputConnection>(ret)
+		{
+			public void customResultAvailable(ITransportComponentIdentifier[] result)
+			{
+				createOutputConnection(result[0], result[1], nonfunc).addResultListener(new DelegationResultListener<IOutputConnection>(ret));
+			}
+		});
+		return ret;
+	}
+
+	/**
+	 *  Create a virtual input connection.
+	 */
+	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, final Map<String, Object> nonfunc)
+	{
+		final Future<IInputConnection> ret = new Future<IInputConnection>();
+		addrservice.getTransportComponentIdentifiers(new IComponentIdentifier[]{sender, receiver}).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier[], IInputConnection>(ret)
+		{
+			public void customResultAvailable(ITransportComponentIdentifier[] result)
+			{
+				createInputConnection(result[0], result[1], nonfunc).addResultListener(new DelegationResultListener<IInputConnection>(ret));
+			}
+		});
+		return ret;
+	}
+
+	
+	/**
+	 *  Create a virtual output connection.
+	 */
 	public OutputConnection internalCreateOutputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, Map<String, Object> nonfunc)
 	{
 		UUID uuconid = UUID.randomUUID();

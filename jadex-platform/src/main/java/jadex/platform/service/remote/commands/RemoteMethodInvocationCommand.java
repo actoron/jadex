@@ -3,6 +3,7 @@ package jadex.platform.service.remote.commands;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IServiceIdentifier;
@@ -70,7 +71,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	protected Object target;
 	
 	/** The caller. */
-	protected IComponentIdentifier caller;
+	protected ITransportComponentIdentifier caller;
 	
 	//-------- constructors --------
 	
@@ -85,7 +86,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  Create a new remote method invocation command. 
 	 */
 	public RemoteMethodInvocationCommand(RemoteReference rr, Method method, 
-		Object[] parametervalues, String callid, IComponentIdentifier caller, Map<String, Object> nonfunc)
+		Object[] parametervalues, String callid, ITransportComponentIdentifier caller, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
 //		if(method.getName().equals("secMethod"))
@@ -117,7 +118,6 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 */
 	public IFuture<Void>	preprocessCommand(IInternalAccess component, final RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
-		
 		Future<Void>	ret	= new Future<Void>();
 		super.preprocessCommand(component, rrm, target)
 			.addResultListener(new DelegationResultListener<Void>(ret)
@@ -264,7 +264,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 //		if("addMessageListener".equals(methodname))
 //			System.out.println("remote addMessageListener");
 		
-		final IComponentIdentifier ridcom = getRealReceiver();
+		final ITransportComponentIdentifier ridcom = getRealReceiver();
 		
 		try
 		{
@@ -491,7 +491,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  Get the caller.
 	 *  @return the caller.
 	 */
-	public IComponentIdentifier getCaller()
+	public ITransportComponentIdentifier getCaller()
 	{
 		return caller;
 	}
@@ -500,7 +500,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  Set the caller.
 	 *  @param caller The caller to set.
 	 */
-	public void setCaller(IComponentIdentifier caller)
+	public void setCaller(ITransportComponentIdentifier caller)
 	{
 		this.caller = caller;
 	}
@@ -545,7 +545,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  Get the receiver component (if other than rms).
 	 *  @return the real receiver.
 	 */
-	public IComponentIdentifier getSender()
+	public ITransportComponentIdentifier getSender()
 	{
 		return caller;
 	}
@@ -554,9 +554,9 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  Get the real receiver (other than rms).
 	 *  @return the real receiver.
 	 */
-	public IComponentIdentifier getRealReceiver()
+	public ITransportComponentIdentifier getRealReceiver()
 	{
-		IComponentIdentifier ret = null;
+		ITransportComponentIdentifier ret = null;
 		Object ti = getRemoteReference().getTargetIdentifier();
 		if(ti instanceof IComponentIdentifier)
 			ret = (IComponentIdentifier)ti;
@@ -580,7 +580,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  sending intermediate results as commands. 
 	 */
 	public static void handleResultFuture(boolean terminable, final RemoteServiceManagementService rsms, final String callid, final Object res,
-		final boolean returnisref, final String methodname, final IComponentIdentifier rec, final IntermediateFuture<IRemoteCommand> ret,
+		final boolean returnisref, final String methodname, final ITransportComponentIdentifier rec, final IntermediateFuture<IRemoteCommand> ret,
 		final Map<String, Object> nonfunc)
 	{
 		// Remember invocation for termination invocation

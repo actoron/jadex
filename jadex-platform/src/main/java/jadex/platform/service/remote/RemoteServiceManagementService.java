@@ -164,12 +164,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The message service. */
 	protected IMessageService msgservice;
 	
+	/** The rms identifier. */
+//	protected ITransportComponentIdentifier rms;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new remote service management service.
 	 */
-	public RemoteServiceManagementService(IExternalAccess component, 
+	public RemoteServiceManagementService(IExternalAccess component, ITransportComponentIdentifier rms,
 		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice)//, boolean binarymode)
 	{
 		super(component.getComponentIdentifier(), IRemoteServiceManagementService.class, null);
@@ -177,6 +180,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //		System.out.println("binary: "+binarymode);
 		
 		this.component = component;
+		this.rms = rms;
 		this.rrm = new RemoteReferenceModule(this, libservice, marshal);
 		this.waitingcalls = new HashMap<String, WaitingCallInfo>();
 		this.processingcalls = new HashMap<String, Object>();
@@ -461,7 +465,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final ITransportComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(final ITransportComponentIdentifier caller, final ITransportComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
 	{
 //		final Future<T>	ret	= new Future<T>();
 //		
@@ -689,9 +693,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Get the rms component identifier.
 	 *  @return The rms component identifier.
 	 */
-	public IComponentIdentifier getRMSComponentIdentifier()
+	public ITransportComponentIdentifier getRMSComponentIdentifier()
 	{
-		return component.getComponentIdentifier();
+		return rms;
+//		return component.getComponentIdentifier();
 	}
 	
 	/**

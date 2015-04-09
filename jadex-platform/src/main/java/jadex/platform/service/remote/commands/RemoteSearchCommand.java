@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
@@ -39,7 +40,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	//-------- attributes --------
 
 	/** The providerid (i.e. the component to start with searching). */
-	protected IComponentIdentifier providerid;
+	protected ITransportComponentIdentifier providerid;
 	
 //	/** The serach manager. */
 //	protected ISearchManager manager;
@@ -69,7 +70,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	protected IAsyncFilter<IService> filter;
 	
 	/** The caller. */
-	protected IComponentIdentifier caller;
+	protected ITransportComponentIdentifier caller;
 	
 	//-------- constructors --------
 	
@@ -83,11 +84,11 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	/**
 	 *  Create a new remote search command.
 	 */
-	public RemoteSearchCommand(IComponentIdentifier providerid, Class<?> type, 
-		boolean multiple, String scope, String callid, IAsyncFilter<IService> filter, IComponentIdentifier caller)
+	public RemoteSearchCommand(ITransportComponentIdentifier providerid, Class<?> type, 
+		boolean multiple, String scope, String callid, IAsyncFilter<IService> filter, ITransportComponentIdentifier caller)
 	{
-		if(type==null)
-			System.out.println("type is null");
+//		if(type==null)
+//			System.out.println("type is null");
 		
 		this.providerid = providerid;
 		this.type = new ClassInfo(type);
@@ -338,7 +339,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  Get the providerid.
 	 *  @return the providerid.
 	 */
-	public IComponentIdentifier getProviderId()
+	public ITransportComponentIdentifier getProviderId()
 	{
 		return providerid;
 	}
@@ -347,7 +348,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  Set the providerid.
 	 *  @param providerid The providerid to set.
 	 */
-	public void setProviderId(IComponentIdentifier providerid)
+	public void setProviderId(ITransportComponentIdentifier providerid)
 	{
 		this.providerid = providerid;
 	}
@@ -501,7 +502,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	/**
 	 *  Get the sender component (if other than rms).
 	 */
-	public IComponentIdentifier getSender()
+	public ITransportComponentIdentifier getSender()
 	{
 		return caller;
 	}
