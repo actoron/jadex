@@ -345,6 +345,10 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		// Return if inital discovery.
 		boolean ret = false;
 		
+		// Announce new platform addresses
+		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		tas.addPlatformAddresses(info.getSender());
+		
 		// Fix broken awareness infos for backwards compatibility.
 		if(info.getDelay()==0)
 			info.setDelay(delay);
