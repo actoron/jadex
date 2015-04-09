@@ -62,6 +62,7 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.platform.service.address.TransportAddressService;
 import jadex.platform.service.awareness.discovery.message.IMessageAwarenessService;
 import jadex.platform.service.message.streams.AbstractConnectionHandler;
 import jadex.platform.service.message.streams.AckInfo;
@@ -305,8 +306,8 @@ public class MessageService extends BasicService implements IMessageService
 		int conid = uuconid.hashCode();
 		OutputConnectionHandler och = new OutputConnectionHandler(this, nonfunc);
 		icons.put(conid, och);
-		OutputConnection con = new OutputConnection(getTransportComponentIdentifier(sender), 
-			getTransportComponentIdentifier(receiver), conid, true, och);
+		OutputConnection con = new OutputConnection(TransportAddressService.getTransportComponentIdentifier(sender, taddresses), 
+			TransportAddressService.getTransportComponentIdentifier(receiver, taddresses), conid, true, och);
 //		System.out.println("created ocon: "+component+", "+System.currentTimeMillis()+", "+och.getConnectionId());
 		return con;
 	}
@@ -328,8 +329,8 @@ public class MessageService extends BasicService implements IMessageService
 		int conid = uuconid.hashCode();
 		InputConnectionHandler ich = new InputConnectionHandler(this, nonfunc);
 		icons.put(conid, ich);
-		InputConnection con = new InputConnection(getTransportComponentIdentifier(sender), 
-			getTransportComponentIdentifier(receiver), conid, true, ich);
+		InputConnection con = new InputConnection(TransportAddressService.getTransportComponentIdentifier(sender, taddresses), 
+			TransportAddressService.getTransportComponentIdentifier(receiver, taddresses), conid, true, ich);
 //		System.out.println("created icon: "+component+", "+System.currentTimeMillis()+", "+ich.getConnectionId());
 		return con;
 	}
@@ -386,7 +387,7 @@ public class MessageService extends BasicService implements IMessageService
 //		System.err.println("send msg2: "+osender+" "+origmsg.get(SFipa.CONTENT));
 		final Map<String, Object> msg = new HashMap<String, Object>(origmsg);
 		
-		final ITransportComponentIdentifier sender = getTransportComponentIdentifier(osender);
+		final ITransportComponentIdentifier sender = TransportAddressService.getTransportComponentIdentifier(osender, taddresses);
 		
 //		final IComponentIdentifier sender = internalUpdateComponentIdentifier(osender);
 //		addrservice.getTransportComponentIdentifier(osender).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Void>(ret)
@@ -584,7 +585,7 @@ public class MessageService extends BasicService implements IMessageService
 				List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
-				return getTransportComponentIdentifier((ITransportComponentIdentifier)object);
+				return TransportAddressService.getTransportComponentIdentifier((ITransportComponentIdentifier)object, taddresses);
 //				return internalUpdateComponentIdentifier((ITransportComponentIdentifier)object);
 			}
 			
@@ -717,7 +718,7 @@ public class MessageService extends BasicService implements IMessageService
 			for(Iterator<?> it = SReflect.getIterator(tmp); it.hasNext(); )
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)it.next();
-				ITransportComponentIdentifier tcid = getTransportComponentIdentifier(cid);
+				ITransportComponentIdentifier tcid = TransportAddressService.getTransportComponentIdentifier(cid, taddresses);
 				SendManager sm = getSendManager(tcid); 
 				managers.add(sm, tcid);
 			}
@@ -725,7 +726,7 @@ public class MessageService extends BasicService implements IMessageService
 		else
 		{
 			IComponentIdentifier cid = (IComponentIdentifier)tmp;
-			ITransportComponentIdentifier tcid = getTransportComponentIdentifier(cid);
+			ITransportComponentIdentifier tcid = TransportAddressService.getTransportComponentIdentifier(cid, taddresses);
 			SendManager sm = getSendManager(tcid); 
 			managers.add(sm, tcid);
 		}
@@ -764,32 +765,6 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		
 //		sendmsg.addMessage(msgcopy, type, receivers, ret);
-	}
-	
-	/**
-	 *  Internal convert method for identifiers.
-	 */
-	protected ITransportComponentIdentifier getTransportComponentIdentifier(IComponentIdentifier cid)
-	{
-		ITransportComponentIdentifier ret = null;
-		
-		if(!taddresses.containsKey(cid.getName()))
-		{
-			if(cid instanceof TransportComponentIdentifier)
-			{
-				ret = (ITransportComponentIdentifier)component;
-			}
-			else
-			{
-				throw new RuntimeException("Not contained: "+cid.getName());
-			}
-		}
-		else
-		{
-			ret = new TransportComponentIdentifier(cid.getName(), taddresses.get(cid.getName()));
-		}
-		
-		return ret;
 	}
 	
 	/**

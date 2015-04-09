@@ -15,6 +15,7 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -22,6 +23,7 @@ import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -105,13 +107,21 @@ public class RemoteServiceManagementAgent
 		STransformation.registerClass(DefaultHashcodeMethodReplacement.class);
 		STransformation.registerClass(GetComponentFeatureMethodReplacement.class);
 		
-		ILibraryService libservice = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		IMarshalService marshalservice = SServiceProvider.getLocalService(agent, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		IMessageService msgservice = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		final ILibraryService libservice = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		final IMarshalService marshalservice = SServiceProvider.getLocalService(agent, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		final IMessageService msgservice = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 //		boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
-		rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice);//, binarymode);
-		agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
-		ret.setResult(null);
+		
+		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<Map<String,String[]>, Void>(ret)
+		{
+			public void customResultAvailable(Map<String, String[]> addresses)
+			{
+				rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice, addresses);//, binarymode);
+				agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+				ret.setResult(null);
+			}
+		});
 		
 		return ret;
 	}

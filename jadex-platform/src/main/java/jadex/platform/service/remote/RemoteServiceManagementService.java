@@ -18,6 +18,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -167,13 +168,16 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The rms identifier. */
 //	protected ITransportComponentIdentifier rms;
 	
+	/** The transport addresses. */
+	protected Map<String, String[]> addresses;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new remote service management service.
 	 */
 	public RemoteServiceManagementService(IExternalAccess component, 
-		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice)//, boolean binarymode)
+		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice, Map<String, String[]> addresses)//, boolean binarymode)
 	{
 		super(component.getComponentIdentifier(), IRemoteServiceManagementService.class, null);
 
@@ -187,6 +191,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.timer	= new Timer(true);
 		this.marshal = marshal;
 		this.msgservice = msgservice;
+		this.addresses = addresses;
 		
 		((MessageService)msgservice).setContentCodecInfo(component.getComponentIdentifier(), getCodecInfo());
 	}
@@ -1779,7 +1784,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		return ret;
 	}
-	
-	
+
+	/**
+	 *  Get the addresses.
+	 *  @return The addresses
+	 */
+	public Map<String, String[]> getAddresses()
+	{
+		return addresses;
+	}
 }
 

@@ -145,4 +145,30 @@ public class TransportAddressService implements ITransportAddressService
 	{
 		return new Future<Map<String, String[]>>(Collections.unmodifiableMap(addresses));
 	}
+	
+	/**
+	 *  Internal convert method for identifiers.
+	 */
+	public static ITransportComponentIdentifier getTransportComponentIdentifier(IComponentIdentifier cid, Map<String, String[]> addresses)
+	{
+		ITransportComponentIdentifier ret = null;
+		
+		if(!addresses.containsKey(cid.getName()))
+		{
+			if(cid instanceof TransportComponentIdentifier)
+			{
+				ret = (ITransportComponentIdentifier)cid;
+			}
+			else
+			{
+				throw new RuntimeException("Not contained: "+cid.getName());
+			}
+		}
+		else
+		{
+			ret = new TransportComponentIdentifier(cid.getName(), addresses.get(cid.getName()));
+		}
+		
+		return ret;
+	}
 }

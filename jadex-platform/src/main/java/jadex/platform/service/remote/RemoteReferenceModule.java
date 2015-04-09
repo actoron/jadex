@@ -34,6 +34,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.SJavaParser;
+import jadex.platform.service.address.TransportAddressService;
 import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
@@ -636,7 +637,7 @@ public class RemoteReferenceModule
 					}
 					else 
 					{
-						ret = new RemoteReference(rsms.getRMSComponentIdentifier(), bsh.getServiceIdentifier());
+						ret = new RemoteReference(TransportAddressService.getTransportComponentIdentifier(rsms.getRMSComponentIdentifier(), rsms.getAddresses()), bsh.getServiceIdentifier());
 					}
 				}
 				else if(handler instanceof RemoteMethodInvocationHandler)
@@ -647,12 +648,12 @@ public class RemoteReferenceModule
 			}
 			else if(target instanceof IExternalAccess)
 			{
-				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
+				ret = new RemoteReference(TransportAddressService.getTransportComponentIdentifier(rsms.getRMSComponentIdentifier(), rsms.getAddresses()), ((IExternalAccess)target).getComponentIdentifier());
 //				System.out.println("component ref: "+ret);
 			}
 			else if(target instanceof IService)
 			{
-				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IService)target).getServiceIdentifier());
+				ret = new RemoteReference(TransportAddressService.getTransportComponentIdentifier(rsms.getRMSComponentIdentifier(), rsms.getAddresses()), ((IService)target).getServiceIdentifier());
 //				System.out.println("service ref: "+ret);
 			}
 			else if(target instanceof ServiceInfo)
@@ -664,7 +665,7 @@ public class RemoteReferenceModule
 				}
 				else
 				{
-					ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((ServiceInfo)target).getManagementService().getServiceIdentifier());
+					ret = new RemoteReference(TransportAddressService.getTransportComponentIdentifier(rsms.getRMSComponentIdentifier(), rsms.getAddresses()), ((ServiceInfo)target).getManagementService().getServiceIdentifier());
 	//				System.out.println("service ref: "+ret);
 				}
 			}
@@ -835,7 +836,7 @@ public class RemoteReferenceModule
 	protected RemoteReference generateRemoteReference()
 	{
 		checkThread();
-		return new RemoteReference(rsms.getRMSComponentIdentifier(), ""+idcnt++);
+		return new RemoteReference(TransportAddressService.getTransportComponentIdentifier(rsms.getRMSComponentIdentifier(), rsms.getAddresses()), ""+idcnt++);
 	}
 	
 	//-------- management of proxies --------
