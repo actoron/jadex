@@ -2,9 +2,12 @@ package jadex.platform.service.security;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.TransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.security.ParameterInfo;
@@ -135,23 +138,27 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 		else if(ttpcid!=null)
 		{
 			// real cid with addresses?
-			if(ttpcid.getAddresses()!=null && ttpcid.getAddresses().length>0)
+			if(ttpcid instanceof ITransportComponentIdentifier)
 			{
-				SServiceProvider.getService(getSecurityService().getComponent(), ttpcid, ISecurityService.class)
-					.addResultListener(new DelegationResultListener<ISecurityService>(ret)
+				ITransportComponentIdentifier tttpcid = (ITransportComponentIdentifier)ttpcid;
+				if(tttpcid.getAddresses()!=null && tttpcid.getAddresses().length>0)
 				{
-					public void customResultAvailable(final ISecurityService ss)
+					SServiceProvider.getService(getSecurityService().getComponent(), ttpcid, ISecurityService.class)
+						.addResultListener(new DelegationResultListener<ISecurityService>(ret)
 					{
-						verifyTTP(ss).addResultListener(new ExceptionDelegationResultListener<Void, ISecurityService>(ret)
+						public void customResultAvailable(final ISecurityService ss)
 						{
-							public void customResultAvailable(Void result)
+							verifyTTP(ss).addResultListener(new ExceptionDelegationResultListener<Void, ISecurityService>(ret)
 							{
-								ttpsecser	= ss;
-								ret.setResult(ss);
-							}
-						});
-					}
-				});
+								public void customResultAvailable(Void result)
+								{
+									ttpsecser	= ss;
+									ret.setResult(ss);
+								}
+							});
+						}
+					});
+				}
 			}
 			// or just a name? Then find the ttp security service by searching (and comparing names)
 			else
@@ -266,7 +273,13 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	public void setTTPCid(IComponentIdentifier ttpcid)
 	{
 		if(ttpcid!=null)
-			ttpcid = new ComponentIdentifier(ttpcid.getPlatformPrefix(), ttpcid.getAddresses());
+		{
+			if(ttpcid instanceof ITransportComponentIdentifier)
+			{
+				ITransportComponentIdentifier tttpcid = (ITransportComponentIdentifier)ttpcid;
+				ttpcid = new TransportComponentIdentifier(tttpcid.getPlatformPrefix(), tttpcid.getAddresses());
+			}
+		}
 		this.ttpcid = ttpcid;
 		
 		getSecurityService().publishEvent(new ChangeEvent<Object>(getClass(), ISecurityService.PROPERTY_MECHANISMPARAMETER, 
