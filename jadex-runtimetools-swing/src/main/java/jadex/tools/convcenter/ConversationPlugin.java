@@ -110,7 +110,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					final IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					final IComponentIdentifier rec = node.getDescription().getName();
 					// Use clone, as added component id might be modified by user.
-					IComponentIdentifier receiver = new ComponentIdentifier(rec.getName(), rec.getAddresses());
+					IComponentIdentifier receiver = new ComponentIdentifier(rec.getName());
 					Map	message	= convcenter.getMessagePanel().getMessage();
 					MessageType	mt	= (MessageType)message.get(ConversationPanel.MESSAGE_TYPE);
 					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(mt.getReceiverIdentifier());

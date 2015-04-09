@@ -26,17 +26,23 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 		if(cid!=null)
 		{
 			setText(cid.getName());
-			String[] addresses = cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
-			String tooltip = "<b>" + cid.getName() + "</b>";
-			if(addresses!=null)
-			{
-				for(int i = 0; i < addresses.length; i++)
-				{
-					tooltip += "<br>" + addresses[i];
-				}
-			}
-			setToolTipText("<html>" + tooltip + "</html>");
+			setToolTipText(getTooltipText(cid));
 		}
 		return this;
+	}
+
+	public static String getTooltipText(IComponentIdentifier cid)
+	{
+		String[] addresses = cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
+		String tooltip = "<b>" + cid.getName() + "</b>";
+		if(addresses!=null)
+		{
+			for(int i=0; i<addresses.length; i++)
+			{
+				tooltip += "<br>" + addresses[i];
+			}
+		}
+		tooltip	= "<html>" + tooltip + "</html>";
+		return tooltip;
 	}
 }

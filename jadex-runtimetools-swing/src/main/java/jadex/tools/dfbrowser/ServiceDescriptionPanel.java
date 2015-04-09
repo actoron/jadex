@@ -1,6 +1,6 @@
 package jadex.tools.dfbrowser;
 
-import jadex.bridge.IComponentIdentifier;
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.bridge.service.types.df.IProperty;
@@ -90,11 +90,7 @@ public class ServiceDescriptionPanel extends JPanel
 		
 		if(ad!=null)
 		{
-			String[] addrs = ((IComponentIdentifier)ad.getName()).getAddresses(); // Hack!!!
-			String tooltip = "<html>" + ad.getName().getName();
-			for(int addr = 0; addr < addrs.length; addr++)
-				tooltip += "<br>" + addrs[addr];
-			component.setToolTipText(tooltip);
+			component.setToolTipText(ComponentIdentifierRenderer.getTooltipText(ad.getName()));
 		}
 		
 		update(onto, sd==null? new String[0]: sd.getOntologies());

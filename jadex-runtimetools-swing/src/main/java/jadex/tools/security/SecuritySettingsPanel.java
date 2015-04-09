@@ -4,6 +4,7 @@ import jadex.base.gui.PlatformSelectorDialog;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.idtree.IdTableModel;
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -509,15 +510,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 									if(cid[0]!=null)
 									{
 										tfentry.setText(cid[0].getPlatformPrefix());
-										StringBuffer buf = new StringBuffer();
-										String adrs[] = cid[0].getAddresses();
-										for(int i=0; i<adrs.length; i++)
-										{
-											buf.append(adrs[i]);
-											if(i+1<adrs.length)
-												buf.append(SUtil.LF);
-										}
-										tfentry.setToolTipText(buf.toString());
+										tfentry.setToolTipText(ComponentIdentifierRenderer.getTooltipText(cid[0]));
 									}
 								}
 							});

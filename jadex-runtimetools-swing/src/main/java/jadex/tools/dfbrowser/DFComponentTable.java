@@ -1,5 +1,6 @@
 package jadex.tools.dfbrowser;
 
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;

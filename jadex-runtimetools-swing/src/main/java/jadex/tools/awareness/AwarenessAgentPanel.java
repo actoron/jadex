@@ -5,21 +5,27 @@ import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
+import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.DateTimeRenderer;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.awareness.management.AwarenessManagementAgentHelper;
 import jadex.platform.service.awareness.management.AwarenessSettingsData;
+import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -59,7 +65,6 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -177,47 +182,72 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				map.setText("Loading map. Please wait...");
 				map.repaint();
 				panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-				
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						boolean	done	= false;
-						for(String adr: component.getComponentIdentifier().getAddresses())
-						{
-							if(adr.startsWith("relay-http"))
-							{
-								adr	= adr.substring(6) + (adr.endsWith("/") ? "" : "/") + "map?width="+map.getWidth()+"&height="+map.getHeight();
-//								System.out.println("adr: "+adr);
-								try
-								{
-									map.setIcon(new ImageIcon(new URL(adr)));
-									map.setText(null);
-									map.repaint();
-									done	= true;
-									break;
-								}
-								catch(Exception ex)
-								{
-//									ex.printStackTrace();
-									map.setIcon(null);
-									map.setText("Error while loading map: "+ex.toString());
-									map.repaint();
-									done	= true;
-									break;
-								}
-							}
-						}
-						
-						if(!done)
-						{
-							map.setText("Could not load map.");
-							map.repaint();					
-						}
 
+				SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new SwingResultListener<IMessageService>(new IResultListener<IMessageService>()
+				{
+					public void resultAvailable(IMessageService ms)
+					{
+						ms.getAddresses().addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
+						{
+							public void resultAvailable(String[] addresses)
+							{
+								boolean	done	= false;
+								for(String adr: addresses)
+								{
+									if(adr.startsWith("relay-http"))
+									{
+										adr	= RelayConnectionManager.httpAddress(adr) + "map?width="+map.getWidth()+"&height="+map.getHeight();
+		//								System.out.println("adr: "+adr);
+										try
+										{
+											map.setIcon(new ImageIcon(new URL(adr)));
+											map.setText(null);
+											map.repaint();
+											done	= true;
+											break;
+										}
+										catch(Exception ex)
+										{
+		//									ex.printStackTrace();
+											map.setIcon(null);
+											map.setText("Error while loading map: "+ex.toString());
+											map.repaint();
+											done	= true;
+											break;
+										}
+									}
+								}
+								
+								if(!done)
+								{
+									map.setText("Could not load map.");
+									map.repaint();					
+								}
+		
+								panel.setCursor(Cursor.getDefaultCursor());
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								map.setIcon(null);
+								map.setText("Error while loading map: "+exception.toString());
+								map.repaint();
+								
+								panel.setCursor(Cursor.getDefaultCursor());
+							}
+						}));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						map.setIcon(null);
+						map.setText("Error while loading map: "+exception.toString());
+						map.repaint();
+						
 						panel.setCursor(Cursor.getDefaultCursor());
 					}
-				});
+				}));
 			}
 		});
 		
@@ -874,7 +904,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			DiscoveryInfo dif = (DiscoveryInfo)list.get(row);
 			final boolean	create	= ((Boolean)val).booleanValue();
-			final IComponentIdentifier	cid	= dif.getComponentIdentifier();
+			final ITransportComponentIdentifier	cid	= dif.getComponentIdentifier();
 			final IComponentIdentifier	proxy	=  dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null ? dif.getProxy().get() : null;
 			if(create && dif.getProxy()==null || !create && proxy!=null)
 			{

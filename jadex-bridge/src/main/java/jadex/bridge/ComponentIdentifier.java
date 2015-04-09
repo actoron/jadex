@@ -120,6 +120,10 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public void	setName(String name)
 	{
+		if(name==null)
+		{
+			throw new NullPointerException();
+		}
 		this.name = name;
 	}
 	
