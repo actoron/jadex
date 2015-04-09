@@ -69,7 +69,7 @@ public class ComponentIdentifierPanel extends JPanel
 	public ComponentIdentifierPanel(IComponentIdentifier cid, final IExternalAccess access)
 	{
 		this.access = access;
-		this.cid	= cid!=null? new TransportComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new TransportComponentIdentifier(); 
+		this.cid	= cid!=null? new TransportComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new TransportComponentIdentifier(""); 
 		this.editable	= true;
 
 		// Initialize component.
