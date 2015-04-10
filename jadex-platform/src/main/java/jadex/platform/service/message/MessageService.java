@@ -1552,6 +1552,7 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			logger.warning("Message could not be delivered to receivers: "+(me!=null ? me.getReceivers() : "unknown") +", "+e);
 		}
 	}

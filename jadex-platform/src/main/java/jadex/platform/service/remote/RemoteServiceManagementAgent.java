@@ -176,7 +176,6 @@ public class RemoteServiceManagementAgent
 			Map rep = mt.createReply(msg);
 			rep.put(SFipa.CONTENT, "alive");
 			rep.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-			rep.put(SFipa.SENDER, agent.getComponentIdentifier());
 			agent.getComponentFeature(IMessageFeature.class).sendMessage(rep, mt);
 			return;
 		}
