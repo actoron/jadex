@@ -457,8 +457,8 @@ public class MessageService extends BasicService implements IMessageService
 				
 				// Automatically add optional meta information.
 				String senid = type.getSenderIdentifier();
-				if(msg.get(senid)==null)
-					msg.put(senid, sender);
+//				if(msg.get(senid)==null)
+				msg.put(senid, sender);
 				
 				final String idid = type.getIdIdentifier();
 				if(msg.get(idid)==null)
