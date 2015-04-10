@@ -6,7 +6,7 @@ import jadex.bdi.model.OAVCapabilityModel;
 import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -129,7 +129,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	// Constructor used by ADF Checker. (hack?)
 	public BDIAgentFactory(String dummy)
 	{
-		super(new ComponentIdentifier(dummy), IComponentFactory.class, null);
+		super(new BasicComponentIdentifier(dummy), IComponentFactory.class, null);
 		myprops = SUtil.createHashMap(
 			new String[]
 			{
@@ -142,7 +142,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 				"dummy"
 			}
 		);
-		this.root	= new ComponentIdentifier(dummy);
+		this.root	= new BasicComponentIdentifier(dummy);
 //		loader	= new OAVBDIModelLoader(getPropertyMap(), root);
 		loader	= new OAVBDIModelLoader(myprops, root);
 		

@@ -2,7 +2,7 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -204,7 +204,7 @@ public class StartPeerPlan extends Plan
 //		lis.waitForResult();
 		
 //		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
-		IComponentIdentifier aid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
+		IComponentIdentifier aid = new BasicComponentIdentifier(name, getComponentIdentifier().getRoot());
 		IFuture ret = ces.destroyComponent(aid);
 		ret.get(this);
 	}
@@ -219,7 +219,7 @@ public class StartPeerPlan extends Plan
 		final IComponentManagementService ces = (IComponentManagementService)getScope()
 			.getServiceContainer().getRequiredService("cms").get(this);
 //		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
-		IComponentIdentifier aid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
+		IComponentIdentifier aid = new BasicComponentIdentifier(name, getComponentIdentifier().getRoot());
 		IGoal sp = createGoal("cms_destroy_component");
 		sp.getParameter("componentidentifier").setValue(aid);
 		dispatchSubgoalAndWait(sp);

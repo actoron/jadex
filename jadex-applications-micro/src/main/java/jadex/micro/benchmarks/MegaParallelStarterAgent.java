@@ -1,6 +1,6 @@
 package jadex.micro.benchmarks;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
@@ -174,7 +174,7 @@ public class MegaParallelStarterAgent
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 //				IComponentIdentifier aid = cms.createComponentIdentifier(name, getComponentIdentifier(), null);
-				IComponentIdentifier aid = new ComponentIdentifier(name, agent.getComponentIdentifier());
+				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getComponentIdentifier());
 				IResultListener lis = new IResultListener()
 				{
 					public void resultAvailable(Object result)

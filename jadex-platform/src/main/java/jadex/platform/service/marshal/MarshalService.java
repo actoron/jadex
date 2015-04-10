@@ -1,6 +1,6 @@
 package jadex.platform.service.marshal;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
@@ -72,7 +72,7 @@ public class MarshalService extends BasicService implements IMarshalService
 		refs.put(Inet4Address.class, tf);
 		refs.put(Inet6Address.class, tf);
 		refs.put(IComponentIdentifier.class, tf);
-		refs.put(ComponentIdentifier.class, tf);
+		refs.put(BasicComponentIdentifier.class, tf);
 		Class<?>	ti	= SReflect.classForName0("jadex.xml.TypeInfo", MarshalService.class.getClassLoader());
 		if(ti!=null)
 		{

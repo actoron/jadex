@@ -6,7 +6,7 @@ import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.idtree.IdTableModel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
@@ -462,7 +462,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 									{
 										final String name = tfentry.getText();
 										FileInputStream fis = new FileInputStream(fname);
-										secservice.addPlatformCertificate(new ComponentIdentifier(name), SSecurity.createCertificate(fis))
+										secservice.addPlatformCertificate(new BasicComponentIdentifier(name), SSecurity.createCertificate(fis))
 											.addResultListener(new IResultListener<Void>()
 										{
 											public void resultAvailable(Void result)
@@ -612,7 +612,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 							 	    
 							 	    Certificate cert = SSecurity.generateCertificate(dn, keys, dur, alg);
 
-									secservice.addPlatformCertificate(new ComponentIdentifier(name), cert)
+									secservice.addPlatformCertificate(new BasicComponentIdentifier(name), cert)
 										.addResultListener(new IResultListener<Void>()
 									{
 										public void resultAvailable(Void result)
@@ -675,7 +675,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 									final String pass = tfalg.getText();
 									final int val = Integer.parseInt(tfval.getText());
 									
-									secservice.createKeyPair(new ComponentIdentifier(name), alg, size, pass.length()>0? pass: null, val)
+									secservice.createKeyPair(new BasicComponentIdentifier(name), alg, size, pass.length()>0? pass: null, val)
 										.addResultListener(new IResultListener<Void>()
 									{
 										public void resultAvailable(Void result)
@@ -799,7 +799,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			public void execute(Object args)
 			{
 				String[] tmp = (String[])args;
-				secservice.setPlatformPassword(new ComponentIdentifier(tmp[0]), tmp[1]).addResultListener(new JCCResultListener<Void>(jcc)
+				secservice.setPlatformPassword(new BasicComponentIdentifier(tmp[0]), tmp[1]).addResultListener(new JCCResultListener<Void>(jcc)
 				{
 					public void customResultAvailable(Void result)
 					{

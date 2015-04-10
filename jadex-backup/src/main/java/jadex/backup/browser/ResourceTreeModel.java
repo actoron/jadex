@@ -10,7 +10,6 @@ import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -167,7 +166,7 @@ public class ResourceTreeModel	implements TreeModel
 				try
 				{
 					// Hack!!! Block swing thread until results are available
-					fut.get(new ThreadSuspendable(), 3000);
+					fut.get(3000);
 				}
 				catch(TimeoutException e)
 				{
@@ -191,7 +190,7 @@ public class ResourceTreeModel	implements TreeModel
 					// Hack!!! Block swing thread until results are available
 					if(fi.getData().isDirectory())
 					{
-						Collection<FileMetaInfo>	list	= remote.getDirectoryContents(fi).get(new ThreadSuspendable(), 3000);
+						Collection<FileMetaInfo>	list	= remote.getDirectoryContents(fi).get(3000);
 						for(FileMetaInfo tmp : list)
 						{
 							if(tmp.isExisting())

@@ -1,10 +1,10 @@
 package jadex.base.gui;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.TransportComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -69,7 +69,7 @@ public class ComponentIdentifierPanel extends JPanel
 	public ComponentIdentifierPanel(IComponentIdentifier cid, final IExternalAccess access)
 	{
 		this.access = access;
-		this.cid	= cid!=null? new TransportComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new TransportComponentIdentifier(""); 
+		this.cid	= cid!=null? new ComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new ComponentIdentifier(""); 
 		this.editable	= true;
 
 		// Initialize component.
@@ -90,7 +90,7 @@ public class ComponentIdentifierPanel extends JPanel
 		{
 			public void tableChanged(TableModelEvent e)
 			{
-				ComponentIdentifierPanel.this.cid = new TransportComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), taddresses.getEntries());
+				ComponentIdentifierPanel.this.cid = new ComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), taddresses.getEntries());
 				cidChanged();
 			}
 		});
@@ -176,7 +176,7 @@ public class ComponentIdentifierPanel extends JPanel
 	 */
 	public void setComponentIdentifier(IComponentIdentifier cid)
 	{
-		this.cid	= cid!=null? new TransportComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new TransportComponentIdentifier();
+		this.cid	= cid!=null? new ComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new ComponentIdentifier();
 		refresh();
 	}
 
@@ -237,7 +237,7 @@ public class ComponentIdentifierPanel extends JPanel
 		protected void	update()
 		{
 			nameediting	= true;
-			ComponentIdentifierPanel.this.cid	= new TransportComponentIdentifier(tfname.getText(), ComponentIdentifierPanel.this.cid.getAddresses());
+			ComponentIdentifierPanel.this.cid	= new ComponentIdentifier(tfname.getText(), ComponentIdentifierPanel.this.cid.getAddresses());
 			cidChanged();
 			nameediting	= false;
 		}

@@ -1,6 +1,6 @@
 package jadex.webservice.examples.rs.hello;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.extension.rs.publish.JadexXMLBodyReader;
 import jadex.xml.bean.JavaWriter;
@@ -21,7 +21,7 @@ public class Hello extends BasicService
 {
 	public Hello() 
 	{
-		super(new ComponentIdentifier(), IHelloService.class, null);
+		super(new BasicComponentIdentifier(), IHelloService.class, null);
 	}
 	
 	@Context 

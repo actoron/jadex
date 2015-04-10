@@ -1,7 +1,7 @@
 package jadex.bridge.service.types.cms;
 
 import jadex.bridge.Cause;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -558,7 +558,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		{
 			CMSComponentDescription ret = (CMSComponentDescription)super.clone();
 			if(name!=null)
-				ret.setName((ComponentIdentifier)((ComponentIdentifier)name).clone());
+				ret.setName((BasicComponentIdentifier)((BasicComponentIdentifier)name).clone());
 			
 			// Do not clone -> only used internally
 //			if(children!=null)

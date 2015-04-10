@@ -1,6 +1,6 @@
 package jadex.android.applications.demos.benchmark;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -154,7 +154,7 @@ public class PojoAgentCreationAgent
 						public void resultAvailable(IComponentManagementService cms)
 						{
 							String	initial	= createPeerName(1, agent.getComponentIdentifier());
-							IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
+							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
 							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess exta)
@@ -217,7 +217,7 @@ public class PojoAgentCreationAgent
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
-				IComponentIdentifier aid = new ComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
+				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
 				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)

@@ -1,9 +1,9 @@
 package jadex.platform.service.security;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.TransportComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -62,7 +62,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	 */
 	public TTPAcquisitionMechanism(String ttpname)
 	{
-		this.ttpcid = ttpname==null? null: new ComponentIdentifier(ttpname);
+		this.ttpcid = ttpname==null? null: new BasicComponentIdentifier(ttpname);
 		this.verify = true;
 		this.rnd	= new Random();
 //		setTTPCid(new ComponentIdentifier(ttpname));
@@ -77,7 +77,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	public IFuture<Certificate> acquireCertificate(final String name)
 	{
 		final Future<Certificate> ret = new Future<Certificate>();
-		final IComponentIdentifier cid = new ComponentIdentifier(name);
+		final IComponentIdentifier cid = new BasicComponentIdentifier(name);
 
 		getTTPSecurityService().addResultListener(new ExceptionDelegationResultListener<ISecurityService, Certificate>(ret)
 		{
@@ -277,7 +277,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 			if(ttpcid instanceof ITransportComponentIdentifier)
 			{
 				ITransportComponentIdentifier tttpcid = (ITransportComponentIdentifier)ttpcid;
-				ttpcid = new TransportComponentIdentifier(tttpcid.getPlatformPrefix(), tttpcid.getAddresses());
+				ttpcid = new ComponentIdentifier(tttpcid.getPlatformPrefix(), tttpcid.getAddresses());
 			}
 		}
 		this.ttpcid = ttpcid;
@@ -320,7 +320,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 //		System.out.println("setProps");
 		if(props.getProperty("ttpcid")!=null)
 		{
-			IComponentIdentifier cid = props.getProperty("ttpcid").getValue()!=null? new ComponentIdentifier(props.getProperty("ttpcid").getValue()): null;
+			IComponentIdentifier cid = props.getProperty("ttpcid").getValue()!=null? new BasicComponentIdentifier(props.getProperty("ttpcid").getValue()): null;
 			setTTPCid(cid);
 //			setTTPCid((IComponentIdentifier)JavaReader.objectFromXML(props.getProperty("responses").getValue(), null);
 		}

@@ -1,6 +1,6 @@
 package jadex.micro.benchmarks;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -118,7 +118,7 @@ public class BlockingAgentCreationAgent
 			// Use initial component to kill others
 			IComponentManagementService cms	= getCMS(agent);
 			String	initial	= createPeerName(1, agent.getComponentIdentifier());
-			IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
+			IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
 			IExternalAccess exta	= cms.getExternalAccess(cid).get();
 			exta.scheduleStep(new IComponentStep<Void>()
 			{
@@ -131,7 +131,7 @@ public class BlockingAgentCreationAgent
 					for(int i=max; i>1; i--)
 					{
 						String name = createPeerName(i, ia.getComponentIdentifier());
-						IComponentIdentifier cid = new ComponentIdentifier(name, ia.getComponentIdentifier().getRoot());
+						IComponentIdentifier cid = new BasicComponentIdentifier(name, ia.getComponentIdentifier().getRoot());
 						cms.destroyComponent(cid).get();
 						System.out.println("Successfully destroyed peer: "+name);
 					}

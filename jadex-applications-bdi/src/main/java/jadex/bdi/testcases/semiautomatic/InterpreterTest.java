@@ -3,7 +3,7 @@ package jadex.bdi.testcases.semiautomatic;
 import jadex.bdi.OAVBDIModelLoader;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInterpreter;
 import jadex.bridge.IExternalAccess;
@@ -159,7 +159,7 @@ class ComponentAdapter implements IComponentAdapter
 
 	public IComponentIdentifier getComponentIdentifier()
 	{
-		return new ComponentIdentifier("nonname@noname");
+		return new BasicComponentIdentifier("nonname@noname");
 	}
 	
 	public boolean isExternalThread()

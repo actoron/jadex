@@ -15,7 +15,7 @@ import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceTerminatedException;
-import jadex.bridge.TransportComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.impl.IInternalMessageFeature;
@@ -745,7 +745,7 @@ public class MessageService extends BasicService implements IMessageService
 		for(Iterator<?> it=managers.keySet().iterator(); it.hasNext();)
 		{
 			final SendManager tm = (SendManager)it.next();
-			ITransportComponentIdentifier[] recs = (ITransportComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
+			ITransportComponentIdentifier[] recs = (ITransportComponentIdentifier[])managers.getCollection(tm).toArray(new ITransportComponentIdentifier[0]);
 			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl, enccontext);
 			tm.addMessage(task).addResultListener(crl);
 			
@@ -1166,7 +1166,7 @@ public class MessageService extends BasicService implements IMessageService
 															{
 																taddresses = result;
 																
-																tas.addPlatformAddresses(new TransportComponentIdentifier(component.getComponentIdentifier().getRoot().getName(), internalGetAddresses()))
+																tas.addPlatformAddresses(new ComponentIdentifier(component.getComponentIdentifier().getRoot().getName(), internalGetAddresses()))
 																	.addResultListener(new DelegationResultListener<Void>(ret)
 																{
 																	public void customResultAvailable(Void result) 

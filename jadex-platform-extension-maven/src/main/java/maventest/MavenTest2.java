@@ -1,6 +1,6 @@
 package maventest;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
@@ -30,7 +30,7 @@ public class MavenTest2
 			"net.sourceforge.jadex:jadex-applications-bdi:2.0"
 		};
 		
-		MavenDependencyResolverService	mh	= new MavenDependencyResolverService(new ComponentIdentifier("dummy"));
+		MavenDependencyResolverService	mh	= new MavenDependencyResolverService(new BasicComponentIdentifier("dummy"));
 		
 		for(int i=0; i<files.length; i++)
 		{

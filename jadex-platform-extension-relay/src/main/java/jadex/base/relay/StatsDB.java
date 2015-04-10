@@ -1,6 +1,6 @@
 package jadex.base.relay;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 
 import java.io.File;
 import java.sql.Connection;
@@ -163,7 +163,7 @@ public class StatsDB
 				int	param	= 1;
 				String	name	= "and_"+rs.getString("PLATFORM").substring(4);
 				update.setString(param++, name);
-				update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+				update.setString(param++, BasicComponentIdentifier.getPlatformPrefix(name));
 				update.setInt(param++, rs.getInt("ID"));
 				update.executeUpdate();
 			}
@@ -254,7 +254,7 @@ public class StatsDB
 				int	param	= 1;
 				String	name	= "and_"+rs.getString("PLATFORM").substring(4);
 				update.setString(param++, name);
-				update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+				update.setString(param++, BasicComponentIdentifier.getPlatformPrefix(name));
 				update.setInt(param++, rs.getInt("ID"));
 				update.executeUpdate();
 			}
@@ -341,7 +341,7 @@ public class StatsDB
 					insert.setInt(param++, pi.getMessageCount());
 					insert.setDouble(param++, pi.getBytes());
 					insert.setDouble(param++, pi.getTransferTime());
-					insert.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+					insert.setString(param++, BasicComponentIdentifier.getPlatformPrefix(name));
 					insert.executeUpdate();
 					ResultSet	keys	= insert.getGeneratedKeys();
 					keys.next();
@@ -367,7 +367,7 @@ public class StatsDB
 					update.setInt(param++, pi.getMessageCount());
 					update.setDouble(param++, pi.getBytes());
 					update.setDouble(param++, pi.getTransferTime());
-					update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+					update.setString(param++, BasicComponentIdentifier.getPlatformPrefix(name));
 					update.setInt(param++, pi.getDBId().intValue());
 					update.setString(param++, peerid);
 					int	cnt	= update.executeUpdate();
@@ -394,7 +394,7 @@ public class StatsDB
 						insert2.setInt(param++, pi.getMessageCount());
 						insert2.setDouble(param++, pi.getBytes());
 						insert2.setDouble(param++, pi.getTransferTime());
-						insert2.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+						insert2.setString(param++, BasicComponentIdentifier.getPlatformPrefix(name));
 						insert2.executeUpdate();
 					}
 				}

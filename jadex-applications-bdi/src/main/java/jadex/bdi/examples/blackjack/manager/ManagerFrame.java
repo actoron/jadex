@@ -10,7 +10,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -146,7 +146,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					public void resultAvailable(final IComponentManagementService ces)
 					{
 //						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
-						dealeraid = new ComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent());
+						dealeraid = new BasicComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent());
 						dealertf.setText(dealeraid.getName());
 					}
 					public void exceptionOccurred(Exception exception)
@@ -174,7 +174,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 							{
 								final IComponentManagementService ces = (IComponentManagementService)result;
 //								dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
-								dealeraid = new ComponentIdentifier(dealertf.getText());
+								dealeraid = new BasicComponentIdentifier(dealertf.getText());
 							}
 						});
 						return IFuture.DONE;

@@ -3,7 +3,7 @@ package jadex.platform.service.cms;
 import jadex.base.Starter;
 import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.FactoryFilter;
@@ -490,7 +490,7 @@ public class ComponentManagementService implements IComponentManagementService
 																{
 																	// Create id and adapter.
 																	
-																	final ComponentIdentifier cid;
+																	final BasicComponentIdentifier cid;
 																	
 																	// check if system component is located in system tree
 																	Map<String, Object> props = lmodel.getProperties();
@@ -594,7 +594,7 @@ public class ComponentManagementService implements IComponentManagementService
 
 																	String paname = pacid.getName().replace('@', '.');
 																	
-																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
+																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
 																	access.getServiceRegistry().addExcludedComponent(cid);
@@ -2687,11 +2687,11 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IComponentIdentifier generateComponentIdentifier(String localname, String platformname)
 	{
-		ComponentIdentifier ret = null;
+		BasicComponentIdentifier ret = null;
 
 		if(platformname==null)
 			platformname = agent.getComponentIdentifier().getName();
-		ret = new ComponentIdentifier(localname+"@"+platformname);
+		ret = new BasicComponentIdentifier(localname+"@"+platformname);
 		
 		if(uniqueids || components.containsKey(ret) || initinfos.containsKey(ret))
 		{
@@ -2703,12 +2703,12 @@ public class ComponentManagementService implements IComponentManagementService
 				if(cnt==null)
 				{
 					cidcounts.put(key, Integer.valueOf(1));
-					ret = new ComponentIdentifier(localname+"@"+platformname);
+					ret = new BasicComponentIdentifier(localname+"@"+platformname);
 				}
 				else
 				{
 					cidcounts.put(key, Integer.valueOf(cnt.intValue()+1));
-					ret = new ComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
+					ret = new BasicComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
 				}
 			}
 			while(components.containsKey(ret) || initinfos.containsKey(ret) || cfs.containsKey(ret));

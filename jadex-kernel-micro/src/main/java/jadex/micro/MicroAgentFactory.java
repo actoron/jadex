@@ -1,6 +1,6 @@
 package jadex.micro;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -127,7 +127,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public MicroAgentFactory(String providerid)
 	{
-		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroModelLoader();
 		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}

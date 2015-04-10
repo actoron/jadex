@@ -5,7 +5,7 @@ import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
 import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
 import jadex.bdiv3.features.impl.BDIMonitoringComponentFeature;
 import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -132,7 +132,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public BDIAgentFactory(String providerid)
 	{
-		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new BDIModelLoader();
 	}
 	

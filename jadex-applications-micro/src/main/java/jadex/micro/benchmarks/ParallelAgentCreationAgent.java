@@ -1,6 +1,6 @@
 package jadex.micro.benchmarks;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -94,7 +94,7 @@ public class ParallelAgentCreationAgent
 											{
 												String name = createPeerName(i);
 //												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
-												final IComponentIdentifier cid = new ComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
+												final IComponentIdentifier cid = new BasicComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
 												cms.destroyComponent(cid).addResultListener(new IResultListener<Map<String, Object>>()
 												{
 													public void resultAvailable(Map<String, Object> result)

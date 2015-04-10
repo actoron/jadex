@@ -1,6 +1,6 @@
 package jadex.extension.envsupport.environment;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -463,10 +463,10 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //						(ia.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
 					if(owner.indexOf("@")!=-1)
 //						ownerid	= ces.createComponentIdentifier((String)owner, false);
-						ownerid	= new ComponentIdentifier((String)owner);
+						ownerid	= new BasicComponentIdentifier((String)owner);
 					else
 //						ownerid	= ces.createComponentIdentifier((String)owner, true);
-						ownerid	= new ComponentIdentifier((String)owner, ia.getComponentIdentifier());
+						ownerid	= new BasicComponentIdentifier((String)owner, ia.getComponentIdentifier());
 					
 					Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
 					this.addInitialAvatar(ownerid, (String)MEnvSpaceType.getProperty(mobj, "type"), props);
@@ -1712,7 +1712,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									// SUtil.createUniqueId(compotype, 3) might lead to conflicts due to race conditions. Use object id as it is really unique.
 //									IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
 									// todo: can fail?
-									IComponentIdentifier cid = new ComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier());
+									IComponentIdentifier cid = new BasicComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier());
 //									IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");
 									// Hack!!! Should have actual description and not just name and local type!?
 									CMSComponentDescription desc = new CMSComponentDescription();

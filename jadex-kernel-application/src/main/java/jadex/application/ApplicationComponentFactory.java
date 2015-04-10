@@ -1,6 +1,6 @@
 package jadex.application;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -77,7 +77,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public ApplicationComponentFactory(String providerid)
 	{
-		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		
 		// Todo: hack!!! make extensions configurable also for reflective constructor (how?)
 		String[]	extensions	= new String[]

@@ -1,6 +1,6 @@
 package jadex.bridge.fipa;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.df.IDF;
@@ -262,7 +262,7 @@ public class SFipa
 		
 		IComponentIdentifier id = source.getName();
 //		id	= cms.createComponentIdentifier(id.getName(), false, id.getAddresses());
-		id	= new ComponentIdentifier(id.getName());//, id.getAddresses());
+		id	= new BasicComponentIdentifier(id.getName());//, id.getAddresses());
 		
 		return df.createDFComponentDescription(id, tds, source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getLeaseTime());
 	}

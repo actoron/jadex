@@ -3,7 +3,7 @@ package jadex.tools.security;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.PlatformSelectorDialog;
 import jadex.base.gui.componenttree.ComponentIconCache;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -337,7 +337,7 @@ public class AcquireCertificatePanel extends JPanel
 			public void run()
 			{
 				String name = tf.getText();
-				IComponentIdentifier cid = name.length()>0? new ComponentIdentifier(name): null; 
+				IComponentIdentifier cid = name.length()>0? new BasicComponentIdentifier(name): null; 
 				AcquireCertificatePanel.this.secser.setAcquisitionMechanismParameterValue(mi.getClazz(), pi.getName(), cid);
 			}
 		}, tf);

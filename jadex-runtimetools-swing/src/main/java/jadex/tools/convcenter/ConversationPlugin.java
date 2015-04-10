@@ -6,7 +6,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -110,7 +110,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					final IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					final IComponentIdentifier rec = node.getDescription().getName();
 					// Use clone, as added component id might be modified by user.
-					IComponentIdentifier receiver = new ComponentIdentifier(rec.getName());
+					IComponentIdentifier receiver = new BasicComponentIdentifier(rec.getName());
 					Map	message	= convcenter.getMessagePanel().getMessage();
 					MessageType	mt	= (MessageType)message.get(ConversationPanel.MESSAGE_TYPE);
 					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(mt.getReceiverIdentifier());

@@ -1,6 +1,6 @@
 package jadex.platform.service.remote;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -11,7 +11,7 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.TransportComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
@@ -485,7 +485,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //		
 //		return ret;
 		
-		final ITransportComponentIdentifier rrms = new TransportComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+		final ITransportComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".0.getServiceProxies");
 		
 		final TerminableIntermediateDelegationFuture<T> future = new TerminableIntermediateDelegationFuture<T>()
@@ -655,7 +655,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					{
 						// Hack! create remote rms cid with "rms" assumption.
 //						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
-						ITransportComponentIdentifier rrms = new TransportComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+						ITransportComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
@@ -1382,11 +1382,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					IComponentIdentifier src = (IComponentIdentifier)object;
-					ComponentIdentifier ret = null;
+					BasicComponentIdentifier ret = null;
 					if(src.getPlatformName().equals(root.getLocalName()))
 					{
 						String[] addresses = ((MessageService)msgservice).internalGetAddresses();
-						ret = new TransportComponentIdentifier(src.getName(), addresses);
+						ret = new ComponentIdentifier(src.getName(), addresses);
 //						System.out.println("Rewritten cid: "+ret);
 					}
 					
@@ -1600,7 +1600,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
-				return TransportComponentIdentifier.class.equals(clazz);
+				return ComponentIdentifier.class.equals(clazz);
 			}
 			
 			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser,
@@ -1609,11 +1609,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					IComponentIdentifier src = (IComponentIdentifier)object;
-					ComponentIdentifier ret = null;
+					BasicComponentIdentifier ret = null;
 					if(src.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
 					{
 						String[] addresses = ((MessageService)msgservice).internalGetAddresses();
-						ret = new TransportComponentIdentifier(src.getName(), addresses);
+						ret = new ComponentIdentifier(src.getName(), addresses);
 					}
 					
 					return ret==null? src: ret;

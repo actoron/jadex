@@ -3,7 +3,7 @@ package jadex.bdi.testcases.misc;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -41,7 +41,7 @@ public class GetExternalAccessPlan extends Plan
 		// Create component.
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider
 			.getServiceUpwards((IServiceProvider)getServiceContainer(), IComponentManagementService.class).get(this);
-		IComponentIdentifier cid = new ComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
+		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
 		Map	args	= new HashMap();
 		args.put("future", wait);
 		IFuture init = ces.createComponent(cid.getLocalName(), "jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml",

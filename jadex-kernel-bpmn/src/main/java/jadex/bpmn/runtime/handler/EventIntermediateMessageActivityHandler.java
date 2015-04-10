@@ -2,7 +2,7 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
@@ -107,7 +107,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 					if(rec instanceof String)
 					{
 //										newrecs.add(cms.createComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent(), null));
-						newrecs.add(new ComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent()));
+						newrecs.add(new BasicComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent()));
 					}
 					else if(rec instanceof IComponentIdentifier)
 					{
@@ -120,7 +120,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 				if(recs instanceof String)
 				{
 //									newrecs.add(cms.createComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent(), null));
-					newrecs.add(new ComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent()));
+					newrecs.add(new BasicComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent()));
 				}
 				else if(recs instanceof IComponentIdentifier)
 				{

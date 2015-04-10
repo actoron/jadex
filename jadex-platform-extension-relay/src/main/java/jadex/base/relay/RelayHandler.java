@@ -1,6 +1,6 @@
 package jadex.base.relay;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.message.ICodec;
@@ -659,7 +659,7 @@ public class RelayHandler
 						peerinfo	= MapSendTask.encodeMessage(info, defcodecs, getClass().getClassLoader(), null);
 					}
 					peer.addDebugText("Sending platform info to peer "+info.getId());
-					new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfo", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+					new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfo", new BasicComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
 					peer.addDebugText("Sent platform info to peer "+info.getId());
 				}
 			}
@@ -686,7 +686,7 @@ public class RelayHandler
 		{
 			peer.addDebugText("Sending platform infos to peer: "+infos.length);
 			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader(), null);
-			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new BasicComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
 			peer.addDebugText("Sent platform infos.");
 		}
 		catch(IOException e)

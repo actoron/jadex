@@ -1,12 +1,12 @@
 package jadex.platform.service.awareness.discovery.message;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.TransportComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
@@ -175,7 +175,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 				{
 //					System.out.println("pinging: "+cid);
 					Map<String, Object> msg = new HashMap<String, Object>();
-					TransportComponentIdentifier rec = new TransportComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+					ComponentIdentifier rec = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 					msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rec});
 					msg.put(SFipa.CONTENT, "ping");
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);

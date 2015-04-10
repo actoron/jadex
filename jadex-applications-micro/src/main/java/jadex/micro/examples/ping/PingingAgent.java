@@ -1,6 +1,6 @@
 package jadex.micro.examples.ping;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -98,7 +98,7 @@ public class PingingAgent
 		
 		if(receiver==null)
 		{
-			receiver = new ComponentIdentifier("Ping", agent.getComponentIdentifier().getParent());
+			receiver = new BasicComponentIdentifier("Ping", agent.getComponentIdentifier().getParent());
 		}
 //			createComponentIdentifier("Ping").addResultListener(new DefaultResultListener()
 //			{

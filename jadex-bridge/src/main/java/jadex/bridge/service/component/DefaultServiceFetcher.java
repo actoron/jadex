@@ -1,7 +1,7 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.ComponentCreationException;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -631,12 +631,12 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			{
 				if(name.indexOf("@")==-1)
 				{
-					ret.setResult(new ComponentIdentifier(name, parent));//, parent.getAddresses()));
+					ret.setResult(new BasicComponentIdentifier(name, parent));//, parent.getAddresses()));
 //					ret.setResult(cms.createComponentIdentifier(name, parent, parent.getAddresses()));
 				}
 				else
 				{
-					ret.setResult(new ComponentIdentifier(name));
+					ret.setResult(new BasicComponentIdentifier(name));
 //					ret.setResult(cms.createComponentIdentifier(name, false));
 				}
 			}

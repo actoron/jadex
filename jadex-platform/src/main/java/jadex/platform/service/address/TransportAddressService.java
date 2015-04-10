@@ -2,7 +2,7 @@ package jadex.platform.service.address;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.TransportComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.commons.SUtil;
@@ -57,7 +57,7 @@ public class TransportAddressService implements ITransportAddressService
 		Future<String[]> ret = new Future<String[]>();
 		if(addresses==null || !addresses.containsKey(component.getName()))
 		{
-			if(component instanceof TransportComponentIdentifier)
+			if(component instanceof ComponentIdentifier)
 			{
 				ret.setResult(((ITransportComponentIdentifier)component).getAddresses());
 			}
@@ -83,7 +83,7 @@ public class TransportAddressService implements ITransportAddressService
 		Future<ITransportComponentIdentifier> ret = new Future<ITransportComponentIdentifier>();
 		if(addresses==null || !addresses.containsKey(component.getName()))
 		{
-			if(component instanceof TransportComponentIdentifier)
+			if(component instanceof ComponentIdentifier)
 			{
 				ret.setResult((ITransportComponentIdentifier)component);
 			}
@@ -94,7 +94,7 @@ public class TransportAddressService implements ITransportAddressService
 		}
 		else
 		{
-			ret.setResult(new TransportComponentIdentifier(component.getName(), addresses.get(component.getName())));
+			ret.setResult(new ComponentIdentifier(component.getName(), addresses.get(component.getName())));
 		}
 		return ret;
 	}
@@ -114,7 +114,7 @@ public class TransportAddressService implements ITransportAddressService
 			{
 				if(addresses==null || !addresses.containsKey(components[i].getName()))
 				{
-					if(components[i] instanceof TransportComponentIdentifier)
+					if(components[i] instanceof ComponentIdentifier)
 					{
 						res[i] = ((ITransportComponentIdentifier)components[i]);
 					}
@@ -126,7 +126,7 @@ public class TransportAddressService implements ITransportAddressService
 				}
 				else
 				{
-					res[i] = new TransportComponentIdentifier(components[i].getName(), addresses.get(components[i].getName()));
+					res[i] = new ComponentIdentifier(components[i].getName(), addresses.get(components[i].getName()));
 				}
 			}
 		}
@@ -153,20 +153,22 @@ public class TransportAddressService implements ITransportAddressService
 	{
 		ITransportComponentIdentifier ret = null;
 		
-		if(!addresses.containsKey(cid.getName()))
+		// Todo: add saved addresses also for custom transport identifier?
+		if(cid instanceof ITransportComponentIdentifier)
 		{
-			if(cid instanceof TransportComponentIdentifier)
+			ret = (ITransportComponentIdentifier)cid;
+		}
+		else
+		{
+			String[]	adrs	= addresses.get(cid.getPlatformName());
+			if(adrs!=null)
 			{
-				ret = (ITransportComponentIdentifier)cid;
+				ret = new ComponentIdentifier(cid.getName(), adrs);
 			}
 			else
 			{
 				throw new RuntimeException("Not contained: "+cid.getName());
 			}
-		}
-		else
-		{
-			ret = new TransportComponentIdentifier(cid.getName(), addresses.get(cid.getName()));
 		}
 		
 		return ret;

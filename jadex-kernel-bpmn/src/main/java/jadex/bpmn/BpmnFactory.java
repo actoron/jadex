@@ -5,7 +5,7 @@ import jadex.bpmn.features.impl.BpmnExecutionFeature;
 import jadex.bpmn.features.impl.BpmnMessageComponentFeature;
 import jadex.bpmn.features.impl.BpmnMonitoringComponentFeature;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -88,7 +88,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public BpmnFactory(String providerid)
 	{
-		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new BpmnModelLoader();
 		this.features = SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BPMN_FEATURES));
 	}

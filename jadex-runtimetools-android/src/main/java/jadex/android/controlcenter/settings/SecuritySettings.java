@@ -4,7 +4,7 @@ import jadex.android.controlcenter.preference.JadexBooleanPreference;
 import jadex.android.controlcenter.preference.JadexStringPreference;
 import jadex.android.controlcenter.preference.LongClickablePreference;
 import jadex.android.service.JadexPlatformManager;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.IService;
@@ -514,7 +514,7 @@ public class SecuritySettings extends AServiceSettings
 			{
 				public void onClick(View v)
 				{
-					ComponentIdentifier cid = new ComponentIdentifier(platformPrefix.toString());
+					BasicComponentIdentifier cid = new BasicComponentIdentifier(platformPrefix.toString());
 					secService.setPlatformPassword(cid, pwDialog.getText());
 				}
 			});
@@ -537,7 +537,7 @@ public class SecuritySettings extends AServiceSettings
 					{
 						public void onClick(DialogInterface dialog, int id)
 						{
-							ComponentIdentifier cid = new ComponentIdentifier(platformPrefix.toString());
+							BasicComponentIdentifier cid = new BasicComponentIdentifier(platformPrefix.toString());
 							secService.setPlatformPassword(cid, null);
 						}
 					}).setNegativeButton("No", new DialogInterface.OnClickListener()

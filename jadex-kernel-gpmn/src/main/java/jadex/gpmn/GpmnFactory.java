@@ -4,7 +4,7 @@ import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
 import jadex.bdibpmn.BpmnPlanExecutor;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -86,7 +86,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public GpmnFactory(String providerid)
 	{
-		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		
 		this.loader = new GpmnModelLoader();
 		this.converter = new GpmnBDIConverter(getProviderId().getRoot());

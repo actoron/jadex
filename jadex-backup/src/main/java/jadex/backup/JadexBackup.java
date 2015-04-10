@@ -6,7 +6,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,14 +61,13 @@ public class JadexBackup
 		System.arraycopy(defargs, 0, newargs, 0, defargs.length);
 		System.arraycopy(jargs.toArray(), 0, newargs, defargs.length, jargs.size());
 		
-		ThreadSuspendable	sus	= new ThreadSuspendable();
-		IExternalAccess	platform	= Starter.createPlatform(newargs).get(sus);
+		IExternalAccess	platform	= Starter.createPlatform(newargs).get();
 		IComponentManagementService	cms	= SServiceProvider.getService(platform,
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		Map<String, Object> baargs = new HashMap<String, Object>();
 		baargs.put("cmdargs", (String[])bargs.toArray(new String[bargs.size()]));
 		CreationInfo ci = new CreationInfo(baargs);
-		cms.createComponent(null, "jadex/backup/JadexBackup.component.xml", ci, null).get(sus);
+		cms.createComponent(null, "jadex/backup/JadexBackup.component.xml", ci, null).get();
 		
 		
 		// Simple test synchonization.

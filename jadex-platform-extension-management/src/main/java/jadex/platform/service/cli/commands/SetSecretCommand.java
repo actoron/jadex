@@ -3,7 +3,7 @@
  */
 package jadex.platform.service.cli.commands;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -86,7 +86,7 @@ public class SetSecretCommand extends ACliCommand
 				{
 					if(plat!=null)
 					{
-						ss.setPlatformPassword(new ComponentIdentifier(plat), pass)
+						ss.setPlatformPassword(new BasicComponentIdentifier(plat), pass)
 							.addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					else if(net!=null)

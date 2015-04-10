@@ -4,7 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ISearchConstraints;
@@ -32,7 +32,7 @@ public class CMSTestPlan extends Plan
 //		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
 //			getScope().getServiceContainer(), IComponentManagementService.class).get(this);
 //		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, getComponentIdentifier(), null);
-		IComponentIdentifier aa = new ComponentIdentifier(SFipa.CMS_COMPONENT, getComponentIdentifier());
+		IComponentIdentifier aa = new BasicComponentIdentifier(SFipa.CMS_COMPONENT, getComponentIdentifier());
 		performTests(num, aa); // test remotely
 	}
 

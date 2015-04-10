@@ -1,6 +1,6 @@
 package jadex.platform.service.awareness.management;
 
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -232,7 +232,7 @@ public class AwarenessManagementAgentHelper
 	/**
 	 * Creates or deletes a local proxy for a given remote component.
 	 * 
-	 * @param cid {@link ComponentIdentifier} of the component to create/delete
+	 * @param cid {@link BasicComponentIdentifier} of the component to create/delete
 	 *        the proxy for
 	 * @param create true if proxy should be created, false if it should be
 	 *        deleted

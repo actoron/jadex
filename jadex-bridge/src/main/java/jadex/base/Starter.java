@@ -1,7 +1,7 @@
 package jadex.base;
 
 import jadex.bridge.Cause;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -448,7 +448,7 @@ public class Starter
 					platformname = buf.toString();
 					
 					// Create an instance of the component.
-					final IComponentIdentifier cid = new ComponentIdentifier(platformname);
+					final IComponentIdentifier cid = new BasicComponentIdentifier(platformname);
 					if(IComponentIdentifier.LOCAL.get()==null)
 					{
 						IComponentIdentifier.LOCAL.set(cid);
