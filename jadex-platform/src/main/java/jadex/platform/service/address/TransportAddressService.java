@@ -31,9 +31,9 @@ public class TransportAddressService implements ITransportAddressService
 		// Must be synchronized due to direct access via getMap()
 //		if(addresses==null)
 //			addresses = Collections.synchronizedMap(new HashMap<String, String[]>());
-		addresses.put(platform.getName(), platform.getAddresses());
+		addresses.put(platform.getPlatformName(), platform.getAddresses());
 		
-		System.out.println("added: "+platform.getName()+" "+SUtil.arrayToString(platform.getAddresses()));
+		System.out.println("added: "+platform.getPlatformName()+" "+SUtil.arrayToString(platform.getAddresses()));
 		return Future.DONE;
 	}
 	
@@ -44,7 +44,7 @@ public class TransportAddressService implements ITransportAddressService
 	public IFuture<Void> removePlatformAddresses(ITransportComponentIdentifier platform)
 	{
 //		if(addresses!=null)
-		addresses.remove(platform.getName());
+		addresses.remove(platform.getPlatformName());
 		return Future.DONE;
 	}
 	
@@ -55,7 +55,7 @@ public class TransportAddressService implements ITransportAddressService
 	public IFuture<String[]> getPlatformAddresses(IComponentIdentifier component)
 	{
 		Future<String[]> ret = new Future<String[]>();
-		if(addresses==null || !addresses.containsKey(component.getName()))
+		if(addresses==null || !addresses.containsKey(component.getPlatformName()))
 		{
 			if(component instanceof ComponentIdentifier)
 			{
@@ -63,12 +63,12 @@ public class TransportAddressService implements ITransportAddressService
 			}
 			else
 			{
-				ret.setException(new RuntimeException("Not contained: "+component.getName()));
+				ret.setException(new RuntimeException("Not contained: "+component.getPlatformName()));
 			}
 		}
 		else
 		{
-			ret.setResult(addresses.get(component.getName()));
+			ret.setResult(addresses.get(component.getPlatformName()));
 		}
 		return ret;
 	}
@@ -81,7 +81,7 @@ public class TransportAddressService implements ITransportAddressService
 	public IFuture<ITransportComponentIdentifier> getTransportComponentIdentifier(IComponentIdentifier component)
 	{
 		Future<ITransportComponentIdentifier> ret = new Future<ITransportComponentIdentifier>();
-		if(addresses==null || !addresses.containsKey(component.getName()))
+		if(addresses==null || !addresses.containsKey(component.getPlatformName()))
 		{
 			if(component instanceof ComponentIdentifier)
 			{
@@ -89,12 +89,12 @@ public class TransportAddressService implements ITransportAddressService
 			}
 			else
 			{
-				ret.setException(new RuntimeException("Not contained: "+component.getName()));
+				ret.setException(new RuntimeException("Not contained: "+component.getPlatformName()));
 			}
 		}
 		else
 		{
-			ret.setResult(new ComponentIdentifier(component.getName(), addresses.get(component.getName())));
+			ret.setResult(new ComponentIdentifier(component.getName(), addresses.get(component.getPlatformName())));
 		}
 		return ret;
 	}
@@ -112,7 +112,7 @@ public class TransportAddressService implements ITransportAddressService
 			ITransportComponentIdentifier[] res = new ITransportComponentIdentifier[components.length];
 			for(int i=0; i<components.length; i++)
 			{
-				if(addresses==null || !addresses.containsKey(components[i].getName()))
+				if(addresses==null || !addresses.containsKey(components[i].getPlatformName()))
 				{
 					if(components[i] instanceof ComponentIdentifier)
 					{
@@ -120,13 +120,13 @@ public class TransportAddressService implements ITransportAddressService
 					}
 					else
 					{
-						ret.setException(new RuntimeException("Not contained: "+components[i].getName()));
+						ret.setException(new RuntimeException("Not contained: "+components[i].getPlatformName()));
 						break;
 					}
 				}
 				else
 				{
-					res[i] = new ComponentIdentifier(components[i].getName(), addresses.get(components[i].getName()));
+					res[i] = new ComponentIdentifier(components[i].getName(), addresses.get(components[i].getPlatformName()));
 				}
 			}
 		}
@@ -160,7 +160,7 @@ public class TransportAddressService implements ITransportAddressService
 		}
 		else
 		{
-			String[]	adrs	= addresses.get(cid.getPlatformName());
+			String[] adrs = addresses.get(cid.getPlatformName());
 			if(adrs!=null)
 			{
 				ret = new ComponentIdentifier(cid.getName(), adrs);
