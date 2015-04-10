@@ -7,14 +7,13 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.LocalResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -370,22 +369,43 @@ public abstract class TestAgent
 //					}
 //				});
 				
-				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				SServiceProvider.getService(exta, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					public void customResultAvailable(ITransportAddressService tas)
 					{
-						// inverse proxy from remote to local.
-						createProxy(exta.getComponentIdentifier(), agent.getComponentIdentifier().getRoot())
-							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+						tas.getTransportComponentIdentifier(exta.getComponentIdentifier())
+							.addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
 						{
-							public void customResultAvailable(IComponentIdentifier result)
+							public void customResultAvailable(final ITransportComponentIdentifier rcid)
 							{
-								createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
-									.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+								ITransportAddressService tas	= SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+								tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot())
+									.addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
+								{
+									public void customResultAvailable(final ITransportComponentIdentifier lcid)
+									{
+										createProxy(lcid, rcid).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+										{
+											public void customResultAvailable(IComponentIdentifier result)
+											{
+												// inverse proxy from remote to local.
+												createProxy(rcid, lcid).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+												{
+													public void customResultAvailable(IComponentIdentifier result)
+													{
+														createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
+															.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+													}
+												});
+											}
+										});
+									}
+								});
 							}
 						});
 					}
-				});
+				});				
 			}
 		});
 		
@@ -395,7 +415,7 @@ public abstract class TestAgent
 	/**
 	 *  Create a proxy for the remote platform.
 	 */
-	protected IFuture<IComponentIdentifier>	createProxy(IComponentIdentifier root, IComponentIdentifier remote)
+	protected IFuture<IComponentIdentifier>	createProxy(ITransportComponentIdentifier root, ITransportComponentIdentifier remote)
 	{
 		Map<String, Object>	args = new HashMap<String, Object>();
 		args.put("component", remote);

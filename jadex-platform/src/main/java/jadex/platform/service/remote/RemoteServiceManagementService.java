@@ -1,6 +1,7 @@
 package jadex.platform.service.remote;
 
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -11,14 +12,12 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -612,24 +611,31 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public IFuture<IExternalAccess> getExternalAccessProxy(final IComponentIdentifier cid)
 	{
-		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-		
-		SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IExternalAccess>(ret)
+		if(cid instanceof ITransportComponentIdentifier)
 		{
-			public void customResultAvailable(ITransportAddressService tas)
+			return getExternalAccessProxy((ITransportComponentIdentifier)cid);
+		}
+		else
+		{
+			final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+			
+			SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IExternalAccess>(ret)
 			{
-				tas.getTransportComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IExternalAccess>(ret)
+				public void customResultAvailable(ITransportAddressService tas)
 				{
-					public void customResultAvailable(ITransportComponentIdentifier tcid)
+					tas.getTransportComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IExternalAccess>(ret)
 					{
-						getExternalAccessProxy(tcid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-					}
-				});
-			}
-		});
-		
-		return ret;
+						public void customResultAvailable(ITransportComponentIdentifier tcid)
+						{
+							getExternalAccessProxy(tcid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+						}
+					});
+				}
+			});
+			
+			return ret;
+		}
 	}
 	
 	/**

@@ -745,7 +745,7 @@ public class MessageService extends BasicService implements IMessageService
 		for(Iterator<?> it=managers.keySet().iterator(); it.hasNext();)
 		{
 			final SendManager tm = (SendManager)it.next();
-			ITransportComponentIdentifier[] recs = (ITransportComponentIdentifier[])managers.getCollection(tm).toArray(new ITransportComponentIdentifier[0]);
+			ITransportComponentIdentifier[] recs = managers.getCollection(tm).toArray(new ITransportComponentIdentifier[0]);
 			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl, enccontext);
 			tm.addMessage(task).addResultListener(crl);
 			
@@ -1552,6 +1552,7 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			logger.warning("Message could not be delivered to receivers: "+(me!=null ? me.getReceivers() : "unknown") +", "+e);
 		}
 	}

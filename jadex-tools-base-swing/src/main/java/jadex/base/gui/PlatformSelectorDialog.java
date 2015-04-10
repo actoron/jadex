@@ -3,6 +3,7 @@ package jadex.base.gui;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -214,9 +215,9 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	 */
 	protected void addPlatform(final IProxyAgentService ser)
 	{
-		ser.getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
+		ser.getRemoteComponentIdentifier().addResultListener(new SwingResultListener<ITransportComponentIdentifier>(new IResultListener<ITransportComponentIdentifier>()
 		{
-			public void resultAvailable(IComponentIdentifier cid)
+			public void resultAvailable(ITransportComponentIdentifier cid)
 			{
 				IComponentIdentifier key = ((IService)ser).getServiceIdentifier().getProviderId();
 				if(!valmap.containsKey(key))
