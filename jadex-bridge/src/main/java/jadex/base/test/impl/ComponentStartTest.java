@@ -13,6 +13,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -241,7 +242,7 @@ public class ComponentStartTest extends	TestCase
 			"-gui", "false"
 		};
 		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(pargs).get();
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp, IComponentManagementService.class).get();
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(rootcomp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		dorun(cms, "jadex/micro/testcases/blocking/ShutdownAgent.class");
 //		dorun(cms, "jadex/micro/benchmarks/MessagePerformanceAgent.class");
 //		dorun(cms, "jadex/micro/examples/ping/PingScenario.application.xml");

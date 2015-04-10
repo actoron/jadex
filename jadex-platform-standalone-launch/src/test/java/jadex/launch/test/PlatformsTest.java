@@ -8,6 +8,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -121,7 +122,7 @@ public class PlatformsTest //extends TestCase
 			}
 			
 			final Future<Void>	fut	= new Future<Void>();
-			IComponentManagementService cms = SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get(timeout);
+			IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
 			cms.addComponentListener(platform.getComponentIdentifier(), new ICMSComponentListener()
 			{
 				public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)

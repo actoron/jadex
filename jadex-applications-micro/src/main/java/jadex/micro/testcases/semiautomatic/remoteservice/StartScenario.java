@@ -5,6 +5,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -54,14 +55,14 @@ public class StartScenario
 					{
 						final IExternalAccess rplat = (IExternalAccess)result;
 						
-						SServiceProvider.getServiceUpwards(lplat, IComponentManagementService.class)
+						SServiceProvider.getService(lplat, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
 								final IComponentManagementService lcms = (IComponentManagementService)result;
 					
-								SServiceProvider.getServiceUpwards(rplat, IComponentManagementService.class)
+								SServiceProvider.getService(rplat, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object result)

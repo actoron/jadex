@@ -33,8 +33,8 @@ public class RequiredServiceInfo
 	/** Global scope. */
 	public static final String SCOPE_GLOBAL = "global";
 	
-	/** Upwards scope. */
-	public static final String SCOPE_UPWARDS = "upwards";
+//	/** Upwards scope. */
+//	public static final String SCOPE_UPWARDS = "upwards";
 	
 	/** Parent scope. */
 	public static final String SCOPE_PARENT = "parent";

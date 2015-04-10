@@ -289,7 +289,7 @@ public class AwarenessManagementAgentHelper
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 
-		SServiceProvider.getServiceUpwards(component, IComponentManagementService.class).addResultListener(
+		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 			new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService result)

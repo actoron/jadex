@@ -5,6 +5,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -57,7 +58,7 @@ public class MicroCreationTest //extends TestCase
 //			"-conf", "jadex.standalone.Platform.component.xml",
 //			"-deftimeout", "-1",
 			"-printpass", "false"}).get(timeout);
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get(timeout);
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();

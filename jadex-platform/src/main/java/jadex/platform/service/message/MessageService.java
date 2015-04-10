@@ -1575,7 +1575,7 @@ public class MessageService extends BasicService implements IMessageService
 		// means for inlcuding them a) as new resource with custom rid b) in the startup path with platform rid
 		if(rid!=null && rid.getGlobalIdentifier()!=null)
 		{
-			SServiceProvider.getServiceUpwards(component, ILibraryService.class)
+			SServiceProvider.getService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 			{
 				public void customResultAvailable(final ILibraryService ls)
@@ -1618,7 +1618,7 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		else if(realrec!=null)
 		{
-			SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
+			SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, ClassLoader>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -1627,7 +1627,7 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						public void customResultAvailable(final IComponentDescription desc)
 						{
-							SServiceProvider.getServiceUpwards(component, ILibraryService.class)
+							SServiceProvider.getService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 								.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 							{
 								public void customResultAvailable(ILibraryService ls)
@@ -1652,7 +1652,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			// Hack? Use global loader if no rid declared? Use x_receiver?
 			
-			SServiceProvider.getServiceUpwards(component, ILibraryService.class)
+			SServiceProvider.getService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 			{
 				public void customResultAvailable(final ILibraryService ls)
@@ -2468,7 +2468,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			final InputConnection	fcon	= con;
 			final Future<Void> ret = new Future<Void>();
-			SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
+			SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -2543,7 +2543,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			final OutputConnection	fcon	= con;
 			final Future<Void> ret = new Future<Void>();
-			SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
+			SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)

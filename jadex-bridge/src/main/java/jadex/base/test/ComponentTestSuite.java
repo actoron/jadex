@@ -140,7 +140,7 @@ public class ComponentTestSuite extends TestSuite
 //		System.out.println("start platform");
 		platform	= (IExternalAccess)Starter.createPlatform(args).get();
 //		System.out.println("end platform");
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).get();
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(platform, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		// Only works with x-rid hack or maven dependency service, because rms cannot use default classloader for decoding application messages.

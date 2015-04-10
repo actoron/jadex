@@ -53,12 +53,12 @@ public class RemoteReferenceTest //extends TestCase
 		Map<String, Object>	args1	= new HashMap<String, Object>();
 		args1.put("component", platform2.getComponentIdentifier());
 		IComponentManagementService	cms1	= SServiceProvider
-			.getServiceUpwards(platform1, IComponentManagementService.class).get(timeout);
+			.getService(platform1, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
 		cms1.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args1), null).get(timeout);
 		Map<String, Object>	args2	= new HashMap<String, Object>();
 		args2.put("component", platform1.getComponentIdentifier());
 		IComponentManagementService	cms2	= SServiceProvider
-			.getServiceUpwards(platform2, IComponentManagementService.class).get(timeout);
+			.getService(platform2, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
 		cms2.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args2), null).get(timeout);
 		
 		// Search for remote search service from local platform

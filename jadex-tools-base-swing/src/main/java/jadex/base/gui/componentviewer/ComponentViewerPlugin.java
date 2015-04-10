@@ -417,7 +417,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
-						IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(getJCC().getJCCAccess(), IComponentManagementService.class);
+						IFuture<IComponentManagementService> fut = SServiceProvider.getService(getJCC().getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 						fut.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(comptree)
 						{
 							public void customResultAvailable(IComponentManagementService cms)
@@ -610,7 +610,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					final Future<Boolean>	fut	= new Future<Boolean>();
 					viewables.put(cid, fut);
 					// Unknown -> start search to find out asynchronously
-					SServiceProvider.getServiceUpwards(getJCC().getJCCAccess(), IComponentManagementService.class)
+					SServiceProvider.getService(getJCC().getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Boolean>(fut)
 					{
 						public void customResultAvailable(final IComponentManagementService cms)

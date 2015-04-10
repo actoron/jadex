@@ -1,5 +1,6 @@
 package jadex.micro.examples.hunterprey;
 
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -70,7 +71,7 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		if(target.getProperty(ISpaceObject.PROPERTY_OWNER)!=null)
 		{
 //			System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
-			SServiceProvider.getServiceUpwards(space.getExternalAccess(), IComponentManagementService.class).addResultListener(new IResultListener()
+			SServiceProvider.getService(space.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

@@ -3,6 +3,7 @@ package jadex.platform.service.execution;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -249,7 +250,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				}
 				else
 				{
-					SServiceProvider.getServiceUpwards(component, IThreadPoolService.class)
+					SServiceProvider.getService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new IResultListener<IThreadPoolService>()
 					{
 						public void resultAvailable(IThreadPoolService result)

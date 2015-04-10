@@ -554,29 +554,29 @@ public class LocalServiceRegistry
 			String subname = getSubcomponentName(cid);
 			ret = sercid.getName().endsWith(subname);
 		}
-		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
-		{
-			// Test if service id is part of searcher id, service is upwards from searcher
-			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
-			ret = getDotName(cid).endsWith(getDotName(sercid));
-			
+//		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
+//		{
+//			// Test if service id is part of searcher id, service is upwards from searcher
 //			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
-//			String subname = getSubcomponentName(cid);
-//			ret = sercid.getName().endsWith(subname);
+//			ret = getDotName(cid).endsWith(getDotName(sercid));
 //			
-//			while(cid!=null)
-//			{
-//				if(sercid.equals(cid))
-//				{
-//					ret = true;
-//					break;
-//				}
-//				else
-//				{
-//					cid = cid.getParent();
-//				}
-//			}
-		}
+////			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+////			String subname = getSubcomponentName(cid);
+////			ret = sercid.getName().endsWith(subname);
+////			
+////			while(cid!=null)
+////			{
+////				if(sercid.equals(cid))
+////				{
+////					ret = true;
+////					break;
+////				}
+////				else
+////				{
+////					cid = cid.getParent();
+////				}
+////			}
+//		}
 		
 		return ret;
 	}
@@ -623,12 +623,12 @@ public class LocalServiceRegistry
 			String subname = getSubcomponentName(sercid);
 			ret = getDotName(cid).endsWith(subname);
 		}
-		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
-		{
-			// check if searcher is upwards from service (part of name)
-			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
-			ret = getDotName(sercid).endsWith(getDotName(cid));
-		}
+//		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
+//		{
+//			// check if searcher is upwards from service (part of name)
+//			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+//			ret = getDotName(sercid).endsWith(getDotName(cid));
+//		}
 		
 		return ret;
 	}
