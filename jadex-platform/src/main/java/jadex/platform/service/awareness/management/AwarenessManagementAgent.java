@@ -355,7 +355,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		if(info.getState()==null)
 			info.setState(AwarenessInfo.STATE_ONLINE);
 //		System.out.println("received: "+agent.getComponentIdentifier()+" "+info.getSender());
-		System.out.println("received: "+info.getSender());
+//		System.out.println("received: "+info.getSender());
 		
 		ITransportComponentIdentifier sender = info.getSender();
 		boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());

@@ -33,7 +33,7 @@ public class TransportAddressService implements ITransportAddressService
 //			addresses = Collections.synchronizedMap(new HashMap<String, String[]>());
 		addresses.put(platform.getPlatformName(), platform.getAddresses());
 		
-		System.out.println("added: "+platform.getPlatformName()+" "+SUtil.arrayToString(platform.getAddresses()));
+//		System.out.println("added: "+platform.getPlatformName()+" "+SUtil.arrayToString(platform.getAddresses()));
 		return Future.DONE;
 	}
 	

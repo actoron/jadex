@@ -133,10 +133,10 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 					System.out.println("library listener on: "+this);
 					ls.addLibraryServiceListener(libservicelistener);
 				}
-				else
-				{
-					System.out.println("no library listener on: "+this);
-				}
+//				else
+//				{
+//					System.out.println("no library listener on: "+this);
+//				}
 				
 				ret.setResult(null);
 			}

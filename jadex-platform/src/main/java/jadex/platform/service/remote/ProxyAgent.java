@@ -204,6 +204,7 @@ public class ProxyAgent	implements IProxyAgentService
 					
 					public void exceptionOccurred(Exception exception)
 					{
+//						exception.printStackTrace();
 						if(exception instanceof SecurityException)
 						{
 							ret.setResult(State.LOCKED);
