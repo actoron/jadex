@@ -2767,13 +2767,14 @@ public class MessageService extends BasicService implements IMessageService
 			
 			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
 			{
-				final ITransportComponentIdentifier rec = (ITransportComponentIdentifier)it.next();
+				final IComponentIdentifier rec = (IComponentIdentifier)it.next();
 				if(rec==null)
 				{
 					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
 				}
 				// Addresses may only null for local messages, i.e. intra platform communication
-				else if(rec.getAddresses()==null && 
+				else if(((rec instanceof ITransportComponentIdentifier && ((ITransportComponentIdentifier)rec).getAddresses()==null) 
+					|| rec instanceof IComponentIdentifier) &&
 					!(rec.getPlatformName().equals(component.getComponentIdentifier().getPlatformName())))
 				{
 					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));

@@ -51,7 +51,7 @@ public class DFTestAgent
 	protected IInternalAccess agent;
 	
 	/** The reports of executed tests, used as result. */
-	protected List	reports;
+	protected List<TestReport>	reports;
 	
 	//-------- methods --------
 	
@@ -61,7 +61,7 @@ public class DFTestAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		this.reports	= new ArrayList();
+		this.reports	= new ArrayList<TestReport>();
 		return registerDF();
 	}
 	
@@ -101,18 +101,17 @@ public class DFTestAgent
 
 		//agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		SServiceProvider.getService(agent, IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)  
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IDF>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IDF df)
 			{
-				IDF df = (IDF)result;
 				IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
 				IDFComponentDescription ad = df.createDFComponentDescription(agent.getComponentIdentifier(), sd);
 
-				IFuture re = df.register(ad); 
-				re.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+				IFuture<IDFComponentDescription> re = df.register(ad); 
+				re.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IDFComponentDescription>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IDFComponentDescription result)
 					{
 						// Set test success and continue test.
 						tr.setSucceeded(true);
@@ -123,7 +122,6 @@ public class DFTestAgent
 					{
 						// Set test failure and kill agent.
 						tr.setFailed(e.toString());
-//						killAgent();
 						ret.setResult(null);
 					}
 				}));
@@ -145,21 +143,19 @@ public class DFTestAgent
 
 		// Create a service description to search for.
 		SServiceProvider.getService(agent, IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)  
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IDF>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IDF df)
 			{
-				IDF df = (IDF)result;
 				IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
 				IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 				ISearchConstraints	cons = df.createSearchConstraints(-1, 0);
 				
-				IFuture re = df.search(ad, cons); 
-				re.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener() 
+				IFuture<IDFComponentDescription[]> re = df.search(ad, cons); 
+				re.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IDFComponentDescription[]>() 
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IDFComponentDescription[] agentDesc)
 					{
-						IDFComponentDescription[] agentDesc = (IDFComponentDescription[])result;
 						if(agentDesc.length != 0)
 						{
 							// Set test success and continue test.
@@ -195,7 +191,7 @@ public class DFTestAgent
 		final TestReport	tr	= new TestReport("#3", "Test sending message to service (i.e. myself).");
 		reports.add(tr);
 
-		Map hlefMessage = new HashMap();
+		Map<String, Object> hlefMessage = new HashMap<String, Object>();
 		hlefMessage.put(SFipa.PERFORMATIVE, SFipa.INFORM);
 		hlefMessage.put(SFipa.SENDER, agent.getComponentIdentifier());
 		hlefMessage.put(SFipa.RECEIVERS, cid);
@@ -216,7 +212,7 @@ public class DFTestAgent
 	
 	// todo: set body future?!
 	@AgentMessageArrived
-	public void messageArrived(Map msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
 		TestReport	tr	= (TestReport)reports.get(reports.size()-1);
 		
