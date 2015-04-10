@@ -1418,7 +1418,7 @@ public class MessageService extends BasicService implements IMessageService
 
 		// this is suboptimal currently because internalGetAddresses has to rebuild addresses immediately so
 		// it could be done here
-		return addrservice.addPlatformAddresses(new TransportComponentIdentifier(component.getComponentIdentifier().getRoot().getName(), internalGetAddresses()));
+		return addrservice.addPlatformAddresses(new ComponentIdentifier(component.getComponentIdentifier().getRoot().getName(), internalGetAddresses()));
 	}
 	
 //	/**
