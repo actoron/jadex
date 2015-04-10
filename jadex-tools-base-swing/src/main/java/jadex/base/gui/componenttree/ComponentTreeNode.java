@@ -330,13 +330,13 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
 
 //		if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
-//			System.err.println("searchChildren queued: "+this);
+			System.out.println("searchChildren 1: "+this);
 		cms.getChildrenDescriptions(cid).addResultListener(new SwingResultListener<IComponentDescription[]>(new IResultListener<IComponentDescription[]>()
 		{
 			public void resultAvailable(final IComponentDescription[] achildren)
 			{
 //				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
-//					System.err.println("searchChildren queued2: "+ComponentTreeNode.this+" "+achildren.length);
+					System.out.println("searchChildren 2: "+ComponentTreeNode.this+" "+achildren.length);
 //				final IComponentDescription[] achildren = (IComponentDescription[])result;
 				
 				Arrays.sort(achildren, new java.util.Comparator<IComponentDescription>()
@@ -362,7 +362,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			public void exceptionOccurred(Exception exception)
 			{
 //				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
-//					System.err.println("searchChildren done2e: "+ComponentTreeNode.this);
+					System.out.println("searchChildren ex: "+ComponentTreeNode.this);
 				ready[0]	= true;
 				if(ready[0] &&  ready[1])
 				{

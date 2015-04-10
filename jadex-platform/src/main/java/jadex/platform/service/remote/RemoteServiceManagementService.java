@@ -451,7 +451,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				{
 					public void customResultAvailable(ITransportComponentIdentifier tcid)
 					{
-						getServiceProxies(caller, tcid, service, scope, filter).addResultListener(new DelegationResultListener<Collection<T>>(ret));
+						getServiceProxies(caller, tcid, service, scope, multiple, filter).addResultListener(new DelegationResultListener<Collection<T>>(ret));
 					}
 				});
 			}
@@ -469,7 +469,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final ITransportComponentIdentifier caller, final ITransportComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final ITransportComponentIdentifier cid, final Class<T> service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
 	{
 //		final Future<T>	ret	= new Future<T>();
 //		
