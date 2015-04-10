@@ -170,7 +170,7 @@ public class MessageService extends BasicService implements IMessageService
 	protected IExecutionService exeservice;
 
 //	/** The address service. */
-//	protected ITransportAddressService addrservice;
+	protected ITransportAddressService addrservice;
 	protected Map<String, String[]> taddresses;
 	
 	/** The awareness service. */
@@ -1160,6 +1160,7 @@ public class MessageService extends BasicService implements IMessageService
 												{
 													public void customResultAvailable(final ITransportAddressService tas)
 													{
+														addrservice = tas;
 														tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<Map<String,String[]>, Void>(ret)
 														{
 															public void customResultAvailable(Map<String, String[]> result)
@@ -1414,7 +1415,10 @@ public class MessageService extends BasicService implements IMessageService
 	public IFuture<Void> refreshAddresses()
 	{
 		addresses	= null;
-		return IFuture.DONE;
+
+		// this is suboptimal currently because internalGetAddresses has to rebuild addresses immediately so
+		// it could be done here
+		return addrservice.addPlatformAddresses(new TransportComponentIdentifier(component.getComponentIdentifier().getRoot().getName(), internalGetAddresses()));
 	}
 	
 //	/**
@@ -1906,6 +1910,8 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					InitInfo ii = (InitInfo)data;
 					initInputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
+					addrservice.addPlatformAddresses(ii.getInitiator());
+					addrservice.addPlatformAddresses(ii.getParticipant());
 				}
 				else if(type==StreamSendTask.ACKINIT_OUTPUT_PARTICIPANT)
 				{
@@ -2005,6 +2011,8 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					InitInfo ii = (InitInfo)data;
 					initOutputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
+					addrservice.addPlatformAddresses(ii.getInitiator());
+					addrservice.addPlatformAddresses(ii.getParticipant());
 				}
 				else if(type==StreamSendTask.ACKINIT_INPUT_PARTICIPANT)
 				{
@@ -2206,6 +2214,7 @@ public class MessageService extends BasicService implements IMessageService
 			// Announce receiver to message awareness
 			ITransportComponentIdentifier sender = (ITransportComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
 			announceComponentIdentifier(sender);
+			addrservice.addPlatformAddresses(sender);
 			
 			// Content decoding works as follows:
 			// Find correct classloader for each receiver by
@@ -2672,7 +2681,8 @@ public class MessageService extends BasicService implements IMessageService
 	IMessageAwarenessService	mws;
 	
 	/**
-	 *  Announce a component identifier to message awareness.
+	 *  Announce a component identifier to message awareness 
+	 *	and address service.
 	 */
 	protected void announceComponentIdentifier(final ITransportComponentIdentifier cid)
 	{
