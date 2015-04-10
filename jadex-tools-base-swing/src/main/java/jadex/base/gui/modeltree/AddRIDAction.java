@@ -4,6 +4,7 @@ import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SReflect;
@@ -130,7 +131,7 @@ public class AddRIDAction extends ToolTipAction
 		if(tp==null)
 		{
 //			SServiceProvider.getServiceUpwards(treepanel.localexta.getServiceProvider(), IDaemonThreadPoolService.class)
-			SServiceProvider.getServiceUpwards(treepanel.getGUIExternalAccess(), IDaemonThreadPoolService.class)
+			SServiceProvider.getService(treepanel.getGUIExternalAccess(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
 			{
 				public void customResultAvailable(IDaemonThreadPoolService result)

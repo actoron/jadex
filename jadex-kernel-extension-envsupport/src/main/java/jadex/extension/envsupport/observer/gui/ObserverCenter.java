@@ -893,7 +893,7 @@ public class ObserverCenter implements IObserverCenter
 			dispose();
 			if(killonexit)
 			{
-				SServiceProvider.getServiceUpwards(space.getExternalAccess(), IComponentManagementService.class)
+				SServiceProvider.getService(space.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)

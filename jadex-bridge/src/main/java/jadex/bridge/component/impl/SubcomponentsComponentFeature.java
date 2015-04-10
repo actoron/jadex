@@ -13,6 +13,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -112,7 +113,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	{
 		final Future<Void> res = new Future<Void>();
 		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
-		SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
+		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(res)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

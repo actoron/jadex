@@ -289,7 +289,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getServiceUpwards(component, IThreadPoolService.class)
+		SServiceProvider.getService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

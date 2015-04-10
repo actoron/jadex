@@ -256,7 +256,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	{
 		final Future<ClassLoader>	ret	= new Future<ClassLoader>();
 		
-		SServiceProvider.getServiceUpwards(jcc.getJCCAccess(), IComponentManagementService.class)
+		SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, ClassLoader>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -265,7 +265,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 				{
 					public void customResultAvailable(final IExternalAccess exta)
 					{
-						SServiceProvider.getServiceUpwards(jcc.getJCCAccess(), ILibraryService.class)
+						SServiceProvider.getService(jcc.getJCCAccess(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 						{
 							public void customResultAvailable(final ILibraryService libservice)

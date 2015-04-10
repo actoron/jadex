@@ -1142,7 +1142,7 @@ public class ComponentTreePanel extends JSplitPane
 				final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 				final IComponentIdentifier cid = node.getComponentIdentifier();
 				
-				SServiceProvider.getServiceUpwards(jcc.getJCCAccess(), IComponentManagementService.class)
+				SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, JComponent>(ret)
 				{
 					public void customResultAvailable(final IComponentManagementService cms)
@@ -1263,7 +1263,7 @@ public class ComponentTreePanel extends JSplitPane
 				else
 				{
 					// Unknown -> start search to find out asynchronously
-					IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(jcc.getJCCAccess(), IComponentManagementService.class);
+					IFuture<IComponentManagementService> fut = SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 					fut.addResultListener(new DefaultResultListener<IComponentManagementService>()
 					{
 						public void resultAvailable(IComponentManagementService result)

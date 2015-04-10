@@ -210,7 +210,7 @@ public class SServiceProvider
 		}
 		else
 		{
-			SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -254,7 +254,7 @@ public class SServiceProvider
 		}
 		else
 		{
-			SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
@@ -332,15 +332,15 @@ public class SServiceProvider
 		return ret;
 	}
 	
-	/**
-	 *  Get one service of a type and only search upwards (parents).
-	 *  @param type The class.
-	 *  @return The corresponding service.
-	 */
-	public static <T> IFuture<T> getServiceUpwards(IInternalAccess provider, Class<T> type)
-	{
-		return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
-	}
+//	/**
+//	 *  Get one service of a type and only search upwards (parents).
+//	 *  @param type The class.
+//	 *  @return The corresponding service.
+//	 */
+//	public static <T> IFuture<T> getServiceUpwards(IInternalAccess provider, Class<T> type)
+//	{
+//		return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
+//	}
 	
 	/**
 	 *  Get all declared services of the given provider.
@@ -490,15 +490,15 @@ public class SServiceProvider
 		return ret;
 	}
 	
-	/**
-	 *  Get one service of a type and only search upwards (parents).
-	 *  @param type The class.
-	 *  @return The corresponding service.
-	 */
-	public static <T> IFuture<T> getServiceUpwards(IExternalAccess provider, Class<T> type)
-	{
-		return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
-	}
+//	/**
+//	 *  Get one service of a type and only search upwards (parents).
+//	 *  @param type The class.
+//	 *  @return The corresponding service.
+//	 */
+//	public static <T> IFuture<T> getServiceUpwards(IExternalAccess provider, Class<T> type)
+//	{
+//		return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
+//	}
 	
 	/**
 	 *  Get all declared services of the given provider.

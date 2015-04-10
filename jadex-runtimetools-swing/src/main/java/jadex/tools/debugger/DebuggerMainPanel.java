@@ -179,7 +179,7 @@ public class DebuggerMainPanel extends JSplitPane
 					public void actionPerformed(ActionEvent e)
 					{
 						pause.setEnabled(false);
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class)
+						SServiceProvider.getService(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
 						{
 							public void customResultAvailable(IComponentManagementService ces)
@@ -197,7 +197,7 @@ public class DebuggerMainPanel extends JSplitPane
 					{
 						step.setEnabled(false);
 						run.setEnabled(false);
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class)
+						SServiceProvider.getService(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
 						{
 							public void customResultAvailable(final IComponentManagementService cms)
@@ -240,7 +240,7 @@ public class DebuggerMainPanel extends JSplitPane
 						step.setEnabled(false);
 						run.setEnabled(false);
 						pause.setEnabled(true);
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class)
+						SServiceProvider.getService(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
 						{
 							public void customResultAvailable(final IComponentManagementService ces)

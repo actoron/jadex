@@ -16,6 +16,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -742,7 +743,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		
 		if(tp==null)
 		{
-			SServiceProvider.getServiceUpwards(jcc.getJCCAccess(), IDaemonThreadPoolService.class)
+			SServiceProvider.getService(jcc.getJCCAccess(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
 			{
 				public void customResultAvailable(IDaemonThreadPoolService result)

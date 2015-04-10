@@ -1003,7 +1003,7 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected void doStep()
 	{
-		SServiceProvider.getServiceUpwards(access, IComponentManagementService.class)
+		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(this)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)

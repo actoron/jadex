@@ -382,7 +382,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				SServiceProvider.getServiceUpwards(access, IThreadPoolService.class)
+				SServiceProvider.getService(access, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)

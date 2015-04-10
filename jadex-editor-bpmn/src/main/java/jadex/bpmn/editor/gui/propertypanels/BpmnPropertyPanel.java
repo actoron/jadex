@@ -114,8 +114,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 									   RequiredServiceInfo.SCOPE_PARENT,
 									   RequiredServiceInfo.SCOPE_LOCAL,
 									   RequiredServiceInfo.SCOPE_PLATFORM,
-									   RequiredServiceInfo.SCOPE_GLOBAL,
-									   RequiredServiceInfo.SCOPE_UPWARDS };
+									   RequiredServiceInfo.SCOPE_GLOBAL};
+//									   RequiredServiceInfo.SCOPE_UPWARDS };
 	
 	/** Cache for handling configurations. */
 	protected List<ConfigurationInfo> confcache;

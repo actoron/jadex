@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
@@ -44,7 +45,7 @@ public class ExternalAccessInvokerAgent
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{
-					SServiceProvider.getServiceUpwards(agent.getExternalAccess(), IComponentManagementService.class)
+					SServiceProvider.getService(agent.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new DefaultResultListener<IComponentManagementService>()
 					{
 						public void resultAvailable(IComponentManagementService cms)

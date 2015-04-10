@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -165,7 +166,7 @@ public class DependendServicesAgent
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 		
-		SServiceProvider.getServiceUpwards(agent, IComponentManagementService.class)
+		SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService result)

@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -218,7 +219,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 			}
 		}
 		
-		SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
+		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IComponentManagementService>()
 //			.addResultListener(component.createResultListener(new IResultListener()
 		{
