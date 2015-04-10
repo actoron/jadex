@@ -130,7 +130,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 				ILibraryService ls = getLibraryService();
 				if(ls!=null)
 				{
-					System.out.println("library listener on: "+this);
+//					System.out.println("library listener on: "+this);
 					ls.addLibraryServiceListener(libservicelistener);
 				}
 //				else

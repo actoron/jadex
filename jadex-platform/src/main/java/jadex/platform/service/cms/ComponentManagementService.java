@@ -1961,7 +1961,9 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal)
 	{
-//		System.out.println("getExternalAccess: "+this+", "+cid);
+//		if(cid.getName().indexOf("cms")!=-1)
+//			System.out.println("getExternalAccess: "+this+", "+cid);
+		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 //		ret.addResultListener(new IResultListener<IExternalAccess>()

@@ -2239,7 +2239,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				public void customResultAvailable(final ClassLoader classloader)
 				{
-					SServiceProvider.getServiceUpwards(component, IComponentManagementService.class)
+					SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
 						public void customResultAvailable(IComponentManagementService cms)
@@ -2886,8 +2886,8 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				catch(Exception e)
 				{
-//										System.out.println("classloader: "+cl);
-//										e.printStackTrace();
+//					System.out.println("classloader: "+cl);
+					e.printStackTrace();
 					if(!(e instanceof ContentException))
 					{
 						// Todo: find out why 50MB sized messages are sent... 
@@ -2906,7 +2906,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			if(fmessage.get(name) instanceof byte[])
 			{
-				System.out.println("sfjkdghfkld\n"+new String((byte[])fmessage.get(name), Charset.forName("UTF-8")));
+				System.out.println("message problem\n"+new String((byte[])fmessage.get(name), Charset.forName("UTF-8")));
 			}
 		}
 	}
