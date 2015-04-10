@@ -112,10 +112,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			System.out.println("library listener on: "+this);
 			ls.addLibraryServiceListener(libservicelistener);
 		}
-		else
-		{
-			System.out.println("no library listener on: "+this);
-		}
+//		else
+//		{
+//			System.out.println("no library listener on: "+this);
+//		}
 		
 		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
