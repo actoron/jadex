@@ -1,7 +1,7 @@
 package jadex.platform.service.cli.commands;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -79,9 +79,9 @@ public class ListPlatformsCommand extends ACliCommand
 			{
 				ongoing++;
 	//			System.out.println("found: "+result);
-				ser.getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
+				ser.getRemoteComponentIdentifier().addResultListener(new SwingResultListener<ITransportComponentIdentifier>(new IResultListener<ITransportComponentIdentifier>()
 				{
-					public void resultAvailable(final IComponentIdentifier cid)
+					public void resultAvailable(final ITransportComponentIdentifier cid)
 					{
 //						IComponentIdentifier key = ((IService)ser).getServiceIdentifier().getProviderId();
 						

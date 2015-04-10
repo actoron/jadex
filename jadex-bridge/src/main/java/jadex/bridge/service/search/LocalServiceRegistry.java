@@ -2,6 +2,7 @@ package jadex.bridge.service.search;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -665,9 +666,9 @@ public class LocalServiceRegistry
 					{
 						IProxyAgentService ps = (IProxyAgentService)ser;
 						
-						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
+						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
 						{
-							public void resultAvailable(IComponentIdentifier rcid)
+							public void resultAvailable(ITransportComponentIdentifier rcid)
 							{
 								IFuture<Collection<T>> rsers = rms.getServiceProxies(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 								rsers.addResultListener(new IResultListener<Collection<T>>()
@@ -759,9 +760,9 @@ public class LocalServiceRegistry
 					{
 						IProxyAgentService ps = (IProxyAgentService)ser;
 						
-						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
+						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
 						{
-							public void resultAvailable(IComponentIdentifier rcid)
+							public void resultAvailable(ITransportComponentIdentifier rcid)
 							{
 								IFuture<T> rsers = rms.getServiceProxy(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 								rsers.addResultListener(new IResultListener<T>()

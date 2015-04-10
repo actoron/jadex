@@ -1,8 +1,8 @@
 package jadex.platform.service.remote;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
@@ -36,7 +36,7 @@ import java.util.Map;
  *  A proxy agent is a pseudo component that mirrors services of a remote platform (or component).
  */
 @Description("This agent represents a proxy for a remote component.")
-@Arguments(@Argument(name="component", clazz=IComponentIdentifier.class, defaultvalue="null", description="The component id of the remote component/platform."))
+@Arguments(@Argument(name="component", clazz=ITransportComponentIdentifier.class, defaultvalue="null", description="The component id of the remote component/platform."))
 @ProvidedServices(@ProvidedService(type=IProxyAgentService.class))
 @NFProperties(@NFProperty(ProxyLatencyProperty.class))
 @Service
@@ -54,7 +54,7 @@ public class ProxyAgent	implements IProxyAgentService
 	
 	/**  The remote component identifier. */
 	@AgentArgument("component")
-	protected IComponentIdentifier	rcid;
+	protected ITransportComponentIdentifier	rcid;
 	
 	/** The remote cms. */
 	protected IComponentManagementService rcms;
@@ -162,17 +162,17 @@ public class ProxyAgent	implements IProxyAgentService
 	/**
 	 *  Get the component identifier of the remote platform.
 	 */
-	public IFuture<IComponentIdentifier>	getRemoteComponentIdentifier()
+	public IFuture<ITransportComponentIdentifier>	getRemoteComponentIdentifier()
 	{
 //		return new Future<IComponentIdentifier>(((RemoteServiceContainer)getServiceContainer()).getRemoteComponentIdentifier());
-		return new Future<IComponentIdentifier>(rcid);
+		return new Future<ITransportComponentIdentifier>(rcid);
 	}
 
 	/**
 	 *  Set or update the component identifier of the remote platform,
 	 *  i.e., top reflect new transport addresses.
 	 */
-	public IFuture<Void>	setRemoteComponentIdentifier(IComponentIdentifier cid)
+	public IFuture<Void>	setRemoteComponentIdentifier(ITransportComponentIdentifier cid)
 	{
 //		((RemoteServiceContainer)getServiceContainer()).setRemoteComponentIdentifier(cid);
 		rcid = cid;

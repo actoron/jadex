@@ -453,7 +453,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			// Update proxy to reflect new addresses.
 			else if(changedaddrs && dif.getProxy()!=null)
 			{
-				final IComponentIdentifier	remote	= dif.getComponentIdentifier();
+				final ITransportComponentIdentifier	remote	= dif.getComponentIdentifier();
 				dif.getProxy().addResultListener(new IResultListener<IComponentIdentifier>()
 				{
 					public void resultAvailable(IComponentIdentifier cid)

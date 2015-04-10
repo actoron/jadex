@@ -990,7 +990,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 																{
 //																	if(content instanceof RemoteMethodInvocationCommand && ((RemoteMethodInvocationCommand)content).getMethodName().equals("testThreading"))
 //																	{
-																		System.out.println("RMS sent: "+System.currentTimeMillis()+", "+content+" "+receiver);
+//																		System.out.println("RMS sent: "+System.currentTimeMillis()+", "+content+" "+receiver);
 //																	}
 	//																System.out.println("sent: "+callid);
 																	// ok message could be sent.
@@ -1000,11 +1000,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 																	}
 																}
 																
-																public void exceptionOccurred(Exception exception)
-																{
-																	System.out.println("msg send ex: "+exception);
-																	super.exceptionOccurred(exception);
-																}
+//																public void exceptionOccurred(Exception exception)
+//																{
+//																	System.out.println("msg send ex: "+exception);
+//																	super.exceptionOccurred(exception);
+//																}
 															});
 														}
 													});
