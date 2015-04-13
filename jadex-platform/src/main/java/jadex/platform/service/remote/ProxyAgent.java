@@ -15,7 +15,9 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -138,15 +140,7 @@ public class ProxyAgent	implements IProxyAgentService
 		});
 		
 		// If done here this is costly (one service call per proxy)
-//		try
-//		{
-//			ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//			tas.addPlatformAddresses(rcid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
-//		}
-//		catch(Exception e)
-//		{
-//			ret.setException(e);
-//		}
+		TransportAddressBook.getAddressBook((IPlatformComponentAccess)agent).addPlatformAddresses(rcid);
 		
 		return IFuture.DONE;
 	}

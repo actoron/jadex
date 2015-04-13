@@ -1,15 +1,17 @@
 package jadex.bridge.service.types.address;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *  Management of transport addresses of platform.
  */
 public class TransportAddressBook
 {
@@ -157,5 +159,13 @@ public class TransportAddressBook
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the address book from a component.
+	 */
+	public static TransportAddressBook getAddressBook(IPlatformComponentAccess access)
+	{
+		return (TransportAddressBook)access.getPlatformData().get(Starter.DATA_ADDRESSBOOK);
 	}
 }

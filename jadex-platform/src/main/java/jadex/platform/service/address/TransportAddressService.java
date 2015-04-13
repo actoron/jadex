@@ -2,10 +2,14 @@ package jadex.platform.service.address;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -17,7 +21,19 @@ import jadex.commons.future.IFuture;
 public class TransportAddressService implements ITransportAddressService
 {
 	/** The managed addresses. */
-	private TransportAddressBook addresses = new TransportAddressBook();
+	private TransportAddressBook addresses;
+	
+	@ServiceComponent
+	protected IInternalAccess agent;
+	
+	/**
+	 * 
+	 */
+	@ServiceStart
+	public void started()
+	{
+		addresses = TransportAddressBook.getAddressBook((IPlatformComponentAccess)agent);
+	}
 	
 	/**
 	 *  Set the addresses of a platform.
