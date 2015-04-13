@@ -3,6 +3,7 @@ package jadex.micro.testcases;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -374,7 +375,6 @@ public abstract class TestAgent
 				if(remove)
 					platforms.remove(exta);
 				
-//				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 				createProxy(agent.getExternalAccess(), exta).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
@@ -385,8 +385,14 @@ public abstract class TestAgent
 						{
 							public void customResultAvailable(IComponentIdentifier result)
 							{
-								createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
-									.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+								ComponentIdentifier.getTransportIdentifier(exta).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
+				                {
+				                    public void customResultAvailable(ITransportComponentIdentifier cid)
+				                    {
+										createComponent(filename, null, config, cid, reslis)
+											.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+				                    }
+				                });
 							}
 						});
 					}

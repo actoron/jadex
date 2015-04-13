@@ -13,9 +13,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ITuple2Future;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.future.TupleResult;
 
 import java.util.Collection;
