@@ -3,10 +3,12 @@ package jadex.micro.testcases.recfutures;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
@@ -209,22 +211,28 @@ public class UserAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno, delay, max)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
-				{
-					public void customResultAvailable(final TestReport result)
-					{
-						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
-					}
-				}));
+				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+                {
+                    public void customResultAvailable(ITransportComponentIdentifier result)
+                    { 
+						performTest(result, testno, delay, max)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+						{
+							public void customResultAvailable(final TestReport result)
+							{
+								platform.killComponent();
+		//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+		//						{
+		//							public void customResultAvailable(Map<String, Object> v)
+		//							{
+		//								ret.setResult(result);
+		//							}
+		//						});
+								ret.setResult(result);
+							}
+						}));
+                    }
+                });
 			}
 		}));
 		
