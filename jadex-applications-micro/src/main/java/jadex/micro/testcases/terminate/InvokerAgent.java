@@ -3,10 +3,12 @@ package jadex.micro.testcases.terminate;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
@@ -57,9 +59,12 @@ public class InvokerAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		if (SReflect.isAndroid()) {
+		if(SReflect.isAndroid()) 
+		{
 			tc.setTestCount(2);
-		} else {
+		} 
+		else 
+		{
 			tc.setTestCount(4);	
 		}
 		
@@ -98,7 +103,7 @@ public class InvokerAgent
 				else 
 				{
 					testRemote(3, 1000).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
-							{
+					{
 						public void customResultAvailable(Collection<TestReport> result)
 						{
 							for(TestReport rep: result)
@@ -145,22 +150,28 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno, delay)
-					.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
-				{
-					public void customResultAvailable(final Collection<TestReport> result)
-					{
-						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
-					}
-				});
+				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Collection<TestReport>>(ret)
+                {
+                    public void customResultAvailable(ITransportComponentIdentifier result)
+                    { 
+						performTest(result, testno, delay)
+							.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
+						{
+							public void customResultAvailable(final Collection<TestReport> result)
+							{
+								platform.killComponent();
+		//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+		//						{
+		//							public void customResultAvailable(Map<String, Object> v)
+		//							{
+		//								ret.setResult(result);
+		//							}
+		//						});
+								ret.setResult(result);
+							}
+						});
+                    }
+                });
 			}
 		}));
 		
