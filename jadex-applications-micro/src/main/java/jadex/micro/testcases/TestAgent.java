@@ -142,40 +142,33 @@ public abstract class TestAgent
 						{
 							public void customResultAvailable(final IExternalAccess exta)
 							{
-//								SServiceProvider.getService(exta, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//									.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, Void>(ret)
-//								{
-//									public void customResultAvailable(ITransportAddressService tas)
-//									{
-//										tas.getTransportComponentIdentifier(exta.getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Void>(ret)
-//										{
-//											public void customResultAvailable(ITransportComponentIdentifier extacid)
-//											{
-												createProxy(cms, exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+								createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+								{
+									public void customResultAvailable(IComponentIdentifier result)
+									{
+										createProxy(exta, agent.getExternalAccess()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+										{
+											public void customResultAvailable(IComponentIdentifier result)
+											{
+												SServiceProvider.getService(exta, IComponentManagementService.class)
+													.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 												{
-													public void customResultAvailable(IComponentIdentifier result)
+													public void customResultAvailable(IComponentManagementService cms2)
 													{
-														SServiceProvider.getService(exta, IComponentManagementService.class)
-															.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+														test(cms2, false).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 														{
-															public void customResultAvailable(IComponentManagementService cms2)
+															public void customResultAvailable(TestReport result)
 															{
-																test(cms2, false).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
-																{
-																	public void customResultAvailable(TestReport result)
-																	{
-																		tc.addReport(result);
-																		ret.setResult(null);
-																	}
-																});
+																tc.addReport(result);
+																ret.setResult(null);
 															}
-														}));
+														});
 													}
-												});
-//											}
-//										});
-//									}
-//								});
+												}));
+											}
+										});
+									}
+								});
 							}
 						});
 					}
@@ -194,59 +187,9 @@ public abstract class TestAgent
 		return 2;
 	}
 
-//	/**
-//	 *  Create a proxy for the remote platform.
-//	 */
-//	protected IFuture<IComponentIdentifier>	createProxy(IComponentManagementService local, IExternalAccess remote)
-//	{
-//		Map<String, Object>	args = new HashMap<String, Object>();
-//		args.put("component", remote.getComponentIdentifier());
-//		CreationInfo ci = new CreationInfo(args);
-//		return local.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null);
-//	}
-	
 	/**
 	 *  Create a proxy for the remote platform.
 	 */
-//	protected IFuture<IComponentIdentifier>	createProxy(IExternalAccess remote)
-//	protected IFuture<IComponentIdentifier>	createProxy(IComponentManagementService local, ITransportComponentIdentifier remote)
-//	{
-//		if(local==null)
-//			local = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//		
-//		Map<String, Object>	args = new HashMap<String, Object>();
-//		args.put("component", remote);
-//		CreationInfo ci = new CreationInfo(args);
-//		return local.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null);
-//	}
-	
-	protected IFuture<IComponentIdentifier>	createProxy(IComponentManagementService local, final IExternalAccess remote)
-	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		
-		final IComponentManagementService flocal = local!=null? local: SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		
-		SServiceProvider.getService(remote, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
-		{
-			public void customResultAvailable(ITransportAddressService tas)
-			{
-				tas.getTransportComponentIdentifier(remote.getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
-				{
-					public void customResultAvailable(ITransportComponentIdentifier extacid)
-					{
-						Map<String, Object>	args = new HashMap<String, Object>();
-						args.put("component", extacid);
-						CreationInfo ci = new CreationInfo(args);
-						flocal.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-					}
-				});
-			}
-		});
-		
-		return ret;
-	}
-	
 	protected IFuture<IComponentIdentifier>	createProxy(IExternalAccess local, final IExternalAccess remote)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
@@ -420,7 +363,7 @@ public abstract class TestAgent
 	 *  Setup a remote test.
 	 */
 	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
-		final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+		final IResultListener<Collection<Tuple2<String,Object>>> reslis, final boolean remove)
 	{
 		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		
@@ -428,86 +371,31 @@ public abstract class TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
+				if(remove)
+					platforms.remove(exta);
 				
-//				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-//				{
-//					public void customResultAvailable(IComponentManagementService cms)
-//					{
-//						cms.addComponentListener(exta.getComponentIdentifier(), new ICMSComponentListener()
-//						{
-//							public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
-//							{
-//								platforms.remove(desc.getName());
-//								return IFuture.DONE;
-//							}
-//							
-//							public IFuture<Void> componentChanged(IComponentDescription desc)
-//							{
-//								return IFuture.DONE;
-//							}
-//							
-//							public IFuture<Void> componentAdded(IComponentDescription desc)
-//							{
-//								return IFuture.DONE;
-//							}
-//						});
-//					}
-//				});
-				
-				SServiceProvider.getService(exta, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+//				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				createProxy(agent.getExternalAccess(), exta).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 				{
-					public void customResultAvailable(ITransportAddressService tas)
+					public void customResultAvailable(IComponentIdentifier result)
 					{
-						tas.getTransportComponentIdentifier(exta.getComponentIdentifier())
-							.addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
+						// inverse proxy from remote to local.
+						createProxy(exta, agent.getExternalAccess())
+							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 						{
-							public void customResultAvailable(final ITransportComponentIdentifier rcid)
+							public void customResultAvailable(IComponentIdentifier result)
 							{
-								ITransportAddressService tas	= SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-								tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot())
-									.addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
-								{
-									public void customResultAvailable(final ITransportComponentIdentifier lcid)
-									{
-										createProxy(lcid, rcid).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-										{
-											public void customResultAvailable(IComponentIdentifier result)
-											{
-												// inverse proxy from remote to local.
-												createProxy(rcid, lcid).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-												{
-													public void customResultAvailable(IComponentIdentifier result)
-													{
-														createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
-															.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-													}
-												});
-											}
-										});
-									}
-								});
+								createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
+									.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 							}
 						});
 					}
-				});				
+				});
 			}
 		});
 		
 		return ret;
 	}
-	
-	/**
-	 *  Create a proxy for the remote platform.
-	 */
-	protected IFuture<IComponentIdentifier>	createProxy(ITransportComponentIdentifier root, ITransportComponentIdentifier remote)
-	{
-		Map<String, Object>	args = new HashMap<String, Object>();
-		args.put("component", remote);
-		return createComponent("jadex/platform/service/remote/ProxyAgent.class", args, null, root, null);
-	}
-
 	
 	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
 	{

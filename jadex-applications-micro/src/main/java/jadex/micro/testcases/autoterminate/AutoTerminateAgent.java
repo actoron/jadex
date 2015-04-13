@@ -96,44 +96,6 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	}
 	
 	/**
-	 *  Setup a remote test.
-	 */
-	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
-		final IResultListener<Collection<Tuple2<String,Object>>> reslis, final boolean remove)
-	{
-		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
-		
-		createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
-		{
-			public void customResultAvailable(final IExternalAccess exta)
-			{
-				if(remove)
-					platforms.remove(exta);
-				
-//				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-				createProxy(agent.getExternalAccess(), exta).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier result)
-					{
-						// inverse proxy from remote to local.
-						createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-						{
-							public void customResultAvailable(IComponentIdentifier result)
-							{
-								createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
-									.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-							}
-						});
-					}
-				});
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
 	 *  Test subscription.
 	 */
 	public ISubscriptionIntermediateFuture<String>	subscribe()

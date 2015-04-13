@@ -7,6 +7,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 

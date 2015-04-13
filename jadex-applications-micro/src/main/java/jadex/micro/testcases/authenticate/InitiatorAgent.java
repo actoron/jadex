@@ -2,8 +2,10 @@ package jadex.micro.testcases.authenticate;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -103,10 +105,16 @@ public class InitiatorAgent extends TestAgent
 			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
-			public void customResultAvailable(final IExternalAccess platform)
+			public void customResultAvailable(IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+                {
+                    public void customResultAvailable(ITransportComponentIdentifier cid)
+                    { 
+						performTest(cid, testno)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+        			}
+        		});
 			}
 		}));
 		

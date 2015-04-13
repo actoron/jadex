@@ -971,7 +971,8 @@ public class Starter
 	 */
 	public static boolean	isRealtimeTimeout(IPlatformComponentAccess access)
 	{
-		return Boolean.TRUE.equals(access.getPlatformData().get(DATA_REALTIMETIMEOUT));
+		// Hack!!! Should default to false?
+		return !Boolean.FALSE.equals(access.getPlatformData().get(DATA_REALTIMETIMEOUT));
 	}
 	
 	/**
