@@ -403,6 +403,42 @@ public abstract class TestAgent
 		return ret;
 	}
 	
+	/**
+	 *  Setup a remote test.
+	 */
+	protected IFuture<IExternalAccess>	setupRemotePlatform(final boolean manualremove)
+	{
+		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
+		
+		createPlatform(null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+		{
+			public void customResultAvailable(final IExternalAccess exta)
+			{
+				if(manualremove)
+					platforms.remove(exta);
+				
+//				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
+					{
+						// inverse proxy from remote to local.
+						createProxy(exta, agent.getExternalAccess())
+							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+						{
+							public void customResultAvailable(IComponentIdentifier result)
+							{
+								ret.setResult(exta);
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
 	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
 	{
 		final Future<T>	ret	= new Future<T>();

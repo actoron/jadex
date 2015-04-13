@@ -2,11 +2,13 @@ package jadex.micro.testcases.stream;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -47,10 +49,13 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				if (SReflect.isAndroid()) {
+				if(SReflect.isAndroid()) 
+				{
 					tc.setTestCount(1);
 					ret.setResult(null);
-				} else {
+				} 
+				else 
+				{
 					testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
 						public void customResultAvailable(TestReport result)
@@ -60,7 +65,6 @@ public class InitiatorAgent extends TestAgent
 						}
 					}));
 				}
-				
 			}
 		}));
 		
@@ -87,8 +91,14 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+                {
+                    public void customResultAvailable(ITransportComponentIdentifier result)
+                    { 
+                    	performTest(result, testno)
+                    		.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+                    }
+                });
 			}
 		}));
 		
