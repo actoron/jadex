@@ -18,7 +18,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.search.LocalServiceRegistry;
+import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -296,7 +296,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		final IComponentAdapterFactory factory, final IModelInfo model, final String config, final Map<String, Object> arguments, 
 		final IExternalAccess parent, @Reference final RequiredServiceBinding[] bindings, @Reference final ProvidedServiceInfo[] pinfos, final boolean copy, final boolean realtime, boolean persist,
 		IPersistInfo persistinfo, 
-		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, @Reference final LocalServiceRegistry registry)
+		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init, @Reference final PlatformServiceRegistry registry)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 

@@ -1,7 +1,7 @@
 package jadex.base;
 
-import jadex.bridge.Cause;
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -20,8 +20,9 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
-import jadex.bridge.service.search.LocalServiceRegistry;
+import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -37,13 +38,13 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,6 +60,20 @@ import java.util.logging.Logger;
  */
 public class Starter
 {
+	//-------- platform data keys --------
+	
+	/** The parameter copy flag argument and data key. */
+	public static final String DATA_PARAMETERCOPY = "parametercopy";
+
+	/** The real time timeout flag argument and data key. */
+	public static final String DATA_REALTIMETIMEOUT = "realtimetimeout";
+	
+	/** The local service registry data key. */
+	public static final String DATA_SERVICEREGISTRY = "serviceregistry";
+	
+	/** The transport address book data key. */
+	public static final String DATA_ADDRESSBOOK = "addressbook";
+	
 	//-------- constants --------
 
 	/** The default platform configuration. */
@@ -96,17 +111,11 @@ public class Starter
 	/** The component flag argument (for starting an additional component). */
 	public static final String COMPONENT = "component";
 	
-	/** The parameter copy flag argument. */
-	public static final String PARAMETERCOPY = "parametercopy";
-
 	/** The persist flag argument. */
 	public static final String PERSIST = "persist";
 
 	/** The default timeout argument. */
 	public static final String DEFTIMEOUT = "deftimeout";
-	
-	/** The realtime timeout flag argument. */
-	public static final String REALTIMETIMEOUT = "realtimetimeout";
 	
 	/** The debug futures flag argument. */
 	public static final String DEBUGFUTURES = "debugfutures";
@@ -142,7 +151,8 @@ public class Starter
 		RESERVED.add(MONITORING);
 		RESERVED.add(WELCOME);
 		RESERVED.add(COMPONENT);
-		RESERVED.add(PARAMETERCOPY);
+		RESERVED.add(DATA_PARAMETERCOPY);
+		RESERVED.add(DATA_REALTIMETIMEOUT);
 		RESERVED.add(PERSIST);
 		RESERVED.add(DEBUGFUTURES);
 		RESERVED.add(DEBUGSERVICES);
@@ -488,13 +498,15 @@ public class Starter
 						autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(),
 						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
 					
-					boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
-					boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
-					boolean persist = !Boolean.FALSE.equals(getArgumentValue(PERSIST, model, cmdargs, compargs));
-	
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, new LocalServiceRegistry(), null, realtime, copy);
+					Map<String, Object>	platformdata	= new HashMap<String, Object>();
+					platformdata.put(DATA_REALTIMETIMEOUT, getArgumentValue(DATA_REALTIMETIMEOUT, model, cmdargs, compargs));
+					platformdata.put(DATA_PARAMETERCOPY, getArgumentValue(DATA_PARAMETERCOPY, model, cmdargs, compargs));
+					platformdata.put(DATA_SERVICEREGISTRY, new PlatformServiceRegistry());
+					platformdata.put(DATA_ADDRESSBOOK, new TransportAddressBook());
+					
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();
-					component.create(cci, features);
+					component.create(cci, Collections.unmodifiableMap(platformdata), features);
 
 					initRescueThread(cid, compargs);	// Required for bootstrapping init.
 
@@ -952,6 +964,23 @@ public class Starter
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Check if the real time timeout flag is set for a platform.
+	 */
+	public static boolean	isRealtimeTimeout(IPlatformComponentAccess access)
+	{
+		return Boolean.TRUE.equals(access.getPlatformData().get(DATA_REALTIMETIMEOUT));
+	}
+	
+	/**
+	 *  Check if the parameter copy flag is set for a platform.
+	 */
+	public static boolean	isParameterCopy(IPlatformComponentAccess access)
+	{
+		// not equals false to make true the default.
+		return !Boolean.FALSE.equals(access.getPlatformData().get(DATA_PARAMETERCOPY));
 	}
 }
 

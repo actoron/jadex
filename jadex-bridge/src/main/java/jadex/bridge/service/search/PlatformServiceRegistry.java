@@ -1,10 +1,12 @@
 package jadex.bridge.service.search;
 
+import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
@@ -39,8 +41,7 @@ import java.util.Set;
  *  Search fetches services by types and excludes some according to
  *  the scope.
  */
-//todo: rename PlatformServiceRegistry
-public class LocalServiceRegistry
+public class PlatformServiceRegistry
 {
 	/** The map of published services sorted by type. */
 	protected Map<ClassInfo, Set<IService>> services;
@@ -889,5 +890,13 @@ public class LocalServiceRegistry
 	{
 		return cid.getName().replace('@', '.');
 //		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
+	}
+	
+	/**
+	 *  Get the registry from a component.
+	 */
+	public static PlatformServiceRegistry	getRegistry(IPlatformComponentAccess access)
+	{
+		return (PlatformServiceRegistry)access.getPlatformData().get(Starter.DATA_SERVICEREGISTRY);
 	}
 }

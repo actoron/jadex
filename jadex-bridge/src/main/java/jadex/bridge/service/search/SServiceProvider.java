@@ -75,7 +75,7 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
-		T ret = ((IPlatformComponentAccess)provider).getServiceRegistry().searchService(type, provider.getComponentIdentifier(), scope, filter);
+		T ret = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchService(type, provider.getComponentIdentifier(), scope, filter);
 		if(ret==null)
 		{
 			throw new ServiceNotFoundException(type.getName());
@@ -86,7 +86,7 @@ public class SServiceProvider
 	
 	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type, final IComponentIdentifier target)
 	{
-		T ret = ((IPlatformComponentAccess)provider).getServiceRegistry().searchService(type, provider.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+		T ret = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchService(type, provider.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
 		{
 			public boolean filter(T obj) 
 			{
@@ -128,7 +128,7 @@ public class SServiceProvider
 	 */
 	public static <T> Collection<T> getLocalServices(final IInternalAccess provider, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
-		Collection<T> ret = ((IPlatformComponentAccess)provider).getServiceRegistry().searchServices(type, provider.getComponentIdentifier(), scope, filter);
+		Collection<T> ret = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope, filter);
 		
 		return ret;
 	}
@@ -168,7 +168,7 @@ public class SServiceProvider
 		{
 			if(filter==null)
 			{
-				T ser = ((IPlatformComponentAccess)provider).getServiceRegistry().searchService(type, provider.getComponentIdentifier(), scope);
+				T ser = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchService(type, provider.getComponentIdentifier(), scope);
 				if(ser!=null)
 				{
 					ret.setResult(ser);
@@ -180,13 +180,13 @@ public class SServiceProvider
 			}
 			else
 			{
-				((IPlatformComponentAccess)provider).getServiceRegistry().searchService(type, provider.getComponentIdentifier(), scope, filter)
+				PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchService(type, provider.getComponentIdentifier(), scope, filter)
 					.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 			}
 		}
 		else
 		{
-			((IPlatformComponentAccess)provider).getServiceRegistry().searchGlobalService(type, provider.getComponentIdentifier(), filter)
+			PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchGlobalService(type, provider.getComponentIdentifier(), filter)
 				.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 		}
 		
@@ -314,18 +314,18 @@ public class SServiceProvider
 		{
 			if(filter==null)
 			{
-				Collection<T> sers = ((IPlatformComponentAccess)provider).getServiceRegistry().searchServices(type, provider.getComponentIdentifier(), scope);
+				Collection<T> sers = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope);
 				ret.setResult(sers==null? Collections.EMPTY_SET: sers);
 			}
 			else
 			{
-				((IPlatformComponentAccess)provider).getServiceRegistry().searchServices(type, provider.getComponentIdentifier(), scope, filter).addResultListener(
+				PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope, filter).addResultListener(
 					new IntermediateComponentResultListener<T>(new IntermediateDelegationResultListener<T>(ret), provider));
 			}
 		}
 		else
 		{
-			((IPlatformComponentAccess)provider).getServiceRegistry().searchGlobalServices(type, provider.getComponentIdentifier(), filter).addResultListener(
+			PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchGlobalServices(type, provider.getComponentIdentifier(), filter).addResultListener(
 				new IntermediateComponentResultListener<T>(new IntermediateDelegationResultListener<T>(ret), provider));
 		}
 		
