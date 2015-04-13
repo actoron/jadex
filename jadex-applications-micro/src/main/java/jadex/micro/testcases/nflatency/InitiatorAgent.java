@@ -2,8 +2,10 @@ package jadex.micro.testcases.nflatency;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
@@ -110,28 +112,34 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				// Hack: announce platform immediately
-				IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
-				fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
+				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
 				{
-					public void customResultAvailable(IComponentManagementService cms)
+					public void customResultAvailable(final ITransportComponentIdentifier result) 
 					{
-						CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getComponentIdentifier().getRoot()}));
-						cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
-							new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
-//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+						IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+						fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 						{
-							public void firstResultAvailable(IComponentIdentifier result)
+							public void customResultAvailable(final IComponentManagementService cms)
 							{
-								performTest(platform.getComponentIdentifier(), testno, false)
-									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-							}
-							public void secondResultAvailable(Map<String,Object> result) 
-							{
-								System.out.println("sec");
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								ret.setExceptionIfUndone(exception);
+								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{result.getRoot()}));
+								cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
+									new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
+		//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+								{
+									public void firstResultAvailable(IComponentIdentifier result)
+									{
+										performTest(result, testno, false)
+											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+									}
+									public void secondResultAvailable(Map<String,Object> result) 
+									{
+										System.out.println("sec");
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										ret.setExceptionIfUndone(exception);
+									}
+								});
 							}
 						});
 					}

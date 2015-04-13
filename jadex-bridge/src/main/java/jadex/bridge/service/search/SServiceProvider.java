@@ -250,7 +250,15 @@ public class SServiceProvider
 		
 		if(cid.equals(provider.getComponentIdentifier()))
 		{
-			ret.setResult((T)provider.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type));
+			T res = (T)provider.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
+			if(res!=null)
+			{
+				ret.setResult(res);
+			}
+			else
+			{
+				ret.setException(new ServiceNotFoundException(""+type));
+			}
 		}
 		else
 		{
