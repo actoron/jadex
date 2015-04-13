@@ -18,8 +18,6 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +72,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.getScaledLocalDefaultTimeout(10), true, true, false);
+		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.getScaledLocalDefaultTimeout(10), true, true, true);
 	}
 	
 	/**
