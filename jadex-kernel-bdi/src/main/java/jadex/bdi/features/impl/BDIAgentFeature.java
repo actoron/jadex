@@ -52,7 +52,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
-import jadex.bridge.service.search.LocalServiceRegistry;
+import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -280,7 +280,7 @@ public class BDIAgentFeature
 	protected ServiceGetter<IMonitoringService> getter;
 	
 	/** The service registry .*/
-	protected LocalServiceRegistry registry;
+	protected PlatformServiceRegistry registry;
 
 	
 	//-------- constructors --------
@@ -294,7 +294,7 @@ public class BDIAgentFeature
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
 		final String config, final Map<String, Object> arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, ProvidedServiceInfo[] pinfos,
-		final Map kernelprops, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited, LocalServiceRegistry registry)
+		final Map kernelprops, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited, PlatformServiceRegistry registry)
 	{	
 		this.initthread = Thread.currentThread();
 		
@@ -2602,7 +2602,7 @@ public class BDIAgentFeature
 	 *  Get the service registry.
 	 *  @return The service registry.
 	 */
-	public LocalServiceRegistry getServiceRegistry() 
+	public PlatformServiceRegistry getServiceRegistry() 
 	{
 		return registry;
 	}

@@ -14,9 +14,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
@@ -63,6 +61,9 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/** The creation info. */
 	protected ComponentCreationInfo	info;
 	
+	/** The creation info. */
+	protected Map<String, Object>	platformdata;
+	
 	/** The features. */
 	protected Map<Class<?>, IComponentFeature>	features;
 	
@@ -85,13 +86,16 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	
 	/**
 	 *  Create the component, i.e. instantiate its features.
+	 *  This is the first method that is called by the platform.
 	 *  
 	 *  @param info The component creation info.
-	 *  @param facs The component feature factories to be instantiated for this component.
+	 *  @param platformdata The shared objects for all components of the same platform (registry etc.). See starter for available data.
+	 *  @param facs The factories for component features to be instantiated for this component.
 	 */
-	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> facs)
+	public void	create(ComponentCreationInfo info, Map<String, Object> platformdata, Collection<IComponentFeatureFactory> facs)
 	{
-		this.info	= info;		
+		this.info	= info;
+		this.platformdata	= platformdata;
 		this.features	= new LinkedHashMap<Class<?>, IComponentFeature>();
 		this.lfeatures	= new ArrayList<IComponentFeature>();
 
@@ -103,7 +107,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			lfeatures.add(instance);
 		}
 	}
-	
 	
 	/**
 	 *  Perform the initialization of the component.
@@ -393,13 +396,13 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
-	 *  Get the local platform service registry.
+	 *  Get the shared platform data.
 	 *  
-	 *  @return The local platform service registry.
+	 *  @return The objects shared by all components of the same platform (registry etc.). See starter for available data.
 	 */
-	public LocalServiceRegistry	getServiceRegistry()
+	public Map<String, Object>	getPlatformData()
 	{
-		return info.getServiceRegistry();
+		return platformdata;
 	}
 	
 	//-------- IInternalAccess interface --------
@@ -439,24 +442,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IComponentDescription	getComponentDescription()
 	{
 		return info.getComponentDescription();
-	}
-
-	/**
-	 *  Get the realtime setting.
-	 *  @return If is realtime.
-	 */
-	public boolean isRealtime()
-	{
-		return info.isRealtime();
-	}
-	
-	/**
-	 *  Get the copy setting.
-	 *  @return If is copy.
-	 */
-	public boolean isCopy()
-	{
-		return info.isCopy();
 	}
 
 	/**
@@ -722,17 +707,17 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		// Todo: better (faster) way than throwing exceptions?
 		return new IParameterGuesser()
 		{
-			IParameterGuesser parent;
-			
-			public void setParent(IParameterGuesser parent)
-			{
-				this.parent = parent;
-			}
-			
-			public IParameterGuesser getParent()
-			{
-				return parent;
-			}
+//			IParameterGuesser parent;
+//			
+//			public void setParent(IParameterGuesser parent)
+//			{
+//				this.parent = parent;
+//			}
+//			
+//			public IParameterGuesser getParent()
+//			{
+//				return parent;
+//			}
 			
 			public Object guessParameter(Class<?> type, boolean exact)
 			{

@@ -1,5 +1,6 @@
 package jadex.bridge.service.component;
 
+import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -16,6 +17,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -135,7 +137,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()),
 						BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info.getScope());
 					final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
-						component, sid, rsi, impl.getBinding(), component.getClassLoader(), cinfo.isRealtime());
+						component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout((IPlatformComponentAccess)component));
 					
 					addService(service, info);
 				}
@@ -169,8 +171,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //						 todo: remove this? currently the level cannot be turned on due to missing interceptor
 						boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 						final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-							component, ser, info.getName(), type, info.getImplementation().getProxytype(), ics, cinfo.isCopy(), 
-							cinfo.isRealtime(), moni, info, info.getScope());
+							component, ser, info.getName(), type, info.getImplementation().getProxytype(), ics, Starter.isParameterCopy((IPlatformComponentAccess)component), 
+							Starter.isRealtimeTimeout((IPlatformComponentAccess)component), moni, info, info.getScope());
 						
 						addService(proxy, info);
 					}
@@ -251,7 +253,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			tmp.add(service);
 			
 			// Make all services available immediately, even before start (hack???).
-			((IPlatformComponentAccess)component).getServiceRegistry().addService(new ClassInfo(servicetype), service);
+			PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)component).addService(new ClassInfo(servicetype), service);
 		}
 	}
 	
@@ -276,7 +278,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 
 		for(Class<?> servicetype: types)
 		{
-			((IPlatformComponentAccess)component).getServiceRegistry().removeService(new ClassInfo(servicetype), service);
+			PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)component).removeService(new ClassInfo(servicetype), service);
 		}
 	}
 	
@@ -852,8 +854,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		
 		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getComponent(), service, name, type, proxytype, ics, getComponent().isCopy(), 
-			getComponent().isRealtime(), moni, 
+			getComponent(), service, name, type, proxytype, ics, Starter.isParameterCopy((IPlatformComponentAccess)getComponent()), 
+			Starter.isRealtimeTimeout((IPlatformComponentAccess)getComponent()), moni, 
 			info, scope!=null ? scope : info!=null? info.getScope(): null);
 		
 		addService(proxy, info);

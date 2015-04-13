@@ -71,7 +71,7 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 		}
 		
 		// Init the arguments with initial or default values.
-		ConfigurationInfo	ci	= cinfo.getConfiguration()!=null ? component.getModel().getConfiguration(cinfo.getConfiguration()) : null;
+		ConfigurationInfo	ci	= component.getConfiguration()!=null ? component.getModel().getConfiguration(component.getConfiguration()) : null;
 		if(ci!=null)
 		{
 			UnparsedExpression[]	upes	= ci.getArguments();

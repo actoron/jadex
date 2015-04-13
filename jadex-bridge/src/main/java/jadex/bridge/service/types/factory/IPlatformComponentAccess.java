@@ -3,10 +3,10 @@ package jadex.bridge.service.types.factory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.commons.future.IFuture;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  *  Interface for operations on the component to be called from the platform.
@@ -20,9 +20,10 @@ public interface IPlatformComponentAccess
 	 *  This is the first method that is called by the platform.
 	 *  
 	 *  @param info The component creation info.
-	 *  @param templates The component feature templates to be instantiated for this component.
+	 *  @param platformdata The shared objects for all components of the same platform (registry etc.). See starter for available data.
+	 *  @param facs The factories for component features to be instantiated for this component.
 	 */
-	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> templates);
+	public void	create(ComponentCreationInfo info, Map<String, Object> platformdata, Collection<IComponentFeatureFactory> facs);
 	
 	/**
 	 *  Perform the initialization of the component.
@@ -62,9 +63,9 @@ public interface IPlatformComponentAccess
 	public Exception	getException();
 	
 	/**
-	 *  Get the local platform service registry.
+	 *  Get the shared platform data.
 	 *  
-	 *  @return The local platform service registry.
+	 *  @return The objects shared by all components of the same platform (registry etc.). See starter for available data.
 	 */
-	public LocalServiceRegistry	getServiceRegistry();
+	public Map<String, Object>	getPlatformData();
 }

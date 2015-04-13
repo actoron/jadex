@@ -39,24 +39,30 @@ public class PersistenceComponentManagementService	extends ComponentManagementSe
 	/** The idle hook, if any. */
 	protected IIdleHook	hook;
 	
+	/** The persist flag. */
+	// Todo: move to platform data ?
+	protected boolean persist;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Static method for reflective creation to allow platform start without add-on.
 	 */
 	public static PersistenceComponentManagementService	create(IPlatformComponentAccess access,	IBootstrapFactory componentfactory,
-		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
+		boolean persist, boolean uniqueids)
 	{
-		return new PersistenceComponentManagementService(access, componentfactory, copy, realtime, persist, uniqueids);
+		return new PersistenceComponentManagementService(access, componentfactory, persist, uniqueids);
 	}
 	
 	/**
 	 *  Create a persistence CMS.
 	 */
 	public PersistenceComponentManagementService(IPlatformComponentAccess access, IBootstrapFactory componentfactory,
-		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
+		boolean persist, boolean uniqueids)
 	{
-		super(access, componentfactory, copy, realtime, persist, uniqueids);
+		super(access, componentfactory, uniqueids);
+		
+		this.persist	= persist;
 	}
 	
 	//-------- methods --------

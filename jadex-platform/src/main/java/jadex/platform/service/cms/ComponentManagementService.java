@@ -1,9 +1,9 @@
 package jadex.platform.service.cms;
 
 import jadex.base.Starter;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
-import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.FactoryFilter;
@@ -33,9 +33,9 @@ import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -75,7 +75,6 @@ import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.IBootstrapFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -144,15 +143,6 @@ public class ComponentManagementService implements IComponentManagementService
 	/** The bootstrap component factory. */
 	protected IBootstrapFactory componentfactory;
 	
-	/** The default copy parameters flag for service calls. */
-	protected boolean copy;
-	
-	/** The persist flag. */
-	protected boolean persist;
-	
-	/** The realtime timeout flag. */
-	protected boolean realtime;
-	
 	/** The locked components (component are locked till init is finished,
 	    i.e. if destroy is called during init it wait till lock is away). */
 	protected Map<IComponentIdentifier, LockEntry> lockentries;
@@ -161,6 +151,7 @@ public class ComponentManagementService implements IComponentManagementService
 //	protected IClockService clockservice;
 	
 	/** Flag to enable unique id generation. */
+	// Todo: move to platform data ?
 	protected boolean uniqueids;
 	
 	/** The cid count. */
@@ -172,13 +163,10 @@ public class ComponentManagementService implements IComponentManagementService
      *  Create a new component execution service.
      *  @param exta	The service provider.
      */
-    public ComponentManagementService(IPlatformComponentAccess access, IBootstrapFactory componentfactory, boolean copy, boolean realtime, boolean persist, boolean uniqueids)
+    public ComponentManagementService(IPlatformComponentAccess access, IBootstrapFactory componentfactory, boolean uniqueids)
 	{
     	this.access	= access;
 		this.componentfactory = componentfactory;
-		this.copy = copy;
-		this.realtime = realtime;
-		this.persist	= persist;
 		this.uniqueids = uniqueids;
 		
 		this.components = SCollection.createHashMap();
@@ -597,7 +585,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
-																	access.getServiceRegistry().addExcludedComponent(cid);
+																	PlatformServiceRegistry.getRegistry(access).addExcludedComponent(cid);
 																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
@@ -627,8 +615,8 @@ public class ComponentManagementService implements IComponentManagementService
 																	String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																	final IPlatformComponentAccess	component	= new PlatformComponent();
-																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, access.getServiceRegistry(), cinfo.getProvidedServiceInfos(), realtime, copy);
-																	component.create(cci, features);
+																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, cinfo.getProvidedServiceInfos());
+																	component.create(cci, access.getPlatformData(), features);
 																	IArgumentsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsFeature.class);
 																	if(resultlistener!=null)
 																	{
@@ -679,7 +667,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Started component: "+cid.getName());
 
-																			access.getServiceRegistry().removeExcludedComponent(cid);
+																			PlatformServiceRegistry.getRegistry(access).removeExcludedComponent(cid);
 																			
 		//																	System.out.println("created: "+ad);
 																			
@@ -785,6 +773,9 @@ public class ComponentManagementService implements IComponentManagementService
 																		public void exceptionOccurred(final Exception exception)
 																		{
 																			logger.info("Starting component failed: "+cid+", "+exception);
+																			
+																			PlatformServiceRegistry.getRegistry(access).removeExcludedComponent(cid);
+																			
 //																			System.err.println("Starting component failed: "+cid+", "+exception);
 //																			exception.printStackTrace();
 			//																System.out.println("Ex: "+cid+" "+exception);

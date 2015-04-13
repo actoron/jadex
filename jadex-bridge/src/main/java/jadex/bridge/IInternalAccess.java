@@ -207,19 +207,7 @@ public interface IInternalAccess
 //	 *  Has the service a property provider.
 //	 */
 //	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid);
-	
-	/**
-	 *  Get the realtime setting.
-	 *  @return If is realtime.
-	 */
-	public boolean isRealtime();
-	
-	/**
-	 *  Get the copy setting.
-	 *  @return If is copy.
-	 */
-	public boolean isCopy();
-	
+		
 	/**
 	 *  Get the children (if any) component identifiers.
 	 *  @return The children component identifiers.

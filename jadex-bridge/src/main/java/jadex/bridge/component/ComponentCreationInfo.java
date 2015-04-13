@@ -2,7 +2,6 @@ package jadex.bridge.component;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.search.LocalServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 
 import java.util.Map;
@@ -27,15 +26,6 @@ public class ComponentCreationInfo
 	// Hack??? Should be only available in CMS (single thread access)
 	protected IComponentDescription desc;
 	
-	/** The service registry of the local platform. */
-	protected LocalServiceRegistry	registry;
-	
-	/** The real time flag. */
-	protected boolean	realtime;
-	
-	/** The copy flag. */
-	protected boolean	copy;
-	
 	/** The provided service infos. */
 	protected ProvidedServiceInfo[]	infos;
 	
@@ -52,17 +42,13 @@ public class ComponentCreationInfo
 	 *  @param copy	The copy flag.
 	 */
 	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, 
-		IComponentDescription desc, LocalServiceRegistry registry, ProvidedServiceInfo[] infos, 
-		boolean realtime, boolean copy)
+		IComponentDescription desc, ProvidedServiceInfo[] infos)
 	{
 		this.model	= model;
 		this.config = config!=null ? config : model.getConfigurationNames().length>0 ? model.getConfigurationNames()[0] : null;
 		this.arguments	= arguments;
-		this.registry	= registry;
 		this.desc	= desc;
 		this.infos	= infos;
-		this.realtime	= realtime;
-		this.copy	= copy;
 	}
 	
 	//-------- methods --------
@@ -98,16 +84,6 @@ public class ComponentCreationInfo
 	{
 		return this.desc;
 	}
-	
-	/**
-	 *  Get the local platform service registry.
-	 *  
-	 *  @return The local platform service registry.
-	 */
-	public LocalServiceRegistry	getServiceRegistry()
-	{
-		return registry;
-	}
 
 	/**
 	 *  Get the provided service infos.
@@ -117,21 +93,5 @@ public class ComponentCreationInfo
 	public ProvidedServiceInfo[]	getProvidedServiceInfos()
 	{
 		return infos;
-	}
-
-	/**
-	 *  Get the real time flag.
-	 */
-	public boolean isRealtime()
-	{
-		return realtime;
-	}
-
-	/**
-	 *  Get the copy flag.
-	 */
-	public boolean isCopy()
-	{
-		return copy;
 	}
 }
