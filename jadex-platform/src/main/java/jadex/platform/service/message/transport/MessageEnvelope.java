@@ -1,5 +1,6 @@
 package jadex.platform.service.message.transport;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -70,15 +71,17 @@ public class MessageEnvelope
 	/**
 	 * Get the receivers.
 	 */
-	public ITransportComponentIdentifier[] getReceivers()
+	// Legacy compatibility hack. Should be ITransportComponentIdentifier
+	public ComponentIdentifier[] getReceivers()
 	{
-		return receivers==null? new ITransportComponentIdentifier[0]: receivers.toArray(new ITransportComponentIdentifier[receivers.size()]);
+		return receivers==null? new ComponentIdentifier[0]: receivers.toArray(new ComponentIdentifier[receivers.size()]);
 	}
 	
 	/**
 	 * Get the receivers.
 	 */
-	public void setReceivers(ITransportComponentIdentifier[] receivers)
+	// Legacy compatibility hack. Should be ITransportComponentIdentifier
+	public void setReceivers(ComponentIdentifier[] receivers)
 	{
 		this.receivers = new ArrayList<ITransportComponentIdentifier>();
 		if(receivers!=null)

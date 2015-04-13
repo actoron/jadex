@@ -247,7 +247,7 @@ public class HttpRelayTransport implements ITransport
 	public IFuture<Void> shutdown()
 	{
 		String adr	= receiver.address==null ? null
-			: receiver.address.endsWith("/") ? receiver.address+"offline" : receiver.address+"/offline";
+			: RelayConnectionManager.httpAddress(receiver.address)+"offline";
 		this.receiver.stop();
 		if(adr!=null)
 		{
