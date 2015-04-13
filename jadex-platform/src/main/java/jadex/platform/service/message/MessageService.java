@@ -27,6 +27,7 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -171,7 +172,7 @@ public class MessageService extends BasicService implements IMessageService
 
 //	/** The address service. */
 	protected ITransportAddressService addrservice;
-	protected Map<String, String[]> taddresses;
+	protected TransportAddressBook taddresses;
 	
 	/** The awareness service. */
 //	protected IAwarenessManagementService ams;
@@ -1161,9 +1162,9 @@ public class MessageService extends BasicService implements IMessageService
 													public void customResultAvailable(final ITransportAddressService tas)
 													{
 														addrservice = tas;
-														tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<Map<String,String[]>, Void>(ret)
+														tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<TransportAddressBook, Void>(ret)
 														{
-															public void customResultAvailable(Map<String, String[]> result)
+															public void customResultAvailable(TransportAddressBook result)
 															{
 																taddresses = result;
 																

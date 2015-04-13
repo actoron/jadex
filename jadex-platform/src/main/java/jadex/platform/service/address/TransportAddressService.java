@@ -1,17 +1,14 @@
 package jadex.platform.service.address;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Service that manages the transport addresses of remote platforms.
@@ -20,7 +17,7 @@ import java.util.Map;
 public class TransportAddressService implements ITransportAddressService
 {
 	/** The managed addresses. */
-	protected Map<String, String[]> addresses = Collections.synchronizedMap(new HashMap<String, String[]>());
+	private TransportAddressBook addresses = new TransportAddressBook();
 	
 	/**
 	 *  Set the addresses of a platform.
@@ -28,13 +25,8 @@ public class TransportAddressService implements ITransportAddressService
 	 */
 	public IFuture<Void> addPlatformAddresses(ITransportComponentIdentifier platform)
 	{
-		// Must be synchronized due to direct access via getMap()
-//		if(addresses==null)
-//			addresses = Collections.synchronizedMap(new HashMap<String, String[]>());
-		addresses.put(platform.getPlatformName(), platform.getAddresses());
-		
-//		System.out.println("added: "+platform.getPlatformName()+" "+SUtil.arrayToString(platform.getAddresses()));
-		return Future.DONE;
+		addresses.addPlatformAddresses(platform);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -43,9 +35,8 @@ public class TransportAddressService implements ITransportAddressService
 	 */
 	public IFuture<Void> removePlatformAddresses(ITransportComponentIdentifier platform)
 	{
-//		if(addresses!=null)
-		addresses.remove(platform.getPlatformName());
-		return Future.DONE;
+		addresses.removePlatformAddresses(platform);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -54,23 +45,8 @@ public class TransportAddressService implements ITransportAddressService
 	 */
 	public IFuture<String[]> getPlatformAddresses(IComponentIdentifier component)
 	{
-		Future<String[]> ret = new Future<String[]>();
-		if(addresses==null || !addresses.containsKey(component.getPlatformName()))
-		{
-			if(component instanceof ComponentIdentifier)
-			{
-				ret.setResult(((ITransportComponentIdentifier)component).getAddresses());
-			}
-			else
-			{
-				ret.setException(new RuntimeException("Not contained: "+component.getPlatformName()));
-			}
-		}
-		else
-		{
-			ret.setResult(addresses.get(component.getPlatformName()));
-		}
-		return ret;
+		String[] ret = addresses.getPlatformAddresses(component);
+		return new Future<String[]>(ret);
 	}
 	
 	/**
@@ -81,21 +57,17 @@ public class TransportAddressService implements ITransportAddressService
 	public IFuture<ITransportComponentIdentifier> getTransportComponentIdentifier(IComponentIdentifier component)
 	{
 		Future<ITransportComponentIdentifier> ret = new Future<ITransportComponentIdentifier>();
-		if(addresses==null || !addresses.containsKey(component.getPlatformName()))
+		
+		ITransportComponentIdentifier res = addresses.getTransportComponentIdentifier(component);
+		if(res!=null)
 		{
-			if(component instanceof ComponentIdentifier)
-			{
-				ret.setResult((ITransportComponentIdentifier)component);
-			}
-			else
-			{
-				ret.setException(new RuntimeException("Not contained: "+component.getPlatformName()));
-			}
+			ret.setResult(res);
 		}
 		else
 		{
-			ret.setResult(new ComponentIdentifier(component.getName(), addresses.get(component.getPlatformName())));
+			ret.setException(new RuntimeException("Not contained: "+component.getPlatformName()));
 		}
+		
 		return ret;
 	}
 	
@@ -107,33 +79,17 @@ public class TransportAddressService implements ITransportAddressService
 	public IFuture<ITransportComponentIdentifier[]> getTransportComponentIdentifiers(IComponentIdentifier[] components)
 	{
 		Future<ITransportComponentIdentifier[]> ret = new Future<ITransportComponentIdentifier[]>();
-		if(components!=null && components.length>0)
+		
+		ITransportComponentIdentifier[] res = addresses.getTransportComponentIdentifiers(components);
+		if(res!=null)
 		{
-			ITransportComponentIdentifier[] res = new ITransportComponentIdentifier[components.length];
-			for(int i=0; i<components.length; i++)
-			{
-				if(addresses==null || !addresses.containsKey(components[i].getPlatformName()))
-				{
-					if(components[i] instanceof ComponentIdentifier)
-					{
-						res[i] = ((ITransportComponentIdentifier)components[i]);
-					}
-					else
-					{
-						ret.setException(new RuntimeException("Not contained: "+components[i].getPlatformName()));
-						break;
-					}
-				}
-				else
-				{
-					res[i] = new ComponentIdentifier(components[i].getName(), addresses.get(components[i].getPlatformName()));
-				}
-			}
+			ret.setResult(res);
 		}
 		else
 		{
-			ret.setResult(null);
+			ret.setException(new RuntimeException("Not contained: "+SUtil.arrayToString(components)));
 		}
+		
 		return ret;
 	}
 
@@ -141,15 +97,15 @@ public class TransportAddressService implements ITransportAddressService
 	 *  Get direct access to the map of the addresses.
 	 *  @return The map.
 	 */
-	public IFuture<Map<String, String[]>> getTransportAddresses()
+	public IFuture<TransportAddressBook> getTransportAddresses()
 	{
-		return new Future<Map<String, String[]>>(Collections.unmodifiableMap(addresses));
+		return new Future<TransportAddressBook>(addresses);
 	}
 	
 	/**
 	 *  Internal convert method for identifiers.
 	 */
-	public static ITransportComponentIdentifier getTransportComponentIdentifier(IComponentIdentifier cid, Map<String, String[]> addresses)
+	public static ITransportComponentIdentifier getTransportComponentIdentifier(IComponentIdentifier cid, TransportAddressBook addresses)
 	{
 		ITransportComponentIdentifier ret = null;
 		
@@ -160,7 +116,7 @@ public class TransportAddressService implements ITransportAddressService
 		}
 		else
 		{
-			String[] adrs = addresses.get(cid.getPlatformName());
+			String[] adrs = addresses.getPlatformAddresses(cid);
 			if(adrs!=null)
 			{
 				ret = new ComponentIdentifier(cid.getName(), adrs);

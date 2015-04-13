@@ -16,6 +16,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -113,9 +114,9 @@ public class RemoteServiceManagementAgent
 //		boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
 		
 		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<Map<String,String[]>, Void>(ret)
+		tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<TransportAddressBook, Void>(ret)
 		{
-			public void customResultAvailable(Map<String, String[]> addresses)
+			public void customResultAvailable(TransportAddressBook addresses)
 			{
 				rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice, addresses);//, binarymode);
 				agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
