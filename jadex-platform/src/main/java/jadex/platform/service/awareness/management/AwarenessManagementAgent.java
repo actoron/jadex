@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -163,6 +164,9 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	/** The cms, cached for speed. */
 	protected IComponentManagementService	cms;
 	
+	/** The addresses. */
+	protected TransportAddressBook addresses;
+	
 	//-------- methods --------
 	
 	/**
@@ -173,82 +177,89 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	{
 //		String[] test = new String[]{"test", "test2"};
 //		System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
+		final Future<Void>	ret	= new Future<Void>();
+
+		this.discovered = new LinkedHashMap<IComponentIdentifier, DiscoveryInfo>();
 
 		initArguments();
 		
-		this.discovered = new LinkedHashMap<IComponentIdentifier, DiscoveryInfo>();
-		
-		final Future<Void>	ret	= new Future<Void>();
-		
-		IFuture<ISettingsService>	setfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("settings");
-		setfut.addResultListener(new IResultListener<ISettingsService>()
+		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<TransportAddressBook, Void>(ret)
 		{
-			public void resultAvailable(ISettingsService settings)
+			public void customResultAvailable(TransportAddressBook addresses)
 			{
-				settings.registerPropertiesProvider(agent.getComponentIdentifier().getName(), AwarenessManagementAgent.this)
-					.addResultListener(new DelegationResultListener<Void>(ret)
+				AwarenessManagementAgent.this.addresses = addresses;
+				
+				IFuture<ISettingsService>	setfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("settings");
+				setfut.addResultListener(new IResultListener<ISettingsService>()
 				{
-					public void customResultAvailable(Void result)
+					public void resultAvailable(ISettingsService settings)
 					{
+						settings.registerPropertiesProvider(agent.getComponentIdentifier().getName(), AwarenessManagementAgent.this)
+							.addResultListener(new DelegationResultListener<Void>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								proceed();
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// No settings service: ignore.
 						proceed();
+					}
+					
+					protected void	proceed()
+					{
+						final String mechas = (String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("mechanisms");
+						if(mechas!=null)
+						{
+							IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+							cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+							{
+								public void customResultAvailable(IComponentManagementService cms)
+								{
+									AwarenessManagementAgent.this.cms = cms;
+									StringTokenizer	stok	= new StringTokenizer(mechas, ", \r\n\t");
+									CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(stok.countTokens(), 
+										false, new DelegationResultListener<Void>(ret)
+									{
+										public void customResultAvailable(Void result)
+										{
+											ret.setResult(null);
+										}
+									});
+									
+									CreationInfo info = new CreationInfo(agent.getComponentIdentifier());
+									info.setConfiguration(agent.getConfiguration());
+									Map<String, Object> args = new HashMap<String, Object>();
+									args.put("delay", Long.valueOf(getDelay()));
+									args.put("fast", Boolean.valueOf(isFastAwareness()));
+									args.put("includes", getIncludes());
+									args.put("excludes", getExcludes());
+									info.setArguments(args);
+									
+//									System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
+									
+									while(stok.hasMoreTokens())
+									{
+			//							System.out.println("mecha: "+mechas[i]);
+										String	mech	= stok.nextToken().toLowerCase();
+										cms.createComponent(mech, mech, info, null).addResultListener(lis);
+									}
+								}
+							});
+						}
+						else
+						{
+							ret.setResult(null);
+						}
 					}
 				});
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// No settings service: ignore.
-				proceed();
-			}
-			
-			protected void	proceed()
-			{
-				final String mechas = (String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("mechanisms");
-				if(mechas!=null)
-				{
-					IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
-					cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-					{
-						public void customResultAvailable(IComponentManagementService cms)
-						{
-							AwarenessManagementAgent.this.cms = cms;
-							StringTokenizer	stok	= new StringTokenizer(mechas, ", \r\n\t");
-							CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(stok.countTokens(), 
-								false, new DelegationResultListener<Void>(ret)
-							{
-								public void customResultAvailable(Void result)
-								{
-									ret.setResult(null);
-								}
-							});
-							
-							CreationInfo info = new CreationInfo(agent.getComponentIdentifier());
-							info.setConfiguration(agent.getConfiguration());
-							Map<String, Object> args = new HashMap<String, Object>();
-							args.put("delay", Long.valueOf(getDelay()));
-							args.put("fast", Boolean.valueOf(isFastAwareness()));
-							args.put("includes", getIncludes());
-							args.put("excludes", getExcludes());
-							info.setArguments(args);
-							
-//							System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
-							
-							while(stok.hasMoreTokens())
-							{
-	//							System.out.println("mecha: "+mechas[i]);
-								String	mech	= stok.nextToken().toLowerCase();
-								cms.createComponent(mech, mech, info, null).addResultListener(lis);
-							}
-						}
-					});
-				}
-				else
-				{
-					ret.setResult(null);
-				}
-			}
 		});
-
 		
 		return ret;
 	}
@@ -346,8 +357,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		boolean ret = false;
 		
 		// Announce new platform addresses
-		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		tas.addPlatformAddresses(info.getSender());
+		addresses.addPlatformAddresses(info.getSender());
+//		tas.addPlatformAddresses(info.getSender());
 		
 		// Fix broken awareness infos for backwards compatibility.
 		if(info.getDelay()==0)

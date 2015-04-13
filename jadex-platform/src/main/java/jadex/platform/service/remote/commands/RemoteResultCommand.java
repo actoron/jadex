@@ -119,7 +119,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public IIntermediateFuture execute(IExternalAccess component, RemoteServiceManagementService rsms)
 	{
-//		System.out.println("result command: "+result+" "+exceptioninfo+" "+callid);
+//		System.out.println("result command: "+result+" "+exception+" "+callid);
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
 		

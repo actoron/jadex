@@ -23,6 +23,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -168,7 +169,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //	protected ITransportComponentIdentifier rms;
 	
 	/** The transport addresses. */
-	protected Map<String, String[]> addresses;
+	protected TransportAddressBook addresses;
 	
 	//-------- constructors --------
 	
@@ -176,7 +177,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Create a new remote service management service.
 	 */
 	public RemoteServiceManagementService(IExternalAccess component, 
-		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice, Map<String, String[]> addresses)//, boolean binarymode)
+		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice, TransportAddressBook addresses)//, boolean binarymode)
 	{
 		super(component.getComponentIdentifier(), IRemoteServiceManagementService.class, null);
 
@@ -1795,7 +1796,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Get the addresses.
 	 *  @return The addresses
 	 */
-	public Map<String, String[]> getAddresses()
+	public TransportAddressBook getAddresses()
 	{
 		return addresses;
 	}
