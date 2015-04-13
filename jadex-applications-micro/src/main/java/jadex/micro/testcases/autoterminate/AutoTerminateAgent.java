@@ -8,7 +8,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -107,12 +110,13 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 				if(remove)
 					platforms.remove(exta);
 				
-				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+//				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				createProxy(agent.getExternalAccess(), exta).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
 						// inverse proxy from remote to local.
-						createProxy(exta.getComponentIdentifier(), agent.getComponentIdentifier().getRoot())
+						createProxy(exta, agent.getExternalAccess())
 							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 						{
 							public void customResultAvailable(IComponentIdentifier result)

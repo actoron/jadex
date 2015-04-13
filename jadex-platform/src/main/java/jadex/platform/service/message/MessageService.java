@@ -2773,8 +2773,9 @@ public class MessageService extends BasicService implements IMessageService
 					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
 				}
 				// Addresses may only null for local messages, i.e. intra platform communication
-				else if(((rec instanceof ITransportComponentIdentifier && ((ITransportComponentIdentifier)rec).getAddresses()==null) 
-					|| rec instanceof IComponentIdentifier) &&
+				else if((
+					(rec instanceof ITransportComponentIdentifier && ((ITransportComponentIdentifier)rec).getAddresses()==null) 
+					|| !(rec instanceof ITransportComponentIdentifier)) &&
 					!(rec.getPlatformName().equals(component.getComponentIdentifier().getPlatformName())))
 				{
 					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));

@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -20,6 +21,7 @@ import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -116,6 +118,16 @@ public class ExternalAccess extends ExternalFeatureProvider implements IExternal
 	{
 		return cid;
 	}
+	
+//	/**
+//	 *  Get the id of the component including addresses.
+//	 *  @return	The component id.
+//	 */
+//	public IFuture<ITransportComponentIdentifier> getTransportComponentIdentifier()
+//	{
+//		return SServiceProvider.getLocalService(this.getInternalAccess(), ITransportAddressService.class, 
+//			RequiredServiceInfo.SCOPE_PLATFORM).getTransportComponentIdentifier(getComponentIdentifier());
+//	}
 	
 //	/**
 //	 *  Get a space of the application.

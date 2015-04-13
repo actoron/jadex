@@ -48,6 +48,12 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 	public IComponentIdentifier	getComponentIdentifier();
 	
 //	/**
+//	 *  Get the id of the component including addresses.
+//	 *  @return	The component id.
+//	 */
+//	public IFuture<ITransportComponentIdentifier> getTransportComponentIdentifier();
+	
+//	/**
 //	 *  Get the service provider.
 //	 *  @return The service provider.
 //	 */

@@ -13,8 +13,12 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -70,6 +74,8 @@ public class ProxyAgent	implements IProxyAgentService
 	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
+		final Future<Void> ret = new Future<Void>();
+			
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, rcid.getRoot())
 			.addResultListener(new IResultListener<IComponentManagementService>()
 		{
@@ -130,6 +136,17 @@ public class ProxyAgent	implements IProxyAgentService
 				// Platform not accessible -> ignore
 			}
 		});
+		
+		// If done here this is costly (one service call per proxy)
+//		try
+//		{
+//			ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//			tas.addPlatformAddresses(rcid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+//		}
+//		catch(Exception e)
+//		{
+//			ret.setException(e);
+//		}
 		
 		return IFuture.DONE;
 	}
