@@ -8,8 +8,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.io.File;
 import java.net.MalformedURLException;

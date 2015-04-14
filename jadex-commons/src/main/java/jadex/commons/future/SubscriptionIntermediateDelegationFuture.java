@@ -127,8 +127,12 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     {
     	boolean	ret;
     	boolean	suspend;
-    	
-		ISuspendable	caller	= null;
+		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
+	   	if(caller==null)
+	   	{
+	   		caller = new ThreadSuspendable();
+	   	}
+
 		List<E>	ownres;
     	synchronized(this)
     	{
@@ -144,11 +148,6 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
-    	    	caller	= ISuspendable.SUSPENDABLE.get();
-    	    	if(caller==null)
-    	    	{
-    		   		throw new RuntimeException("No suspendable element.");
-    	    	}
 	    	   	if(icallers==null)
 	    	   	{
 	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
@@ -193,13 +192,17 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     /**
      *  Perform the get without increasing the index.
      */
-    protected E doGetNextIntermediateResult(int index, ISuspendable sus)
+    protected E doGetNextIntermediateResult(int index)
     {
        	E	ret	= null;
     	boolean	suspend	= false;
-    	
+		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
+	   	if(caller==null)
+	   	{
+	   		caller = new ThreadSuspendable();
+	   	}
+
     	List<E>	ownres;
-		ISuspendable	caller	= sus;
     	synchronized(this)
     	{
     		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
@@ -261,7 +264,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
     				caller.suspend(this, -1);
     	    	   	icallers.remove(caller);
-    		    	ret	= doGetNextIntermediateResult(index, sus);
+    		    	ret	= doGetNextIntermediateResult(index);
     			}
     			// else already resumed.
     		}

@@ -131,8 +131,12 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     {
     	boolean	ret;
     	boolean	suspend;
-    	
-		ISuspendable	caller	= null;
+		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
+	   	if(caller==null)
+	   	{
+	   		caller = new ThreadSuspendable();
+	   	}
+
 		List<E>	ownres;
     	boolean first;
 
@@ -153,11 +157,6 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
-    	    	caller	= ISuspendable.SUSPENDABLE.get();
-    	    	if(caller==null)
-    	    	{
-    		   		throw new RuntimeException("No suspendable element.");
-    	    	}
 	    	   	if(icallers==null)
 	    	   	{
 	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
@@ -207,13 +206,17 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     /**
      *  Perform the get without increasing the index.
      */
-    protected E doGetNextIntermediateResult(int index, ISuspendable sus)
+    protected E doGetNextIntermediateResult(int index)
     {
        	E	ret	= null;
     	boolean	suspend	= false;
-    	
+		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
+	   	if(caller==null)
+	   	{
+	   		caller = new ThreadSuspendable();
+	   	}
+
     	List<E>	ownres;
-		ISuspendable	caller	= sus;
     	boolean first;
 
     	synchronized(this)
@@ -242,12 +245,6 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		else
     		{
     			suspend	= true;
-    			if(caller==null)
-    				caller	= ISuspendable.SUSPENDABLE.get();
-    	    	if(caller==null)
-    	    	{
-    		   		throw new RuntimeException("No suspendable element.");
-    	    	}
 	    	   	if(icallers==null)
 	    	   	{
 	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
@@ -289,7 +286,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     			// else already resumed.
     		}
 	    	
-	    	ret	= doGetNextIntermediateResult(index, sus);
+	    	ret	= doGetNextIntermediateResult(index);
     		synchronized(this)
     		{
     			ownresults.remove(Thread.currentThread());

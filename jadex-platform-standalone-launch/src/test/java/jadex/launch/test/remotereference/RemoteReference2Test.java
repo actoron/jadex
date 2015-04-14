@@ -32,7 +32,6 @@ public class RemoteReference2Test //extends TestCase
 	public void	testRemoteReference()
 	{
 		long timeout	= BasicService.getLocalDefaultTimeout();
-//		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		// Underscore in platform name assures both platforms use same password.
 		String	pid	= SUtil.createUniqueId(name.getMethodName(), 3)+"-*";
@@ -55,16 +54,8 @@ public class RemoteReference2Test //extends TestCase
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
 		
 		// Connect platforms by creating proxy agents.
-		Map<String, Object>	args1	= new HashMap<String, Object>();
-		args1.put("component", platform2.getComponentIdentifier());
-		IComponentManagementService	cms1	= SServiceProvider
-			.getService(platform1, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
-		cms1.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args1), null).get(timeout);
-		Map<String, Object>	args2	= new HashMap<String, Object>();
-		args2.put("component", platform1.getComponentIdentifier());
-		IComponentManagementService	cms2	= SServiceProvider
-			.getService(platform2, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
-		cms2.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args2), null).get(timeout);
+		Starter.createProxy(platform1, platform2).get(timeout);
+		Starter.createProxy(platform2, platform1).get(timeout);
 		
 		// Find local service with direct remote search.
 //		System.out.println("searching local");

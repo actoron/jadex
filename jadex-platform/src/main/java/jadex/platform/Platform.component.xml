@@ -49,10 +49,6 @@
 		<argument name="simulation" class="Boolean"/>
 		<!-- Use asynchronous execution mode? -->
 		<argument name="asyncexecution" class="Boolean"/>
-		<!-- Flag if copying parameters for local service calls is allowed. -->
-		<argument name="parametercopy" class="boolean">true</argument>
-		<!-- Flag if local timeouts should be realtime (instead of clock dependent) . -->
-		<argument name="realtimetimeout" class="boolean">true</argument>
 		<!-- Flag to enable component persistence. -->
 		<argument name="persist" class="boolean">false</argument>
 		<!-- Flag if CIDs may be reused (true for not). -->
@@ -244,18 +240,6 @@
 				new jadex.platform.service.marshal.MarshalService($component)
 			</implementation>
 		</providedservice>
-		<!--  <providedservice class="jadex.bridge.service.types.context.IContextService">
-			<implementation>
-				$args.contextserviceclass!=null
-					? jadex.commons.SReflect.classForName0($args.contextserviceclass, jadex.commons.SReflect.class.getClassLoader()).newInstance()
-					: jadex.commons.SReflect.isAndroid()
-						? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})
-						: jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})
-			</implementation>
-		</providedservice>-->
-		<!--<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
-			<implementation class="jadex.platform.service.settings.SettingsService"/>
-		</providedservice>-->
 		<providedservice class="jadex.bridge.service.types.execution.IExecutionService">
 			<implementation proxytype="raw">
 				//new jadex.platform.service.execution.AsyncExecutionService($component)
@@ -265,80 +249,13 @@
 				: new jadex.platform.service.execution.AsyncExecutionService($component)
 			</implementation>
 		 </providedservice>
-		<!-- <providedservice class="jadex.bridge.service.types.library.IDependencyService">
-			<implementation>
-				$args.maven_dependencies ? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance()
-					: new jadex.platform.service.library.BasicDependencyService()
-			</implementation>
-		</providedservice>-->
-		<!-- <providedservice class="jadex.bridge.service.types.library.ILibraryService">
-			<implementation> <!- - proxytype="raw" - ->
-				jadex.commons.SReflect.isAndroid() ? jadex.platform.service.library.AndroidLibraryService.class.newInstance() :
-				$args.libpath==null ? new jadex.platform.service.library.LibraryService() :
-					new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath),
-						$args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))
-			</implementation>
-		</providedservice> -->
-		<!-- <providedservice class="jadex.bridge.service.types.clock.IClockService">
-			<implementation proxytype="raw">
-				$args.simulation==null || !$args.simulation.booleanValue()
-				? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, "system_clock", System.currentTimeMillis(), 100), $component, $args.simulation)
-				: new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component, $args.simulation)
-			</implementation>
-		</providedservice> -->
-		<!-- <providedservice class="jadex.bridge.service.types.security.ISecurityService">
-			<implementation>
-				new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames, $args.validityduration)
-			</implementation>
-		</providedservice> -->
-		<!-- <providedservice class="jadex.bridge.service.types.message.IMessageService">
-			<implementation proxytype="raw">
-				new jadex.platform.service.message.MessageService($component.getExternalAccess(), $component.getLogger(),
-					new jadex.platform.service.message.transport.ITransport[]
-					{
-						$args.localtransport? new jadex.platform.service.message.transport.localmtp.LocalTransport($component): null,
-						$args.tcptransport? new jadex.platform.service.message.transport.tcpmtp.TCPTransport($component, $args.tcpport): null,
-						$args.niotcptransport? new jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport($component, $args.niotcpport, $component.getLogger()): null,
-						$args.ssltcptransport? jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport.create($component, $args.ssltcpport): null,
-						$args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress, $args.relaysecurity): null
-					},
-					new jadex.bridge.service.types.message.MessageType[]
-					{
-						new jadex.bridge.fipa.FIPAMessageType()
-					},
-					null, 
-					$args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, 
-					$args.binarymessages? new jadex.platform.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.platform.service.message.transport.codecs.JadexBinaryCodec.class, jadex.platform.service.message.transport.codecs.GZIPCodec.class} ): new jadex.platform.service.message.transport.codecs.CodecFactory(),
-					$args.strictcom
-				)
-			</implementation>
-		</providedservice>-->
 		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService" name="cms">
 			<implementation>
 				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
-					? jadex.platform.service.persistence.PersistenceComponentManagementService.create($args.platformaccess, $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
-					: new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
+					? jadex.platform.service.persistence.PersistenceComponentManagementService.create($args.platformaccess, $args.componentfactory, $args.persist, $args.uniqueids)
+					: new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.componentfactory, $args.uniqueids)
 			</implementation>
 		</providedservice>
-		<!-- <providedservice class="jadex.bridge.service.types.df.IDF">
-			<implementation class="jadex.platform.service.df.DirectoryFacilitatorService"/>
-		</providedservice>-->
-		<!-- <providedservice class="jadex.bridge.service.types.simulation.ISimulationService">
-			<implementation class="jadex.platform.service.simulation.SimulationService"/>
-		</providedservice> -->
-		<!-- <providedservice class="jadex.bridge.service.types.deployment.IDeploymentService">
-			<implementation class="jadex.platform.service.deployment.DeploymentService"/>		
-		</providedservice>-->
-		<!-- <providedservice name="publish_ws" class="jadex.bridge.service.types.publish.IPublishService">
-			<implementation>
-				Boolean.TRUE.equals($args.wspublish) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null
-			</implementation>
-		</providedservice> 
-		<providedservice name="publish_rs" class="jadex.bridge.service.types.publish.IPublishService">
-			<implementation>
-				Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null
-			</implementation>
-		</providedservice> -->
 		<providedservice class="jadex.bridge.service.types.persistence.IPersistenceService">
 			<implementation>
 				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null

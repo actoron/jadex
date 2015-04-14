@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
@@ -22,6 +23,7 @@ import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -62,10 +64,10 @@ public class Starter
 {
 	//-------- platform data keys --------
 	
-	/** The parameter copy flag argument and data key. */
+	/** Flag if copying parameters for local service calls is allowed. */
 	public static final String DATA_PARAMETERCOPY = "parametercopy";
 
-	/** The real time timeout flag argument and data key. */
+	/**  Flag if local timeouts should be realtime (instead of clock dependent). */
 	public static final String DATA_REALTIMETIMEOUT = "realtimetimeout";
 	
 	/** The local service registry data key. */
@@ -982,6 +984,41 @@ public class Starter
 	{
 		// not equals false to make true the default.
 		return !Boolean.FALSE.equals(access.getPlatformData().get(DATA_PARAMETERCOPY));
+	}
+
+	/**
+	 *  Create a proxy for the remote platform.
+	 */
+	public static IFuture<IComponentIdentifier>	createProxy(IExternalAccess local, final IExternalAccess remote)
+	{
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		SServiceProvider.getService(local, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(final IComponentManagementService flocal)
+			{
+				SServiceProvider.getService(remote, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+				{
+					public void customResultAvailable(ITransportAddressService tas)
+					{
+						tas.getTransportComponentIdentifier(remote.getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
+						{
+							public void customResultAvailable(ITransportComponentIdentifier extacid)
+							{
+								Map<String, Object>	args = new HashMap<String, Object>();
+								args.put("component", extacid);
+								CreationInfo ci = new CreationInfo(args);
+								flocal.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 }
 

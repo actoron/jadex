@@ -358,8 +358,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
     	boolean	ret;
     	boolean	suspend;
-    	
-		ISuspendable	caller	= null;
+		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
+	   	if(caller==null)
+	   	{
+	   		caller = new ThreadSuspendable();
+	   	}
+	   	
     	synchronized(this)
     	{
     		Integer	index	= indices!=null ? indices.get(Thread.currentThread()) : null;
@@ -372,11 +376,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
-    	    	caller	= ISuspendable.SUSPENDABLE.get();
-    	    	if(caller==null)
-    	    	{
-    		   		throw new RuntimeException("No suspendable element.");
-    	    	}
 	    	   	if(icallers==null)
 	    	   	{
 	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
@@ -419,23 +418,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public E getNextIntermediateResult()
     {
-    	return getNextIntermediateResult(null);
-    }
-    
-    /**
-     *  Iterate over the intermediate results in a blocking fashion.
-     *  Manages results independently for different callers, i.e. when called
-     *  from different threads, each thread receives all intermediate results.
-     *  
-     *  The operation is guaranteed to be non-blocking, if hasNextIntermediateResult()
-     *  has returned true before for the same caller. Otherwise the caller is blocked
-     *  until a result is available or the future is finished.
-     *  
-     *  @return	The next intermediate result.
-     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
-     */
-    public E getNextIntermediateResult(ISuspendable sus)
-    {
     	Integer	index;
     	synchronized(this)
     	{
@@ -448,18 +430,22 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 			}
 			indices.put(Thread.currentThread(), index);
     	}
-		return doGetNextIntermediateResult(index.intValue()-1, sus);
+		return doGetNextIntermediateResult(index.intValue()-1);
     }
     
     /**
      *  Perform the get without increasing the index.
      */
-    protected E doGetNextIntermediateResult(int index, ISuspendable sus)
+    protected E doGetNextIntermediateResult(int index)
     {
        	E	ret	= null;
     	boolean	suspend	= false;
-    	
-		ISuspendable	caller	= sus;
+		ISuspendable	caller	= ISuspendable.SUSPENDABLE.get();
+		if(caller==null)
+		{
+			caller	= new ThreadSuspendable();
+		}
+
     	synchronized(this)
     	{
     		if(results!=null && results.size()>index)
@@ -489,12 +475,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		else
     		{
     			suspend	= true;
-    			if(caller==null)
-    				caller	= ISuspendable.SUSPENDABLE.get();
-    	    	if(caller==null)
-    	    	{
-    		   		throw new RuntimeException("No suspendable element.");
-    	    	}
 	    	   	if(icallers==null)
 	    	   	{
 	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
@@ -517,7 +497,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			}
     			// else already resumed.
     		}
-	    	ret	= doGetNextIntermediateResult(index, sus);
+	    	ret	= doGetNextIntermediateResult(index);
     	}
     	
     	return ret;

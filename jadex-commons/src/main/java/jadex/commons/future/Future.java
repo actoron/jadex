@@ -161,7 +161,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public E get()
 	{
-		return get(ISuspendable.SUSPENDABLE.get(), -1);
+		return get(-1);
 	}
 
 	/**
@@ -171,42 +171,17 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public E get(long timeout)
 	{
-		return get(ISuspendable.SUSPENDABLE.get(), timeout);
-	}
-	
-//    /**
-//     *  Get the result - blocking call.
-//     *  @return The future result.
-//     */
-//    public E get(ISuspendable caller)
-//    {
-//    	return get(caller, -1);
-//    }
-
-    /**
-     *  Get the result - blocking call.
-     *  @param timeout The timeout in millis.
-     *  @return The future result.
-     */
-    protected E get(ISuspendable caller, long timeout)
-    {
     	boolean suspend = false;
+		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
+	   	if(caller==null)
+	   	{
+	   		caller = new ThreadSuspendable();
+	   	}
+	   	
     	synchronized(this)
     	{
 	    	if(!isDone())
 	    	{
-	    		ISuspendable sus = ISuspendable.SUSPENDABLE.get();
-	    		if(sus!=null && caller!=null && sus!=caller)
-	    		{
-	    			throw new RuntimeException("More than one suspendable element.");
-	    		}
-	    		
-	    	   	if(caller==null)
-	    	   	{
-	    	   		caller = new ThreadSuspendable();
-//	    	   		throw new RuntimeException("No suspendable element.");
-	    	   	}
-	     
 	    	   	if(callers==null)
 	    	   	{
 	    	   		callers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());

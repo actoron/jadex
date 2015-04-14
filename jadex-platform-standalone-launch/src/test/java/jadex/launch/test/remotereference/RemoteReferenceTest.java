@@ -5,13 +5,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +23,6 @@ public class RemoteReferenceTest //extends TestCase
 	public void	testRemoteReference()
 	{
 		long timeout	= BasicService.getLocalDefaultTimeout();
-		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		// Start platform1 with local service. (underscore in name assures both platforms use same password)
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
@@ -50,16 +42,8 @@ public class RemoteReferenceTest //extends TestCase
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(timeout);
 		
 		// Connect platforms by creating proxy agents.
-		Map<String, Object>	args1	= new HashMap<String, Object>();
-		args1.put("component", platform2.getComponentIdentifier());
-		IComponentManagementService	cms1	= SServiceProvider
-			.getService(platform1, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
-		cms1.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args1), null).get(timeout);
-		Map<String, Object>	args2	= new HashMap<String, Object>();
-		args2.put("component", platform1.getComponentIdentifier());
-		IComponentManagementService	cms2	= SServiceProvider
-			.getService(platform2, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
-		cms2.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args2), null).get(timeout);
+		Starter.createProxy(platform1, platform2).get(timeout);
+		Starter.createProxy(platform2, platform1).get(timeout);
 		
 		// Search for remote search service from local platform
 		ISearchService	search	= SServiceProvider
@@ -71,8 +55,8 @@ public class RemoteReferenceTest //extends TestCase
 		Assert.assertSame(service1, service2);
 
 		// Kill platforms and end test case.
+		platform2.killComponent().get(timeout);
 		platform1.killComponent().get(timeout);
-//		platform2.killComponent().get(sus, timeout);
 	}
 	
 	/**
