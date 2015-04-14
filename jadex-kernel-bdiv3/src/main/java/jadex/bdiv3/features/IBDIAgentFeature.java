@@ -1,30 +1,16 @@
 package jadex.bdiv3.features;
 
-import jadex.bdiv3.model.BDIModel;
-import jadex.bdiv3.model.MElement;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.impl.RCapability;
-import jadex.bdiv3.runtime.impl.RPlan;
-import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.commons.future.IFuture;
-import jadex.rules.eca.RuleSystem;
 
-import java.lang.annotation.Annotation;
 import java.util.Collection;
 
 /**
- * 
+ *  Public methods for working with BDI agents.
  */
 public interface IBDIAgentFeature
 {
-//	/**
-//	 *  Get the bdi agent.
-//	 *  @return The bdi agent.
-//	 */
-//	public BDIAgent getAgent();
-	
 	/**
 	 *  Get the goals of a given type as pojos.
 	 *  @param clazz The pojo goal class.
@@ -86,38 +72,4 @@ public interface IBDIAgentFeature
 	 *  @param listener The belief listener.
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener);
-	
-	
-	// internal methods?
-	
-//	/**
-//	 *  Get the rulesystem.
-//	 *  @return The rulesystem.
-//	 */
-//	public RuleSystem getRuleSystem();
-//	
-//	/**
-//	 *  Get the bdimodel.
-//	 *  @return the bdimodel.
-//	 */
-//	public BDIModel getBDIModel();
-//
-//	/**
-//	 *  Get the state.
-//	 *  @return the state.
-//	 */
-//	public RCapability getCapability();
-//	
-//	/**
-//	 *  Get a capability pojo object.
-//	 */
-//	public Object	getCapabilityObject(String name);
-//	
-//	/**
-//	 *  Get parameter values for injection into method and constructor calls.
-//	 */
-//	public Object[] getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe);
-//
-//	public Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs);
-
 }

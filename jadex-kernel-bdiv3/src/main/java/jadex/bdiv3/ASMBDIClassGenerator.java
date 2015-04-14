@@ -901,11 +901,14 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			{
 				if(e.getTargetException() instanceof LinkageError)
 				{
-//					e.printStackTrace();
-					
+//					e.printStackTrace();					
 					// when same class was already loaded via other filename wrong cache miss:-(
 //					ret = SReflect.findClass(name, null, loader);
 					ret = Class.forName(name, true, loader);
+				}
+				else
+				{
+					throw e.getTargetException();
 				}
 			}
 			finally
@@ -913,13 +916,20 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				method.setAccessible(false);
 			}
 		}
-		catch(RuntimeException e)
+		catch(Throwable e)
 		{
-			throw e;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
+			if(e instanceof Error)
+			{
+				throw (Error)e;
+			}
+			else if(e instanceof RuntimeException)
+			{
+				throw (RuntimeException)e;
+			}
+			else
+			{
+				throw new RuntimeException(e);
+			}
 		}
 		
 		return ret;

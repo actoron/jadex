@@ -1,5 +1,6 @@
 package jadex.bdiv3;
 
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.commons.SReflect;
@@ -65,8 +66,10 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			List<String> ifaces = cn.interfaces;
 			for(String name: ifaces)
 			{
+				// Auto-implement abstract methods from IBDIAgent and subinterfaces.
 				if(name.indexOf(Type.getInternalName(IBDIAgent.class))!=-1)
 				{
+					// Fetch all methods.
 					List<Class<?>> allcz = SUtil.arrayToList(SReflect.getSuperInterfaces(new Class[]{IBDIAgent.class}));
 					allcz.add(IBDIAgent.class);
 					Set<Method> allms = new HashSet<Method>();
@@ -79,13 +82,22 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						}
 					}
 					
+					// Implement all methods
 					for(Method m: allms)
 					{
 						MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, m.getName(), Type.getMethodDescriptor(m), null, null);
 						Type ret = Type.getReturnType(mnode.desc);
 						InsnList nl = new InsnList();
+						
+						// Fetch agent object to invoke method on.
 						nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
 						nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bridge/IInternalAccess;"));
+						if(m.getDeclaringClass().equals(IBDIAgentFeature.class))
+						{
+							nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "getBDIAgentFeature", "(Ljadex/bridge/IInternalAccess;)Ljadex/bdiv3/features/IBDIAgentFeature;", false));
+						}
+						
+						// Push parameters to stack
 						Class<?>[] ptypes = m.getParameterTypes();
 						int cnt = 1;
 						for(int i=0; i<ptypes.length; i++)
@@ -111,8 +123,19 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 								nl.add(new VarInsnNode(Opcodes.ALOAD, i+cnt));
 							}
 //							nl.add(new InsnNode(Opcodes.SWAP));
-						}						
-						nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bridge/IInternalAccess", mnode.name, mnode.desc));
+						}
+						
+						// Invoke method.
+						if(m.getDeclaringClass().equals(IBDIAgentFeature.class))
+						{
+							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bdiv3/features/IBDIAgentFeature", mnode.name, mnode.desc, true));
+						}
+						else
+						{
+							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bridge/IInternalAccess", mnode.name, mnode.desc, true));
+						}
+						
+						// Return result.
 						Class<?> rett = m.getReturnType();
 						if(ret!=null && !rett.equals(void.class) && !rett.equals(Void.class))
 						{

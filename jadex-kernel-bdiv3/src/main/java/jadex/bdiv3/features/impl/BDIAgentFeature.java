@@ -3616,4 +3616,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return new EventType(p);
 	}
 	
+	
+	/**
+	 *  Get the feature from the agent.
+	 */
+	public static IBDIAgentFeature	getBDIAgentFeature(IInternalAccess agent)
+	{
+		return agent.getComponentFeature(IBDIAgentFeature.class);
+	}
 }
