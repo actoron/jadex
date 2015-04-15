@@ -4,6 +4,7 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -40,7 +41,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 	//-------- attribute --------
 
 	/** The remote component identifier.*/
-	protected IComponentIdentifier cid;
+	protected ITransportComponentIdentifier cid;
 	
 	/** The connection state. */
 	protected String	state;
@@ -57,9 +58,9 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 		this.state = STATE_UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
-		getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
+		getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
 		{
-			public void resultAvailable(IComponentIdentifier result)
+			public void resultAvailable(ITransportComponentIdentifier result)
 			{
 				if(result!=null)
 				{
@@ -114,9 +115,9 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 	{
 		busy	= true;
 		// Get remote component identifier before calling searchChildren
-		getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
+		getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
 		{
-			public void resultAvailable(IComponentIdentifier result)
+			public void resultAvailable(ITransportComponentIdentifier result)
 			{
 				if(result!=null)
 				{
@@ -181,20 +182,20 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 	 *  Get the remote component identifier.
 	 *  @return The remote identifier.
 	 */
-	public IFuture<IComponentIdentifier> getRemoteComponentIdentifier()
+	public IFuture<ITransportComponentIdentifier> getRemoteComponentIdentifier()
 	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		final Future<ITransportComponentIdentifier> ret = new Future<ITransportComponentIdentifier>();
 		
 		if(cid==null)
 		{
 			SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
-				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
+				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, ITransportComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(IProxyAgentService pas)
 				{
-					pas.getRemoteComponentIdentifier().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+					pas.getRemoteComponentIdentifier().addResultListener(new DelegationResultListener<ITransportComponentIdentifier>(ret)
 					{
-						public void customResultAvailable(IComponentIdentifier rcid)
+						public void customResultAvailable(ITransportComponentIdentifier rcid)
 						{
 							cid	= rcid;
 							super.customResultAvailable(rcid);

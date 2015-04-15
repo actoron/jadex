@@ -9,6 +9,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -580,7 +581,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 		ArrayList<PropertyItem> props = new ArrayList<PropertyItem>();
 		props.add(new PropertyItem("Name", desc.getName().getName()));
 		
-		String[] addresses = desc.getName().getAddresses();
+		String[]	addresses	= desc.getName() instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)desc.getName()).getAddresses() : null;
 		props.add(new PropertyItem("Adresses", (addresses != null ? addresses : SUtil.EMPTY_STRING_ARRAY)));
 		
 		props.add(new PropertyItem("Type", desc.getType()));

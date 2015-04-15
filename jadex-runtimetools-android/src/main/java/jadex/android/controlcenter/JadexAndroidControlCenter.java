@@ -258,7 +258,7 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 
 	private void addViewableComponents(IExternalAccess extAcc)
 	{
-		SServiceProvider.getServiceUpwards(extAcc, IComponentManagementService.class).addResultListener(
+		SServiceProvider.getService(extAcc, IComponentManagementService.class).addResultListener(
 				new DefaultResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(final IComponentManagementService cms)
