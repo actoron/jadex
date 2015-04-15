@@ -7,6 +7,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -46,14 +47,14 @@ import java.util.Map;
 /**
  *  Inject agent arguments into annotated field values.
  */
-public class MicroInjectionComponentFeature extends	AbstractComponentFeature
+public class MicroInjectionComponentFeature extends	AbstractComponentFeature	implements IMicroInjectionFeature
 {
 	//-------- constants ---------
 	
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(
 		IMicroInjectionFeature.class, MicroInjectionComponentFeature.class,
-		new Class<?>[]{IArgumentsFeature.class, IRequiredServicesFeature.class}, new Class<?>[]{IProvidedServicesFeature.class});
+		new Class<?>[]{IArgumentsFeature.class, IRequiredServicesFeature.class/*, ISubcomponentsFeature.class*/}, new Class<?>[]{IProvidedServicesFeature.class});
 
 	//-------- constructors --------
 	

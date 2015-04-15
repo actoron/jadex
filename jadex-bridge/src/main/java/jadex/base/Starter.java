@@ -506,7 +506,7 @@ public class Starter
 					platformdata.put(DATA_SERVICEREGISTRY, new PlatformServiceRegistry());
 					platformdata.put(DATA_ADDRESSBOOK, new TransportAddressBook());
 					
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, null);
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, null, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();
 					component.create(cci, Collections.unmodifiableMap(platformdata), features);
 

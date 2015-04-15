@@ -89,17 +89,17 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		}
 		
 		// Todo: Bindings from outside
-//		RequiredServiceBinding[]	bindings	= getBindings();
-//		if(bindings!=null)
-//		{
-//			for(int i=0; i<bindings.length; i++)
-//			{
-//				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(bindings[i].getName());
-//				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
-//					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(cl, model.getAllImports()), new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties());
-//				sermap.put(rsi.getName(), newrsi);
-//			}
-//		}
+		RequiredServiceBinding[]	bindings	= cinfo.getRequiredServiceBindings();
+		if(bindings!=null)
+		{
+			for(int i=0; i<bindings.length; i++)
+			{
+				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(bindings[i].getName());
+				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
+					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(cl, model.getAllImports()), new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties());
+				sermap.put(rsi.getName(), newrsi);
+			}
+		}
 		
 		RequiredServiceInfo[]	rservices	= (RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]);
 		addRequiredServiceInfos(rservices);

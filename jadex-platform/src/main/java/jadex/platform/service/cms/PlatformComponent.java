@@ -10,6 +10,7 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPropertiesFeature;
+import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
@@ -417,12 +418,21 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 
 	/**
-	 *  Get the configuration.
+	 *  Get the start configuration or the default configuration if any.
 	 *  @return	The configuration.
 	 */
 	public String getConfiguration()
 	{
-		return info.getConfiguration();
+		String	ret	= info.getConfiguration();
+//		if(ret==null)
+//		{
+//			ConfigurationInfo[]	configs	= getModel().getConfigurations();
+//			if(configs.length>0)
+//			{
+//				ret	= configs[0].getName();
+//			}
+//		}
+		return ret;
 	}
 	
 	/**

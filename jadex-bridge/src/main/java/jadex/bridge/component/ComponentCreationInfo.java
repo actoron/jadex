@@ -2,6 +2,7 @@ package jadex.bridge.component;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 
 import java.util.Map;
@@ -29,6 +30,9 @@ public class ComponentCreationInfo
 	/** The provided service infos. */
 	protected ProvidedServiceInfo[]	infos;
 	
+	/** The required service bindings. */
+	protected RequiredServiceBinding[]	bindings;
+	
 	//-------- constructors --------
 	
 	/**
@@ -42,13 +46,14 @@ public class ComponentCreationInfo
 	 *  @param copy	The copy flag.
 	 */
 	public ComponentCreationInfo(IModelInfo model, String config, Map<String, Object> arguments, 
-		IComponentDescription desc, ProvidedServiceInfo[] infos)
+		IComponentDescription desc, ProvidedServiceInfo[] infos, RequiredServiceBinding[] bindings)
 	{
 		this.model	= model;
 		this.config = config!=null ? config : model.getConfigurationNames().length>0 ? model.getConfigurationNames()[0] : null;
 		this.arguments	= arguments;
 		this.desc	= desc;
 		this.infos	= infos;
+		this.bindings	= bindings;
 	}
 	
 	//-------- methods --------
@@ -93,5 +98,14 @@ public class ComponentCreationInfo
 	public ProvidedServiceInfo[]	getProvidedServiceInfos()
 	{
 		return infos;
+	}
+	
+	/**
+	 *  Get the bindings.
+	 *  @return The bindings.
+	 */
+	public RequiredServiceBinding[] getRequiredServiceBindings()
+	{
+		return bindings;
 	}
 }

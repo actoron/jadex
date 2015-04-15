@@ -15,6 +15,7 @@ import java.util.Map;
 /**
  *  This feature provides arguments.
  */
+// Todo: remove!!! only used for logging level.
 public class PropertiesComponentFeature	extends	AbstractComponentFeature	implements IPropertiesFeature
 {
 	//-------- constants ---------

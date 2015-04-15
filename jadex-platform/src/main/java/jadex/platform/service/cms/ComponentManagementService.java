@@ -615,7 +615,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																	final IPlatformComponentAccess	component	= new PlatformComponent();
-																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, cinfo.getProvidedServiceInfos());
+																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, cinfo.getProvidedServiceInfos(), cinfo.getRequiredServiceBindings());
 																	component.create(cci, access.getPlatformData(), features);
 																	IArgumentsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsFeature.class);
 																	if(resultlistener!=null)
