@@ -170,6 +170,7 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 //		return ret;
 		
 		Object ret = prop;
+		RuntimeException[] exceptions = new RuntimeException[2];
 		
 		if(prop instanceof IParsedExpression)
 		{
@@ -181,14 +182,16 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 			String name = ((IParsedExpression)prop).getExpressionText();//(String)prop;
 			ret = getProperty(name);
 			
+			
 			if(ret instanceof IParsedExpression)
 			{
 				try
 				{
 					ret = ((IParsedExpression)ret).getValue(fetcher);
 				}
-				catch(Exception e)
+				catch(RuntimeException e)
 				{
+					exceptions[0] = e;
 				}
 			}
 			
@@ -198,8 +201,9 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 				{
 					ret = ((IParsedExpression)prop).getValue(fetcher);
 				}
-				catch(Exception e)
+				catch(RuntimeException e)
 				{
+					exceptions[1] = e;
 				}
 			}
 			
@@ -225,6 +229,17 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 			if(ret==null)
 			{
 				ret = SObjectInspector.getProperty(obj, name);
+			}
+		}
+		
+		if (ret instanceof IParsedExpression) {
+			// Obviously parsing didn't work -> fail-fast. 
+			// Throw last exception first, hoping that this is the relevant error.
+			for(int i = exceptions.length-1; i > -1; i--)
+			{
+				if (exceptions[i] != null) {
+					throw exceptions[i];
+				}
 			}
 		}
 		
