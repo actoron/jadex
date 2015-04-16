@@ -61,6 +61,13 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
+		
+		
+		<dependency>
 			<groupId>bouncycastle</groupId>
 			<artifactId>bcprov-jdk15</artifactId>
 			<version>140</version>
