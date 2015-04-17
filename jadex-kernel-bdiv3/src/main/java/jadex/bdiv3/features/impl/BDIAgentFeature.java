@@ -74,7 +74,6 @@ import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
 import jadex.micro.features.IMicroLifecycleFeature;
-import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
@@ -1342,11 +1341,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				
 				injectAgent(getComponent(), capa, caps[i].getSecondEntity(), globalname);
 				
-				MicroInjectionComponentFeature.injectServices(capa, caps[i].getSecondEntity(), getComponent())
-					.addResultListener(new DelegationResultListener<Void>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
+				// Todo: capability features?
+//				MicroInjectionComponentFeature.injectServices(capa, caps[i].getSecondEntity(), getComponent())
+//					.addResultListener(new DelegationResultListener<Void>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
 //						injectParent(capa, caps[i].getSecondEntity())
 //							.addResultListener(new DelegationResultListener<Void>(ret)
 //						{
@@ -1358,8 +1358,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 									.addResultListener(new DelegationResultListener<Void>(ret));
 //							}
 //						});
-					}
-				});				
+//					}
+//				});				
 			}
 			catch(Exception e)
 			{
