@@ -883,6 +883,16 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Test, if a property is declared and has nonull unparsed expression.
+	 *  @param name	The property name.
+	 *  @return True, if the property is declared.
+	 */
+	public boolean hasInitialPropertyValue(String name)
+	{
+		return hasPropertyValue(name) && getPropertyValue(name).getValue()!=null && getPropertyValue(name).getValue().length()>0;
+	}
+	
+	/**
 	 *  Get the properties.
 	 *  @return The properties.
 	 */

@@ -10,6 +10,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.javaparser.SJavaParser;
 
@@ -140,6 +141,40 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		
 		thread.setOrCreateParameterValue("$callargs", args);
 		thread.setOrCreateParameterValue(THREAD_PARAMETER_SERVICE_RESULT, ret);
+		
+		String[] pnames = act.getPropertyNames();
+		if(pnames!=null)
+		{
+			boolean hasval = false;
+			for(int i=0; i<pnames.length && i<pnames.length && !hasval; i++)
+			{
+				hasval |= act.hasInitialPropertyValue(pnames[i]);
+			}
+
+			// If no initial values have been defined try to copy 1:1
+			if(!hasval)
+			{
+				if(args.length==pnames.length)
+				{
+					for(int i=0; i<pnames.length && i<pnames.length; i++)
+					{
+						thread.setOrCreateParameterValue(pnames[i], args[i]);
+					}
+				}
+				else
+				{
+					throw new RuntimeException("Parameter mapping problem in service call: "+SUtil.arrayToString(args));
+				}
+			}
+			else
+			{
+				for(int i=0; i<pnames.length && i<pnames.length; i++)
+				{
+					Object val = thread.getPropertyValue(pnames[i]);
+					thread.setOrCreateParameterValue(pnames[i], val);
+				}
+			}
+		}
 		
 		((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).step(act, instance, thread, null);
 		

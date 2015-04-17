@@ -4,6 +4,7 @@ import jadex.bpmn.features.impl.BpmnComponentFeature;
 import jadex.bpmn.features.impl.BpmnExecutionFeature;
 import jadex.bpmn.features.impl.BpmnMessageComponentFeature;
 import jadex.bpmn.features.impl.BpmnMonitoringComponentFeature;
+import jadex.bpmn.features.impl.BpmnProvidedServicesFeature;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -15,6 +16,7 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -53,6 +55,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	
 	public static final Collection<IComponentFeatureFactory> BPMN_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
+			new ComponentFeatureFactory(IProvidedServicesFeature.class, BpmnProvidedServicesFeature.class),
 			BpmnComponentFeature.FACTORY,
 			new ComponentFeatureFactory(IExecutionFeature.class, BpmnExecutionFeature.class),
 			BpmnMessageComponentFeature.FACTORY,

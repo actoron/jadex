@@ -11,11 +11,12 @@
     <jadex:modelname>ServiceHandler</jadex:modelname>
     <jadex:description>&lt;h1&gt;Service Handling Process&lt;/h1&gt;This process provides a service and starts threads for handling service invocations.</jadex:description>
     <jadex:package>jadex.bpmn.examples.service</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:providedservices>
       <jadex:providedservice name="calc" interface="jadex.bpmn.examples.service.ICalculatorService" proxytype="decoupled"/>
     </jadex:providedservices>
     <jadex:requiredservices>
-      <jadex:requiredservice name="calc" interface="jadex.bpmn.examples.service.ICalculatorService" scope="application" dynamic="false"/>
+      <jadex:requiredservice name="calc" interface="jadex.bpmn.examples.service.ICalculatorService" scope="application" dynamic="false" create="false"/>
     </jadex:requiredservices>
     <jadex:configurations>
       <jadex:configuration name="Pool">
@@ -134,6 +135,7 @@
       <semantic:outgoing>_kz1rgdVUEeCSPre9p8r1cA</semantic:outgoing>
       <semantic:outgoing>_VVt7MdVVEeCSPre9p8r1cA</semantic:outgoing>
       <semantic:outgoing>_VNtvUdiCEeChMt_8FfXHzw</semantic:outgoing>
+      <semantic:outgoing>4diS3YrIQK9k6gDW</semantic:outgoing>
       <semantic:multipleEventDefinition/>
     </semantic:startEvent>
     <semantic:intermediateCatchEvent name="subtractValues" id="_VVkKMdVVEeCSPre9p8r1cA">
@@ -141,8 +143,8 @@
       <semantic:outgoing>_Ww6t4dVVEeCSPre9p8r1cA</semantic:outgoing>
       <semantic:signalEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="a" type="int">null</jadex:property>
-        <jadex:property name="b" type="int">null</jadex:property>
+        <jadex:property name="a" type="int"/>
+        <jadex:property name="b" type="int"/>
       </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:endEvent id="_Yl2PMdVVEeCSPre9p8r1cA">
@@ -166,9 +168,9 @@
       <semantic:outgoing>_ixtAOtVKEeC_1bBivy-cGg</semantic:outgoing>
       <semantic:signalEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="a" type="int">null</jadex:property>
-        <jadex:property name="b" type="int">null</jadex:property>
-        <jadex:property name="c" type="int">null</jadex:property>
+        <jadex:property name="a" type="int"/>
+        <jadex:property name="b" type="int"/>
+        <jadex:property name="c" type="int"/>
       </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:endEvent id="_a-BhEdiCEeChMt_8FfXHzw">
@@ -183,16 +185,17 @@
       <semantic:outgoing>_a-NuUdiCEeChMt_8FfXHzw</semantic:outgoing>
       <semantic:signalEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="a" type="int">null</jadex:property>
+        <jadex:property name="a" type="int"/>
       </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:intermediateCatchEvent name="addValues" id="_TA0V0dVUEeCSPre9p8r1cA">
       <semantic:incoming>_kcCPgdVUEeCSPre9p8r1cA</semantic:incoming>
+      <semantic:incoming>4diS3YrIQK9k6gDW</semantic:incoming>
       <semantic:outgoing>_XaS3gdVUEeCSPre9p8r1cA</semantic:outgoing>
       <semantic:signalEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="a" type="int">null</jadex:property>
-        <jadex:property name="b" type="int">null</jadex:property>
+        <jadex:property name="a" type="int">$callargs[0]</jadex:property>
+        <jadex:property name="b" type="int">$callargs[1]</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:task name="Add Values" id="_TWvuE9VKEeC_1bBivy-cGg">
@@ -201,8 +204,8 @@
       <semantic:outgoing>_25fUMdVSEeCSPre9p8r1cA</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-        <jadex:parameter direction="in" name="text" type="String">&quot;Adding values &quot;+a+&quot; and &quot;+b+(c!=null ? &quot; and &quot;+c : &quot;&quot;)</jadex:parameter>
-        <jadex:parameter direction="out" name="result" type="int">a+b+c</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Adding values &quot;+a+&quot; and &quot;+b+(ifdef.c ? &quot; and &quot;+c : &quot;&quot;)</jadex:parameter>
+        <jadex:parameter direction="out" name="result" type="int">a+b+(ifdef.c? c: 0)</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:endEvent id="_25CoQdVSEeCSPre9p8r1cA">
@@ -233,6 +236,8 @@
     <semantic:sequenceFlow sourceRef="_cT6R0dVUEeCSPre9p8r1cA" targetRef="_VVkKMdVVEeCSPre9p8r1cA" id="_VVt7MdVVEeCSPre9p8r1cA">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_cT6R0dVUEeCSPre9p8r1cA" targetRef="_VNhiEdiCEeChMt_8FfXHzw" id="_VNtvUdiCEeChMt_8FfXHzw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_cT6R0dVUEeCSPre9p8r1cA" targetRef="_TA0V0dVUEeCSPre9p8r1cA" id="4diS3YrIQK9k6gDW">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_VVkKMdVVEeCSPre9p8r1cA" targetRef="_Www84dVVEeCSPre9p8r1cA" id="_Ww6t4dVVEeCSPre9p8r1cA">
     </semantic:sequenceFlow>
@@ -374,6 +379,8 @@
       <bpmndi:BPMNEdge bpmnElement="_Ww6t4dVVEeCSPre9p8r1cA">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_YmAAMdVVEeCSPre9p8r1cA">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="4diS3YrIQK9k6gDW">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

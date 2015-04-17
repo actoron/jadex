@@ -1,8 +1,8 @@
 package jadex.bpmn.runtime;
 
-import jadex.bridge.IMessageAdapter;
 import jadex.commons.IValueFetcher;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,6 +20,9 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 	
 	/** The fall back value fetcher (if any). */
 	protected IValueFetcher fetcher;
+	
+	/** The ifdefined map. */
+	protected Map<String, Boolean> ifdef;
 	
 	//-------- constructors --------
 	
@@ -96,6 +99,14 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 				value = thread;
 				found = true;
 			}
+			else if("$ifdef".equals(name) || "ifdef".equals(name))
+			{
+				if(ifdef==null)
+					ifdef = new IfDefMap();
+
+				value = ifdef;
+				found = true;
+			}
 		}
 		
 		// Ask contained fetcher.
@@ -109,5 +120,17 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 		}
 		
 		return value;
+	}
+	
+	/**
+	 * 
+	 */
+	public class IfDefMap extends HashMap<String, Boolean>
+	{
+		public Boolean get(Object key) 
+		{
+//			System.out.println("isdef: "+thread.hasParameterValue((String)key)+" "+key);
+			return thread.hasParameterValue((String)key)? Boolean.TRUE: Boolean.FALSE;
+		}
 	}
 }

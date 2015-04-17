@@ -198,6 +198,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		return ret;
 	}
 	
+	/**
+	 * 
+	 */
 	public IFuture<Void> shutdown()
 	{
 		Future<Void>	ret	= new Future<Void>();
@@ -307,7 +310,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				throw new RuntimeException("Service creation error: "+info, e);
 			}
 		}
-		else if(impl!=null && impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports())!=null)
+		else if(impl!=null && impl.getClazz()!=null && impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports())!=null)
 		{
 			ser = impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports()).newInstance();
 		}
