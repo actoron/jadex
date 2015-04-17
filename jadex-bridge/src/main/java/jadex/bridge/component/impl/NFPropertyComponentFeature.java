@@ -113,7 +113,8 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 					for(IInternalService ser: sers.get(type))
 					{
 						cnt++;
-						initNFProperties(ser, psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass()).addResultListener(lis);
+						Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
+						initNFProperties(ser, impltype).addResultListener(lis);
 					}
 				}
 			}
@@ -229,14 +230,17 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			classes.add(superclazz);
 			superclazz = superclazz.getSuperclass();
 		}
-						
-		superclazz = impltype;
-		while(superclazz != null && !BasicService.class.equals(superclazz) && !Object.class.equals(superclazz))
+		
+		if(impltype!=null)
 		{
-			classes.add(superclazz);
-			superclazz = superclazz.getSuperclass();
+			superclazz = impltype;
+			while(superclazz != null && !BasicService.class.equals(superclazz) && !Object.class.equals(superclazz))
+			{
+				classes.add(superclazz);
+				superclazz = superclazz.getSuperclass();
+			}
 		}
-//				Collections.reverse(classes);
+//		Collections.reverse(classes);
 		
 		int cnt = 0;
 		
