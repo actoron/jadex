@@ -31,13 +31,14 @@ public class RServiceCall extends RProcessableElement
 	/**
 	 *  Called when a plan has finished.
 	 */
-	public void planFinished(IInternalAccess ia, RPlan rplan)
+//	public void planFinished(IInternalAccess ia, RPlan rplan)
+	public void planFinished(IInternalAccess ia, IInternalPlan rplan)
 	{
 		super.planFinished(ia, rplan);
 		finished = true;
-		if(rplan!=null)
+		if(rplan instanceof RPlan)
 		{
-			PlanLifecycleState state = rplan.getLifecycleState();
+			PlanLifecycleState state = ((RPlan)rplan).getLifecycleState();
 			if(state.equals(RPlan.PlanLifecycleState.FAILED))
 			{
 				setException(rplan.getException());

@@ -1,5 +1,6 @@
 package jadex.bdiv3.tutorial.f2;
 
+import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanPrecondition;
@@ -33,7 +34,7 @@ import java.util.Map;
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(name="transser", type=ITranslationService.class, 
-	implementation=@Implementation(IInternalAccess.class)))
+	implementation=@Implementation(IBDIAgent.class)))
 //	implementation=@Implementation(BDIAgent.class)))
 public class TranslationBDI
 {
