@@ -4,6 +4,7 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.component.ComponentComponentFactory;
 import jadex.component.ComponentXMLReader;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -36,6 +37,14 @@ public class ApplicationXMLReader extends ComponentXMLReader
 	
 	//-------- methods --------
 	
+	/**
+	 *  Get the type of loaded models.
+	 */
+	protected	String getModelType()
+	{
+		return ApplicationComponentFactory.FILETYPE_APPLICATION;
+	}
+
 	/**
 	 *  Get the XML mapping.
 	 */
