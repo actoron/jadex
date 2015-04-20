@@ -1,6 +1,5 @@
 package jadex.platform.service.awareness.discovery.local;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -103,10 +102,10 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 					}
 					
 					postInfo();
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(updaterate, this);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(updaterate, this, true);
 					return IFuture.DONE;
 				}
-			});
+			}, true);
 			
 			try
 			{

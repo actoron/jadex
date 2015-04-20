@@ -984,16 +984,19 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 														{
 															msg.put(SFipa.CONTENT, content);
 															
+//															if(content.toString().indexOf("ntermediate")!=-1)
+//															{
+//																System.out.println("RMS sending: "+System.currentTimeMillis()+", "+content+", "+receiver);
+//															}
 															ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), realrec, null)
 																.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
 															{
 																public void customResultAvailable(Void result)
 																{
-//																	if(content instanceof RemoteMethodInvocationCommand && ((RemoteMethodInvocationCommand)content).getMethodName().equals("testThreading"))
+//																	if(content.toString().indexOf("ntermediate")!=-1)
 //																	{
-//																		System.out.println("RMS sent: "+System.currentTimeMillis()+", "+content+" "+receiver);
+//																		System.out.println("RMS sent: "+System.currentTimeMillis()+", "+content+", "+receiver);
 //																	}
-	//																System.out.println("sent: "+callid);
 																	// ok message could be sent.
 																	if(to>=0 && timer!=null && !tt.isCancelled())
 																	{
@@ -1001,11 +1004,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 																	}
 																}
 																
-//																public void exceptionOccurred(Exception exception)
-//																{
-//																	System.out.println("msg send ex: "+exception);
-//																	super.exceptionOccurred(exception);
-//																}
+																public void exceptionOccurred(Exception exception)
+																{
+//																	if(content.toString().indexOf("ntermediate")!=-1)
+//																	{
+//																		System.out.println("msg send ex: "+System.currentTimeMillis()+", "+content+", "+receiver+", "+exception);
+//																	}
+																	super.exceptionOccurred(exception);
+																}
 															});
 														}
 													});

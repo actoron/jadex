@@ -1,6 +1,5 @@
 package jadex.platform.service.message;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.ICodec;

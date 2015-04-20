@@ -250,6 +250,11 @@ public abstract class AbstractSendTask implements ISendTask
 		
 		if(sendpairs.isEmpty())
 		{
+//			if(getMessage().toString().indexOf("IAutoTerminateService.subscribe()")!=-1)
+//			{
+//				System.out.println(hashCode()+": No transports available for sending message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())+", "+SUtil.arrayToString(getTransports()));
+//			}
+
 			getFuture().setException(new MessageFailureException(getMessage(), getMessageType(), receivers, 
 				"No transports available for sending message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())+", "+SUtil.arrayToString(getTransports())));								
 		}
@@ -277,6 +282,11 @@ public abstract class AbstractSendTask implements ISendTask
 	 */
 	public void ready(IResultCommand<IFuture<Void>, Void> send)
 	{
+//		if(getMessage().toString().indexOf("IAutoTerminateService.subscribe()")!=-1)
+//		{
+//			System.out.println(hashCode()+": ready: "+send);
+//		}
+
 		boolean	dosend;
 		synchronized(this)
 		{
@@ -293,6 +303,11 @@ public abstract class AbstractSendTask implements ISendTask
 		}
 		if(dosend)
 		{
+//			if(getMessage().toString().indexOf("IAutoTerminateService.subscribe()")!=-1)
+//			{
+//				System.out.println(hashCode()+": do send: "+send);
+//			}
+
 			try
 			{
 				send.execute(null).addResultListener(new IResultListener<Void>()
@@ -322,6 +337,11 @@ public abstract class AbstractSendTask implements ISendTask
 	 */
 	protected void done(Exception e)
 	{
+//		if(getMessage().toString().indexOf("IAutoTerminateService.subscribe()")!=-1)
+//		{
+//			System.out.println(hashCode()+": sent: "+e);
+//		}
+		
 		if(e!=null)
 		{
 			IResultCommand<IFuture<Void>, Void>	next	= null;
