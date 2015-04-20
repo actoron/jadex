@@ -4,11 +4,13 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.lang.reflect.Constructor;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -52,10 +54,26 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	 */
 	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs)
 	{
+		this(type, impl, pres, sucs, true);
+	}
+	
+	/**
+	 *  Create a new feature factory.
+	 */
+	public ComponentFeatureFactory(Class<?> type, Class<?> impl, Class<?>[] pres, Class<?>[] sucs, boolean autoaddlast)
+	{
 		this.type = type;
 		this.impl = impl;
 		this.pres = pres==null? null: (Set)SUtil.arrayToSet(pres);
 		this.sucs = sucs==null? null: (Set)SUtil.arrayToSet(sucs);
+		
+		// automallically add the lifecycle feature as precondition for all (besides itself)
+		if(autoaddlast)
+		{
+			if(this.sucs==null)
+				this.sucs = new HashSet<Class<?>>();
+			this.sucs.add(ILifecycleComponentFeature.class);
+		}
 	}
 	
 	//-------- IComponentFeature interface / type level --------
@@ -152,6 +170,7 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 	 */
 	public String	toString()
 	{
-		return "ComponentFeatureFactory("+SReflect.getUnqualifiedClassName(type)+")";
+//		return "ComponentFeatureFactory("+SReflect.getUnqualifiedClassName(type)+")";
+		return SReflect.getUnqualifiedClassName(type);
 	}
 }

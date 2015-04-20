@@ -35,7 +35,7 @@ public class ResourceService	implements IResourceService
 	@ServiceStart
 	public void	start()
 	{
-		rpa	= (ResourceProviderAgent)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		rpa	= (ResourceProviderAgent)agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 	}
 	
 	//-------- IResourceService interface --------

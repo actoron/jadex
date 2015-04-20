@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
@@ -23,7 +24,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.AgentService;
-import jadex.micro.features.IMicroLifecycleFeature;
 import jadex.micro.features.IMicroServiceInjectionFeature;
 
 import java.lang.reflect.Field;
@@ -44,7 +44,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(
 		IMicroServiceInjectionFeature.class, MicroServiceInjectionComponentFeature.class,
-		new Class<?>[]{ISubcomponentsFeature.class}, null);
+		new Class<?>[]{ISubcomponentsFeature.class, IPojoComponentFeature.class}, null);
 
 	//-------- constructors --------
 	
@@ -65,7 +65,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		final Future<Void> ret = new Future<Void>();
 		
 		final MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
-		final Object agent = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		final Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 
 		// Inject required services
 		if(component.getComponentFeature(IRequiredServicesFeature.class)==null)

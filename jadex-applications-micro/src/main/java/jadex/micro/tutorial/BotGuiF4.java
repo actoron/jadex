@@ -3,11 +3,11 @@ package jadex.micro.tutorial;
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -57,7 +57,7 @@ public class BotGuiF4 extends AbstractComponentViewerPanel
 			@Classname("fetch_values")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
-				ChatBotF4Agent	chatbot	= (ChatBotF4Agent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+				ChatBotF4Agent	chatbot	= (ChatBotF4Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				return new Future<String[]>(new String[]{chatbot.getKeyword(), chatbot.getReply()});
 			}
 		}).addResultListener(new SwingDefaultResultListener<String[]>()
@@ -80,7 +80,7 @@ public class BotGuiF4 extends AbstractComponentViewerPanel
 					@Classname("set_keyword")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ChatBotF4Agent	chatbot	= (ChatBotF4Agent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+						ChatBotF4Agent	chatbot	= (ChatBotF4Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 						chatbot.setKeyword(keyword);
 						return IFuture.DONE;
 					}
@@ -99,7 +99,7 @@ public class BotGuiF4 extends AbstractComponentViewerPanel
 					@Classname("set_reply")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ChatBotF4Agent	chatbot	= (ChatBotF4Agent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+						ChatBotF4Agent	chatbot	= (ChatBotF4Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 						chatbot.setReply(reply);
 						return IFuture.DONE;
 					}

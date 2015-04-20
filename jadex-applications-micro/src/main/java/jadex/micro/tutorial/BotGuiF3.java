@@ -3,10 +3,10 @@ package jadex.micro.tutorial;
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -55,7 +55,7 @@ public class BotGuiF3 extends AbstractComponentViewerPanel
 		{
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
-				ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+				ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				return new Future<String[]>(new String[]{chatbot.getKeyword(), chatbot.getReply()});
 			}
 		}).addResultListener(new SwingDefaultResultListener<String[]>()
@@ -77,7 +77,7 @@ public class BotGuiF3 extends AbstractComponentViewerPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+						ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 						chatbot.setKeyword(keyword);
 						return IFuture.DONE;
 					}
@@ -95,7 +95,7 @@ public class BotGuiF3 extends AbstractComponentViewerPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+						ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 						chatbot.setReply(reply);
 						return IFuture.DONE;
 					}

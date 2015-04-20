@@ -10,6 +10,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
@@ -26,8 +27,6 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.NameValue;
-import jadex.micro.features.IMicroInjectionFeature;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -203,7 +202,7 @@ public class CreationBDI
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 //											final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
-											final CreationBDI cbdi = (CreationBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+											final CreationBDI cbdi = (CreationBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 											cbdi.getClock().addResultListener(new IResultListener<IClockService>()
 											{
 												public void resultAvailable(IClockService clock)

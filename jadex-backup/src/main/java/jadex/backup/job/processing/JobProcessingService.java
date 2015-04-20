@@ -45,7 +45,7 @@ public class JobProcessingService implements IJobProcessingService
 	@ServiceStart
 	public IFuture<Void> start()
 	{
-		pojoagent = (SyncJobProcessingAgent)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		pojoagent = (SyncJobProcessingAgent)agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 		return IFuture.DONE;
 	}
 	

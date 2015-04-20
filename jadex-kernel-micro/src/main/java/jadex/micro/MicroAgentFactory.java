@@ -23,6 +23,7 @@ import jadex.kernelbase.IBootstrapFactory;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.micro.features.impl.MicroMessageComponentFeature;
+import jadex.micro.features.impl.MicroPojoComponentFeature;
 import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
 
 import java.io.IOException;
@@ -54,6 +55,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/** The specific component features for micro agents. */
 	public static final Collection<IComponentFeatureFactory>	MICRO_FEATURES	= Collections.unmodifiableCollection(
 		Arrays.asList(
+			MicroPojoComponentFeature.FACTORY,
 			MicroInjectionComponentFeature.FACTORY,
 			MicroServiceInjectionComponentFeature.FACTORY,
 			MicroLifecycleComponentFeature.FACTORY,
@@ -118,7 +120,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //			System.out.println("no library listener on: "+this);
 //		}
 		
-		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
 	
 	/**
@@ -130,7 +132,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroModelLoader();
-		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
 	
 	/**

@@ -11,10 +11,10 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -215,7 +215,7 @@ class CleanerPanel extends JPanel
 	{
 		public IFuture<DrawData> execute(IInternalAccess ia)
 		{
-			CleanerBDI cleaner = (CleanerBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+			CleanerBDI cleaner = (CleanerBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 			DrawData	drawdata	= new DrawData();
 			drawdata.daytime = cleaner.isDaytime();
 			drawdata.visited_positions = cleaner.getVisitedPositions().toArray(new MapPoint[0]);

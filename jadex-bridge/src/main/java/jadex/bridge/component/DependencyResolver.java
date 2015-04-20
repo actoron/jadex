@@ -1,6 +1,10 @@
 package jadex.bridge.component;
 
+import jadex.commons.transformation.cloner.ClonerTest;
+import jadex.commons.transformation.traverser.Traverser;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -44,6 +48,16 @@ public class DependencyResolver<T>
 		NodeInfo<T> nib = getNodeInfo(b);
 		nib.getOtherDeps().add(a);
 		
+		Set<T> t = new HashSet<T>(nia.getMyDeps());
+		t.retainAll(nia.getOtherDeps());
+		if(t.size()>0)
+			throw new RuntimeException("error cycle detected: "+nia);
+		
+		t = new HashSet<T>(nib.getMyDeps());
+		t.retainAll(nib.getOtherDeps());
+		if(t.size()>0)
+			throw new RuntimeException("error cycle detected: "+nib);
+		
 		// Update nodeps
 		nodeps.remove(a);
 		if(!hasDependencies(b))
@@ -51,8 +65,6 @@ public class DependencyResolver<T>
 			nodeps.add(b);
 		}
 	}
-
-	
 	
 	/**
 	 *  Remove a dependency that a depends on b.
@@ -79,14 +91,16 @@ public class DependencyResolver<T>
 	 *  Resolve the DAG and deliver a valid order of nodes.
 	 *  @return A valid list of nodes.
 	 */
-	public List<T> resolveDependencies()
+	public List<T> resolveDependencies(boolean keep)
 	{
 		List<T> ret = new ArrayList<T>();
+		
+		DependencyResolver<T> dr2 = !keep? null: (DependencyResolver<T>)Traverser.traverseObject(this, Traverser.getDefaultProcessors(), true, null);
 		
 		while(!nodes.isEmpty())
 		{
 			if(nodeps.size()==0)
-				System.out.println("herer");
+				throw new RuntimeException("Dependency resolution problem.");
 			T node = nodeps.iterator().next();
 			ret.add(node);
 			
@@ -97,6 +111,13 @@ public class DependencyResolver<T>
 			}
 			nodeps.remove(node);
 			nodes.remove(node);
+		}
+		
+		// reset
+		if(keep)
+		{
+			nodes = dr2.getNodes();
+			nodeps = dr2.getNodeps();
 		}
 		
 //		System.out.println("Resolved: "+ret);
@@ -154,6 +175,42 @@ public class DependencyResolver<T>
 	}
 	
 	/**
+	 *  Get the nodes.
+	 *  @return The nodes
+	 */
+	public Map<T, NodeInfo<T>> getNodes()
+	{
+		return nodes;
+	}
+	
+	/**
+	 *  The nodes to set.
+	 *  @param nodes The nodes to set
+	 */
+	public void setNodes(Map<T, NodeInfo<T>> nodes)
+	{
+		this.nodes = nodes;
+	}
+
+	/**
+	 *  Get the nodeps.
+	 *  @return The nodeps
+	 */
+	public Set<T> getNodeps()
+	{
+		return nodeps;
+	}
+
+	/**
+	 *  The nodeps to set.
+	 *  @param nodeps The nodeps to set
+	 */
+	public void setNodeps(Set<T> nodeps)
+	{
+		this.nodeps = nodeps;
+	}
+
+	/**
 	 *  The main for testing. 
 	 */
 	public static void main(String[] args) 
@@ -177,8 +234,9 @@ public class DependencyResolver<T>
 		dr.addDependency("h", "g");
 		dr.addDependency("i", "a");
 		dr.addDependency("j", "b");
-		System.out.println(dr.resolveDependencies());
+		System.out.println(dr.resolveDependencies(true));
 	}
+	
 	
 	/**
 	 *  Info object for a node.

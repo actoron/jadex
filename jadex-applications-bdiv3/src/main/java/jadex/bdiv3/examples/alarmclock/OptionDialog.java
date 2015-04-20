@@ -3,10 +3,10 @@ package jadex.bdiv3.examples.alarmclock;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -70,7 +70,7 @@ public class OptionDialog extends JDialog
 			@Classname("create")
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				final AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+				final AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				final Settings orig_sets = agent.getSettings();
 				final Settings sets = (Settings)orig_sets.clone();
 				

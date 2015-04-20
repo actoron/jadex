@@ -1,12 +1,12 @@
 package jadex.micro.tutorial;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,7 +33,7 @@ public class ChatServiceF2 implements IChatService
 	public void message(final String sender, final String text)
 	{
 		// Reply if the message contains the keyword.
-		final ChatBotF2Agent	chatbot	= (ChatBotF2Agent)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		final ChatBotF2Agent	chatbot	= (ChatBotF2Agent)agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 		if(text.toLowerCase().indexOf(chatbot.getKeyword().toLowerCase())!=-1)
 		{
 			IFuture<Collection<IChatService>> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");

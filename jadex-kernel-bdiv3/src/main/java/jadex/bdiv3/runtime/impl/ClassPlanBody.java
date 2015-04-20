@@ -8,9 +8,9 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
-import jadex.micro.features.IMicroLifecycleFeature;
 import jadex.rules.eca.ChangeInfo;
 
 import java.lang.reflect.Constructor;
@@ -84,7 +84,7 @@ public class ClassPlanBody extends AbstractPlanBody
 			abortedmethod = mi.getMethod(ia.getClassLoader());
 		
 		if(plan!=null)
-			injectElements(ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent());
+			injectElements(ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent());
 	}
 	
 	//-------- methods --------

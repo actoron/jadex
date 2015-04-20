@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -18,7 +19,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -162,7 +162,7 @@ public class AwarenessManagementAgentHelper
 			@Classname("getDiscoveryInfos")
 			public IFuture<DiscoveryInfo[]> execute(IInternalAccess ia)
 			{
-				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 //				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 				return new Future<DiscoveryInfo[]>(agent.getDiscoveryInfos());
 			}

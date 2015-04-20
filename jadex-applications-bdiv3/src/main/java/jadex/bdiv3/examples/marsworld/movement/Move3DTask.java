@@ -4,6 +4,7 @@ import jadex.bdiv3.examples.marsworld.BaseBDI;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
@@ -14,7 +15,6 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.environment.space3d.Space3D;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector1Double;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -103,7 +103,7 @@ public class Move3DTask extends AbstractTask
 				@Classname("add")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					BaseBDI ba = (BaseBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+					BaseBDI ba = (BaseBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 					for(Iterator<ISpaceObject> it=objects.iterator(); it.hasNext(); )
 					{
 						final ISpaceObject so = it.next();

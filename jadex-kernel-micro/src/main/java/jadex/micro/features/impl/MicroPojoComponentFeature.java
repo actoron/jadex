@@ -1,0 +1,103 @@
+package jadex.micro.features.impl;
+
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.commons.IParameterGuesser;
+import jadex.commons.IValueFetcher;
+import jadex.commons.SimpleParameterGuesser;
+import jadex.micro.MicroModel;
+
+import java.util.Collections;
+
+/**
+ *  Feature that makes pojo accessible.
+ */
+public class MicroPojoComponentFeature extends	AbstractComponentFeature implements IPojoComponentFeature, IValueFetcher
+{
+	//-------- constants --------
+	
+	/** The factory. */
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IPojoComponentFeature.class, MicroPojoComponentFeature.class,
+		null, null);
+	
+	//-------- attributes --------
+	
+	/** The pojo agent. */
+	protected Object pojoagent;
+	
+	/** The parameter guesser (cached for speed). */
+	protected IParameterGuesser	guesser; 
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Factory method constructor for instance level.
+	 */
+	public MicroPojoComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
+	{
+		super(component, cinfo);
+		
+		try
+		{
+			// Create the pojo agent
+			MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
+			this.pojoagent = model.getPojoClass().getType(model.getClassloader()).newInstance();
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 *  Get the pojoagent.
+	 *  @return The pojoagent
+	 */
+	public Object getPojoAgent()
+	{
+		return pojoagent;
+	}
+	
+	/**
+	 *  The feature can inject parameters for expression evaluation
+	 *  by providing an optional value fetcher. The fetch order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
+	 */
+	public IValueFetcher	getValueFetcher()
+	{
+		return this;
+	}
+	
+	/**
+	 *  Add $pojoagent to fetcher.
+	 */
+	public Object fetchValue(String name)
+	{
+		if("$pojoagent".equals(name))
+		{
+			return getPojoAgent();
+		}
+		else
+		{
+			throw new RuntimeException("Value not found: "+name);
+		}
+	}
+	
+	/**
+	 *  The feature can add objects for field or method injections
+	 *  by providing an optional parameter guesser. The selection order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
+	 */
+	public IParameterGuesser	getParameterGuesser()
+	{
+		if(guesser==null)
+		{
+			guesser	= new SimpleParameterGuesser(Collections.singleton(pojoagent));
+		}
+		return guesser;
+	}
+}

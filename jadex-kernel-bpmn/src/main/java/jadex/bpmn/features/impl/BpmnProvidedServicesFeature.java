@@ -9,6 +9,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.ProvidedServicesComponentFeature;
+import jadex.commons.IValueFetcher;
 import jadex.commons.collection.MultiCollection;
 
 import java.lang.reflect.Method;
@@ -38,7 +39,7 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 	 *  Init a service.
 	 *  Overriden to allow for service implementations as BPMN processes using signal events.
 	 */
-	protected Object createServiceImplementation(ProvidedServiceInfo info) throws Exception
+	protected Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
 	{
 		Object ret = null;
 		ProvidedServiceImplementation	impl	= info.getImplementation();
@@ -113,7 +114,7 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 		// External service implementation
 		else
 		{
-			ret	= super.createServiceImplementation(info);
+			ret	= super.createServiceImplementation(info, fetcher);
 		}
 		
 		return ret;
