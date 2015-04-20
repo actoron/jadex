@@ -11,12 +11,11 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.concurrent.TimeoutException;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.TupleResult;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
@@ -46,6 +45,9 @@ public class ComponentTest extends TestCase
 	/** The component full name. */
 	protected String	fullname;
 	
+	/** The component (kernel) type. */
+	protected String	type;
+	
 	/** The timeout. */
 	protected long	timeout;
 	
@@ -67,6 +69,7 @@ public class ComponentTest extends TestCase
 		this.filename	= comp.getFilename();
 		this.rid	= comp.getResourceIdentifier();
 		this.fullname	= comp.getFullName();
+		this.type	= comp.getType();
 		Object	to	= comp.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, suite.getClassLoader());
 		if(to!=null)
 		{
@@ -99,33 +102,67 @@ public class ComponentTest extends TestCase
 			return;
 		}
 		
-//		System.out.println("starting: "+filename);
-		
 		// Start the component.
-//		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+		final IComponentIdentifier[]	cid	= new IComponentIdentifier[1];
 		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
 		Timer	t	= new Timer(true);
 		t.schedule(new TimerTask()
 		{
 			public void run()
 			{
-				finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
+				boolean	b	= finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
+				if(b && cid[0]!=null)
+				{
+					cms.destroyComponent(cid[0]);
+				}
 			}
 		}, timeout);
 
-		final ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
-		fut.addResultListener(new ExceptionDelegationResultListener<Collection<TupleResult>, Map<String, Object>>(finished)
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
+		componentStarted(fut);
+		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
 		{
-			public void customResultAvailable(Collection<TupleResult> result)
+			public void intermediateResultAvailable(TupleResult result)
 			{
-				finished.setResult(fut.getSecondResult());
+				if(result.getNum()==0)
+				{
+					cid[0]	= (IComponentIdentifier)result.getResult();
+				}
+				else
+				{
+					finished.setResultIfUndone((Map<String, Object>)result.getResult());
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				finished.setExceptionIfUndone(exception);
 			}
 		});
-
-		// Evaluate the results.
 		Map<String, Object>	res	= finished.get();
 		t.cancel();
-//		System.out.println("finished: "+filename);
+		checkTestResults(res);
+		
+		// Remove references to Jadex resources to aid GC cleanup.
+		cms	= null;
+		suite	= null;
+	}
+
+	/**
+	 *  Called when a component has been started.
+	 *  @param cid	The cid, set as soon as known.
+	 */
+	protected void componentStarted(ITuple2Future<IComponentIdentifier, Map<String, Object>> fut)
+	{
+	}
+
+	/**
+	 *  Optional checking after component has finished.
+	 *  @param res	The results.
+	 */
+	protected void checkTestResults(Map<String, Object> res)
+	{
+		// Evaluate the results.
 		Testcase	tc	= null;
 		for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )
 		{
@@ -156,12 +193,8 @@ public class ComponentTest extends TestCase
 		{
 			throw new AssertionFailedError("No test results provided by component: "+res);
 		}
-
-		// Remove references to Jadex resources to aid GC cleanup.
-		cms	= null;
-		suite	= null;
 	}
-	
+
 	public String getName()
 	{
 		return this.toString();
@@ -173,6 +206,6 @@ public class ComponentTest extends TestCase
 	 */
 	public String toString()
 	{
-		return fullname;
+		return fullname + " (" + type + ")";
 	}
 }

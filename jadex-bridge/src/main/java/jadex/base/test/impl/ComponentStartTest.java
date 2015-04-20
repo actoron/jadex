@@ -1,64 +1,30 @@
 package jadex.base.test.impl;
 
 
-import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
-import jadex.base.test.Testcase;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.Tuple2;
-import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITuple2Future;
 
-import java.util.Collection;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import junit.framework.TestCase;
 
 /**
  *  Test if a component can be started.
  */
-public class ComponentStartTest extends	TestCase
+public class ComponentStartTest extends	ComponentTest
 {
-	//-------- attributes --------
-	
-	/** The component management system. */
-	protected IComponentManagementService	cms;
-	
-	/** The component model. */
-	protected String	filename;
-	
-	/** The component resource identifier. */
-	protected IResourceIdentifier	rid;
-	
-	/** The component full name. */
-	protected String	fullname;
-	
-	/** The timeout. */
-	protected long	timeout;
-
-	/** The test suite. */
-	protected ComponentTestSuite	suite;
-	
 	//-------- constructors --------
 	
 	public ComponentStartTest() {
@@ -70,62 +36,21 @@ public class ComponentStartTest extends	TestCase
 	 */
 	public ComponentStartTest(IComponentManagementService cms, IModelInfo comp, ComponentTestSuite suite)
 	{
-		this.cms	= cms;
-		this.filename	= comp.getFilename();
-		this.rid	= comp.getResourceIdentifier();
-		this.fullname	= comp.getFullName();
-		Object	to	= comp.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, suite.getClassLoader());
-		if(to!=null)
-		{
-			this.timeout	= ((Number)to).longValue();
-		}
-		else
-		{
-			this.timeout	= BasicService.getLocalDefaultTimeout();
-		}
-		this.suite	= suite;
+		super(cms, comp, suite);
 	}
 	
 	//-------- methods --------
 	
 	/**
-	 *  The number of test cases.
+	 *  Called when a component has been started.
+	 *  @param cid	The cid, set as soon as known.
 	 */
-	public int countTestCases()
+	protected void componentStarted(ITuple2Future<IComponentIdentifier, Map<String, Object>> fut)
 	{
-		return 1;
-	}
-	
-	
-	
-	/**
-	 *  Test the component.
-	 */
-	public void runBare()
-	{
-		if(suite.isAborted())
-		{
-			return;
-		}
-		
-		// Start the component.
-//		System.out.println("starting: "+this);
-//		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
-		final Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
-		Timer	t	= new Timer(true);
-		t.schedule(new TimerTask()
-		{
-			public void run()
-			{
-				finished.setExceptionIfUndone(new TimeoutException(ComponentStartTest.this+" did not finish in "+timeout+" ms."));
-			}
-		}, timeout);
-		final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
-			new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
-//		System.out.println("started: "+this);
-		
 		try
 		{
+			final IComponentIdentifier	cid	= fut.getFirstResult();
+			
 			// Wait some time (simulation and real time) and kill the component afterwards.
 			final IResultListener<Void>	lis	= new CounterResultListener<Void>(2, new DefaultResultListener<Void>()
 			{
@@ -154,10 +79,6 @@ public class ComponentStartTest extends	TestCase
 					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true);
 				}
 			}).addResultListener(lis);
-			
-			finished.get();
-			t.cancel();
-//			System.out.println("killed: "+this);
 		}
 		catch(ComponentTerminatedException cte)
 		{				
@@ -171,78 +92,22 @@ public class ComponentStartTest extends	TestCase
 				throw e;
 			}
 		}
-//		ISuspendable.SUSPENDABLE.set(null);
-		
-		// Remove references to Jadex resources to aid GC cleanup.
-		cms	= null;
-		suite	= null;
-	}
-	
-	/**
-	 *  Test the component.
-	 */
-	public static void dorun(IComponentManagementService cms, String filename)
-	{
-		// Start the component.
-		try
-		{
-			System.out.println("starting: "+filename);
-			IComponentIdentifier	cid	= cms.createComponent(null, filename, null, null).get();
-			try
-			{
-//				if(comp.getFilename().indexOf("Heatbugs")!=-1)
-//				{
-					System.out.println("killing: "+filename);
-//					SyncExecutionService.DEBUG	= true;
-//				}
-				cms.destroyComponent(cid).get();
-				System.out.println("killed: "+filename);
-			}
-			catch(ComponentTerminatedException cte)
-			{				
-				// Ignore if component already terminated.
-			}
-			catch(RuntimeException e)
-			{
-				// Ignore if component already terminated.
-				if(!(e.getCause() instanceof ComponentTerminatedException))
-				{
-					throw e;
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public String getName()
-	{
-		return this.toString();
 	}
 
+	/**
+	 *  Optional checking after component has finished.
+	 *  @param res	The results.
+	 */
+	protected void checkTestResults(Map<String, Object> res)
+	{
+		// Nop.
+	}
+	
 	/**
 	 *  Get a string representation of this test.
 	 */
 	public String toString()
 	{
-		return "start: "+fullname;
+		return "start: "+super.toString();
 	}	
-	
-	/**
-	 * 
-	 */
-	public static void main(String[] args)
-	{
-		String[]	pargs	= new String[]
-		{
-			"-gui", "false"
-		};
-		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(pargs).get();
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(rootcomp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		dorun(cms, "jadex/micro/testcases/blocking/ShutdownAgent.class");
-//		dorun(cms, "jadex/micro/benchmarks/MessagePerformanceAgent.class");
-//		dorun(cms, "jadex/micro/examples/ping/PingScenario.application.xml");
-	}
 }

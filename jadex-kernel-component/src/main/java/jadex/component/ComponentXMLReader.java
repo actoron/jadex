@@ -205,7 +205,7 @@ public class ComponentXMLReader
 		if(mi!=null)
 		{
 			mi.setFilename(rinfo.getFilename());
-			mi.setType(ComponentComponentFactory.FILETYPE_COMPONENT);
+			mi.setType(getModelType());
 			mi.setClassloader(classloader);
 			mi.setStartable(true);
 			if(rid==null)
@@ -247,6 +247,14 @@ public class ComponentXMLReader
 		return ret;
 	}
 	
+	/**
+	 *  Get the type of loaded models.
+	 */
+	protected	String getModelType()
+	{
+		return ComponentComponentFactory.FILETYPE_COMPONENT;
+	}
+
 	/**
 	 *  Add method info.
 	 */
