@@ -223,6 +223,7 @@ public class RelayHandler
 		}
 		else
 		{
+			// Throws exception, if reconnect not allowed (e.g. from different IP).
 			info.reconnect(hostip, hostname);
 		}
 		
@@ -360,54 +361,20 @@ public class RelayHandler
 	public void handleMessage(InputStream in, String protocol) throws Exception
 	{
 		String	targetid	= readString(in);
-//		boolean	sent	= false;
 		
 		// Only send message when request is not https or target is also connected via https.
 		PlatformInfo	targetpi	= platforms.get(targetid);
-		if(targetpi!=null && (!protocol.equals("https") || targetpi.getScheme().equals("https")))
+		IBlockingQueue<Message>	queue	= map.get(targetid);
+		if(queue!=null && targetpi!=null && (!protocol.equals("https") || targetpi.getScheme().equals("https")))
 		{
-			IBlockingQueue<Message>	queue	= map.get(targetid);
-			if(queue!=null)
-			{
-//				long	start	= System.currentTimeMillis();
-//				try
-//				{
-					Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
-//					System.out.println("queing message to: "+targetid);
-					queue.enqueue(msg);
-					msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
-//					sent	= true;
-////					System.out.println("message sent to: "+targetid+", "+(System.currentTimeMillis()-start));
-//				}
-//				catch(Exception e)
-//				{
-//					try
-//					{
-//						// timeout or platform just disconnected
-//						System.out.println("message not sent to: "+targetid+", "+(System.currentTimeMillis()-start)+", "+e);
-//	
-//						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//						byte[] buffer = new byte[8192];
-//						int length = 0;
-//						while((length=in.read(buffer))!=-1)
-//						{
-//							baos.write(buffer, 0, length);
-//						}
-//						System.out.println("message: "+new String(baos.toByteArray(), "UTF-8"));
-//						//					e.printStackTrace();
-//					}
-//					catch(Exception e2)
-//					{
-//						
-//					}
-//				}
-			}
+			Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
+			queue.enqueue(msg);
+			msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
 		}
-		
-//		if(!sent)
-//		{
-//			throw new RuntimeException("message not sent: "+targetid+", "+targetpi);
-//		}
+		else
+		{
+			throw new RuntimeException("message not sent: "+targetid+", "+targetpi+", "+queue);
+		}
 	}
 	
 	/**
