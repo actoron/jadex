@@ -253,7 +253,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 */
 	protected IBackupResource	getResource()
 	{
-		return ((ResourceProviderAgent)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent()).getResource();
+		return ((ResourceProviderAgent)agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent()).getResource();
 	}
 	
 	/**

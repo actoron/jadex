@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -26,7 +27,6 @@ import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.MicroModel;
 import jadex.micro.features.IMicroInjectionFeature;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(
 		IMicroInjectionFeature.class, MicroInjectionComponentFeature.class,
-		new Class<?>[]{IArgumentsFeature.class, IRequiredServicesFeature.class}, new Class<?>[]{IProvidedServicesFeature.class});
+		new Class<?>[]{IPojoComponentFeature.class, IArgumentsFeature.class, IRequiredServicesFeature.class}, new Class<?>[]{IProvidedServicesFeature.class});
 
 	//-------- constructors --------
 	
@@ -64,7 +64,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 		Map<String, Object>	args	= getComponent().getComponentFeature(IArgumentsFeature.class).getArguments();
 		Map<String, Object>	results	= getComponent().getComponentFeature(IArgumentsFeature.class).getResults();
 		final MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
-		final Object agent = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		final Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 
 		// Inject agent fields.
 		FieldInfo[] fields = model.getAgentInjections();
@@ -200,7 +200,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									Object pagent = ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+									Object pagent = ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 									if(SReflect.isSupertype(f.getType(), pagent.getClass()))
 									{
 										try
@@ -249,7 +249,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 		{
 			try
 			{
-				Object agent = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+				Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				if(convert!=null)
 				{
 					SimpleValueFetcher fetcher = new SimpleValueFetcher(getComponent().getFetcher());

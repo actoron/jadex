@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -15,7 +16,6 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.AWTException;
 import java.awt.MenuItem;
@@ -182,7 +182,7 @@ public class ClockFrame extends JFrame
 					@Classname("settings")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+						AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 						final Settings sets = agent.getSettings();
 						
 						if(sets.isAutosave())
@@ -379,7 +379,7 @@ public class ClockFrame extends JFrame
 				@Classname("refresh")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+					AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 					final Settings sets = agent.getSettings();
 					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
 					fut.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()

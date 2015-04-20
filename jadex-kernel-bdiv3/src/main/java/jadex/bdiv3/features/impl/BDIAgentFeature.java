@@ -44,12 +44,15 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckNotNull;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -73,7 +76,6 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
-import jadex.micro.features.IMicroLifecycleFeature;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
@@ -108,7 +110,9 @@ import java.util.StringTokenizer;
  */
 public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAgentFeature
 {
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBDIAgentFeature.class, BDIAgentFeature.class, new Class[]{IMicroLifecycleFeature.class}, null);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBDIAgentFeature.class, BDIAgentFeature.class, 
+//		new Class[]{IMicroLifecycleFeature.class}, null);
+		null, new Class[]{ILifecycleComponentFeature.class, IProvidedServicesFeature.class});
 	
 	/** The bdi model. */
 	protected BDIModel bdimodel;
@@ -131,26 +135,28 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		super(component, cinfo);
 		
-		Object pojo = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		Object pojo = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 		ASMBDIClassGenerator.checkEnhanced(pojo.getClass());
 		this.bdimodel = (BDIModel)getComponent().getModel().getRawModel();
 		this.capa = new RCapability(bdimodel.getCapability());
 		this.rulesystem = new RuleSystem(pojo);
 	}
 
-//	/**
-//	 *  Initialize the feature.
-//	 *  Empty implementation that can be overridden.
-//	 */
-//	public IFuture<Void> init()
-//	{
-//		Object pojo = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
-//		injectAgent(getComponent(), pojo, bdimodel, null);
-//		invokeInitCalls(pojo);
-//		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
+	/**
+	 *  Initialize the feature.
+	 *  Empty implementation that can be overridden.
+	 */
+	public IFuture<Void> init()
+	{
+		// cannot do this in constructor because it needs access to this feature in expressions
+		
+		Object pojo = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		injectAgent(getComponent(), pojo, bdimodel, null);
+		invokeInitCalls(pojo);
+		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
 //		startBehavior();
-//		return IFuture.DONE;
-//	}
+		return IFuture.DONE;
+	}
 	
 	//-------- internal method used for rewriting field access -------- 
 	
@@ -547,7 +553,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		try
 		{
-			Object pojo = agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+			Object pojo = agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 		
 			Method getter = pojo.getClass().getMethod("get"+belname.substring(0,1).toUpperCase()+belname.substring(1), new Class[0]);
 			Object oldval = getter.invoke(pojo, new Object[0]);
@@ -562,7 +568,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 	
 	/**
-	 * 
+	 *  Observe a value.
 	 */
 	public static void observeValue(RuleSystem rs, Object val, final IInternalAccess agent, final String etype, final MBelief mbel)
 	{
@@ -570,7 +576,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 	
 	/**
-	 * 
+	 *  Observe a value.
 	 */
 	public static void observeValue(final RuleSystem rs, final Object val, final IInternalAccess agent, final EventType etype, final MBelief mbel)
 	{
@@ -1074,7 +1080,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	public Object	getCapabilityObject(String name)
 	{
 //		Object	ret	= ((PojoBDIAgent)microagent).getPojoAgent();
-		Object ret = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		Object ret = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 		if(name!=null)
 		{
 			StringTokenizer	stok	= new StringTokenizer(name, MElement.CAPABILITY_SEPARATOR);
@@ -1207,7 +1213,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //		
 //		int i	= info.getName()!=null ? info.getName().indexOf(MElement.CAPABILITY_SEPARATOR) : -1;
 ////		Object	ocapa	= ((PojoBDIAgent)microagent).getPojoAgent();
-//		Object ocapa = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+//		Object ocapa = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 //		String	capa	= null;
 //		final IValueFetcher	oldfetcher	= getFetcher();
 //		if(i!=-1)
@@ -1324,7 +1330,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			{
 				Field	f	= caps[i].getFirstEntity().getField(getComponent().getClassLoader());
 				f.setAccessible(true);
-				final Object	capa	= f.get(agent);
+				final Object capa = f.get(agent);
 				
 				String globalname;
 				try
@@ -1403,7 +1409,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				{
 					String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+clazz.getName().replace("/", "_").replace(".", "_");
 					Method um = pojo.getClass().getMethod(name, initcall.getFirstEntity());
-//						System.out.println("Init: "+um);
+//					System.out.println("Init: "+um);
 					um.invoke(pojo, initcall.getSecondEntity());
 				}
 				catch(InvocationTargetException e)
@@ -1693,7 +1699,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //		super.startBehavior();
 		
 //		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
-		final Object agent = getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		final Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				
 		// Init bdi configuration
 		String confname = getComponent().getConfiguration();
@@ -2973,7 +2979,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				capaname = melement.getName().substring(0, idx);
 			}
 		}
-		Object capa = capaname!=null ? getCapabilityObject(capaname): getComponent().getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		Object capa = capaname!=null ? getCapabilityObject(capaname): getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 //			: getAgent() instanceof PojoBDIAgent? ((PojoBDIAgent)getAgent()).getPojoAgent(): getAgent();
 		
 		vals.add(capa);
@@ -3624,4 +3630,26 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		return agent.getComponentFeature(IBDIAgentFeature.class);
 	}
+	
+//	/**
+//	 *  Get the value fetcher.
+//	 */
+//	public IValueFetcher getValueFetcher()
+//	{
+//		return new IValueFetcher()
+//		{
+//			public Object fetchValue(String name)
+//			{
+//				// Hack!
+//				if("$pojocapa".equals(name))
+//				{
+//					return curcapa;
+//				}
+//				else
+//				{
+//					throw new RuntimeException("Value not found: "+name);
+//				}
+//			}
+//		};
+//	}
 }

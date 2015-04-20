@@ -1,14 +1,26 @@
 package jadex.bdiv3.features.impl;
 
 import jadex.bdiv3.IBDIAgent;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.model.MElement;
+import jadex.bdiv3.runtime.IBeliefListener;
+import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.BDIServiceInvocationHandler;
+import jadex.bdiv3.runtime.impl.CapabilityWrapper;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.ProvidedServicesComponentFeature;
+import jadex.commons.IParameterGuesser;
+import jadex.commons.IValueFetcher;
+import jadex.commons.SimpleParameterGuesser;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.lang.reflect.Proxy;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *  Overriden to allow for service implementations to be directly mapped to plans.
@@ -29,8 +41,29 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 	 *  Init a service.
 	 *  Overriden to allow for service implementations as BPMN processes using signal events.
 	 */
-	protected Object createServiceImplementation(ProvidedServiceInfo info) throws Exception
+	protected Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
 	{
+		int i	= info.getName()!=null ? info.getName().indexOf(MElement.CAPABILITY_SEPARATOR) : -1;
+		Object	ocapa	= getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		String	capa	= null;
+		if(i!=-1)
+		{
+			capa	= info.getName().substring(0, i); 
+			SimpleValueFetcher fet = new SimpleValueFetcher(fetcher);
+			ocapa = ((BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capa);
+			fet.setValue("$pojocapa", ocapa);
+			fetcher = fet;
+			
+			Set<Object> vals = new HashSet<Object>();
+			vals.add(ocapa);
+			vals.add(new CapabilityWrapper(getComponent(), ocapa, capa));
+			hackguesser = new SimpleParameterGuesser(super.getParameterGuesser(), vals);
+		}
+		else
+		{
+			hackguesser = null;
+		}
+		
 		// Support special case that BDI should implement provided service with plans.
 		Object ret = null;
 		ProvidedServiceImplementation impl = info.getImplementation();
@@ -42,8 +75,22 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 		}
 		else
 		{
-			ret = super.createServiceImplementation(info);
+			ret = super.createServiceImplementation(info, fetcher);
 		}
+		
+//		hackguesser = null;
+		
 		return ret;
+	}
+	
+//	public IValueFetcher getValueFetcher()
+//	{
+//		return super.getValueFetcher();
+//	}
+	
+	protected IParameterGuesser hackguesser;
+	public IParameterGuesser getParameterGuesser()
+	{
+		return hackguesser!=null? hackguesser: super.getParameterGuesser();
 	}
 }

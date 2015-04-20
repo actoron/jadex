@@ -1,10 +1,10 @@
 package jadex.platform.service.awareness.discovery;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 /**
  * 
@@ -67,6 +67,6 @@ public class DiscoveryService	implements IDiscoveryService
 	 */
 	protected DiscoveryAgent getDiscoveryAgent()
 	{
-		return (DiscoveryAgent)agent.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+		return (DiscoveryAgent)agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 	}
 }

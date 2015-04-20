@@ -11,6 +11,7 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -18,7 +19,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -351,7 +351,7 @@ public class APL
 				if(!Modifier.isStatic(m.getModifiers()))
 				{
 					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia);
-					final Object agent = ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+					final Object agent = ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 					pojo = rp.getBody().getBody(agent);
 				}
 				try

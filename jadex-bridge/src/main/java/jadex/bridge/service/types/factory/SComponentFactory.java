@@ -33,6 +33,7 @@ import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -41,6 +42,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,7 +73,7 @@ public class SComponentFactory
 		def_features.add(PropertiesComponentFeature.FACTORY);	// After args for logging
 		def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
-		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class, new Class[]{IProvidedServicesFeature.class}, null));
 		def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(INFPropertyComponentFeature.class, NFPropertyComponentFeature.class));
 		def_features.add(ComponentLifecycleFeature.FACTORY);
@@ -83,9 +85,25 @@ public class SComponentFactory
 	 *  @param facss	A list of component feature lists.
 	 *  @return An ordered list of component features.
 	 */
-	public static Collection<IComponentFeatureFactory> orderComponentFeatures(Collection<Collection<IComponentFeatureFactory>> facss)
+	public static Collection<IComponentFeatureFactory> orderComponentFeatures(String name, Collection<Collection<IComponentFeatureFactory>> facss)
 	{
 		DependencyResolver<IComponentFeatureFactory> dr = new DependencyResolver<IComponentFeatureFactory>();
+
+		// visualize feature dependencies for debugging
+//		Class<?> cl = SReflect.classForName0("jadex.tools.featuredeps.DepViewerPanel", null);
+//		if(cl!=null)
+//		{
+//			try
+//			{
+//				Method m = cl.getMethod("createFrame", new Class[]{String.class, DependencyResolver.class});
+//				m.invoke(null, new Object[]{name, dr});
+//			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
+//		}
+		
 		Map<Class<?>, IComponentFeatureFactory> facsmap = new HashMap<Class<?>, IComponentFeatureFactory>();
 		
 		for(Collection<IComponentFeatureFactory> facs: facss)
@@ -100,7 +118,7 @@ public class SComponentFactory
 		
 		for(Collection<IComponentFeatureFactory> facs: facss)
 		{
-			IComponentFeatureFactory last = null;
+//			IComponentFeatureFactory last = null;
 			for(IComponentFeatureFactory fac: facs)
 			{
 				// Only use the last feature of a given type (allows overriding features)
@@ -117,10 +135,12 @@ public class SComponentFactory
 						}
 					}
 					// else order in current list
-					else if(last!=null)
-					{
-						dr.addDependency(fac, last);
-					}
+//					else 
+//					{
+//						if(last!=null)
+//							dr.addDependency(fac, last);
+//						last = fac;
+//					}
 					
 					Set<Class<?>> sucs = fac.getSuccessors();
 					for(Class<?> suc: sucs)
@@ -132,17 +152,16 @@ public class SComponentFactory
 					{
 						dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
 					}
-					last = fac;
 				}
 				// Save original dependency of the feature
-				else if(!odeps.containsKey(fac.getType()))
-				{
-					odeps.put(fac.getType(), last);
-				}
+//				else if(!odeps.containsKey(fac.getType()))
+//				{
+//					odeps.put(fac.getType(), last);
+//				}
 			}
 		}
 
-		Collection<IComponentFeatureFactory> ret = dr.resolveDependencies();
+		Collection<IComponentFeatureFactory> ret = dr.resolveDependencies(true);
 		return ret;
 	}
 

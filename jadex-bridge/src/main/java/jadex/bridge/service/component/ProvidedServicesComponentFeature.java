@@ -22,6 +22,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -143,7 +144,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				}
 				else
 				{
-					Object ser = createServiceImplementation(info);
+					Object ser = createServiceImplementation(info, getComponent().getFetcher());
 					
 					// Implementation may null to disable service in some configurations.
 					if(ser!=null)
@@ -288,7 +289,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	/**
 	 *  Create a service implementation from description.
 	 */
-	protected Object createServiceImplementation(ProvidedServiceInfo info)	throws Exception
+	protected Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
 	{
 		Object	ser	= null;
 		ProvidedServiceImplementation impl = info.getImplementation();
@@ -301,7 +302,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //				fetcher.setValue("$servicename", info.getName());
 //				fetcher.setValue("$servicetype", info.getType().getType(component.getClassLoader(), component.getModel().getAllImports()));
 //				System.out.println("sertype: "+fetcher.fetchValue("$servicetype")+" "+info.getName());
-				ser = SJavaParser.getParsedValue(impl, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+				ser = SJavaParser.getParsedValue(impl, component.getModel().getAllImports(), fetcher, component.getClassLoader());
 //				System.out.println("added: "+ser+" "+model.getName());
 			}
 			catch(RuntimeException e)

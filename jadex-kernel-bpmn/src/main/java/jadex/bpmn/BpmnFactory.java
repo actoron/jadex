@@ -23,6 +23,7 @@ import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -93,7 +94,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	{
 		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new BpmnModelLoader();
-		this.features = SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BPMN_FEATURES));
+		this.features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BPMN_FEATURES));
 	}
 	
 	/**
@@ -106,7 +107,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 		this.provider = provider;
 		this.loader = new BpmnModelLoader();
 		this.fproperties	= properties;
-		this.features = SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BPMN_FEATURES));
+		this.features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BPMN_FEATURES));
 
 		this.libservicelistener = new ILibraryServiceListener()
 		{

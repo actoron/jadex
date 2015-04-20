@@ -4,8 +4,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.component.IComponentLifecycleFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -22,13 +22,13 @@ import java.util.List;
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
  */
-public class ComponentLifecycleFeature extends	AbstractComponentFeature implements IComponentLifecycleFeature
+public class ComponentLifecycleFeature extends	AbstractComponentFeature implements ILifecycleComponentFeature
 {
 	//-------- constants --------
 	
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IComponentLifecycleFeature.class, ComponentLifecycleFeature.class,
-		new Class<?>[]{IRequiredServicesFeature.class}, null);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(ILifecycleComponentFeature.class, ComponentLifecycleFeature.class,
+		new Class<?>[]{IRequiredServicesFeature.class}, null, false);
 	
 	//-------- methods --------
 	

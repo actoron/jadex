@@ -170,7 +170,7 @@ public class PojoAgentCreationAgent
 											{
 												public void customResultAvailable(IClockService result)
 												{
-													((PojoAgentCreationAgent)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent())
+													((PojoAgentCreationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent())
 														.deletePeers(max, result.getTime(), dur, pera, omem, upera);
 													ret.setResult(null);
 												}

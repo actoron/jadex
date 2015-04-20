@@ -5,6 +5,8 @@ import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.ILifecycleComponentFeature;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
@@ -13,7 +15,6 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.FieldInfo;
 import jadex.commons.IParameterGuesser;
-import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SimpleParameterGuesser;
@@ -29,7 +30,6 @@ import jadex.micro.MicroModel;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -37,27 +37,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
  */
-public class MicroLifecycleComponentFeature extends	AbstractComponentFeature implements IMicroLifecycleFeature, IValueFetcher
+public class MicroLifecycleComponentFeature extends	AbstractComponentFeature implements ILifecycleComponentFeature
 {
 	//-------- constants --------
 	
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMicroLifecycleFeature.class, MicroLifecycleComponentFeature.class,
-		new Class<?>[]{IRequiredServicesFeature.class, IProvidedServicesFeature.class, ISubcomponentsFeature.class}, null);
-	
-	//-------- attributes --------
-	
-	/** The pojo agent. */
-	protected Object pojoagent;
-	
-	/** The parameter guesser (cached for speed). */
-	protected IParameterGuesser	guesser; 
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(ILifecycleComponentFeature.class, MicroLifecycleComponentFeature.class,
+		new Class<?>[]{IPojoComponentFeature.class, IRequiredServicesFeature.class, IProvidedServicesFeature.class, ISubcomponentsFeature.class}, null, false);
 	
 	//-------- constructors --------
 	
@@ -67,26 +58,6 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	public MicroLifecycleComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-		
-		try
-		{
-			// Create the pojo agent
-			MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
-			this.pojoagent = model.getPojoClass().getType(model.getClassloader()).newInstance();
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 *  Get the pojoagent.
-	 *  @return The pojoagent
-	 */
-	public Object getPojoAgent()
-	{
-		return pojoagent;
 	}
 
 	/**
@@ -176,6 +147,15 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the pojoagent.
+	 *  @return The pojoagent
+	 */
+	public Object getPojoAgent()
+	{
+		return getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 	}
 	
 	/**
@@ -316,45 +296,8 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		}
 	}
 	
-	/**
-	 *  The feature can inject parameters for expression evaluation
-	 *  by providing an optional value fetcher. The fetch order is the reverse
-	 *  init order, i.e., later features can override values from earlier features.
-	 */
-	public IValueFetcher	getValueFetcher()
-	{
-		return this;
-	}
+	
 
-	/**
-	 *  Add $pojoagent to fetcher.
-	 */
-	public Object fetchValue(String name)
-	{
-		if("$pojoagent".equals(name))
-		{
-			return getPojoAgent();
-		}
-		else
-		{
-			throw new RuntimeException("Value not found: "+name);
-		}
-	}
-	
-	/**
-	 *  The feature can add objects for field or method injections
-	 *  by providing an optional parameter guesser. The selection order is the reverse
-	 *  init order, i.e., later features can override values from earlier features.
-	 */
-	public IParameterGuesser	getParameterGuesser()
-	{
-		if(guesser==null)
-		{
-			guesser	= new SimpleParameterGuesser(Collections.singleton(pojoagent));
-		}
-		return guesser;
-	}
-	
 	//-------- helper methods --------
 	
 	/**
@@ -382,7 +325,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 			{
 				// It is now allowed to use protected/private agent created, body, terminate methods
 				method.setAccessible(true);
-				Object res = method.invoke(component.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent(), iargs);
+				Object res = method.invoke(component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(), iargs);
 				if(res instanceof IFuture)
 				{
 					ret	= (IFuture<Void>)res;

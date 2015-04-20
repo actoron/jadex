@@ -3,6 +3,7 @@ package jadex.bdiv3.examples.alarmclock;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
@@ -10,7 +11,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -191,7 +191,7 @@ public class AlarmsGui extends JFrame
 									@Classname("alarms")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+										AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 										final Alarm[] alarms = agent.getAlarms();
 										SwingUtilities.invokeLater(new Runnable()
 										{
@@ -282,7 +282,7 @@ public class AlarmsGui extends JFrame
 			@Classname("addAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+				AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				agent.addAlarm(alarm);
 				return IFuture.DONE;
 			}
@@ -309,7 +309,7 @@ public class AlarmsGui extends JFrame
 			@Classname("removeAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IMicroLifecycleFeature.class).getPojoAgent();
+				AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				agent.removeAlarm(alarm);
 				return IFuture.DONE;
 			}

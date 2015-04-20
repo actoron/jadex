@@ -124,7 +124,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			}
 		};
 		
-		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MicroAgentFactory.MICRO_FEATURES, BDI_FEATURES));
+		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MicroAgentFactory.MICRO_FEATURES, BDI_FEATURES));
 	}
 	
 	/**

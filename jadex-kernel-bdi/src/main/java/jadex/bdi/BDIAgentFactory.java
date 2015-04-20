@@ -34,6 +34,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
 import jadex.commons.ResourceInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -146,7 +147,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 //		loader	= new OAVBDIModelLoader(getPropertyMap(), root);
 		loader	= new OAVBDIModelLoader(myprops, root);
 		
-		features	= SComponentFactory.orderComponentFeatures(Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BDI_FEATURES));
+		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BDI_FEATURES));
 	}
 	
 	/**
