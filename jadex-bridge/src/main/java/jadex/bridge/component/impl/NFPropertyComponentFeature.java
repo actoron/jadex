@@ -2,6 +2,7 @@ package jadex.bridge.component.impl;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.modelinfo.NFPropertyInfo;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
@@ -17,6 +18,7 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.collection.ILRUEntryCleaner;
@@ -37,10 +39,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * 
+ *  Feature for non functional properties of the component, provided/required services and methods.
  */
 public class NFPropertyComponentFeature extends AbstractComponentFeature implements INFPropertyComponentFeature
 {
+	//-------- constants --------
+	
+	/** The factory. */
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(INFPropertyComponentFeature.class, NFPropertyComponentFeature.class,
+		new Class<?>[]{IProvidedServicesFeature.class, IRequiredServicesFeature.class}, null, false);
+	
 	//-------- attributes --------
 	
 	/** The component property provider. */

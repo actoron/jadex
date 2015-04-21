@@ -6,9 +6,15 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.IFuture;
 
+/**
+ *  Service with nf props.
+ */
 @Service
 public class NFPropertyTestService implements ICoreDependentService
 {
+	/**
+	 *  Init method.
+	 */
 	@ServiceStart
 	public IFuture<Void> x()
 	{
@@ -16,6 +22,9 @@ public class NFPropertyTestService implements ICoreDependentService
 		return IFuture.DONE;
 	}
 
+	/**
+	 *  Example method.
+	 */
 	@NFProperties(@NFProperty(name="methodspeed", value=MethodSpeedProperty.class))
 	public IFuture<Void> testMethod()
 	{

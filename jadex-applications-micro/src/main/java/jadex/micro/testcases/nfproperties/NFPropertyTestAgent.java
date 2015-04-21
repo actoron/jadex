@@ -1,8 +1,6 @@
 package jadex.micro.testcases.nfproperties;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.INFPropertyComponentFeature;
-import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
@@ -32,7 +30,7 @@ public class NFPropertyTestAgent
 		String[] names = SNFPropertyProvider.getNFPropertyNames(agent.getExternalAccess(), iscds.getServiceIdentifier()).get();
 		
 		System.out.println("Begin list of non-functional properties:");
-		for (String name : names)
+		for(String name : names)
 		{
 			System.out.println(name);
 		}

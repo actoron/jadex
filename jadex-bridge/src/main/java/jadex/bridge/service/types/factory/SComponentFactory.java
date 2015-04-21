@@ -75,7 +75,7 @@ public class SComponentFactory
 		def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class, new Class[]{IProvidedServicesFeature.class}, null));
 		def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
-		def_features.add(new ComponentFeatureFactory(INFPropertyComponentFeature.class, NFPropertyComponentFeature.class));
+		def_features.add(NFPropertyComponentFeature.FACTORY);
 		def_features.add(ComponentLifecycleFeature.FACTORY);
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
 	}
