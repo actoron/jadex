@@ -114,12 +114,24 @@ public class CustomerPanel extends JPanel
 						if(remote.isSelected())
 						{
 							IFuture<Collection<IShopService>> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("remoteshopservices");
-							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
+							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret)
+							{
+								public void exceptionOccurred(Exception exception)
+								{
+									super.exceptionOccurred(exception);
+								}
+							});
 						}
 						else
 						{
 							IFuture<Collection<IShopService>> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("localshopservices");
-							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
+							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret)
+							{
+								public void exceptionOccurred(Exception exception)
+								{
+									super.exceptionOccurred(exception);
+								}
+							});
 						}
 						return ret;
 					}

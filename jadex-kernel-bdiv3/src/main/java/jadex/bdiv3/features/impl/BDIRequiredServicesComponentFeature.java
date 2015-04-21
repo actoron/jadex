@@ -146,10 +146,13 @@ public class BDIRequiredServicesComponentFeature extends RequiredServicesCompone
 	}
 	
 	/**
-	 * 
+	 *  Rename the service name according to the current capability.
 	 */
 	protected String rename(String name)
 	{
+		if(name.indexOf(MElement.CAPABILITY_SEPARATOR)!=-1)
+			return name;
+		
 		RPlan rplan = ExecutePlanStepAction.RPLANS.get();
 		String capa = null;
 		if(rplan!=null)

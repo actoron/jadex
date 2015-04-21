@@ -36,11 +36,11 @@ public class CustomerCapability
 
 	/** The capability. */
 	@Agent
-	protected ICapability	capa;
+	protected ICapability capa;
 	
 	/** The inventory. */
 	@Belief
-	protected List<ItemInfo>	inventory	= new ArrayList<ItemInfo>();
+	protected List<ItemInfo> inventory = new ArrayList<ItemInfo>();
 	
 	//-------- constructors --------
 	
@@ -62,13 +62,13 @@ public class CustomerCapability
 	 *  Get the money.
 	 */
 	@Belief
-	public native double	getMoney();
+	public native double getMoney();
 	
 	/**
 	 *  Set the money.
 	 */
 	@Belief
-	public native void	setMoney(double money);
+	public native void setMoney(double money);
 	
 	//-------- goals --------
 	

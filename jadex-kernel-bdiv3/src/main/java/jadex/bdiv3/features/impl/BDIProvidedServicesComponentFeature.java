@@ -3,8 +3,6 @@ package jadex.bdiv3.features.impl;
 import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MElement;
-import jadex.bdiv3.runtime.IBeliefListener;
-import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.BDIServiceInvocationHandler;
 import jadex.bdiv3.runtime.impl.CapabilityWrapper;
 import jadex.bridge.IInternalAccess;

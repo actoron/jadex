@@ -13,14 +13,15 @@ import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+
 /**
  * 
  */
 @Agent
 @Arguments(
 {
-	@Argument(name="catalog", clazz=List.class), 
-	@Argument(name="shopname", clazz=String.class)
+	@Argument(name="catalog", clazz=List.class, defaultvalue="ShopBDI.getDefaultCatalog()"), 
+	@Argument(name="shopname", clazz=String.class, defaultvalue="jadex.commons.SUtil.createUniqueId(\"Shop\",2)")
 })
 public class ShopAndCustomerBDI
 {
@@ -33,11 +34,12 @@ public class ShopAndCustomerBDI
 	
 	/** The customer capability. */
 	@Capability(beliefmapping=@Mapping("money"))
-	protected CustomerCapability	customercap	= new CustomerCapability();
+	protected CustomerCapability customercap = new CustomerCapability();
 
 	/** The shop capability. */
 	@Capability(beliefmapping=@Mapping(value="money", target="money"))
-	protected ShopCapa shopcap	= new ShopCapa((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("shopname"), (List<ItemInfo>)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("catalog"));
+	protected ShopCapa shopcap = new ShopCapa((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("shopname"), 
+		(List<ItemInfo>)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("catalog"));
 	
 	/** The money. */
 	@Belief

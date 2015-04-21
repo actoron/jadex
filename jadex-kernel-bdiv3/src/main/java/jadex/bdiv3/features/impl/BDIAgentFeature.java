@@ -1381,7 +1381,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 	
 	/**
-	 * 
+	 *  Invoke init constructor calls.
 	 */
 	protected void invokeInitCalls(Object pojo)
 	{

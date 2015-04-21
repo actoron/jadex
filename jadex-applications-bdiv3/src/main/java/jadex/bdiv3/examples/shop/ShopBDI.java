@@ -9,18 +9,19 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * 
+ *  Shop bdi agent.
  */
 @Agent
 @Arguments(
 {
-	@Argument(name="catalog", clazz=List.class), 
-	@Argument(name="shopname", clazz=String.class)
+	@Argument(name="catalog", clazz=List.class, defaultvalue="ShopBDI.getDefaultCatalog()"), 
+	@Argument(name="shopname", clazz=String.class, defaultvalue="jadex.commons.SUtil.createUniqueId(\"Shop\",2)")
 })
 public class ShopBDI
 {
@@ -44,4 +45,15 @@ public class ShopBDI
 	/** The money. */
 	@Belief
 	protected double	money	= 100;
+	
+	/**
+	 *  Get some default catalog.
+	 */
+	public static List<ItemInfo> getDefaultCatalog()
+	{
+		List<ItemInfo> ret = new ArrayList<ItemInfo>();
+		ret.add(new ItemInfo("Paper", 0.89, 10));
+		ret.add(new ItemInfo("Pencil", 0.56, 2));
+		return ret;
+	}
 }

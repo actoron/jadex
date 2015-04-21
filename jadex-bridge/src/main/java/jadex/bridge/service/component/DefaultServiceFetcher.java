@@ -1033,14 +1033,15 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 //					if(!binding.isDynamic())
 					DefaultServiceFetcher.this.result = future.getIntermediateResults();
 					
-					if(future.getIntermediateResults().size()==0)
-					{
-						StoreIntermediateDelegationResultListener.this.exceptionOccurred(new ServiceNotFoundException("no results"));
-					}
-					else
-					{
+					// no service not found exception for multiple search!
+//					if(future.getIntermediateResults().size()==0)
+//					{
+//						StoreIntermediateDelegationResultListener.this.exceptionOccurred(new ServiceNotFoundException("no results"));
+//					}
+//					else
+//					{
 						StoreIntermediateDelegationResultListener.super.finished();
-					}
+//					}
 				}
 			});
 		}
