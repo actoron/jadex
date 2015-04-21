@@ -32,6 +32,7 @@ import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -40,6 +41,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -87,19 +89,19 @@ public class SComponentFactory
 		DependencyResolver<IComponentFeatureFactory> dr = new DependencyResolver<IComponentFeatureFactory>();
 
 		// visualize feature dependencies for debugging
-//		Class<?> cl = SReflect.classForName0("jadex.tools.featuredeps.DepViewerPanel", null);
-//		if(cl!=null)
-//		{
-//			try
-//			{
-//				Method m = cl.getMethod("createFrame", new Class[]{String.class, DependencyResolver.class});
-//				m.invoke(null, new Object[]{name, dr});
-//			}
-//			catch(Exception e)
-//			{
-//				e.printStackTrace();
-//			}
-//		}
+		Class<?> cl = SReflect.classForName0("jadex.tools.featuredeps.DepViewerPanel", null);
+		if(cl!=null)
+		{
+			try
+			{
+				Method m = cl.getMethod("createFrame", new Class[]{String.class, DependencyResolver.class});
+				m.invoke(null, new Object[]{name, dr});
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 		
 		Map<Class<?>, IComponentFeatureFactory> facsmap = new HashMap<Class<?>, IComponentFeatureFactory>();
 		

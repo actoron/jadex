@@ -730,7 +730,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public static void publishToolBeliefEvent(IInternalAccess ia, MBelief mbel)//, String evtype)
 	{
-		if(mbel!=null && ia.getComponentFeature(IMonitoringComponentFeature.class)!=null && 
+		if(mbel!=null && ia.getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
 			ia.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();

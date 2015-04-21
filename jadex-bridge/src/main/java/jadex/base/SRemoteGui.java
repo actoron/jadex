@@ -10,6 +10,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.FeatureNotAvailableException;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -102,8 +103,8 @@ public class SRemoteGui
 				final Future<Object[]>	ret	= new Future<Object[]>();
 				try
 				{
-					final RequiredServiceInfo[]	ris	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfos();
-	//				final IServiceIdentifier[] sid
+					final RequiredServiceInfo[]	ris	= ia.getComponentFeature0(IRequiredServicesFeature.class)==null? null: ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfos();
+					
 					IIntermediateFuture<IService>	ds	= SServiceProvider.getDeclaredServices(ia);
 					ds.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, Object[]>(ret)
 					{
@@ -127,8 +128,16 @@ public class SRemoteGui
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							super.exceptionOccurred(exception);
+							if(exception instanceof FeatureNotAvailableException)
+							{
+								ret.setResult(new Object[]{null, ris, null});
+							}
+							else
+							{
+								super.exceptionOccurred(exception);
+							}
 						}
+						
 					});
 				}
 				catch(Exception e)

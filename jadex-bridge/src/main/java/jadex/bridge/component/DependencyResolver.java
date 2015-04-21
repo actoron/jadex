@@ -1,10 +1,8 @@
 package jadex.bridge.component;
 
-import jadex.commons.transformation.cloner.ClonerTest;
 import jadex.commons.transformation.traverser.Traverser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

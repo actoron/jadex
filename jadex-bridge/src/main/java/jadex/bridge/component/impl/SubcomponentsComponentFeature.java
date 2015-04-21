@@ -291,7 +291,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	public IFuture<Void>	componentCreated(final IComponentDescription desc, IModelInfo model)
 	{
 		// Throw component events for extensions (envsupport)
-		final IMonitoringComponentFeature	mon	= getComponent().getComponentFeature(IMonitoringComponentFeature.class);
+		final IMonitoringComponentFeature	mon	= getComponent().getComponentFeature0(IMonitoringComponentFeature.class);
 		if(mon!=null)
 		{
 			return getComponent().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()

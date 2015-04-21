@@ -88,7 +88,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(getComponent().getComponentFeature(IMonitoringComponentFeature.class)!=null 
+		if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
 			&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 		{
 			// Hack, necessary because getService() is not a service call and the first contained

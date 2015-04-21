@@ -208,7 +208,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 
 		if(!bcf.isFinished() && bcf.isReady())
 		{
-			if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
 					getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
@@ -219,7 +219,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 //			executeStep(pool, lane);
 			executeStep(null, null);
 			
-			if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(
 					getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
@@ -308,7 +308,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 			MActivity act = thread.getActivity();
 			
 //			notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
-			if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(bcf.createActivityEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()), PublishTarget.TOALL);
 			}
@@ -358,7 +358,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 				}
 			}
 			
-			if(thread.getActivity()!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getActivity()!=null && getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(bcf.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 			}

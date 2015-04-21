@@ -23,6 +23,7 @@ import org.apache.commons.collections15.functors.ConstantTransformer;
 
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.algorithms.layout.SpringLayout;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
@@ -60,7 +61,8 @@ public class DepViewerPanel<T> extends JPanel
 	{
 		this.setLayout(new BorderLayout());
 		this.g = new DirectedSparseGraph();
-		this.layout = new KKLayout(g);
+//		this.layout = new KKLayout(g);
+		this.layout = new SpringLayout(g);
 //		this.layout = new DAGLayout(g);
 		this.dr = dr;
 		buildGraph(g);

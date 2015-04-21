@@ -165,6 +165,8 @@ public class ComponentFeatureFactory implements IComponentFeatureFactory
 		}
 	}
 	
+	
+	
 	/**
 	 *  Create a string representation.
 	 */

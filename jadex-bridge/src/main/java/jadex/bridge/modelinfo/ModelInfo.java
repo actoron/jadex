@@ -2,6 +2,7 @@ package jadex.bridge.modelinfo;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -89,7 +91,10 @@ public class ModelInfo extends Startable implements IModelInfo
 	protected String[] breakpoints;
 	
 	/** The raw model. */
-	protected Object	rawmodel;
+	protected Object rawmodel;
+	
+	/** The component features. */
+	protected IComponentFeatureFactory[] features;
 	
 	//-------- constructors --------
 	
@@ -99,7 +104,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public ModelInfo()
 	{
 		this(null, null, null, null, null, null, 
-			false, null, null, null, null, null, null, null, null, null, null);
+			false, null, null, null, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -111,7 +116,7 @@ public class ModelInfo extends Startable implements IModelInfo
 		String filename, Map<String, Object> properties, ClassLoader classloader, 
 		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
 		ConfigurationInfo[] configurations, SubcomponentTypeInfo[] subcomponents, String[] imports,
-		IResourceIdentifier rid, Object rawmodel)
+		IResourceIdentifier rid, Object rawmodel, IComponentFeatureFactory[] features)
 	{
 		this.name = name;
 		this.packagename = packagename;
@@ -133,6 +138,8 @@ public class ModelInfo extends Startable implements IModelInfo
 			this.subcomponents = SUtil.arrayToList(subcomponents);
 		if(imports!=null)
 			this.imports = SUtil.arrayToList(imports);
+		if(features!=null)
+			this.features = features;
 		setRequiredServices(requiredservices);
 		this.rid = rid;
 		this.rawmodel	= rawmodel;
@@ -1038,5 +1045,23 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void	internalSetRawModel(Object rawmodel)
 	{
 		this.rawmodel	= rawmodel;
+	}
+
+	/**
+	 *  Get the features.
+	 *  @return The features
+	 */
+	public IComponentFeatureFactory[] getFeatures()
+	{
+		return features!=null? features: new IComponentFeatureFactory[0];
+	}
+
+	/**
+	 *  The features to set.
+	 *  @param features The features to set
+	 */
+	public void setFeatures(IComponentFeatureFactory[] features)
+	{
+		this.features = features;
 	}
 }

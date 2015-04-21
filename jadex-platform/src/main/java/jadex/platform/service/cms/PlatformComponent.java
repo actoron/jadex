@@ -5,12 +5,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.FeatureNotAvailableException;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPropertiesFeature;
-import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
@@ -102,7 +102,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 
 		for(IComponentFeatureFactory fac: facs)
 		{
-//			System.out.println("fac: "+fac);
+//			System.out.println("feature: "+fac);
 			IComponentFeature	instance	= fac.createInstance(getInternalAccess(), info);
 			features.put((Class<?>)fac.getType(), instance);
 			lfeatures.add(instance);
@@ -175,7 +175,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					
 					public void proceed(final Exception ex)
 					{
-						if(getComponentFeature(IMonitoringComponentFeature.class)!=null 
+						if(getComponentFeature0(IMonitoringComponentFeature.class)!=null 
 							&& getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 						{
 							MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
@@ -463,12 +463,22 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		if(!features.containsKey(type))
 		{
-			throw new RuntimeException("No such feature: "+type);
+			throw new FeatureNotAvailableException("No such feature: "+type);
 		}
 		else
 		{
 			return type.cast(features.get(type));
 		}
+	}
+	
+	/**
+	 *  Get a feature of the component.
+	 *  @param feature	The type of the feature.
+	 *  @return The feature instance.
+	 */
+	public <T> T getComponentFeature0(Class<? extends T> type)
+	{
+		return type.cast(features.get(type));
 	}
 
 	/**
@@ -563,16 +573,18 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	protected void initLogger(Logger logger)
 	{
+		IPropertiesFeature pf = getComponentFeature0(IPropertiesFeature.class);
+		
 		// get logging properties (from ADF)
 		// the level of the logger
 		// can be Integer or Level
-		Object prop = getComponentFeature(IPropertiesFeature.class).getProperty("logging.level");
+		Object prop = pf!=null? pf.getProperty("logging.level"): null;
 		Level level = prop!=null? (Level)prop : logger.getParent()!=null && logger.getParent().getLevel()!=null ? logger.getParent().getLevel() : Level.SEVERE;
 		logger.setLevel(level);
 		
 		// if logger should use Handlers of parent (global) logger
 		// the global logger has a ConsoleHandler(Level:INFO) by default
-		prop = getComponentFeature(IPropertiesFeature.class).getProperty("logging.useParentHandlers");
+		prop = pf!=null? pf.getProperty("logging.useParentHandlers"): null;
 		if(prop!=null)
 		{
 			logger.setUseParentHandlers(((Boolean)prop).booleanValue());
@@ -580,7 +592,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			
 		// add a ConsoleHandler to the logger to print out
         // logs to the console. Set Level to given property value
-		prop = getComponentFeature(IPropertiesFeature.class).getProperty("logging.addConsoleHandler");
+		prop = pf!=null? pf.getProperty("logging.addConsoleHandler"): null;
 		if(prop!=null)
 		{
 			Handler console;

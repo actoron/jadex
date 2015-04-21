@@ -14,6 +14,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -398,7 +399,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(IModelInfo model)
 	{
-		return new Future<Collection<IComponentFeatureFactory>>(features);
+//		Collection<IComponentFeatureFactory> ret = features;
+//		if(model.getFeatures().length>0)
+//			ret = SUtil.arrayToSet(model.getFeatures());
+		return new Future<Collection<IComponentFeatureFactory>>(model.getFeatures().length==0? features: (Collection)SUtil.arrayToSet(model.getFeatures()));
 	}
 
 //	/**

@@ -2,6 +2,7 @@ package jadex.bridge.modelinfo;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -9,6 +10,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -258,4 +260,10 @@ public interface IModelInfo
 	 *  @return The kernel-specific model when loaded locally, null for remote models.
 	 */
 	public Object	getRawModel();
+	
+	/**
+	 *  Get the features.
+	 *  @return The features
+	 */
+	public IComponentFeatureFactory[] getFeatures();
 }

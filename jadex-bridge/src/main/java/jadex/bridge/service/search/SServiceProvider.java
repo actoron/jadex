@@ -367,11 +367,18 @@ public class SServiceProvider
 	{
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
-		for(Object s: provider.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(null))
+		try
 		{
-			ret.addIntermediateResult((IService)s);
+			for(Object s: provider.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(null))
+			{
+				ret.addIntermediateResult((IService)s);
+			}
+			ret.setFinished();
 		}
-		ret.setFinished();
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
 	}

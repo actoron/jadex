@@ -205,7 +205,7 @@ public class DefaultStepHandler implements IStepHandler
 //					instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
 //				}
 //			}
-			if(thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(instance.getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				instance.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 			}
@@ -235,7 +235,7 @@ public class DefaultStepHandler implements IStepHandler
 		if(next instanceof MSequenceEdge)
 		{
 			thread.setLastEdge((MSequenceEdge)next);
-			if(thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(instance.getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				instance.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 			}
@@ -243,7 +243,7 @@ public class DefaultStepHandler implements IStepHandler
 		else if(next instanceof MActivity)
 		{
 			thread.setActivity((MActivity)next);
-			if(thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(instance.getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getActivity()!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				instance.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 			}

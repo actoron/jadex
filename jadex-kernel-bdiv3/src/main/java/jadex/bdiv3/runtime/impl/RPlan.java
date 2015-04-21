@@ -1569,7 +1569,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	 */
 	public void publishToolPlanEvent(String evtype)
 	{
-		if(ia.getComponentFeature(IMonitoringComponentFeature.class)!=null 
+		if(ia.getComponentFeature0(IMonitoringComponentFeature.class)!=null 
 			&& ia.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();

@@ -9,11 +9,11 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Map;
@@ -52,7 +52,7 @@ public class SNFPropertyProvider
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
-				return nfp.getComponentPropertyProvider().getNFAllPropertyNames();
+				return nfp==null? new Future<String[]>(SUtil.EMPTY_STRING_ARRAY): nfp.getComponentPropertyProvider().getNFAllPropertyNames();
 			}
 		});
 	}
@@ -70,7 +70,7 @@ public class SNFPropertyProvider
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
-				return nfp.getComponentPropertyProvider().getNFPropertyMetaInfos();
+				return nfp==null? new Future<Map<String, INFPropertyMetaInfo>>((Map<String, INFPropertyMetaInfo>)null) :nfp.getComponentPropertyProvider().getNFPropertyMetaInfos();
 			}
 		});
 	}
@@ -88,7 +88,7 @@ public class SNFPropertyProvider
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
-				return nfp.getComponentPropertyProvider().getNFPropertyMetaInfo(name);
+				return nfp==null? new Future<INFPropertyMetaInfo>(null): nfp.getComponentPropertyProvider().getNFPropertyMetaInfo(name);
 			}
 		});
 	}

@@ -6,6 +6,8 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCallInfo;
+import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -26,6 +28,7 @@ import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Value;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.FieldInfo;
 import jadex.commons.IValueFetcher;
@@ -57,6 +60,8 @@ import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Feature;
+import jadex.micro.annotation.Features;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.NameValue;
@@ -85,6 +90,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -266,6 +272,7 @@ public class MicroClassReader
 		boolean compdone = false;
 		boolean breaksdone = false;
 		boolean nfpropsdone = false;
+		boolean featdone = false;
 		Set<String> configdone = new HashSet<String>();
 		
 		Set<Class<?>> serifaces = new HashSet<Class<?>>(); 
@@ -359,6 +366,25 @@ public class MicroClassReader
 			{
 				imports = new LinkedHashSet<String>();
 				toset.put("imports", imports);
+			}
+			
+			// Take all, duplicates are eleminated
+			if(!featdone && isAnnotationPresent(cma, Features.class, cl))
+			{
+				Features fs =getAnnotation(cma, Features.class, cl);
+				Feature[] tmp = fs.value();
+				featdone = fs.replace();
+				Map<Class<?>, IComponentFeatureFactory> features = (Map<Class<?>, IComponentFeatureFactory>)toset.get("features");
+				if(features==null)
+				{
+					features = new HashMap<Class<?>, IComponentFeatureFactory>();
+					toset.put("features", features);
+				}
+				for(int i=0; i<tmp.length; i++)
+				{
+					features.put(tmp[i].type(), new ComponentFeatureFactory(tmp[i].type(), 
+						tmp[i].clazz(), tmp[i].predecessors(), tmp[i].successors(), tmp[i].addlast()));
+				}
 			}
 			
 			// Take all, upper replace lower
@@ -945,6 +971,13 @@ public class MicroClassReader
 		if(cfs!=null)
 			modelinfo.setConfigurations((ConfigurationInfo[])cfs.values().toArray(new ConfigurationInfo[cfs.size()]));
 
+		Map<Class<?>, IComponentFeatureFactory> feats = (Map<Class<?>, IComponentFeatureFactory>)toset.get("features");
+		if(feats!=null)
+		{
+			Collection<IComponentFeatureFactory> facts = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(feats.values()));
+			modelinfo.setFeatures(facts.toArray(new IComponentFeatureFactory[feats.size()]));
+		}
+		
 		// Check if there are implemented service interfaces for which the agent
 		// does not have a provided service declaration (implementation=agent)
 		
