@@ -16,8 +16,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
 
 import java.util.Arrays;
@@ -90,7 +88,6 @@ public class PlatformsTest //extends TestCase
 	public void	testPlatforms()
 	{
 		long timeout = BasicService.getLocalDefaultTimeout();
-		ISuspendable	sus	= 	new ThreadSuspendable();
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];
 		IModelInfo	defmodel	= null;	// Model of default platform to compare others to.

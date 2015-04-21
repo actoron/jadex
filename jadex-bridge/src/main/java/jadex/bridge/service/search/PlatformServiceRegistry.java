@@ -3,6 +3,7 @@ package jadex.bridge.service.search;
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.INonUserAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -895,7 +896,7 @@ public class PlatformServiceRegistry
 	/**
 	 *  Get the registry from a component.
 	 */
-	public static PlatformServiceRegistry	getRegistry(IPlatformComponentAccess access)
+	public static PlatformServiceRegistry	getRegistry(INonUserAccess access)
 	{
 		return (PlatformServiceRegistry)access.getPlatformData().get(Starter.DATA_SERVICEREGISTRY);
 	}

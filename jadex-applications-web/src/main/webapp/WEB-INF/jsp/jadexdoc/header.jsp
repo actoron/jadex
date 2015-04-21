@@ -11,7 +11,7 @@
 	String	pkgid	= "0";
 	if(request.getAttribute("model")!=null)
 	{
-		IModelInfo	model	= ((IFuture<IModelInfo>)request.getAttribute("model")).get(null);
+		IModelInfo	model	= ((IFuture<IModelInfo>)request.getAttribute("model")).get();
 		Collection<IModelInfo>	models	= ((IIntermediateFuture<IModelInfo>)request.getAttribute("models")).getIntermediateResults();
 		
 		MultiCollection	pmodels	= new MultiCollection();

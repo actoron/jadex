@@ -3,13 +3,18 @@ package jadex.platform.service.message.transport.httprelaymtp;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -19,7 +24,6 @@ import jadex.platform.service.awareness.discovery.relay.IRelayAwarenessService;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -246,26 +250,46 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public IFuture<Void> shutdown()
 	{
-		String adr	= receiver.address==null ? null
-			: RelayConnectionManager.httpAddress(receiver.address)+"offline";
+		final Future<Void>	ret	= new Future<Void>();
 		
-		this.receiver.stop();
-		if(adr!=null)
+		// Async shutdown as offline message or connection closing may hang :-(
+		SServiceProvider.getLocalService(component, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.execute(new Runnable()
 		{
-			try
+			public void run()
 			{
-//				System.out.println("going offline: "+adr+", "+component.getComponentIdentifier().getRoot());
-				this.conman.postMessage(adr, component.getComponentIdentifier().getRoot(), new byte[0][]);
-//				System.out.println("offline: "+adr+", "+component.getComponentIdentifier().getRoot());
+				try
+				{
+					String adr	= receiver.address==null ? null
+						: RelayConnectionManager.httpAddress(receiver.address)+"offline";
+					
+					receiver.stop();
+					if(adr!=null)
+					{
+//						System.out.println("going offline: "+adr+", "+component.getComponentIdentifier().getRoot());
+						conman.postMessage(adr, component.getComponentIdentifier().getRoot(), new byte[0][]);
+//						System.out.println("offline: "+adr+", "+component.getComponentIdentifier().getRoot());
+					}
+					conman.dispose();
+					ret.setResultIfUndone(null);
+				}
+				catch(Exception e)
+				{
+//					System.out.println("not offline: "+adr+", "+component.getComponentIdentifier().getRoot()+", "+e);
+					ret.setExceptionIfUndone(e);
+				}
 			}
-			catch(IOException e)
+		});
+		SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.createRealtimeTimer(BasicService.getScaledRemoteDefaultTimeout(0.5), new ITimedObject()
+		{
+			public void timeEventOccurred(long currenttime)
 			{
-//				System.out.println("not offline: "+adr+", "+component.getComponentIdentifier().getRoot()+", "+e);
-				component.getLogger().warning("Exception during relay shutdown: "+e);
+				ret.setExceptionIfUndone(new TimeoutException());
 			}
-		}
-		this.conman.dispose();
-		return IFuture.DONE;
+		});
+		
+		return ret;
 	}
 	
 	/**

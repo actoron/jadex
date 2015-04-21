@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.INonUserAccess;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.nonfunctional.search.IRankingSearchTerminationDecider;
 import jadex.bridge.nonfunctional.search.IServiceRanker;
@@ -75,7 +76,7 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
-		T ret = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchService(type, provider.getComponentIdentifier(), scope, filter);
+		T ret = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchService(type, provider.getComponentIdentifier(), scope, filter);
 		if(ret==null)
 		{
 			throw new ServiceNotFoundException(type.getName());
@@ -86,7 +87,7 @@ public class SServiceProvider
 	
 	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type, final IComponentIdentifier target)
 	{
-		T ret = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchService(type, provider.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+		T ret = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchService(type, provider.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
 		{
 			public boolean filter(T obj) 
 			{
@@ -128,7 +129,7 @@ public class SServiceProvider
 	 */
 	public static <T> Collection<T> getLocalServices(final IInternalAccess provider, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
-		Collection<T> ret = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope, filter);
+		Collection<T> ret = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope, filter);
 		
 		return ret;
 	}
@@ -168,7 +169,7 @@ public class SServiceProvider
 		{
 			if(filter==null)
 			{
-				T ser = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchService(type, provider.getComponentIdentifier(), scope);
+				T ser = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchService(type, provider.getComponentIdentifier(), scope);
 				if(ser!=null)
 				{
 					ret.setResult(ser);
@@ -180,13 +181,13 @@ public class SServiceProvider
 			}
 			else
 			{
-				PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchService(type, provider.getComponentIdentifier(), scope, filter)
+				PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchService(type, provider.getComponentIdentifier(), scope, filter)
 					.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 			}
 		}
 		else
 		{
-			PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchGlobalService(type, provider.getComponentIdentifier(), filter)
+			PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchGlobalService(type, provider.getComponentIdentifier(), filter)
 				.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 		}
 		
@@ -322,18 +323,18 @@ public class SServiceProvider
 		{
 			if(filter==null)
 			{
-				Collection<T> sers = PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope);
+				Collection<T> sers = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope);
 				ret.setResult(sers==null? Collections.EMPTY_SET: sers);
 			}
 			else
 			{
-				PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope, filter).addResultListener(
+				PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope, filter).addResultListener(
 					new IntermediateComponentResultListener<T>(new IntermediateDelegationResultListener<T>(ret), provider));
 			}
 		}
 		else
 		{
-			PlatformServiceRegistry.getRegistry((IPlatformComponentAccess)provider).searchGlobalServices(type, provider.getComponentIdentifier(), filter).addResultListener(
+			PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchGlobalServices(type, provider.getComponentIdentifier(), filter).addResultListener(
 				new IntermediateComponentResultListener<T>(new IntermediateDelegationResultListener<T>(ret), provider));
 		}
 		
@@ -412,7 +413,7 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(IExternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)
 	{
-//		if(scope==null && type.getName().indexOf("ICompo")!=-1)
+//		if(type.getName().indexOf("ITra")!=-1)
 //			System.out.println("gfdfgdfg");
 		
 		return provider.scheduleImmediate(new IComponentStep<T>()

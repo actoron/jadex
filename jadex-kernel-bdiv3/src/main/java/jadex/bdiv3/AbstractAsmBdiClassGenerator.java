@@ -3,6 +3,7 @@ package jadex.bdiv3;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.eca.EventType;
@@ -96,6 +97,10 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						{
 							nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "getBDIAgentFeature", "(Ljadex/bridge/IInternalAccess;)Ljadex/bdiv3/features/IBDIAgentFeature;", false));
 						}
+						else if(m.getDeclaringClass().equals(IPlatformComponentAccess.class))
+						{
+							nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "getPlatformComponentAccess", "(Ljadex/bridge/IInternalAccess;)Ljadex/bridge/service/types/factory/IPlatformComponentAccess;", false));
+						}
 						
 						// Push parameters to stack
 						Class<?>[] ptypes = m.getParameterTypes();
@@ -129,6 +134,10 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						if(m.getDeclaringClass().equals(IBDIAgentFeature.class))
 						{
 							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bdiv3/features/IBDIAgentFeature", mnode.name, mnode.desc, true));
+						}
+						else if(m.getDeclaringClass().equals(IPlatformComponentAccess.class))
+						{
+							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bridge/service/types/factory/IPlatformComponentAccess", mnode.name, mnode.desc, true));
 						}
 						else
 						{

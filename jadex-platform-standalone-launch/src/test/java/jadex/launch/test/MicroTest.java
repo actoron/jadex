@@ -56,6 +56,8 @@ public class MicroTest	extends ComponentTestSuite
 			"messagequeue\\replicated\\User",
 			"search/User",
 			"search\\User",
+			"nfpropvis/User",
+			"nfpropvis\\User",
 			"ServicePrey",
 			"MicroPrey",
 			"Firefly",

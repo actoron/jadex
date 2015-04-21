@@ -3,13 +3,13 @@ package jadex.bridge.component.impl;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.INonUserAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.wrappers.MapWrapper;
@@ -154,7 +154,7 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	{
 		if(resfuts!=null)
 		{
-			Exception	ex	= ((IPlatformComponentAccess)getComponent()).getException();
+			Exception	ex	= ((INonUserAccess)getComponent()).getException();
 			if(ex!=null)
 			{
 				for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)

@@ -1528,7 +1528,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	                    	}
 	            			else if(!path.endsWith(".jar") || !jarnames.contains(getJarName(path)))
 	            			{
-	            				component.getLogger().warning("Jar not found: "+file+", "+path);
+	            				component.getLogger().info("Jar not found: "+file+", "+path);
 	            			}
 	               		}
 	                }

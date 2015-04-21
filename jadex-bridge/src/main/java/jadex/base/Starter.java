@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.INonUserAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
@@ -971,7 +972,7 @@ public class Starter
 	/**
 	 *  Check if the real time timeout flag is set for a platform.
 	 */
-	public static boolean	isRealtimeTimeout(IPlatformComponentAccess access)
+	public static boolean	isRealtimeTimeout(INonUserAccess access)
 	{
 		// Hack!!! Should default to false?
 		return !Boolean.FALSE.equals(access.getPlatformData().get(DATA_REALTIMETIMEOUT));
@@ -980,7 +981,7 @@ public class Starter
 	/**
 	 *  Check if the parameter copy flag is set for a platform.
 	 */
-	public static boolean	isParameterCopy(IPlatformComponentAccess access)
+	public static boolean	isParameterCopy(INonUserAccess access)
 	{
 		// not equals false to make true the default.
 		return !Boolean.FALSE.equals(access.getPlatformData().get(DATA_PARAMETERCOPY));

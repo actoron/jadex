@@ -4,7 +4,7 @@
 <%@page import="jadex.bridge.modelinfo.IArgument"%>
 <%@page import="jadex.bridge.modelinfo.IModelInfo"%>
 <%
-	IModelInfo	model	= ((IFuture<IModelInfo>)request.getAttribute("model")).get(null);
+	IModelInfo	model	= ((IFuture<IModelInfo>)request.getAttribute("model")).get();
 	boolean	jaxcent	= ((Boolean)request.getAttribute("jaxcent")).booleanValue();
 %>
 <h2>Package <%= model.getPackage() %></h2>

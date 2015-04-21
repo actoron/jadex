@@ -3,8 +3,8 @@ package jadex.bridge.service.types.address;
 import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.INonUserAccess;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -164,7 +164,7 @@ public class TransportAddressBook
 	/**
 	 *  Get the address book from a component.
 	 */
-	public static TransportAddressBook getAddressBook(IPlatformComponentAccess access)
+	public static TransportAddressBook getAddressBook(INonUserAccess access)
 	{
 		return (TransportAddressBook)access.getPlatformData().get(Starter.DATA_ADDRESSBOOK);
 	}
