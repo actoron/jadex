@@ -179,61 +179,92 @@ public abstract class TestAgent
 	/**
 	 * 
 	 */
-	protected IFuture<IExternalAccess> createPlatform(String[] args)
+	protected IFuture<IExternalAccess> createPlatform(final String[] args)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
-		// Start platform
-//		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
-//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-//		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
-		String[] defargs = new String[]{
-//			"-libpath", url,
-			"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-//			"-logging", "true",
-//			"-relaytransport", "false",
-			"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
-			"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
-//				"-gui", "false", "-usepass", "false", "-simulation", "false"
-//			"-binarymessages", "false",
-			"-gui", "false",
-			"-cli", "false",
-			"-simulation", "false", "-printpass", "false"};
-		
-		if(args!=null && args.length>0)
+		// Fetch own arguments
+		IComponentManagementService	cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		cms.getExternalAccess(agent.getComponentIdentifier().getRoot())
+			.addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 		{
-			Map<String, String> argsmap = new HashMap<String, String>();
-			for(int i=0; i<defargs.length; i++)
+			public void customResultAvailable(IExternalAccess root)
 			{
-				argsmap.put(defargs[i], defargs[++i]);
-			}
-			for(int i=0; i<args.length; i++)
-			{
-				argsmap.put(args[i], args[++i]);
-			}
-			defargs = new String[argsmap.size()*2];
-			int i=0;
-			for(String key: argsmap.keySet())
-			{
-				defargs[i*2]= key; 
-				defargs[i*2+1] = argsmap.get(key);
-				i++;
-			}
-		}
+				root.getArguments()
+					.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, IExternalAccess>(ret)
+				{
+					public void customResultAvailable(Map<String,Object> rootargs)
+					{
+						Map<String, String> argsmap = new HashMap<String, String>();
+						String[]	progargs	= (String[])rootargs.get(Starter.PROGRAM_ARGUMENTS);
+						String[]	defargs	= new String[]
+						{
+//							"-libpath", url,
+							"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+							"-saveonexit", "false",
+							"-welcome", "false",
+							"-autoshutdown", "false",
+							"-awareness", "false",
+							"-gui", "false",
+							"-cli", "false",
+							"-simulation", "false",
+							"-printpass", "false"
+//							"-logging", "true",
+////							"-relaytransport", "false",
+//							"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
+//							"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
+//							"-gui", "false", "-usepass", "false", "-simulation", "false"
+//							"-binarymessages", "false",
+						};
+						
+						// Build argsmap as program args (e.g. relay address) overridden by defargs, overridden by supplied args.
+						for(int i=0; progargs!=null && i<progargs.length; i++)
+						{
+							argsmap.put(progargs[i], progargs[++i]);
+						}
+						for(int i=0; i<defargs.length; i++)
+						{
+							argsmap.put(defargs[i], defargs[++i]);
+						}
+						for(int i=0; args!=null && i<args.length; i++)
+						{
+							argsmap.put(args[i], args[++i]);
+						}
+						
+						defargs = new String[argsmap.size()*2];
+						int i=0;
+						for(String key: argsmap.keySet())
+						{
+							defargs[i*2]= key; 
+							defargs[i*2+1] = argsmap.get(key);
+							i++;
+						}
 
-//		System.out.println("platform args: "+SUtil.arrayToString(defargs));
-		
-		Starter.createPlatform(defargs).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new DelegationResultListener<IExternalAccess>(ret)
-		{
-			public void customResultAvailable(IExternalAccess result)
-			{
-				platforms.add(result);
-				super.customResultAvailable(result);
+//						System.out.println("platform args: "+SUtil.arrayToString(defargs));
+						
+						// Start platform
+						Starter.createPlatform(defargs).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+							new DelegationResultListener<IExternalAccess>(ret)
+						{
+							public void customResultAvailable(IExternalAccess result)
+							{
+								try
+								{
+									Thread.sleep(5000);
+								}
+								catch(InterruptedException e)
+								{
+								}
+								
+								platforms.add(result);
+								super.customResultAvailable(result);
+							}
+						}));
+					}
+				});
 			}
-		}));
-		
+		});
+				
 		return ret;
 	}
 	

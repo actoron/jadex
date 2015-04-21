@@ -4,7 +4,6 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.component.ComponentComponentFactory;
 import jadex.component.ComponentXMLReader;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -15,10 +14,9 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.stax.QName;
 
 import java.util.Set;
-
-import jadex.xml.stax.QName;
 
 /**
  *  Reader for loading component XML models into a Java representation states.

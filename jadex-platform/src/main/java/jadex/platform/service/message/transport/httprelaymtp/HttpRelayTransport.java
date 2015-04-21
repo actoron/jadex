@@ -248,6 +248,7 @@ public class HttpRelayTransport implements ITransport
 	{
 		String adr	= receiver.address==null ? null
 			: RelayConnectionManager.httpAddress(receiver.address)+"offline";
+		
 		this.receiver.stop();
 		if(adr!=null)
 		{
@@ -255,9 +256,11 @@ public class HttpRelayTransport implements ITransport
 			{
 //				System.out.println("going offline: "+adr+", "+component.getComponentIdentifier().getRoot());
 				this.conman.postMessage(adr, component.getComponentIdentifier().getRoot(), new byte[0][]);
+//				System.out.println("offline: "+adr+", "+component.getComponentIdentifier().getRoot());
 			}
 			catch(IOException e)
 			{
+//				System.out.println("not offline: "+adr+", "+component.getComponentIdentifier().getRoot()+", "+e);
 				component.getLogger().warning("Exception during relay shutdown: "+e);
 			}
 		}

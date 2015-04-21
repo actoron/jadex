@@ -385,16 +385,28 @@ public class RemoteServiceManagementAgent
 										reply.put(SFipa.CONTENT, result);
 //										System.out.println("content: "+result);
 //										System.out.println("reply: "+callid);
+//										if(reply.toString().indexOf("IAutoTerminateService.subscribe()")!=-1)
+//										{
+//											System.out.println("RMS sending: "+System.currentTimeMillis()+", "+reply);
+//										}
+
 										agent.getComponentFeature(IMessageFeature.class).sendMessage(reply, mt, null).addResultListener(new IResultListener<Void>()
 										{
 											public void resultAvailable(Void res)
 											{
-//												System.out.println("result: "+result+", "+agent.getComponentIdentifier()+", "+reply.get(SFipa.RECEIVERS));
+												// Nop on success.
+//												if(reply.toString().indexOf("IAutoTerminateService.subscribe()")!=-1)
+//												{
+//													System.out.println("RMS sent: "+System.currentTimeMillis()+", "+reply);
+//												}
 											}
 											
 											public void exceptionOccurred(Exception exception)
 											{
-//												System.out.println("exception: "+result+", "+exception+", "+agent.getComponentIdentifier()+", "+reply.get(SFipa.RECEIVERS));
+//												if(reply.toString().indexOf("IAutoTerminateService.subscribe()")!=-1)
+//												{
+//													System.out.println("RMS exception: "+System.currentTimeMillis()+", "+exception+", "+reply);
+//												}
 //												exception.printStackTrace();v
 												// Could not send message -> terminate future, if terminable.
 												if(result instanceof RemoteIntermediateResultCommand

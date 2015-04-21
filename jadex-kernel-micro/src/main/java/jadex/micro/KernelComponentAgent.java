@@ -12,6 +12,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Component kernel.
  */
 @Properties({
+	@NameValue(name="system", value="true"),
 	@NameValue(name="kernel.types", value="new String[] { \"component.xml\"}")
 })
 @ProvidedServices({
