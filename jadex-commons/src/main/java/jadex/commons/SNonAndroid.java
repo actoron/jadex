@@ -1,7 +1,6 @@
 package jadex.commons;
 
 import jadex.commons.future.Future;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;

@@ -2,6 +2,7 @@ package jadex.backup.resource;
 
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.Tuple2;
@@ -13,7 +14,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.io.File;
 import java.io.FileOutputStream;

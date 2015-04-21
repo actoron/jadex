@@ -151,34 +151,26 @@
 		
 		<!-- Flag if df component and service should be started.  -->
 		<argument name="df" class="boolean">true</argument>
-		
 		<!-- Flag if clock component and service should be started.  -->
 		<argument name="clock" class="boolean">true</argument>
-		
 		<!-- Flag if message component and service should be started.  -->
 		<argument name="message" class="boolean">true</argument>
-		
 		<!-- Flag if simulation component and service should be started.  -->
 		<argument name="simul" class="boolean">true</argument>
-		
 		<!-- Flag if deployment component and service should be started.  -->
 		<argument name="deployment" class="boolean">true</argument>
-		
 		<!-- Flag if marshal component and service should be started.  -->
 		<argument name="marshal" class="boolean">true</argument>
-		
 		<!-- Flag if security component and service should be started.  -->
 		<argument name="security" class="boolean">true</argument>
-		
 		<!-- Flag if library component and service should be started.  -->
 		<argument name="library" class="boolean">true</argument>
-		
 		<!-- Flag if settings component and service should be started.  -->
 		<argument name="settings" class="boolean">true</argument>
-		
 		<!-- Flag if context component and service should be started.  -->
 		<argument name="context" class="boolean">true</argument>
-		
+		<!-- Flag if address component and service should be started.  -->
+		<argument name="address" class="boolean">true</argument>
 	</arguments>
 	
 	<componenttypes>
@@ -214,6 +206,7 @@
 		<componenttype filename="jadex/platform/service/library/Library.component.xml" name="library"/>
 		<componenttype filename="jadex/platform/service/settings/Settings.component.xml" name="settings"/>
 		<componenttype filename="jadex/platform/service/context/Context.component.xml" name="context"/>
+		<componenttype filename="jadex/platform/service/address/TransportAddressAgent.class" name="address"/>
 	</componenttypes>
 	
 	<services>
@@ -318,9 +311,21 @@
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<!-- <component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdiv3&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/> -->
 				
+				<component name="address" type="address" daemon="true" number="Boolean.TRUE.equals($args.address)? 1: 0"/>
 				<component name="clock" type="clock" daemon="true" number="Boolean.TRUE.equals($args.clock)? 1: 0">
 					<arguments>
 						<argument name="simulation">$args.simulation</argument>
+					</arguments>
+				</component>
+				<component name="security" type="security" daemon="true" number="Boolean.TRUE.equals($args.security)? 1: 0">
+					<arguments>
+						<argument name="usepass">$args.usepass</argument>
+						<argument name="printpass">$args.printpass</argument>
+						<argument name="trustedlan">$args.trustedlan</argument>
+						<argument name="networkname">$args.networkname</argument>
+						<argument name="networkpass">$args.networkpass</argument>
+						<argument name="virtualnames">$args.virtualnames</argument>
+						<argument name="validityduration">$args.validityduration</argument>
 					</arguments>
 				</component>
 				<component name="message" type="message" daemon="true" number="Boolean.TRUE.equals($args.message)? 1: 0">
@@ -341,17 +346,6 @@
 				</component>
 				<component name="simulation" type="simulation" daemon="true" number="Boolean.TRUE.equals($args.simul)? 1: 0"/>
 				<component name="deployment" type="deployment" daemon="true" number="Boolean.TRUE.equals($args.deployment)? 1: 0"/>
-				<component name="security" type="security" daemon="true" number="Boolean.TRUE.equals($args.security)? 1: 0">
-					<arguments>
-						<argument name="usepass">$args.usepass</argument>
-						<argument name="printpass">$args.printpass</argument>
-						<argument name="trustedlan">$args.trustedlan</argument>
-						<argument name="networkname">$args.networkname</argument>
-						<argument name="networkpass">$args.networkpass</argument>
-						<argument name="virtualnames">$args.virtualnames</argument>
-						<argument name="validityduration">$args.validityduration</argument>
-					</arguments>
-				</component>
 				
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
@@ -408,6 +402,43 @@
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdi&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				
+				<component name="address" type="address" daemon="true" number="Boolean.TRUE.equals($args.address)? 1: 0"/>
+				<component name="clock" type="clock" daemon="true" number="Boolean.TRUE.equals($args.clock)? 1: 0">
+					<arguments>
+						<argument name="simulation">$args.simulation</argument>
+					</arguments>
+				</component>
+				<component name="security" type="security" daemon="true" number="Boolean.TRUE.equals($args.security)? 1: 0">
+					<arguments>
+						<argument name="usepass">$args.usepass</argument>
+						<argument name="printpass">$args.printpass</argument>
+						<argument name="trustedlan">$args.trustedlan</argument>
+						<argument name="networkname">$args.networkname</argument>
+						<argument name="networkpass">$args.networkpass</argument>
+						<argument name="virtualnames">$args.virtualnames</argument>
+						<argument name="validityduration">$args.validityduration</argument>
+					</arguments>
+				</component>
+				<component name="message" type="message" daemon="true" number="Boolean.TRUE.equals($args.message)? 1: 0">
+					<arguments>
+						<argument name="localtransport">$args.localtransport</argument>
+						<argument name="tcptransport">$args.tcptransport</argument>
+						<argument name="niotcptransport">$args.niotcptransport</argument>
+						<argument name="ssltcptransport">$args.ssltcptransport</argument>
+						<argument name="relaytransport">$args.relaytransport</argument>
+						<argument name="tcpport">$args.tcpport</argument>
+						<argument name="niotcpport">$args.niotcpport</argument>
+						<argument name="ssltcpport">$args.ssltcpport</argument>
+						<argument name="relayaddress">$args.relayaddress</argument>
+						<argument name="relaysecurity">$args.relaysecurity</argument>
+						<argument name="binarymessages">$args.binarymessages</argument>
+						<argument name="strictcom">$args.strictcom</argument>
+					</arguments>
+				</component>
+				<component name="simulation" type="simulation" daemon="true" number="Boolean.TRUE.equals($args.simul)? 1: 0"/>
+				<component name="deployment" type="deployment" daemon="true" number="Boolean.TRUE.equals($args.deployment)? 1: 0"/>
+				
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>

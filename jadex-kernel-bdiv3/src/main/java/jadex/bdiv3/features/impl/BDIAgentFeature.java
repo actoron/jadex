@@ -56,6 +56,7 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -3629,6 +3630,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	public static IBDIAgentFeature	getBDIAgentFeature(IInternalAccess agent)
 	{
 		return agent.getComponentFeature(IBDIAgentFeature.class);
+	}
+	
+	/**
+	 *  Get the platform component access from the agent.
+	 */
+	public static IPlatformComponentAccess	getPlatformComponentAccess(IInternalAccess agent)
+	{
+		return (IPlatformComponentAccess)agent;
 	}
 	
 //	/**

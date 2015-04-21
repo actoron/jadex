@@ -235,6 +235,15 @@ import java.util.logging.Level;
 		
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
+		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
+			@NameValue(name="usepass", value="$args.usepass"),
+			@NameValue(name="printpass", value="$args.printpass"),
+			@NameValue(name="trustedlan", value="$args.trustedlan"),
+			@NameValue(name="networkname", value="$args.networkname"),
+			@NameValue(name="networkpass", value="$args.networkpass"),
+			@NameValue(name="virtualnames", value="$args.virtualnames"),
+			@NameValue(name="validityduration", value="$args.validityduration")
+		}),
 		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
 			@NameValue(name="localtransport", value="$args.localtransport"),
 			@NameValue(name="tcptransport", value="$args.tcptransport"),
@@ -251,15 +260,6 @@ import java.util.logging.Level;
 		}),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="deployment", type="deployment", daemon=Boolean3.TRUE, number="$args.deployment? 1 : 0"),
-		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
-			@NameValue(name="usepass", value="$args.usepass"),
-			@NameValue(name="printpass", value="$args.printpass"),
-			@NameValue(name="trustedlan", value="$args.trustedlan"),
-			@NameValue(name="networkname", value="$args.networkname"),
-			@NameValue(name="networkpass", value="$args.networkpass"),
-			@NameValue(name="virtualnames", value="$args.virtualnames"),
-			@NameValue(name="validityduration", value="$args.validityduration")
-		}),
 		
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
@@ -314,6 +314,15 @@ import java.util.logging.Level;
 		
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
+		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
+			@NameValue(name="usepass", value="$args.usepass"),
+			@NameValue(name="printpass", value="$args.printpass"),
+			@NameValue(name="trustedlan", value="$args.trustedlan"),
+			@NameValue(name="networkname", value="$args.networkname"),
+			@NameValue(name="networkpass", value="$args.networkpass"),
+			@NameValue(name="virtualnames", value="$args.virtualnames"),
+			@NameValue(name="validityduration", value="$args.validityduration")
+		}),
 		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
 			@NameValue(name="localtransport", value="$args.localtransport"),
 			@NameValue(name="tcptransport", value="$args.tcptransport"),
@@ -330,15 +339,6 @@ import java.util.logging.Level;
 		}),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="deployment", type="deployment", daemon=Boolean3.TRUE, number="$args.deployment? 1 : 0"),
-		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
-			@NameValue(name="usepass", value="$args.usepass"),
-			@NameValue(name="printpass", value="$args.printpass"),
-			@NameValue(name="trustedlan", value="$args.trustedlan"),
-			@NameValue(name="networkname", value="$args.networkname"),
-			@NameValue(name="networkpass", value="$args.networkpass"),
-			@NameValue(name="virtualnames", value="$args.virtualnames"),
-			@NameValue(name="validityduration", value="$args.validityduration")
-		}),
 		
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",

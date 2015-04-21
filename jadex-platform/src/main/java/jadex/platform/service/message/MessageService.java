@@ -1,5 +1,6 @@
 package jadex.platform.service.message;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -15,7 +16,6 @@ import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceTerminatedException;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.impl.IInternalMessageFeature;
@@ -141,7 +141,7 @@ public class MessageService extends BasicService implements IMessageService
 	//-------- attributes --------
 
 	/** The component. */
-    protected IExternalAccess component;
+    protected IInternalAccess component;
 
 	/** The transports. */
 	protected List<ITransport> transports;
@@ -186,9 +186,6 @@ public class MessageService extends BasicService implements IMessageService
 	/** The class loader of the message service (only for envelope en/decoding, content is handled by receiver class loader). */
 	protected ClassLoader classloader;
 	
-//	/** The cashed clock service. */
-//	protected IComponentManagementService cms;
-	
 	/** The target managers (platform id->manager). */
 	protected LRU<IComponentIdentifier, SendManager> managers;
 		
@@ -224,7 +221,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IExternalAccess component, Logger logger, ITransport[] transports, 
+	public MessageService(IInternalAccess component, Logger logger, ITransport[] transports, 
 		MessageType[] messagetypes)
 	{
 		this(component, logger, transports, messagetypes, null, null, null, false);
@@ -234,7 +231,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IExternalAccess component, Logger logger, ITransport[] transports, 
+	public MessageService(IInternalAccess component, Logger logger, ITransport[] transports, 
 		MessageType[] messagetypes, IContentCodec[] contentcodecs, String deflanguage, CodecFactory codecfactory, boolean strictcom)
 	{
 		super(component.getComponentIdentifier(), IMessageService.class, null);
@@ -1130,130 +1127,79 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else
 				{
-					SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
+					exeservice	= SServiceProvider.getLocalService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					cms	=  SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
+					CollectionResultListener<Void> lis = new CollectionResultListener<Void>(tps.length, true,
+						new ExceptionDelegationResultListener<Collection<Void>, Void>(ret)
 					{
-						public void customResultAvailable(IExecutionService result)
+						public void customResultAvailable(Collection<Void> result)
 						{
-							exeservice	= result;
-							
-							SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-								.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+							if(result.isEmpty())
 							{
-								public void customResultAvailable(IComponentManagementService cmsser)
+								ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
+							}
+							else
+							{
+								addrservice	= SServiceProvider.getLocalService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+								addrservice.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<TransportAddressBook, Void>(ret)
 								{
-									cms	= cmsser;
-							
-									ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
-									CollectionResultListener<Void> lis = new CollectionResultListener<Void>(tps.length, true,
-										new ExceptionDelegationResultListener<Collection<Void>, Void>(ret)
+									public void customResultAvailable(TransportAddressBook result)
 									{
-										public void customResultAvailable(Collection<Void> result)
+										taddresses = result;
+										
+										addrservice.addPlatformAddresses(new ComponentIdentifier(component.getComponentIdentifier().getRoot().getName(), internalGetAddresses()))
+											.addResultListener(new DelegationResultListener<Void>(ret)
 										{
-											if(result.isEmpty())
+											public void customResultAvailable(Void result) 
 											{
-												ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
-											}
-											else
-											{
-												SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-													.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, Void>(ret)
+												clockservice	= SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+												libservice	= SServiceProvider.getLocalService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+												libservice.getClassLoader(component.getModel().getResourceIdentifier())
+													.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 												{
-													public void customResultAvailable(final ITransportAddressService tas)
+													public void customResultAvailable(ClassLoader result)
 													{
-														addrservice = tas;
-														tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<TransportAddressBook, Void>(ret)
-														{
-															public void customResultAvailable(TransportAddressBook result)
-															{
-																taddresses = result;
-																
-																tas.addPlatformAddresses(new ComponentIdentifier(component.getComponentIdentifier().getRoot().getName(), internalGetAddresses()))
-																	.addResultListener(new DelegationResultListener<Void>(ret)
-																{
-																	public void customResultAvailable(Void result) 
-																	{
-																		SServiceProvider.getService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-																			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
-																		{
-																			public void customResultAvailable(IClockService result)
-																			{
-																				clockservice = result;
-																				SServiceProvider.getService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-																					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
-																				{
-																					public void customResultAvailable(ILibraryService result)
-																					{
-																						libservice = result;
-																						libservice.getClassLoader(component.getModel().getResourceIdentifier())
-																							.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
-																						{
-																							public void customResultAvailable(ClassLoader result)
-																							{
-																								classloader = result;
-																								startStreamSendAliveBehavior();
-																								startStreamCheckAliveBehavior();
-																								ret.setResult(null);
-						//																		SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						//																		.addResultListener(new IResultListener<IAwarenessManagementService>()
-						//																		{
-						//																			public void resultAvailable(IAwarenessManagementService result)
-						//																			{
-						//																				ams = result;
-						//																				ret.setResult(null);
-						//																			};
-						//																			
-						//																			public void exceptionOccurred(
-						//																					Exception exception)
-						//																			{
-						//																				ret.setResult(null);
-						//																			}
-						//																		});
-																							}
-																						});
-																					}
-																				});
-																			}
-																		});
-																	}
-																});
-															}
-														});
-													}
-												});
-											}
-										}
-									});
-									
-									for(int i=0; i<tps.length; i++)
-									{
-										final ITransport	transport	= tps[i];
-										IFuture<Void>	fut	= transport.start();
-										fut.addResultListener(lis);
-										fut.addResultListener(new IResultListener<Void>()
-										{
-											public void resultAvailable(Void result)
-											{
-											}
-											
-											public void exceptionOccurred(final Exception exception)
-											{
-												transports.remove(transport);
-												component.scheduleStep(new IComponentStep<Void>()
-												{
-													public IFuture<Void> execute(IInternalAccess ia)
-													{
-														ia.getLogger().warning("Could not initialize transport: "+transport+" reason: "+exception);
-														return IFuture.DONE;
+														classloader = result;
+														startStreamSendAliveBehavior();
+														startStreamCheckAliveBehavior();
+//														ams	= SServiceProvider.getLocalService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+														ret.setResult(null);
 													}
 												});
 											}
 										});
 									}
-								}
-							});
+								});
+							}
 						}
 					});
+									
+					for(int i=0; i<tps.length; i++)
+					{
+						final ITransport	transport	= tps[i];
+						IFuture<Void>	fut	= transport.start();
+						fut.addResultListener(lis);
+						fut.addResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void result)
+							{
+							}
+							
+							public void exceptionOccurred(final Exception exception)
+							{
+								transports.remove(transport);
+								getComponent().scheduleStep(new IComponentStep<Void>()
+								{
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										ia.getLogger().warning("Could not initialize transport: "+transport+" reason: "+exception);
+										return IFuture.DONE;
+									}
+								});
+							}
+						});
+					}
 				}
 			}
 		});
@@ -1440,7 +1386,7 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public IExternalAccess getComponent()
 	{
-		return component;
+		return component.getExternalAccess();
 	}
 	
 	/**
@@ -1450,7 +1396,7 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		if(StreamSendTask.MIN_LEASETIME!=Timeout.NONE)
 		{
-			component.scheduleStep(new IComponentStep<Void>()
+			getComponent().scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("sendAlive")
 				public IFuture<Void> execute(IInternalAccess ia)
@@ -1488,7 +1434,7 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		if(StreamSendTask.MIN_LEASETIME!=Timeout.NONE)
 		{
-			component.scheduleStep(new IComponentStep<Void>()
+			getComponent().scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("checkAlive")
 				public IFuture<Void> execute(IInternalAccess ia)
@@ -2136,7 +2082,7 @@ public class MessageService extends BasicService implements IMessageService
 			catch(final Exception e)
 			{
 //				e.printStackTrace();
-				component.scheduleStep(new IComponentStep<Void>()
+				getComponent().scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -2421,7 +2367,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				try
 				{
-					component.scheduleStep(step);
+					getComponent().scheduleStep(step);
 				}
 				catch(ComponentTerminatedException cte)
 				{
@@ -2692,7 +2638,7 @@ public class MessageService extends BasicService implements IMessageService
 		if(System.currentTimeMillis()-mwstime>5000)
 		{
 			mwstime	= System.currentTimeMillis();
-			component.scheduleStep(new IComponentStep<Void>()
+			getComponent().scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

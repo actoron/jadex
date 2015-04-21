@@ -1,11 +1,11 @@
 package jadex.extension.envsupport;
 
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IExtensionInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -16,11 +16,11 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
-import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 
 /**
  *  Environment service implementation.
  */
+@Service
 public class	EnvironmentService	implements IEnvironmentService
 {
 	//-------- attributes --------

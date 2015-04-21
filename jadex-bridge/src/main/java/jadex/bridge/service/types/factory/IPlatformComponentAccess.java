@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.factory;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.INonUserAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.commons.future.IFuture;
@@ -11,7 +12,7 @@ import java.util.Map;
 /**
  *  Interface for operations on the component to be called from the platform.
  */
-public interface IPlatformComponentAccess
+public interface IPlatformComponentAccess extends INonUserAccess
 {
 	//-------- methods --------
 	
@@ -54,18 +55,4 @@ public interface IPlatformComponentAccess
 	 *  @return An internal access exposing user operations of the component.
 	 */
 	public IInternalAccess	getInternalAccess();
-	
-	/**
-	 *  Get the exception, if any.
-	 *  
-	 *  @return The failure reason for use during cleanup, if any.
-	 */
-	public Exception	getException();
-	
-	/**
-	 *  Get the shared platform data.
-	 *  
-	 *  @return The objects shared by all components of the same platform (registry etc.). See starter for available data.
-	 */
-	public Map<String, Object>	getPlatformData();
 }

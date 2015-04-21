@@ -2,6 +2,7 @@ package jadex.platform.service.remote;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.INonUserAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
@@ -13,14 +14,9 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.remote.IProxyAgentService;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -140,7 +136,7 @@ public class ProxyAgent	implements IProxyAgentService
 		});
 		
 		// If done here this is costly (one service call per proxy)
-		TransportAddressBook.getAddressBook((IPlatformComponentAccess)agent).addPlatformAddresses(rcid);
+		TransportAddressBook.getAddressBook((INonUserAccess)agent).addPlatformAddresses(rcid);
 		
 		return IFuture.DONE;
 	}

@@ -4,6 +4,7 @@ import jadex.backup.job.Job;
 import jadex.backup.job.SyncJob;
 import jadex.backup.job.Task;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -14,7 +15,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
