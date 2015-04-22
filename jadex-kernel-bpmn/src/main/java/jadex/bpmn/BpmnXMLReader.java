@@ -218,6 +218,7 @@ public class BpmnXMLReader
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
 		ret.setName(name);
+		((ModelInfo)ret.getModelInfo()).setType(BpmnFactory.FILETYPE_BPMNLEGACYPROCESS);
 		
 		if(rid==null)
 		{

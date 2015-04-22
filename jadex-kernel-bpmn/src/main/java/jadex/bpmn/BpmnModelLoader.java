@@ -78,6 +78,7 @@ public class BpmnModelLoader extends AbstractModelLoader
 			}
 			model.setResourceIdentifier(rid);
 			model.initModelInfo(classloader);
+			((ModelInfo)model.getModelInfo()).setType(BpmnFactory.FILETYPE_BPMNPROCESS);
 			return model;
 		}
 		return (ICacheableModel)BpmnXMLReader.read(info, classloader, (IResourceIdentifier)((Object[])context)[0],

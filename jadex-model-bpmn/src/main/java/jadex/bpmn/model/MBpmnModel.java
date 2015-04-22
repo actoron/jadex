@@ -218,7 +218,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	public MBpmnModel()
 	{
 		this.modelinfo = new ModelInfo();
-		modelinfo.setType("BPMN Process");
 		modelinfo.internalSetRawModel(this);
 	}
 	

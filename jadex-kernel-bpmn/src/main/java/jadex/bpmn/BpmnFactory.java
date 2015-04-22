@@ -48,8 +48,11 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 *  Convention used by platform config panel. */
 	public static final String[]	FILETYPES	= new String[]{".bpmn", ".bpmn2"};
 	
-	/** The micro agent file type. */
+	/** The bpmn process file type. */
 	public static final String	FILETYPE_BPMNPROCESS = "BPMN Process";
+	
+	/** The bpmn legacy process file type. */
+	public static final String	FILETYPE_BPMNLEGACYPROCESS = "BPMN Legacy Process";
 	
 	/** The image icon. */
 	protected static final LazyResource ICON = new LazyResource(BpmnFactory.class, "/jadex/bpmn/images/bpmn_process.png");
@@ -257,7 +260,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public String[] getComponentTypes()
 	{
-		return new String[]{FILETYPE_BPMNPROCESS};
+		return new String[]{FILETYPE_BPMNPROCESS, FILETYPE_BPMNLEGACYPROCESS};
 	}
 
 	/**
@@ -266,7 +269,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	public IFuture<byte[]> getComponentTypeIcon(String type)
 	{
 		Future<byte[]>	ret	= new Future<byte[]>();
-		if(type.equals(FILETYPE_BPMNPROCESS))
+		if(type.equals(FILETYPE_BPMNPROCESS) || type.equals(FILETYPE_BPMNLEGACYPROCESS))
 		{
 			try
 			{
@@ -291,7 +294,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<String>(model.endsWith(".bpmn") || model.endsWith(".bpmn2") ? FILETYPE_BPMNPROCESS: null);
+		return new Future<String>(model.endsWith(".bpmn") ? FILETYPE_BPMNLEGACYPROCESS : model.endsWith(".bpmn2") ? FILETYPE_BPMNPROCESS : null);
 	}
 		
 	/**
@@ -303,7 +306,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public Map<String, Object>	getProperties(String type)
 	{
-		return FILETYPE_BPMNPROCESS.equals(type)
+		return FILETYPE_BPMNPROCESS.equals(type) || FILETYPE_BPMNLEGACYPROCESS.equals(type)
 		? fproperties : null;
 	}
 	
