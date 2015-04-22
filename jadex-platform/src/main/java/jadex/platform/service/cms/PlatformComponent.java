@@ -496,7 +496,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IFuture<Map<String, Object>> killComponent(Exception e)
 	{
 		// Only remember first exception.
-		if(exception==null)
+		if(exception==null && e!=null)
 		{
 			this.exception	= e;
 		}

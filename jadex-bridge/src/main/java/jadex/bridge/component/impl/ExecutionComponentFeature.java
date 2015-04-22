@@ -949,11 +949,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			
 			if(ex!=null)
 			{
+				if(ex instanceof StepAborted)
+				{
+					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
+					ex	= new ComponentTerminatedException(component.getComponentIdentifier());
+				}
 				step.getSecondEntity().setException(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
 
 				// If no listener, print failed step to console for developer.
 				// Hard step failure with uncatched exception is shown also when no debug.
-				if(!(ex instanceof StepAborted) && !step.getSecondEntity().hasResultListener())
+				if(!step.getSecondEntity().hasResultListener() &&
+					(!(ex instanceof ComponentTerminatedException)
+					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier())))
 				{
 					final Throwable fex = ex;
 					// No wait for delayed listener addition for hard failures to print errors immediately.

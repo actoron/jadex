@@ -35,9 +35,9 @@ import javax.swing.SwingUtilities;
 @Agent
 @BDIConfigurations(
 {
-	@BDIConfiguration(name=MoveComparator.STRATEGY_DEFAULT),
+	@BDIConfiguration(name=MoveComparator.STRATEGY_SAME_LONG),	// Best strategy first.
+	@BDIConfiguration(name=MoveComparator.STRATEGY_NONE),
 	@BDIConfiguration(name=MoveComparator.STRATEGY_LONG),
-	@BDIConfiguration(name=MoveComparator.STRATEGY_SAME_LONG),
 	@BDIConfiguration(name=MoveComparator.STRATEGY_ALTER_LONG)
 })
 public class SokratesBDI

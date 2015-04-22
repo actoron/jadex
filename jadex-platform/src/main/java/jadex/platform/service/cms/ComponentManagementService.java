@@ -1611,7 +1611,11 @@ public class ComponentManagementService implements IComponentManagementService
 										
 										public void exceptionOccurred(Exception exception)
 										{
-											adapter.getInternalAccess().killComponent(exception);
+											if(!(exception instanceof ComponentTerminatedException)
+												|| !((ComponentTerminatedException)exception).getComponentIdentifier().equals(adapter.getInternalAccess().getComponentIdentifier()))
+											{
+												adapter.getInternalAccess().killComponent(exception);
+											}
 										}
 									});
 								}
