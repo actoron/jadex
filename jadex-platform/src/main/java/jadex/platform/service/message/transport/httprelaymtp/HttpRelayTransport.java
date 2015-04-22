@@ -280,8 +280,10 @@ public class HttpRelayTransport implements ITransport
 				}
 			}
 		});
+		
+		// Use short timeout as www2 relay sometimes hangs and thus otherwise would break multiplatforms test (hack???)
 		SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.createRealtimeTimer(BasicService.getScaledRemoteDefaultTimeout(0.5), new ITimedObject()
+			.createRealtimeTimer(500, new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{

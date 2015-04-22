@@ -1,5 +1,6 @@
 package jadex.bridge.component.impl;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
@@ -222,10 +223,14 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				// Todo: fail fast components?
-				StringWriter	sw	= new StringWriter();
-				exception.printStackTrace(new PrintWriter(sw));
-				getComponent().getLogger().severe("Exception during message processing\n"+sw);
+				if(!(exception instanceof ComponentTerminatedException)
+					|| !((ComponentTerminatedException)exception).getComponentIdentifier().equals(component.getComponentIdentifier()))
+				{
+					// Todo: fail fast components?
+					StringWriter	sw	= new StringWriter();
+					exception.printStackTrace(new PrintWriter(sw));
+					getComponent().getLogger().severe("Exception during message processing\n"+sw);
+				}
 			}
 		});
 	}

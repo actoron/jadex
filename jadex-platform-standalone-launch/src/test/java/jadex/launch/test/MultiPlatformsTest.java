@@ -59,7 +59,7 @@ public class MultiPlatformsTest //extends TestCase
 //		Thread.sleep(3000000);
 
 		
-		int	number	= 15; // 15; larger numbers cause timeout on toaster.
+		int	number	= 50; // 15; larger numbers cause timeout on toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)
@@ -82,7 +82,7 @@ public class MultiPlatformsTest //extends TestCase
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
-		long	timeout	= BasicService.getLocalDefaultTimeout();
+		long	timeout	= BasicService.getScaledLocalDefaultTimeout(number/15.0);
 		IExternalAccess[]	platforms	= new IExternalAccess[number];
 		for(int i=0; i<number; i++)
 		{
