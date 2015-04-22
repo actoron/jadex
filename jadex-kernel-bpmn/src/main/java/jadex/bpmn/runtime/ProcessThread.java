@@ -15,7 +15,6 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bpmn.runtime.handler.SplitInfo;
-import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler.SubprocessResultHandler;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
@@ -24,7 +23,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
-import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
@@ -866,16 +864,16 @@ public class ProcessThread	implements ITaskContext
 							}
 							
 							// else if bpmn instance has context variable
-							if(!found && instance.getComponentFeature(IInternalBpmnComponentFeature.class).hasContextVariable(name))
+							if(!found && getBpmnFeature(instance).hasContextVariable(name))
 							{
 								if(iexp!=null)
 								{
-									Object	array	= instance.getComponentFeature(IInternalBpmnComponentFeature.class).getContextVariable(name);
+									Object	array	= getBpmnFeature(instance).getContextVariable(name);
 									Array.set(array, ((Number)index).intValue(), value);
 								}
 								else
 								{
-									instance.getComponentFeature(IInternalBpmnComponentFeature.class).setContextVariable(name, value);
+									getBpmnFeature(instance).setContextVariable(name, value);
 								}
 								found	= true;
 							}

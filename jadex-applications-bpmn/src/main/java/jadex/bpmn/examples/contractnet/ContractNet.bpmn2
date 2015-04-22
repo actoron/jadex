@@ -319,7 +319,7 @@
       <semantic:outgoing>_i2I9ilT7Ed-32983CGnnJA</semantic:outgoing>
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="message">$component.createReply(msg)</jadex:property>
+        <jadex:property name="message">msg.getMessageType().createReply(msg.getParameterMap())</jadex:property>
         <jadex:property name="performative">&quot;propose&quot;</jadex:property>
         <jadex:property name="content">proposal</jadex:property>
       </semantic:extensionElements>
@@ -378,7 +378,7 @@
       <semantic:outgoing>_GCv1OlT8Ed-32983CGnnJA</semantic:outgoing>
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="message">$component.createReply(msg)</jadex:property>
+        <jadex:property name="message">msg.getMessageType().createReply(msg.getParameterMap())</jadex:property>
         <jadex:property name="content">result</jadex:property>
         <jadex:property name="performative">&quot;inform&quot;</jadex:property>
       </semantic:extensionElements>
@@ -388,7 +388,7 @@
       <semantic:outgoing>_HOvuQVT8Ed-32983CGnnJA</semantic:outgoing>
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="message">$component.createReply(msg)</jadex:property>
+        <jadex:property name="message">msg.getMessageType().createReply(msg.getParameterMap())</jadex:property>
         <jadex:property name="performative">&quot;failure&quot;</jadex:property>
         <jadex:property name="content">msg.getValue(&quot;content&quot;)</jadex:property>
       </semantic:extensionElements>
@@ -398,7 +398,7 @@
       <semantic:outgoing>_eYyVYVaQEd-1RJ7RXx1qjA</semantic:outgoing>
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="message">$component.createReply(msg)</jadex:property>
+        <jadex:property name="message">msg.getMessageType().createReply(msg.getParameterMap())</jadex:property>
         <jadex:property name="performative">&quot;refuse&quot;</jadex:property>
         <jadex:property name="content">msg.getValue(&quot;content&quot;)</jadex:property>
       </semantic:extensionElements>

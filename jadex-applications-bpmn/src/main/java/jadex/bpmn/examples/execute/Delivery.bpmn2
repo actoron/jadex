@@ -30,7 +30,7 @@
         <jadex:property name="isThrowing">true</jadex:property>
         <jadex:property name="performative">&quot;request&quot;</jadex:property>
         <jadex:property name="content">&quot;Please pay.&quot;</jadex:property>
-        <jadex:property name="receivers">$component.getParentAccess().getComponentIdentifier()</jadex:property>
+        <jadex:property name="receivers">$component.getComponentIdentifier().getParent()</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:intermediateCatchEvent name="Item returned" id="_1t1X0HLtEd-fEqakq96uUw">
@@ -86,7 +86,7 @@
           <jadex:property name="isThrowing">true</jadex:property>
           <jadex:property name="performative">&quot;inform&quot;</jadex:property>
           <jadex:property name="content">&quot;Payment late!&quot;</jadex:property>
-          <jadex:property name="receivers">$component.getParentAccess().getComponentIdentifier()</jadex:property>
+          <jadex:property name="receivers">$component.getComponentIdentifier().getParent()</jadex:property>
         </semantic:extensionElements>
       </semantic:intermediateCatchEvent>
       <semantic:extensionElements>
