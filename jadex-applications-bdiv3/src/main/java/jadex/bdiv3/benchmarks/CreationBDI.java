@@ -1,5 +1,6 @@
 package jadex.bdiv3.benchmarks;
 
+import jadex.base.Starter;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
@@ -13,6 +14,7 @@ import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -155,7 +157,7 @@ public class CreationBDI
 			{
 				public void resultAvailable(IComponentManagementService result)
 				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getComponentIdentifier()), CreationBDI.class.getName().replaceAll("\\.", "/")+".class",
+					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getComponentIdentifier()), "jadex.bdiv3.benchmarks.CreationBDI.class",
 						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getComponentDescription().getResourceIdentifier()), null);
 				}
 			});
@@ -312,13 +314,4 @@ public class CreationBDI
 	{
 		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
-
-	
-//	public static void main(String[] args) throws Exception
-//	{
-//		Field f = CreationBDI.class.getDeclaredField("num");
-//		f.setAccessible(true);
-//		f.set(null, Integer.valueOf(1));
-//		System.out.println(f.get(null));
-//	}
 }

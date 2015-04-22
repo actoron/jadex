@@ -89,19 +89,19 @@ public class SComponentFactory
 		DependencyResolver<IComponentFeatureFactory> dr = new DependencyResolver<IComponentFeatureFactory>();
 
 		// visualize feature dependencies for debugging
-		Class<?> cl = SReflect.classForName0("jadex.tools.featuredeps.DepViewerPanel", null);
-		if(cl!=null)
-		{
-			try
-			{
-				Method m = cl.getMethod("createFrame", new Class[]{String.class, DependencyResolver.class});
-				m.invoke(null, new Object[]{name, dr});
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
+//		Class<?> cl = SReflect.classForName0("jadex.tools.featuredeps.DepViewerPanel", null);
+//		if(cl!=null)
+//		{
+//			try
+//			{
+//				Method m = cl.getMethod("createFrame", new Class[]{String.class, DependencyResolver.class});
+//				m.invoke(null, new Object[]{name, dr});
+//			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
+//		}
 		
 		Map<Class<?>, IComponentFeatureFactory> facsmap = new HashMap<Class<?>, IComponentFeatureFactory>();
 		

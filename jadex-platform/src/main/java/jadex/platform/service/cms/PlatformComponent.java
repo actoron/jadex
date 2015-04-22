@@ -615,7 +615,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		// class, java.util.logging.FileHandler, 
 		// such as "%h" for the user's home directory.
 		// 
-		String logfile =	(String)getComponentFeature(IPropertiesFeature.class).getProperty("logging.file");
+		
+		String logfile = pf!=null? (String)pf.getProperty("logging.file"): null;
 		if(logfile!=null)
 		{
 		    try
@@ -632,7 +633,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		
 		// Add further custom log handlers.
-		prop = getComponentFeature(IPropertiesFeature.class).getProperty("logging.handlers");
+		prop = pf!=null? pf.getProperty("logging.handlers"): null;
 		if(prop!=null)
 		{
 			if(prop instanceof Handler)
