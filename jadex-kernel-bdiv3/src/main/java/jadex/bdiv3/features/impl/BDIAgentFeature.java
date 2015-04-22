@@ -41,6 +41,7 @@ import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.INonUserAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
@@ -3630,14 +3631,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	public static IBDIAgentFeature	getBDIAgentFeature(IInternalAccess agent)
 	{
 		return agent.getComponentFeature(IBDIAgentFeature.class);
-	}
-	
-	/**
-	 *  Get the platform component access from the agent.
-	 */
-	public static IPlatformComponentAccess	getPlatformComponentAccess(IInternalAccess agent)
-	{
-		return (IPlatformComponentAccess)agent;
 	}
 	
 //	/**

@@ -3,6 +3,7 @@ package jadex.bdiv3;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bridge.INonUserAccess;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -70,9 +71,11 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				// Auto-implement abstract methods from IBDIAgent and subinterfaces.
 				if(name.indexOf(Type.getInternalName(IBDIAgent.class))!=-1)
 				{
+					cn.interfaces.add(Type.getInternalName(INonUserAccess.class));
 					// Fetch all methods.
 					List<Class<?>> allcz = SUtil.arrayToList(SReflect.getSuperInterfaces(new Class[]{IBDIAgent.class}));
 					allcz.add(IBDIAgent.class);
+					allcz.add(INonUserAccess.class);
 					Set<Method> allms = new HashSet<Method>();
 					for(Class<?> tmp: allcz)
 					{
@@ -96,10 +99,6 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						if(m.getDeclaringClass().equals(IBDIAgentFeature.class))
 						{
 							nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "getBDIAgentFeature", "(Ljadex/bridge/IInternalAccess;)Ljadex/bdiv3/features/IBDIAgentFeature;", false));
-						}
-						else if(m.getDeclaringClass().equals(IPlatformComponentAccess.class))
-						{
-							nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "getPlatformComponentAccess", "(Ljadex/bridge/IInternalAccess;)Ljadex/bridge/service/types/factory/IPlatformComponentAccess;", false));
 						}
 						
 						// Push parameters to stack
@@ -135,9 +134,9 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						{
 							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bdiv3/features/IBDIAgentFeature", mnode.name, mnode.desc, true));
 						}
-						else if(m.getDeclaringClass().equals(IPlatformComponentAccess.class))
+						else if(m.getDeclaringClass().equals(INonUserAccess.class))
 						{
-							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bridge/service/types/factory/IPlatformComponentAccess", mnode.name, mnode.desc, true));
+							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bridge/INonUserAccess", mnode.name, mnode.desc, true));
 						}
 						else
 						{
