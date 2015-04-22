@@ -88,6 +88,16 @@ public class InternalAccessAdapter implements IInternalAccess, INonUserAccess
 	}
 	
 	/**
+	 *  Get a feature of the component.
+	 *  @param feature	The type of the feature.
+	 *  @return The feature instance.
+	 */
+	public <T> T getComponentFeature0(Class<? extends T> type)
+	{
+		return access.getComponentFeature0(type);
+	}
+	
+	/**
 	 *  Get the component description.
 	 *  @return	The component description.
 	 */

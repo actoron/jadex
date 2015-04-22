@@ -88,7 +88,7 @@ public class SNFPropertyProvider
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 			{
 				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
-				return nfp==null? new Future<INFPropertyMetaInfo>(null): nfp.getComponentPropertyProvider().getNFPropertyMetaInfo(name);
+				return nfp.getComponentPropertyProvider().getNFPropertyMetaInfo(name);
 			}
 		});
 	}
