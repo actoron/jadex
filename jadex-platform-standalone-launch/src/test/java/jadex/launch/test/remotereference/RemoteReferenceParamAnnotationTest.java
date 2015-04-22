@@ -12,8 +12,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,58 +21,48 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+
 /**
- *  Test if a remote references are correctly transferred and mapped back.
- *  
- *  On platform1 there is a serviceA provider.
- *  On platform2 there is a search component which searches for serviceA and return it as result.
- *  
- *  Tests if the result of the remote search yields the same local service proxy.
+ * Test if a remote references are correctly transferred and mapped back. On
+ * platform1 there is a serviceA provider. On platform2 there is a search
+ * component which searches for serviceA and return it as result. Tests if the
+ * result of the remote search yields the same local service proxy.
  */
-public class RemoteReferenceParamAnnotationTest //extends TestCase
+public class RemoteReferenceParamAnnotationTest // extends TestCase
 {
-	Future<Boolean> successIndicator;
+	Future<Boolean>			successIndicator;
+
 	private IExternalAccess	platform2;
+
 	private IExternalAccess	platform1;
-	private ISuspendable	sus;
-	long timeout	= BasicService.getLocalDefaultTimeout();
-	
+
+	long					timeout	= BasicService.getLocalDefaultTimeout();
+
 	@Before
-	public void initPlatforms() {
-		sus = new ThreadSuspendable();
+	public void initPlatforms()
+	{
 		// reset indicator
 		successIndicator = new Future<Boolean>();
-		
-		platform1 = Starter.createPlatform(new String[]{"-platformname", "testcases_*",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false",
-			"-gui", "false",
-			"-awareness", "false", "-printpass", "false",
-			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(sus, timeout);
-		
-		// Find local service (as local provided service proxy).
-		ILocalService	service1	= SServiceProvider
-			.getService(platform1.getServiceProvider(), ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus, timeout);
-		
-		platform2 = Starter.createPlatform(new String[]{"-platformname", "testcases_*",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
-			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(sus, timeout);
-		
-		// Connect platforms by creating proxy agents.
-		Map<String, Object>	args1	= new HashMap<String, Object>();
-		args1.put("component", platform2.getComponentIdentifier());
-		IComponentManagementService	cms1	= SServiceProvider
-			.getServiceUpwards(platform1.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
-		cms1.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args1), null).get(sus, timeout);
-		Map<String, Object>	args2	= new HashMap<String, Object>();
-		args2.put("component", platform1.getComponentIdentifier());
-		IComponentManagementService	cms2	= SServiceProvider
-			.getServiceUpwards(platform2.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
-		cms2.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", new CreationInfo(args2), null).get(sus, timeout);
 
+		platform1 = Starter.createPlatform(
+			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+				"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
+
+		// Find local service (as local provided service proxy).
+		ILocalService service1 = SServiceProvider.getService(platform1, ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
+
+		platform2 = Starter.createPlatform(
+			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+				"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(timeout);
+
+		// Connect platforms by creating proxy agents.
+		// Connect platforms by creating proxy agents.
+		Starter.createProxy(platform1, platform2).get(timeout);
+		Starter.createProxy(platform2, platform1).get(timeout);
 	}
-	
+
 	@Test
-	public void	testRemoteReferenceCall_withTypeAnnotation()
+	public void testRemoteReferenceCall_withTypeAnnotation()
 	{
 		// schedule on platform, so platform2platform communication is used.
 		platform2.scheduleStep(new IComponentStep<Void>()
@@ -82,46 +70,49 @@ public class RemoteReferenceParamAnnotationTest //extends TestCase
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				Future<Void> ret = new Future<Void>();
-				ILocalService locService = SServiceProvider.getService(ia.getExternalAccess().getServiceProvider(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
+				ILocalService locService = SServiceProvider.getService(ia.getExternalAccess(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
 				// call service with @Reference Object
-				locService.executeCallback(new MyCallbackReference()).addResultListener(new DelegationResultListener<Void>(ret));;
+				locService.executeCallback(new MyCallbackReference()).addResultListener(new DelegationResultListener<Void>(ret));
+				;
 				return ret;
 			}
-		}).get(sus);
-		
+		}).get();
+
 		Assert.assertTrue(successIndicator.isDone());
 		Assert.assertTrue(successIndicator.get());
 	}
-	
-//	@Test
-	public void	testRemoteReferenceCall_withMethodAnnotation()
+
+	// @Test
+	public void testRemoteReferenceCall_withMethodAnnotation()
 	{
 		platform2.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				Future<Void> ret = new Future<Void>();
-				ILocalService locService = SServiceProvider.getService(ia.getExternalAccess().getServiceProvider(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
+				ILocalService locService = SServiceProvider.getService(ia.getExternalAccess(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
 				// call service without @Reference Object
-				locService.executeCallback(new MyCallback()).addResultListener(new DelegationResultListener<Void>(ret));;
+				locService.executeCallback(new MyCallback()).addResultListener(new DelegationResultListener<Void>(ret));
+				;
 				return ret;
 			}
-		}).get(sus);
-		
+		}).get();
+
 		Assert.assertTrue(successIndicator.isDone());
 		Assert.assertTrue(successIndicator.get());
 
 	}
-	
+
 	@After
 	public void shutdownPlatforms()
 	{
 		// Kill platforms and end test case.
-		platform1.killComponent().get(sus, timeout);
-		platform2.killComponent().get(sus, timeout);
+		platform1.killComponent().get(timeout);
+		platform2.killComponent().get(timeout);
 	}
 
-	public class MyCallback implements ICallback {
+	public class MyCallback implements ICallback
+	{
 		public IFuture<Void> call()
 		{
 			System.out.println("setting result");
@@ -129,8 +120,9 @@ public class RemoteReferenceParamAnnotationTest //extends TestCase
 			return Future.DONE;
 		}
 	}
-	
-	public class MyCallbackReference implements ICallbackReference {
+
+	public class MyCallbackReference implements ICallbackReference
+	{
 		public IFuture<Void> call()
 		{
 			System.out.println("setting result");
@@ -138,15 +130,15 @@ public class RemoteReferenceParamAnnotationTest //extends TestCase
 			return Future.DONE;
 		}
 	}
-	
+
 	/**
-	 *  Execute in main to have no timeouts.
+	 * Execute in main to have no timeouts.
 	 */
 	public static void main(String[] args)
 	{
 		RemoteReferenceTest test = new RemoteReferenceTest();
 		test.testRemoteReference();
 	}
-	
+
 
 }

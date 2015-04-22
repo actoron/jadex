@@ -118,7 +118,7 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 	/**
 	 *  Determine the location of the local platform.
 	 */
-	protected String	determineLocation()
+	protected static String	determineLocation()
 	{
 		String	ret	= "unknown";
 		try
@@ -137,7 +137,8 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 		}
 		catch(Exception e)
 		{
-			agent.getLogger().warning("Cannot determine location: "+e);
+			// freegeoip sometimes has connection timeouts :-(
+			System.err.println("Cannot determine location: "+e);
 		}
 		
 		return ret;

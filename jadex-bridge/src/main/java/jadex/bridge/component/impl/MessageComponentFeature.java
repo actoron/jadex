@@ -71,22 +71,29 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IMessageService ms = SServiceProvider.getLocalService(getComponent(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//		System.err.println("send msg1: "+getComponentIdentifier()+" "+me.get(SFipa.CONTENT));
-		IFuture<Void> res = ms.sendMessage(me, mt, getComponent().getComponentIdentifier(),
-			getComponent().getModel().getResourceIdentifier(), null, codecids);
-		res.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
-//		res.addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				System.out.println("ok send: "+me.get(SFipa.RECEIVERS));
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("ex: "+exception);
-//			}
-//		});
+		try
+		{
+			IMessageService ms = SServiceProvider.getLocalService(getComponent(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+	//		System.err.println("send msg1: "+getComponentIdentifier()+" "+me.get(SFipa.CONTENT));
+			IFuture<Void> res = ms.sendMessage(me, mt, getComponent().getComponentIdentifier(),
+				getComponent().getModel().getResourceIdentifier(), null, codecids);
+			res.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+	//		res.addResultListener(new IResultListener<Void>()
+	//		{
+	//			public void resultAvailable(Void result)
+	//			{
+	//				System.out.println("ok send: "+me.get(SFipa.RECEIVERS));
+	//			}
+	//			public void exceptionOccurred(Exception exception)
+	//			{
+	//				System.out.println("ex: "+exception);
+	//			}
+	//		});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		return ret;
 	}
 	

@@ -5,8 +5,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +84,6 @@ public class MultiPlatformsTest //extends TestCase
 		
 		long	timeout	= BasicService.getLocalDefaultTimeout();
 		IExternalAccess[]	platforms	= new IExternalAccess[number];
-		ISuspendable	sus	= 	new ThreadSuspendable();
 		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)
@@ -99,7 +96,7 @@ public class MultiPlatformsTest //extends TestCase
 			}
 			catch(RuntimeException e)
 			{
-				System.out.println("failed: "+i+e);
+				System.out.println("failed: "+i+", "+e);
 				throw e;
 			}
 		}

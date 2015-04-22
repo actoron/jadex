@@ -198,7 +198,15 @@ public class SNonAndroid
 	 */
 	public static boolean isGuiThread()
 	{
-		return SReflect.HAS_GUI && SwingUtilities.isEventDispatchThread();
+		try
+		{
+			return SReflect.HAS_GUI && SwingUtilities.isEventDispatchThread();
+		}
+		catch(Exception e)
+		{
+			// Todo: why null pointer exception thrown by swing?
+			return false;
+		}
 	}
 	
 	/**
