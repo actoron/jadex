@@ -11,7 +11,7 @@
 <%@ page import="java.util.*" %>
 <%
 	PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
-	PeerEntry[]	peers	= (PeerEntry[])request.getAttribute("peers");
+	PeerHandler[]	peers	= (PeerHandler[])request.getAttribute("peers");
 	String	url	= RelayConnectionManager.httpAddress((String)request.getAttribute("url"));
 	String	host	= new URL(url).getHost();
 	StringBuffer markers	= new StringBuffer();
@@ -74,6 +74,7 @@ if(peers.length>0)
 positions.clear();
 
 // Add markers for locally connected platforms
+boolean	unlabelled	= false;
 if(infos.length>0)
 {
 	for(int i=0; i<infos.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
@@ -91,14 +92,15 @@ if(infos.length>0)
 				markers.append(infos[i].getPosition());
 				positions.add(infos[i].getPosition());
 			}
-			else if(i==9)
+			else if(!unlabelled)
 			{
-				// Add unlabelled markers for each unique position of remaining entries
+				// Add first unlabelled marker for unique position of remaining entries
 				markers.append("&markers=size:mid|color:");
 				markers.append(colors[Math.abs(url.hashCode())%colors.length]);
 				markers.append("|");
 				markers.append(infos[i].getPosition());
 				positions.add(infos[i].getPosition());
+				unlabelled	= true;
 			}
 			else
 			{
@@ -120,7 +122,7 @@ if(peers.length>0)
 		PlatformInfo[]	infos2	= peers[j].getPlatformInfos();
 		for(int i=0; i<infos2.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
 		{
-			if(infos2[i].getPosition()!=null)
+			if(infos2[i].getPosition()!=null && !positions.contains(infos2[i].getPosition()))
 			{
 				if(i+cnt<9)
 				{
@@ -133,16 +135,17 @@ if(peers.length>0)
 					markers.append(infos2[i].getPosition());
 					positions.add(infos2[i].getPosition());
 				}
-				else if(i+cnt==9)
+				else if(!unlabelled)
 				{
-					// Add unlabelled markers for each unique position of remaining entries
+					// Add first unlabelled marker for unique position of remaining entries
 					markers.append("&markers=size:mid|color:");
 					markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
 					markers.append("|");
 					markers.append(infos2[i].getPosition());
 					positions.add(infos2[i].getPosition());
+					unlabelled	= true;
 				}
-				else if(!positions.contains(infos2[i].getPosition()))
+				else
 				{
 					// Add unlabelled markers for each unique position of remaining entries
 					markers.append("|");

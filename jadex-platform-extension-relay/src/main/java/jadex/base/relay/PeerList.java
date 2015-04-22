@@ -1,27 +1,11 @@
 package jadex.base.relay;
 
-import jadex.commons.Base64;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
-import jadex.commons.SUtil;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
 
 /**
  *  The peer list actively manages the list of
@@ -29,128 +13,23 @@ import java.util.UUID;
  */
 public class PeerList
 {
-	//-------- constants --------
-
-	/** The property for this relay's own id. */
-	public static final String	PROPERTY_ID	= "id";
-	
-	/** The property for this relay's own url. */
-	public static final String	PROPERTY_URL	= "url";
-	
-	/** The property for the peer server urls (comma separated). */
-	public static final String	PROPERTY_PEERS	= "initial_peers";
-	
-	/** The property for the debug flag. */
-	public static final String	PROPERTY_DEBUG	= "debug";
-	
-	/** Delay between two pings when a peer is connected. */
-	public static final long	DELAY_ONLINE	= 30000;
-	
-	/** Delay between two pings when a peer is offline. */
-	public static final long	DELAY_OFFLINE	= 30000;
-	
 	//-------- attributes --------
 	
-	/** The own peer id (generated on first use). */
-	protected String	id;
+	/** The relay handler. */
+	protected RelayHandler	handler;
 	
-	/** The own url. */
-	protected String	url;
+	/** The peer handlers for polling relay peers (url -> peer handler). */
+	protected Map<String, PeerHandler>	peers;
 	
-	/** The known peers (url -> peer entry). */
-	protected Map<String, PeerEntry>	peers;
-	
-	/** Timer for polling relay peers. */
-	protected volatile Timer	timer;
-	
-	/** The connection manager. */
-	protected RelayConnectionManager	conman;
-	
-	/** Change listeners. */
-	protected List<IChangeListener<PeerEntry>>	listeners;
-
-	/**	Flag to enable debug text being generated (set debug=true in peer.properties). */
-	protected boolean	debug;
-
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new peer list.
 	 */
-	public PeerList()
+	public PeerList(RelayHandler handler)
 	{
-		this.peers	= Collections.synchronizedMap(new HashMap<String, PeerEntry>());
-		this.listeners	= Collections.synchronizedList(new ArrayList<IChangeListener<PeerEntry>>());
-		this.conman	= new RelayConnectionManager();
-		
-		Properties	props	= new Properties();
-		File	propsfile	= new File(RelayHandler.SYSTEMDIR, "peer.properties");
-		if(propsfile.exists())
-		{
-			try
-			{
-				InputStream	fis	= new FileInputStream(propsfile);
-				props.load(fis);
-				fis.close();
-				
-				if(props.getProperty(PROPERTY_ID)==null || props.getProperty(PROPERTY_ID).equals(""))
-				{
-					props.setProperty(PROPERTY_ID, UUID.randomUUID().toString());
-					OutputStream	fos	= new FileOutputStream(propsfile);
-					props.store(fos, " Relay peer properties.\n"
-						+" Specify settings below to enable load balancing and exchanging awareness information with other relay servers.\n"
-						+" '"+PROPERTY_ID+"' is this relay's own generated ID to differentiate entries from different peers in shared history information.\n"
-						+" Set '"+PROPERTY_URL+"' to this relay's own publically accessible URL, e.g., http://www.mydomain.com:8080/relay (required for enabling peer-to-peer behavior).\n"
-						+" Set '"+PROPERTY_PEERS+"' to a comma separated list of peer server urls to connect to at startup (optional, if this relay should only respond to connections from other peers).\n"
-						+" Set '"+PROPERTY_DEBUG+"=true' for enabling debugging output in html tooltips of peer relay table (optional).");
-					fos.close();
-				}
-			}
-			catch(Exception e)
-			{
-				RelayHandler.getLogger().warning("Relay failed to load: "+propsfile);
-			}
-		}
-		else
-		{
-			try
-			{
-				props.setProperty(PROPERTY_ID, UUID.randomUUID().toString());
-				props.setProperty(PROPERTY_URL, "");
-				props.setProperty(PROPERTY_PEERS, "");
-				props.setProperty(PROPERTY_DEBUG, "false");
-				OutputStream	fos	= new FileOutputStream(propsfile);
-				props.store(fos, " Relay peer properties.\n"
-					+" Specify settings below to enable load balancing and exchanging awareness information with other relay servers.\n"
-					+" '"+PROPERTY_ID+"' is this relay's own generated ID to differentiate entries from different peers in shared history information.\n"
-					+" Set '"+PROPERTY_URL+"' to this relay's own publically accessible URL, e.g., http://www.mydomain.com:8080/relay (required for enabling peer-to-peer behavior).\n"
-					+" Set '"+PROPERTY_PEERS+"' to a comma separated list of peer server urls to connect to at startup (optional, if this relay should only respond to connections from other peers).\n"
-					+" Set '"+PROPERTY_DEBUG+"=true' for enabling debugging output in html tooltips of peer relay table (optional).");
-				fos.close();
-			}
-			catch(Exception e)
-			{
-				RelayHandler.getLogger().warning("Relay failed to save: "+propsfile);
-			}
-		}
-		
-		this.debug	= "true".equals(props.getProperty(PROPERTY_DEBUG));
-		this.id	= props.getProperty(PROPERTY_ID);
-		
-		// Todo: check that specified url is valid and connects to this server.
-		this.url	= props.containsKey(PROPERTY_URL) && !"".equals(props.getProperty(PROPERTY_URL))
-			? RelayConnectionManager.relayAddress(props.getProperty(PROPERTY_URL)) : "";
-			
-		RelayHandler.getLogger().info("Relay url: "+url);
-		
-		if(props.containsKey(PROPERTY_PEERS))
-		{
-			StringTokenizer	stok	= new StringTokenizer(props.getProperty(PROPERTY_PEERS), ",");
-			while(stok.hasMoreTokens())
-			{
-				addPeer(stok.nextToken().trim(), true);
-			}
-		}
+		this.handler	= handler;
+		this.peers	= Collections.synchronizedMap(new HashMap<String, PeerHandler>());
 	}
 	
 	/**
@@ -158,30 +37,13 @@ public class PeerList
 	 */
 	public void	dispose()
 	{
-		if(timer!=null)
+		for(PeerHandler handler: peers.values().toArray(new PeerHandler[0]))
 		{
-			timer.cancel();
+			handler.shutdown();
 		}
-		conman.dispose();
 	}
 	
 	//-------- methods --------
-	
-	/**
-	 *  Get the peer id of this relay.
-	 */
-	public String	getId()
-	{
-		return id;
-	}
-	
-	/**
-	 *  Get the public url of this relay, if known.
-	 */
-	public String	getUrl()
-	{
-		return url;
-	}
 	
 	/**
 	 *  Get the known relay urls.
@@ -192,7 +54,7 @@ public class PeerList
 		String	ret;
 		
 		// Fallback, when no peers specified.
-		if("".equals(url))
+		if(!handler.getSettings().isUrlSpecified())
 		{
 			ret	= request;
 			if(ret.endsWith("/servers"))
@@ -206,9 +68,9 @@ public class PeerList
 		else
 		{
 			StringBuffer	sret	= new StringBuffer();
-			sret.append(url);
-			PeerEntry[] apeers = getPeers();
-			for(PeerEntry peer: apeers)
+			sret.append(handler.getSettings().getUrl());
+			PeerHandler[] apeers = getPeers();
+			for(PeerHandler peer: apeers)
 			{
 				if(peer.isConnected())
 				{
@@ -224,10 +86,10 @@ public class PeerList
 	/**
 	 *  Get the currently connected peers.
 	 */
-	public PeerEntry[] getPeers()
+	public PeerHandler[] getPeers()
 	{
 		// Fetch array to avoid concurrency problems
-		return peers.values().toArray(new PeerEntry[0]);
+		return peers.values().toArray(new PeerHandler[0]);
 	}
 	
 	/**
@@ -236,7 +98,7 @@ public class PeerList
 	public boolean	checkPlatform(String id)
 	{
 		boolean	found	= false;
-		for(PeerEntry peer: peers.values().toArray(new PeerEntry[0]))
+		for(PeerHandler peer: peers.values().toArray(new PeerHandler[0]))
 		{
 			if(peer.checkPlatform(id))
 			{
@@ -248,140 +110,92 @@ public class PeerList
 	}
 	
 	/**
-	 *  Add a peer that requested a connection.
+	 *  Add peers from a servers list.
+	 *  @param peers	The remote peer urls (comma separated).
+	 *  @param initial	Denotes an initial peer as specified in the properties of this relay. Initial peers are not removed when they are offline.
 	 */
-	public PeerEntry	addPeer(String peerurl, boolean initial)
+	public void	addPeers(String peerurls, boolean initial)
 	{
-		PeerEntry	peer;
-		if("".equals(url))
+		if(peerurls!=null)
 		{
-			throw new RuntimeException("No peer connections allowed, if local URL not set.");
-		}
-		else
-		{
-			peerurl	= RelayConnectionManager.relayAddress(peerurl);
-			peer	= peers.get(peerurl);
-			if(!url.equals(peerurl) && peer==null)
+			StringTokenizer	stok	= new StringTokenizer(peerurls, ",");
+			while(stok.hasMoreTokens())
 			{
-				peer	= new PeerEntry(peerurl, initial, debug);
-				peers.put(peerurl, peer);
-				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "added", peer));
+				addPeer(stok.nextToken().trim(), null, -1, true);
+			}
+		}
+	}
 	
-				// Create timer on demand.
-				if(timer==null)
+	/**
+	 *  Add a peer that requested a connection.
+	 *  @param peerurl	The remote peer url.
+	 */
+	public PeerHandler	addPeer(String peerurl)
+	{
+		return addPeer(peerurl, null, -1);
+	}
+	
+	/**
+	 *  Add a peer that requested a connection.
+	 *  Called for the continuous pings sent by connected peers.
+	 *  @param peerurl	The remote peer url.
+	 *  @param peerid	Contains the id of the remote peer.
+	 *  @param peerstate	Contains id of the latest history entry of that peer to enable synchronization.
+	 */
+	public PeerHandler	addPeer(String peerurl, String peerid, int peerstate)
+	{
+		return addPeer(peerurl, peerid, peerstate, false);
+	}
+	
+	/**
+	 *  Remove a peer from the list.
+	 */
+	public void removePeer(PeerHandler peer)
+	{
+		peers.remove(peer.getUrl());
+	}
+	
+	/**
+	 *  Add a peer found in a servers list or a peer that requested a connection.
+	 *  Also called for the continuous pings sent by connected peers.
+	 *  @param peerurl	The remote peer url.
+	 *  @param peerid	If called from remote peer, contains the id of that peer.
+	 *  @param peerstate	If called from remote peer, contains id of the latest history entry of that peer to enable synchronization.
+	 *  @param initial	Denotes an initial peer as specified in the properties of this relay. Initial peers are not removed when they are offline.
+	 */
+	protected PeerHandler	addPeer(String peerurl, String peerid, int peerstate, boolean initial)
+	{
+		PeerHandler	peer	= null;
+		peerurl	= RelayConnectionManager.httpAddress(peerurl);
+		
+		if(!handler.getSettings().isUrlSpecified())
+		{
+			throw new RuntimeException("No peer connections allowed, if public URL not set.");
+		}
+		
+		// Add/update peer if not server itself
+		else if(!RelayConnectionManager.isSameServer(handler.getSettings().getUrl(), peerurl))
+		{
+			synchronized(peers)
+			{
+				peer	= peers.get(peerurl);
+				if(peer==null)
 				{
-					synchronized(this)
-					{
-						if(timer==null)
-						{
-							this.timer	= new Timer(true);
-						}
-					}
+					peer	= new PeerHandler(handler, peerurl, initial);
+					peers.put(peerurl, peer);
 				}
-				
-				// Periodically test connection to peer.
-				timer.schedule(new PeerTimerTask(peer), 0);		
+			}
+			
+			// DB synchronization.
+			if(peerid!=null && peerstate!=-1)
+			{
+				PeerHandler	handler	= peers.get(peerurl);
+				if(handler!=null)
+				{
+					handler.setPeerState(peerid, peerstate);
+				}
 			}
 		}
 		return peer;
-	}
-	
-	/**
-	 *  Add a change listener.
-	 */
-	public void	addChangeListener(IChangeListener<PeerEntry> lis)
-	{
-		listeners.add(lis);
-	}
-
-	/**
-	 *  Remove a change listener.
-	 */
-	public void	removeChangeListener(IChangeListener<PeerEntry> lis)
-	{
-		listeners.remove(lis);
-	}
-	
-	/**
-	 *  inform listeners about an event.
-	 */
-	protected void	informListeners(ChangeEvent<PeerEntry> event)
-	{
-		IChangeListener<PeerEntry>[]	alis	= listeners.toArray(new IChangeListener[0]);
-		for(IChangeListener<PeerEntry> lis: alis)
-		{
-			lis.changeOccurred(event);
-		}
-	}
-
-	//-------- helper classes --------
-	
-	/**
-	 *  Timer task to periodically ping remote peers.
-	 */
-	public class PeerTimerTask extends TimerTask
-	{
-		//-------- attributes --------
-		
-		/** The peer. */
-		protected PeerEntry	peer;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Create a timer task.
-		 */
-		public PeerTimerTask(PeerEntry peer)
-		{
-			this.peer = peer;
-		}
-		
-		//-------- methods --------
-
-		/**
-		 *  Execute the timer task.
-		 */
-		public void run()
-		{
-			boolean	connected	= peer.isConnected();
-			try
-			{
-				// Try to connect and add new peers, if any.
-//				peer.addDebugText("Pinging peer");
-				String	servers	= conman.getPeerServers(peer.getUrl(), url, !peer.isConnected());
-				peer.setConnected(true);
-				for(StringTokenizer stok=new StringTokenizer(servers, ","); stok.hasMoreTokens(); )
-				{
-					addPeer(stok.nextToken().trim(), false);
-				}
-			}
-			catch(IOException e)
-			{
-				peer.addDebugText("Exception pinging peer: "+e);
-				peer.setConnected(false);
-			}
-			
-			if(peer.isConnected())
-			{
-				timer.schedule(new PeerTimerTask(peer), DELAY_ONLINE);
-				if(connected!=peer.isConnected())
-				{
-					informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "online", peer));
-				}
-			}
-			else if(peer.isInitial())
-			{
-				timer.schedule(new PeerTimerTask(peer), DELAY_OFFLINE);
-				if(connected!=peer.isConnected())
-				{
-					informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "offline", peer));
-				}
-			}
-			else
-			{
-				peers.remove(peer.getUrl());
-				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "removed", peer));
-			}
-		}
-	}
+	}	
 }

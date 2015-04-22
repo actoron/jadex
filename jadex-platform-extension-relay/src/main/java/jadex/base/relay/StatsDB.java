@@ -3,6 +3,9 @@ package jadex.base.relay;
 import jadex.bridge.BasicComponentIdentifier;
 
 import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -35,20 +38,26 @@ public class StatsDB
 	/** The db connection (if any). */
 	protected Connection	con;
 	
-	/** The prepared insert statement for new entries (without dbid). */
+	/** The prepared insert statement for new platform entries (without dbid). */
 	protected PreparedStatement	insert;
 	
-	/** The prepared insert statement for remote entries (with dbid). */
+	/** The prepared insert statement for remote platform entries (with dbid). */
 	protected PreparedStatement	insert2;
 	
-	/** The prepared update statement. */
+	/** The prepared update statement for platform entries. */
 	protected PreparedStatement	update;
+	
+	/** The prepared get latest entry query statement. */
+	protected PreparedStatement	getlatest;
 	
 	/** The prepared delete properties statement. */
 	protected PreparedStatement	deleteprops;
 	
 	/** The prepared insert properties statement. */
 	protected PreparedStatement	insertprops;
+	
+	/** The latest entries (cached for speed). */
+	protected Map<String, Integer>	latest;
 	
 	//-------- constructors --------
 	
@@ -72,12 +81,14 @@ public class StatsDB
 				
 				new File(RelayHandler.SYSTEMDIR, "mydb").renameTo(new File(RelayHandler.SYSTEMDIR, "derbydb_bak"));
 			}
-			
 		}
 		catch(Exception e)
 		{
 			// Ignore errors and let relay work without stats.
-			RelayHandler.getLogger().warning("Warning: Could not connect to relay stats DB: "+ e);
+			StringWriter	sw	= new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			RelayHandler.getLogger().warning("Warning: Could not connect to relay stats DB: "+ sw.toString());
+			
 		}
 		return ret;
 	}
@@ -87,6 +98,7 @@ public class StatsDB
 	 */
 	protected StatsDB(String peerid, Connection con)
 	{
+		this.latest	= new HashMap<String, Integer>();
 		this.peerid	= peerid;
 		this.con	= con;
 	}
@@ -151,11 +163,11 @@ public class StatsDB
 			Statement	stmt	= con.createStatement();
 			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
 			
-			// Update platform entries where hostname is same as ip.
+			// Update legacy platform entries where hostname is same as ip.
 			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
 			stmt.close();
 			
-			// Replace android platform names and-xxx to and_xxx
+			// Replace legacy android platform names and-xxx to and_xxx
 			PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
 			rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
 			while(rs.next())
@@ -205,8 +217,8 @@ public class StatsDB
 			rs.close();
 			
 			stmt.execute("CREATE TABLE RELAY.PLATFORMINFO ("
-				+ "ID	INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,"
-				+ "PEER VARCHAR(60) PRIMARY KEY,"
+				+ "ID	INTEGER NOT NULL AUTO_INCREMENT,"
+				+ "PEER VARCHAR(60) NOT NULL,"
 				+ "PLATFORM	VARCHAR(60)," 
 				+ "HOSTIP	VARCHAR(32),"
 				+ "HOSTNAME	VARCHAR(60),"
@@ -216,13 +228,22 @@ public class StatsDB
 				+ "MSGS	INTEGER,"
 				+ "BYTES	DOUBLE,"
 				+ "TRANSTIME	DOUBLE,"
-				+ "PREFIX	VARCHAR(60))");
+				+ "PREFIX	VARCHAR(60),"
+				+ "PRIMARY KEY (ID, PEER)"
+				+ ")");
 		}
 		else
 		{
 			rs.close();
 			
-			// Add peer column, if it doesn't exist.
+			// Add indices.
+//			stmt.execute("CREATE INDEX IDX_HOSTNAME ON RELAY.PLATFORMINFO(HOSTNAME)");
+//			stmt.execute("CREATE INDEX IDX_CONTIME ON RELAY.PLATFORMINFO(CONTIME)");
+//			stmt.execute("CREATE INDEX IDX_DISTIME ON RELAY.PLATFORMINFO(DISTIME)");
+//			stmt.execute("CREATE INDEX IDX_ID ON RELAY.PLATFORMINFO(ID)");
+//			stmt.execute("CREATE INDEX IDX_PEER ON RELAY.PLATFORMINFO(PEER)");
+			
+			// Add peer column, if it doesn't exist. (legacy for broken migrations from derby)
 			rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PEER");
 			if(!rs.next())
 			{
@@ -233,33 +254,31 @@ public class StatsDB
 				stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET PEER='"+peerid+"' WHERE PEER IS NULL");
 				
 				// Include peer column in primary key constraint.
-				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PRIMARY KEY(PEER)");
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ALTER COLUMN PEER SET NOT NULL");
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO DROP PRIMARY KEY");
+				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PRIMARY KEY(ID, PEER)");
 			}
 			else
 			{
+				// Add primary key, if it does not exist. (legacy for broken migrations from derby)
+				rs.close();
+				
+				rs	= meta.getPrimaryKeys(null, "RELAY", "PLATFORMINFO");
+				boolean	pks	= rs.next(); 
+				if(!pks || !rs.next())	// None or only one pk column
+				{
+					stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ALTER COLUMN PEER SET NOT NULL");
+					if(pks)
+					{
+						stmt.execute("ALTER TABLE RELAY.PLATFORMINFO DROP PRIMARY KEY");
+					}
+					stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PRIMARY KEY(ID, PEER)");
+				}
 				rs.close();
 			}
 
 			// Update platform entries where disconnection was missed.
 			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
-			
-			// Update platform entries where hostname is same as ip.
-			stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
-			
-			// Replace android platform names and-xxx to and_xxx
-			PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
-			rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
-			while(rs.next())
-			{
-				int	param	= 1;
-				String	name	= "and_"+rs.getString("PLATFORM").substring(4);
-				update.setString(param++, name);
-				update.setString(param++, BasicComponentIdentifier.getPlatformPrefix(name));
-				update.setInt(param++, rs.getInt("ID"));
-				update.executeUpdate();
-			}
-			rs.close();
-			update.close();
 		}
 
 		// Create the properties table, if it doesn't exist.
@@ -270,16 +289,17 @@ public class StatsDB
 		{
 			rs.close();
 			con.createStatement().execute("CREATE TABLE RELAY.PROPERTIES ("
-				+ "ID	INTEGER,"
-				+ "PEER VARCHAR(60),"
+				+ "ID	INTEGER NOT NULL,"
+				+ "PEER VARCHAR(60) NOT NULL,"
 				+ "NAME	VARCHAR(30)," 
-				+ "VALUE	VARCHAR(60)),"
-				+ "FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
+				+ "VALUE	VARCHAR(60),"
+				+ "FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)"
+				+ ")");
 		}
 		else
 		{
 			rs.close();
-			// Add peer column, if it doesn't exist.
+			// Add peer column, if it doesn't exist. (legacy for broken migrations from derby)
 			rs	= meta.getColumns(null, "RELAY", "PROPERTIES", "PEER");
 			if(!rs.next())
 			{
@@ -290,11 +310,20 @@ public class StatsDB
 				stmt.executeUpdate("UPDATE RELAY.PROPERTIES SET PEER='"+peerid+"' WHERE PEER IS NULL");
 				
 				// Include peer column in foreing key constraint.
-				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO DROP CONSTRAINT PLATFORM_KEY");
-				stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
+				stmt.execute("ALTER TABLE RELAY.PROPERTIES ALTER COLUMN PEER SET NOT NULL");
+				stmt.execute("ALTER TABLE RELAY.PROPERTIES DROP CONSTRAINT PLATFORM_KEY");
+				stmt.execute("ALTER TABLE RELAY.PROPERTIES ADD FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
 			}
 			else
 			{
+				// Add foreign key, if it does not exist. (legacy for broken migrations from derby)
+				rs.close();
+				
+				rs	= meta.getImportedKeys(null, "RELAY", "PROPERTIES");
+				if(!rs.next() || !rs.next())	// None or only one fk column
+				{
+					stmt.execute("ALTER TABLE RELAY.PROPERTIES ADD FOREIGN KEY (ID, PEER) REFERENCES PLATFORMINFO (ID, PEER)");
+				}
 				rs.close();
 			}
 		}
@@ -369,7 +398,7 @@ public class StatsDB
 					update.setDouble(param++, pi.getTransferTime());
 					update.setString(param++, BasicComponentIdentifier.getPlatformPrefix(name));
 					update.setInt(param++, pi.getDBId().intValue());
-					update.setString(param++, peerid);
+					update.setString(param++, pi.getPeerId());
 					int	cnt	= update.executeUpdate();
 					
 					// Not updated -> new entry from remote
@@ -420,12 +449,18 @@ public class StatsDB
 					for(String propname: pi.getProperties().keySet())
 					{
 						param	= 1;
-						insertprops.setInt(param++, pi.getDBId());
+						insertprops.setInt(param++, pi.getDBId().intValue());
 						insertprops.setString(param++, pi.getPeerId());
 						insertprops.setString(param++, propname);
 						insertprops.setString(param++, pi.getProperties().get(propname));
 						insertprops.executeUpdate();
 					}
+				}
+				
+				// Remove latest entry cache as new platform info might be the new latest, but may be not.
+				if(pi.getPeerId()!=null && latest.containsKey(pi.getPeerId()))
+				{
+					latest.remove(pi.getPeerId());
 				}
 			}
 			catch(Exception e)
@@ -440,7 +475,7 @@ public class StatsDB
 	 *  Get all saved platform infos for direct data export (sorted by id, oldest first).
 	 *  @return All stored platform infos.
 	 */
-	public Iterator<PlatformInfo>	getAllPlatformInfos()
+	public Iterator<PlatformInfo>	getAllPlatformInfos(final boolean properties)
 	{
 		Iterator<PlatformInfo>	ret;
 		
@@ -448,6 +483,8 @@ public class StatsDB
 		{
 			try
 			{
+				final PreparedStatement	ps	= properties ? con.prepareStatement("select * from relay.properties where ID=?") : null;
+
 				final ResultSet	rs	= con.createStatement().executeQuery("select * from relay.platforminfo order by id asc");
 				ret	= new Iterator<PlatformInfo>()
 				{
@@ -464,6 +501,10 @@ public class StatsDB
 								if(!hasnext)
 								{
 									rs.close();
+									if(ps!=null)
+									{
+										ps.close();
+									}
 								}
 							}
 							catch(SQLException e)
@@ -480,20 +521,34 @@ public class StatsDB
 						{
 							try
 							{
-								PlatformInfo	pi	= new PlatformInfo(Integer.valueOf(rs.getInt("ID")), rs.getString("PEER"), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+								String	peer	= null;
+								try
+								{
+									peer	= rs.getString("PEER");
+								}
+								catch(Exception e)
+								{
+									// Ignore missing peer column from old databases
+								}
+								
+								PlatformInfo	pi	= new PlatformInfo(Integer.valueOf(rs.getInt("ID")), peer, rs.getString("PLATFORM"), rs.getString("HOSTIP"),
 									rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 									rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
 	
-								// Load properties of platform.
-								Map<String, String>	props	= new HashMap<String, String>();
-								pi.setProperties(props);
-								ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
-								while(rs2.next())
+								// Load latest properties of platform. (for migration from derby, no peer required)
+								if(properties)
 								{
-									props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+									Map<String, String>	props	= new HashMap<String, String>();
+									pi.setProperties(props);
+									ps.setInt(1, pi.getDBId());
+									ResultSet	rs2	= ps.executeQuery();
+									while(rs2.next())
+									{
+										props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+									}
+									rs2.close();
 								}
-								rs2.close();
-								
+
 								cursormoved	= false;
 								
 								return pi;
@@ -533,19 +588,85 @@ public class StatsDB
 	}
 	
 	/**
+	 *  Get platform infos for history synchronization
+	 *  @param peerid	The peer id;
+	 *  @param startid	Start id;
+	 *  @param cnt	The number of entries to retrieve;
+	 *  @return Up to cnt platform infos (less means no more available).
+	 */
+	public PlatformInfo[]	getPlatformInfosForSync(String peerid, int startid, int cnt)
+	{
+		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
+		
+		if(con!=null)
+		{
+			ResultSet	rs	= null;
+			try
+			{
+				PreparedStatement	ps	= con.prepareStatement("SELECT * FROM RELAY.PROPERTIES WHERE PEER=? AND ID=?");
+
+				PreparedStatement	qpls	= con.prepareStatement(
+					"SELECT * FROM RELAY.PLATFORMINFO "
+					+ "WHERE PEER=? AND ID>=? "
+					+ "ORDER BY ID ASC ");
+				
+				qpls.setString(1, peerid);
+				qpls.setInt(2, startid);
+				rs	= qpls.executeQuery();
+				
+				while(rs.next() && ret.size()<cnt)
+				{
+					PlatformInfo	pi	= new PlatformInfo(rs.getInt("ID"), rs.getString("PEER"), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+						rs.getString("HOSTNAME"), null, rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
+						rs.getInt("MSGS"), 0, 0);
+					ret.add(pi);
+						
+					// Load latest properties of platform.
+					Map<String, String>	props	= new HashMap<String, String>();
+					pi.setProperties(props);
+					ps.setString(1, pi.getPeerId());
+					ps.setInt(2, pi.getDBId());
+					ResultSet	rs2	= ps.executeQuery();
+					while(rs2.next())
+					{
+						props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+					}
+					rs2.close();
+				}
+				qpls.close();
+				rs.close();
+			}
+			catch(Exception e)
+			{
+				if(rs!=null)
+				{
+					try
+					{
+						rs.close();
+					}
+					catch(SQLException sqle)
+					{
+						// ignore
+					}
+				}
+				e.printStackTrace();
+				// Ignore errors and let relay work without stats.
+				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
+			}
+		}
+		return ret.toArray(new PlatformInfo[ret.size()]);
+	}
+
+	/**
 	 *  Get cumulated platform infos per ip to use for display (sorted by recency, newest first).
 	 *  @param limit	Limit the number of results (-1 for no limit);
 	 *  @param startid	Start id (-1 for all entries);
 	 *  @param endid	End id (-1 for all entries);
 	 *  @return Up to limit platform infos.
 	 */
-	public PlatformInfo[]	getPlatformInfos(int limit, int startid, int endid)
+	public PlatformInfo[]	getPlatformInfos(int limit)
 	{
-		if(endid==-1)
-		{
-			endid	= Integer.MAX_VALUE;
-		}
-		
+		long start	= System.nanoTime();
 		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
 		
 		if(con!=null)
@@ -557,10 +678,12 @@ public class StatsDB
 				rs	= con.createStatement().executeQuery(
 					"select max(id) as ID, prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
 					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
-					+"from relay.platforminfo where id>="+startid+" AND id<="+endid+" "
+					+"from relay.platforminfo "
 					+"group by hostip, prefix order by CONTIME desc");
 				
 //				PreparedStatement	ps	= con.prepareStatement("select * from relay.properties where ID=?");
+				
+				System.out.println("took a: "+((System.nanoTime()-start)/1000000)+" ms");
 				
 				while(rs.next() && (limit==-1 || ret.size()<limit))
 				{
@@ -569,7 +692,20 @@ public class StatsDB
 						PlatformInfo	pi	= map.get(rs.getString("HOSTIP"));
 						if(pi.getId().indexOf(rs.getString("PLATFORM"))==-1)
 						{
-							pi.setId(pi.getId()+", "+rs.getString("PLATFORM"));
+							String	platform	= rs.getString("PLATFORM");
+							if(platform.length()>16)
+							{
+								String pre	= rs.getString("PLATFORM").substring(0, 13);
+								if(pi.getId().indexOf(pre)==-1)
+								{
+									pi.setId(pi.getId()+", "+pre+"...");									
+								}
+							}
+							else
+							{
+								pi.setId(pi.getId()+", "+platform);
+							}
+							
 							if(pi.getConnectDate()==null || rs.getTimestamp("CONTIME")!=null && rs.getTimestamp("CONTIME").getTime()>pi.getConnectDate().getTime())
 							{
 								pi.setConnectDate(rs.getTimestamp("CONTIME"));
@@ -622,7 +758,122 @@ public class StatsDB
 				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
 			}
 		}
+		System.out.println("took b: "+((System.nanoTime()-start)/1000000)+" ms");
 		return ret.toArray(new PlatformInfo[ret.size()]);
+	}
+
+	/**
+	 *  Write platform infos as JSON to the provided output stream. 
+	 *  Cumulated per ip/platform to use for display (sorted by recency, newest first).
+	 *  @param limit	Limit the number of results (-1 for no limit);
+	 */
+	public void	writePlatformInfos(OutputStream out, int limit)
+	{
+		if(con!=null)
+		{
+			ResultSet	rs	= null;
+			try
+			{
+				rs	= con.createStatement().executeQuery(
+					"select max(id) as ID, prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
+					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
+					+"from relay.platforminfo "
+					+"group by hostip, prefix order by CONTIME desc");
+				
+				out.write("{\"data\":[".getBytes("UTF-8"));
+				
+				for(int i=0; rs.next() && (limit==-1 || i<limit); i++)
+				{
+					if(i==0)
+					{
+						out.write("[\"".getBytes("UTF-8"));
+					}
+					else
+					{
+						out.write(",[\"".getBytes("UTF-8"));
+					}
+					out.write(rs.getString("PLATFORM").getBytes("UTF-8"));
+					out.write("\",\"".getBytes("UTF-8"));
+					out.write(rs.getString("HOSTIP").getBytes("UTF-8"));
+					out.write("\",\"".getBytes("UTF-8"));
+					out.write(PlatformInfo.TIME_FORMAT_LONG.get().format(rs.getTimestamp("CONTIME")).getBytes("UTF-8"));
+					out.write("\",\"".getBytes("UTF-8"));
+					out.write(PlatformInfo.TIME_FORMAT_LONG.get().format(rs.getTimestamp("DISTIME")).getBytes("UTF-8"));
+					out.write("\",\"".getBytes("UTF-8"));
+					out.write(Integer.toString(rs.getInt("MSGS")).getBytes("UTF-8"));
+					out.write("\"]".getBytes("UTF-8"));
+				}
+				rs.close();
+				
+				out.write("]}".getBytes("UTF-8"));
+
+			}
+			catch(Exception e)
+			{
+				if(rs!=null)
+				{
+					try
+					{
+						rs.close();
+					}
+					catch(SQLException sqle)
+					{
+						// ignore
+					}
+				}
+				e.printStackTrace();
+				// Ignore errors and let relay work without stats.
+				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
+			}
+		}
+	}
+
+	/**
+	 *  Get the latest id for a peer.
+	 *  Only considers completed (immutable platform infos), i.e., that have a disconnection time set.
+	 *  @return The latest id or 0 if no entry for that peer or -1 in case of db error.
+	 */
+	public synchronized int	getLatestEntry(String peerid)
+	{
+		int	ret;
+		
+		if(latest.containsKey(peerid))
+		{
+			ret	= latest.get(peerid).intValue();
+		}
+		else
+		{
+			try
+			{
+				if(getlatest==null)
+				{
+					getlatest	= con.prepareStatement("SELECT MAX(ID) FROM relay.platforminfo"
+						+ " WHERE PEER=? and DISTIME IS NOT NULL");
+				}
+				
+				getlatest.setString(1, peerid);
+				ResultSet	rs	= getlatest.executeQuery();
+				if(rs.next())
+				{
+					ret	= rs.getInt(1);
+				}
+				else
+				{
+					ret	= 0;
+				}
+				rs.close();
+				
+				latest.put(peerid, new Integer(ret));
+			}
+			catch(Exception e)
+			{
+				// Ignore errors and let relay work without stats.
+				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
+				ret	= -1;
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -648,7 +899,7 @@ public class StatsDB
 	 */
 	protected void	migrateFrom(StatsDB old)
 	{
-		Iterator<PlatformInfo>	infos	= old.getAllPlatformInfos();
+		Iterator<PlatformInfo>	infos	= old.getAllPlatformInfos(true);
 		while(infos.hasNext())
 		{
 			PlatformInfo	info	= infos.next();
@@ -656,7 +907,6 @@ public class StatsDB
 			save(info);
 		}
 	}
-	
 	
 	//-------- main for testing --------
 	
@@ -716,9 +966,14 @@ public class StatsDB
 	//		pi.addMessage(123, 456);
 	//		
 	//		pi.disconnect();
-			printPlatformInfos(db.getPlatformInfos(-1, -1, -1));
+			
+			System.out.println("Latest: "+db.getLatestEntry("test"));
 			System.out.println("---");
-			printPlatformInfos(db.getAllPlatformInfos());
+			
+			printPlatformInfos(db.getPlatformInfos(-1));
+			System.out.println("---");
+			
+			printPlatformInfos(db.getAllPlatformInfos(false));
 			
 			Statement	stmt	= db.con.createStatement();
 			printResultSet(stmt.executeQuery("select * from relay.platforminfo"));
@@ -768,6 +1023,23 @@ public class StatsDB
 				System.out.print(rs.getMetaData().getColumnName(i)+": "+rs.getString(i)+", ");
 			}
 			System.out.println();
+		}		
+	}
+	
+	/**
+	 *  Print out the contents of a result set.
+	 */
+	protected static void	logResultSet(ResultSet rs) throws Exception
+	{
+		while(rs.next())
+		{
+			int	cnt	= rs.getMetaData().getColumnCount();
+			String	col	= "";
+			for(int i=1; i<=cnt; i++)
+			{
+				col	+= rs.getMetaData().getColumnName(i)+": "+rs.getString(i)+", ";
+			}
+			RelayHandler.getLogger().info(col);
 		}		
 	}
 }

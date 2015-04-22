@@ -2,10 +2,13 @@ package jadex.bridge;
 
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.future.IFunctionalExceptionListener;
+import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
+import jadex.commons.future.SResultListener;
 
 import java.util.logging.Logger;
 
@@ -38,7 +41,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	public ComponentResultListener(IResultListener<E> listener, IInternalAccess component)
 	{
 		if(listener==null)
-			throw new NullPointerException("Listener must not null.");
+			throw new NullPointerException("Listener must not be null.");
 		this.listener = listener;
 		this.component = component;
 	}
@@ -51,9 +54,60 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	public ComponentResultListener(IResultListener<E> listener, IExternalAccess access)
 	{
 		if(listener==null)
-			throw new NullPointerException("Listener must not null.");
+			throw new NullPointerException("Listener must not be null.");
 		this.listener = listener;
 		this.access = access;
+	}
+	
+	/**
+	 * Create a new component result listener.
+	 * 
+	 * @param listener The functional listener.
+	 * @param exceptionListener The functional exception listener. Maybe
+	 *        <code>null</code>, which will lead to default exception logging.
+	 * @param access External access of the component to schedule the listener
+	 *        methods on.
+	 */
+	public ComponentResultListener(final IFunctionalResultListener<E> listener, final IFunctionalExceptionListener exceptionListener, IExternalAccess access)
+	{
+		if(listener == null)
+		{
+			throw new NullPointerException("Listener must not be null.");
+		}
+		if(exceptionListener != null)
+		{
+			this.listener = SResultListener.createResultListener(listener, exceptionListener);
+		}
+		else
+		{
+			this.listener = SResultListener.createResultListener(listener);
+		}
+		this.access = access;
+	}
+
+	/**
+	 * Create a new component result listener.
+	 * 
+	 * @param listener The functional listener.
+	 * @param exceptionListener The functional exception listener. Maybe
+	 *        <code>null</code>, which will lead to default exception logging.
+	 * @param adapter The adapter. to schedule the listener methods on.
+	 */
+	public ComponentResultListener(final IFunctionalResultListener<E> listener, final IFunctionalExceptionListener exceptionListener, IInternalAccess component)
+	{
+		if(listener == null)
+		{
+			throw new NullPointerException("Listener must not be null.");
+		}
+		if(exceptionListener != null)
+		{
+			this.listener = SResultListener.createResultListener(listener, exceptionListener);
+		}
+		else
+		{
+			this.listener = SResultListener.createResultListener(listener);
+		}
+		this.component = component;
 	}
 	
 	//-------- methods --------

@@ -10,6 +10,7 @@ import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -28,10 +29,10 @@ public class BasicService extends ExternalFeatureProvider implements IInternalSe
 	//-------- constants --------
 
 	/** Constant for remote default timeout. */
-	private static long DEFAULT_REMOTE = 30000;
+	private static long DEFAULT_REMOTE = SReflect.isAndroid() ? 60000 : 30000;;
 
 	/** Constant for local default timeout. */
-	private static long DEFAULT_LOCAL = 30000;
+	private static long DEFAULT_LOCAL = SReflect.isAndroid() ? 60000 : 30000;
 
 	
 	static

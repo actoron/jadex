@@ -20,6 +20,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
@@ -32,6 +33,7 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -39,6 +41,11 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.ThreadSuspendable;
+import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -67,6 +74,7 @@ import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Logger;
 
 /**
  *  Library service for loading classpath elements.
@@ -962,8 +970,11 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 
 		// http://tools.ietf.org/html/rfc3548#section-4 for local storage of hashed resources
 		String	name	= rid.getGlobalIdentifier().getResourceId().substring(2).replace('+', '-').replace('/', '_') + ".jar";
-		
-		return new File(SUtil.JADEXDIR, "resources/"+name);
+		IContextService localService = SServiceProvider.getLocalService(component.getExternalAccess().getServiceProvider(), IContextService.class);
+		// use contextService to get private data dir on android
+		IFuture<File> future = localService.getFile(SUtil.JADEXDIR + "resources/"+name);
+		File file = future.get();
+		return file;
 	}
 	
 	/**

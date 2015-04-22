@@ -4,10 +4,13 @@
 package jadex.commons.gui.future;
 
 import jadex.commons.SReflect;
+import jadex.commons.future.IFunctionalExceptionListener;
+import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -29,6 +32,61 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	
 	//-------- constructors --------
 
+	/**
+	 * Create a new listener with functional interfaces.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 */
+	public SwingIntermediateResultListener(final IFunctionalResultListener<E> intermediateListener)
+	{
+		this(intermediateListener, null);
+	}
+	
+	/**
+	 * Create a new listener with functional interfaces.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive.
+	 */
+	public SwingIntermediateResultListener(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener)
+	{
+		this(intermediateListener, finishedListener, null);
+	}
+	
+	/**
+	 * Create a new listener with functional interfaces.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive.
+	 * @param exceptionListener The listener that is called on exceptions.
+	 */
+	public SwingIntermediateResultListener(final IFunctionalResultListener<E> intermediateListener, final IFunctionalResultListener<Void> finishedListener, final IFunctionalExceptionListener exceptionListener)
+	{
+		this(new IntermediateDefaultResultListener<E>()
+		{
+			public void intermediateResultAvailable(E result)
+			{
+				intermediateListener.resultAvailable(result);
+			}
+			public void finished()
+			{
+				if (finishedListener != null) {
+					finishedListener.resultAvailable(null);
+				}
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				if (exceptionListener != null) {
+					exceptionListener.exceptionOccurred(exception);
+				} else {
+					super.exceptionOccurred(exception);
+				}
+			}
+		});
+	}
+	
 	/**
 	 *  Create a new listener.
 	 */

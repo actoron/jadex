@@ -131,7 +131,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				callService(cid, testno, BasicService.getScaledLocalDefaultTimeout(1.0/6)).addResultListener(new DelegationResultListener<TestReport>(ret));
+				callService(cid, testno, 5000).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)

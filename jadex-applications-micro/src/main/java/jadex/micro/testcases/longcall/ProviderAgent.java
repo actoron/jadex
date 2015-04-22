@@ -122,7 +122,7 @@ public class ProviderAgent implements ITestService
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				System.out.println("done waiting: "+System.currentTimeMillis());
+				System.out.println("done waiting: "+System.currentTimeMillis());
 				ret.setResultIfUndone(null);
 				return IFuture.DONE;
 			}

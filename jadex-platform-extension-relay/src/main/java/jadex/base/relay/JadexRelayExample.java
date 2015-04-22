@@ -6,15 +6,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.Random;
 
 
 /**
- *  Example showing how to connect to Jadex relay server.
+ *  Example showing how to connect to Jadex relay server using pure Java only
+ *  (no Jadex jars required).
+ *  It is recommended using the helper methods of RelayConnectionManager instead. 
  */
 public class JadexRelayExample
 {
+	//-------- example code below --------
+	
 	/**
 	 *  Main method for testing.
 	 */
@@ -23,7 +26,7 @@ public class JadexRelayExample
 		// Create a random id, which is used for sending message to.
 		String	id	= "RelayExample_"+new Random().nextInt(1000);
 		
-		// Connect to server.
+		// Connect to server (starts receiver thread in background).
 		connect(id);
 		
 		// Send a message to self.
@@ -53,9 +56,10 @@ public class JadexRelayExample
 		}
 	}
 	
+	//-------- helper code below (need not be touched) --------
+	
 	/** The relay server address. */
-//	public static final String	ADDRESS	= "http://jadex.informatik.uni-hamburg.de/relay/";
-	public static final String	ADDRESS	= "http://localhost/";
+	public static final String	ADDRESS	= "http://www.activecomponents.org/relay/";
 	
 	/** The default message type: followed by length (int as 4 bytes) and arbitrary message content from some sender. */
 	public static final byte	MSGTYPE_DEFAULT	= 1;

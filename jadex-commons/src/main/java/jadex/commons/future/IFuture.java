@@ -74,4 +74,25 @@ public interface IFuture<E>
 	 *  @param listener The listener.
 	 */
 	public void addResultListener(IResultListener<E> listener);
+	
+	/**
+	 * Add an functional result listener, which is only called on success.
+	 * Exceptions will be handled by DefaultResultListener.
+	 * 
+	 * @param listener The listener.
+	 */
+	public void addResultListener(IFunctionalResultListener<E> listener);
+
+	/**
+	 * Add a result listener by combining an OnSuccessListener and an
+	 * OnExceptionListener.
+	 * 
+	 * @param sucListener The listener that is called on success.
+	 * @param exListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
+	 */
+	public void addResultListener(IFunctionalResultListener<E> sucListener, IFunctionalExceptionListener exListener);
+
+
+
 }

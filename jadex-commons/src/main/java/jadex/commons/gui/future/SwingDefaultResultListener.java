@@ -2,6 +2,8 @@ package jadex.commons.gui.future;
 
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFunctionalExceptionListener;
+import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.gui.SGUI;
 
@@ -13,15 +15,57 @@ import javax.swing.SwingUtilities;
 /**
  *  Result listener that redirects callbacks on the swing thread.
  */
-public abstract class SwingDefaultResultListener<E> extends DefaultResultListener<E>	implements IFutureCommandResultListener<E>
+public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	implements IFutureCommandResultListener<E>
 {
 	//-------- attributes --------
 	
 	/** The component. */
 	protected Component parent;
 	
+	/** Custom result listener */
+	protected IFunctionalResultListener<E>	customResultListener;
+	
+	/** Custom result listener */
+	protected IFunctionalExceptionListener	customExceptionListener;
+	
 	//-------- constructors --------
 	
+	/**
+	 * Create a new listener with functional interfaces.
+	 * 
+	 * @param listener The listener.
+	 */
+	public SwingDefaultResultListener(IFunctionalResultListener<E> customResultListener)
+	{
+		this(customResultListener, null);
+	}
+
+	/**
+	 * Create a new listener with functional interfaces.
+	 * 
+	 * @param customResultListener The custom result listener.
+	 * @param customExceptionListener The listener that is called on exceptions.
+	 */
+	public SwingDefaultResultListener(IFunctionalResultListener<E> customResultListener, IFunctionalExceptionListener customExceptionListener)
+	{
+		this(customResultListener, customExceptionListener, null);
+	}
+
+	/**
+	 * Create a new listener with functional interfaces.
+	 * 
+	 * @param customResultListener The custom result listener.
+	 * @param customExceptionListener The listener that is called on exceptions.
+	 * @param parent The parent component (when errors should be shown as
+	 *        dialog).
+	 */
+	public SwingDefaultResultListener(IFunctionalResultListener<E> customResultListener, IFunctionalExceptionListener customExceptionListener, Component parent)
+	{
+		this(parent);
+		this.customResultListener = customResultListener;
+		this.customExceptionListener = customExceptionListener;
+	}
+
 	/**
 	 *  Create a new listener.
 	 */
@@ -108,7 +152,11 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public abstract void customResultAvailable(E result);
+	public void customResultAvailable(E result) {
+		if (customResultListener != null) {
+			customResultListener.resultAvailable(result);
+		}
+	}
 	
 	/**
 	 *  Called when an exception occurred.
@@ -116,15 +164,19 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 	 */
 	public void customExceptionOccurred(Exception exception)
 	{
-		if(parent!=null)
-		{
-			SGUI.showError(parent, "Problem Occurred", "A problem occurred while performing the requested action: "
-					+SReflect.getInnerClassName(exception.getClass())+" "+exception.getMessage(), exception);
-//			exception.printStackTrace();
-		}
-		else
-		{
-			super.exceptionOccurred(exception);
+		if (customExceptionListener != null) {
+			customExceptionListener.exceptionOccurred(exception);
+		} else {
+			if(parent!=null)
+			{
+				SGUI.showError(parent, "Problem Occurred", "A problem occurred while performing the requested action: "
+						+SReflect.getInnerClassName(exception.getClass())+" "+exception.getMessage(), exception);
+	//			exception.printStackTrace();
+			}
+			else
+			{
+				super.exceptionOccurred(exception);
+			}
 		}
 	}
 

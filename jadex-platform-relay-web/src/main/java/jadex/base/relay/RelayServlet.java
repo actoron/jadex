@@ -73,8 +73,16 @@ public class RelayServlet extends HttpServlet
 		if("/ping".equals(request.getServletPath()))
 		{
 			// somebody is checking, if the server is available, just return an empty http ok.
+			
+			// ..or disable platform connection
+			if(handler.getSettings().isNoConnections())
+			{
+				// Set content length to avoid error page being sent.
+				response.setStatus(403);
+				response.setContentLength(0);
+			}
 		}
-		else if(request.getServletPath().startsWith("/resources"))
+		else if(request.getServletPath().startsWith("/resources") || request.getServletPath().equals("/robots.txt"))
 		{
 			// serve images etc. (hack? url mapping doesn't support excludes and we want the relay servlet to react to the wepapp root url.
 			serveResource(request, response);
@@ -90,13 +98,11 @@ public class RelayServlet extends HttpServlet
 			// Render status page.
 			if(id==null)
 			{
-				String	view;
+				String	view	= null;
 				// todo: add request property
 				if("/history".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
-					int	cnt	= 20;
-					int	startid	= -1;
-					int	endid	= -1;
+					int	cnt	= -1;	// 20
 					try
 					{
 						cnt	= Integer.parseInt(request.getParameter("cnt"));
@@ -104,39 +110,76 @@ public class RelayServlet extends HttpServlet
 					catch(RuntimeException e)
 					{
 					}
-					try
-					{
-						startid	= Integer.parseInt(request.getParameter("startid"));
-					}
-					catch(RuntimeException e)
-					{
-					}
-					try
-					{
-						endid	= Integer.parseInt(request.getParameter("endid"));
-					}
-					catch(RuntimeException e)
-					{
-					}
-					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(cnt, startid, endid));
+					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(cnt));
 					view	= "/WEB-INF/jsp/history.jsp";
+				}
+				else if("/history.json".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
+				{
+					int	cnt	= -1;
+					try
+					{
+						cnt	= Integer.parseInt(request.getParameter("cnt"));
+					}
+					catch(RuntimeException e)
+					{
+					}
+					
+					handler.getStatisticsDB().writePlatformInfos(response.getOutputStream(), cnt);
 				}
 				else if("/history_all".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
-					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(-1, -1, -1));
+					request.setAttribute("platforms", handler.getStatisticsDB().getPlatformInfos(-1));
 					view	= "/WEB-INF/jsp/history.jsp";
 				}
 				else if("/export".equals(request.getServletPath()) && handler.getStatisticsDB()!=null)
 				{
-					request.setAttribute("platforms", handler.getStatisticsDB().getAllPlatformInfos());
+					// Todo: properties
+					request.setAttribute("platforms", handler.getStatisticsDB().getAllPlatformInfos(false));
 					view	= "/WEB-INF/jsp/csv.jsp";
+				}
+				else if("/sync".equals(request.getServletPath()))
+				{
+					String	peerid	= request.getParameter("peerid");
+					String	sstartid	= request.getParameter("startid");
+					String	scnt	= request.getParameter("cnt");
+					int	startid	= -1;
+					int	cnt	= -1;
+					try
+					{
+						startid	= Integer.valueOf(sstartid);
+						cnt	= Integer.valueOf(scnt);
+						response.setHeader("Content-Disposition", "attachment; filename=relay_dbentries.ser");
+						handler.handleSyncRequest(peerid, startid, cnt, response.getOutputStream());
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+						// Set content length to avoid error page being sent.
+						response.setStatus(400);
+						response.setContentLength(0);
+					}
 				}
 				else if("/servers".equals(request.getServletPath()))
 				{
 					String	requesturl	= request.getRequestURL().toString();
 					String	peerurl	= request.getParameter("peerurl");
+					String	peerid	= request.getParameter("peerid");
+					String	sdbstate	= request.getParameter("peerstate");
 					String	initial	= request.getParameter("initial");
-					String	serverurls	= handler.handleServersRequest(requesturl, peerurl, "true".equals(initial));
+					
+					int	dbstate	= -1;
+					if(sdbstate!=null)
+					{
+						try
+						{
+							dbstate	= Integer.valueOf(sdbstate);
+						}
+						catch(NumberFormatException e)
+						{
+						}
+					}
+					
+					String	serverurls	= handler.handleServersRequest(requesturl, peerurl, peerid, dbstate, "true".equals(initial));
 					request.setAttribute("peers", serverurls);					
 					view	= "/WEB-INF/jsp/servers.jsp";
 				}
@@ -146,12 +189,16 @@ public class RelayServlet extends HttpServlet
 					infos.addAll(Arrays.asList(handler.getCurrentPlatforms()));
 					request.setAttribute("platforms", infos.toArray(new PlatformInfo[0]));
 					request.setAttribute("peers", handler.getCurrentPeers());
-					request.setAttribute("url", "".equals(handler.getUrl()) ? request.getRequestURL().toString() : handler.getUrl());
+					request.setAttribute("url", handler.getSettings().isUrlSpecified() ? handler.getSettings().getUrl() : request.getRequestURL().toString());
 					request.setAttribute("refresh", "30");
 					view	= "/WEB-INF/jsp/status.jsp";
 				}
-				RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
-				rd.forward(request, response);
+				
+				if(view!=null)
+				{
+					RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
+					rd.forward(request, response);
+				}
 			}
 			
 			// Handle platform connection.
@@ -278,7 +325,7 @@ public class RelayServlet extends HttpServlet
 		cnt = addMarkers(infos, markers, colors, positions, cnt);
 
 		// Add markers for remotely connected platforms
-		PeerEntry[]	peers	= handler.getCurrentPeers();
+		PeerHandler[]	peers	= handler.getCurrentPeers();
 		if(peers.length>0)
 		{
 			for(int j=0; j<peers.length && markers.length()+250<2048; j++)	// hack!!! make sure url length stays below 2048 character limit. 

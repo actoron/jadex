@@ -4,7 +4,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.HttpConnectionManager;
 import jadex.commons.SUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
@@ -48,12 +50,12 @@ public class RelayConnectionManager	extends HttpConnectionManager
 			con	= openConnection(address + "ping");
 			con.connect();
 			int	code	= con.getResponseCode();
-			if(code!=HttpURLConnection.HTTP_OK)
-				throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
 			while(con.getInputStream().read(RESPONSE_BUF)!=-1)
 			{
 			}
 			con.getInputStream().close();
+			if(code!=HttpURLConnection.HTTP_OK)
+				throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
 		}
 		finally
 		{
@@ -105,18 +107,20 @@ public class RelayConnectionManager	extends HttpConnectionManager
 	 */
 	public String	getServers(String address)	throws IOException
 	{
-		return getPeerServers(address, null, false);
+		return getPeerServers(address, null, null, 0, false);
 	}
 
 	/**
 	 *  Get known servers from a peer server.
 	 *  @param peeraddress	The remote server address.
-	 *  @param ownaddress	The local server address supplied for mutual connection (may be null if not connecting to peer).
-	 *  @param initial	True, when peer connects initially (only sent when ownaddress!=null).
+	 *  @param ownaddress	The local server address supplied for mutual connection (set to null if not connecting to peer).
+	 *  @param ownid	The local peer id supplied for history db synchronization (not used if not connecting to peer).
+	 *  @param peerstate	Contains id of the latest history entry of that peer to enable synchronization (not used if not connecting to peer).
+	 *  @param initial	True, when peer connects initially (not used if not connecting to peer).
 	 *  @return The comma separated server list.
 	 *  @throws IOException on connection failures
 	 */
-	public String	getPeerServers(String peeraddress, String ownaddress, boolean initial)	throws IOException
+	public String	getPeerServers(String peeraddress, String ownaddress, String ownid, int dbstate, boolean initial)	throws IOException
 	{
 		String	ret;
 		HttpURLConnection	con	= null;
@@ -125,7 +129,7 @@ public class RelayConnectionManager	extends HttpConnectionManager
 		try
 		{
 			con	= openConnection(peeraddress+"servers"
-				+(ownaddress!=null ? "?peerurl="+URLEncoder.encode(ownaddress, "UTF-8")+"&initial="+initial : ""));
+				+(ownaddress!=null ? "?peerurl="+URLEncoder.encode(ownaddress, "UTF-8")+"&initial="+initial+"&peerid="+ownid+"&peerstate="+dbstate : ""));
 			if(con.getContentType()!=null && con.getContentType().startsWith("text/plain"))
 			{
 				ret	= new Scanner(con.getInputStream(), "UTF-8").useDelimiter("\\A").next();
@@ -209,6 +213,40 @@ public class RelayConnectionManager	extends HttpConnectionManager
 		}
 	}
 	
+	public byte[] getDBEntries(String peeraddress, String peerid, int startid, int cnt)	throws IOException
+	{
+		byte[]	ret;
+		HttpURLConnection	con	= null;
+		peeraddress	= httpAddress(peeraddress);
+		try
+		{
+			con	= openConnection(peeraddress+"sync"
+				+ "?peerid="+URLEncoder.encode(peerid, "UTF-8")
+				+ "&startid="+startid
+				+ "&cnt="+cnt);
+			
+			InputStream	is	= con.getInputStream();
+			ByteArrayOutputStream	baos = new ByteArrayOutputStream();
+			int	read;
+			byte[]	buf	= new byte[8192];
+			while((read=is.read(buf))!=-1)
+			{
+				baos.write(buf, 0, read);
+			}
+			baos.flush();
+			ret	= baos.toByteArray();
+		}
+		finally
+		{
+			if(con!=null)
+			{
+				remove(con);
+			}
+		}
+		return ret;
+	}
+
+	
 	//-------- helper methods --------
 	
 	/**
@@ -261,5 +299,13 @@ public class RelayConnectionManager	extends HttpConnectionManager
 			address	= "relay-https://" + address.substring(13);
 		}
 		return address;
+	}
+	
+	/**
+	 *  Test if two addresses refer to the same server.
+	 */
+	public static boolean	isSameServer(String address1, String address2)
+	{
+		return secureAddress(httpAddress(address1)).equals(secureAddress(httpAddress(address2)));
 	}
 }

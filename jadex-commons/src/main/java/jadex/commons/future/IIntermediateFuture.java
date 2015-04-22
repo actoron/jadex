@@ -64,4 +64,42 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 //     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
 //     */
 //    public E getNextIntermediateResult(ISuspendable sus);
+    
+    /**
+	 * Add a result listener.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 */
+	public void addIntermediateResultListener(IIntermediateResultListener<E> intermediateListener);
+    
+	/**
+	 * Add a functional result listener, which called on intermediate results.
+	 * Exceptions will be logged.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 */
+	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener);
+    
+	/**
+	 * Add a functional result listener, which called on intermediate results.
+	 * Exceptions will be logged.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive. If <code>null</code>, the finish
+	 *        event will be ignored.
+	 */
+	public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener);
+    
+	/**
+	 * Add a functional result listener, which called on intermediate results.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param finishedListener The finished listener, called when no more
+	 *        intermediate results will arrive. If <code>null</code>, the finish
+	 *        event will be ignored.
+	 * @param exListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
+	 */
+    public void addIntermediateResultListener(IFunctionalResultListener<E> intermediateListener, IFunctionalResultListener<Void> finishedListener, IFunctionalExceptionListener exceptionListener);
 }

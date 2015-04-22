@@ -465,10 +465,35 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 			}
 		}
 	}
+
 	
+	/**
+	 * Add an functional result listener, which is only called on success.
+	 * Exceptions will be handled by DefaultResultListener.
+	 * 
+	 * @param listener The listener.
+	 */
+	public void addResultListener(IFunctionalResultListener<E> sucListener)
+	{
+		addResultListener(sucListener, null);
+	}
+
+	/**
+	 * Add a result listener by combining an OnSuccessListener and an
+	 * OnExceptionListener.
+	 * 
+	 * @param sucListener The listener that is called on success.
+	 * @param exListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
+	 */
+	public void addResultListener(IFunctionalResultListener<E> sucListener, IFunctionalExceptionListener exListener)
+	{
+		addResultListener(SResultListener.createResultListener(sucListener, exListener));
+	}
+
     /**
      *  Add a result listener.
-     *  @param listsner The listener.
+     *  @param listener The listener.
      */
     public void	addResultListener(IResultListener<E> listener)
     {
