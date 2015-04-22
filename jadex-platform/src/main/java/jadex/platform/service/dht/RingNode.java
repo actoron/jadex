@@ -4,13 +4,18 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.dht.IDebugRingNode;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IRingNode;
+import jadex.commons.DebugException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -25,11 +30,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service
-public class RingNode implements IRingNode
+public class RingNode implements IRingNode, IDebugRingNode
 {
 	protected static final long	FIX_DELAY	= 10000;
 
 	protected static final long	STABILIZE_DELAY	= 5000;
+
+	private static final long	REMOTE_TIMEOUT	= 2000;
+	
+//	private static final long	REMOTE_LONG_TIMEOUT	= REMOTE_TIMEOUT * 2;
+
+	private State state = State.UNJOINED;
+	
+	enum State {
+		JOINED, UNJOINED
+	}
 
 	/** The agent. */
 	@ServiceComponent
@@ -49,16 +64,23 @@ public class RingNode implements IRingNode
 //		logger.addHandler(new ConsoleHandler() {
 //			
 //		});
+		
+		logger.log(Level.INFO, "created ringnode");
 	}
 	
 	@ServiceStart
 	public void onStart() {
+		if (this.myId != null) {
+			return;
+		}
 		init(ID.get(agent.getComponentIdentifier()));
 		
 		log("Started ringnode");
 		
-		IComponentStep<Void> step = new IComponentStep<Void>()
+		IComponentStep<Void> searchStep = new IComponentStep<Void>()
 		{
+			
+			IComponentStep<Void> thisStep = this;
 
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -68,20 +90,16 @@ public class RingNode implements IRingNode
 				
 				requiredServices.addResultListener(new IntermediateDefaultResultListener<Object>()
 				{
-					List<IRingNode> currentStores = new ArrayList<IRingNode>();
-					
 					boolean join = false;
 					
 					@Override
 					public void intermediateResultAvailable(Object result)
 					{
 						IRingNode other = (IRingNode)result;
-						final IComponentIdentifier cid = ((IService)result).getServiceIdentifier().getProviderId();
-						currentStores.add(other);
+//						final IComponentIdentifier cid = ((IService)result).getServiceIdentifier().getProviderId();
 						if (!join) {
 							if (!other.getId().get().equals(myId)) {
-								join(other);
-								join = true;
+								join = join(other).get(REMOTE_TIMEOUT);
 							}
 						}
 					}
@@ -90,8 +108,10 @@ public class RingNode implements IRingNode
 					public void finished()
 					{
 						log("finish");
-						if (!join) {
-							join(null);
+						if (!join && state != State.JOINED) {
+//							join(null);
+							// re-schedule search
+							agent.getExternalAccess().scheduleStep(thisStep, FIX_DELAY);
 						}
 						super.finished();
 					}
@@ -108,14 +128,12 @@ public class RingNode implements IRingNode
 			}
 		};
 		
-		agent.getExternalAccess().scheduleStep(step).addResultListener(new DefaultResultListener<Void>()
+		agent.getExternalAccess().scheduleStep(searchStep).addResultListener(new DefaultResultListener<Void>()
 		{
 
 			@Override
 			public void resultAvailable(Void result)
 			{
-				agent.getExternalAccess().scheduleStep(fixStep, FIX_DELAY);
-				agent.getExternalAccess().scheduleStep(stabilizeStep, STABILIZE_DELAY);
 			}
 		});
 	}
@@ -123,10 +141,10 @@ public class RingNode implements IRingNode
 	void init(IID id)
 	{
 		this.myId = id;
-		finger = new Fingertable(this);
+		IRingNode me = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IRingNode.class);
+		
+		finger = new Fingertable(((IService) me).getServiceIdentifier(), myId, this);
 	}
-	
-	
 	
 	@Override
 	public IFuture<IID> getId()
@@ -134,47 +152,85 @@ public class RingNode implements IRingNode
 		return new Future<IID>(myId);
 	}
 	
-	public IFuture<IRingNode> findSuccessor(IID id) {
+	public IFuture<IFinger> findSuccessor(IID id) {
+		final Future<IFinger> ret = new Future<IFinger>();
 //		log("findSuccessor for: " + id);		
-		IRingNode nDash = findPredecessor(id);
+		final IFinger nDash = findPredecessor(id).get();
 //		IRingNode suc = nDash.findSuccessor(id).get();
-		return nDash.getSuccessor();
+		getRingService(nDash).addResultListener(new MyResultListener<IRingNode>(nDash, ret, null)
+		{
+
+			@Override
+			public void resultAvailable(IRingNode result)
+			{
+				result.getSuccessor().addResultListener(new MyResultListener<IFinger>(nDash, ret, null)
+				{
+
+					@Override
+					public void resultAvailable(IFinger result)
+					{
+						ret.setResult(result);
+					}
+				});
+			}
+		});
+		return ret;
 	}
 	
-	protected IRingNode findPredecessor(IID id)
+	protected IFuture<IFinger> findPredecessor(IID id)
 	{
+		Future<IFinger> ret = new Future<IFinger>();
 //		log("findPredecessor for: " + id);
-		IRingNode nDash = this;
-		while (!id.isInInterval(ID.get(nDash), ID.get(nDash.getSuccessor().get()), false, true)) {
-//			log("findPredecessor while loop id " + id + " not in interval: " + ID.get(nDash) + " , " + (ID.get(nDash.getSuccessor().get())));
-			nDash = nDash.getClosestPrecedingFinger(id).get();
+		IFinger nDash = finger.getSelf();
+		
+		IRingNode nDashRing = getRingService(nDash).get(REMOTE_TIMEOUT);
+		
+		IFinger firstSuc = nDashRing.getSuccessor().get();
+		
+//		System.out.println("Got successor: " + firstSuc);
+		
+		// TODO: NPE here:
+		while (!id.isInInterval(nDash.getNodeId(), nDashRing.getSuccessor().get(REMOTE_TIMEOUT).getNodeId(), false, true)) {
+			nDash = nDashRing.getClosestPrecedingFinger(id).get(REMOTE_TIMEOUT);
 			if (nDash == null) {
-				nDash = this;
+				nDash = finger.getSelf();
 				break;
 			}
+			nDashRing = getRingService(nDash).get(REMOTE_TIMEOUT);
 		}
-		return nDash;
+		
+//		while (!id.isInInterval(nDash.getNodeID(), ID.get(nDash.getSuccessor().get(REMOTE_TIMEOUT)), false, true)) {
+//			nDash = nDash.getClosestPrecedingFinger(id).get(REMOTE_TIMEOUT);
+//			if (nDash == null) {
+//				nDash = finger.getSelf();
+//				break;
+//			}
+//		}
+		ret.setResult(nDash);
+		
+		return ret;
 	}
 	
 	@Override
-	public IFuture<IRingNode> getSuccessor()
+	public IFuture<IFinger> getSuccessor()
 	{
-		return new Future<IRingNode>(finger.getSuccessor());
+		return new Future<IFinger>(finger.getSuccessor());
 	}
 	
-	public IFuture<IRingNode> getPredecessor()
+	public IFuture<IFinger> getPredecessor()
 	{
-		return new Future<IRingNode>(finger.getPredecessor());
+		return new Future<IFinger>(finger.getPredecessor());
 	}
 
-	public IFuture<Void> setPredecessor(IRingNode predecessor)
+	public IFuture<Void> setPredecessor(IFinger predecessor)
 	{
 		this.finger.setPredecessor(predecessor);
+		setState(State.JOINED);
 		return Future.DONE;
 	}
 
 	@Override
-	public IFuture<IRingNode> getClosestPrecedingFinger(IID id)
+	public IFuture<IFinger> getClosestPrecedingFinger(IID id)
 	{
 //		log("getClosestPrecedingFinger for " + id);
 		return finger.getClosestPrecedingFinger(id);
@@ -187,7 +243,7 @@ public class RingNode implements IRingNode
 		return new Future<IComponentIdentifier>(this.agent.getComponentIdentifier());
 	}
 
-	protected IFuture<Void> join(IRingNode nDash) {
+	public IFuture<Boolean> join(final IRingNode nDashRing) {
 //		if (nDash != null) {
 //			log("joining " + nDash);
 //			finger.init(nDash);
@@ -197,34 +253,60 @@ public class RingNode implements IRingNode
 //			log("joining (no peers)");
 //			finger.setPredecessor(this);
 //		}
-		final Future<Void> future = new Future<Void>();
+		final Future<Boolean> future = new Future<Boolean>();
 		finger.setPredecessor(null);
-		if (nDash != null) {
-			nDash.findSuccessor(myId).addResultListener(new MyResultListener<IRingNode>(nDash)
-			{
+		if(nDashRing != null)
+		{
+//			getRingService(nDash).addResultListener(new MyResultListener<IRingNode>(nDash, future, Boolean.FALSE)
+//			{
+//				@Override
+//				public void resultAvailable(IRingNode nDashRing)
+//				{
+					nDashRing.findSuccessor(myId).addResultListener(new MyResultListener<IFinger>(new Finger(nDashRing, null), future, Boolean.FALSE)
+					{
 
-				@Override
-				public void resultAvailable(IRingNode suc)
-				{
-					finger.setSuccessor(suc);
-					log("Join complete with successor: " + suc);
-					future.setResult(null);
-				}
-			});
-		} else {
+						@Override
+						public void resultAvailable(IFinger suc)
+						{
+							finger.setSuccessor(suc);
+							log("Join complete with successor: " + suc.getNodeId());
+							setState(State.JOINED);
+							future.setResult(true);
+						}
+					});
+//				}
+//
+//			});
+		}
+		else
+		{
 			log("Join complete without successor.");
-			future.setResult(null);
+			future.setResult(false);
 		}
 		return future;
 	}
 	
 
+	private void setState(State state)
+	{
+		if (state == State.JOINED) {
+			agent.getExternalAccess().scheduleStep(fixStep, FIX_DELAY);
+			agent.getExternalAccess().scheduleStep(stabilizeStep, STABILIZE_DELAY);
+		} else {
+			
+		}
+		this.state = state;
+	}
+
 	@Override
-	public IFuture<Void> notify(IRingNode nDash)
+	/**
+	 * Notifies this node about a possible new predecessor.
+	 */
+	public IFuture<Void> notify(IFinger nDash)
 	{
 		Future<Void> future = new Future<Void>();
-		IRingNode pre = getPredecessor().get();
-		if (pre == null || nDash.getId().get().isInInterval(pre.getId().get(), myId)) {
+		IFinger pre = getPredecessor().get();
+		if (pre == null || nDash.getNodeId().isInInterval(pre.getNodeId(), myId)) {
 			setPredecessor(nDash).addResultListener(new DelegationResultListener<Void>(future));
 		} else {
 			future.setResult(null);
@@ -236,25 +318,83 @@ public class RingNode implements IRingNode
 	 * Informs about new successor relations to this node.
 	 * @return
 	 */
-	protected IFuture<Void> stabilize() {
+	public IFuture<Void> stabilize() {
 		final Future<Void> ret = new Future<Void>();
-		final IRingNode successor = finger.getSuccessor();
-		successor.getPredecessor().addResultListener(new MyResultListener<IRingNode>(successor)
+		final IFinger successor = finger.getSuccessor();
+//		ServiceCall.getOrCreateNextInvocation()
+		if (successor instanceof IService) {
+			Boolean valid = ((IService) successor).isValid().get();
+			if (!valid) {
+				System.out.println("not valid: " + successor.getNodeId());
+			}
+		}
+		getRingService(successor).addResultListener(new MyResultListener<IRingNode>(successor, ret)
 		{
 
 			@Override
-			public void resultAvailable(IRingNode x)
+			public void resultAvailable(final IRingNode successorRing)
 			{
-				if (x != null && x.getId().get().isInInterval(myId, successor.getId().get())) {
-					finger.setSuccessor(x);
+				if (successorRing != null) {
+					IFuture<IFinger> predecessor = successorRing.getPredecessor();
+					predecessor.addResultListener(new MyResultListener<IFinger>(successor, ret)
+					{
+						@Override
+						public void resultAvailable(IFinger x)
+						{
+							if(x != null && x.getNodeId().isInInterval(myId, successor.getNodeId()))
+							// TODO: problem when successor is null
+							{
+								finger.setSuccessor(x);
+							}
+							IFuture<Void> notify = successorRing.notify(finger.getSelf());
+							notify.addResultListener(new MyResultListener<Void>(successor, ret)
+							{
+
+								@Override
+								public void resultAvailable(Void result)
+								{
+									ret.setResult(result);
+								}
+							});
+						}
+					});
+				} else {
+					ret.setResult(null);
 				}
-				successor.notify(RingNode.this).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		return ret;
 	}
 	
-	protected IFuture<Void> fixFingers() {
+	
+	
+	@Override
+	public void disableSchedules()
+	{
+		stabilizeStep = new IComponentStep<Void>()
+		{
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				// TODO Auto-generated method stub
+				return null;
+			}
+		};
+		
+		fixStep = new IComponentStep<Void>()
+		{
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				// TODO Auto-generated method stub
+				return null;
+			}
+		};
+	}
+
+	public IFuture<Void> fixFingers() {
 		return finger.fixFingers();
 	}
 
@@ -269,7 +409,8 @@ public class RingNode implements IRingNode
 	/** Helper methods **/
 	
 	private void log(String message) {
-		logger.log(Level.INFO, myId + ": " + message);
+//		logger.log(Level.INFO, myId + ": " + message);
+		System.out.println(myId + ": " + message);
 	}
 
 	public IFuture<List<IFinger>> getFingers()
@@ -322,16 +463,65 @@ public class RingNode implements IRingNode
 	
 	abstract class MyResultListener<T> implements IResultListener<T> {
 
-		private IRingNode	rn;
+		private IFinger	rn;
+		@SuppressWarnings("rawtypes")
+		private Future	retFuture;
+		private Object retValue = null;
+		
+		private Exception ex = new DebugException();
 
-		public MyResultListener(IRingNode rn)
+		public MyResultListener(IFinger rn, Future<Void> ret)
 		{
 			this.rn = rn;
+			this.retFuture = ret;
 		}
 		
+		public MyResultListener(IFinger rn, Future<?> ret, Object value)
+		{
+			this.rn = rn;
+			this.retFuture = ret;
+			this.retValue = value;
+		}
+		
+		@SuppressWarnings("unchecked")
 		@Override
 		public void exceptionOccurred(Exception exception)
 		{
+			log("exception in Ringnode rpc on node: " + rn.getNodeId());
+			ex.printStackTrace();
+//			exception.printStackTrace();
+			
+			finger.setInvalid(rn);
+//			System.out.println("new fingertable");
+//			System.out.println(finger);
+			IFinger successor = finger.getSuccessor();
+			if (successor.getSid() == null || successor.getSid().equals(finger.getSelf().getSid())) {
+				// no successor :(
+				if (finger.getPredecessor() == null || finger.getPredecessor().getSid() == null) {
+					// and no predecessor, so no connection at all.
+					log("No predecessor.. :(");
+					setState(State.UNJOINED);
+				} else {
+					// will clear up during stabilize
+//					stabilize().get();
+//					findSuccessor(myId).addResultListener(new DefaultResultListener<IFinger>()
+//					{
+//
+//						@Override
+//						public void resultAvailable(IFinger result)
+//						{
+//							System.out.println("Got new successor: " + result);
+//							finger.setSuccessor(result);
+//						}
+//					});
+				}
+				if (retFuture != null) {
+					retFuture.setResult(retValue);
+				}
+			}
+			
+			
+			
 //			final ProxyHolder proxyHolder = proxies.get(id);
 //			if (proxyHolder != null && proxyHolder.spaceObject != null) {
 //				System.out.println("Removing proxy: " + proxyHolder.spaceObject);
@@ -347,12 +537,62 @@ public class RingNode implements IRingNode
 //				});
 //			}
 		}
-		
 	}
+	
+	protected IFuture<IRingNode> getRingService(IFinger finger) {
+		final Future<IRingNode> ret = new Future<IRingNode>();
+		IComponentIdentifier providerId = finger.getSid().getProviderId();
+		
+		IFuture<IRingNode> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRingNode.class, providerId);
+		searchService.addResultListener(new MyResultListener<IRingNode>(finger, ret, null)
+		{
 
+			@Override
+			public void resultAvailable(IRingNode result)
+			{
+				ret.setResult(result);
+			}
+		});
+		return ret;
+	}
+	
+//	protected IFuture<IRingNode> getRingService(final IServiceIdentifier sid) {
+//		final Future<IRingNode> ret = new Future<IRingNode>();
+//		IComponentIdentifier providerId = sid.getProviderId();
+//		
+//		IFuture<IRingNode> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRingNode.class, providerId);
+		
+//		IFuture<Object> getService = SServiceProvider.getService(agent, sid);
+//		searchService.addResultListener(new DefaultResultListener<IRingNode>()
+//		{
+//
+//			@Override
+//			public void resultAvailable(IRingNode result)
+//			{
+//				ret.setResult((IRingNode)result);
+//			}
+//			
+//			@Override
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("could not find service: " + sid + ", i am: " + agent);				
+//				exception.printStackTrace();
+//			}
+//		});
+		
+//		return ret;
+//	}
 
-	public Fingertable getFingerTable()
+	protected Fingertable getFingerTable()
 	{
 		return finger;
 	}
+
+	@Override
+	public IFuture<String> getFingerTableString()
+	{
+		return new Future<String>(finger.toString());
+	}
+	
+	
 }

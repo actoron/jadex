@@ -182,7 +182,7 @@ public class ID implements IID
 		} else {
 			// must be local
 			if (node != null) {
-				result = node.getId().get();
+				result = node.getId().get(2000);
 			} else {
 				throw new Error("node is null, cannot hash");
 			}

@@ -8,6 +8,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IKVStore;
 import jadex.bridge.service.types.dht.IRingNode;
@@ -58,37 +59,30 @@ public class KVStore implements IKVStore
 	public IFuture<IID> publish(final String key, final String value)
 	{
 		final Future<IID> ret = new Future<IID>();
-		ring.findSuccessor(ID.get(key)).addResultListener(new DefaultResultListener<IRingNode>()
+		ring.findSuccessor(ID.get(key)).addResultListener(new DefaultResultListener<IFinger>()
 		{
 
 			@Override
-			public void resultAvailable(IRingNode result)
+			public void resultAvailable(IFinger result)
 			{
-				result.getCID().addResultListener(new DefaultResultListener<IComponentIdentifier>()
-				{
-
-					@Override
-					public void resultAvailable(IComponentIdentifier result)
+				IComponentIdentifier providerId = result.getSid().getProviderId();
+				if (providerId.equals(myCid)) {
+					// use local access
+					storeLocal(key, value).addResultListener(new DelegationResultListener<IID>(ret));
+				} else {
+					// search for remote kvstore service
+					IFuture<IKVStore> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IKVStore.class, providerId.getParent());
+					searchService.addResultListener(new DefaultResultListener<IKVStore>()
 					{
-						if (result.equals(myCid)) {
-							// use local access
-							storeLocal(key, value).addResultListener(new DelegationResultListener<IID>(ret));
-						} else {
-							// search for remote kvstore service
-							IFuture<IKVStore> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IKVStore.class, result.getParent());
-							searchService.addResultListener(new DefaultResultListener<IKVStore>()
-							{
-								@Override
-								public void resultAvailable(IKVStore result)
-								{
-									logger.log(Level.INFO, myId + ": Storing key: " + key + "(hash: " + ID.get(key) + ")" + " in: " + result);
-									IFuture<IID> publish = result.storeLocal(key, value);
-									publish.addResultListener(new DelegationResultListener<IID>(ret));
-								}
-							});
+						@Override
+						public void resultAvailable(IKVStore result)
+						{
+							logger.log(Level.INFO, myId + ": Storing key: " + key + "(hash: " + ID.get(key) + ")" + " in: " + result);
+							IFuture<IID> publish = result.storeLocal(key, value);
+							publish.addResultListener(new DelegationResultListener<IID>(ret));
 						}
-					}
-				});
+					});
+				}
 			}
 		});
 		return ret;
@@ -96,7 +90,7 @@ public class KVStore implements IKVStore
 	
 	public IFuture<IID> storeLocal(String key, String value) {
 		if (!isResponsibleFor(key)) {
-			logger.log(Level.WARNING, myId + ": storeLocal called even if i do not feel responsible for: " + ID.get(key) + ". My successor is " + ring.getSuccessor().get().getId().get());
+			logger.log(Level.WARNING, myId + ": storeLocal called even if i do not feel responsible for: " + ID.get(key) + ". My successor is " + ring.getSuccessor().get().getNodeId());
 		}
 		logger.log(Level.INFO, myId + ": Storing key: " + key + "(hash: " + ID.get(key) +")" + " locally.");
 		kvmap.put(ID.get(key), value);
@@ -109,72 +103,64 @@ public class KVStore implements IKVStore
 	{
 		final Future<String> ret = new Future<String>();
 		final IExecutionFeature execFeature = agent.getComponentFeature(IExecutionFeature.class);
-		ring.findSuccessor(ID.get(key)).addResultListener(new DefaultResultListener<IRingNode>()
+		ring.findSuccessor(ID.get(key)).addResultListener(new DefaultResultListener<IFinger>()
 		{
 
 			@Override
-			public void resultAvailable(IRingNode result)
+			public void resultAvailable(IFinger result)
 			{
 				logger.log(Level.INFO, myId + ": retrieving key: " + key + "(hash: " + ID.get(key) + ")");
-				result.getCID().addResultListener(new DefaultResultListener<IComponentIdentifier>()
+				final IComponentIdentifier providerId = result.getSid().getProviderId();
+				execFeature.scheduleStep(new IComponentStep<String>()
 				{
 
 					@Override
-					public void resultAvailable(final IComponentIdentifier result)
+					public IFuture<String> execute(IInternalAccess ia)
 					{
-						execFeature.scheduleStep(new IComponentStep<String>()
-						{
-
-							@Override
-							public IFuture<String> execute(IInternalAccess ia)
-							{
-								final Future<String> ret = new Future<String>();
-								if (result.equals(myCid)) {
-									// use local access
-									System.out.println(myId + ": retrieving from local map: " + " (hash: " + ID.get(key) +")");
-									if (!isResponsibleFor(key)) {
-										logger.log(Level.WARNING, myId + ": storeLocal called even if i do not feel responsible for: " + ID.get(key) + ". My successor is " + ring.getSuccessor().get().getId().get());
-									}
-									ret.setResult(kvmap.get(ID.get(key)));
+						final Future<String> ret = new Future<String>();
+						if (providerId.equals(myCid)) {
+							// use local access
+							System.out.println(myId + ": retrieving from local map: " + " (hash: " + ID.get(key) +")");
+							if (!isResponsibleFor(key)) {
+								logger.log(Level.WARNING, myId + ": storeLocal called even if i do not feel responsible for: " + ID.get(key) + ". My successor is " + ring.getSuccessor().get().getNodeId());
+							}
+							ret.setResult(kvmap.get(ID.get(key)));
 //									storeLocal(key, value).addResultListener(new DelegationResultListener<ID>(ret));
-								} else {
-									// search for remote kvstore service
-									System.out.println(myId + ": retrieving from remote: " + " (hash: " + ID.get(key) +")");
-									IFuture<IKVStore> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IKVStore.class, result.getParent());
-									searchService.addResultListener(new DefaultResultListener<IKVStore>()
-									{
-										@Override
-										public void resultAvailable(IKVStore result)
-										{
+						} else {
+							// search for remote kvstore service
+							System.out.println(myId + ": retrieving from remote: " + " (hash: " + ID.get(key) +")");
+							IFuture<IKVStore> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IKVStore.class, providerId.getParent());
+							searchService.addResultListener(new DefaultResultListener<IKVStore>()
+							{
+								@Override
+								public void resultAvailable(IKVStore result)
+								{
 //												System.out.println("Found remote kvstore");
-											IFuture<String> string = result.lookup(key);
+									IFuture<String> string = result.lookup(key);
 //												System.out.println("adding listener");
-											string.addResultListener(new DefaultResultListener<String>()
-											{
+									string.addResultListener(new DefaultResultListener<String>()
+									{
 
-												@Override
-												public void resultAvailable(String result)
-												{
+										@Override
+										public void resultAvailable(String result)
+										{
 //														System.out.println("got result: " + result);
-													ret.setResult(result);
-												}
-											});
+											ret.setResult(result);
 										}
 									});
 								}
-								return ret;
-							}
-						}).addResultListener(new DefaultResultListener<String>()
-						{
+							});
+						}
+						return ret;
+					}
+				}).addResultListener(new DefaultResultListener<String>()
+				{
 
-							@Override
-							public void resultAvailable(String result)
-							{
+					@Override
+					public void resultAvailable(String result)
+					{
 //									System.out.println("got result #2: " + result);
-								ret.setResult(result);
-							}
-						});
-						
+						ret.setResult(result);
 					}
 				});
 			}
@@ -185,8 +171,8 @@ public class KVStore implements IKVStore
 
 	private boolean isResponsibleFor(String key)
 	{
-		IRingNode suc = ring.getSuccessor().get();
-		return (suc == null) ? true : (myId.isInInterval(ID.get(key), suc.getId().get(), true, false));
+		IFinger suc = ring.getSuccessor().get();
+		return (suc == null) ? true : (myId.isInInterval(ID.get(key), suc.getNodeId(), true, false));
 	}
 
 	@Override

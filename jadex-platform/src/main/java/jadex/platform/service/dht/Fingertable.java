@@ -1,5 +1,7 @@
 package jadex.platform.service.dht;
 
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IRingNode;
 import jadex.commons.future.CounterResultListener;
@@ -11,37 +13,40 @@ import jadex.commons.future.IResultListener;
 
 public class Fingertable 
 {
-	private RingNode self;
-	
-	private IID selfId;
-	
+	private IFinger selfFinger;
 	protected Finger[]	fingers;
+	private IFinger	predecessor;
+
+	private RingNode	local;
 	
-	private IRingNode	predecessor;
-	
-	public Fingertable(RingNode self)
+	public Fingertable(IServiceIdentifier selfSid, IID selfId, RingNode local)
 	{
-		this.self = self;
-		IID id = self.getId().get();
-		selfId = id;
-		this.fingers = new Finger[id.getLength()];
+		this.local = local;
+		selfFinger = new Finger(selfSid, null, selfId);
+		this.fingers = new Finger[selfId.getLength()];
 		for(int i = 0; i < fingers.length; i++)
 		{
-			fingers[i] = new Finger(self, id.addPowerOfTwo(i));
+			fingers[i] = new Finger(selfSid, selfId.addPowerOfTwo(i), selfId);
 		}
 	}
+	
+	public IFinger getSelf() {
+		return selfFinger;
+	}
 
-	public IRingNode getSuccessor()
+	public IFinger getSuccessor()
 	{
-		return fingers[0].getNode() == null ? self : fingers[0].getNode();
+		IFinger result = fingers[0].getSid() == null ? selfFinger : fingers[0];
+//		System.out.println("returning successor: " + result);
+		return result;
 	}
 	
-	public void setSuccessor(IRingNode node)
+	public void setSuccessor(IFinger node)
 	{
-		fingers[0].setNode(node);
+		fingers[0].set(node);
 	}
 	
-	public IFuture<IRingNode> getClosestPrecedingFinger(IID key)
+	public IFuture<IFinger> getClosestPrecedingFinger(IID key)
 	{
 		if (key == null) {
 			NullPointerException e = new NullPointerException(
@@ -50,13 +55,13 @@ public class Fingertable
 			throw e;
 		}
 		
-		Future<IRingNode> ret = new Future<IRingNode>();
+		Future<IFinger> ret = new Future<IFinger>();
 		for(int i = this.fingers.length -1; i >= 0; i--) 
 		{
-			IRingNode fingerNode = fingers[i].getNode();
-			if (fingerNode.getId().get().isInInterval(selfId, key))
+			IFinger finger = fingers[i];
+			if (finger.getNodeId().isInInterval(selfFinger.getNodeId(), key))
 			{
-				ret.setResult(fingerNode);
+				ret.setResult(finger);
 				break;
 			}
 		}
@@ -67,12 +72,12 @@ public class Fingertable
 		return ret;
 	}
 
-	public IRingNode getPredecessor()
+	public IFinger getPredecessor()
 	{
 		return predecessor;
 	}
 
-	public void setPredecessor(IRingNode predecessor)
+	public void setPredecessor(IFinger predecessor)
 	{
 		this.predecessor = predecessor;
 	}
@@ -82,7 +87,7 @@ public class Fingertable
 	/** Helper methods **/
 	
 	private void log(String message) {
-		System.out.println(selfId + ": " + message);
+		System.out.println(selfFinger.getNodeId() + ": " + message);
 	}
 
 //	public void init(IRingNode nDash)
@@ -103,16 +108,17 @@ public class Fingertable
 	
 	public IFuture<Void> fixFingers() {
 		Future<Void> future = new Future<Void>();
-		final CounterResultListener<Void> counter = new CounterResultListener<Void>(selfId.getLength(), new DelegationResultListener<Void>(future));
-		for (int i = 0; i < selfId.getLength(); i++) {
+		int idLength = selfFinger.getNodeId().getLength();
+		final CounterResultListener<Void> counter = new CounterResultListener<Void>(idLength, new DelegationResultListener<Void>(future));
+		for (int i = 0; i < idLength; i++) {
 			final Finger finger = fingers[i];
-			self.findSuccessor(finger.getStart()).addResultListener(new DefaultResultListener<IRingNode>()
+			local.findSuccessor(finger.getStart()).addResultListener(new DefaultResultListener<IFinger>()
 			{
 
 				@Override
-				public void resultAvailable(IRingNode result)
+				public void resultAvailable(IFinger result)
 				{
-					finger.setNode(result);
+					finger.set(result);
 					counter.resultAvailable(null);
 				}
 			});
@@ -184,18 +190,38 @@ public class Fingertable
 	{
 		String str = new String();
 		str += "======================\n";
-		str += "Table for: " + self.getId().get() + " (predecessor: " + predecessor + ")" + "\n";
+		str += "Table for: " + selfFinger.getNodeId() + " (predecessor: " + predecessor + ")" + "\n";
 		str += "index \t start \t node\n";
 		str += "----------------------\n";
 		for(int i = 0; i < fingers.length; i++)
 		{
 //			if (fingers[i] != null) {
 				str += i;
-				IRingNode node = fingers[i].getNode();
-				str += " \t " + fingers[i].getStart() + "\t" + (node != null ? ID.get(node) : null);
+				IID node = fingers[i].getNodeId();
+				str += " \t " + fingers[i].getStart() + "\t" + node;
 				str += "\n";
 //			}
 		}
 		return str;
+	}
+
+	public void setInvalid(IFinger rn)
+	{
+		for(int i = 0; i < fingers.length; i++)
+		{
+			if (rn.equals(fingers[i])) {
+				fingers[i].set(selfFinger);
+				log("resetting finger " + i + " to " + selfFinger);
+			} else {
+				if (rn.getNodeId().equals(fingers[i].getNodeId())) {
+					System.out.println("should have been replaced: " + i);
+				}
+			}
+		}
+		
+		if (rn.equals(predecessor)) {
+			log("Resetting predecessor");
+			predecessor = selfFinger;
+		}
 	}
 }
