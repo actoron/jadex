@@ -46,6 +46,7 @@ public class BPMNTest	extends ComponentTestSuite
 				"ServiceCallTask",	// task properties implementation not yet finished
 				"S2_RequiredServices",	// req service not available
 				"S2_RequiredServices2",	// req service not available
+				"UserFlow", // req service not available
 			});
 //			}, 600000, true, false);	// Uncomment for no starting of non-test agents.
 	}
