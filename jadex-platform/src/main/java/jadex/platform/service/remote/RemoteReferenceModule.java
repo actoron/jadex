@@ -883,7 +883,6 @@ public class RemoteReferenceModule
 			
 			ret = Proxy.newProxyInstance(classloader, 
 				interfaces, new RemoteMethodInvocationHandler(rsms, pr));
-
 			
 			incProxyCount(pr.getRemoteReference());
 			

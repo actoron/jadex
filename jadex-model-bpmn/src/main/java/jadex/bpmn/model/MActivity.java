@@ -770,7 +770,7 @@ public class MActivity extends MAssociationTarget
 	public void removeParameter(String name)
 	{
 		if(parameters!=null)
-			parameters.removeValue(name);
+			parameters.removeKey(name);
 	}
 	
 	/**

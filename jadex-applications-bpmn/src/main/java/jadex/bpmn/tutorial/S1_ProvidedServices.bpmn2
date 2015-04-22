@@ -21,6 +21,7 @@
           <jadex:parameter direction="out" name="param1" type="int"/>
           <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
           <jadex:property name="method">&quot;IFuture&lt;Integer&gt; add(int, int)&quot;</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:task name="Method 1" id="EIIUyDRP37T+GbVt">
@@ -45,8 +46,11 @@
         <semantic:outgoing>gkpmA0Jeo+713iXM</semantic:outgoing>
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
+          <jadex:parameter direction="out" name="param0" type="int"/>
+          <jadex:parameter direction="out" name="param1" type="int"/>
           <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
           <jadex:property name="method">&quot;IFuture&lt;Integer&gt; sub(int, int)&quot;</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:endEvent id="dXojUkOKANVBrm25">
@@ -54,13 +58,16 @@
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
           <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:endEvent>
       <semantic:endEvent id="LxP3XYiJRbz8g0MS">
         <semantic:incoming>hCmn6earoHTmDtA6</semantic:incoming>
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
+          <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
           <jadex:property name="returnparam">param0-param1</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:endEvent>
       <semantic:startEvent id="sZlEH92/9t0EQDRU">
@@ -78,8 +85,8 @@
         <semantic:outgoing>DEvMaqZuasVEhiJO</semantic:outgoing>
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service C - method 3&quot;</jadex:parameter>
-          <jadex:parameter direction="inout" name="cnt" type="">0</jadex:parameter>
+          <jadex:parameter direction="inout" name="cnt" type="int">0</jadex:parameter>
+          <jadex:parameter direction="in" name="text1" type="java.lang.String">&quot;Service C - method 3: &quot;+cnt</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
       <semantic:intermediateThrowEvent id="CM2YXVq9jNbjX/vx">
@@ -112,6 +119,7 @@
         <semantic:extensionElements>
           <jadex:property name="method">&quot;IFuture&lt;String&gt; test()&quot;</jadex:property>
           <jadex:property name="iface">jadex.bpmn.testcases.IAService.class</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:task name="Method 1" id="HSjAxDflhY3JYSiV">
@@ -126,7 +134,9 @@
         <semantic:incoming>uFWlOF7UPObuF9uy</semantic:incoming>
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
+          <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
           <jadex:property name="returnparam">text</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
         </semantic:extensionElements>
       </semantic:endEvent>
     </semantic:subProcess>
@@ -159,11 +169,11 @@
       <jadex:dataFlow id="CD5FbioCR+Q1fJXy" sourceRef="EIIUyDRP37T+GbVt" sourceParam="param0" targetRef="dXojUkOKANVBrm25" targetParam="returnparam">
         <jadex:dataFlowValueMapping>param0+param1</jadex:dataFlowValueMapping>
       </jadex:dataFlow>
-      <jadex:dataFlow id="kbJosNYbUy5svUwk" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="CM2YXVq9jNbjX/vx" targetParam="returnparam"/>
-      <jadex:dataFlow id="AWxOGZe8V1sQ8gBC" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="/09zsgGkEnkWC1wR" targetParam="text">
+      <jadex:dataFlow id="yFWtiNqxE549bNnW" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="/09zsgGkEnkWC1wR" targetParam="cnt">
         <jadex:dataFlowValueMapping>cnt+1</jadex:dataFlowValueMapping>
       </jadex:dataFlow>
-      <jadex:dataFlow id="ccNv2FkqQgUnxFfC" sourceRef="HSjAxDflhY3JYSiV" sourceParam="text" targetRef="m5vdqhI00xqP2LF7" targetParam=""/>
+      <jadex:dataFlow id="kbJosNYbUy5svUwk" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="CM2YXVq9jNbjX/vx" targetParam="returnparam"/>
+      <jadex:dataFlow id="ccNv2FkqQgUnxFfC" sourceRef="HSjAxDflhY3JYSiV" sourceParam="text" targetRef="m5vdqhI00xqP2LF7" targetParam="returnparam"/>
     </semantic:extensionElements>
   </semantic:process>
   <bpmndi:BPMNDiagram>
@@ -245,9 +255,7 @@
       </bpmndi:BPMNEdge>
       <di:Edge type="data" jadexElement="kbJosNYbUy5svUwk">
       </di:Edge>
-      <di:Edge type="data" jadexElement="AWxOGZe8V1sQ8gBC">
-        <di:waypoint x="330.0" y="300.0"/>
-        <di:waypoint x="140.0" y="300.0"/>
+      <di:Edge type="data" jadexElement="yFWtiNqxE549bNnW">
       </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="4DdtrGFKVof6uS49">
       </bpmndi:BPMNEdge>

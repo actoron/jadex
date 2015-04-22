@@ -31,7 +31,6 @@ public class ProxyReference
 	 */
 	public ProxyReference()
 	{
-		super();
 	}
 
 	/**
