@@ -118,7 +118,7 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 	/**
 	 *  Determine the location of the local platform.
 	 */
-	protected static String	determineLocation()
+	protected String	determineLocation()
 	{
 		String	ret	= "unknown";
 		try
@@ -134,21 +134,10 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 			scanner.findInLine("([^,]*),");
 			ret	= scanner.match().group(1) + ", " + ret;	// City
 			scanner.close();
-
-			// old: "134.100.11.232","DE","Germany","04","Hamburg","Hamburg","","53.5500","10.0000","",""
-//			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/csv/").openStream(), "UTF-8");
-//			scanner.findInLine("\"([^\"]*)\"");
-//			scanner.findInLine("\"([^\"]*)\"");
-//			scanner.findInLine("\"([^\"]*)\"");
-//			ret	= scanner.match().group(1);	// Country
-//			scanner.findInLine("\"([^\"]*)\"");
-//			scanner.findInLine("\"([^\"]*)\"");
-//			ret	= scanner.match().group(1) + ", " + ret;	// City
-//			scanner.close();
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			agent.getLogger().warning("Cannot determine location: "+e);
 		}
 		
 		return ret;
@@ -164,7 +153,5 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 			System.out.write(buf, 0, read);
 		}
 		is.close();
-		
-		System.out.println("\n"+determineLocation());
 	}
 }

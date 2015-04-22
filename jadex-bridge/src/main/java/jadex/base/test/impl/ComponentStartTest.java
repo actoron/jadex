@@ -9,6 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -25,6 +26,11 @@ import java.util.logging.Logger;
  */
 public class ComponentStartTest extends	ComponentTest
 {
+	//-------- constants --------
+	
+	/** The delay before the component is stopped. */
+	public static final long	DELAY	= BasicService.getScaledLocalDefaultTimeout(1.0/60);
+	
 	//-------- constructors --------
 	
 	public ComponentStartTest() {
@@ -69,14 +75,14 @@ public class ComponentStartTest extends	ComponentTest
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(500, false);
+					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(DELAY, false);
 				}
 			}).addResultListener(lis);
 			ea.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true);
+					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(DELAY, true);
 				}
 			}).addResultListener(lis);
 		}

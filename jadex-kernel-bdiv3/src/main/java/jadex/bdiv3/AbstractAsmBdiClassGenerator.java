@@ -4,7 +4,6 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bridge.INonUserAccess;
-import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.eca.EventType;

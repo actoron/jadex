@@ -72,7 +72,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.getScaledLocalDefaultTimeout(10), true, true, true);
+		this(path, root, excludes, true, true, true);
 	}
 	
 	/**
@@ -80,12 +80,11 @@ public class ComponentTestSuite extends TestSuite
 	 * @param path	The path to look for test cases in.
 	 * @param root	The classpath root corresponding to the path.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
-	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted). 
 	 * @param test	Run test components.
 	 * @param broken	Include broken components (will cause test failure if any).
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(File path, File root, String[] excludes, long timeout, boolean test, boolean broken, boolean start) throws Exception
+	public ComponentTestSuite(File path, File root, String[] excludes, boolean test, boolean broken, boolean start) throws Exception
 	{
 		this(new String[]
 		{
@@ -113,7 +112,7 @@ public class ComponentTestSuite extends TestSuite
 			"-printpass", "false",
 			// Hack!!! include ssl transport if available
 			"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
-		}, path, root, excludes, timeout, test, broken, start);
+		}, path, root, excludes, test, broken, start);
 	}
 	
 	/**
@@ -121,15 +120,14 @@ public class ComponentTestSuite extends TestSuite
 	 * @param args	The platform arguments.
 	 * @param path	The path to look for test cases in.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
-	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted).
 	 * @param runtests	Run test components.
 	 * @param broken	Include broken components (will cause test failure if any).
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout, final boolean runtests, final boolean broken, final boolean start) throws Exception
+	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final boolean runtests, final boolean broken, final boolean start) throws Exception
 	{
 		super(path.toString());
-		this.timeout	= timeout;				
+		this.timeout	= BasicService.getLocalDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();
 		
 		// Tests must be available after constructor execution.
@@ -155,10 +153,15 @@ public class ComponentTestSuite extends TestSuite
 		}
 		
 		this.classloader	= libsrv.getClassLoader(null).get();
+		stopTimer();
+
 		
 		// Scan for test cases.
-		Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + path);
 		List<String> scanForTestCases = scanForTestCases(root, path);
+		this.timeout	= BasicService.getScaledLocalDefaultTimeout(0.01*scanForTestCases.size());	// Timeout for loading models.
+		startTimer();
+		Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + path+" (scan timeout: "+timeout+")");
+		long	ctimeout	= BasicService.getLocalDefaultTimeout();	// Start with normal timeout for platform startup/shutdown.
 		for (String abspath : scanForTestCases)
 		{	
 			boolean	exclude	= false;
@@ -204,6 +207,17 @@ public class ComponentTestSuite extends TestSuite
 									ComponentTest test = new ComponentTest(cms, model, this);
 									test.setName(abspath);
 									addTest(test);
+									
+									Object	to	= model.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, getClassLoader());
+									if(to!=null)
+									{
+										ctimeout	+= ((Number)to).longValue();
+									}
+									else
+									{
+										ctimeout	+= BasicService.getLocalDefaultTimeout();
+									}
+
 								}
 							}
 							else if(model.getReport()!=null)
@@ -224,6 +238,7 @@ public class ComponentTestSuite extends TestSuite
 									ComponentStartTest test = new ComponentStartTest(cms, model, this);
 									test.setName(abspath);
 									addTest(test);
+									ctimeout	+= ComponentStartTest.DELAY;
 								}
 							}
 						}
@@ -259,7 +274,8 @@ public class ComponentTestSuite extends TestSuite
 		
 		stopTimer();
 		
-//		System.out.println("Finished Building Suite for " + path);
+		Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + path+", cumulated execution timeout is: "+ctimeout);
+		this.timeout	= ctimeout;
 	}
 
 	protected void startTimer()
