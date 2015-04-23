@@ -176,7 +176,12 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 			}
 		}
 		
-		((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).step(act, instance, thread, null);
+		// Hack for old style service impls as signal events
+		// The signal events otherwise waits on the signal
+		if(act.isSignalEvent())
+		{
+			((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).step(act, instance, thread, null);
+		}
 		
 		return ret;
 	}
