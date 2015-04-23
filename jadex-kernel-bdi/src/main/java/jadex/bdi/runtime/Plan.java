@@ -9,6 +9,8 @@ import jadex.bdi.runtime.impl.flyweights.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.beans.PropertyChangeSupport;
 import jadex.commons.future.Future;
@@ -539,15 +541,16 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	public void suspend(Future<?> future, long timeout)
 	{
 		if(lis==null)
-		{
 			lis = new SyncResultListener();
-		}
 
 		if(!getBDIFeature().isPlanThread())
 			throw new RuntimeException("SyncResultListener may only be used from plan thread.");
 		
 		if(this.future!=null)
 			throw new RuntimeException("Already suspended");
+		
+		if(timeout==Timeout.UNSET)
+			timeout = getDefaultTimeout();
 		
 		this.future	= future;
 		
@@ -602,6 +605,16 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		IBDIAgentFeature pi = BDIAgentFeature.getInterpreter(getState());
 		IPlanExecutor exe = pi==null? null: pi.getPlanExecutor(getRPlan());
 		return exe==null? null: exe.getMonitor(getRPlan());
+	}
+	
+	/**
+	 *  Get the default timeout.
+	 *  @return The default timeout (-1 for none).
+	 */
+	public long getDefaultTimeout()
+	{
+		return BasicService.getLocalDefaultTimeout();
+//		return ((INonUserAccess)agent).getPlatformData().
 	}
     
 //	/**

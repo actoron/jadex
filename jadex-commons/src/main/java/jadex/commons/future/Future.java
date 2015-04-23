@@ -54,6 +54,12 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	/** The empty future. */
 	public static final IFuture<?> EMPTY = new Future<Object>(null);
 	
+	/** Constant for no timeout. */
+	public static final long NONE = -1;
+	
+	/** Constant for unset. */
+	public static final long UNSET = -2;
+	
 	/**
 	 *  Get the empty future of some type.
 	 *  @return The empty future.
@@ -161,7 +167,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public E get()
 	{
-		return get(-1);
+		return get(UNSET); 
 	}
 
 	/**
@@ -174,9 +180,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	boolean suspend = false;
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
 	   	if(caller==null)
-	   	{
 	   		caller = new ThreadSuspendable();
-	   	}
 	   	
     	synchronized(this)
     	{

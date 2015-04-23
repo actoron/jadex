@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.junit.rules.Timeout;
+
 /**
  *  Default implementation of an intermediate future.
  */
@@ -462,7 +464,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    				caller.suspend(this, -1);
+    				caller.suspend(this, UNSET);
     	    	   	icallers.remove(caller);
     			}
     			// else already resumed.
@@ -511,9 +513,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	boolean	suspend	= false;
 		ISuspendable	caller	= ISuspendable.SUSPENDABLE.get();
 		if(caller==null)
-		{
 			caller	= new ThreadSuspendable();
-		}
 
     	synchronized(this)
     	{
@@ -561,7 +561,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    				caller.suspend(this, -1);
+    				caller.suspend(this, UNSET);
     	    	   	icallers.remove(caller);
     			}
     			// else already resumed.

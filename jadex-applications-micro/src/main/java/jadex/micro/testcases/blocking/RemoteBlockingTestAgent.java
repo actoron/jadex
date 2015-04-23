@@ -4,16 +4,15 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
-
+	
 /**
  *  Test threaded access to raw services.
  */
@@ -31,12 +30,13 @@ public class RemoteBlockingTestAgent	extends TestAgent
 
 	protected IFuture<Void> performTests(Testcase tc)
 	{
-		IExternalAccess	exta	= createPlatform(null).get();
+		// timeout none due to remote call and simulation mode
+		IExternalAccess	exta	= createPlatform(null).get(Timeout.NONE);
 		
 		IComponentManagementService	cms	= SServiceProvider.getService(exta,
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(Timeout.NONE);
 		
-		cms.getComponentDescriptions().get();
+		cms.getComponentDescriptions().get(Timeout.NONE);
 		
 		tc.addReport(new TestReport("#1", "Test blocking wait.", true, null));
 		

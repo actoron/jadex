@@ -24,14 +24,14 @@ public interface ISuspendable
 	
 	/**
 	 *  Suspend the execution of the suspendable.
-	 *  @param future	The future to wait for.
-	 *  @param timeout The timeout.
+	 *  @param future The future to wait for.
+	 *  @param timeout The timeout (-1 for no timeout, -2 for default timeout).
 	 */
 	public void suspend(Future<?> future, long timeout);
 	
 	/**
 	 *  Resume the execution of the suspendable.
-	 *  @param future	The future that issues the resume.
+	 *  @param future The future that issues the resume.
 	 */
 	public void resume(Future<?> future);
 	
@@ -40,4 +40,10 @@ public interface ISuspendable
 	 *  @return The monitor.
 	 */
 	public Object getMonitor();
+	
+//	/**
+//	 *  Get the default timeout.
+//	 *  @return The default timeout (-1 for none).
+//	 */
+//	public long getDefaultTimeout();
 }

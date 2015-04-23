@@ -1,9 +1,6 @@
 package jadex.bridge.component.impl;
 
-import java.util.HashSet;
-
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 
 

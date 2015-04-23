@@ -4,6 +4,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
@@ -19,7 +21,7 @@ public class ComponentSuspendable implements ISuspendable
 	//-------- attributes --------
 	
 	/** The component adapter. */
-	protected IInternalAccess	adapter;
+	protected IInternalAccess	agent;
 	
 	/** The current future. */
 	protected Future<?>	future;
@@ -29,9 +31,9 @@ public class ComponentSuspendable implements ISuspendable
 	/**
 	 *  Create a component suspendable.
 	 */
-	public ComponentSuspendable(IInternalAccess adapter)
+	public ComponentSuspendable(IInternalAccess agent)
 	{
-		this.adapter	= adapter;
+		this.agent	= agent;
 	}
 	
 	//-------- ISuspandable interface --------
@@ -45,6 +47,9 @@ public class ComponentSuspendable implements ISuspendable
 	{
 //		System.out.println("ComponentSuspendable.suspend "+Thread.currentThread());
 		
+		if(timeout==Timeout.UNSET)
+			timeout = getDefaultTimeout();
+		
 		synchronized(this)
 		{
 			this.future	= future;
@@ -52,7 +57,7 @@ public class ComponentSuspendable implements ISuspendable
 			try
 			{
 				COMSUPS.set(this);
-				((IInternalExecutionFeature)adapter.getComponentFeature(IExecutionFeature.class))
+				((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
 					.block(this, timeout);
 			}
 			finally
@@ -70,9 +75,9 @@ public class ComponentSuspendable implements ISuspendable
 	{
 //		System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
 //		Thread.dumpStack();
-		if(!adapter.getComponentFeature(IExecutionFeature.class).isComponentThread())
+		if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
-			adapter.getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
+			agent.getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -81,7 +86,7 @@ public class ComponentSuspendable implements ISuspendable
 						// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 						if(future==ComponentSuspendable.this.future)
 						{
-							((IInternalExecutionFeature)adapter.getComponentFeature(IExecutionFeature.class))
+							((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
 								.unblock(ComponentSuspendable.this, null);
 						}
 					}
@@ -96,7 +101,7 @@ public class ComponentSuspendable implements ISuspendable
 				// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 				if(future==this.future)
 				{
-					((IInternalExecutionFeature)adapter.getComponentFeature(IExecutionFeature.class))
+					((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
 						.unblock(this, null);
 				}
 			}			
@@ -121,12 +126,22 @@ public class ComponentSuspendable implements ISuspendable
 	{
 		return future;
 	}
+	
+	/**
+	 *  Get the default timeout.
+	 *  @return The default timeout (-1 for none).
+	 */
+	public long getDefaultTimeout()
+	{
+		return BasicService.getLocalDefaultTimeout();
+//		return ((INonUserAccess)agent).getPlatformData().
+	}
 
 	/**
 	 *  Get the string representation.
 	 */
 	public String toString()
 	{
-		return "ComponentSuspendable [adapter=" + adapter + "]";
+		return "ComponentSuspendable [adapter=" + agent + "]";
 	}
 }

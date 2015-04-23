@@ -1,6 +1,5 @@
 package jadex.commons.future;
 
-
 /**
  *  Suspendable for threads.
  */
@@ -19,6 +18,9 @@ public class ThreadSuspendable implements ISuspendable
 	 */
 	public void suspend(Future<?> future, long timeout)
 	{
+		if(timeout==-2)//Timeout.UNSET)
+			timeout = getDefaultTimeout();
+		
 		synchronized(this)
 		{
 			this.future	= future;
@@ -67,5 +69,14 @@ public class ThreadSuspendable implements ISuspendable
 	public Object getMonitor()
 	{
 		return this;
+	}
+	
+	/**
+	 *  Get the default timeout.
+	 *  @return The default timeout (-1 for none).
+	 */
+	public long getDefaultTimeout()
+	{
+		return -1;
 	}
 }

@@ -192,7 +192,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    				caller.suspend(this, -1);
+    				caller.suspend(this, UNSET);
     	    	   	icallers.remove(caller);
     			}
     			// else already resumed.
@@ -280,7 +280,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    				caller.suspend(this, -1);
+    				caller.suspend(this, UNSET);
     	    	   	icallers.remove(caller);
     			}
     			// else already resumed.

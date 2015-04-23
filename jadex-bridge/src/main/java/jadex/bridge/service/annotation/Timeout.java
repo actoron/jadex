@@ -1,5 +1,7 @@
 package jadex.bridge.service.annotation;
 
+import jadex.commons.future.Future;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -21,10 +23,10 @@ public @interface Timeout
 	public static final String TIMEOUT = "timeout";
 	
 	/** Constant for no timeout. */
-	public static final long NONE = -1;
+	public static final long NONE = Future.NONE;
 	
 	/** Constant for unset. */
-	public static final long UNSET = -2;
+	public static final long UNSET = Future.UNSET;
 
 	/**
 	 *  The timeout period after which local or remote invocations
