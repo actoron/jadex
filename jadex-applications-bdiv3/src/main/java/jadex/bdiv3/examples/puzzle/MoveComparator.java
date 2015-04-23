@@ -9,8 +9,8 @@ public class MoveComparator implements Comparator<Move>
 {
 	//-------- constants --------
 
-	/** The default strategy to try moves in order of appearance. */
-	public static final String STRATEGY_DEFAULT	= "none";
+	/** No strategy: try moves in order of appearance. */
+	public static final String STRATEGY_NONE	= "none";
 	
 	/** The strategy preferring jump moves, but ignoring colors. */
 	public static final String STRATEGY_LONG	= "long";

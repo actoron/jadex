@@ -13,7 +13,7 @@
       <jadex:providedservice name="aser" interface="jadex.bpmn.examples.nfprops.IAService" class="jadex.bpmn.examples.nfprops.AService" proxytype="decoupled"/>
     </jadex:providedservices>
     <jadex:requiredservices>
-      <jadex:requiredservice name="aser" interface="jadex.bpmn.examples.nfprops.IAService" multi="true" scope="platform" dynamic="true"/>
+      <jadex:requiredservice name="aser" interface="jadex.bpmn.examples.nfprops.IAService" multi="true" scope="platform" dynamic="true" create="false"/>
     </jadex:requiredservices>
   </semantic:extension>
   <semantic:process name="Pool" id="qem4RVqaTvHARCR2">
@@ -26,6 +26,9 @@
       <semantic:timerEventDefinition>
         <semantic:timeDuration>0</semantic:timeDuration>
       </semantic:timerEventDefinition>
+      <semantic:extensionElements>
+        <jadex:property name="duration" type="java.lang.Number">0</jadex:property>
+      </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:task name="Invoke non busy\nService" id="0Iqn/r/XXotuw4WK">
       <semantic:incoming>KmJy/PwMDTQOJSmG</semantic:incoming>
@@ -38,11 +41,32 @@
         <jadex:property name="ranking" type="java.lang.String">&quot;jadex.bridge.sensor.service.WaitqueueEvaluator&quot;</jadex:property>
       </semantic:extensionElements>
     </semantic:task>
+    <semantic:intermediateCatchEvent id="HGjMMirFE2SvWYY4">
+      <semantic:incoming>/fDhHVYxbyIVqGxn</semantic:incoming>
+      <semantic:outgoing>xCjVHG6NGXjLSNr5</semantic:outgoing>
+      <semantic:timerEventDefinition>
+        <semantic:timeDuration>5000</semantic:timeDuration>
+      </semantic:timerEventDefinition>
+      <semantic:extensionElements>
+        <jadex:property name="duration">5000</jadex:property>
+      </semantic:extensionElements>
+    </semantic:intermediateCatchEvent>
+    <semantic:endEvent id="dQhkMy91IcjgPcmI">
+      <semantic:incoming>xCjVHG6NGXjLSNr5</semantic:incoming>
+      <semantic:terminateEventDefinition/>
+    </semantic:endEvent>
+    <semantic:startEvent id="E6+99RZyzdN+M1cm">
+      <semantic:outgoing>/fDhHVYxbyIVqGxn</semantic:outgoing>
+    </semantic:startEvent>
     <semantic:sequenceFlow sourceRef="zait5KWxNKxr6m2U" targetRef="0Iqn/r/XXotuw4WK" id="KmJy/PwMDTQOJSmG">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="hTVbHWUJszFCG4cS" targetRef="0Iqn/r/XXotuw4WK" id="HahXfefD1HgdKs55">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="0Iqn/r/XXotuw4WK" targetRef="hTVbHWUJszFCG4cS" id="EZtVjFUlhql3UeS+">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="HGjMMirFE2SvWYY4" targetRef="dQhkMy91IcjgPcmI" id="xCjVHG6NGXjLSNr5">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="E6+99RZyzdN+M1cm" targetRef="HGjMMirFE2SvWYY4" id="/fDhHVYxbyIVqGxn">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
     </semantic:extensionElements>
@@ -61,11 +85,24 @@
       <bpmndi:BPMNShape bpmnElement="0Iqn/r/XXotuw4WK">
         <dc:Bounds height="100.0" width="160.0" x="330.0" y="140.0"/>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="HGjMMirFE2SvWYY4">
+        <dc:Bounds height="40.0" width="40.0" x="390.0" y="360.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="dQhkMy91IcjgPcmI">
+        <dc:Bounds height="40.0" width="40.0" x="550.0" y="360.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="E6+99RZyzdN+M1cm">
+        <dc:Bounds height="40.0" width="40.0" x="220.0" y="360.0"/>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="KmJy/PwMDTQOJSmG">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="EZtVjFUlhql3UeS+">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="HahXfefD1HgdKs55">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="xCjVHG6NGXjLSNr5">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="/fDhHVYxbyIVqGxn">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

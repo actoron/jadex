@@ -92,12 +92,12 @@ public class TranslationBDI
 //				System.out.println("added: "+rand);
 				System.out.println("egwords: "+egwords);
 //				context = false;
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, this);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, this, true);
 				return IFuture.DONE;
 			}
 		};
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, step);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, step, true);
 		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{

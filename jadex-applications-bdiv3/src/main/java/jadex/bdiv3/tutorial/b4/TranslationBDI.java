@@ -66,7 +66,7 @@ public class TranslationBDI
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			System.out.println("Plan exception: "+e);
 		}
 	}
 	
@@ -97,14 +97,7 @@ public class TranslationBDI
 		@PlanBody
 		public String translateEnglishGerman()
 		{
-			throw new PlanFailureException()
-			{
-				public void printStackTrace()
-				{
-					Thread.dumpStack();
-					super.printStackTrace();
-				}
-			};
+			throw new PlanFailureException();
 //			return wordtable.get(gword);
 		}
 		

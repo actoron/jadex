@@ -337,8 +337,18 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 			}
 			catch(Exception e)
 			{
-				e = (Exception)(e instanceof InvocationTargetException && ((InvocationTargetException)e)
-					.getTargetException() instanceof Exception? ((InvocationTargetException)e).getTargetException(): e);
+				if(e instanceof InvocationTargetException)
+				{
+					if(((InvocationTargetException)e).getTargetException() instanceof Exception)
+					{
+						e	= (Exception)((InvocationTargetException)e).getTargetException();
+					}
+					else if(((InvocationTargetException)e).getTargetException() instanceof Error)
+					{
+						// re-throw errors, e.g. StepAborted
+						throw (Error)((InvocationTargetException)e).getTargetException();
+					}
+				}
 				ret	= new Future<Void>(e);
 			}
 		}

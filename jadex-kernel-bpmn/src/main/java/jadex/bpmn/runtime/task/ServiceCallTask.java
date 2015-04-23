@@ -1,7 +1,5 @@
 package jadex.bpmn.runtime.task;
 
-import jadex.bpmn.features.IBpmnComponentFeature;
-import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
@@ -16,6 +14,7 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.task.ServiceCallTask.ServiceCallTaskGui;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
@@ -201,15 +200,15 @@ public class ServiceCallTask implements ITask
 				Class<?> evacl = SReflect.findClass(rank, process.getModel().getAllImports(), process.getClassLoader());
 				try
 				{
-					Constructor con = evacl.getConstructor(new Class[]{MethodInfo.class});
-					eval = (IServiceEvaluator)con.newInstance(new Object[]{new MethodInfo(m)});
+					Constructor con = evacl.getConstructor(new Class[]{IExternalAccess.class, MethodInfo.class});
+					eval = (IServiceEvaluator)con.newInstance(new Object[]{process.getExternalAccess(), new MethodInfo(m)});
 				}
 				catch(Exception e)
 				{
 					try
 					{
-						Constructor con = evacl.getConstructor(new Class[0]);
-						eval = (IServiceEvaluator)con.newInstance(new Object[0]);
+						Constructor con = evacl.getConstructor(new Class[]{IExternalAccess.class});
+						eval = (IServiceEvaluator)con.newInstance(new Object[]{process.getExternalAccess()});
 					}
 					catch(Exception ex)
 					{

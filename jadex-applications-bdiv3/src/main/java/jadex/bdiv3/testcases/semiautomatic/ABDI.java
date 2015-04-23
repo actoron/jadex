@@ -7,7 +7,6 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -94,7 +93,10 @@ public class ABDI extends AABDI
 		
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
 		
-		return new Future<Void>();
+		fut1.get();
+		fut2.get();
+		
+		return IFuture.DONE;
 	}
 	
 	/**

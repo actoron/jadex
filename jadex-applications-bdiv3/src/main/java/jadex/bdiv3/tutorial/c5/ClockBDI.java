@@ -3,8 +3,11 @@ package jadex.bdiv3.tutorial.c5;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bridge.service.annotation.Service;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 
 import java.text.SimpleDateFormat;
@@ -30,5 +33,16 @@ public class ClockBDI
 	protected void printTime()
 	{
 		System.out.println(formatter.format(time));
+	}
+	
+	/**
+	 *  The agent body.
+	 */
+	@AgentBody
+	public IFuture<Void> body(IInternalAccess agent)
+	{
+		// Stop the agent after 5 seconds.
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(5000).get();
+		return IFuture.DONE;
 	}
 }
