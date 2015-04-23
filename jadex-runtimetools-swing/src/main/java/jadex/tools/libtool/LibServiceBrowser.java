@@ -18,7 +18,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;

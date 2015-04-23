@@ -1,4 +1,4 @@
-package jadex.tools.deployer;
+package jadex.tools.filetransfer;
 
 import jadex.base.gui.asynctree.ISwingNodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -10,7 +10,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -22,7 +22,7 @@ import javax.swing.tree.TreePath;
 /**
  *  Panel for deployment service selection.
  */
-public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
+public class FileTransferServiceSelectorPanel extends AbstractServiceSelectorPanel
 {
 	//-------- attributes --------
 	
@@ -40,9 +40,9 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	/**
 	 *  Create a new selector panel.
 	 */
-	public DeployerServiceSelectorPanel(IControlCenter jcc, IExternalAccess platformaccess, ISwingNodeHandler nodehandler, String title)
+	public FileTransferServiceSelectorPanel(IControlCenter jcc, IExternalAccess platformaccess, ISwingNodeHandler nodehandler, String title)
 	{
-		super(platformaccess, IDeploymentService.class);
+		super(platformaccess, IFileTransferService.class);
 		this.jcc = jcc;
 		this.nodehandler = nodehandler;
 		this.title	= title;
@@ -70,7 +70,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 					{
 						IExternalAccess component = (IExternalAccess)result; 
 						boolean remote = !jcc.getJCCAccess().getComponentIdentifier().getPlatformName().equals(component.getComponentIdentifier().getPlatformName());
-						DeploymentServiceViewerPanel dp = new DeploymentServiceViewerPanel(component, jcc, remote, (IDeploymentService)service, nodehandler, title);
+						FileTransferServiceViewerPanel dp = new FileTransferServiceViewerPanel(component, jcc, remote, (IFileTransferService)service, nodehandler, title);
 						ret.setResult(dp);
 					};
 				});
@@ -83,10 +83,10 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	/**
 	 *  Get the deployment service.
 	 */
-	public IDeploymentService getDeploymentService()
+	public IFileTransferService getDeploymentService()
 	{
-		IDeploymentService ret = null;
-		DeploymentServiceViewerPanel dvp = (DeploymentServiceViewerPanel)getCurrentPanel();
+		IFileTransferService ret = null;
+		FileTransferServiceViewerPanel dvp = (FileTransferServiceViewerPanel)getCurrentPanel();
 		if(dvp!=null)
 		{
 			ret = dvp.getDeploymentService();
@@ -100,7 +100,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	public String getSelectedPath()
 	{
 		String ret = null;
-		DeploymentServiceViewerPanel dvp = (DeploymentServiceViewerPanel)getCurrentPanel();
+		FileTransferServiceViewerPanel dvp = (FileTransferServiceViewerPanel)getCurrentPanel();
 		if(dvp!=null)
 		{
 			ret = dvp.getSelectedPath();
@@ -114,7 +114,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	public TreePath getSelectedTreePath()
 	{
 		TreePath ret = null;
-		DeploymentServiceViewerPanel dvp = (DeploymentServiceViewerPanel)getCurrentPanel();
+		FileTransferServiceViewerPanel dvp = (FileTransferServiceViewerPanel)getCurrentPanel();
 		if(dvp!=null)
 		{
 			ret = dvp.getFileTreePanel().getTree().getSelectionPath();
@@ -127,7 +127,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	 */
 	public void refreshTreePaths(TreePath[] paths)
 	{
-		DeploymentServiceViewerPanel dvp = (DeploymentServiceViewerPanel)getCurrentPanel();
+		FileTransferServiceViewerPanel dvp = (FileTransferServiceViewerPanel)getCurrentPanel();
 		if(dvp!=null)
 		{
 			if(paths==null)
@@ -145,7 +145,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	public JTree getTree()
 	{
 		JTree ret = null;
-		DeploymentServiceViewerPanel dvp = (DeploymentServiceViewerPanel)getCurrentPanel();
+		FileTransferServiceViewerPanel dvp = (FileTransferServiceViewerPanel)getCurrentPanel();
 		if(dvp!=null)
 		{
 			ret = dvp.getFileTreePanel().getTree();

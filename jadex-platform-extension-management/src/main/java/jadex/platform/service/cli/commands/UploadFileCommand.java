@@ -10,7 +10,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -85,10 +85,10 @@ public class UploadFileCommand extends ACliCommand
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				getDeploymentService(ia, p)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IDeploymentService, String>(ret)
+					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IFileTransferService, String>(ret)
 //					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, Collection<Long>>(ret)
 				{
-					public void customResultAvailable(final IDeploymentService ds)
+					public void customResultAvailable(final IFileTransferService ds)
 					{
 						try
 						{
@@ -166,17 +166,17 @@ public class UploadFileCommand extends ACliCommand
 	/**
 	 *  Get the deployment service. 
 	 */
-	protected IFuture<IDeploymentService> getDeploymentService(final IInternalAccess ia, final IComponentIdentifier cid)
+	protected IFuture<IFileTransferService> getDeploymentService(final IInternalAccess ia, final IComponentIdentifier cid)
 	{
-		final Future<IDeploymentService> ret = new Future<IDeploymentService>();
+		final Future<IFileTransferService> ret = new Future<IFileTransferService>();
 		
 		if(cid!=null)
 		{
 			// global search not a good idea due to long timeout but what to do else?
-			ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(IDeploymentService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IDeploymentService>()
+			ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(IFileTransferService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
 			{
-				public void intermediateResultAvailable(IDeploymentService result)
+				public void intermediateResultAvailable(IFileTransferService result)
 				{
 //					System.out.println("found: "+((IService)result).getServiceIdentifier().getProviderId().getRoot()+" - "+cid);
 					if(((IService)result).getServiceIdentifier().getProviderId().getRoot().equals(cid))
@@ -190,9 +190,9 @@ public class UploadFileCommand extends ACliCommand
 					ret.setExceptionIfUndone(new RuntimeException("Deployment service not found: "+cid));
 				}
 				
-				public void resultAvailable(Collection<IDeploymentService> result)
+				public void resultAvailable(Collection<IFileTransferService> result)
 				{
-					for(IDeploymentService ds: result)
+					for(IFileTransferService ds: result)
 					{
 						intermediateResultAvailable(ds);
 					}
@@ -229,8 +229,8 @@ public class UploadFileCommand extends ACliCommand
 		}
 		else
 		{
-			SServiceProvider.getService(ia, IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IDeploymentService>(ret)));
+			SServiceProvider.getService(ia, IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IFileTransferService>(ret)));
 		}
 		
 		return ret;

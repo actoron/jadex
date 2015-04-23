@@ -2,7 +2,7 @@ package jadex.base.gui.filechooser;
 
 import jadex.base.SRemoteFileChooser;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;

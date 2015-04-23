@@ -1,4 +1,4 @@
-package jadex.tools.deployer;
+package jadex.tools.filetransfer;
 
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
@@ -12,21 +12,21 @@ import javax.swing.UIDefaults;
 /**
  *  The library plugin.
  */
-public class DeployerPlugin extends AbstractJCCPlugin
+public class FileTransferPlugin extends AbstractJCCPlugin
 {
 	//-------- constants --------
 
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"deployer",	SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/deployer.png"),
-		"deployer_sel", SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/deployer_sel.png"),
+		"deployer",	SGUI.makeIcon(FileTransferPlugin.class, "/jadex/tools/common/images/deployer.png"),
+		"deployer_sel", SGUI.makeIcon(FileTransferPlugin.class, "/jadex/tools/common/images/deployer_sel.png"),
 	});
 
 	//-------- attributes --------
 	
 	/** The panel. */
-	protected DeployerPanel deployerpanel;
+	protected FileTransferPanel deployerpanel;
 	
 	//-------- methods --------
 	
@@ -54,7 +54,7 @@ public class DeployerPlugin extends AbstractJCCPlugin
 	 */
 	public JComponent createView()
 	{
-		deployerpanel = new DeployerPanel(getJCC());
+		deployerpanel = new FileTransferPanel(getJCC());
 		return deployerpanel;
 	}
 

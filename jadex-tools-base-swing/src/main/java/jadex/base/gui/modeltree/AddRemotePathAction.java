@@ -1,7 +1,7 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.gui.RemoteFileChooser;
-import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;

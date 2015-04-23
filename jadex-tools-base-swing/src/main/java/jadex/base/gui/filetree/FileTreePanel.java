@@ -9,7 +9,7 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.Properties;

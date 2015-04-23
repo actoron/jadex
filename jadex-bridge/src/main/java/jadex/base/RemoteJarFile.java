@@ -1,6 +1,6 @@
 package jadex.base;
 
-import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.filetransfer.FileData;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -10,8 +10,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.deployment.FileData;
-import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -78,10 +78,10 @@ public class ListDirectoryCommand extends ACliCommand
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				SServiceProvider.getService(ia, IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IDeploymentService, FileData[]>(ret)
+				SServiceProvider.getService(ia, IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IFileTransferService, FileData[]>(ret)
 				{
-					public void customResultAvailable(final IDeploymentService ds)
+					public void customResultAvailable(final IFileTransferService ds)
 					{
 						ds.listDirectory(dir).addResultListener(new DelegationResultListener<FileData[]>(ret));
 					}

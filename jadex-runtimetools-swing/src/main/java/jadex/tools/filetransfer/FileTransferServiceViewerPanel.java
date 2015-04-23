@@ -1,4 +1,4 @@
-package jadex.tools.deployer;
+package jadex.tools.filetransfer;
 
 import jadex.base.DefaultFileFilter;
 import jadex.base.SRemoteGui;
@@ -12,7 +12,7 @@ import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
@@ -42,7 +42,7 @@ import javax.swing.tree.TreeSelectionModel;
  *  The deployment service viewer panel displays 
  *  the file tree in a scroll panel.
  */
-public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
+public class FileTransferServiceViewerPanel	implements IAbstractViewerPanel
 {
 	//-------- attributes --------
 	
@@ -53,7 +53,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	protected FileTreePanel ftp;
 	
 	/** The service. */
-	protected IDeploymentService service;
+	protected IFileTransferService service;
 	
 	/** The jcc. */
 	protected IControlCenter jcc;
@@ -63,8 +63,8 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	/**
 	 *  Create a new viewer panel.
 	 */
-	public DeploymentServiceViewerPanel(IExternalAccess exta, IControlCenter jcc, boolean remote, 
-		IDeploymentService service, ISwingNodeHandler nodehandler, String title)
+	public FileTransferServiceViewerPanel(IExternalAccess exta, IControlCenter jcc, boolean remote, 
+		IFileTransferService service, ISwingNodeHandler nodehandler, String title)
 	{
 		this.jcc = jcc;
 		this.service = service;
@@ -155,7 +155,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	 *  Get the service.
 	 *  @return the service.
 	 */
-	public IDeploymentService getDeploymentService()
+	public IFileTransferService getDeploymentService()
 	{
 		return service;
 	}
@@ -172,7 +172,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	/**
 	 * 
 	 */
-	public static void copy(final DeploymentServiceViewerPanel pan1, final DeploymentServiceViewerPanel pan2, final TreePath sp2, IControlCenter jcc) 
+	public static void copy(final FileTransferServiceViewerPanel pan1, final FileTransferServiceViewerPanel pan2, final TreePath sp2, IControlCenter jcc) 
 	{
 		String sel1 = pan1.getSelectedPath();
 		IExternalAccess exta1 = pan1.getFileTreePanel().getExternalAccess();
@@ -182,11 +182,11 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	/**
 	 * 
 	 */
-	public static void copy(final String sel1, final IExternalAccess exta1, final DeploymentServiceViewerPanel pan2, final TreePath sp2, final IControlCenter jcc) 
+	public static void copy(final String sel1, final IExternalAccess exta1, final FileTransferServiceViewerPanel pan2, final TreePath sp2, final IControlCenter jcc) 
 	{
 		IFileNode fn = ((IFileNode)sp2.getLastPathComponent());
 		final String sel2 = fn.getFilePath();
-		final IDeploymentService ds = pan2.getDeploymentService();
+		final IFileTransferService ds = pan2.getDeploymentService();
 		
 		if(sel1!=null && sel2!=null)
 		{
@@ -375,7 +375,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			Object o = path!=null ? path.getLastPathComponent() : null;
 			if(o instanceof IFileNode && (((ITreeNode)o).isLeaf() || !isRealDirectory((IFileNode)o)))
 			{
-				ret = new NodesTransferable(new TransferInfo(DeploymentServiceViewerPanel.this));
+				ret = new NodesTransferable(new TransferInfo(FileTransferServiceViewerPanel.this));
 			}
 			
 			return ret;
@@ -387,7 +387,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		 */
 		protected void exportDone(JComponent source, Transferable data, int action)
 		{
-			System.out.println("expDone");
+//			System.out.println("expDone");
 			if(data!=null)
 			{
 				if(data.isDataFlavorSupported(flavor))
@@ -397,10 +397,10 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		//				System.out.println("export done: "+data.getTransferData(flavor));
 						
 						TransferInfo ti = (TransferInfo)data.getTransferData(flavor);
-						DeploymentServiceViewerPanel second = ti.getTarget();
+						FileTransferServiceViewerPanel second = ti.getTarget();
 	//					String sel1 = DeploymentServiceViewerPanel.this.getSelectedPath();
 	//					IExternalAccess exta1 = DeploymentServiceViewerPanel.this.getFileTreePanel().getExternalAccess();
-						copy(DeploymentServiceViewerPanel.this, second, ti.getSelection(), jcc);
+						copy(FileTransferServiceViewerPanel.this, second, ti.getSelection(), jcc);
 					}
 					catch(Exception e)
 					{
@@ -480,7 +480,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		{
 			boolean ret = false;
 		
-			System.out.println("impData: "+support);
+//			System.out.println("impData: "+support);
 			
 			if(canImport(support))
 			{
@@ -503,7 +503,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 							if(n instanceof IFileNode && ((IFileNode)n).isDirectory())
 							{
 								ti.setSelection(dest);
-								ti.setTarget(DeploymentServiceViewerPanel.this);
+								ti.setTarget(FileTransferServiceViewerPanel.this);
 							}
 						}
 					}
@@ -524,7 +524,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 								if(file.exists())
 								{
 									String sel1 = file.getAbsolutePath();
-									copy(sel1, jcc.getJCCAccess(), DeploymentServiceViewerPanel.this, dest, jcc);
+									copy(sel1, jcc.getJCCAccess(), FileTransferServiceViewerPanel.this, dest, jcc);
 								}
 							}
 						}
@@ -593,10 +593,10 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		public class TransferInfo
 		{
 			/** The source panel. */
-			protected DeploymentServiceViewerPanel source;
+			protected FileTransferServiceViewerPanel source;
 			
 			/** The target panel. */
-			protected DeploymentServiceViewerPanel target;
+			protected FileTransferServiceViewerPanel target;
 			
 			/** The selected drop location (is not made selection in tree). */
 			protected TreePath selection;
@@ -604,7 +604,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			/**
 			 *  Create a new TransferInfo.
 			 */
-			public TransferInfo(DeploymentServiceViewerPanel source)
+			public TransferInfo(FileTransferServiceViewerPanel source)
 			{
 				this.source = source;
 			}
@@ -613,7 +613,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			 *  Get the source.
 			 *  @return The source.
 			 */
-			public DeploymentServiceViewerPanel getSource()
+			public FileTransferServiceViewerPanel getSource()
 			{
 				return source;
 			}
@@ -622,7 +622,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			 *  Set the source.
 			 *  @param source The source to set.
 			 */
-			public void setSource(DeploymentServiceViewerPanel source)
+			public void setSource(FileTransferServiceViewerPanel source)
 			{
 				this.source = source;
 			}
@@ -631,7 +631,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			 *  Get the target.
 			 *  @return The target.
 			 */
-			public DeploymentServiceViewerPanel getTarget()
+			public FileTransferServiceViewerPanel getTarget()
 			{
 				return target;
 			}
@@ -640,7 +640,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			 *  Set the target.
 			 *  @param target The target to set.
 			 */
-			public void setTarget(DeploymentServiceViewerPanel target)
+			public void setTarget(FileTransferServiceViewerPanel target)
 			{
 				this.target = target;
 			}

@@ -14,7 +14,7 @@ import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;

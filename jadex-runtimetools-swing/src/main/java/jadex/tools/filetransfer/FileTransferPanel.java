@@ -1,4 +1,4 @@
-package jadex.tools.deployer;
+package jadex.tools.filetransfer;
 
 import jadex.base.JarAsDirectory;
 import jadex.base.gui.asynctree.ISwingNodeHandler;
@@ -7,7 +7,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -33,7 +33,7 @@ import javax.swing.tree.TreePath;
  *  Panel for showing a file transfer view composed of two
  *  panels with a file tree.
  */
-public class DeployerPanel extends JPanel implements IPropertiesProvider
+public class FileTransferPanel extends JPanel implements IPropertiesProvider
 {
 	//-------- attributes --------
 	
@@ -44,17 +44,17 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 	protected JSplitPane splitpanel;
 	
 	/** The first panel. */
-	protected DeployerServiceSelectorPanel p1;
+	protected FileTransferServiceSelectorPanel p1;
 
 	/** The second panel. */
-	protected DeployerServiceSelectorPanel p2;
+	protected FileTransferServiceSelectorPanel p2;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new deployer panel.
 	 */
-	public DeployerPanel(final IControlCenter jcc)
+	public FileTransferPanel(final IControlCenter jcc)
 	{
 		this.jcc = jcc;
 		
@@ -65,8 +65,8 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		// Local view on the left
 		DeployerNodeHandler nh1 = new DeployerNodeHandler();
 		DeployerNodeHandler nh2 = new DeployerNodeHandler();
-		p1 = new DeployerServiceSelectorPanel(jcc, jcc.getJCCAccess(), nh1, "Local Platform");
-		p2 = new DeployerServiceSelectorPanel(jcc, jcc.getPlatformAccess(), nh2, "Remote Platform");
+		p1 = new FileTransferServiceSelectorPanel(jcc, jcc.getJCCAccess(), nh1, "Local Platform");
+		p2 = new FileTransferServiceSelectorPanel(jcc, jcc.getPlatformAccess(), nh2, "Remote Platform");
 		nh1.setFirstPanel(p1);
 		nh1.setSecondPanel(p2);
 		nh2.setFirstPanel(p2);
@@ -94,8 +94,8 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		props.addProperty(new Property("split_location", ""+splitpanel.getDividerLocation()));
 		
 		// Only save properties of local panels.
-		DeploymentServiceViewerPanel	dsvp1	= (DeploymentServiceViewerPanel)p1.getCurrentPanel();
-		DeploymentServiceViewerPanel	dsvp2	= (DeploymentServiceViewerPanel)p2.getCurrentPanel();
+		FileTransferServiceViewerPanel	dsvp1	= (FileTransferServiceViewerPanel)p1.getCurrentPanel();
+		FileTransferServiceViewerPanel	dsvp2	= (FileTransferServiceViewerPanel)p2.getCurrentPanel();
 		IFuture<Properties>	p1props	= dsvp1!=null && !dsvp1.getFileTreePanel().isRemote()
 			? p1.getProperties() : new Future<Properties>((Properties)null);
 		final IFuture<Properties>	p2props	= dsvp2!=null && !dsvp2.getFileTreePanel().isRemote()
@@ -150,10 +150,10 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		//-------- attributes --------
 		
 		/** The first panel. */
-		protected DeployerServiceSelectorPanel first;
+		protected FileTransferServiceSelectorPanel first;
 		
 		/** The second panel. */
-		protected DeployerServiceSelectorPanel second;
+		protected FileTransferServiceSelectorPanel second;
 
 		AbstractAction copy = new AbstractAction("Copy file")
 		{
@@ -161,8 +161,8 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 			{
 				if(first!=null && second!=null)
 				{
-					DeploymentServiceViewerPanel.copy((DeploymentServiceViewerPanel)first.getCurrentPanel(), 
-						(DeploymentServiceViewerPanel)second.getCurrentPanel(), second.getSelectedTreePath(), jcc);
+					FileTransferServiceViewerPanel.copy((FileTransferServiceViewerPanel)first.getCurrentPanel(), 
+						(FileTransferServiceViewerPanel)second.getCurrentPanel(), second.getSelectedTreePath(), jcc);
 				}
 			}
 			
@@ -182,7 +182,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					final String sel = first.getSelectedPath();
 					if(sel!=null)
 					{
-						IDeploymentService ds = first.getDeploymentService();
+						IFileTransferService ds = first.getDeploymentService();
 						ds.deleteFile(sel).addResultListener(new SwingDefaultResultListener<Void>()
 						{
 							public void customResultAvailable(Void result)
@@ -237,7 +237,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 						}
 						else
 						{
-							IDeploymentService ds = first.getDeploymentService();
+							IFileTransferService ds = first.getDeploymentService();
 							ds.renameFile(sel, name).addResultListener(new SwingDefaultResultListener<String>()
 							{
 								public void customResultAvailable(String result)
@@ -272,7 +272,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					
 					if(sel!=null)
 					{
-						IDeploymentService ds = first.getDeploymentService();
+						IFileTransferService ds = first.getDeploymentService();
 						ds.openFile(sel).addResultListener(new SwingDefaultResultListener<Void>()
 						{
 							public void customResultAvailable(Void result)
@@ -333,7 +333,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		/**
 		 *  Set the first panel.
 		 */
-		public void setFirstPanel(DeployerServiceSelectorPanel first)
+		public void setFirstPanel(FileTransferServiceSelectorPanel first)
 		{
 			 this.first = first;
 		}
@@ -341,7 +341,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		/**
 		 *  Set the first panel.
 		 */
-		public void setSecondPanel(DeployerServiceSelectorPanel second)
+		public void setSecondPanel(FileTransferServiceSelectorPanel second)
 		{
 			 this.second = second;
 		}

@@ -21,10 +21,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.deployment.BunchFileData;
-import jadex.bridge.service.types.deployment.FileData;
-import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.factory.SComponentFactory;
+import jadex.bridge.service.types.filetransfer.BunchFileData;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.ChangeEvent;
@@ -1311,7 +1311,7 @@ public class SRemoteGui
 	 *  Copy a file between two platforms.
 	 *  Intermediate results represent status messages.
 	 */
-	public static IIntermediateFuture<String> copy(final String source, final IExternalAccess sourceaccess, final String target, final IDeploymentService targetds) 
+	public static IIntermediateFuture<String> copy(final String source, final IExternalAccess sourceaccess, final String target, final IFileTransferService targetds) 
 	{
 		return (IIntermediateFuture<String>)sourceaccess.scheduleStep(new IComponentStep<Collection<String>>()
 		{

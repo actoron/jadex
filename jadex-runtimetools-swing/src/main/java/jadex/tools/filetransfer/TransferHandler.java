@@ -1,4 +1,4 @@
-package jadex.tools.deployer;
+package jadex.tools.filetransfer;
 
 public class TransferHandler
 {

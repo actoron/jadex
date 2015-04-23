@@ -1,4 +1,4 @@
-package jadex.platform.service.deployment;
+package jadex.platform.service.filetransfer;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
@@ -7,8 +7,8 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
-import jadex.bridge.service.types.deployment.FileData;
-import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,7 +26,7 @@ import java.io.IOException;
  *  Service for deployment files on file system.
  */
 @Service
-public class DeploymentService implements IDeploymentService
+public class FileTransferService implements IFileTransferService
 {
 	/** The agent. */
 	@ServiceComponent

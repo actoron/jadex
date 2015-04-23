@@ -1,12 +1,12 @@
-package jadex.tools.deployer;
+package jadex.tools.filetransfer;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.filetree.RootNode;
-import jadex.bridge.service.types.deployment.FileData;
-import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.filetransfer.FileData;
+import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.commons.future.Future;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -39,14 +39,14 @@ public class RefreshAllAction extends AbstractAction
 	protected FileTreePanel ftp;
 	
 	/** The deployment service. */
-	protected IDeploymentService	service;
+	protected IFileTransferService	service;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new action.
 	 */
-	public RefreshAllAction(FileTreePanel ftp, IDeploymentService service)
+	public RefreshAllAction(FileTreePanel ftp, IFileTransferService service)
 	{
 		super("Refresh all", icons.getIcon("overlay_refresh"));
 		this.ftp	= ftp;

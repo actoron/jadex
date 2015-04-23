@@ -176,7 +176,7 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 			}
 		}
 		
-//		((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).step(act, instance, thread, null);
+		((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).step(act, instance, thread, null);
 		
 		return ret;
 	}

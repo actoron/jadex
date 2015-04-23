@@ -11,6 +11,7 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -192,6 +193,16 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 ////		});
         
         return IFuture.DONE;
+	}
+	
+	/**
+	 *  Reschedule steps to immediate to allow debugger
+	 *  step on bpmn actions only.
+	 */
+	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
+	{
+//		System.out.println("adding bpmn step: "+step);
+		return super.scheduleImmediate(step);
 	}
 	
 	/**

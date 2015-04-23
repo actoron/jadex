@@ -32,8 +32,8 @@ import jadex.platform.service.address.TransportAddressAgent;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.context.ContextAgent;
-import jadex.platform.service.deployment.DeploymentAgent;
 import jadex.platform.service.df.DirectoryFacilitatorAgent;
+import jadex.platform.service.filetransfer.FileTransferAgent;
 import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
 import jadex.platform.service.message.MessageAgent;
@@ -124,7 +124,7 @@ import java.util.logging.Level;
 	@Argument(name="clock", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="message", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="simul", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="deployment", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="filetransfer", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="marshal", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="security", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="library", clazz=boolean.class, defaultvalue="true"),
@@ -159,7 +159,7 @@ import java.util.logging.Level;
 	@ComponentType(name="clock", clazz=ClockAgent.class),
 	@ComponentType(name="message", clazz=MessageAgent.class),
 	@ComponentType(name="simulation", clazz=SimulationAgent.class),
-	@ComponentType(name="deployment", clazz=DeploymentAgent.class),
+	@ComponentType(name="filetransfer", clazz=FileTransferAgent.class),
 	@ComponentType(name="marshal", clazz=MarshalAgent.class),
 	@ComponentType(name="security", clazz=SecurityAgent.class),
 	@ComponentType(name="library", clazz=LibraryAgent.class),
@@ -259,7 +259,7 @@ import java.util.logging.Level;
 			@NameValue(name="strictcom", value="$args.strictcom"),
 		}),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
-		@Component(name="deployment", type="deployment", daemon=Boolean3.TRUE, number="$args.deployment? 1 : 0"),
+		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
@@ -338,7 +338,7 @@ import java.util.logging.Level;
 			@NameValue(name="strictcom", value="$args.strictcom"),
 		}),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
-		@Component(name="deployment", type="deployment", daemon=Boolean3.TRUE, number="$args.deployment? 1 : 0"),
+		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",

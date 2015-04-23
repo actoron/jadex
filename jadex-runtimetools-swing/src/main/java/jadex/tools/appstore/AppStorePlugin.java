@@ -5,7 +5,7 @@ import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.tools.deployer.DeployerPlugin;
+import jadex.tools.filetransfer.FileTransferPlugin;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -21,8 +21,8 @@ public class AppStorePlugin extends AbstractJCCPlugin
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"appstore",	SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/appstore.png"),
-		"appstore_sel", SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/appstore_sel.png"),
+		"appstore",	SGUI.makeIcon(FileTransferPlugin.class, "/jadex/tools/common/images/appstore.png"),
+		"appstore_sel", SGUI.makeIcon(FileTransferPlugin.class, "/jadex/tools/common/images/appstore_sel.png"),
 	});
 
 	//-------- attributes --------

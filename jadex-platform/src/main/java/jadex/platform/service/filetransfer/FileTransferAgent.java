@@ -1,6 +1,6 @@
-package jadex.platform.service.deployment;
+package jadex.platform.service.filetransfer;
 
-import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
@@ -9,11 +9,11 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 /**
- *  Agent that provides the deployment service.
+ *  Agent that provides the file transfer service.
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(DeploymentService.class)))
+@ProvidedServices(@ProvidedService(type=IFileTransferService.class, implementation=@Implementation(FileTransferService.class)))
 @Properties(value=@NameValue(name="system", value="true"))
-public class DeploymentAgent
+public class FileTransferAgent
 {
 }

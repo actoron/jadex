@@ -1,4 +1,4 @@
-package jadex.bridge.service.types.deployment;
+package jadex.bridge.service.types.filetransfer;
 
 import jadex.base.RemoteJarFile;
 import jadex.commons.Tuple2;

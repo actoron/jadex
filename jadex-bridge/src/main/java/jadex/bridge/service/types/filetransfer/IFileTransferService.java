@@ -1,4 +1,4 @@
-package jadex.bridge.service.types.deployment;
+package jadex.bridge.service.types.filetransfer;
 
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
@@ -6,9 +6,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
- *  Interface for the deployment service.
+ *  Interface for the file transfer service.
  */
-public interface IDeploymentService //extends IService
+public interface IFileTransferService
 {
 	/**
 	 *  Put a file.
