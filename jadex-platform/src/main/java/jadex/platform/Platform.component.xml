@@ -157,8 +157,8 @@
 		<argument name="message" class="boolean">true</argument>
 		<!-- Flag if simulation component and service should be started.  -->
 		<argument name="simul" class="boolean">true</argument>
-		<!-- Flag if deployment component and service should be started.  -->
-		<argument name="deployment" class="boolean">true</argument>
+		<!-- Flag if filetransfer component and service should be started.  -->
+		<argument name="filetransfer" class="boolean">true</argument>
 		<!-- Flag if marshal component and service should be started.  -->
 		<argument name="marshal" class="boolean">true</argument>
 		<!-- Flag if security component and service should be started.  -->
@@ -201,7 +201,7 @@
 		<componenttype filename="jadex/platform/service/clock/ClockAgent.class" name="clock"/>
 		<componenttype filename="jadex/platform/service/message/MessageAgent.class" name="message"/>
 		<componenttype filename="jadex/platform/service/simulation/SimulationAgent.class" name="simulation"/>
-		<componenttype filename="jadex/platform/service/deployment/DeploymentAgent.class" name="deployment"/>
+		<componenttype filename="jadex/platform/service/filetransfer/FileTransferAgent.class" name="filetransfer"/>
 		<componenttype filename="jadex/platform/service/security/SecurityAgent.class" name="security"/>
 		<componenttype filename="jadex/platform/service/library/Library.component.xml" name="library"/>
 		<componenttype filename="jadex/platform/service/settings/Settings.component.xml" name="settings"/>
@@ -345,7 +345,7 @@
 					</arguments>
 				</component>
 				<component name="simulation" type="simulation" daemon="true" number="Boolean.TRUE.equals($args.simul)? 1: 0"/>
-				<component name="deployment" type="deployment" daemon="true" number="Boolean.TRUE.equals($args.deployment)? 1: 0"/>
+				<component name="filetransfer" type="filetransfer" daemon="true" number="Boolean.TRUE.equals($args.filetransfer)? 1: 0"/>
 				
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
@@ -437,7 +437,7 @@
 					</arguments>
 				</component>
 				<component name="simulation" type="simulation" daemon="true" number="Boolean.TRUE.equals($args.simul)? 1: 0"/>
-				<component name="deployment" type="deployment" daemon="true" number="Boolean.TRUE.equals($args.deployment)? 1: 0"/>
+				<component name="filetransfer" type="filetransfer" daemon="true" number="Boolean.TRUE.equals($args.filetransfer)? 1: 0"/>
 				
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
