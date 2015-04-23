@@ -10,6 +10,8 @@ import jadex.commons.future.DefaultResultListener;
 
 public class Finger implements IFinger
 {
+	/** DEBUG field **/
+	public static IID	killedId;
 	
 	private IServiceIdentifier sid;
 	private IID nodeId;
@@ -72,6 +74,9 @@ public class Finger implements IFinger
 //		System.out.println("Setting " + this.getNodeId() + " to : " + other.getNodeId());
 		this.nodeId = other.getNodeId();
 		this.sid = other.getSid();
+//		if (killedId != null && killedId.equals(nodeId)) {
+//			throw new RuntimeException("re-setting killed id to table :(");
+//		}
 	}
 
 	@Override

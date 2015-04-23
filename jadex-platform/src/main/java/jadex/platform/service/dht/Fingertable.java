@@ -222,6 +222,8 @@ public class Fingertable
 		if (rn.equals(predecessor)) {
 			log("Resetting predecessor");
 			predecessor = selfFinger;
+		} else {
+//			System.out.println(rn.getNodeId() + " is not " + predecessor.getNodeId());
 		}
 	}
 }

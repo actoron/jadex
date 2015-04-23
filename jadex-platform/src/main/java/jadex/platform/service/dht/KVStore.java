@@ -51,8 +51,10 @@ public class KVStore implements IKVStore
 	public void setRing(IRingNode ring)
 	{
 		this.ring = ring;
+		System.out.println("store: set ring");
 		myCid = ring.getCID().get();
 		myId = ring.getId().get();
+		System.out.println("store: done set ring");
 	}
 
 	@Override

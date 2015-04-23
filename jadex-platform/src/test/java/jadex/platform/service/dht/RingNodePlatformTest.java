@@ -17,7 +17,10 @@ import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IRingNode;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -137,31 +140,44 @@ public class RingNodePlatformTest extends TestCase
 	@Test
 	public void testJoin() {
 		rn2.join(rn1).get();
-		stabilize(new IDebugRingNode[]{rn1, rn2});
-		System.out.println(rn1);
-		System.out.println(rn2);
+		stabilize(new IDebugRingNode[]{rn1, rn2}).get();
+//		rn2.stabilize().get();
+//		rn1.stabilize().get();
+//		System.out.println(rn1.getFingerTableString().get());
+//		System.out.println(rn2.getFingerTableString().get());
 		assertCircle(rn1, rn2);
 	}
 	
 	@Test
-	public void testJoin3() {
+	public void testJoin3() throws InterruptedException {
 		rn2.join(rn1).get();
+		stabilize(new IDebugRingNode[]{rn1, rn2, rn3}).get();
 		rn3.join(rn1).get();
-		stabilize(new IDebugRingNode[]{rn1, rn2, rn3});
+		stabilize(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+//		System.out.println(rn1.getFingerTableString().get());
 		assertCircle(rn1, rn2, rn3);
 	}
 	
 	@Test
-	public void testLeave3() {
+	public void testKillPlatform() {
 		rn2.join(rn1).get();
+		stabilize(new IDebugRingNode[]{rn1, rn2, rn3}).get();
 		rn3.join(rn1).get();
-		stabilize(new IDebugRingNode[]{rn1, rn2, rn3});
-		System.out.println("killing platform of " + rn3.getId().get());
-//		platform3.killComponent().get();
+		stabilize(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		
+//		System.out.println(rn1.getFingerTableString().get());
+//		System.out.println(rn2.getFingerTableString().get());
+		
+		IID iid = rn3.getId().get();
+		Finger.killedId = iid;
+		System.out.println("killing platform of node: " + iid);
 		platform3.killComponent().get();
 		
-		stabilize(new IDebugRingNode[]{rn1, rn2});
+		System.out.println("platform killed");
+		
+		stabilize(new IDebugRingNode[]{rn1, rn2}).get();
 //		stabilize(new IDebugRingNode[]{rn1, rn2});
+		
 		System.out.println(rn1.getFingerTableString().get());
 		System.out.println(rn2.getFingerTableString().get());
 
@@ -172,18 +188,20 @@ public class RingNodePlatformTest extends TestCase
 	{
 		IRingNode[] circleContents = new IRingNode[rns.length];
 		IRingNode suc = rns[0];
+		System.out.print("circle is: ");
+		System.out.print(suc.getId().get(timeout) + ", ");
 		for(int i = 0; i < rns.length; i++)
 		{
  			IFuture<IFinger> successor = suc.getSuccessor();
-			IFinger sucsuc = successor.get();
+			IFinger sucsuc = successor.get(timeout);
 			suc = getService(rns, sucsuc.getSid());
+			System.out.print(suc.getId().get(timeout) + ", ");
 			if (suc == null) {
 				throw new RuntimeException("got null service");
 			}
 			circleContents[i] = suc;
 		}
 		
-		System.out.print("circle is: ");
 		for(int i = 0; i < rns.length; i++)
 		{
 			boolean found = false;
@@ -193,7 +211,6 @@ public class RingNodePlatformTest extends TestCase
 				IID iid = circleContents[j].getId().get(timeout);
 				if (iid.equals(wanted)) {
 					found = true;
-					System.out.print(iid + ", ");
 				}
 			}
 			assertTrue("Node " + wanted + " has to be in the circle",found);
@@ -217,21 +234,67 @@ public class RingNodePlatformTest extends TestCase
 		return null;
 		
 	}
-
-	private void stabilize(IDebugRingNode[] nodes)
-	{
+	
+	private void fixFingers(IDebugRingNode[] nodes) {
 		for(int j = 0; j < nodes.length; j++)
 		{
 			for(int i = 0; i < nodes.length; i++)
 			{
 				try {
-					nodes[i].stabilize().get(10000);
+//					nodes[i].stabilize().get(10000);
 					nodes[i].fixFingers().get(10000);
-					nodes[i].stabilize().get(10000);
+//					nodes[i].stabilize().get(10000);
 				} catch (TimeoutException e) {
 					System.out.println("to for node " + nodes[i].getId().get());
+//					e.printStackTrace();
 				}
 			}
 		}
+	}
+
+	private IFuture<Void> stabilize(IDebugRingNode[] nodes)
+	{
+		final Future<Void> future = new Future<Void>();
+
+		CounterResultListener<Void> rejoinListener = new CounterResultListener<Void>((nodes.length * nodes.length), new DelegationResultListener<Void>(future))
+		{
+
+			@Override
+			public void resultAvailable(Void result)
+			{
+				super.resultAvailable(result);
+				System.out.println("count: " + cnt);
+			}
+
+			@Override
+			public void exceptionOccurredIfUndone(Exception exception)
+			{
+				if(exception instanceof UnjoinedException)
+				{
+					System.out.println("initiate re-join");
+					rn2.join(rn1);
+				}
+			}
+		};
+
+		for(int j = 0; j < nodes.length; j++)
+		{
+			for(int i = 0; i < nodes.length; i++)
+			{
+				try
+				{
+					nodes[i].stabilize().addResultListener(rejoinListener);
+					// stabilize.addResultListener(rejoinListener);
+					// nodes[i].fixFingers().get(10000);
+					// nodes[i].stabilize().get(10000);
+				}
+				catch(TimeoutException e)
+				{
+					System.out.println("to for node " + nodes[i].getId().get());
+//					e.printStackTrace();
+				}
+			}
+		}
+		return future;
 	}
 }

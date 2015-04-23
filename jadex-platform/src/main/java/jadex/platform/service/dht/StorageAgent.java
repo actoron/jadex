@@ -23,7 +23,7 @@ import jadex.micro.annotation.RequiredServices;
 	@ProvidedService(type = IKVStore.class, implementation = @Implementation(value = KVStore.class), scope = RequiredServiceInfo.SCOPE_GLOBAL)
 })
 @RequiredServices( {
-	@RequiredService(name="store", type = IKVStore.class, binding=@Binding(scope=Binding.SCOPE_LOCAL)),
+//	@RequiredService(name="store", type = IKVStore.class, binding=@Binding(scope=Binding.SCOPE_LOCAL)),
 	@RequiredService(name="ring", type = IRingNode.class, binding=@Binding(scope=Binding.SCOPE_LOCAL, create = true,
 	creationinfo=@CreationInfo(type = "ringAgent")))
 })
