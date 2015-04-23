@@ -29,6 +29,7 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 import jadex.tools.awareness.AwarenessComponentPlugin;
+import jadex.tools.awareness.AwarenessServicePlugin;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.security.SecurityServicePlugin;
@@ -248,7 +249,8 @@ public class JCCAgent	implements IComponentStep<Void>
 					DebuggerPlugin.class.getName(),
 	//				RuleProfilerPlugin.class.getName(),
 	//				LibraryServicePlugin.class.getName(),
-					AwarenessComponentPlugin.class.getName(),
+//					AwarenessComponentPlugin.class.getName(),
+					AwarenessServicePlugin.class.getName(),
 					ComponentViewerPlugin.class.getName(),
 					SecurityServicePlugin.class.getName()
 	//				DeployerPlugin.class.getName()

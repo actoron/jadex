@@ -1,19 +1,24 @@
 package jadex.tools.awareness;
 
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
+import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -77,7 +82,7 @@ import javax.swing.table.AbstractTableModel;
 /**
  *  Panel for the awareness infos.
  */
-public class AwarenessAgentPanel implements IComponentViewerPanel
+public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewerPanel
 {	
 	//-------- constants --------
 	
@@ -87,10 +92,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	//-------- attributes --------
 	
 	/** The jcc. */
-	protected IControlCenter jcc;
+//	protected IControlCenter jcc;
 	
 	/** The component. */
-	protected IExternalAccess component;
+//	protected IExternalAccess component;
 	
 	/** The update timer. */
 	protected Timer timer;
@@ -150,12 +155,39 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 *  Called once to initialize the panel.
 	 *  Called on the swing thread.
 	 *  @param jcc	The jcc.
+	 * 	@param service	The service.
+	 */
+	public IFuture<Void> init(final IControlCenter jcc, final IService service)
+	{
+		final Future<Void> ret = new Future<Void>();
+		SServiceProvider.getService(jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.getExternalAccess(service.getServiceIdentifier().getProviderId())
+					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				{
+					public void customResultAvailable(IExternalAccess result)
+					{
+						init(jcc, result).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Called once to initialize the panel.
+	 *  Called on the swing thread.
+	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
 	public IFuture<Void> init(final IControlCenter jcc, final IExternalAccess component)
 	{
-		this.jcc = jcc;
-		this.component = component;
+//		this.jcc = jcc;
+//		this.component = component;
 		this.helper = new AwarenessManagementAgentHelper(component);
 		
 		JPanel	mainpanel = new JPanel(new GridBagLayout());
@@ -339,8 +371,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		pdissettings.add(new JLabel("Fast startup awareness", JLabel.LEFT), 
-				new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-				GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
+			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
 		pdissettings.add(cbfast, new GridBagConstraints(1, y, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;

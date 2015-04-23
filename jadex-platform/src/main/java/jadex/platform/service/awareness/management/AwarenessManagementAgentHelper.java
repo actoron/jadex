@@ -35,6 +35,9 @@ public class AwarenessManagementAgentHelper
 {
 	private IExternalAccess	component;
 
+	/**
+	 *  Create a new helper.
+	 */
 	public AwarenessManagementAgentHelper(IExternalAccess component)
 	{
 		this.component = component;
