@@ -1,5 +1,6 @@
 package jadex.platform.service.chat;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
@@ -1042,7 +1043,7 @@ public class ChatService implements IChatService, IChatGuiService
 				
 				// Call chat service of receiver (alternative interface)
 				final TransferInfo fi = new TransferInfo(false, null, file.getName(), filepath, cid, file.length(), System.currentTimeMillis() + // Hack!!! assume real time timeout.
-					(cid.getRoot().equals(agent.getComponentIdentifier().getRoot()) ? BasicService.getLocalDefaultTimeout() : BasicService.getRemoteDefaultTimeout()));	// Todo: actual timeout of method!?
+					(cid.getRoot().equals(agent.getComponentIdentifier().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()) : Starter.getRemoteDefaultTimeout(agent.getComponentIdentifier())));	// Todo: actual timeout of method!?
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, file.getName(), size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));

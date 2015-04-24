@@ -1,5 +1,6 @@
 package jadex.bridge.service.component;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -133,7 +134,7 @@ public class ComponentSuspendable implements ISuspendable
 	 */
 	public long getDefaultTimeout()
 	{
-		return BasicService.getLocalDefaultTimeout();
+		return Starter.getLocalDefaultTimeout(agent.getComponentIdentifier());
 //		return ((INonUserAccess)agent).getPlatformData().
 	}
 

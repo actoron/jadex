@@ -38,10 +38,11 @@ public class JCCTest //extends TestCase
 //			"-logging", "true",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"});
 		
-		long timeout	= BasicService.getLocalDefaultTimeout();
+		long timeout = Starter.getLocalDefaultTimeout(null);
 //		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		IExternalAccess	platform	= fut.get(timeout);
+		timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
 			.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);

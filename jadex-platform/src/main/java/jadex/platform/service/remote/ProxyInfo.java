@@ -1,5 +1,7 @@
 package jadex.platform.service.remote;
 
+import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.BasicService;
 import jadex.commons.MethodInfo;
@@ -110,9 +112,9 @@ public class ProxyInfo
 	 *  @param method	The method.
 	 *  @return	The timeout or -1 if none.
 	 */
-	public long	getMethodTimeout(Method method)
+	public long	getMethodTimeout(IComponentIdentifier platform, Method method)
 	{
-		long	ret	= BasicService.getRemoteDefaultTimeout();
+		long	ret	= Starter.getRemoteDefaultTimeout(platform);
 		MethodInfo	key	= new MethodInfo(method);
 		if(timeouts!=null && timeouts.containsKey(key))
 		{

@@ -1,5 +1,6 @@
 package jadex.platform.service.remote;
 
+import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
@@ -170,6 +171,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	
 	/** The transport addresses. */
 	protected TransportAddressBook addresses;
+	
+	/** The local platform. */
+	protected String platform;
 	
 	//-------- constructors --------
 	
@@ -520,7 +524,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, e);
 							// Can be invoked directly, because internally redirects to agent thread.
 		//					System.out.println("sending terminate");
-							sendMessage(rrms, null, content, mycallid,  BasicService.getRemoteDefaultTimeout(), res, null, null);
+							sendMessage(rrms, null, content, mycallid,  Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier()), res, null, null);
 						}
 						return IFuture.DONE;
 					}
@@ -533,7 +537,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				final String mycallid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".ret.getServiceProxies");
 				RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
 //				System.out.println("sending backward cmd");
-				sendMessage(rrms, null, content, mycallid, BasicService.getRemoteDefaultTimeout(), res, null, null);
+				sendMessage(rrms, null, content, mycallid, Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier()), res, null, null);
 			}
 			
 			// Called from delegation listeners in RMS -> ignore if already terminated
@@ -579,7 +583,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, service, true, scope, callid, (IAsyncFilter<IService>)filter, caller);
 						
 //						System.out.println("send to: "+rrms+" "+callid);
-						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func
+						sendMessage(rrms, cid, content, callid, Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier()), fut, null, null); // todo: non-func
 //					}
 //				});
 				
@@ -666,7 +670,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
-						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func
+						sendMessage(rrms, cid, content, callid, Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier()), fut, null, null); // todo: non-func
 //					}
 //				});
 				

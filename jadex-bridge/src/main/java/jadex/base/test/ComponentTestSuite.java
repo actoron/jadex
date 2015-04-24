@@ -9,7 +9,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -127,7 +126,7 @@ public class ComponentTestSuite extends TestSuite
 	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final boolean runtests, final boolean broken, final boolean start) throws Exception
 	{
 		super(path.toString());
-		this.timeout	= BasicService.getLocalDefaultTimeout();	// Initial timeout for starting platform.
+		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
 		startTimer();
 		
 		// Tests must be available after constructor execution.
@@ -135,6 +134,7 @@ public class ComponentTestSuite extends TestSuite
 		
 //		System.out.println("start platform");
 		platform	= (IExternalAccess)Starter.createPlatform(args).get();
+		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 //		System.out.println("end platform");
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(platform, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
@@ -158,10 +158,10 @@ public class ComponentTestSuite extends TestSuite
 		
 		// Scan for test cases.
 		List<String> scanForTestCases = scanForTestCases(root, path);
-		this.timeout	= BasicService.getScaledLocalDefaultTimeout(0.05*scanForTestCases.size());	// Timeout for loading models.
+		this.timeout = Starter.getScaledLocalDefaultTimeout(platform.getComponentIdentifier(), 0.05*scanForTestCases.size());	// Timeout for loading models.
 		startTimer();
 		Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + path+" (scan timeout: "+timeout+")");
-		long	ctimeout	= BasicService.getLocalDefaultTimeout();	// Start with normal timeout for platform startup/shutdown.
+		long ctimeout = Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());	// Start with normal timeout for platform startup/shutdown.
 		for (String abspath : scanForTestCases)
 		{	
 			boolean	exclude	= false;
@@ -215,7 +215,7 @@ public class ComponentTestSuite extends TestSuite
 									}
 									else
 									{
-										ctimeout	+= BasicService.getLocalDefaultTimeout();
+										ctimeout	+= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 									}
 
 								}

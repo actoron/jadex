@@ -1,5 +1,6 @@
 package jadex.micro.testcases.longcall;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.ComponentIdentifier;
@@ -8,7 +9,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SReflect;
@@ -46,7 +46,7 @@ import java.util.List;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.bridge.service.BasicService.getScaledLocalDefaultTimeout(2)")})
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
 public class InitiatorAgent extends TestAgent
 {
 	/**
@@ -278,7 +278,7 @@ public class InitiatorAgent extends TestAgent
 			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
 //			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
-			ServiceCall.getOrCreateNextInvocation().setTimeout(BasicService.getScaledLocalDefaultTimeout(1.0/15));
+			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledLocalDefaultTimeout(agent.getComponentIdentifier(), 1.0/15));
 			
 			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);

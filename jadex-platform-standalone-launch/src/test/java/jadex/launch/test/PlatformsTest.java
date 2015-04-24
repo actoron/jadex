@@ -87,7 +87,7 @@ public class PlatformsTest //extends TestCase
 	@Test
 	public void	testPlatforms()
 	{
-		long timeout = BasicService.getLocalDefaultTimeout();
+		long timeout = Starter.getLocalDefaultTimeout(null);
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];
 		IModelInfo	defmodel	= null;	// Model of default platform to compare others to.
@@ -105,7 +105,8 @@ public class PlatformsTest //extends TestCase
 			}
 			
 			long start = System.currentTimeMillis();
-			IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(args).get(timeout);
+			IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(args).get(timeout);
+			timeout = Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 			starttimes[i] = System.currentTimeMillis()-start;
 //			System.out.println("Started platform: "+i);
 			

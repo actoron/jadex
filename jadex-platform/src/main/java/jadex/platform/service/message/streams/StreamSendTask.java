@@ -1,7 +1,8 @@
 package jadex.platform.service.message.streams;
 
+import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
@@ -23,9 +24,9 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	/** The message type for streams. */
 	public static final byte MESSAGE_TYPE_STREAM = 99;
 
-	/** The minimal lease time. */
+//	/** The minimal lease time. */
 	// Todo: individual value transmitted to remote platforms and used for each connection separately.
-	public static final long MIN_LEASETIME = BasicService.getScaledRemoteDefaultTimeout(1.0/6);
+//	public static long MIN_LEASETIME;
 	
 	/** Constants for message types. */
 	
@@ -253,6 +254,16 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 *  Get the minimum lease time.
+	 *  @param platform The (local) platform.
+	 *  @return The minimum leasetime.
+	 */
+	public static long getMinLeaseTime(IComponentIdentifier platform)
+	{
+		return Starter.getScaledRemoteDefaultTimeout(platform, 1.0/6);
 	}
 	
 //	/**

@@ -1,5 +1,6 @@
 package jadex.extension.rs.publish;
 
+import jadex.base.Starter;
 import jadex.bridge.service.BasicService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -465,9 +466,7 @@ public class SInvokeHelper
 //			
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)
-			{
-				ret = ((IFuture<?>)ret).get(BasicService.getLocalDefaultTimeout());
-			}
+				ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null)); // todo: how to get platform context?
 			System.out.println("call finished: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
 			
 			if(method.isAnnotationPresent(ResultMapper.class))
