@@ -167,7 +167,13 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public E get()
 	{
-		return get(UNSET); 
+		// It is a critical point whether to use NONE or UNSET here
+		// NONE is good for Jadex service calls which automatically terminate after a timeout, 
+		// problem is with non-Jadex calls which could block infinitely
+		// UNSET is not good for Jadex calls, because the service call and the get() call could use different timeouts.
+		// For non-Jadex calls this behavior avoids ever blocking calls and is good.
+		//return get(UNSET); 
+		return get(NONE); 
 	}
 
 	/**

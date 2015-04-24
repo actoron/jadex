@@ -27,7 +27,7 @@ public class Service1Agent implements IService1
 	public IFuture<Void> service()
 	{
 		IService2 ser2 = (IService2)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ser2").get();
-		ser2.service().get(Timeout.NONE);
+		ser2.service().get();
 
 		return IFuture.DONE;
 	}
