@@ -18,7 +18,6 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
@@ -76,6 +75,15 @@ public class Starter
 	
 	/** The transport address book data key. */
 	public static final String DATA_ADDRESSBOOK = "addressbook";
+	
+	/** Constant for local default timeout name. */
+	public static final String DATA_DEFAULT_LOCAL_TIMEOUT = "default_local_timeout";
+
+	/** Constant for remote default timeout name. */
+	public static final String DATA_DEFAULT_REMOTE_TIMEOUT = "default_remote_timeout";
+	
+	/** Global platform data. */
+	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
 	
 	//-------- constants --------
 
@@ -142,8 +150,32 @@ public class Starter
 	/** The reserved platform parameters. */
 	public static final Set<String> RESERVED;
 	
+	
+	/** Constant for remote default timeout. */
+	private static long DEFAULT_REMOTE = SReflect.isAndroid() ? 60000 : 30000;;
+
+	/** Constant for local default timeout. */
+	private static long DEFAULT_LOCAL = SReflect.isAndroid() ? 60000 : 30000;
+
 	static
 	{
+		// Set deftimeout from environment, if set.
+		String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
+		if(dtoprop!=null)
+		{
+			System.out.println("Property jadex.deftimeout is deprecated. Use jadex_deftimeout instead.");
+		}
+		else
+		{
+			dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
+		}
+		if(dtoprop!=null)
+		{
+			DEFAULT_LOCAL = Long.parseLong(dtoprop);
+			DEFAULT_REMOTE = Long.parseLong(dtoprop);
+			System.out.println("Setting jadex_deftimeout: "+dtoprop);
+		}
+		
 		RESERVED = new HashSet<String>();
 		RESERVED.add(CONFIGURATION_FILE);
 		RESERVED.add(CONFIGURATION_NAME);
@@ -412,62 +444,10 @@ public class Starter
 					
 					// Build platform name.
 					Object pfname = getArgumentValue(PLATFORM_NAME, model, cmdargs, compargs);
-					String	platformname	= null; 
-					if(pfname==null)
-					{
-						try
-						{
-							platformname	= InetAddress.getLocalHost().getHostName();
-							platformname	+= "_*";
-						}
-						catch(UnknownHostException e)
-						{
-						}
-					}
-					else
-					{
-						platformname	= pfname.toString(); 
-					}
-					// Replace special characters used in component ids.
-					if(platformname!=null)
-					{
-						platformname	= platformname.replace('.', '$'); // Dot in host name on Mac !?
-						platformname	= platformname.replace('@', '$');
-					}
-					else
-					{
-						platformname = "platform_*";
-					}
-					Random	rnd	= new Random();
-					StringBuffer	buf	= new StringBuffer();
-					StringTokenizer	stok	= new StringTokenizer(platformname, "*+", true);
-					while(stok.hasMoreTokens())
-					{
-						String	tok	= stok.nextToken();
-						if(tok.equals("+"))
-						{
-							buf.append(Integer.toHexString(rnd.nextInt(16)));
-						}
-						else if(tok.equals("*"))
-						{
-							buf.append(Integer.toHexString(rnd.nextInt(16)));
-							buf.append(Integer.toHexString(rnd.nextInt(16)));
-							buf.append(Integer.toHexString(rnd.nextInt(16)));
-						}
-						else
-						{
-							buf.append(tok);
-						}
-					}
-					platformname = buf.toString();
-					
-					// Create an instance of the component.
-					final IComponentIdentifier cid = new BasicComponentIdentifier(platformname);
+					final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname.toString(): null);
 					if(IComponentIdentifier.LOCAL.get()==null)
-					{
 						IComponentIdentifier.LOCAL.set(cid);
-					}
-	
+					
 					// Hack: change rid afterwards?!
 					ResourceIdentifier rid = (ResourceIdentifier)model.getResourceIdentifier();
 					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
@@ -476,11 +456,8 @@ public class Starter
 					String ctype	= cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get();
 					IComponentIdentifier caller = sc==null? null: sc.getCaller();
 					Cause cause = sc==null? null: sc.getCause();
-					if(cause==null)
-					{
-						System.out.println(Thread.currentThread().hashCode()+": kaputt "+sc);
-					}
 					assert cause!=null;
+					
 					Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
 					Object tmpmoni = getArgumentValue(MONITORING, model, cmdargs, compargs);
 					PublishEventLevel moni = PublishEventLevel.OFF;
@@ -506,6 +483,9 @@ public class Starter
 					platformdata.put(DATA_PARAMETERCOPY, getArgumentValue(DATA_PARAMETERCOPY, model, cmdargs, compargs));
 					platformdata.put(DATA_SERVICEREGISTRY, new PlatformServiceRegistry());
 					platformdata.put(DATA_ADDRESSBOOK, new TransportAddressBook());
+					Long to = (Long)cmdargs.remove(DEFTIMEOUT);
+					platformdata.put(DATA_DEFAULT_LOCAL_TIMEOUT, to);
+					platformdata.put(DATA_DEFAULT_REMOTE_TIMEOUT, to);
 					
 					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, null, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();
@@ -562,6 +542,65 @@ public class Starter
 	}
 	
 	/**
+	 * 
+	 */
+	protected static IComponentIdentifier createPlatformIdentifier(String pfname)
+	{
+		// Build platform name.
+		String	platformname	= null; 
+		if(pfname==null)
+		{
+			try
+			{
+				platformname	= InetAddress.getLocalHost().getHostName();
+				platformname	+= "_*";
+			}
+			catch(UnknownHostException e)
+			{
+			}
+		}
+		else
+		{
+			platformname	= pfname.toString(); 
+		}
+		// Replace special characters used in component ids.
+		if(platformname!=null)
+		{
+			platformname	= platformname.replace('.', '$'); // Dot in host name on Mac !?
+			platformname	= platformname.replace('@', '$');
+		}
+		else
+		{
+			platformname = "platform_*";
+		}
+		Random	rnd	= new Random();
+		StringBuffer	buf	= new StringBuffer();
+		StringTokenizer	stok	= new StringTokenizer(platformname, "*+", true);
+		while(stok.hasMoreTokens())
+		{
+			String	tok	= stok.nextToken();
+			if(tok.equals("+"))
+			{
+				buf.append(Integer.toHexString(rnd.nextInt(16)));
+			}
+			else if(tok.equals("*"))
+			{
+				buf.append(Integer.toHexString(rnd.nextInt(16)));
+				buf.append(Integer.toHexString(rnd.nextInt(16)));
+				buf.append(Integer.toHexString(rnd.nextInt(16)));
+			}
+			else
+			{
+				buf.append(tok);
+			}
+		}
+		platformname = buf.toString();
+		
+		// Create an instance of the component.
+		return new BasicComponentIdentifier(platformname);
+	}
+	
+	/**
 	 *  Create the platform.
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
@@ -594,7 +633,10 @@ public class Starter
 	}
 	
 	/**
-	 * 
+	 *  @param cmdargs Starter arguments (required for instantiation of root component)
+	 *  @param compargs Arguments of root component (platform)
+	 *  @param components Additional components to start.
+	 *  @param 
 	 */
 	protected static void processArg(String okey, String val, Map<String, Object> cmdargs, Map<String, Object> compargs, List<String> components)
 	{
@@ -618,7 +660,7 @@ public class Starter
 		}
 		else if(DEBUGFUTURES.equals(key) && "true".equals(val))
 		{
-			Future.DEBUG	= true;
+			Future.DEBUG = true;
 		}
 		else if(DEBUGSERVICES.equals(key) && "true".equals(val))
 		{
@@ -633,9 +675,13 @@ public class Starter
 			value = SJavaParser.evaluateExpression(val, null);
 //				BasicService.DEFTIMEOUT	= ((Number)val).longValue();
 			long to	= ((Number)value).longValue();
-			BasicService.setRemoteDefaultTimeout(to);
-			BasicService.setLocalDefaultTimeout(to);
-//				System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
+//			setLocalDefaultTimeout(platform, to);
+//			setRemoteDefaultTimeout(platform, to);
+			cmdargs.put(DEFTIMEOUT, to);
+			
+//			BasicService.setRemoteDefaultTimeout(to);
+//			BasicService.setLocalDefaultTimeout(to);
+//			System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
 		}
 		else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
 		{
@@ -1020,6 +1066,108 @@ public class Starter
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get a global platform value.
+	 *  @param platform The platform name.
+	 *  @param key The key.
+	 *  @return The value.
+	 */
+	public static synchronized Object getPlatformValue(IComponentIdentifier platform, String key)
+	{
+		Object ret = null;
+		Map<String, Object> mem = platformmem.get(platform.getRoot());
+		if(mem!=null)
+			ret = mem.get(key);
+		return ret;
+	}
+	
+	/**
+	 *  Get a global platform value.
+	 *  @param platform The platform name.
+	 *  @param key The key.
+	 *  @param value The value.
+	 */
+	public static synchronized void putPlatformValue(IComponentIdentifier platform, String key, Object value)
+	{
+		Map<String, Object> mem = platformmem.get(platform.getRoot());
+		if(mem==null)
+			mem = new HashMap<String, Object>();
+		mem.put(key, value);
+	}
+	
+	/**
+	 *  Get a global platform value.
+	 *  @param platform The platform name.
+	 *  @param key The key.
+	 *  @return The value.
+	 */
+	public static synchronized boolean hasPlatformValue(IComponentIdentifier platform, String key)
+	{
+		boolean ret = false;
+		Map<String, Object> mem = platformmem.get(platform.getRoot());
+		if(mem!=null)
+			ret = mem.containsKey(key);
+		return ret;
+	}
+	
+	/**
+	 *  Get the remote default timeout.
+	 */
+	public static synchronized long getRemoteDefaultTimeout(IComponentIdentifier platform)
+	{
+		if(platform==null)
+			return DEFAULT_REMOTE;
+		
+		platform = platform.getRoot();
+		return hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue(): DEFAULT_REMOTE;
+	}
+
+	/**
+	 *  Get the scaled remote default timeout.
+	 */
+	public static synchronized long	getScaledRemoteDefaultTimeout(IComponentIdentifier platform, double scale)
+	{
+		long ret = getRemoteDefaultTimeout(platform);
+		return ret==-1 ? -1 : (long)(ret*scale);
+	}
+
+	/**
+	 *  Get the local default timeout.
+	 */
+	public static synchronized long getLocalDefaultTimeout(IComponentIdentifier platform)
+	{
+		if(platform==null)
+			return DEFAULT_LOCAL;
+		
+		platform = platform.getRoot();
+		return hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue(): DEFAULT_LOCAL;
+	}
+
+	/**
+	 *  Get the scaled local default timeout.
+	 */
+	public static synchronized long getScaledLocalDefaultTimeout(IComponentIdentifier platform, double scale)
+	{
+		long ret = getLocalDefaultTimeout(platform);
+		return ret==-1 ? -1 : (long)(ret*scale);
+	}
+
+	/**
+	 *  Set the remote default timeout.
+	 */
+	public static synchronized void setRemoteDefaultTimeout(IComponentIdentifier platform, long timeout)
+	{
+		putPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT, timeout);
+	}
+
+	/**
+	 *  Set the local default timeout.
+	 */
+	public static synchronized void setLocalDefaultTimeout(IComponentIdentifier platform, long timeout)
+	{
+		putPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT, timeout);
 	}
 }
 

@@ -30,13 +30,13 @@ import org.junit.Test;
  */
 public class RemoteReferenceParamAnnotationTest // extends TestCase
 {
-	Future<Boolean>			successIndicator;
+	Future<Boolean> successIndicator;
 
 	private IExternalAccess	platform2;
 
 	private IExternalAccess	platform1;
 
-	long					timeout	= BasicService.getLocalDefaultTimeout();
+	long timeout = Starter.getLocalDefaultTimeout(null);
 
 	@Before
 	public void initPlatforms()
@@ -47,7 +47,8 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 		platform1 = Starter.createPlatform(
 			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 				"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
-
+		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
+		
 		// Find local service (as local provided service proxy).
 		ILocalService service1 = SServiceProvider.getService(platform1, ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
 

@@ -1,5 +1,6 @@
 package jadex.platform.service.remote;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -427,7 +428,7 @@ public class RemoteReferenceModule
 //					System.out.println("hjgff");
 				long to = BasicService.getMethodTimeout(remoteinterfaces, methods[j], true);
 				// Do not save default value (overhead)
-				if(to!=Timeout.UNSET && to!=BasicService.getRemoteDefaultTimeout())
+				if(to!=Timeout.UNSET && to!=Starter.getRemoteDefaultTimeout(rsms.getComponent().getComponentIdentifier()))
 					ret.addMethodTimeout(new MethodInfo(methods[j]), to);
 			}
 		}
@@ -1192,7 +1193,7 @@ public class RemoteReferenceModule
 				ret.setResult(null);
 			}
 		});
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null);
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, Starter.getRemoteDefaultTimeout(rsms.getComponent().getComponentIdentifier()), fut, null, null);
 		
 		return ret;
 	}
@@ -1232,7 +1233,7 @@ public class RemoteReferenceModule
 				ret.setResult(null);
 			}
 		});
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null);
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, Starter.getRemoteDefaultTimeout(rsms.getComponent().getComponentIdentifier()), fut, null, null);
 		return ret;
 	}
 	

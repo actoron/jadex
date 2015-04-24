@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
@@ -22,7 +23,7 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IInternalAccess ia)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		long to = sc!=null? sc.getTimeout(): BasicService.getLocalDefaultTimeout(); // Hack!!! find out in which cases service call can null
+		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ia.getComponentIdentifier()); // Hack!!! find out in which cases service call can null
 		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
@@ -41,7 +42,7 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IExternalAccess ea)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		long to = sc!=null? sc.getTimeout(): BasicService.getLocalDefaultTimeout(); // Hack!!! find out in which cases service call can null
+		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ea.getComponentIdentifier()); // Hack!!! find out in which cases service call can null
 		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);

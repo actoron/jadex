@@ -1,6 +1,7 @@
 package jadex.base.test.impl;
 
 
+import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
@@ -9,7 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -29,7 +30,7 @@ public class ComponentStartTest extends	ComponentTest
 	//-------- constants --------
 	
 	/** The delay before the component is stopped. */
-	public static final long	DELAY	= BasicService.getScaledLocalDefaultTimeout(1.0/60);
+	public static long DELAY;
 	
 	//-------- constructors --------
 	
@@ -43,6 +44,7 @@ public class ComponentStartTest extends	ComponentTest
 	public ComponentStartTest(IComponentManagementService cms, IModelInfo comp, ComponentTestSuite suite)
 	{
 		super(cms, comp, suite);
+		DELAY = Starter.getScaledLocalDefaultTimeout(((IService)cms).getServiceIdentifier().getProviderId(), 1.0/60);
 	}
 	
 	//-------- methods --------

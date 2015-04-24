@@ -10,7 +10,6 @@ import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -28,84 +27,8 @@ public class BasicService extends ExternalFeatureProvider implements IInternalSe
 {
 	//-------- constants --------
 
-	/** Constant for remote default timeout. */
-	private static long DEFAULT_REMOTE = SReflect.isAndroid() ? 60000 : 30000;;
-
-	/** Constant for local default timeout. */
-	private static long DEFAULT_LOCAL = SReflect.isAndroid() ? 60000 : 30000;
-
-	
-	static
-	{
-		// Set deftimeout from environment, if set.
-		String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
-		if(dtoprop!=null)
-		{
-			System.out.println("Property jadex.deftimeout is deprecated. Use jadex_deftimeout instead.");
-		}
-		else
-		{
-			dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
-		}
-		if(dtoprop!=null)
-		{
-			DEFAULT_LOCAL = Long.parseLong(dtoprop);
-			DEFAULT_REMOTE = Long.parseLong(dtoprop);
-			System.out.println("Setting jadex_deftimeout: "+dtoprop);
-		}
-	}
-	
-	/**
-	 *  Get the remote default timeout.
-	 */
-	public static long	getRemoteDefaultTimeout()
-	{
-		return DEFAULT_REMOTE;
-	}
-
-	/**
-	 *  Get the scaled remote default timeout.
-	 */
-	public static long	getScaledRemoteDefaultTimeout(double scale)
-	{
-		return DEFAULT_REMOTE==-1 ? -1 : (long)(DEFAULT_REMOTE*scale);
-	}
-
-	/**
-	 *  Get the local default timeout.
-	 */
-	public static long	getLocalDefaultTimeout()
-	{
-		return DEFAULT_LOCAL;
-	}
-
-	/**
-	 *  Get the scaled local default timeout.
-	 */
-	public static long	getScaledLocalDefaultTimeout(double scale)
-	{
-		return DEFAULT_LOCAL==-1 ? -1 : (long)(DEFAULT_LOCAL*scale);
-	}
-
-	/**
-	 *  Set the remote default timeout.
-	 */
-	public static void	setRemoteDefaultTimeout(long timeout)
-	{
-		DEFAULT_REMOTE	= timeout;
-//		System.err.println("Setting Jadex default remote timeout: "+DEFAULT_REMOTE);
-//		Thread.dumpStack();
-	}
-
-	/**
-	 *  Set the local default timeout.
-	 */
-	public static void	setLocalDefaultTimeout(long timeout)
-	{
-		DEFAULT_LOCAL	= timeout;
-//		System.err.println("Setting Jadex default local timeout: "+DEFAULT_LOCAL);
-//		Thread.dumpStack();
-	}
+//	/** Constant for timeout name in non-functional properties. */
+//	public static final String TIMEOUT = "timeout";
 
 	//-------- attributes --------
 

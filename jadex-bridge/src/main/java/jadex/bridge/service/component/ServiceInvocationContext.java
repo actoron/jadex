@@ -1,5 +1,6 @@
 package jadex.bridge.service.component;
 
+import jadex.base.Starter;
 import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
@@ -218,7 +219,8 @@ public class ServiceInvocationContext
 			}
 			else 
 			{
-				call.setProperty(ServiceCall.DEFTIMEOUT, isRemoteCall()? BasicService.getRemoteDefaultTimeout(): BasicService.getLocalDefaultTimeout());
+				call.setProperty(ServiceCall.DEFTIMEOUT, isRemoteCall()? Starter.getLocalDefaultTimeout(sid.getProviderId())
+					: Starter.getLocalDefaultTimeout(sid.getProviderId()));
 			}
 		}
 		if(!call.getProperties().containsKey(ServiceCall.REALTIME))

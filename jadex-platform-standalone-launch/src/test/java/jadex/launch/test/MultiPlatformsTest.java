@@ -82,8 +82,8 @@ public class MultiPlatformsTest //extends TestCase
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
-		long	timeout	= BasicService.getScaledLocalDefaultTimeout(number/15.0);
 		IExternalAccess[]	platforms	= new IExternalAccess[number];
+		long	timeout	= Starter.getScaledLocalDefaultTimeout(platforms[0].getComponentIdentifier(), number/15.0);
 		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)

@@ -1,5 +1,6 @@
 package jadex.micro.testcases.autoterminate;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -100,7 +101,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		
 //		System.out.println("test: "+report.getDescription()+", "+BasicService.getLocalDefaultTimeout());
 		
-		waitForRealtimeDelay(BasicService.getLocalDefaultTimeout(),
+		waitForRealtimeDelay(Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)

@@ -22,7 +22,7 @@ public class RemoteReferenceTest //extends TestCase
 	@Test
 	public void	testRemoteReference()
 	{
-		long timeout	= BasicService.getLocalDefaultTimeout();
+		long timeout = Starter.getLocalDefaultTimeout(null);
 		
 		// Start platform1 with local service. (underscore in name assures both platforms use same password)
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
@@ -31,6 +31,7 @@ public class RemoteReferenceTest //extends TestCase
 //			"-logging", "true",
 			"-awareness", "false", "-printpass", "false",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
+		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
 		
 		// Find local service (as local provided service proxy).
 		ILocalService	service1	= SServiceProvider

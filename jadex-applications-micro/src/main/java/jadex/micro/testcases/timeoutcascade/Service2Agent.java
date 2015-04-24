@@ -3,6 +3,7 @@ package jadex.micro.testcases.timeoutcascade;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 
@@ -20,7 +21,8 @@ public class Service2Agent implements IService2
 	public IFuture<Void> service()
 	{
 		// wait longer than default 30 secs
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(35000).get();
+		// get must set no timeout to avoid being interrupted
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(35000).get(Timeout.NONE);
 		return IFuture.DONE;
 	}
 }

@@ -53,7 +53,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	/** The empty future. */
 	public static final IFuture<?> EMPTY = new Future<Object>(null);
-	
+		
 	/** Constant for no timeout. */
 	public static final long NONE = -1;
 	

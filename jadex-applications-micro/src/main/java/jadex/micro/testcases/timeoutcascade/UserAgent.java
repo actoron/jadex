@@ -4,6 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -45,7 +46,7 @@ public class UserAgent
 		IService1 ser1 = (IService1)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ser1").get();
 		try
 		{
-			ser1.service().get();
+			ser1.service().get(Timeout.NONE);
 			tr.setSucceeded(true);
 		}
 		catch(Exception e)

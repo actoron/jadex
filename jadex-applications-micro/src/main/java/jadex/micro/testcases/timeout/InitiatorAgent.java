@@ -1,12 +1,12 @@
 package jadex.micro.testcases.timeout;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -210,7 +210,7 @@ public class InitiatorAgent extends TestAgent
 						else if(exception instanceof TimeoutException)
 						{
 							long diff = System.currentTimeMillis() - (start+to);
-							if(to==Timeout.NONE || diff>=0 && diff<BasicService.getScaledLocalDefaultTimeout(1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
+							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledLocalDefaultTimeout(agent.getComponentIdentifier(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
 							{
 								tr.setSucceeded(true);
 							}

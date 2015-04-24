@@ -1,5 +1,6 @@
 package jadex.platform.service.processengine;
 
+import jadex.base.Starter;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
@@ -586,9 +587,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Set<Object>	fwq	= wq;
 		final String	ftype	= type;
 		
-		if(BasicService.getLocalDefaultTimeout()>0)
+		long to = Starter.getLocalDefaultTimeout(agent.getComponentIdentifier());
+		if(to>0)
 		{
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(BasicService.getLocalDefaultTimeout(), new IComponentStep<Void>()
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(to, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

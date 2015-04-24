@@ -18,16 +18,16 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Timeout
-{
-	/** Constant for timeout name in non-functional properties. */
-	public static final String TIMEOUT = "timeout";
-	
+{	
 	/** Constant for no timeout. */
 	public static final long NONE = Future.NONE;
 	
 	/** Constant for unset. */
 	public static final long UNSET = Future.UNSET;
 
+	/** Constant for timeout name in non-functional properties. */
+	public static final String TIMEOUT = "timeout";
+	
 	/**
 	 *  The timeout period after which local or remote invocations
 	 *  are aborted when no result is received.

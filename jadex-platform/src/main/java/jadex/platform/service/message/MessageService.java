@@ -127,8 +127,8 @@ public class MessageService extends BasicService implements IMessageService
         new jadex.platform.service.message.contentcodecs.NuggetsXMLContentCodec(),
 		new jadex.platform.service.message.contentcodecs.JadexBinaryContentCodec()
     }
-    : SUtil.androidUtils().hasXmlSupport()
-	    ? new IContentCodec[]
+    : SUtil.androidUtils().hasXmlSupport()? 
+    	new IContentCodec[]
 	    {
 	    		new jadex.platform.service.message.contentcodecs.JadexBinaryContentCodec()
 	    }
@@ -1394,7 +1394,8 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public void startStreamSendAliveBehavior()
 	{
-		if(StreamSendTask.MIN_LEASETIME!=Timeout.NONE)
+		final long lt = StreamSendTask.getMinLeaseTime(getComponent().getComponentIdentifier());
+		if(lt!=Timeout.NONE)
 		{
 			getComponent().scheduleStep(new IComponentStep<Void>()
 			{
@@ -1419,7 +1420,7 @@ public class MessageService extends BasicService implements IMessageService
 						}
 					}
 					
-					waitForRealDelay(StreamSendTask.MIN_LEASETIME, this);
+					waitForRealDelay(lt, this);
 					
 					return IFuture.DONE;
 				}
@@ -1432,7 +1433,9 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public void startStreamCheckAliveBehavior()
 	{
-		if(StreamSendTask.MIN_LEASETIME!=Timeout.NONE)
+		final long lt = StreamSendTask.getMinLeaseTime(getComponent().getComponentIdentifier());
+//		System.out.println("to is: "+lt);
+		if(lt!=Timeout.NONE)
 		{
 			getComponent().scheduleStep(new IComponentStep<Void>()
 			{
@@ -1463,7 +1466,7 @@ public class MessageService extends BasicService implements IMessageService
 						}
 					}
 					
-					waitForRealDelay(StreamSendTask.MIN_LEASETIME, this);
+					waitForRealDelay(lt, this);
 					
 					return IFuture.DONE;
 				}

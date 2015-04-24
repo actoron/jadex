@@ -42,9 +42,10 @@ public class BPMNStartElementsTest //extends TestCase
 //				"-deftimeout", "-1",
 				"-printpass", "false",});
 		
-		long timeout	= BasicService.getLocalDefaultTimeout();
+		long timeout = Starter.getLocalDefaultTimeout(null);
 		
 		IExternalAccess	platform	= fut.get(timeout);
+		timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
 			.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);

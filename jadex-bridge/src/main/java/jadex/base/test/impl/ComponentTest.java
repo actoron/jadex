@@ -1,6 +1,7 @@
 package jadex.base.test.impl;
 
 
+import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -8,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.concurrent.TimeoutException;
@@ -77,7 +79,7 @@ public class ComponentTest extends TestCase
 		}
 		else
 		{
-			this.timeout	= BasicService.getLocalDefaultTimeout();
+			this.timeout	= Starter.getLocalDefaultTimeout(((IService)cms).getServiceIdentifier().getProviderId());
 		}
 		this.suite	= suite;
 	}

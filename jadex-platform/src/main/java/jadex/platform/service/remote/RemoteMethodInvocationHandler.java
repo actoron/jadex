@@ -162,7 +162,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		ServiceCall invoc = ServiceCall.getOrCreateNextInvocation(props);
 		
 		// Get method timeout
-		final long to = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): pi.getMethodTimeout(method);
+		final long to = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): pi.getMethodTimeout(rsms.getComponent().getComponentIdentifier(), method);
 		// The reatime property is not necessary, as currently message are sent with realtime timeouts always  
 		
 //		if(method.getName().indexOf("schedule")!=-1)

@@ -39,7 +39,7 @@ public class MicroCreationTest //extends TestCase
 	@Test
 	public void	testMicroCreation() throws Exception
 	{
-		long timeout	= BasicService.getLocalDefaultTimeout();
+		long timeout	= Starter.getLocalDefaultTimeout(null);
 //		ISuspendable	sus	= 	new ThreadSuspendable();
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
@@ -58,6 +58,7 @@ public class MicroCreationTest //extends TestCase
 //			"-conf", "jadex.standalone.Platform.component.xml",
 //			"-deftimeout", "-1",
 			"-printpass", "false"}).get(timeout);
+		timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();

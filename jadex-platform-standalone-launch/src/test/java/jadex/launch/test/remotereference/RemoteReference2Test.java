@@ -31,7 +31,7 @@ public class RemoteReference2Test //extends TestCase
 	@Test
 	public void	testRemoteReference()
 	{
-		long timeout	= BasicService.getLocalDefaultTimeout();
+		long timeout	= Starter.getLocalDefaultTimeout(null);
 		
 		// Underscore in platform name assures both platforms use same password.
 		String	pid	= SUtil.createUniqueId(name.getMethodName(), 3)+"-*";
@@ -43,6 +43,7 @@ public class RemoteReference2Test //extends TestCase
 //			"-logging", "true",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 			}).get(timeout);
+		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
 		
 		// Start platform2 with services.
 		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", pid,

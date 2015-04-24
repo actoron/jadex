@@ -1,5 +1,6 @@
 package jadex.platform.service.message.streams;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -75,7 +76,8 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	public AbstractConnectionHandler(MessageService ms, Map<String, Object> nonfunc)
 	{
 		// Use timeouts relative to deftimeout
-		this(ms, nonfunc, 3, BasicService.getScaledRemoteDefaultTimeout(1.0/3), BasicService.getScaledRemoteDefaultTimeout(1.0/2));
+		this(ms, nonfunc, 3, Starter.getScaledRemoteDefaultTimeout(ms.getComponent().getComponentIdentifier(), 1.0/3), 
+			Starter.getScaledRemoteDefaultTimeout(ms.getComponent().getComponentIdentifier(), 1.0/2));
 	}
 	
 	/**
