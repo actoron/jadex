@@ -158,7 +158,7 @@ public class ComponentTestSuite extends TestSuite
 		
 		// Scan for test cases.
 		List<String> scanForTestCases = scanForTestCases(root, path);
-		this.timeout	= BasicService.getScaledLocalDefaultTimeout(0.01*scanForTestCases.size());	// Timeout for loading models.
+		this.timeout	= BasicService.getScaledLocalDefaultTimeout(0.05*scanForTestCases.size());	// Timeout for loading models.
 		startTimer();
 		Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + path+" (scan timeout: "+timeout+")");
 		long	ctimeout	= BasicService.getLocalDefaultTimeout();	// Start with normal timeout for platform startup/shutdown.

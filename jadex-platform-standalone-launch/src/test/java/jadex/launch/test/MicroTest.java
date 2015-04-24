@@ -20,7 +20,6 @@ public class MicroTest	extends ComponentTestSuite
 	public MicroTest() 	throws Exception
 	{
 		this("../jadex-applications-micro/target/classes");
-//		this("../jadex-applications-micro/target/classes/jadex/micro/testcases/recfutures", "../jadex-applications-micro/target/classes");
 	}
 	
 	/**
@@ -30,7 +29,7 @@ public class MicroTest	extends ComponentTestSuite
 	{
 		// Use micro application classes directory as classpath root,
 		super(new File(SReflect.isAndroid() ? "jadex.micro.testcases" : "../jadex-applications-micro/target/classes/"),
-//		super(new File("../jadex-applications-micro/target/classes/jadex/micro/testcases/blocking"),
+//		super(new File(SReflect.isAndroid() ? "jadex.micro.testcases" : "../jadex-applications-micro/target/classes/jadex/micro/testcases/tuplefuture"),
 			new File(cpRoot),
 			// Exclude failing tests to allow maven build.
 			new String[]
