@@ -3,7 +3,6 @@ package jadex.bridge.service.component;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.INonUserAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -481,7 +480,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout((INonUserAccess)getComponent())));
+					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
 			}
 		});
 		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
@@ -500,7 +499,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout((INonUserAccess)getComponent())));
+					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
 			}
 		});
 		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
@@ -520,7 +519,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			public void customIntermediateResultAvailable(Object result)
 			{
 				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(),
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout((INonUserAccess)getComponent())));
+					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
 			}
 		});
 		return (ITerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
@@ -540,7 +539,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			public void customIntermediateResultAvailable(Object result)
 			{
 				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(),
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout((INonUserAccess)getComponent())));
+					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
 			}
 		});
 		return (ITerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
@@ -560,7 +559,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout((INonUserAccess)getComponent())));
+					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
 			}
 		});
 		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
@@ -589,7 +588,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public IRequiredServiceFetcher createServiceFetcher(String name)
 	{
-		return new DefaultServiceFetcher(getComponent(), Starter.isRealtimeTimeout((INonUserAccess)getComponent()));
+		return new DefaultServiceFetcher(getComponent(), Starter.isRealtimeTimeout(getComponent().getComponentIdentifier()));
 	}
 	
 	/**

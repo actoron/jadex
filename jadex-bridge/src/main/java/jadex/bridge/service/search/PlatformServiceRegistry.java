@@ -3,11 +3,10 @@ package jadex.bridge.service.search;
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.INonUserAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
@@ -896,8 +895,16 @@ public class PlatformServiceRegistry
 	/**
 	 *  Get the registry from a component.
 	 */
-	public static PlatformServiceRegistry	getRegistry(INonUserAccess access)
+	public static PlatformServiceRegistry	getRegistry(IComponentIdentifier platform)
 	{
-		return (PlatformServiceRegistry)access.getPlatformData().get(Starter.DATA_SERVICEREGISTRY);
+		return (PlatformServiceRegistry)Starter.getPlatformValue(platform, Starter.DATA_SERVICEREGISTRY);
+	}
+	
+	/**
+	 *  Get the registry from a component.
+	 */
+	public static PlatformServiceRegistry	getRegistry(IInternalAccess ia)
+	{
+		return getRegistry(ia.getComponentIdentifier());
 	}
 }

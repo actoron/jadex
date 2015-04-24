@@ -220,4 +220,10 @@ public interface IInternalAccess
 	 *  @return The children component identifiers.
 	 */
 	public IFuture<IComponentIdentifier[]> getChildren(String type);
+	
+	/**
+	 *  Get the exception, if any.
+	 *  @return The failure reason for use during cleanup, if any.
+	 */
+	public Exception getException();
 }

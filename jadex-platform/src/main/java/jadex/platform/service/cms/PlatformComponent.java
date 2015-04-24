@@ -62,9 +62,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	/** The creation info. */
 	protected ComponentCreationInfo	info;
 	
-	/** The creation info. */
-	protected Map<String, Object>	platformdata;
-	
 	/** The features. */
 	protected Map<Class<?>, IComponentFeature>	features;
 	
@@ -93,10 +90,9 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 *  @param platformdata The shared objects for all components of the same platform (registry etc.). See starter for available data.
 	 *  @param facs The factories for component features to be instantiated for this component.
 	 */
-	public void	create(ComponentCreationInfo info, Map<String, Object> platformdata, Collection<IComponentFeatureFactory> facs)
+	public void	create(ComponentCreationInfo info, Collection<IComponentFeatureFactory> facs)
 	{
 		this.info	= info;
-		this.platformdata	= platformdata;
 		this.features	= new LinkedHashMap<Class<?>, IComponentFeature>();
 		this.lfeatures	= new ArrayList<IComponentFeature>();
 
@@ -388,7 +384,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	
 	/**
 	 *  Get the exception, if any.
-	 *  
 	 *  @return The failure reason for use during cleanup, if any.
 	 */
 	public Exception	getException()
@@ -396,15 +391,15 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		return exception;
 	}
 	
-	/**
-	 *  Get the shared platform data.
-	 *  
-	 *  @return The objects shared by all components of the same platform (registry etc.). See starter for available data.
-	 */
-	public Map<String, Object>	getPlatformData()
-	{
-		return platformdata;
-	}
+//	/**
+//	 *  Get the shared platform data.
+//	 *  
+//	 *  @return The objects shared by all components of the same platform (registry etc.). See starter for available data.
+//	 */
+//	public Map<String, Object>	getPlatformData()
+//	{
+//		return platformdata;
+//	}
 	
 	//-------- IInternalAccess interface --------
 	

@@ -5,7 +5,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.INonUserAccess;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.nonfunctional.search.IRankingSearchTerminationDecider;
 import jadex.bridge.nonfunctional.search.IServiceRanker;
@@ -17,7 +16,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
@@ -76,7 +74,7 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
-		T ret = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchService(type, provider.getComponentIdentifier(), scope, filter);
+		T ret = PlatformServiceRegistry.getRegistry(provider).searchService(type, provider.getComponentIdentifier(), scope, filter);
 		if(ret==null)
 		{
 			throw new ServiceNotFoundException(type.getName());
@@ -87,7 +85,7 @@ public class SServiceProvider
 	
 	public static <T> T getLocalService(final IInternalAccess provider, final Class<T> type, final IComponentIdentifier target)
 	{
-		T ret = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchService(type, provider.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+		T ret = PlatformServiceRegistry.getRegistry(provider).searchService(type, provider.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
 		{
 			public boolean filter(T obj) 
 			{
@@ -129,7 +127,7 @@ public class SServiceProvider
 	 */
 	public static <T> Collection<T> getLocalServices(final IInternalAccess provider, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
-		Collection<T> ret = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope, filter);
+		Collection<T> ret = PlatformServiceRegistry.getRegistry(provider).searchServices(type, provider.getComponentIdentifier(), scope, filter);
 		
 		return ret;
 	}
@@ -169,7 +167,7 @@ public class SServiceProvider
 		{
 			if(filter==null)
 			{
-				T ser = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchService(type, provider.getComponentIdentifier(), scope);
+				T ser = PlatformServiceRegistry.getRegistry(provider).searchService(type, provider.getComponentIdentifier(), scope);
 				if(ser!=null)
 				{
 					ret.setResult(ser);
@@ -181,13 +179,13 @@ public class SServiceProvider
 			}
 			else
 			{
-				PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchService(type, provider.getComponentIdentifier(), scope, filter)
+				PlatformServiceRegistry.getRegistry(provider).searchService(type, provider.getComponentIdentifier(), scope, filter)
 					.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 			}
 		}
 		else
 		{
-			PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchGlobalService(type, provider.getComponentIdentifier(), filter)
+			PlatformServiceRegistry.getRegistry(provider).searchGlobalService(type, provider.getComponentIdentifier(), filter)
 				.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
 		}
 		
@@ -323,18 +321,18 @@ public class SServiceProvider
 		{
 			if(filter==null)
 			{
-				Collection<T> sers = PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope);
+				Collection<T> sers = PlatformServiceRegistry.getRegistry(provider).searchServices(type, provider.getComponentIdentifier(), scope);
 				ret.setResult(sers==null? Collections.EMPTY_SET: sers);
 			}
 			else
 			{
-				PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchServices(type, provider.getComponentIdentifier(), scope, filter).addResultListener(
+				PlatformServiceRegistry.getRegistry(provider).searchServices(type, provider.getComponentIdentifier(), scope, filter).addResultListener(
 					new IntermediateComponentResultListener<T>(new IntermediateDelegationResultListener<T>(ret), provider));
 			}
 		}
 		else
 		{
-			PlatformServiceRegistry.getRegistry((INonUserAccess)provider).searchGlobalServices(type, provider.getComponentIdentifier(), filter).addResultListener(
+			PlatformServiceRegistry.getRegistry(provider).searchGlobalServices(type, provider.getComponentIdentifier(), filter).addResultListener(
 				new IntermediateComponentResultListener<T>(new IntermediateDelegationResultListener<T>(ret), provider));
 		}
 		
