@@ -1,5 +1,6 @@
 package jadex.bdi.runtime;
 
+import jadex.base.Starter;
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.runtime.impl.AbstractPlan;
@@ -613,7 +614,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	 */
 	public long getDefaultTimeout()
 	{
-		return BasicService.getLocalDefaultTimeout();
+		return Starter.getLocalDefaultTimeout(getComponentIdentifier());
 //		return ((INonUserAccess)agent).getPlatformData().
 	}
     

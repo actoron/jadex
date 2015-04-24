@@ -131,11 +131,11 @@ public interface ICapability	extends IElement
 	 */
 	public Object	getPlatformComponent();
 
-	/**
-	 *  Get the container
-	 *  @return The container.
-	 */
-	public IInternalAccess getServiceContainer();
+//	/**
+//	 *  Get the container
+//	 *  @return The container.
+//	 */
+//	public IInternalAccess getServiceContainer();
 	
 	/**
 	 *  Get the current time.

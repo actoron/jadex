@@ -38,7 +38,6 @@ public class ComponentLifecycleFeature extends	AbstractComponentFeature implemen
 	public ComponentLifecycleFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-
 	}
 
 	/**

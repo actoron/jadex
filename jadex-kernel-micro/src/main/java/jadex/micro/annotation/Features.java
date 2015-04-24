@@ -18,7 +18,13 @@ public @interface Features
 	public Feature[] value() default {};
 	
 	/**
-	 *  Replace content of the existing classes.
+	 *  Replace content of the inherited classes.
 	 */
 	public boolean replace() default false;
+	
+	/**
+	 *  Add the defined features of this classes (and inherited when replace==false)
+	 *  to the standard features of the component.
+	 */
+	public boolean additional() default false;
 }

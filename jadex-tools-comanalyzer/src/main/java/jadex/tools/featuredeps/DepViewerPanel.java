@@ -61,8 +61,8 @@ public class DepViewerPanel<T> extends JPanel
 	{
 		this.setLayout(new BorderLayout());
 		this.g = new DirectedSparseGraph();
-//		this.layout = new KKLayout(g);
-		this.layout = new SpringLayout(g);
+		this.layout = new KKLayout(g);
+//		this.layout = new SpringLayout(g);
 //		this.layout = new DAGLayout(g);
 		this.dr = dr;
 		buildGraph(g);

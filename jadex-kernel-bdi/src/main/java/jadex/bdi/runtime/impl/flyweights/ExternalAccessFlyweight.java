@@ -68,7 +68,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 		super(state, scope, scope);
 //		this.provider = getInterpreter().getServiceProvider();
 		this.cid = getInterpreter().getComponentIdentifier();
-		this.parent = getInterpreter().getParent().getComponentIdentifier();
+		this.parent = getInterpreter().getComponentIdentifier().getParent();
 	}
 
 	//-------- methods --------

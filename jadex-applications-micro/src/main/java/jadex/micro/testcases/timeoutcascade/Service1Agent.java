@@ -2,7 +2,6 @@ package jadex.micro.testcases.timeoutcascade;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;

@@ -32,6 +32,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -223,7 +224,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 					{
 						try
 						{
-							IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot()}).getModelInfo();
+							IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
 							ret.setResult(mi);
 						}
 						catch(Exception e)
@@ -238,7 +239,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				try
 				{
 					ClassLoader cl = getClass().getClassLoader();
-					IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot()}).getModelInfo();
+					IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
 					ret.setResult(mi);
 				}
 				catch(Exception e)
@@ -402,7 +403,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //		Collection<IComponentFeatureFactory> ret = features;
 //		if(model.getFeatures().length>0)
 //			ret = SUtil.arrayToSet(model.getFeatures());
-		return new Future<Collection<IComponentFeatureFactory>>(model.getFeatures().length==0? features: (Collection)SUtil.arrayToSet(model.getFeatures()));
+		return new Future<Collection<IComponentFeatureFactory>>(model.getFeatures().length==0? features: (Collection)SUtil.arrayToList(model.getFeatures()));
 	}
 
 //	/**

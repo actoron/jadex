@@ -1,35 +1,17 @@
 package jadex.micro.testcases.features;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.ILifecycleComponentFeature;
-import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.component.impl.ArgumentsComponentFeature;
-import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
-import jadex.micro.features.IMicroInjectionFeature;
-import jadex.micro.features.impl.MicroInjectionComponentFeature;
-import jadex.micro.features.impl.MicroLifecycleComponentFeature;
-import jadex.micro.features.impl.MicroPojoComponentFeature;
 
 /**
- *  Agent testing incorporation of a different feature set.
+ *  Agent testing incorporation of an additional feature.
  */
 @Agent
-@Features(
-{	
-	@Feature(type=IExecutionFeature.class, clazz=ExecutionComponentFeature.class),
-	@Feature(type=IArgumentsFeature.class, clazz=ArgumentsComponentFeature.class),
-	@Feature(type=IPojoComponentFeature.class, clazz=MicroPojoComponentFeature.class),
-	@Feature(type=IMicroInjectionFeature.class, clazz=MicroInjectionComponentFeature.class,
-		predecessors={IPojoComponentFeature.class, IArgumentsFeature.class}),
-	@Feature(type=ILifecycleComponentFeature.class, clazz=MicroLifecycleComponentFeature.class,
-		predecessors={IPojoComponentFeature.class}, addlast=false),	
-})
+@Features(additional=true,
+	value=@Feature(type=ICustomFeature.class, clazz=CustomFeature.class))
 public class CustomFeatureAgent
 {
 	@Agent
@@ -38,6 +20,7 @@ public class CustomFeatureAgent
 	@AgentCreated
 	public void hello()
 	{
-		System.out.println("hello: "+agent);
+		System.out.println(agent+" "+agent.getComponentFeature(ICustomFeature.class).someMethod());
 	}
 }
+
