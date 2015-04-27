@@ -3,6 +3,7 @@ package jadex.bdi.planlib.cms;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
@@ -36,9 +37,9 @@ public class CMSLocalCreateComponentPlan extends Plan
 		try
 		{
 			// todo: support parent/master etc.
-			IFuture ret = ((IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this))
+			IFuture ret = ((IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get())
 				.createComponent(name, type, new CreationInfo(config, args, parent, suspend, master, null, null, null, null, null, null, null, rid), null);
-			IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
+			IComponentIdentifier aid = (IComponentIdentifier)ret.get();
 			getParameter("componentidentifier").setValue(aid);
 //			System.out.println("create ok: "+aid);
 		}

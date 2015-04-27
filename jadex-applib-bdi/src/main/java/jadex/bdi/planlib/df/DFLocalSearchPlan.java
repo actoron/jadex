@@ -2,6 +2,7 @@ package jadex.bdi.planlib.df;
 
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.commons.future.IFuture;
@@ -28,8 +29,8 @@ public class DFLocalSearchPlan extends Plan
 		// todo: support remote search (search on all DFs on remote platforms also).
 		if(remote)
 			throw new UnsupportedOperationException("Remote DF search not yet implemented.");
-		IFuture ret = ((IDF)getServiceContainer().getRequiredService("df").get(this)).search(desc, con);
-		IDFComponentDescription[] result = (IDFComponentDescription[])ret.get(this);
+		IFuture ret = ((IDF)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("df").get()).search(desc, con);
+		IDFComponentDescription[] result = (IDFComponentDescription[])ret.get();
 		
 		getParameterSet("result").addValues(result);
 	}

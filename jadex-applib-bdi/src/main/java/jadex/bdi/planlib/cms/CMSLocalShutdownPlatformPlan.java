@@ -2,6 +2,7 @@ package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 
 /**
@@ -15,19 +16,19 @@ public class CMSLocalShutdownPlatformPlan extends Plan
 	 */
 	public void body()
 	{
-		IComponentManagementService	cms	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
+		IComponentManagementService	cms	= (IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 		IComponentIdentifier	root	= getScope().getComponentIdentifier();
 		boolean	foundroot	= false;
 		while(!foundroot)
 		{
-			IComponentIdentifier	parent	= (IComponentIdentifier)cms.getParent(root).get(this);
+			IComponentIdentifier	parent	= (IComponentIdentifier)cms.getParent(root).get();
 			if(parent==null)
 				foundroot	= true;
 			else
 				root	= parent;
 		}
 		
-		cms.resumeComponent(root).get(this);
+		cms.resumeComponent(root).get();
 		cms.destroyComponent(root);
 	}
 }
