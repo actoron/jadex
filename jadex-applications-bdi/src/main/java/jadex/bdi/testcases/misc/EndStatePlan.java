@@ -49,7 +49,7 @@ public class EndStatePlan extends Plan
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
 		IGoal	search	= createGoal("cmscap.cms_search_components");
 //		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-//			getServiceContainer(), IComponentManagementService.class).get(this);
+//			getComponentFeature(IRequiredServiceFeature.class), IComponentManagementService.class).get(this);
 //		search.getParameter("description").setValue(cms.createComponentDescription(worker, null, null, null, null, null));
 		search.getParameter("description").setValue(new CMSComponentDescription(worker, null, false, false, false, false, false, null, null, null, null, -1, null, null, false));
 		dispatchSubgoalAndWait(search);
@@ -80,7 +80,7 @@ public class EndStatePlan extends Plan
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
-		IDF df = (IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getServiceContainer(), IDF.class).get(this);
+		IDF df = (IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "endstate_testservice", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		

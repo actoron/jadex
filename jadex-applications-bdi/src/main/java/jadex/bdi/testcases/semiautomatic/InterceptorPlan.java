@@ -46,9 +46,9 @@ public class InterceptorPlan extends Plan
 //			}
 //		};
 		
-//		IPrintHelloService ps = (IPrintHelloService)getServiceContainer().getProvidedService("printservice");
-//		IServiceInvocationInterceptor[] ics = getServiceContainer().getInterceptors(ps);
-//		getServiceContainer().addInterceptor(ic, ps, ics.length-1);
+//		IPrintHelloService ps = (IPrintHelloService)getComponentFeature(IRequiredServiceFeature.class).getProvidedService("printservice");
+//		IServiceInvocationInterceptor[] ics = getComponentFeature(IRequiredServiceFeature.class).getInterceptors(ps);
+//		getComponentFeature(IRequiredServiceFeature.class).addInterceptor(ic, ps, ics.length-1);
 
 		for(int i=0; i<3; i++)
 			callPrintService();
@@ -61,7 +61,7 @@ public class InterceptorPlan extends Plan
 	{
 		try
 		{
-			IPrintHelloService ps = (IPrintHelloService)getServiceContainer().getProvidedService("printservice");
+			IPrintHelloService ps = (IPrintHelloService)getComponentFeature(IRequiredServiceFeature.class).getProvidedService("printservice");
 			ps.printHello().get(this);
 		}
 		catch(Exception e)

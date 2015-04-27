@@ -40,7 +40,7 @@ public class SimulationEndPlan extends Plan {
 //		// kill via gui		
 
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.getService((IServiceProvider)getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+			.getService((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		cms.destroyComponent(getScope().getParentAccess().getComponentIdentifier());
 	}
 }

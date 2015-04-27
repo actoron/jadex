@@ -1,6 +1,7 @@
 package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 
@@ -44,7 +45,7 @@ public class PlaySongPlan extends Plan
 		final SyncResultListener lis = new SyncResultListener();
 		
 //		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), IThreadPoolService.class).get(this);
-		IThreadPoolService tp = (IThreadPoolService)getServiceContainer().getRequiredService("tpservice").get(this);
+		IThreadPoolService tp = (IThreadPoolService)getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tpservice").get(this);
 		final ClassLoader cl = getScope().getClassLoader();
 		tp.execute(new Runnable()
 		{

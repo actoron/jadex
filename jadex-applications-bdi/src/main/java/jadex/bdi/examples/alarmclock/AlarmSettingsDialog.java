@@ -7,6 +7,7 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -408,7 +409,7 @@ public class AlarmSettingsDialog extends JDialog
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 //					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-					ia.getServiceContainer().getRequiredService("clockservice")
+					ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")
 						.addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
 					{
 						public void customResultAvailable(Object result)
@@ -422,7 +423,7 @@ public class AlarmSettingsDialog extends JDialog
 				}
 			});
 
-//			alarm.setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
+//			alarm.setClock((IClockService)agent.getComponentFeature(IRequiredServiceFeature.class).getService(IClockService.class));
 		}
 		else
 		{
@@ -470,7 +471,7 @@ public class AlarmSettingsDialog extends JDialog
 		if(alarm==null)
 		{
 			this.alarm = new Alarm();
-//			alarm.setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
+//			alarm.setClock((IClockService)agent.getComponentFeature(IRequiredServiceFeature.class).getService(IClockService.class));
 		}
 
 		alarm.setMode((String)mode.getSelectedItem());

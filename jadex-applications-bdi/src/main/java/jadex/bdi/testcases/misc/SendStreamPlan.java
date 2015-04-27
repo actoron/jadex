@@ -15,7 +15,7 @@ public class SendStreamPlan extends Plan
 	  */
 	public void body()
 	{
-		IMessageService ms = getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		IMessageService ms = getComponentFeature(IRequiredServiceFeature.class).searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		IOutputConnection con = ms.createOutputConnection(getComponentIdentifier(), getComponentIdentifier(), null).get(this);
 
 		for(int i=0; i<5; i++)

@@ -18,6 +18,7 @@ import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.GoalDelegationHandler;
+import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
@@ -140,10 +141,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //	protected IComponentAdapter	adapter;
 	
 	/** The parent of the agent (if any). */
-	protected IExternalAccess	parent;
+//	protected IExternalAccess	parent;
 	
-	/** The kernel properties. */
-	protected Map kernelprops;
+//	/** The kernel properties. */
+//	protected Map kernelprops;
 	
 	/** The extensions. */
 	protected Map<String, IExtensionInstance> extensions;
@@ -243,8 +244,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/** The service container. */
 	protected IInternalAccess container;
 	
-	/** The cms future for init return. */
-	protected Future inited;
+//	/** The cms future for init return. */
+//	protected Future inited;
 	
 	/** The cached external access. */
 	protected IExternalAccess ea;
@@ -255,11 +256,11 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/** The currently inited mcapability. */
 	protected Object	initcapa;
 	
-	/** The parameter copy flag. */
-	protected boolean copy;
+//	/** The parameter copy flag. */
+//	protected boolean copy;
 
-	/** The realtime local timeout flag. */
-	protected boolean realtime;
+//	/** The realtime local timeout flag. */
+//	protected boolean realtime;
 
 	/** The monitoring service getter. */
 	protected ServiceGetter<IMonitoringService> getter;
@@ -282,16 +283,16 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(model.getState());
 			
-		this.parent	= parent;
-		this.kernelprops = kernelprops;
+//		this.parent	= parent;
+//		this.kernelprops = kernelprops;
 		this.planexecutors = new HashMap();
 		this.volcache = new LRU(0);	// 50
 		this.stacache = new LRU(20);
 		this.microplansteps = true;
-		this.copy = copy;
-		this.realtime = realtime;
+//		this.copy = copy;
+//		this.realtime = realtime;
 //		this.resultlistener = resultlistener;
-		this.inited = inited;
+//		this.inited = inited;
 		this.emitlevelsub = PublishEventLevel.OFF;
 		
 		// Hack! todo:
@@ -357,12 +358,13 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		// Initialize rule system.
 		rulesystem = new RuleSystem(state, model.getMatcherFunctionality().getRulebase(), model.getMatcherFunctionality(), new PriorityAgenda());
 		
-		if(kernelprops!=null)
-		{
-			Boolean mps = (Boolean)kernelprops.get("microplansteps");
-			if(mps!=null)
-				microplansteps = mps.booleanValue();
-		}
+//		if(kernelprops!=null)
+//		{
+//			Boolean mps = (Boolean)kernelprops.get("microplansteps");
+//			if(mps!=null)
+//				microplansteps = mps.booleanValue();
+//		}
+		microplansteps = true;
 		
 		// Init the external access
 //		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
@@ -1152,21 +1154,23 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //					SimpleValueFetcher	fetcher	= new SimpleValueFetcher();
 //					fetcher.setValue("$platformname", getAgentAdapter().getPlatform().getName());
 					
-					Iterator it = getKernelProperties().keySet().iterator();
-					while(it.hasNext())
-					{
-						String key = (String)it.next();
-						if(key.startsWith("planexecutor"))
-						{
-							String tmp = key.substring(13);
-//							System.out.println("PE:"+tmp);
-//							global.put(tmp, getKernelProperties().get(key));
-							if(tmp.equals(name))
-							{
-								ret	= (IPlanExecutor)getKernelProperties().get(key);
-							}
-						}
-					}
+					ret = JavaStandardPlanExecutor.createPlanExecutor(getComponent());
+				
+//					Iterator it = getKernelProperties().keySet().iterator();
+//					while(it.hasNext())
+//					{
+//						String key = (String)it.next();
+//						if(key.startsWith("planexecutor"))
+//						{
+//							String tmp = key.substring(13);
+////							System.out.println("PE:"+tmp);
+////							global.put(tmp, getKernelProperties().get(key));
+//							if(tmp.equals(name))
+//							{
+//								ret	= (IPlanExecutor)getKernelProperties().get(key);
+//							}
+//						}
+//					}
 					
 					/*for(int i=0; i<props.length; i++)
 					{
@@ -1481,14 +1485,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return atomic;
 	}
 	
-	/**
-	 *  Get the kernel properties.
-	 *  @return The kernel properties.
-	 */
-	public Map getKernelProperties()
-	{
-		return kernelprops;
-	}
+//	/**
+//	 *  Get the kernel properties.
+//	 *  @return The kernel properties.
+//	 */
+//	public Map getKernelProperties()
+//	{
+//		return kernelprops;
+//	}
 	
 	/**
 	 *  Put an element into the cache.
@@ -1514,14 +1518,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return cache.get(key);
 	}
 	
-	/**
-	 *  Get the parent of the agent.
-	 *  @return The external access of the parent.
-	 */
-	public IExternalAccess getParent()
-	{
-		return parent;
-	}
+//	/**
+//	 *  Get the parent of the agent.
+//	 *  @return The external access of the parent.
+//	 */
+//	public IExternalAccess getParent()
+//	{
+//		return parent;
+//	}
 	
 //	/**
 //	 *  Create the service container.
@@ -1922,14 +1926,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return prefix;
 	}
 
-	/**
-	 *  Get the copy.
-	 *  @return the copy.
-	 */
-	public boolean isCopy()
-	{
-		return copy;
-	}
+//	/**
+//	 *  Get the copy.
+//	 *  @return the copy.
+//	 */
+//	public boolean isCopy()
+//	{
+//		return copy;
+//	}
 	
 //	/**
 //	 *  Create the service container.
@@ -1979,14 +1983,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		}
 	}
 
-	/**
-	 *  Get the realtime.
-	 *  @return The realtime.
-	 */
-	public boolean isRealtime()
-	{
-		return realtime;
-	}
+//	/**
+//	 *  Get the realtime.
+//	 *  @return The realtime.
+//	 */
+//	public boolean isRealtime()
+//	{
+//		return realtime;
+//	}
 	
 	/**
 	 *  Create a wrapper service implementation based on 

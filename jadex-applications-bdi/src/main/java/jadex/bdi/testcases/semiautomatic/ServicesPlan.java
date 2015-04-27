@@ -24,12 +24,12 @@ public class ServicesPlan extends Plan
 		IInternalService	service	= getInterpreter().createInternalService(new PrintHelloService(), IPrintHelloService.class, null);
 		ProvidedServiceInfo	psi	= new ProvidedServiceInfo();
 		psi.setPublish(new PublishInfo("http://localhost:8080/hello/", IPublishService.PUBLISH_RS, IPrintHelloService.class));
-		getServiceContainer().addService(service, psi);
+		getComponentFeature(IRequiredServiceFeature.class).addService(service, psi);
 		
 		waitFor(500);
 		
 		// Call service internally
-		IPrintHelloService phs = (IPrintHelloService)SServiceProvider.getService((IServiceProvider)getServiceContainer(), 
+		IPrintHelloService phs = (IPrintHelloService)SServiceProvider.getService((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), 
 			IPrintHelloService.class, RequiredServiceInfo.SCOPE_LOCAL).get(this);
 		phs.printHello();
 		
