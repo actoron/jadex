@@ -110,7 +110,8 @@ public class MicroClassReader
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
+	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root,
+		List<IComponentFeatureFactory> features)
 	{
 //		System.out.println("loading micro: "+model);
 		String clname = model;
@@ -126,13 +127,14 @@ public class MicroClassReader
 		
 		Class<?> cma = getMicroAgentClass(clname, imports, classloader);
 		
-		return read(model, cma, classloader, rid, root);
+		return read(model, cma, classloader, rid, root, features);
 	}
 	
 	/**
 	 *  Load the model.
 	 */
-	protected MicroModel read(String model, Class<?> cma, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
+	protected MicroModel read(String model, Class<?> cma, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root,
+		List<IComponentFeatureFactory> features)
 	{
 		ModelInfo modelinfo = new ModelInfo();
 		MicroModel ret = new MicroModel(modelinfo);
@@ -156,6 +158,8 @@ public class MicroClassReader
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
+		if(features!=null)
+			modelinfo.setFeatures((IComponentFeatureFactory[])features.toArray(new IComponentFeatureFactory[features.size()]));
 		
 		if(rid==null)
 		{
@@ -273,6 +277,8 @@ public class MicroClassReader
 		boolean breaksdone = false;
 		boolean nfpropsdone = false;
 		boolean featdone = false;
+		
+		boolean addfeat = false;
 		Set<String> configdone = new HashSet<String>();
 		
 		Set<Class<?>> serifaces = new HashSet<Class<?>>(); 
@@ -371,19 +377,24 @@ public class MicroClassReader
 			// Take all, duplicates are eleminated
 			if(!featdone && isAnnotationPresent(cma, Features.class, cl))
 			{
-				Features fs =getAnnotation(cma, Features.class, cl);
+				Features fs = getAnnotation(cma, Features.class, cl);
 				Feature[] tmp = fs.value();
 				featdone = fs.replace();
 				Map<Class<?>, IComponentFeatureFactory> features = (Map<Class<?>, IComponentFeatureFactory>)toset.get("features");
 				if(features==null)
 				{
+					// Only set the first time (most specific subclass wins)
+					addfeat = fs.additional();
 					features = new HashMap<Class<?>, IComponentFeatureFactory>();
 					toset.put("features", features);
 				}
 				for(int i=0; i<tmp.length; i++)
 				{
-					features.put(tmp[i].type(), new ComponentFeatureFactory(tmp[i].type(), 
-						tmp[i].clazz(), tmp[i].predecessors(), tmp[i].successors(), tmp[i].addlast()));
+					if(!features.containsKey(tmp[i].type()))
+					{
+						features.put(tmp[i].type(), new ComponentFeatureFactory(tmp[i].type(), 
+							tmp[i].clazz(), tmp[i].predecessors(), tmp[i].successors(), tmp[i].addlast()));
+					}
 				}
 			}
 			
@@ -974,8 +985,22 @@ public class MicroClassReader
 		Map<Class<?>, IComponentFeatureFactory> feats = (Map<Class<?>, IComponentFeatureFactory>)toset.get("features");
 		if(feats!=null)
 		{
-			Collection<IComponentFeatureFactory> facts = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(feats.values()));
-			modelinfo.setFeatures(facts.toArray(new IComponentFeatureFactory[feats.size()]));
+			Map<Class<?>, IComponentFeatureFactory> fs = new HashMap<Class<?>, IComponentFeatureFactory>();
+			
+			IComponentFeatureFactory[] stdfeats = modelinfo.getFeatures();
+			if(addfeat)
+			{
+				for(IComponentFeatureFactory feat: stdfeats)
+				{
+					fs.put(feat.getType(), feat);
+				}
+			}
+			for(IComponentFeatureFactory feat: feats.values())
+			{
+				fs.put(feat.getType(), feat);
+			}
+			Collection<IComponentFeatureFactory> facts = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(fs.values()));
+			modelinfo.setFeatures(facts.toArray(new IComponentFeatureFactory[facts.size()]));
 		}
 		
 		// Check if there are implemented service interfaces for which the agent

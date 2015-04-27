@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.INonUserAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
@@ -478,18 +477,17 @@ public class Starter
 						autosd!=null ? autosd.booleanValue() : false, false, false, moni, model.getFullName(),
 						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
 					
-					Map<String, Object>	platformdata	= new HashMap<String, Object>();
-					platformdata.put(DATA_REALTIMETIMEOUT, getArgumentValue(DATA_REALTIMETIMEOUT, model, cmdargs, compargs));
-					platformdata.put(DATA_PARAMETERCOPY, getArgumentValue(DATA_PARAMETERCOPY, model, cmdargs, compargs));
-					platformdata.put(DATA_SERVICEREGISTRY, new PlatformServiceRegistry());
-					platformdata.put(DATA_ADDRESSBOOK, new TransportAddressBook());
+					putPlatformValue(cid, DATA_REALTIMETIMEOUT, getArgumentValue(DATA_REALTIMETIMEOUT, model, cmdargs, compargs));
+					putPlatformValue(cid, DATA_PARAMETERCOPY, getArgumentValue(DATA_PARAMETERCOPY, model, cmdargs, compargs));
+					putPlatformValue(cid, DATA_SERVICEREGISTRY, new PlatformServiceRegistry());
+					putPlatformValue(cid, DATA_ADDRESSBOOK, new TransportAddressBook());
 					Long to = (Long)cmdargs.remove(DEFTIMEOUT);
-					platformdata.put(DATA_DEFAULT_LOCAL_TIMEOUT, to);
-					platformdata.put(DATA_DEFAULT_REMOTE_TIMEOUT, to);
+					putPlatformValue(cid, DATA_DEFAULT_LOCAL_TIMEOUT, to!=null? to: DEFAULT_LOCAL);
+					putPlatformValue(cid, DATA_DEFAULT_REMOTE_TIMEOUT, to!=null? to: DEFAULT_REMOTE);
 					
 					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, compargs, desc, null, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();
-					component.create(cci, Collections.unmodifiableMap(platformdata), features);
+					component.create(cci, features);
 
 					initRescueThread(cid, compargs);	// Required for bootstrapping init.
 
@@ -1018,19 +1016,19 @@ public class Starter
 	/**
 	 *  Check if the real time timeout flag is set for a platform.
 	 */
-	public static boolean	isRealtimeTimeout(INonUserAccess access)
+	public static synchronized boolean	isRealtimeTimeout(IComponentIdentifier platform)
 	{
 		// Hack!!! Should default to false?
-		return !Boolean.FALSE.equals(access.getPlatformData().get(DATA_REALTIMETIMEOUT));
+		return !Boolean.FALSE.equals(getPlatformValue(platform, DATA_REALTIMETIMEOUT));
 	}
 	
 	/**
 	 *  Check if the parameter copy flag is set for a platform.
 	 */
-	public static boolean	isParameterCopy(INonUserAccess access)
+	public static synchronized boolean	isParameterCopy(IComponentIdentifier platform)
 	{
 		// not equals false to make true the default.
-		return !Boolean.FALSE.equals(access.getPlatformData().get(DATA_PARAMETERCOPY));
+		return !Boolean.FALSE.equals(getPlatformValue(platform, DATA_PARAMETERCOPY));
 	}
 
 	/**
@@ -1093,7 +1091,10 @@ public class Starter
 	{
 		Map<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem==null)
+		{
 			mem = new HashMap<String, Object>();
+			platformmem.put(platform, mem);
+		}
 		mem.put(key, value);
 	}
 	
@@ -1110,6 +1111,17 @@ public class Starter
 		if(mem!=null)
 			ret = mem.containsKey(key);
 		return ret;
+	}
+	
+	/**
+	 *  Get a global platform value.
+	 *  @param platform The platform name.
+	 *  @param key The key.
+	 *  @param value The value.
+	 */
+	public static synchronized void removePlatformMemory(IComponentIdentifier platform)
+	{
+		platformmem.remove(platform.getRoot());
 	}
 	
 	/**

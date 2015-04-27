@@ -21,15 +21,19 @@ import jadex.bdi.runtime.impl.GoalDelegationHandler;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
+import jadex.bdi.runtime.interpreter.BeliefInfo;
 import jadex.bdi.runtime.interpreter.EventProcessingRules;
 import jadex.bdi.runtime.interpreter.EventReificator;
 import jadex.bdi.runtime.interpreter.ExternalAccessRules;
 import jadex.bdi.runtime.interpreter.GoalDeliberationRules;
+import jadex.bdi.runtime.interpreter.GoalInfo;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.GoalProcessingRules;
 import jadex.bdi.runtime.interpreter.ListenerRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.PlanInfo;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.ComponentTerminatedException;
@@ -41,6 +45,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.SFuture;
+import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -74,7 +82,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
@@ -117,7 +124,7 @@ import java.util.logging.SimpleFormatter;
  *  and performing the agent execution when
  *  being called from the platform.
  */
-public class BDIAgentFeature 
+public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAgentFeature
 {
 	//-------- static part --------
 	
@@ -286,16 +293,18 @@ public class BDIAgentFeature
 	//-------- constructors --------
 	
 	/**
-	 *  Create an agent interpreter for the given agent.
-	 *  @param state	The state. 
-	 *  @param magent	The reference to the agent model in the state.
-	 *  @param config	The name of the configuration (or null for default configuration) 
-	 *  @param arguments	The arguments for the agent as name/value pairs.
+	 *  Bean constructor for type level.
 	 */
-	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
-		final String config, final Map<String, Object> arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, ProvidedServiceInfo[] pinfos,
-		final Map kernelprops, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited, PlatformServiceRegistry registry)
-	{	
+	public BDIAgentFeature()
+	{
+	}
+	
+	/**
+	 *  Factory method constructor for instance level.
+	 */
+	protected BDIAgentFeature(IInternalAccess component, final ComponentCreationInfo cinfo)
+	{
+		super(component, cinfo);
 		this.initthread = Thread.currentThread();
 		
 		this.state = state;
@@ -332,17 +341,17 @@ public class BDIAgentFeature
 		{
 			public boolean isExternalThread()
 			{
-				return BDIInterpreter.this.getComponentAdapter().isExternalThread();
+				return !getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 			}
 			
 			public void invokeSynchronized(Runnable code)
 			{
-				BDIInterpreter.this.invokeSynchronized(code);
+				invokeSynchronized(code);
 			}
 			
 			public void invokeLater(Runnable action)
 			{
-				getAgentAdapter().invokeLater(action);
+				invokeLater(action);
 			}
 		});
 		
@@ -373,7 +382,7 @@ public class BDIAgentFeature
 		// Set up initial state of agent
 		ragent = state.createRootObject(OAVBDIRuntimeModel.agent_type);
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model, model.getHandle());
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, config);
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, cinfo.getConfiguration());
 		if(arguments!=null && !arguments.isEmpty())
 			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, arguments);
 		this.bindings	= bindings;
@@ -394,8 +403,8 @@ public class BDIAgentFeature
 		}
 		
 		// Init the external access
-		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
-		this.container = createServiceContainer();
+//		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
+//		this.container = createServiceContainer();
 		this.ea = new ExternalAccessFlyweight(state, ragent);
 
 		scheduleStep(new IComponentStep<Void>()
@@ -403,7 +412,7 @@ public class BDIAgentFeature
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				init(getModel(), config).addResultListener(createResultListener(new DelegationResultListener(inited)));
+				init(getModel(), cinfo.getConfiguration()).addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(inited)));
 				return IFuture.DONE;
 			}
 		});
@@ -416,7 +425,7 @@ public class BDIAgentFeature
 	 */
 	public void startBehavior()
 	{
-		assert !getComponentAdapter().isExternalThread();
+		assert !isExternalThread();
 
 		// Use step in case agent is started as suspended.
 		scheduleStep(new IComponentStep<Void>()
@@ -460,7 +469,7 @@ public class BDIAgentFeature
 	public IFuture init(IModelInfo model,String config)
 	{
 //		assert isAgentThread();
-		assert !getAgentAdapter().isExternalThread();
+		assert !isExternalThread();
 		
 		return initCapability(this.model, config);
 	}
@@ -471,7 +480,7 @@ public class BDIAgentFeature
 	protected IFuture	initCapability(final OAVCapabilityModel oavmodel, final String config)
 	{
 //		assert isAgentThread();
-		assert !getAgentAdapter().isExternalThread();
+		assert !isExternalThread();
 		
 		final Future	ret	= new Future();
 		initcapa	= oavmodel.getHandle();
@@ -504,7 +513,7 @@ public class BDIAgentFeature
 								}
 								Object	mcapa	= state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability); 
 								OAVCapabilityModel	submodel	= oavmodel.getSubcapabilityModel(mcapa);
-								initCapability(submodel, subconf).addResultListener(createResultListener(this));
+								initCapability(submodel, subconf).addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(this));
 							}
 							else
 							{
@@ -524,52 +533,52 @@ public class BDIAgentFeature
 		return ret;
 	}
 
-	/**
-	 *  Overridden to init BDI internals before services.
-	 */
-	public IFuture initProvidedServices(final IModelInfo model, final String config)
-	{
-//		assert isAgentThread();
-		assert !getAgentAdapter().isExternalThread();
-		
-		IFuture	ret;
-		if(model==getModel())
-		{
-			final Future	fut	= new Future();
-			ret	= fut;
-			// Agent model: init agent stuff first.
-			init0().addResultListener(createResultListener(new DelegationResultListener(fut)
-			{
-				public void customResultAvailable(Object result)
-				{
-					init1().addResultListener(createResultListener(new DelegationResultListener(fut)
-					{
-						public void customResultAvailable(Object result)
-						{
-							BDIInterpreter.super.initProvidedServices(model, config).addResultListener(new DelegationResultListener(fut));
-						}
-					}));				
-				}
-			}));
-		}
-		else
-		{
-			// Capability model: agent stuff already inited.
-			ret	= BDIInterpreter.super.initProvidedServices(model, config);
-//			ret	= IFuture.DONE;
-		}
-		return ret;
-	}
+//	/**
+//	 *  Overridden to init BDI internals before services.
+//	 */
+//	public IFuture initProvidedServices(final IModelInfo model, final String config)
+//	{
+////		assert isAgentThread();
+//		assert !getAgentAdapter().isExternalThread();
+//		
+//		IFuture	ret;
+//		if(model==getModel())
+//		{
+//			final Future	fut	= new Future();
+//			ret	= fut;
+//			// Agent model: init agent stuff first.
+//			init0().addResultListener(createResultListener(new DelegationResultListener(fut)
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//					init1().addResultListener(createResultListener(new DelegationResultListener(fut)
+//					{
+//						public void customResultAvailable(Object result)
+//						{
+//							BDIInterpreter.super.initProvidedServices(model, config).addResultListener(new DelegationResultListener(fut));
+//						}
+//					}));				
+//				}
+//			}));
+//		}
+//		else
+//		{
+//			// Capability model: agent stuff already inited.
+//			ret	= BDIInterpreter.super.initProvidedServices(model, config);
+////			ret	= IFuture.DONE;
+//		}
+//		return ret;
+//	}
 	
-	/**
-	 *  Start the services.
-	 */
-	public IFuture startServiceContainer()
-	{
-		// Overriden to do nothing when this is called for a capability.
-		// Hack!!! Container started, but capability services added later.
-		return initcapa==model.getHandle() ? super.startServiceContainer() : IFuture.DONE;
-	}
+//	/**
+//	 *  Start the services.
+//	 */
+//	public IFuture startServiceContainer()
+//	{
+//		// Overriden to do nothing when this is called for a capability.
+//		// Hack!!! Container started, but capability services added later.
+//		return initcapa==model.getHandle() ? super.startServiceContainer() : IFuture.DONE;
+//	}
 
 	
 	/**
@@ -578,7 +587,7 @@ public class BDIAgentFeature
 	protected IFuture	init0()
 	{
 //		assert isAgentThread();
-		assert !getAgentAdapter().isExternalThread();
+		assert !isExternalThread();
 		
 		final Future	ret	= new Future();
 		
@@ -586,57 +595,57 @@ public class BDIAgentFeature
 //		ea = new ExternalAccessFlyweight(state, ragent);
 		
 		// Get the services.
-		final boolean services[]	= new boolean[3];
-		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				clockservice	= (IClockService)result;
-				boolean	startagent;
-				synchronized(services)
-				{
-					services[0]	= true;
-					startagent	= services[0] && services[1] && services[2];// && services[3];
-				}
-				if(startagent)
-				{
-					ret.setResult(null);
-				}
-			}
-		}));
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				cms	= (IComponentManagementService)result;
-				boolean	startagent;
-				synchronized(services)
-				{
-					services[1]	= true;
-					startagent	= services[0] && services[1] && services[2];// && services[3];
-				}
-				if(startagent)
-					ret.setResult(null);
-			}
-		}));
-		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				msgservice	= (IMessageService)result;
-				boolean	startagent;
-				synchronized(services)
-				{
-					services[2]	= true;
-					startagent	= services[0] && services[1] && services[2];// && services[3];
-				}
-				if(startagent)
-					ret.setResult(null);
-			}
-		}));
+//		final boolean services[]	= new boolean[3];
+//		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(createResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				clockservice	= (IClockService)result;
+//				boolean	startagent;
+//				synchronized(services)
+//				{
+//					services[0]	= true;
+//					startagent	= services[0] && services[1] && services[2];// && services[3];
+//				}
+//				if(startagent)
+//				{
+//					ret.setResult(null);
+//				}
+//			}
+//		}));
+//		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(createResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				cms	= (IComponentManagementService)result;
+//				boolean	startagent;
+//				synchronized(services)
+//				{
+//					services[1]	= true;
+//					startagent	= services[0] && services[1] && services[2];// && services[3];
+//				}
+//				if(startagent)
+//					ret.setResult(null);
+//			}
+//		}));
+//		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(createResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				msgservice	= (IMessageService)result;
+//				boolean	startagent;
+//				synchronized(services)
+//				{
+//					services[2]	= true;
+//					startagent	= services[0] && services[1] && services[2];// && services[3];
+//				}
+//				if(startagent)
+//					ret.setResult(null);
+//			}
+//		}));
 
 		// Previously done in createStartAgentRule
 		Map parents = new HashMap(); 
@@ -652,7 +661,7 @@ public class BDIAgentFeature
 	protected IFuture	init1()
 	{
 //		assert isAgentThread();
-		assert !getAgentAdapter().isExternalThread();
+		assert !isExternalThread();
 		
 		return AgentRules.initializeCapabilityInstance(state, ragent);
 	}
@@ -689,9 +698,9 @@ public class BDIAgentFeature
 //					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
 //						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 					
-					if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+					if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 					{
-						publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+						getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 					}
 					
 					rulesystem.getAgenda().fireRule();
@@ -702,9 +711,9 @@ public class BDIAgentFeature
 					state.notifyEventListeners();
 					state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 					
-					if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+					if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 					{
-						publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+						getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 					}
 				}
 	
@@ -916,7 +925,7 @@ public class BDIAgentFeature
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
 //		assert isAgentThread();
-		assert !getAgentAdapter().isExternalThread();
+		assert !isExternalThread();
 		
 		boolean	isatbreakpoint	= false;
 		
@@ -936,56 +945,56 @@ public class BDIAgentFeature
 		return isatbreakpoint;
 	}
 
-	/**
-	 *  Get the logger.
-	 *  @return The logger.
-	 */
-	public Logger getLogger(Object rcapa)
-	{
-		Logger ret = adapter.getLogger();
-		
-		if(ragent!=rcapa)
-		{
-			// get logger with unique capability name
-			// todo: implement getDetailName()
-			//String name = getDetailName();
-			
-			List path = new ArrayList();
-			findSubcapability(ragent, rcapa, path);
-			StringBuffer buf = new StringBuffer();
-			buf.append(ret.getName()).append(".");
-			for(int i=0; i<path.size(); i++)
-			{
-				Object caparef = path.get(i);
-				String name = (String)state.getAttributeValue(caparef, OAVBDIRuntimeModel.capabilityreference_has_name);
-				buf.append(name);
-				if(i+1<path.size())
-					buf.append(".");
-			}
-			String name = buf.toString();
-			ret = LogManager.getLogManager().getLogger(name);
-			
-			// if logger does not already exists, create it
-			if(ret==null)
-			{
-				// Hack!!! Might throw exception in applet / webstart.
-				try
-				{
-					ret = Logger.getLogger(name);
-					initLogger(path, ret);
-					//System.out.println(logger.getParent().getLevel());
-				}
-				catch(SecurityException e)
-				{
-					// Hack!!! For applets / webstart use anonymous logger.
-					ret	= Logger.getAnonymousLogger();
-					initLogger(path, ret);
-				}
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get the logger.
+//	 *  @return The logger.
+//	 */
+//	public Logger getLogger(Object rcapa)
+//	{
+//		Logger ret = adapter.getLogger();
+//		
+//		if(ragent!=rcapa)
+//		{
+//			// get logger with unique capability name
+//			// todo: implement getDetailName()
+//			//String name = getDetailName();
+//			
+//			List path = new ArrayList();
+//			findSubcapability(ragent, rcapa, path);
+//			StringBuffer buf = new StringBuffer();
+//			buf.append(ret.getName()).append(".");
+//			for(int i=0; i<path.size(); i++)
+//			{
+//				Object caparef = path.get(i);
+//				String name = (String)state.getAttributeValue(caparef, OAVBDIRuntimeModel.capabilityreference_has_name);
+//				buf.append(name);
+//				if(i+1<path.size())
+//					buf.append(".");
+//			}
+//			String name = buf.toString();
+//			ret = LogManager.getLogManager().getLogger(name);
+//			
+//			// if logger does not already exists, create it
+//			if(ret==null)
+//			{
+//				// Hack!!! Might throw exception in applet / webstart.
+//				try
+//				{
+//					ret = Logger.getLogger(name);
+//					initLogger(path, ret);
+//					//System.out.println(logger.getParent().getLevel());
+//				}
+//				catch(SecurityException e)
+//				{
+//					// Hack!!! For applets / webstart use anonymous logger.
+//					ret	= Logger.getAnonymousLogger();
+//					initLogger(path, ret);
+//				}
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Find the path to a subcapability.
@@ -1268,14 +1277,14 @@ public class BDIAgentFeature
 //	// hack!!!
 //	protected static Map gexecutors	= new HashMap();
 	
-	/**
-	 *  Get the adapter agent.
-	 *  @return The adapter agent.
-	 */
-	public IComponentAdapter getAgentAdapter()
-	{
-		return this.adapter;
-	}
+//	/**
+//	 *  Get the adapter agent.
+//	 *  @return The adapter agent.
+//	 */
+//	public IComponentAdapter getAgentAdapter()
+//	{
+//		return this.adapter;
+//	}
 	
 	/**
 	 *  Get the agent state.
@@ -1325,7 +1334,7 @@ public class BDIAgentFeature
 	 */
 	public void invokeSynchronized(final Runnable code)
 	{
-		if(getComponentAdapter().isExternalThread())
+		if(isExternalThread())
 		{
 			System.err.println("Unsynchronized internal thread.");
 			Thread.dumpStack();
@@ -1379,13 +1388,13 @@ public class BDIAgentFeature
 						if(BDIAgentFeature.getInterpreter(state)!=null)
 						{
 //							System.err.println("Waiting: "+state);
-							getAgentAdapter().getLogger().warning("Executing synchronized code (might lead to deadlocks): "+code);
+							getComponent().getLogger().warning("Executing synchronized code (might lead to deadlocks): "+code);
 							exception.wait();
 //							System.err.println("Continued: "+state);
 						}
 						else
 						{
-							throw new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
+							throw new ComponentTerminatedException(getComponent().getComponentIdentifier());
 						}
 					}
 				}
@@ -1432,7 +1441,7 @@ public class BDIAgentFeature
 	{
 		final Future ret = step instanceof IComponentStep<?> ?  createStepFuture((IComponentStep)step) : new Future<T>();
 		
-		if(getComponentAdapter().isExternalThread()
+		if(isExternalThread()
 			|| getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
 		{
 			try
@@ -1465,14 +1474,14 @@ public class BDIAgentFeature
 						}
 						else
 						{
-							ret.setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
+							ret.setException(new ComponentTerminatedException(getComponent().getComponentIdentifier()));
 						}
 					}
 				});
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(getComponent().getComponentIdentifier(), new Runnable()
 				{
 					public void run()
 					{
@@ -1490,7 +1499,7 @@ public class BDIAgentFeature
 			else
 			{
 				// Happens when timeout listener should be added on cleanup.
-				ret.setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));				
+				ret.setException(new ComponentTerminatedException(getComponent().getComponentIdentifier()));				
 			}
 		}
 
@@ -1528,7 +1537,7 @@ public class BDIAgentFeature
 		}
 		catch(final Exception e)
 		{
-			Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+			Starter.scheduleRescueStep(getComponent().getComponentIdentifier(), new Runnable()
 			{
 				public void run()
 				{
@@ -1574,8 +1583,8 @@ public class BDIAgentFeature
 	public boolean isExternalThread()
 	{
 		return initthread!=Thread.currentThread() && !isPlanThread() &&
-			!(IComponentDescription.STATE_TERMINATED.equals(getComponentDescription().getState()) 
-				&& Starter.isRescueThread(getComponentIdentifier()));
+			!(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()) 
+				&& Starter.isRescueThread(getComponent().getComponentIdentifier()));
 	}
 
 	/**
@@ -1591,7 +1600,7 @@ public class BDIAgentFeature
 	 *  Sets the plan currently executed by this agent.
 	 *  @param currentplan The current plan.
 	 */
-	protected void setCurrentPlan(Object currentplan)
+	public void setCurrentPlan(Object currentplan)
 	{
 		this.currentplan = currentplan;
 	}
@@ -1750,17 +1759,17 @@ public class BDIAgentFeature
 		return parent;
 	}
 	
-	/**
-	 *  Create the service container.
-	 *  @return The service container.
-	 */
-	public IInternalAccess getServiceContainer()
-	{
-//		assert container!=null;
-		if(container==null)
-			container = createServiceContainer();
-		return container;
-	}
+//	/**
+//	 *  Create the service container.
+//	 *  @return The service container.
+//	 */
+//	public IInternalAccess getServiceContainer()
+//	{
+////		assert container!=null;
+//		if(container==null)
+//			container = createServiceContainer();
+//		return container;
+//	}
 	
 	//-------- helper methods --------
 	
@@ -2158,15 +2167,15 @@ public class BDIAgentFeature
 		return copy;
 	}
 	
-	/**
-	 *  Create the service container.
-	 *  @return The service conainer.
-	 */
-	public IInternalAccess createServiceContainer()
-	{
-		assert container==null;
-		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess(), isRealtime(), getServiceRegistry());
-	}
+//	/**
+//	 *  Create the service container.
+//	 *  @return The service conainer.
+//	 */
+//	public IInternalAccess createServiceContainer()
+//	{
+//		assert container==null;
+//		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess(), isRealtime(), getServiceRegistry());
+//	}
 	
 	/**
 	 *  Get the results of the component (considering it as a functionality).
@@ -2187,7 +2196,7 @@ public class BDIAgentFeature
 	 */
 	public void setResultValue(String name, Object value)
 	{
-		assert !getComponentAdapter().isExternalThread();
+		assert !isExternalThread();
 		
 		// todo: store results only within listener?!
 		if(results==null)
@@ -2266,7 +2275,7 @@ public class BDIAgentFeature
 		ret.setTerminationCommand(tcom);
 		
 		// Signal that subscription has been done
-		MonitoringEvent	subscribed	= new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), 
+		MonitoringEvent	subscribed	= new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), 
 			IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(), PublishEventLevel.COARSE);
 		boolean	post = false;
 		try
@@ -2435,7 +2444,7 @@ public class BDIAgentFeature
 				Object	belief	= it.next();
 				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, belief, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), belief.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(belief.toString());
 				ev.setProperty("details", info);
 				events.add(ev);
@@ -2451,7 +2460,7 @@ public class BDIAgentFeature
 				Object	beliefset	= it.next();
 				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, beliefset, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), beliefset.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(beliefset.toString());
 				ev.setProperty("details", info);
 				events.add(ev);
@@ -2467,7 +2476,7 @@ public class BDIAgentFeature
 				Object	goal	= it.next();
 				GoalInfo	info = GoalInfo.createGoalInfo(state, goal, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_GOAL, info.getType(), goal.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis(), PublishEventLevel.FINE);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(goal.toString());
 				ev.setProperty("details", info);
 				events.add(ev);
@@ -2483,7 +2492,7 @@ public class BDIAgentFeature
 				Object	plan	= it.next();
 				PlanInfo	info = PlanInfo.createPlanInfo(state, plan, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_PLAN, info.getType(), plan.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis(), PublishEventLevel.FINE);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(plan.toString());
 				ev.setProperty("details", info);
 				events.add(ev);
@@ -2501,109 +2510,109 @@ public class BDIAgentFeature
 		}
 	}
 	
-	/**
-	 *  Get the required service property provider for a service.
-	 */
-	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
-	{
-		INFMixedPropertyProvider ret = null;
-		if(reqserprops==null)
-			reqserprops = new HashMap<IServiceIdentifier, INFMixedPropertyProvider>(); // use LRU?
-		ret = reqserprops.get(sid);
-		if(ret==null)
-		{
-			ret = new NFMethodPropertyProvider(null)
-			{
-				public IInternalAccess getInternalAccess() 
-				{
-					return BDIInterpreter.this.getInternalAccess();
-				}
-			}; // parent of required service property?
-			reqserprops.put(sid, ret);
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get the required service property provider for a service.
+//	 */
+//	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
+//	{
+//		INFMixedPropertyProvider ret = null;
+//		if(reqserprops==null)
+//			reqserprops = new HashMap<IServiceIdentifier, INFMixedPropertyProvider>(); // use LRU?
+//		ret = reqserprops.get(sid);
+//		if(ret==null)
+//		{
+//			ret = new NFMethodPropertyProvider(null)
+//			{
+//				public IInternalAccess getInternalAccess() 
+//				{
+//					return BDIInterpreter.this.getInternalAccess();
+//				}
+//			}; // parent of required service property?
+//			reqserprops.put(sid, ret);
+//		}
+//		return ret;
+//	}
 	
-	/**
-	 *  Has the service a property provider.
-	 */
-	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
-	{
-		return reqserprops!=null? reqserprops.get(sid)!=null: false;
-	}
+//	/**
+//	 *  Has the service a property provider.
+//	 */
+//	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
+//	{
+//		return reqserprops!=null? reqserprops.get(sid)!=null: false;
+//	}
+//	
+//
+//	/**
+//	 *  Check if event targets exist.
+//	 */
+//	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi)
+//	{
+//		boolean ret = false;
+//		
+//		if(pi.getLevel()<=getPublishEmitLevelSubscriptions().getLevel() 
+//			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOSUBSCRIBERS.equals(pt)))
+//		{
+//			ret = subscriptions!=null && !subscriptions.isEmpty();
+//		}
+//		if(!ret && pi.getLevel()<=getPublishEmitLevelMonitoring().getLevel()
+//			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt)))
+//		{
+//			ret = true;
+//		}
+//		
+//		return ret;
+//	}
 	
-
-	/**
-	 *  Check if event targets exist.
-	 */
-	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi)
-	{
-		boolean ret = false;
-		
-		if(pi.getLevel()<=getPublishEmitLevelSubscriptions().getLevel() 
-			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOSUBSCRIBERS.equals(pt)))
-		{
-			ret = subscriptions!=null && !subscriptions.isEmpty();
-		}
-		if(!ret && pi.getLevel()<=getPublishEmitLevelMonitoring().getLevel()
-			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt)))
-		{
-			ret = true;
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get the monitoring event emit level for subscriptions.
+//	 *  Is the maximum level of all subscriptions (cached for speed).
+//	 */
+//	public PublishEventLevel getPublishEmitLevelSubscriptions()
+//	{
+//		return emitlevelsub;
+//	}
 	
-	/**
-	 *  Get the monitoring event emit level for subscriptions.
-	 *  Is the maximum level of all subscriptions (cached for speed).
-	 */
-	public PublishEventLevel getPublishEmitLevelSubscriptions()
-	{
-		return emitlevelsub;
-	}
+//	/**
+//	 *  Get the monitoring event emit level.
+//	 */
+//	public PublishEventLevel getPublishEmitLevelMonitoring()
+//	{
+//		return getComponent().getComponentDescription().getMonitoring();
+//	}
 	
-	/**
-	 *  Get the monitoring event emit level.
-	 */
-	public PublishEventLevel getPublishEmitLevelMonitoring()
-	{
-		return getComponentDescription().getMonitoring();
-	}
-	
-	/**
-	 *  Terminate the result subscribers.
-	 */
-	public void terminateResultSubscribers()
-	{
-		if(resultsubscriptions!=null)
-		{
-			// terminate all but the first (cms) subscriptions
-			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> sub: resultsubscriptions)
-			{
-				if(sub.equals(cmssub))
-				{
-					continue;
-				}
-				sub.setFinishedIfUndone();
-			}
-		}
-	}
-
-	/**
-	 *  Invalidate the external access.
-	 */
-	public void invalidateAccess(boolean terminate)
-	{
-		// Todo...
-	}
-	
-	/**
-	 *  Get the service registry.
-	 *  @return The service registry.
-	 */
-	public PlatformServiceRegistry getServiceRegistry() 
-	{
-		return registry;
-	}
+//	/**
+//	 *  Terminate the result subscribers.
+//	 */
+//	public void terminateResultSubscribers()
+//	{
+//		if(resultsubscriptions!=null)
+//		{
+//			// terminate all but the first (cms) subscriptions
+//			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> sub: resultsubscriptions)
+//			{
+//				if(sub.equals(cmssub))
+//				{
+//					continue;
+//				}
+//				sub.setFinishedIfUndone();
+//			}
+//		}
+//	}
+//
+//	/**
+//	 *  Invalidate the external access.
+//	 */
+//	public void invalidateAccess(boolean terminate)
+//	{
+//		// Todo...
+//	}
+//	
+//	/**
+//	 *  Get the service registry.
+//	 *  @return The service registry.
+//	 */
+//	public PlatformServiceRegistry getServiceRegistry() 
+//	{
+//		return registry;
+//	}
 }

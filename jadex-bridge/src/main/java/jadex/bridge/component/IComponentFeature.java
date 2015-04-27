@@ -26,19 +26,6 @@ public interface IComponentFeature
 	public IFuture<Void>	shutdown();
 	
 	/**
-	 *  Get external feature facade.
-	 */
-//	public <T> IFuture<T> getExternalFacade(Class<T> type, Object context);
-//	public <T> IFuture<T> getExternalFacade(Object context);
-	public <T> T getExternalFacade(Object context);
-	
-//	/**
-//	 *  Get external feature facade.
-//	 */
-////	public <T> IFuture<Class<T>> getExternalFacadeType(Object context);
-//	public <T> Class<T> getExternalFacadeType(Object context);
-	
-	/**
 	 *  The feature can inject parameters for expression evaluation
 	 *  by providing an optional value fetcher. The fetch order is the reverse
 	 *  init order, i.e., later features can override values from earlier features.

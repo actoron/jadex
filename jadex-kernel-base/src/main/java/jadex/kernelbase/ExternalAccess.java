@@ -3,12 +3,10 @@ package jadex.kernelbase;
 import jadex.base.Starter;
 import jadex.bridge.ComponentPersistedException;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.ExternalFeatureProvider;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -21,7 +19,6 @@ import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -46,7 +43,7 @@ import java.util.logging.Logger;
 /**
  *  External access for applications.
  */
-public class ExternalAccess extends ExternalFeatureProvider implements IExternalAccess
+public class ExternalAccess implements IExternalAccess
 {
 	//-------- attributes --------
 

@@ -585,7 +585,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
-																	PlatformServiceRegistry.getRegistry(access).addExcludedComponent(cid);
+																	PlatformServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);
 																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
@@ -616,7 +616,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																	final IPlatformComponentAccess	component	= new PlatformComponent();
 																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, cinfo.getProvidedServiceInfos(), cinfo.getRequiredServiceBindings());
-																	component.create(cci, access.getPlatformData(), features);
+																	component.create(cci, features);
 																	IArgumentsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsFeature.class);
 																	if(resultlistener!=null)
 																	{
@@ -667,7 +667,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Started component: "+cid.getName());
 
-																			PlatformServiceRegistry.getRegistry(access).removeExcludedComponent(cid);
+																			PlatformServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
 																			
 		//																	System.out.println("created: "+ad);
 																			
@@ -774,7 +774,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Starting component failed: "+cid+", "+exception);
 																			
-																			PlatformServiceRegistry.getRegistry(access).removeExcludedComponent(cid);
+																			PlatformServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
 																			
 //																			System.err.println("Starting component failed: "+cid+", "+exception);
 //																			exception.printStackTrace();
@@ -1929,6 +1929,12 @@ public class ComponentManagementService implements IComponentManagementService
 //				System.out.println("killparent: "+pad.getComponentIdentifier());
 				destroyComponent(pad.getComponentIdentifier());
 			}
+			
+			if(cid.getRoot().equals(cid))
+			{
+//				System.out.println("removed: "+cid);
+				Starter.removePlatformMemory(cid);
+			}
 //		}
 //		catch(Throwable t)
 //		{
@@ -2883,6 +2889,9 @@ public class ComponentManagementService implements IComponentManagementService
 		});
 		
 		return ret;*/
+		
+//		Starter.removePlatformMemory(sid.getProviderId());
+		
 		return IFuture.DONE;
 	}
 	

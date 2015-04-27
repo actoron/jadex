@@ -46,7 +46,7 @@ public class UserAgent
 		IService1 ser1 = (IService1)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ser1").get();
 		try
 		{
-			ser1.service().get(Timeout.NONE);
+			ser1.service().get();
 			tr.setSucceeded(true);
 		}
 		catch(Exception e)

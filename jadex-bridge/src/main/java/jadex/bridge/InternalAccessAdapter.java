@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 /**
  *  Internal access adapter.
  */
-public class InternalAccessAdapter implements IInternalAccess, INonUserAccess
+public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 {
 	/** The delegate access. */
 	protected IInternalAccess access;
@@ -25,28 +25,27 @@ public class InternalAccessAdapter implements IInternalAccess, INonUserAccess
 		this.access = access;
 	}
 	
-	//-------- INonUserAccess interface --------
-	
-	/**
-	 *  Get the exception, if any.
-	 *  
-	 *  @return The failure reason for use during cleanup, if any.
-	 */
-	public Exception	getException()
-	{
-		return ((INonUserAccess)access).getException();
-	}
-	
-	/**
-	 *  Get the shared platform data.
-	 *  
-	 *  @return The objects shared by all components of the same platform (registry etc.). See starter for available data.
-	 */
-	public Map<String, Object>	getPlatformData()
-	{
-		return ((INonUserAccess)access).getPlatformData();
-	}
-
+//	//-------- INonUserAccess interface --------
+//	
+//	/**
+//	 *  Get the exception, if any.
+//	 *  
+//	 *  @return The failure reason for use during cleanup, if any.
+//	 */
+//	public Exception	getException()
+//	{
+//		return ((INonUserAccess)access).getException();
+//	}
+//	
+//	/**
+//	 *  Get the shared platform data.
+//	 *  
+//	 *  @return The objects shared by all components of the same platform (registry etc.). See starter for available data.
+//	 */
+//	public Map<String, Object>	getPlatformData()
+//	{
+//		return ((INonUserAccess)access).getPlatformData();
+//	}
 
 	//-------- IInternalAccess interface --------
 	
@@ -177,5 +176,14 @@ public class InternalAccessAdapter implements IInternalAccess, INonUserAccess
 	public IFuture<IComponentIdentifier[]> getChildren(String type)
 	{
 		return access.getChildren(type);
+	}
+	
+	/**
+	 *  Get the exception, if any.
+	 *  @return The failure reason for use during cleanup, if any.
+	 */
+	public Exception getException()
+	{
+		return access.getException();
 	}
 }

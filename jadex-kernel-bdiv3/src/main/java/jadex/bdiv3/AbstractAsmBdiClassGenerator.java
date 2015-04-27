@@ -3,7 +3,6 @@ package jadex.bdiv3;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
-import jadex.bridge.INonUserAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.eca.EventType;
@@ -70,11 +69,11 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				// Auto-implement abstract methods from IBDIAgent and subinterfaces.
 				if(name.indexOf(Type.getInternalName(IBDIAgent.class))!=-1)
 				{
-					cn.interfaces.add(Type.getInternalName(INonUserAccess.class));
+//					cn.interfaces.add(Type.getInternalName(INonUserAccess.class));
 					// Fetch all methods.
 					List<Class<?>> allcz = SUtil.arrayToList(SReflect.getSuperInterfaces(new Class[]{IBDIAgent.class}));
 					allcz.add(IBDIAgent.class);
-					allcz.add(INonUserAccess.class);
+//					allcz.add(INonUserAccess.class);
 					Set<Method> allms = new HashSet<Method>();
 					for(Class<?> tmp: allcz)
 					{
@@ -133,10 +132,10 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						{
 							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bdiv3/features/IBDIAgentFeature", mnode.name, mnode.desc, true));
 						}
-						else if(m.getDeclaringClass().equals(INonUserAccess.class))
-						{
-							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bridge/INonUserAccess", mnode.name, mnode.desc, true));
-						}
+//						else if(m.getDeclaringClass().equals(INonUserAccess.class))
+//						{
+//							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bridge/INonUserAccess", mnode.name, mnode.desc, true));
+//						}
 						else
 						{
 							nl.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "jadex/bridge/IInternalAccess", mnode.name, mnode.desc, true));

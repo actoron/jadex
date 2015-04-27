@@ -50,7 +50,7 @@ public class ServiceCallPlan extends Plan
 		IIntermediateFuture<?>	services	= getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(service);
 		// Todo: implement suspendable intermediate futures.
 //		while(!success && services.hasNextIntermediateResult(this))
-		Collection<?>	results	= services.get(this);
+		Collection<?>	results	= services.get();//this);
 //		System.out.println("received: "+results);
 		for(Object proxy: results)
 		{
@@ -63,7 +63,7 @@ public class ServiceCallPlan extends Plan
 				Object	res	= meths[0].invoke(proxy, myargs);
 				if(res instanceof IFuture<?>)
 				{
-					Object resu = ((IFuture<?>)res).get(this);
+					Object resu = ((IFuture<?>)res).get();//this);
 //					System.out.println("invoked, result: "+resu);
 					// todo: set return value on parameter
 				}

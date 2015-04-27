@@ -1,8 +1,11 @@
 package jadex.bdiv3;
 
+import java.util.List;
+
 import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -58,8 +61,10 @@ public class BDIModelLoader extends AbstractModelLoader
 		ClassLoader classloader, Object context) throws Exception
 	{
 //		System.out.println("cache miss: "+name);
+		if(((Object[])context).length!=3)
+			System.out.println("sdgdf");
 		return (ICacheableModel)reader.read(name, imports, classloader, 
-			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1]);
+			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1], (List<IComponentFeatureFactory>)((Object[])context)[2]);
 	}
 	
 	//-------- constructors --------

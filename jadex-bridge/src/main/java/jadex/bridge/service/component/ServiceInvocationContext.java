@@ -136,8 +136,8 @@ public class ServiceInvocationContext
 	/** The platform identifier. */
 	protected IComponentIdentifier platform;
 	
-	/** The flag if local timeouts should be realtime. */
-	protected boolean realtime;
+//	/** The flag if local timeouts should be realtime. */
+//	protected boolean realtime;
 	
 	/** The creation (root) cause. */
 	protected Cause cause;
@@ -153,14 +153,13 @@ public class ServiceInvocationContext
 	 */
 	public ServiceInvocationContext(Object proxy, Method method, 
 		IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform, 
-		boolean realtime, IServiceIdentifier sid, Cause crcause)
+		IServiceIdentifier sid, Cause crcause)
 	{
 //		this.ex = new RuntimeException();
 		this.sid = sid;
 		
 		this.platform = platform;
 		this.proxy = proxy;
-		this.realtime	= realtime;
 		this.object = new ArrayList<Object>();
 		this.method = new ArrayList<Method>();
 		this.arguments = new ArrayList<List<Object>>();
@@ -225,7 +224,7 @@ public class ServiceInvocationContext
 		}
 		if(!call.getProperties().containsKey(ServiceCall.REALTIME))
 		{
-			call.setProperty(ServiceCall.REALTIME, realtime ? Boolean.TRUE : Boolean.FALSE);
+			call.setProperty(ServiceCall.REALTIME, Starter.isRealtimeTimeout(sid.getProviderId())? Boolean.TRUE : Boolean.FALSE);
 		}
 		
 		// Init the cause of the next call based on the last one
@@ -266,7 +265,7 @@ public class ServiceInvocationContext
 		
 		this.call	= context.call;
 		this.lastcall = context.lastcall;
-		this.realtime	= context.realtime;
+//		this.realtime	= context.realtime;
 		this.platform = context.platform;
 		this.proxy = context.proxy;
 		this.object = new ArrayList<Object>(context.object);

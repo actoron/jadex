@@ -23,6 +23,7 @@ import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
@@ -36,6 +37,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
+import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -377,6 +379,15 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IComponentDescription	getComponentDescription()
 	{
 		return getInterpreter().getComponentDescription();
+	}
+	
+	/**
+	 *  Get the exception.
+	 *  @return The exception.
+	 */
+	public Exception getException()
+	{
+		return getInterpreter().getException();
 	}
 	
 //	/**
@@ -1232,5 +1243,63 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	{
 		return getInterpreter().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(pt, pi);
 	}
+	
+	/**
+	 *  Get the children (if any) component identifiers.
+	 *  @return The children component identifiers.
+	 */
+	public IFuture<IComponentIdentifier[]> getChildren(final String type)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getChildren(type);
+				}
+			};
+			return new Future<IComponentIdentifier[]>((IComponentIdentifier[])invoc.object);
+		}
+		else
+		{
+			return getInterpreter().getChildren(type);
+		}
+	}
+	
+	/**
+	 *  Get the children (if any) component identifiers.
+	 *  @return The children component identifiers.
+	 */
+	public <T> T getComponentFeature(final Class< ? extends T> type)
+	{
+		return getInterpreter().getComponentFeature(type);
+	}
+	
+	/**
+	 *  Get the children (if any) component identifiers.
+	 *  @return The children component identifiers.
+	 */
+	public <T> T getComponentFeature0(final Class< ? extends T> type)
+	{
+		return getInterpreter().getComponentFeature0(type);
+	}
+	
+	public IParameterGuesser getParameterGuesser()
+	{
+		return getInterpreter().getParameterGuesser();
+	}
+	
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture killComponent(Exception e)
+	{
+		return getInterpreter().killComponent(e);
+	}
 
+	public Object getPlatformComponent()
+	{
+		return getInterpreter();
+	}
 }

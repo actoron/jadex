@@ -1,6 +1,5 @@
 package jadex.bridge.service;
 
-import jadex.bridge.ExternalFeatureProvider;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -23,7 +22,7 @@ import java.util.Map;
  *  Basic service provide a simple default isValid() implementation
  *  that returns true after start service and false afterwards.
  */
-public class BasicService extends ExternalFeatureProvider implements IInternalService //extends NFMethodPropertyProvider implements IInternalService
+public class BasicService implements IInternalService //extends NFMethodPropertyProvider implements IInternalService
 {
 	//-------- constants --------
 

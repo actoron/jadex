@@ -3,7 +3,6 @@ package jadex.bridge.component.impl;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.INonUserAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -154,7 +153,7 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	{
 		if(resfuts!=null)
 		{
-			Exception	ex	= ((INonUserAccess)getComponent()).getException();
+			Exception	ex	= getComponent().getException();
 			if(ex!=null)
 			{
 				for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)

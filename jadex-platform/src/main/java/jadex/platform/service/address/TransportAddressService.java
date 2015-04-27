@@ -3,7 +3,6 @@ package jadex.platform.service.address;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.INonUserAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -32,7 +31,7 @@ public class TransportAddressService implements ITransportAddressService
 	@ServiceStart
 	public void started()
 	{
-		addresses = TransportAddressBook.getAddressBook((INonUserAccess)agent);
+		addresses = TransportAddressBook.getAddressBook(agent);
 	}
 	
 	/**

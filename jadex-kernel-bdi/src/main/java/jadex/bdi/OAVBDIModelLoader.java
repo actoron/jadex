@@ -13,12 +13,18 @@ import jadex.bdi.runtime.interpreter.GoalProcessingRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.modelinfo.ConfigurationInfo;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
@@ -245,7 +251,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				null, null, false, 
 				name, null, classloader, 
 				null, null, 
-				null, null, imports, null, ret);
+				null, null, imports, null, ret, null); // todo: set features
 			ret.setModelInfo(mi);
 		}
 		

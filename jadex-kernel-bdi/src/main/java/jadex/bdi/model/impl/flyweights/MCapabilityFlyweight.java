@@ -666,6 +666,6 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public ModelInfo	getModelInfo()
 	{
-		return getInterpreter()!=null ? (ModelInfo)getInterpreter().getModel(getHandle()) : info;
+		return getBDIFeature()!=null ? (ModelInfo)getBDIFeature().getModel(getHandle()) : info;
 	}
 }

@@ -1,10 +1,13 @@
 package jadex.bdi.model.impl.flyweights;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMEElement;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
@@ -27,7 +30,8 @@ public class MElementFlyweight implements IMElement, IMEElement
 	private Object scope;
 	
 	/** The interpreter. */
-	private BDIInterpreter interpreter;
+	private IBDIAgentFeature interpreter;
+	private IInternalAccess agent;
 	
 	/** Flag to indicate if the flyweight was already cleaned up. */
 	private boolean	cleanedup;
@@ -52,6 +56,7 @@ public class MElementFlyweight implements IMElement, IMEElement
 			state.addExternalObjectUsage(scope, this);
 		
 		this.interpreter = BDIAgentFeature.getInterpreter(state);
+		this.agent = BDIAgentFeature.getInternalAccess(state);
 		setHandle(handle);
 	}
 	
@@ -186,9 +191,18 @@ public class MElementFlyweight implements IMElement, IMEElement
 	 *  Get the interpreter.
 	 *  @return The interpreter.
 	 */
-	public BDIInterpreter getInterpreter()
+	public IBDIAgentFeature getBDIFeature()
 	{
 		return interpreter;
+	}
+	
+	/**
+	 *  Get the interpreter.
+	 *  @return The interpreter.
+	 */
+	public IInternalAccess getInterpreter()
+	{
+		return agent;
 	}
 	
 	/**
@@ -402,7 +416,7 @@ public class MElementFlyweight implements IMElement, IMEElement
 		public AgentInvocation(Object arg)
 		{
 			this.arg = arg;
-			getInterpreter().invokeSynchronized(this);
+			getBDIFeature().invokeSynchronized(this);
 		}
 		
 		/**
@@ -411,16 +425,16 @@ public class MElementFlyweight implements IMElement, IMEElement
 		public AgentInvocation(Object[] args)
 		{
 			this.args = args;
-			getInterpreter().invokeSynchronized(this);
+			getBDIFeature().invokeSynchronized(this);
 		}
 	}
 	
 	public boolean	isExternalThread()
 	{
 		boolean	ret	= false;	// Default for models during creation.
-		if(getInterpreter()!=null)
+		if(getBDIFeature()!=null)
 		{
-			ret	= getInterpreter().getComponentAdapter().isExternalThread();
+			ret	= !getInterpreter().getComponentFeature(IExecutionFeature.class).isComponentThread();//isExternalThread();
 		}
 		return ret;
 	}

@@ -2,9 +2,12 @@ package jadex.micro;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
+
+import java.util.List;
 
 /**
  *  Loader for micro models.
@@ -58,7 +61,7 @@ public class MicroModelLoader extends AbstractModelLoader
 //			System.out.println("cache miss: "+name);
 		
 		return (ICacheableModel)reader.read(name, imports, classloader, 
-			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1]);
+			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1], (List<IComponentFeatureFactory>)((Object[])context)[2]);
 	}
 	
 	//-------- constructors --------
