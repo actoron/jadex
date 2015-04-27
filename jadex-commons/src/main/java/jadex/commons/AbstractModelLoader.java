@@ -233,7 +233,7 @@ public abstract class AbstractModelLoader
 	 */
 	public synchronized ICacheableModel	loadModel(String name, String[] imports, Object clkey, ClassLoader classloader, Object context) throws Exception
 	{
-		return loadModel(name, null, imports, classloader, context);
+		return loadModel(name, null, imports, clkey, classloader, context);
 	}
 
 	/**

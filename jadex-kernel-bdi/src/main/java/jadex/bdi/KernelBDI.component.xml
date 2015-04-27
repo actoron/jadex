@@ -30,22 +30,22 @@
 	<services>
 		<providedservice name="component_factory" class="IComponentFactory">
 			<implementation>
-				new BDIAgentFactory($component)
-				//, SUtil.createHashMap(
-				//	new String[]
-				//	{
-				//		"planexecutor_standard", 
-				//		"microplansteps",
+				new BDIAgentFactory($component
+				, SUtil.createHashMap(
+					new String[]
+					{
+						//"planexecutor_standard", 
+						"microplansteps",
 						//"planexecutor_bpmn",
-				//		"debugger.panels"
-				//	},
-				//	new Object[]
-				//	{
-				//		$component.getProperty("planexecutor_standard"),
-				//		Boolean.TRUE,
-				//		"jadex.tools.debugger.bdi.BDIViewerDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
-				//	}
-				//))
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						//$component.getModel().getProperty("planexecutor_standard"),
+						Boolean.TRUE,
+						"jadex.tools.debugger.bdi.BDIViewerDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+					}
+				))
 			</implementation>
 		</providedservice>
 		
