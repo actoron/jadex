@@ -27,7 +27,7 @@ public interface IInternalBDIAgentFeature
 	 *  @param path The result path as list of capas.
 	 *  @return True if found.
 	 */
-	public boolean findSubcapability(Object rcapa, Object targetcapa, List path);
+	public boolean findSubcapability(Object rcapa, Object targetcapa, List<Object> path);
 	
 	/**
 	 *  Get the agent instance reference.
@@ -112,12 +112,12 @@ public interface IInternalBDIAgentFeature
 	/**
 	 *  Put an element into the cache.
 	 */
-	public void putFlyweightCache(Class type, Object key, Object flyweight);
+	public void putFlyweightCache(Class<?> type, Object key, Object flyweight);
 	
 	/**
 	 *  Get an element from the cache.
 	 */
-	public Object getFlyweightCache(Class type, Object key);
+	public Object getFlyweightCache(Class<?> type, Object key);
 	
 	/**
 	 *  Invoke some code with agent behaviour synchronized on the agent.
@@ -136,7 +136,7 @@ public interface IInternalBDIAgentFeature
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public <T> IFuture<T> scheduleStep(final Object step, final Object scope);
+	public <T> IFuture<T> scheduleStep(IComponentStep<T> step, Object scope);
 	
 	/**
 	 *  Execute some code on the component's thread.
@@ -145,11 +145,24 @@ public interface IInternalBDIAgentFeature
 	 *  @param action	Code to be executed on the component's thread.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleImmediate(final IComponentStep step, final Object scope);
+	public <T> IFuture<T> scheduleImmediate(IComponentStep<T> step, Object scope);
 	
 	/**
 	 *  Check if the agent thread is accessing.
 	 *  @return True, if access is ok.
 	 */ 
 	public boolean isPlanThread();
+
+	/**
+	 *  Add a default value for an argument (if not already present).
+	 *  Called once for each argument during init.
+	 *  @param name	The argument name.
+	 *  @param value	The argument value.
+	 */
+	public boolean	addArgument(String name, Object value);
+
+	/**
+	 *  Called when the agent is removed from the platform.
+	 */
+	public void cleanup();
 }

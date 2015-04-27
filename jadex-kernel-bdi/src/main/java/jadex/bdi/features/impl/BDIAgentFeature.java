@@ -57,9 +57,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
-import jadex.bridge.service.search.PlatformServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
@@ -245,12 +243,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/** The plan executor. */
 	protected Map planexecutors;
 	
-	/** The externally synchronized threads to be notified on cleanup. */
-	protected Set externalthreads;
-	
-//	/** The get-external-access listeners to be notified after init. */
-//	protected Set eal;
-	
 	/** The service container. */
 	protected IInternalAccess container;
 	
@@ -272,16 +264,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/** The realtime local timeout flag. */
 	protected boolean realtime;
 
-	
-//	/** The result listener. */
-//	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
-	
 	/** The monitoring service getter. */
 	protected ServiceGetter<IMonitoringService> getter;
-	
-	/** The service registry .*/
-	protected PlatformServiceRegistry registry;
-
 	
 	//-------- constructors --------
 	
@@ -735,48 +719,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	int lastmax;
 	int lastmin;
 	String	lastmsg;
-
-	/**
-	 *  Inform the agent that a message has arrived.
-	 *  @param message The message that arrived.
-	 */
-	public void messageArrived(final IMessageAdapter message)
-	{
-//		System.out.println("messageArrived: "+getAgentAdapter().getComponentIdentifier().getLocalName()+", "+message);
-		// Notify/ask tools that we are about to receive a message.
-//		boolean	toolmsg	= false;
-//		for(int i=0; !toolmsg && i<tooladapters.length; i++)
-//			toolmsg	= tooladapters[i].messageReceived(message);
-
-		// Handle normal messages.
-//		if(!toolmsg)
-//		{
-			getAgentAdapter().invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_inbox, message);
-//					System.out.println("message moved to inbox: "+getAgentAdapter().getComponentIdentifier().getLocalName()
-//						+"("+state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)+")"+", "+message);
-				}
-			});
-//		}
-	}
 	
-	/**
-	 *  Inform the agent that a message has arrived.
-	 *  @param message The message that arrived.
-	 */
-	public void streamArrived(final IConnection con)
-	{
-//		System.out.println("messageArrived: "+getAgentAdapter().getComponentIdentifier().getLocalName()+", "+message);
-		Map<String, Object> msg = new HashMap<String, Object>();
-		msg.put(SFipa.CONTENT, con);
-		msg.put(SFipa.SENDER, con.getInitiator());
-		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{con.getParticipant()});
-		messageArrived(new DefaultMessageAdapter(msg, SFipa.FIPA_MESSAGE_TYPE));
-	}
-
 	/**
 	 *  Request agent to kill itself.
 	 */
@@ -801,7 +744,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		else
 		{
 			// Killed after termination.
-			ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
+			ret.setException(new RuntimeException("Component not running: "+getComponent().getComponentIdentifier().getName()));
 		}
 		
 		return ret;
@@ -872,17 +815,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 
 		interpreters.remove(state);
 		
-		for(Iterator it=externalthreads.iterator(); it.hasNext(); )
-		{
-			Throwable[]	exception	= (Throwable[])it.next();
-			synchronized(exception)
-			{
-				exception[0] = new ComponentTerminatedException(getInternalAccess().getComponentIdentifier());
-				exception[0].fillInStackTrace();
-				exception.notify();
-				it.remove();
-			}
-		}
 //		System.out.println(BDIInterpreter.interpreters.size());
 	}
 
@@ -1075,36 +1007,36 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		String	logfile	= null;
 		Object	handlers = null;
 		
-		for(int i=-1; i<path.size(); i++)
-		{
-			Object	rcapa	= i==-1 ? ragent
-				: state.getAttributeValue(path.get(i), OAVBDIRuntimeModel.capabilityreference_has_capability);
-			if(level==null)
-			{
-				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.level");
-				level	= prop!=null ? (Level)prop : null;
-			}
-			if(useparent==null)
-			{
-				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.useParentHandlers");
-				useparent	= prop!=null ? (Boolean)prop : null;
-			}
-			if(addconsole==null)
-			{
-				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.addConsoleHandler");
-				addconsole	= prop!=null ? (Level)prop : null;
-			}
-			if(logfile==null)
-			{
-				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.file");
-				logfile	= prop!=null ? (String)prop : null;
-			}
-			if(logfile==null)
-			{
-				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.handlers");
-				handlers	= prop!=null ? prop : null;
-			}
-		}
+//		for(int i=-1; i<path.size(); i++)
+//		{
+//			Object	rcapa	= i==-1 ? ragent
+//				: state.getAttributeValue(path.get(i), OAVBDIRuntimeModel.capabilityreference_has_capability);
+//			if(level==null)
+//			{
+//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.level");
+//				level	= prop!=null ? (Level)prop : null;
+//			}
+//			if(useparent==null)
+//			{
+//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.useParentHandlers");
+//				useparent	= prop!=null ? (Boolean)prop : null;
+//			}
+//			if(addconsole==null)
+//			{
+//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.addConsoleHandler");
+//				addconsole	= prop!=null ? (Level)prop : null;
+//			}
+//			if(logfile==null)
+//			{
+//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.file");
+//				logfile	= prop!=null ? (String)prop : null;
+//			}
+//			if(logfile==null)
+//			{
+//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.handlers");
+//				handlers	= prop!=null ? prop : null;
+//			}
+//		}
 		
 		// the level of the logger
 		logger.setLevel(level==null? Level.WARNING: level);
@@ -1332,79 +1264,16 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			System.err.println("Unsynchronized internal thread.");
 			Thread.dumpStack();
 
-			final boolean[] notified = new boolean[1];
-			final Throwable[] exception = new Throwable[1];
-			externalthreads.add(exception);
-			
-			// Add external will throw exception if action execution cannot be done.
-//			System.err.println("invokeSynchonized("+code+"): adding");
-			getAgentAdapter().invokeLater(new Runnable()
+			IFuture<Void>	fut	= getComponent().getComponentFeature(IExecutionFeature.class)
+				.scheduleImmediate(new IComponentStep<Void>()
 			{
-				public void run()
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					try
-					{
-						code.run();
-
-//						// Assert for testing state consistency (slow -> comment out for release!)
-//						assert rulesystem.getState().getUnreferencedObjects().isEmpty()
-//							: getAgentAdapter().getComponentIdentifier().getLocalName()
-//							+ ", " + code
-//							+ ", " + rulesystem.getState().getUnreferencedObjects();
-					}
-					catch(Throwable e)
-					{
-						exception[0]	= e;
-					}
-					
-					synchronized(exception)
-					{
-						exception.notify();
-						notified[0] = true;
-						externalthreads.remove(exception);
-					}
-				}
-				
-				public String	toString()
-				{
-					return code.toString();
+					code.run();
+					return IFuture.DONE;
 				}
 			});
-			
-			try
-			{
-//				System.err.println("invokeSynchonized("+code+"): waiting");
-				synchronized(exception)
-				{
-					if(!notified[0])
-					{
-						if(BDIAgentFeature.getInterpreter(state)!=null)
-						{
-//							System.err.println("Waiting: "+state);
-							getComponent().getLogger().warning("Executing synchronized code (might lead to deadlocks): "+code);
-							exception.wait();
-//							System.err.println("Continued: "+state);
-						}
-						else
-						{
-							throw new ComponentTerminatedException(getComponent().getComponentIdentifier());
-						}
-					}
-				}
-//				System.err.println("invokeSynchonized("+code+"): returned");
-			}
-			catch(InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-			if(exception[0] instanceof RuntimeException)
-			{
-				throw (RuntimeException)exception[0];
-			}
-			else if(exception[0]!=null)
-			{
-				throw new RuntimeException(exception[0]);
-			}
+			fut.get();
 		}
 		else
 		{
@@ -1430,73 +1299,15 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public <T> IFuture<T> scheduleStep(final Object step, final Object scope)
+	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step, final Object scope)
 	{
-		final Future ret = step instanceof IComponentStep<?> ?  createStepFuture((IComponentStep)step) : new Future<T>();
-		
-		if(isExternalThread()
-			|| getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
+		return getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<T>()
 		{
-			try
+			public IFuture<T> execute(IInternalAccess ia)
 			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						if(state.containsObject(ragent))
-						{
-							if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
-							{
-								// Hack!!! During init phase execute directly as rule engine isn't running.
-								try
-								{
-//									((IComponentStep)step).execute(getInternalAccess())
-//										.addResultListener(new DelegationResultListener(ret));
-									IFuture res = ((IComponentStep)step).execute(getInternalAccess(scope));
-									FutureFunctionality.connectDelegationFuture(ret, res);
-								}
-								catch(Exception e)
-								{
-									ret.setException(e);
-								}
-							}
-							else
-							{
-								getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope!=null ? scope : ragent});
-							}
-						}
-						else
-						{
-							ret.setException(new ComponentTerminatedException(getComponent().getComponentIdentifier()));
-						}
-					}
-				});
+				return step.execute(getInternalAccess(scope));
 			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(getComponent().getComponentIdentifier(), new Runnable()
-				{
-					public void run()
-					{
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			if(getState().containsObject(ragent))
-			{
-				getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope!=null ? scope : ragent});
-			}
-			else
-			{
-				// Happens when timeout listener should be added on cleanup.
-				ret.setException(new ComponentTerminatedException(getComponent().getComponentIdentifier()));				
-			}
-		}
-
-		return ret;		
+		});
 	}
 	
 	/**
@@ -1506,40 +1317,15 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 *  @param action	Code to be executed on the component's thread.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleImmediate(final IComponentStep step, final Object scope)
+	public <T> IFuture<T> scheduleImmediate(final IComponentStep<T> step, final Object scope)
 	{
-		final Future ret = createStepFuture(step);
-		
-		try
+		return getComponent().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<T>()
 		{
-			adapter.invokeLater(new Runnable() 
+			public IFuture<T> execute(IInternalAccess ia)
 			{
-				public void run() 
-				{
-					try
-					{
-						IFuture res = step.execute(new CapabilityFlyweight(state, scope));
-						FutureFunctionality.connectDelegationFuture(ret, res);	
-					}
-					catch(Exception e)
-					{
-						ret.setException(e);
-					}
-				}
-			});
-		}
-		catch(final Exception e)
-		{
-			Starter.scheduleRescueStep(getComponent().getComponentIdentifier(), new Runnable()
-			{
-				public void run()
-				{
-					ret.setException(e);
-				}
-			});
-		}
-		
-		return ret;
+				return step.execute(getInternalAccess(scope));
+			}
+		});
 	}
 	
 	/**
@@ -2501,6 +2287,13 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				getCurrentStateEvents(ia, state, state.getAttributeValue(it.next(), OAVBDIRuntimeModel.capabilityreference_has_capability), events);
 			}
 		}
+	}
+
+	@Override
+	public Logger getLogger(Object rcapa)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 //	/**
