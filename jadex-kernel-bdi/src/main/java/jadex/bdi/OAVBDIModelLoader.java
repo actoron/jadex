@@ -13,18 +13,12 @@ import jadex.bdi.runtime.interpreter.GoalProcessingRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.modelinfo.ConfigurationInfo;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
@@ -508,17 +502,17 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			{
 				Object mplan = it.next();
 				
-				// Check if body types are supported.
-				Object	mbody	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
-				String	type	= (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_type);
-				if(!properties.containsKey("planexecutor_"+type))
-				{
-					Tuple	se	= new Tuple(new Object[]{
-						new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
-						new StackElement(new QName(state.getType(mplan).getName()), mplan),
-						new StackElement(new QName(state.getType(mbody).getName()), mbody)});
-					model.addEntry(se, "No executor for plan body type: "+type);
-				}
+//				// Check if body types are supported.
+//				Object	mbody	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
+//				String	type	= (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_type);
+//				if(!properties.containsKey("planexecutor_"+type))
+//				{
+//					Tuple	se	= new Tuple(new Object[]{
+//						new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
+//						new StackElement(new QName(state.getType(mplan).getName()), mplan),
+//						new StackElement(new QName(state.getType(mbody).getName()), mbody)});
+//					model.addEntry(se, "No executor for plan body type: "+type);
+//				}
 				
 				// Create rules for plans
 				
