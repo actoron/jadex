@@ -5,7 +5,6 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
