@@ -100,7 +100,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				dispatchSubgoalAndWait(da);
 				
 //				SyncResultListener	listener	= new SyncResultListener();
-				IComponentManagementService ces	= (IComponentManagementService)SServiceProvider.getLocalService(getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getLocalService(getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				IFuture ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
 				ret.get();
 //				listener.waitForResult();

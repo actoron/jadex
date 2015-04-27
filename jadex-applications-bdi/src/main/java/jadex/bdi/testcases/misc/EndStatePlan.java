@@ -6,7 +6,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.df.IDF;
@@ -80,7 +80,7 @@ public class EndStatePlan extends Plan
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
-		IDF df = (IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get();
+		IDF df = (IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "endstate_testservice", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		

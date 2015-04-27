@@ -1,6 +1,7 @@
 package jadex.bdi.testcases.semiautomatic;
 
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 
 /**
@@ -62,7 +63,7 @@ public class InterceptorPlan extends Plan
 	{
 		try
 		{
-			IPrintHelloService ps = (IPrintHelloService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getProvidedService("printservice");
+			IPrintHelloService ps = (IPrintHelloService)getInterpreter().getComponentFeature(IProvidedServicesFeature.class).getProvidedService("printservice");
 			ps.printHello().get();
 		}
 		catch(Exception e)

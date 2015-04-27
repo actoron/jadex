@@ -3,7 +3,7 @@ package jadex.bdi.testcases.misc;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -19,8 +19,8 @@ public class FlagPlan extends Plan
 	  */
 	public void body()
 	{
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			getInterpreter(), IComponentManagementService.class).get();
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getLocalService(
+			getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		
 		TestReport tr = new TestReport("#1", "Start agent as suspended.");
 		CreationInfo ci =  new CreationInfo("donothing", null, getComponentIdentifier());

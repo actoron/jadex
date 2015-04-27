@@ -3,7 +3,6 @@ package jadex.bdi.testcases.service;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 
 import java.util.Collection;
@@ -21,8 +20,8 @@ public class FactFetcherPlan extends Plan
 	{	
 		TestReport tr = new TestReport("#1", "Tests if own service can be found.");
 		
-		Collection services = (Collection)SServiceProvider.getServices(getInterpreter(), 
-			IBeliefGetter.class, RequiredServiceInfo.SCOPE_LOCAL).get();
+		Collection services = (Collection)SServiceProvider.getLocalServices(getInterpreter(), 
+			IBeliefGetter.class, RequiredServiceInfo.SCOPE_LOCAL);
 //		System.out.println("Found: "+services);
 		if(services!=null)
 		{
