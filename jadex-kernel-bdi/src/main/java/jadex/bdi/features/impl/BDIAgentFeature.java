@@ -275,7 +275,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		OAVTypeModel tmodel	= new OAVTypeModel(getComponent().getComponentDescription().getName().getLocalName()+"_typemodel", model.getState().getTypeModel().getClassLoader());
 		tmodel.addTypeModel(model.getState().getTypeModel());
 		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
+		this.state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(model.getState());
 			
 //		this.parent	= parent;
