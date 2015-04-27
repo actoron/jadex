@@ -15,19 +15,19 @@ import jadex.bridge.component.impl.MessageComponentFeature;
 /**
  *  Extension to allow message injection in agent methods.
  */
-public class BDIMessageComponentStep extends MessageComponentFeature
+public class BDIMessageComponentFeature extends MessageComponentFeature
 {
 	//-------- constants --------
 	
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMessageFeature.class, BDIMessageComponentStep.class);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMessageFeature.class, BDIMessageComponentFeature.class);
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create the feature.
 	 */
-	public BDIMessageComponentStep(IInternalAccess component, ComponentCreationInfo cinfo)
+	public BDIMessageComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 	}
@@ -40,15 +40,15 @@ public class BDIMessageComponentStep extends MessageComponentFeature
 	 */
 	protected IComponentStep<Void> createHandleMessageStep(IMessageAdapter message)
 	{
-		return new HandleMicroMessageStep(message);
+		return new HandleBDIMessageStep(message);
 	}
 	
 	/**
 	 *  Step to handle a message.
 	 */
-	public class HandleMicroMessageStep	extends HandleMessageStep
+	public class HandleBDIMessageStep	extends HandleMessageStep
 	{
-		public HandleMicroMessageStep(IMessageAdapter message)
+		public HandleBDIMessageStep(IMessageAdapter message)
 		{
 			super(message);
 		}
@@ -73,15 +73,15 @@ public class BDIMessageComponentStep extends MessageComponentFeature
 	 */
 	protected IComponentStep<Void> createHandleStreamStep(IConnection con)
 	{
-		return new HandleMicroStreamStep(con);
+		return new HandleBDIStreamStep(con);
 	}
 	
 	/**
 	 *  Step to handle a message.
 	 */
-	public class HandleMicroStreamStep	extends HandleStreamStep
+	public class HandleBDIStreamStep	extends HandleStreamStep
 	{
-		public HandleMicroStreamStep(IConnection con)
+		public HandleBDIStreamStep(IConnection con)
 		{
 			super(con);
 		}
