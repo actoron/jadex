@@ -179,6 +179,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		super(component.getComponentIdentifier(), IComponentFactory.class, null);
 		this.myprops = properties;
 		this.component	= component;
+		
+		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BDI_FEATURES));
 	}
 	
 	/**
