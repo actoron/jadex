@@ -82,7 +82,6 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.javaimpl.OAVState;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.IOException;
@@ -249,9 +248,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/** The cached external access. */
 	protected IExternalAccess ea;
 	
-	/** The initthread. */
-	protected Thread initthread;
-	
 	/** The currently inited mcapability. */
 	protected Object	initcapa;
 	
@@ -272,7 +268,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	public BDIAgentFeature(IInternalAccess component, final ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-		this.initthread = Thread.currentThread();
 		
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 		this.model	= (OAVAgentModel)getComponent().getModel().getRawModel();
@@ -363,23 +358,28 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			if(mps!=null)
 				microplansteps = mps.booleanValue();
 		}
-		
+	}
+	
+	/**
+	 *  Init the agent.
+	 */
+	public IFuture<Void> init()
+	{
 		// Init the external access
 //		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 //		this.container = createServiceContainer();
 		this.ea = new ExternalAccessFlyweight(state, ragent);
 
-		scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
+//		scheduleStep(new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
 				getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				init(getModel(), cinfo.getConfiguration()).addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(inited)));
-				return IFuture.DONE;
-			}
-		});
-
-		this.initthread = null;
+//				return IFuture.DONE;
+//			}
+//		});
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -1346,7 +1346,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */ 
 	public boolean isExternalThread()
 	{
-		return initthread!=Thread.currentThread() && !isPlanThread() &&
+		return !isPlanThread() &&
 			!(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()) 
 				&& Starter.isRescueThread(getComponent().getComponentIdentifier()));
 	}
