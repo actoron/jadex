@@ -264,16 +264,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	//-------- constructors --------
 	
 	/**
-	 *  Bean constructor for type level.
-	 */
-	public BDIAgentFeature()
-	{
-	}
-	
-	/**
 	 *  Factory method constructor for instance level.
 	 */
-	protected BDIAgentFeature(IInternalAccess component, final ComponentCreationInfo cinfo)
+	public BDIAgentFeature(IInternalAccess component, final ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 		this.initthread = Thread.currentThread();
