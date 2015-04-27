@@ -153,17 +153,17 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BDI_FEATURES));
 	}
 	
-	/**
-	 *  Create a new agent factory.
-	 */
-	// Constructor used by GPMN factory.
-	public BDIAgentFactory(Map<String, Object> props, IInternalAccess component)
-	{
-//		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
-		super(component.getComponentIdentifier(), IComponentFactory.class, null);
-		this.myprops = props;
-		this.component	= component;
-	}
+//	/**
+//	 *  Create a new agent factory.
+//	 */
+//	// Constructor used by GPMN factory.
+//	public BDIAgentFactory(Map<String, Object> props, IInternalAccess component)
+//	{
+////		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
+//		super(component.getComponentIdentifier(), IComponentFactory.class, null);
+//		this.myprops = props;
+//		this.component	= component;
+//	}
 	
 //	/**
 //	 *  Create a new agent factory.
@@ -173,6 +173,24 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 //		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
 //		this.props = props;
 //	}
+	
+	/**
+	 *  Create a new agent factory.
+	 */
+	public BDIAgentFactory(IInternalAccess agent)//, Map properties)
+	{
+		this(agent, null);
+	}
+	
+	/**
+	 *  Create a new agent factory.
+	 */
+	public BDIAgentFactory(IInternalAccess component, Map<String, Object> properties)
+	{
+		super(component.getComponentIdentifier(), IComponentFactory.class, null);
+		this.myprops = properties;
+		this.component	= component;
+	}
 	
 	/**
 	 *  Start the service.
