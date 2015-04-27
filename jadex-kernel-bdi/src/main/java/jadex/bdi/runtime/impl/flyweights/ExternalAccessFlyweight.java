@@ -295,7 +295,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	{
 		final Future ret = new Future();
 		
-		if(!getBDIFeature().isPlanThread())
+		if(!getInterpreter().getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
@@ -355,7 +355,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 	{
 		final Future ret = new Future();
 		
-		if(!getBDIFeature().isPlanThread())
+		if(!getInterpreter().getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{

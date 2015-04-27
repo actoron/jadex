@@ -3,6 +3,7 @@ package jadex.bdi.runtime;
 import jadex.base.Starter;
 import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.features.impl.IInternalBDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIExecutionFeature;
 import jadex.bdi.runtime.impl.AbstractPlan;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
@@ -10,6 +11,7 @@ import jadex.bdi.runtime.impl.flyweights.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.beans.PropertyChangeSupport;
@@ -543,7 +545,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		if(lis==null)
 			lis = new SyncResultListener();
 
-		if(!BDIAgentFeature.getInterpreter(getState()).isPlanThread())
+		if(!((IInternalBDIExecutionFeature)BDIAgentFeature.getInternalAccess(getState()).getComponentFeature(IExecutionFeature.class)).isPlanThread())
 			throw new RuntimeException("SyncResultListener may only be used from plan thread.");
 		
 		if(this.future!=null)
@@ -714,7 +716,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		 */
 		public Object waitForResult(long timeout)
 		{
-			if(!BDIAgentFeature.getInterpreter(getState()).isPlanThread())
+			if(!((IInternalBDIExecutionFeature)BDIAgentFeature.getInternalAccess(getState()).getComponentFeature(IExecutionFeature.class)).isPlanThread())
 				throw new RuntimeException("SyncResultListener may only be used from plan thread.");
 			
 			if(!alreadyresumed)

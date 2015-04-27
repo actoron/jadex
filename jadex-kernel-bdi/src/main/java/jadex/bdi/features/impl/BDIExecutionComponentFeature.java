@@ -15,8 +15,11 @@ import jadex.rules.state.IProfiler;
 /**
  *  BDI execution feature adds rule engine behavior to the cycle.
  */
-public class BDIExecutionComponentFeature extends ExecutionComponentFeature
+public class BDIExecutionComponentFeature extends ExecutionComponentFeature	implements IInternalBDIExecutionFeature
 {
+	/** The plan thread currently executing (null for none). */
+	protected transient Thread planthread;
+	
 	/**
 	 *  Create the feature.
 	 */
@@ -93,4 +96,43 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 		
 		return again;
 	}
+
+	/**
+	 *  Set the current plan thread.
+	 *  @param planthread The planthread.
+	 */ 
+	public void setPlanThread(Thread planthread)
+	{
+		this.planthread = planthread;
+	}
+	
+	/**
+	 *  Check if the agent thread is accessing.
+	 *  @return True, if access is ok.
+	 */ 
+	public boolean isPlanThread()
+	{
+		return planthread==Thread.currentThread();
+	}
+	
+	/**
+	 *  Test if current thread is the component thread.
+	 *  @return True if the current thread is the component thread.
+	 */
+	public boolean isComponentThread()
+	{
+		return super.isComponentThread() || isPlanThread();
+	}
+	
+//	/**
+//	 *  Check if the external thread is accessing.
+//	 *  @return True, if access is ok.
+//	 */ 
+//	public boolean isExternalThread()
+//	{
+//		return !getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread()
+//			&& !isPlanThread()
+//			&& !(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()) 
+//				&& Starter.isRescueThread(getComponent().getComponentIdentifier()));
+//	}
 }

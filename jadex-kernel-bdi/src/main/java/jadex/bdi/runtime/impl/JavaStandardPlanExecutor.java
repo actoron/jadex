@@ -2,21 +2,20 @@ package jadex.bdi.runtime.impl;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.IInternalBDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIExecutionFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
 
 import java.io.Serializable;
@@ -590,7 +589,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			
 			// Save the execution thread for this task.
 			this.thread = Thread.currentThread();
-			getBDIAgentFeature(interpreter).setPlanThread(thread);
+			((IInternalBDIExecutionFeature)interpreter.getComponentFeature(IExecutionFeature.class)).setPlanThread(thread);
 			ClassLoader oldcl = thread.getContextClassLoader();
 			assert getBDIAgentFeature(interpreter).getState().getTypeModel().getClassLoader()!=null;
 			thread.setContextClassLoader(getBDIAgentFeature(interpreter).getState().getTypeModel().getClassLoader());
@@ -697,7 +696,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			synchronized(monitor)
 			{
 //				System.out.println("finish1: "+rplan);
-				getBDIAgentFeature(interpreter).setPlanThread(null);
+				((IInternalBDIExecutionFeature)interpreter.getComponentFeature(IExecutionFeature.class)).setPlanThread(null);
 				thread.setContextClassLoader(oldcl);
 				monitor.notify();
 //				System.out.println("finish2: "+rplan);
@@ -734,7 +733,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				monitor.notify();
 				try
 				{
-					getBDIAgentFeature(interpreter).setPlanThread(null);
+					((IInternalBDIExecutionFeature)interpreter.getComponentFeature(IExecutionFeature.class)).setPlanThread(null);
 //					System.out.println("givebackcontrol: "+rplan);
 					monitor.wait();
 				}
@@ -747,7 +746,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 
 				// Execution continues when the executors executeStep() transfers
 				// execution from agent thread to plan thread (using another notify/wait pair).
-				getBDIAgentFeature(interpreter).setPlanThread(thread);
+				((IInternalBDIExecutionFeature)interpreter.getComponentFeature(IExecutionFeature.class)).setPlanThread(thread);
 				
 				// When plan must be terminated unconditionally stop execution.
 				if(terminate)
