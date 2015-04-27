@@ -2,6 +2,7 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
@@ -3417,7 +3418,7 @@ public class AgentRules
 	public static void cleanupAgent(IOAVState state, Object ragent)
 	{
 		Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
-		IBDIAgentFeature interpreter	= BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature interpreter	= BDIAgentFeature.getInterpreter(state);
 		
 //				String name = BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
 //				if(name.indexOf("jcc")!=-1)

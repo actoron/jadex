@@ -2,6 +2,7 @@ package jadex.bdi.runtime.impl;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IExternalCondition;
@@ -227,7 +228,7 @@ public class SFlyweightFunctionality
 	public static void modified(IOAVState state, Object handle, IInternalAccess interpreter)
 	{
 		Object	fact = state.getAttributeValue(handle, OAVBDIRuntimeModel.belief_has_fact);
-		interpreter.getComponentFeature(IBDIAgentFeature.class).getEventReificator().objectModified(handle, state.getType(handle), OAVBDIRuntimeModel.belief_has_fact, fact, fact);
+		((IInternalBDIAgentFeature)interpreter.getComponentFeature(IBDIAgentFeature.class)).getEventReificator().objectModified(handle, state.getType(handle), OAVBDIRuntimeModel.belief_has_fact, fact, fact);
 	}
 	
 	/**

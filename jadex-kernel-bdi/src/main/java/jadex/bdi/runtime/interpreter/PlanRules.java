@@ -2,6 +2,7 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.BDIFailureException;
 import jadex.bdi.runtime.GoalFailureException;
@@ -540,7 +541,7 @@ public class PlanRules
 				Object	rplan	= assignments.getVariableValue("?rplan");
 				Object	rcapa	= assignments.getVariableValue("?rcapa");
 				
-				IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+				IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 				boolean interrupted = false;
 
 				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
@@ -649,7 +650,7 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				boolean interrupted = false;
-				IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+				IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 				ip.setCurrentPlan(rplan);
 				try
 				{
@@ -735,7 +736,7 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				boolean interrupted = false;
-				IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+				IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 				ip.setCurrentPlan(rplan);
 				try
 				{
@@ -820,7 +821,7 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				boolean interrupted = false;
-				IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+				IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 				ip.setCurrentPlan(rplan);
 				try
 				{
