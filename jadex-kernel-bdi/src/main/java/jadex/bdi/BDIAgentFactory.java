@@ -1,5 +1,8 @@
 package jadex.bdi;
 
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.BDIMessageComponentFeature;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.OAVCapabilityModel;
@@ -13,6 +16,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -86,13 +90,12 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	protected static final LazyResource	ICON_CAPABILITY = new LazyResource(BDIAgentFactory.class, "/jadex/bdi/images/bdi_capability.png");
 
 	/** The specific component features for micro agents. */
-	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = null;//Collections.unmodifiableCollection(
-//		Arrays.asList(null
-//			BDIAgentFeature.FACTORY, 
+	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = Collections.unmodifiableCollection(
+		Arrays.asList(
+			new ComponentFeatureFactory(IBDIAgentFeature.class, BDIAgentFeature.class),
+			BDIMessageComponentFeature.FACTORY
 //			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class),
-//			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BDIMonitoringComponentFeature.class),
-//			new ComponentFeatureFactory(IRequiredServicesFeature.class, BDIRequiredServicesComponentFeature.class)
-//		));
+		));
 	
 	//-------- attributes --------
 	

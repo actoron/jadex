@@ -15,19 +15,19 @@ import jadex.bridge.component.impl.MessageComponentFeature;
 /**
  *  Extension to allow message injection in agent methods.
  */
-public class BDIMessageComponentStep extends MessageComponentFeature
+public class BDIMessageComponentFeature extends MessageComponentFeature
 {
 	//-------- constants --------
 	
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMessageFeature.class, BDIMessageComponentStep.class);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IMessageFeature.class, BDIMessageComponentFeature.class);
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create the feature.
 	 */
-	public BDIMessageComponentStep(IInternalAccess component, ComponentCreationInfo cinfo)
+	public BDIMessageComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 	}
