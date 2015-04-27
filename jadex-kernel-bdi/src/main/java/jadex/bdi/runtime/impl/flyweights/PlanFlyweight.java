@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MPlanFlyweight;
 import jadex.bdi.runtime.IElement;
@@ -35,7 +35,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public static PlanFlyweight getPlanFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		PlanFlyweight ret = (PlanFlyweight)ip.getFlyweightCache(IPlan.class, new Tuple(IPlan.class, handle));
 		if(ret==null)
 		{

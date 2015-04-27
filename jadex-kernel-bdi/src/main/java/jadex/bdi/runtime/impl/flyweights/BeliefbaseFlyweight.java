@@ -1,9 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import java.text.SimpleDateFormat;
-
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MBeliefbaseFlyweight;
 import jadex.bdi.runtime.IBelief;
@@ -37,7 +35,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public static BeliefbaseFlyweight getBeliefbaseFlyweight(IOAVState state, Object scope)
 	{		
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		BeliefbaseFlyweight ret = (BeliefbaseFlyweight)ip.getFlyweightCache(IBeliefbase.class, new Tuple(IBeliefbase.class, scope));
 		if(ret==null)
 		{

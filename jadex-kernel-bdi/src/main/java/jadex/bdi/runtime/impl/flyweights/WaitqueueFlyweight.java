@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IWaitAbstraction;
 import jadex.bdi.runtime.IWaitqueue;
@@ -47,7 +47,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	public static WaitqueueFlyweight getWaitqueueFlyweight(IOAVState state, Object scope, Object rplan)
 	{
 		Tuple	key	= new Tuple(rplan, IWaitqueue.class);
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		WaitqueueFlyweight ret = (WaitqueueFlyweight)ip.getFlyweightCache(IWaitqueue.class, key);
 		if(ret==null)
 		{

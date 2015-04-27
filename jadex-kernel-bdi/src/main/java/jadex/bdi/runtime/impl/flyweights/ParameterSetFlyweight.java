@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MParameterSetFlyweight;
@@ -55,7 +55,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public static ParameterSetFlyweight getParameterSetFlyweight(IOAVState state, Object scope, Object handle, String name, Object parameterelement)
 	{
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		ParameterSetFlyweight ret = (ParameterSetFlyweight)ip.getFlyweightCache(IParameterSet.class, new Tuple(IParameterSet.class, parameterelement, name));
 		if(ret==null)
 		{

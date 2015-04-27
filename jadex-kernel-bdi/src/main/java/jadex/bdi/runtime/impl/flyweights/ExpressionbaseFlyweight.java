@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MExpressionbaseFlyweight;
@@ -36,7 +36,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	 */
 	public static ExpressionbaseFlyweight getExpressionbaseFlyweight(IOAVState state, Object scope)
 	{
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		ExpressionbaseFlyweight ret = (ExpressionbaseFlyweight)ip.getFlyweightCache(IExpressionbase.class, new Tuple(IExpressionbase.class, scope));
 		if(ret==null)
 		{

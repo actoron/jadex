@@ -53,7 +53,6 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
-import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -61,11 +60,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.search.PlatformServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -78,7 +73,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.ISynchronizator;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -113,7 +107,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -124,7 +117,7 @@ import java.util.logging.SimpleFormatter;
  *  and performing the agent execution when
  *  being called from the platform.
  */
-public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAgentFeature
+public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAgentFeature, IInternalBDIAgentFeature
 {
 	//-------- static part --------
 	
@@ -1777,9 +1770,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 *  Get the interpreter for an agent object.
 	 */
 //	public static BDIInterpreter	getInterpreter(IOAVState state)
-	public static IBDIAgentFeature getInterpreter(IOAVState state)
+	public static IInternalBDIAgentFeature getInterpreter(IOAVState state)
 	{
-		return ((IInternalAccess)interpreters.get(state)).getComponentFeature(IBDIAgentFeature.class);
+		return (IInternalBDIAgentFeature)((IInternalAccess)interpreters.get(state)).getComponentFeature(IBDIAgentFeature.class);
 	}
 	
 	public static IInternalAccess getInternalAccess(IOAVState state)

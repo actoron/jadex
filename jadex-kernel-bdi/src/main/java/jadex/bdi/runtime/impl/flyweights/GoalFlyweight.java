@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MGoalbaseFlyweight;
@@ -37,7 +37,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public static GoalFlyweight getGoalFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		GoalFlyweight ret = (GoalFlyweight)ip.getFlyweightCache(IGoal.class, new Tuple(IGoal.class, handle));
 		if(ret==null)
 		{

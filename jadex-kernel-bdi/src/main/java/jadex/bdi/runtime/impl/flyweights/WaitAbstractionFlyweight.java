@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MTriggerFlyweight;
 import jadex.bdi.runtime.IExternalCondition;
@@ -38,7 +38,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public static WaitAbstractionFlyweight getWaitAbstractionFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		WaitAbstractionFlyweight ret = (WaitAbstractionFlyweight)ip.getFlyweightCache(IWaitAbstraction.class, new Tuple(IWaitAbstraction.class, handle));
 		if(ret==null)
 		{

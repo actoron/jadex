@@ -3431,11 +3431,11 @@ public class AgentRules
 		// Trigger pull beliefs if declared as result
 		// todo: currently updates all beliefs/sets, should only update pull beliefs
 		Map<String, Object> resultvals = collectResults(state, ragent);
-		IArgument[] results = interpreter.getModel().getResults();
+		IArgument[] results = interpreter.getModel(ragent).getResults();
 		for(int i=0; i<results.length; i++)
 		{
 //			interpreter.setResultValue(results[i].getName(), resultvals.get(results[i].getName()));
-			BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(results[i].getName(), resultvals.get(results[i].getName());
+			BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(results[i].getName(), resultvals.get(results[i].getName()));
 //			interpreter.setResultValue(results[i].getName(), resultvals.get(results[i].getName()));
 		}
 		

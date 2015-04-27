@@ -2,6 +2,7 @@ package jadex.bdi.runtime.impl.flyweights;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
@@ -217,7 +218,7 @@ public class ExpressionNoModel implements IExpression
 		 */
 		public AgentInvocation()
 		{
-			interpreter.getComponentFeature(IBDIAgentFeature.class).invokeSynchronized(this);
+			((IInternalBDIAgentFeature)interpreter.getComponentFeature(IBDIAgentFeature.class)).invokeSynchronized(this);
 		}
 		
 		/**
@@ -226,7 +227,7 @@ public class ExpressionNoModel implements IExpression
 		public AgentInvocation(Object arg)
 		{
 			this.arg = arg;
-			interpreter.getComponentFeature(IBDIAgentFeature.class).invokeSynchronized(this);
+			((IInternalBDIAgentFeature)interpreter.getComponentFeature(IBDIAgentFeature.class)).invokeSynchronized(this);
 		}
 		
 		/**
@@ -235,7 +236,7 @@ public class ExpressionNoModel implements IExpression
 		public AgentInvocation(Object[] args)
 		{
 			this.args = args;
-			interpreter.getComponentFeature(IBDIAgentFeature.class).invokeSynchronized(this);
+			((IInternalBDIAgentFeature)interpreter.getComponentFeature(IBDIAgentFeature.class)).invokeSynchronized(this);
 		}
 	}
 	

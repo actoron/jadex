@@ -2,6 +2,7 @@ package jadex.bdi.runtime.impl.flyweights;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IInternalAccess;
@@ -352,9 +353,9 @@ public abstract class ElementFlyweight implements IElement
 	/**
 	 *  Get the BDI agent feature.
 	 */
-	public IBDIAgentFeature getBDIFeature()
+	public IInternalBDIAgentFeature getBDIFeature()
 	{
-		return getInterpreter().getComponentFeature(IBDIAgentFeature.class);
+		return (IInternalBDIAgentFeature)getInterpreter().getComponentFeature(IBDIAgentFeature.class);
 	}
 	
 	//-------- inner classes --------

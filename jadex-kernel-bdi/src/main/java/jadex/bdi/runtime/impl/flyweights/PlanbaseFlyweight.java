@@ -1,9 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import java.util.Collection;
-
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.IMPlan;
 import jadex.bdi.model.OAVBDIMetaModel;
@@ -13,7 +11,6 @@ import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.commons.Tuple;
@@ -42,7 +39,7 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 	 */
 	public static PlanbaseFlyweight getPlanbaseFlyweight(IOAVState state, Object scope)
 	{
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		PlanbaseFlyweight ret = (PlanbaseFlyweight)ip.getFlyweightCache(IPlanbase.class, new Tuple(IPlanbase.class, scope));
 		if(ret==null)
 		{

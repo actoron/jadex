@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MMessageEventFlyweight;
 import jadex.bdi.runtime.IMessageEvent;
@@ -35,7 +35,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 */
 	public static MessageEventFlyweight getMessageEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		MessageEventFlyweight ret = (MessageEventFlyweight)ip.getFlyweightCache(IMessageEvent.class, new Tuple(IMessageEvent.class, handle));
 		if(ret==null)
 		{

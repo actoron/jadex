@@ -1,4 +1,4 @@
-package jadex.base.benchmarks;
+package jadex.tools.benchmarks;
 
 
 

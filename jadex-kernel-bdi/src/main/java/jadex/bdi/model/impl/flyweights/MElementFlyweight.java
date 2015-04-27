@@ -2,6 +2,7 @@ package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMEElement;
@@ -30,7 +31,7 @@ public class MElementFlyweight implements IMElement, IMEElement
 	private Object scope;
 	
 	/** The interpreter. */
-	private IBDIAgentFeature interpreter;
+	private IInternalBDIAgentFeature interpreter;
 	private IInternalAccess agent;
 	
 	/** Flag to indicate if the flyweight was already cleaned up. */
@@ -191,7 +192,7 @@ public class MElementFlyweight implements IMElement, IMEElement
 	 *  Get the interpreter.
 	 *  @return The interpreter.
 	 */
-	public IBDIAgentFeature getBDIFeature()
+	public IInternalBDIAgentFeature getBDIFeature()
 	{
 		return interpreter;
 	}

@@ -1,4 +1,6 @@
-package jadex.base.benchmarks;
+package jadex.tools.benchmarks;
+
+import java.net.InetAddress;
 
 
 /**
@@ -9,7 +11,24 @@ public class BenchmarkDB
 	//-------- constants --------
 	
 	/** The package name of this class (required for finding declaring class of benchmark). */
-	protected final String	PACKAGE	= BenchmarkDB.class.getName().substring(0, BenchmarkDB.class.getName().lastIndexOf("."));
+	protected static final String	PACKAGE	= BenchmarkDB.class.getName().substring(0, BenchmarkDB.class.getName().lastIndexOf("."));
+	
+	/** The host name (cached for speed). */
+	protected static final String	HOST;
+	
+	static
+	{
+		String	host;
+		try
+		{
+			host	= InetAddress.getLocalHost().getHostName();
+		}
+		catch(Exception e)
+		{
+			host	= "unknown";
+		}
+		HOST	= host;
+	}
 	
 	//-------- methods --------
 	
@@ -20,7 +39,8 @@ public class BenchmarkDB
 	{
 		// Node table.
 		int	nodeid;
-		String	nidname;
+		String	nidname	= HOST;
+		// Todo: node properties from sigar (cpuinfo, etc)
 		
 		// Benchmark table.
 		int benchmarkid;
