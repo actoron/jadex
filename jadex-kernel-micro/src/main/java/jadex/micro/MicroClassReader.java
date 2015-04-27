@@ -158,7 +158,8 @@ public class MicroClassReader
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
-		modelinfo.setFeatures((IComponentFeatureFactory[])features.toArray(new IComponentFeatureFactory[features.size()]));
+		if(features!=null)
+			modelinfo.setFeatures((IComponentFeatureFactory[])features.toArray(new IComponentFeatureFactory[features.size()]));
 		
 		if(rid==null)
 		{

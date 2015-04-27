@@ -50,6 +50,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
@@ -122,12 +123,14 @@ public class BDIClassReader extends MicroClassReader
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
+	@Override
+	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid, 
+		IComponentIdentifier root, List<IComponentFeatureFactory> features)
 	{
 		// use dummy classloader that will not be visisble outside
 		List<URL> urls = SUtil.getClasspathURLs(classloader, false);
 		DummyClassLoader cl = createDummyClassLoader(classloader, null, urls);
-		return super.read(model, imports, cl, rid, root);
+		return super.read(model, imports, cl, rid, root, features);
 	}
 
 	/**
@@ -141,7 +144,9 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 *  Load the model.
 	 */
-	protected BDIModel read(String model, Class<?> cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root)
+	@Override
+	protected BDIModel read(String model, Class<?> cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root,
+		List<IComponentFeatureFactory> features)
 	{
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		
@@ -166,6 +171,8 @@ public class BDIClassReader extends MicroClassReader
 		modelinfo.setResourceIdentifier(rid);
 		modelinfo.setClassloader(classloader);
 		ret.setClassloader(classloader); // use parent
+		if(features!=null)
+			modelinfo.setFeatures((IComponentFeatureFactory[])features.toArray(new IComponentFeatureFactory[features.size()]));
 		
 //		System.out.println("filename: "+modelinfo.getFilename());
 		
@@ -178,7 +185,7 @@ public class BDIClassReader extends MicroClassReader
 		
 		fillMicroModelFromAnnotations(ret, model, cma, cl);
 		
-		fillBDIModelFromAnnotations(ret, model, cma, cl, rid, root);
+		fillBDIModelFromAnnotations(ret, model, cma, cl, rid, root, features);
 		
 		Class<?> genclass = SReflect.findClass0(cma.getName(), null, classloader);
 		modelinfo.setStartable(!Modifier.isAbstract(genclass.getModifiers()));
@@ -190,7 +197,7 @@ public class BDIClassReader extends MicroClassReader
 	 *  Fill the model details using annotation.
 	 *  // called with dummy classloader (that was used to load cma first time)
 	 */
-	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, Class<?> cma, ClassLoader cl,  IResourceIdentifier rid, IComponentIdentifier root)
+	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, Class<?> cma, ClassLoader cl,  IResourceIdentifier rid, IComponentIdentifier root, List<IComponentFeatureFactory> features)
 	{
 //		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
@@ -234,7 +241,7 @@ public class BDIClassReader extends MicroClassReader
 				{
 					try
 					{
-						BDIModel cap = loader.loadComponentModel(fields[i].getType().getName()+".class", null, rid, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root});
+						BDIModel cap = loader.loadComponentModel(fields[i].getType().getName()+".class", null, rid, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root, features});
 //						System.out.println("found capability: "+fields[i].getName()+", "+cap);
 						capas.put(fields[i].getName(), cap);
 						
