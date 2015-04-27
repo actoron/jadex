@@ -8,7 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutResultListener;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -120,8 +120,8 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				public void resultAvailable(ISettingsService settings)
 				{
-					if(!(agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("nosave") instanceof Boolean)
-						|| !((Boolean)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("nosave")).booleanValue())
+					if(!(agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
+						|| !((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue())
 					{
 						settings.registerPropertiesProvider(getSubname(), pp)
 							.addResultListener(new DelegationResultListener<Void>(ret)
@@ -233,8 +233,8 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				public void resultAvailable(ISettingsService settings)
 				{
-					if(!(agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("nosave") instanceof Boolean)
-						|| !((Boolean)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("nosave")).booleanValue())
+					if(!(agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
+						|| !((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue())
 					{
 						settings.deregisterPropertiesProvider(getSubname())
 							.addResultListener(new DelegationResultListener<Void>(ret)

@@ -3,7 +3,7 @@ package jadex.micro.testcases.subscriptionlistener;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.CollectingIntermediateResultListener;
 import jadex.commons.future.Future;
@@ -90,7 +90,7 @@ public class ListenerAgent
 			protected void	proceed()
 			{
 				reports.add(tr2);
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
 				ret.setResult(null);				
 			}
 		});

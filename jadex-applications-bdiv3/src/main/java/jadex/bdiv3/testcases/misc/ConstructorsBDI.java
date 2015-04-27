@@ -3,7 +3,7 @@ package jadex.bdiv3.testcases.misc;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -60,6 +60,6 @@ public class ConstructorsBDI	extends ConstructorsSuper
 		{
 			tr.setReason("Calls do not match: [A, B, C, D], "+calls.toString());
 		}
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

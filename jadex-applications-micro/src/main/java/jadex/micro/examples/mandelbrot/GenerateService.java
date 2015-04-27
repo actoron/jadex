@@ -3,7 +3,7 @@ package jadex.micro.examples.mandelbrot;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -153,7 +153,7 @@ public class GenerateService implements IGenerateService
 					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService cms = (IComponentManagementService)result;
-						Object delay = agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay");
+						Object delay = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay");
 						if(delay==null)
 							delay = Long.valueOf(5000);
 						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 

@@ -4,7 +4,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -50,7 +50,7 @@ public class ParallelAgentCreationAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		Map arguments = agent.getComponentFeature(IArgumentsFeature.class).getArguments();			
+		Map arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();			
 		final int num	= ((Integer)arguments.get("num")).intValue();
 		if(num>0)
 		{

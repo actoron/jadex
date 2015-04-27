@@ -6,7 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -56,7 +56,7 @@ public class AgentCreationAgent
 	{
 //		System.out.println("body");
 		
-		Map arguments = agent.getComponentFeature(IArgumentsFeature.class).getArguments();	
+		Map arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();	
 		if(arguments==null)
 			arguments = new HashMap();
 		final Map args = arguments;	
@@ -235,9 +235,9 @@ public class AgentCreationAgent
 		System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 		System.out.println("Still used memory: "+stillused+"kB.");
 		
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 		agent.killComponent();
 	}
 	

@@ -15,7 +15,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
@@ -617,7 +617,7 @@ public class ComponentManagementService implements IComponentManagementService
 																	final IPlatformComponentAccess	component	= new PlatformComponent();
 																	ComponentCreationInfo	cci	= new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, cinfo.getProvidedServiceInfos(), cinfo.getRequiredServiceBindings());
 																	component.create(cci, features);
-																	IArgumentsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsFeature.class);
+																	IArgumentsResultsFeature	af	= component.getInternalAccess().getComponentFeature(IArgumentsResultsFeature.class);
 																	if(resultlistener!=null)
 																	{
 																		IResultListener<Collection<Tuple2<String, Object>>>	rl;
@@ -1841,7 +1841,7 @@ public class ComponentManagementService implements IComponentManagementService
 //					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
 			
 			desc	= (CMSComponentDescription)comp.getComponentDescription();
-			results = comp.getComponentFeature(IArgumentsFeature.class).getResults();
+			results = comp.getComponentFeature(IArgumentsResultsFeature.class).getResults();
 			
 //				desc.setState(IComponentDescription.STATE_TERMINATED);
 //				ccs.remove(cid);

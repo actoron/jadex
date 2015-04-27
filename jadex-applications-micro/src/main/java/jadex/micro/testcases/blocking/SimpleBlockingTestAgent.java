@@ -3,7 +3,7 @@ package jadex.micro.testcases.blocking;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
@@ -26,7 +26,7 @@ public class SimpleBlockingTestAgent
 	{
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 			new TestReport[]{new TestReport("#1", "Test blocking wait.", true, null)}));
 	}
 }

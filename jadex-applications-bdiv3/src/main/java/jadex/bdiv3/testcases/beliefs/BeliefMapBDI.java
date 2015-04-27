@@ -9,7 +9,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -72,7 +72,7 @@ public class BeliefMapBDI
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	// todo: plan creation condition?!

@@ -11,7 +11,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -88,7 +88,7 @@ public class UserAgent
 			{
 //				System.out.println("tests finished");
 
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				agent.killComponent();			
 			}
 			
@@ -96,7 +96,7 @@ public class UserAgent
 			{
 				System.out.println(agent.getComponentFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getComponentIdentifier());
 				
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				agent.killComponent();	
 			}
 		}));

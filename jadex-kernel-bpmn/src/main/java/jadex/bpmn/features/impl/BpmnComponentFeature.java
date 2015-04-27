@@ -38,7 +38,7 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -356,9 +356,9 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		this.messages = new ArrayList<Object>();
 		this.streams = new ArrayList<IConnection>();
 		
-		if(getComponent().getComponentFeature(IArgumentsFeature.class).getArguments()!=null)
+		if(getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments()!=null)
 		{
-			for(Map.Entry<String, Object> entry: getComponent().getComponentFeature(IArgumentsFeature.class).getArguments().entrySet())
+			for(Map.Entry<String, Object> entry: getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments().entrySet())
 			{
 				topthread.setParameterValue(entry.getKey(), entry.getValue());
 			}
@@ -423,11 +423,11 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		}
 		else if(getComponent().getModel().getArgument(name)!=null)
 		{
-			ret = getComponent().getComponentFeature(IArgumentsFeature.class).getArguments().get(name);
+			ret = getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments().get(name);
 		}
 		else if(getComponent().getModel().getResult(name)!=null)
 		{
-			ret	= getComponent().getComponentFeature(IArgumentsFeature.class).getResults().get(name);
+			ret	= getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().get(name);
 		}
 		else
 		{
@@ -473,7 +473,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		{
 			if(isres)
 			{
-				getComponent().getComponentFeature(IArgumentsFeature.class).getResults().put(name, value);
+				getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, value);
 			}
 			else
 			{
@@ -486,7 +486,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 			Object coll;
 			if(isres)
 			{
-				coll = getComponent().getComponentFeature(IArgumentsFeature.class).getResults().get(name);
+				coll = getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().get(name);
 			}
 			else
 			{
@@ -518,7 +518,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 			if(isres)
 			{
 				// Trigger event notification
-				getComponent().getComponentFeature(IArgumentsFeature.class).getResults().put(name, coll);
+				getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, coll);
 			}
 //				else
 //				{

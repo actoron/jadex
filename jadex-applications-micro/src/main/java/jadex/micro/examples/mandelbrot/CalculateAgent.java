@@ -2,7 +2,7 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
@@ -61,7 +61,7 @@ public class CalculateAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final long delay = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay")).longValue();
+		final long delay = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)

@@ -5,7 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -204,7 +204,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		if (started)
 			return IFuture.DONE;
 		
-		String[] blarray = (String[]) ia.getComponentFeature(IArgumentsFeature.class).getArguments().get("ignoreextensions");
+		String[] blarray = (String[]) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("ignoreextensions");
 //		System.out.println(Arrays.toString(blarray));
 		if (blarray != null)
 			baseextensionblacklist.addAll(Arrays.asList(blarray));
@@ -254,7 +254,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			public IFuture resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
 			{
 				final URI uri = rid.getLocalIdentifier().getUri();
-				String regex = (String) ia.getComponentFeature(IArgumentsFeature.class).getArguments().get("kerneluriregex");
+				String regex = (String) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("kerneluriregex");
 				if (Pattern.matches(regex!=null ? regex : "", uri.toString()))
 				{
 					exta.scheduleStep(new IComponentStep<Void>()
@@ -278,7 +278,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void customResultAvailable(Object result)
 			{
-				String regexstr = (String) ia.getComponentFeature(IArgumentsFeature.class).getArguments().get("kerneluriregex");
+				String regexstr = (String) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("kerneluriregex");
 				Pattern regex = Pattern.compile(regexstr!=null ? regexstr : "");
 				
 //						potentialurls.addAll();

@@ -1,7 +1,7 @@
 package jadex.micro.benchmarks;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -41,7 +41,7 @@ public class TreeStressTestAgent
 			public void resultAvailable(Object result)
 			{
 				IComponentManagementService	cms	= (IComponentManagementService)result;
-				int	depth	= ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("depth")).intValue();
+				int	depth	= ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("depth")).intValue();
 				if(depth>0)
 				{
 					Map	args	= new HashMap();

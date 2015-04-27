@@ -17,7 +17,7 @@ import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler.SubprocessResultHandler;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -1027,7 +1027,7 @@ public class ProcessThread	implements ITaskContext
 					else if (de.getSource() == null)
 					{
 						// Argument data edge
-						passedparams.put(de.getTargetParameter(), instance.getComponentFeature(IArgumentsFeature.class).getArguments().get(de.getSourceParameter()));
+						passedparams.put(de.getTargetParameter(), instance.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get(de.getSourceParameter()));
 					}
 					else
 					{
@@ -1128,7 +1128,7 @@ public class ProcessThread	implements ITaskContext
 					if(de.getTarget() == null)
 					{
 						// Result data edge
-						instance.getComponentFeature(IArgumentsFeature.class).getResults().put(de.getTargetParameter(), value);
+						instance.getComponentFeature(IArgumentsResultsFeature.class).getResults().put(de.getTargetParameter(), value);
 					}
 					else
 					{

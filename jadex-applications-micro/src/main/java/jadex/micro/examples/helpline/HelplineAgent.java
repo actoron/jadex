@@ -2,7 +2,7 @@ package jadex.micro.examples.helpline;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -60,7 +60,7 @@ public class HelplineAgent
 	{
 //		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
 		this.infos = new MultiCollection<String, InformationEntry>();
-		Object ini = agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("infos");
+		Object ini = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("infos");
 		if(ini!=null && SReflect.isIterable(ini))
 		{
 			for(Iterator it=SReflect.getIterator(ini); it.hasNext(); )

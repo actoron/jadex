@@ -4,7 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.Boolean3;
 import jadex.commons.concurrent.TimeoutException;
@@ -36,7 +36,7 @@ public class BlockingTimeoutTestAgent
 		runTests(agent, tests);
 		runTests(agent, tests);	// perform tests twice
 
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(tests.size(), tests.toArray(new TestReport[tests.size()])));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tests.size(), tests.toArray(new TestReport[tests.size()])));
 	}
 
 	/**

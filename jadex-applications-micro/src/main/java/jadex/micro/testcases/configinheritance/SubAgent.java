@@ -3,7 +3,7 @@ package jadex.micro.testcases.configinheritance;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -68,6 +68,6 @@ public class SubAgent extends MainAgent
 		{
 			tr.setFailed("Wrong number of subcomponents, expected 4 (1xa, 2xb, 1xc"+" but was: "+Arrays.toString(descs));
 		}
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

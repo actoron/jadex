@@ -8,7 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
@@ -664,7 +664,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = getInterpreter().getComponentFeature(IArgumentsFeature.class).subscribeToResults();
+						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).subscribeToResults();
 						TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 						fut.addResultListener(lis);
 						return IFuture.DONE;
@@ -684,7 +684,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = getInterpreter().getComponentFeature(IArgumentsFeature.class).subscribeToResults();
+			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).subscribeToResults();
 			TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 			fut.addResultListener(lis);
 		}
@@ -708,7 +708,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(getInterpreter().getComponentFeature(IArgumentsFeature.class).getArguments());
+						ret.setResult(getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).getArguments());
 						return IFuture.DONE;
 					}
 				});
@@ -720,7 +720,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 		}
 		else
 		{
-			ret.setResult(getInterpreter().getComponentFeature(IArgumentsFeature.class).getArguments());
+			ret.setResult(getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).getArguments());
 		}
 		
 		return ret;
@@ -742,7 +742,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(getInterpreter().getComponentFeature(IArgumentsFeature.class).getResults());
+						ret.setResult(getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).getResults());
 						return IFuture.DONE;
 					}
 				});
@@ -754,7 +754,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 		}
 		else
 		{
-			ret.setResult(getInterpreter().getComponentFeature(IArgumentsFeature.class).getResults());
+			ret.setResult(getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).getResults());
 		}
 		
 		return ret;

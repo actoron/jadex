@@ -10,7 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -102,7 +102,7 @@ public abstract class TestAgent
 			{
 //				System.out.println("tests finished: "+agent.getComponentIdentifier());
 
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();				
 			}
@@ -113,7 +113,7 @@ public abstract class TestAgent
 				
 				exception.printStackTrace();
 				
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();	
 			}

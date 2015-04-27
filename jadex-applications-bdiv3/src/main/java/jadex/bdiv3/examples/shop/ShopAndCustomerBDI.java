@@ -4,7 +4,7 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -38,8 +38,8 @@ public class ShopAndCustomerBDI
 
 	/** The shop capability. */
 	@Capability(beliefmapping=@Mapping(value="money", target="money"))
-	protected ShopCapa shopcap = new ShopCapa((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("shopname"), 
-		(List<ItemInfo>)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("catalog"));
+	protected ShopCapa shopcap = new ShopCapa((String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("shopname"), 
+		(List<ItemInfo>)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("catalog"));
 	
 	/** The money. */
 	@Belief

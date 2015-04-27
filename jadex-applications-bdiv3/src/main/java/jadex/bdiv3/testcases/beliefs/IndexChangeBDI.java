@@ -10,7 +10,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.NameValue;
@@ -75,7 +75,7 @@ public abstract class IndexChangeBDI implements IBDIAgent
 			tr.setReason("Exception occurred: "+e.getMessage());
 		}
 		
-		getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		
 		killComponent();
 		

@@ -4,7 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
@@ -41,7 +41,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(
 		IMicroInjectionFeature.class, MicroInjectionComponentFeature.class,
-		new Class<?>[]{IPojoComponentFeature.class, IArgumentsFeature.class, IRequiredServicesFeature.class}, new Class<?>[]{IProvidedServicesFeature.class});
+		new Class<?>[]{IPojoComponentFeature.class, IArgumentsResultsFeature.class, IRequiredServicesFeature.class}, new Class<?>[]{IProvidedServicesFeature.class});
 
 	//-------- constructors --------
 	
@@ -61,8 +61,8 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		Map<String, Object>	args	= getComponent().getComponentFeature(IArgumentsFeature.class).getArguments();
-		Map<String, Object>	results	= getComponent().getComponentFeature(IArgumentsFeature.class).getResults();
+		Map<String, Object>	args	= getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+		Map<String, Object>	results	= getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults();
 		final MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
 		final Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 

@@ -3,7 +3,7 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.future.DefaultResultListener;
@@ -59,7 +59,7 @@ public class ProvidedServiceConfigurationsAgent implements IAService
 		        {
 		        	tr.setFailed("Wrong service implementation: "+result);
 		        }
-		        agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		        agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		        ret.setResult(null);
 			}
 		});

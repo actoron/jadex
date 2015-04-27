@@ -12,7 +12,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -120,7 +120,7 @@ public class GoalGoalBDI
 				if(!tr.isFinished())
 				{
 					tr.setFailed("Goal did not return");
-					agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				
 				agent.killComponent();
@@ -131,7 +131,7 @@ public class GoalGoalBDI
 		Object res = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal1()).get();
 		System.out.println("Goal success: "+res);
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 }

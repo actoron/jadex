@@ -12,7 +12,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -44,7 +44,7 @@ public abstract class PlanReasonInjectionBDI implements IBDIAgent
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				tr.setReason("Plan not triggered.");
-				getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				killComponent();
 				return IFuture.DONE;
 			}
@@ -65,7 +65,7 @@ public abstract class PlanReasonInjectionBDI implements IBDIAgent
 		{
 			System.out.println("plan invoked " + PlanReasonInjectionBDI.this + " for reason " + target);
 			tr.setSucceeded(true);
-			getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+			getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 			killComponent();
 		}
 	}

@@ -11,7 +11,7 @@ import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.IArgument;
@@ -3422,7 +3422,7 @@ public class AgentRules
 		for(int i=0; i<results.length; i++)
 		{
 //			interpreter.setResultValue(results[i].getName(), resultvals.get(results[i].getName()));
-			BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(results[i].getName(), resultvals.get(results[i].getName()));
+			BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsResultsFeature.class).getResults().put(results[i].getName(), resultvals.get(results[i].getName()));
 //			interpreter.setResultValue(results[i].getName(), resultvals.get(results[i].getName()));
 		}
 		

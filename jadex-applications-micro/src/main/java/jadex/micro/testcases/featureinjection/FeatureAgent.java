@@ -3,7 +3,7 @@ package jadex.micro.testcases.featureinjection;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -26,7 +26,7 @@ public class FeatureAgent
 	
 	/** The arguments feature. */
 	@AgentFeature
-	protected IArgumentsFeature args;
+	protected IArgumentsResultsFeature args;
 	
 	/** The required services feature. */
 	@AgentFeature
@@ -93,7 +93,7 @@ public class FeatureAgent
 		System.out.println("args is: "+args);
 		System.out.println("reqs is: "+reqs);
 		
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(trs.length, trs));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.length, trs));
 		agent.killComponent();
 	}
 }

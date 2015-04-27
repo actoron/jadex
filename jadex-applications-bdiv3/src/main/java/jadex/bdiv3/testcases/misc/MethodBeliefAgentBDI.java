@@ -6,7 +6,7 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.Agent;
@@ -63,7 +63,7 @@ public class MethodBeliefAgentBDI
 				if(!tr.isFinished())
 				{
 					tr.setSucceeded(true);
-					agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 					agent.killComponent();
 				}
 			}
@@ -78,7 +78,7 @@ public class MethodBeliefAgentBDI
 				if(!tr.isFinished())
 				{
 					tr.setFailed("No event occurred.");
-					agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 					agent.killComponent();
 				}
 			}

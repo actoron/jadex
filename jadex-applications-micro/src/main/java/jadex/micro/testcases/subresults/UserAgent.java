@@ -5,7 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -75,7 +75,7 @@ public class UserAgent
 				{
 					tr.setFailed("No intermediate results have been retrieved.");
 				}
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killComponent();
 			}
 			
@@ -83,7 +83,7 @@ public class UserAgent
 			{
 				System.out.println("ra: "+result);
 				tr.setFailed("No intermediate results have been retrieved: "+result);
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killComponent();
 			}
 			
@@ -91,7 +91,7 @@ public class UserAgent
 			{
 				System.out.println("ex: "+exception);
 				tr.setFailed("Exception occrred: "+exception);
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killComponent();
 			}
 		}));

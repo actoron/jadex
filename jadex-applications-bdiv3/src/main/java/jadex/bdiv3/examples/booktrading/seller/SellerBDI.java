@@ -19,7 +19,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -68,7 +68,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	@AgentBody
 	public void body()
 	{
-		Order[] ios = (Order[])agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("initial_orders");
+		Order[] ios = (Order[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("initial_orders");
 		if(ios!=null)
 		{
 			for(Order o: ios)

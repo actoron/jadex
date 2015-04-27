@@ -1,7 +1,7 @@
 package jadex.platform.service.servicepool;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
@@ -60,7 +60,7 @@ public class ServicePoolAgent implements IServicePoolService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("serviceinfos");
+		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("serviceinfos");
 		
 		if(psis!=null)
 		{

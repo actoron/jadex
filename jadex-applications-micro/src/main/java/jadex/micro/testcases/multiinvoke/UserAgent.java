@@ -3,7 +3,7 @@ package jadex.micro.testcases.multiinvoke;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -67,7 +67,7 @@ public class UserAgent
 					{
 //						System.out.println("countlis: "+agent.getComponentFeature(IExecutionFeature.class).isComponentThread());
 						
-						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
+						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
 						ret.setResult(null);
 					}
 

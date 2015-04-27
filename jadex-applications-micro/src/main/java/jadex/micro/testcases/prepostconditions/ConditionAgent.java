@@ -3,7 +3,7 @@ package jadex.micro.testcases.prepostconditions;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.SReflect;
@@ -56,7 +56,7 @@ public class ConditionAgent implements IContractService
 		{
 			public void resultAvailable(Void result)
 			{
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 					(TestReport[])results.toArray(new TestReport[results.size()])));
 				ret.setResult(null);
 			}

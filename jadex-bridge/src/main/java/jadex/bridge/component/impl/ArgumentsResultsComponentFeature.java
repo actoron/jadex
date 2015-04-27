@@ -4,7 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  *  This feature provides arguments.
  */
-public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsFeature, IValueFetcher
+public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher
 {
 	//-------- attributes --------
 	
@@ -46,7 +46,7 @@ public class ArgumentsComponentFeature	extends	AbstractComponentFeature	implemen
 	/**
 	 *  Create the feature.
 	 */
-	public ArgumentsComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
+	public ArgumentsResultsComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
 	}

@@ -2,7 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -39,7 +39,7 @@ public class AAgent implements IAService
 		String reason = ext? "Wrong thread: "+Thread.currentThread(): null;
 		List<TestReport> tests = new ArrayList<TestReport>();
 		tests.add(new TestReport("#A1", "Test if service is called on component thread.", !ext, reason));
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testcases", tests);
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testcases", tests);
 		
 //		System.out.println("called service");
 		return IFuture.DONE;

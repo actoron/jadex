@@ -3,7 +3,7 @@ package jadex.micro.testcases.blocking;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -31,7 +31,7 @@ public class RawBlockingTestAgent
 		
 		cms.getComponentDescriptions().get();
 		
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 			new TestReport[]{new TestReport("#1", "Test blocking wait.", true, null)}));
 	}
 }

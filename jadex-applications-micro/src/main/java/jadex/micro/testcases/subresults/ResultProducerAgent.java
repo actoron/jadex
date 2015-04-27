@@ -2,7 +2,7 @@ package jadex.micro.testcases.subresults;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -29,7 +29,7 @@ public class ResultProducerAgent
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("res", Integer.valueOf(cnt[0]));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("res", Integer.valueOf(cnt[0]));
 				if(cnt[0]++<5)
 				{
 					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);

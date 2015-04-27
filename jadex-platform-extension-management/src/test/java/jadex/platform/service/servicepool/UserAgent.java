@@ -4,7 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
@@ -197,7 +197,7 @@ public class UserAgent
 											public void resultAvailable(TestReport rep5)
 											{
 //												System.err.println("FFFFFFFFFFFINI: "+agent.getComponentIdentifier());
-												agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}
 											
@@ -205,7 +205,7 @@ public class UserAgent
 											{
 												TestReport rep5 = new TestReport("#5", "Test non-func props");
 												rep5.setFailed(exception);
-												agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}
 										});

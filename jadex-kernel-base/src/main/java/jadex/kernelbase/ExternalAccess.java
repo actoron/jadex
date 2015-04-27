@@ -7,12 +7,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
-import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
@@ -552,51 +551,6 @@ public class ExternalAccess implements IExternalAccess
 		return ret;
 	}
 	
-	/**
-	 *  Get a space of the application.
-	 *  @param name	The name of the space.
-	 *  @return	The space.
-	 */
-	public IFuture<IExtensionInstance> getExtension(final String name)
-	{
-		final Future<IExtensionInstance> ret = new Future<IExtensionInstance>();
-		
-//		if(!valid)
-//		{
-//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-//		}
-//		else if(isExternalThread())
-//		{
-//			try
-//			{
-//				adapter.invokeLater(new Runnable() 
-//				{
-//					public void run() 
-//					{
-//						ret.setResult(ia.getExtension(name));
-//					}
-//				});
-//			}
-//			catch(final Exception e)
-//			{
-//				Starter.scheduleRescueStep(cid, new Runnable()
-//				{
-//					public void run()
-//					{
-//						ret.setException(e);
-//					}
-//				});
-//			}
-//		}
-//		else
-//		{
-//			ret.setResult(ia.getExtension(name));
-//		}
-		
-		ret.setException(new UnsupportedOperationException());
-		return ret;
-	}
-
 	// todo: move to external feature!?
 	/**
 	 *  Subscribe to component events.
@@ -674,7 +628,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getComponentFeature(IArgumentsFeature.class).subscribeToResults(); 
+						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getComponentFeature(IArgumentsResultsFeature.class).subscribeToResults(); 
 						TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 						fut.addResultListener(lis);
 						return IFuture.DONE;
@@ -694,7 +648,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getComponentFeature(IArgumentsFeature.class).subscribeToResults(); 
+			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getComponentFeature(IArgumentsResultsFeature.class).subscribeToResults(); 
 			TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 			fut.addResultListener(lis);
 		}
@@ -722,7 +676,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(ia.getComponentFeature(IArgumentsFeature.class).getArguments());
+						ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments());
 						return IFuture.DONE;
 					}
 				});
@@ -740,7 +694,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(ia.getComponentFeature(IArgumentsFeature.class).getArguments());
+			ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments());
 		}
 		
 		return ret;
@@ -766,7 +720,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(ia.getComponentFeature(IArgumentsFeature.class).getResults());
+						ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getResults());
 						return IFuture.DONE;
 					}
 				});
@@ -778,7 +732,7 @@ public class ExternalAccess implements IExternalAccess
 					public void run()
 					{
 						// Should be possible to get the results even if component is already terminated?!
-						ret.setResult(ia.getComponentFeature(IArgumentsFeature.class).getResults());
+						ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getResults());
 //						ret.setException(e);
 					}
 				});
@@ -786,7 +740,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(ia.getComponentFeature(IArgumentsFeature.class).getResults());
+			ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getResults());
 		}
 		
 		return ret;

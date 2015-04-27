@@ -15,7 +15,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
@@ -69,7 +69,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 		// Check if triggered by external event
 		// eventtype, mactid, event
         Tuple3<String, String, Object> trigger = (Tuple3<String, String, Object>)getComponent()
-        	.getComponentFeature(IArgumentsFeature.class).getArguments().get(MBpmnModel.TRIGGER);
+        	.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get(MBpmnModel.TRIGGER);
         MSubProcess triggersubproc = null;
         MActivity triggeractivity = null;
         

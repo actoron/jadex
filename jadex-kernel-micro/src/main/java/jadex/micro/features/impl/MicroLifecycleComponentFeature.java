@@ -3,7 +3,7 @@ package jadex.micro.features.impl;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
@@ -123,7 +123,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 							val = SJavaParser.evaluateExpression(convback, getComponent().getModel().getAllImports(), fetcher, getComponent().getClassLoader());
 						}
 						
-						getComponent().getComponentFeature(IArgumentsFeature.class).getResults().put(name, val);
+						getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, val);
 					}
 				}
 				catch(Exception e2)

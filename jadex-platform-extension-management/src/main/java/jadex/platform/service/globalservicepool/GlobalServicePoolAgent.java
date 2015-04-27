@@ -4,7 +4,7 @@ package jadex.platform.service.globalservicepool;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -85,7 +85,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		final Future<Void> ret = new Future<Void>();
 		this.managers = new HashMap<Class<?>, GlobalPoolServiceManager>();
 		
-		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("serviceinfos");
+		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("serviceinfos");
 		
 		if(psis!=null)
 		{

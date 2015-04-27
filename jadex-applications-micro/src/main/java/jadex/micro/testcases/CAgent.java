@@ -3,7 +3,7 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -76,7 +76,7 @@ public class CAgent implements ICService
 								{
 									public void resultAvailable(Void result)
 									{										
-										agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(testcases.size(),
+										agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(testcases.size(),
 											(TestReport[])testcases.toArray(new TestReport[testcases.size()])));
 //										killAgent();
 										ret.setResult(null);

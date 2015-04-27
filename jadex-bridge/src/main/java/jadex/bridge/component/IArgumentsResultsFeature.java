@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  *  This features provides arguments.
  */
-public interface IArgumentsFeature
+public interface IArgumentsResultsFeature
 {
 	/**
 	 *  Get the arguments.

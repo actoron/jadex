@@ -3,7 +3,7 @@ package jadex.micro.testcases.blocking;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Boolean3;
@@ -68,12 +68,12 @@ public class ComplexBlockingTestAgent
 		
 		if("[1, 1, 2, 2, 3, 3]".equals(steps.toString()))
 		{
-			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
+			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test interleaved blocking.", true, null)}));
 		}
 		else
 		{
-			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1,
+			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test interleaved blocking.", false, "Wrong steps: "+steps)}));
 		}
 	}

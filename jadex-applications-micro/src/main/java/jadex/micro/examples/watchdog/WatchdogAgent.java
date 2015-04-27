@@ -2,7 +2,7 @@ package jadex.micro.examples.watchdog;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -57,7 +57,7 @@ public class WatchdogAgent	implements IWatchdogService
 		try
 		{
 			this.watchdogs	= new LinkedHashMap();
-			final long	delay	= ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay")).longValue();
+			final long	delay	= ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
 			
 			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{

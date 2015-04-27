@@ -3,7 +3,7 @@ package jadex.platform.persistence;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -54,13 +54,13 @@ public class PersistableAgent
 					public void resultAvailable(IPersistInfo result)
 					{
 						System.out.println("Worked");
-						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", true, null)}));
+						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", true, null)}));
 						ret.setResult(null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", exception)}));
+						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", exception)}));
 						ret.setResult(null);
 					}
 				});

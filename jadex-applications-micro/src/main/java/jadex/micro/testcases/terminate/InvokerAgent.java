@@ -11,7 +11,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -75,14 +75,14 @@ public class InvokerAgent
 			public void resultAvailable(Void result)
 			{
 //				System.out.println("tests finished: "+tc);
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				agent.killComponent();				
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				tc.addReport(new TestReport("#0", "Unexpected exception", exception));
 //				System.out.println("tests finished: "+tc);
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				agent.killComponent();
 			}
 		}));

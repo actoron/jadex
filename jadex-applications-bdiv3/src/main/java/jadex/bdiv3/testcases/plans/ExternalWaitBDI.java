@@ -8,7 +8,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanAbortedException;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.Future;
@@ -80,6 +80,6 @@ public class ExternalWaitBDI
 	{
 		if(!tr.isFinished())
 				tr.setFailed("Plan not activated");
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

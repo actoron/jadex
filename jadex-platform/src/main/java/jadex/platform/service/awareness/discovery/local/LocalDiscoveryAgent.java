@@ -4,7 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -91,7 +91,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 			scan();
 			postInfo();
 			
-			final long updaterate = (long) (((Long) agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("leasetime")) * 0.9);
+			final long updaterate = (long) (((Long) agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime")) * 0.9);
 			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(updaterate, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
@@ -223,7 +223,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 //		IFuture<IComponentIdentifier> fut2 = cms.updateComponentIdentifier(agent.getComponentIdentifier().getRoot());
 		IFuture<ITransportComponentIdentifier> fut2 = tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
 		ITransportComponentIdentifier root = fut2.get();
-		long leasetime = (Long) agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("leasetime");
+		long leasetime = (Long) agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");
 		AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
 		byte[] data = BinarySerializer.objectToByteArray(info, null, null, null, agent.getClassLoader());
 		long deadline = leasetime + System.currentTimeMillis();

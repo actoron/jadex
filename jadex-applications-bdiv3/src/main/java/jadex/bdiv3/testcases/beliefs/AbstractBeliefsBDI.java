@@ -6,7 +6,7 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
@@ -64,6 +64,6 @@ public class AbstractBeliefsBDI
 	public void	destroy(IInternalAccess agent)
 	{
 		TestReport[]	trs	= capa.results.values().toArray(new TestReport[capa.results.size()]);
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(trs.length, trs));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.length, trs));
 	}
 }

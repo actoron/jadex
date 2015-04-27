@@ -4,7 +4,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
@@ -62,10 +62,10 @@ public class PingingAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		receiver = (IComponentIdentifier)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("receiver");
-		final int missed_max = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("missed_max")).intValue();
-		final long timeout = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("timeout")).longValue();
-		final Object content = agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("content");
+		receiver = (IComponentIdentifier)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("receiver");
+		final int missed_max = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("missed_max")).intValue();
+		final long timeout = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("timeout")).longValue();
+		final Object content = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("content");
 		sent = new HashSet();
 		
 		final IComponentStep step = new IComponentStep<Void>()

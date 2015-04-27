@@ -9,7 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.message.IMessageService;
@@ -167,7 +167,7 @@ public class InitiatorAgent extends TestAgent
 		
 		try
 		{
-			final InputStream is = SUtil.getResource((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("filename"), agent.getClassLoader());
+			final InputStream is = SUtil.getResource((String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("filename"), agent.getClassLoader());
 			
 			final TestReport tr = new TestReport(""+testno, "Test if file is transferred correctly.");
 			

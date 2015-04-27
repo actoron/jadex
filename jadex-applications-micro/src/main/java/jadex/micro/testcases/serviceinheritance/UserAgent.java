@@ -3,7 +3,7 @@ package jadex.micro.testcases.serviceinheritance;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -64,7 +64,7 @@ public class UserAgent
 					public void customResultAvailable(TestReport tr)
 					{
 						tc.addReport(tr);
-						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", tc);
+						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 						ret.setResult(null);
 					}
 				});

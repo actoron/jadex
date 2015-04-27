@@ -3,7 +3,7 @@ package jadex.micro.testcases.stream;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.IIntermediateResultListener;
@@ -102,7 +102,7 @@ public class ReceiverAgent
 					{
 //						System.out.println("finished, size: "+cnt[0]);
 						fos.close();
-						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("filesize", Long.valueOf(cnt[0]));
+						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("filesize", Long.valueOf(cnt[0]));
 						agent.killComponent();
 					}
 					catch(Exception e)

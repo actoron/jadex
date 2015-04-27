@@ -7,7 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.VersionInfo;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -434,7 +434,7 @@ public class UpdateAgent implements IUpdateService
 		
 		// todo: create new classpath for new version 
 		
-		Map<String, Object> args = agent.getComponentFeature(IArgumentsFeature.class).getArguments();//new HashMap<String, Object>();
+		Map<String, Object> args = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();//new HashMap<String, Object>();
 		args.put("creator", agent.getComponentIdentifier());
 		String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
 //		String argsstr = JavaWriter.objectToXML(args, null);
@@ -625,7 +625,7 @@ public class UpdateAgent implements IUpdateService
 	protected Map<String, Object>	getUpdateArguments()
 	{
 		Map<String, Object>	ret	= new HashMap<String, Object>();
-		ret.putAll(agent.getComponentFeature(IArgumentsFeature.class).getArguments());
+		ret.putAll(agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments());
 		return ret;
 	}
 }

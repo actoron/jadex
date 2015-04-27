@@ -5,7 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -213,7 +213,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 					
 					protected void	proceed()
 					{
-						final String mechas = (String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("mechanisms");
+						final String mechas = (String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("mechanisms");
 						if(mechas!=null)
 						{
 							IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
@@ -269,19 +269,19 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	protected void initArguments()
 	{
-		this.delay = ((Number)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("delay")).longValue();
-		this.autocreate = ((Boolean)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("autocreate")).booleanValue();
-		this.autodelete = ((Boolean)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("autodelete")).booleanValue();
+		this.delay = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
+		this.autocreate = ((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("autocreate")).booleanValue();
+		this.autodelete = ((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("autodelete")).booleanValue();
 		
 		this.includes	= new ArrayList<String>();
-		StringTokenizer	stok	= new StringTokenizer((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("includes"), ",");
+		StringTokenizer	stok	= new StringTokenizer((String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("includes"), ",");
 		while(stok.hasMoreTokens())
 		{
 			includes.add(stok.nextToken().trim());
 		}
 		
 		this.excludes	= new ArrayList<String>();
-		stok	= new StringTokenizer((String)agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("excludes"), ",");
+		stok	= new StringTokenizer((String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("excludes"), ",");
 		while(stok.hasMoreTokens())
 		{
 			excludes.add(stok.nextToken().trim());

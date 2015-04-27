@@ -2,7 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -62,7 +62,7 @@ public class BAgent implements IBService
 						boolean ext = !agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
 						String reason = ext? "Wrong thread: "+Thread.currentThread(): null;
 						tests.add(new TestReport("#B2", "Test if comes back on component thread.", !ext, reason));
-						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testcases", tests);
+						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testcases", tests);
 //						System.out.println("invoked service: "+ser);
 						ret.setResult(result);
 					}
@@ -72,7 +72,7 @@ public class BAgent implements IBService
 						boolean ext = !agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
 						String reason = ext? "Wrong thread: "+Thread.currentThread(): null;
 						tests.add(new TestReport("#B2", "Test if comes back on component thread.", !ext, reason));
-						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testcases", tests);
+						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testcases", tests);
 						ret.setResult(null);
 					}
 				});
@@ -81,7 +81,7 @@ public class BAgent implements IBService
 			public void exceptionOccurred(Exception exception)
 			{
 				tests.add(new TestReport("#B1", "Test if service could be found in init.", exception));
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testcases", tests);
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testcases", tests);
 				ret.setResult(null);
 			}
 		});

@@ -9,7 +9,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -95,7 +95,7 @@ public class WaitBDI
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	/**

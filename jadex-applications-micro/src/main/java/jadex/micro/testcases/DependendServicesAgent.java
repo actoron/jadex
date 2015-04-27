@@ -5,7 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -89,7 +89,7 @@ public class DependendServicesAgent
 							Collection<TestReport> tmp = (Collection<TestReport>)it.next();
 							tests.addAll(tmp);
 						}
-						agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(tests.size(), (TestReport[])tests.toArray(new TestReport[tests.size()])));
+						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tests.size(), (TestReport[])tests.toArray(new TestReport[tests.size()])));
 						
 						agent.killComponent();
                     }

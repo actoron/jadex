@@ -19,7 +19,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
@@ -953,14 +953,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					object = getInterpreter().getComponentFeature(IArgumentsFeature.class).getArguments();
+					object = getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 				}
 			};
 			return (Map)invoc.object;
 		}
 		else
 		{
-			return getInterpreter().getComponentFeature(IArgumentsFeature.class).getArguments();
+			return getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 		}
 	}
 	
@@ -976,14 +976,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					object = getInterpreter().getComponentFeature(IArgumentsFeature.class).getResults();
+					object = getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).getResults();
 				}
 			};
 			return (Map)invoc.object;
 		}
 		else
 		{
-			return getInterpreter().getComponentFeature(IArgumentsFeature.class).getResults();
+			return getInterpreter().getComponentFeature(IArgumentsResultsFeature.class).getResults();
 		}
 	}
 	

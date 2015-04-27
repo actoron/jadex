@@ -1,11 +1,11 @@
 package jadex.micro.testcases.features;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.component.impl.ArgumentsComponentFeature;
+import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -23,10 +23,10 @@ import jadex.micro.features.impl.MicroPojoComponentFeature;
 @Features(
 {	
 	@Feature(type=IExecutionFeature.class, clazz=ExecutionComponentFeature.class),
-	@Feature(type=IArgumentsFeature.class, clazz=ArgumentsComponentFeature.class),
+	@Feature(type=IArgumentsResultsFeature.class, clazz=ArgumentsResultsComponentFeature.class),
 	@Feature(type=IPojoComponentFeature.class, clazz=MicroPojoComponentFeature.class),
 	@Feature(type=IMicroInjectionFeature.class, clazz=MicroInjectionComponentFeature.class,
-		predecessors={IPojoComponentFeature.class, IArgumentsFeature.class}),
+		predecessors={IPojoComponentFeature.class, IArgumentsResultsFeature.class}),
 	@Feature(type=ILifecycleComponentFeature.class, clazz=MicroLifecycleComponentFeature.class,
 		predecessors={IPojoComponentFeature.class}, addlast=false),	
 })

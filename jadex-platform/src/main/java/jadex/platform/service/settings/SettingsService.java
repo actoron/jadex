@@ -1,7 +1,7 @@
 package jadex.platform.service.settings;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -73,7 +73,7 @@ public class SettingsService implements ISettingsService
 	public IFuture<Void>	startService()
 	{
 		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
-		Object	soe	= access.getComponentFeature(IArgumentsFeature.class).getArguments().get("saveonexit");
+		Object	soe	= access.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("saveonexit");
 		this.saveonexit	= soe instanceof Boolean && ((Boolean)soe).booleanValue();
 		this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 		

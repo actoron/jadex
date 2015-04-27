@@ -7,7 +7,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bridge.CheckedAction;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -136,7 +136,7 @@ public class BeliefRules
 				{
 					String name = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
 //					BDIAgentFeature.getInterpreter(state).setResultValue(name, fact);
-					BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(name, fact);
+					BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, fact);
 				}
 			}
 			// case 2: check if agent belief references map to target belief
@@ -158,7 +158,7 @@ public class BeliefRules
 							{
 								String name = (String)state.getAttributeValue(mbelref, OAVBDIMetaModel.modelelement_has_name);
 //								BDIAgentFeature.getInterpreter(state).setResultValue(name, fact);
-								BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(name, fact);
+								BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, fact);
 							}
 						}
 					}
@@ -232,7 +232,7 @@ public class BeliefRules
 				String name = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
 				Collection facts = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
 //				BDIAgentFeature.getInterpreter(state).setResultValue(name, facts);
-				BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(name, facts);
+				BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, facts);
 			}
 		}
 		// case 2: check if agent belief references map to target belief
@@ -255,7 +255,7 @@ public class BeliefRules
 							String name = (String)state.getAttributeValue(mbelref, OAVBDIMetaModel.modelelement_has_name);
 							Collection facts = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
 //							BDIAgentFeature.getInterpreter(state).setResultValue(name, facts);
-							BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsFeature.class).getResults().put(name, facts);
+							BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, facts);
 						}
 					}
 				}

@@ -6,11 +6,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.component.impl.ArgumentsComponentFeature;
+import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -49,10 +49,10 @@ import java.util.Map;
 @Features(
 {	
 	@Feature(type=IExecutionFeature.class, clazz=ExecutionComponentFeature.class),
-	@Feature(type=IArgumentsFeature.class, clazz=ArgumentsComponentFeature.class),
+	@Feature(type=IArgumentsResultsFeature.class, clazz=ArgumentsResultsComponentFeature.class),
 	@Feature(type=IPojoComponentFeature.class, clazz=MicroPojoComponentFeature.class),
 	@Feature(type=IMicroInjectionFeature.class, clazz=MicroInjectionComponentFeature.class,
-		predecessors={IPojoComponentFeature.class, IArgumentsFeature.class}),
+		predecessors={IPojoComponentFeature.class, IArgumentsResultsFeature.class}),
 	@Feature(type=ILifecycleComponentFeature.class, clazz=MicroLifecycleComponentFeature.class,
 		predecessors={IPojoComponentFeature.class}, addlast=false),	
 })
@@ -75,7 +75,7 @@ public class MinimalAgentCreationAgent
 	{
 //		System.out.println("body");
 		
-		Map arguments = agent.getComponentFeature(IArgumentsFeature.class).getArguments();	
+		Map arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();	
 		if(arguments==null)
 			arguments = new HashMap();
 		final Map args = arguments;	
@@ -254,9 +254,9 @@ public class MinimalAgentCreationAgent
 		System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 		System.out.println("Still used memory: "+stillused+"kB.");
 		
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 		agent.killComponent();
 	}
 	

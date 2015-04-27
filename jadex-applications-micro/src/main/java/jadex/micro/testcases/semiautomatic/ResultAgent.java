@@ -1,7 +1,7 @@
 package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -41,13 +41,13 @@ public class ResultAgent
 		
 		if(Math.random()<0.3)
 		{
-			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("result", "last: "+agent.getComponentIdentifier()+": "+Math.random());
+			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("result", "last: "+agent.getComponentIdentifier()+": "+Math.random());
 //			killAgent();
 			ret.setResult(null);
 		}
 		else
 		{
-			agent.getComponentFeature(IArgumentsFeature.class).getResults().put("result", "not last: "+agent.getComponentIdentifier()+": "+Math.random());
+			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getComponentIdentifier()+": "+Math.random());
 			
 //			getServiceContainer().searchService(IComponentManagementService.class)
 			SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)

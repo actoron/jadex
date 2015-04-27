@@ -11,7 +11,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -78,7 +78,7 @@ public class GoalArrayParameterBDI
 				if(!tr.isFinished())
 				{
 					tr.setFailed("Goal did return");
-					agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				
 				ret.setResultIfUndone(null);
@@ -88,7 +88,7 @@ public class GoalArrayParameterBDI
 		
 		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal()).get();
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		ret.setResultIfUndone(null);
 		
 		return ret;

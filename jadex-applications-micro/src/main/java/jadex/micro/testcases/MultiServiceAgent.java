@@ -3,7 +3,7 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -83,7 +83,7 @@ public class MultiServiceAgent	implements IAddService, ISubService
 			public void resultAvailable(Object result)
 			{
 				tr.setSucceeded(true);
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}
@@ -91,7 +91,7 @@ public class MultiServiceAgent	implements IAddService, ISubService
 			public void exceptionOccurred(Exception exception)
 			{
 				tr.setFailed(exception.toString());
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}
