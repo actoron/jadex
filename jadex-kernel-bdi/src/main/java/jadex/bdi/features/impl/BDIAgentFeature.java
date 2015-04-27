@@ -81,6 +81,8 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
+import jadex.rules.state.OAVTypeModel;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Proxy;
@@ -271,8 +273,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		super(component, cinfo);
 		this.initthread = Thread.currentThread();
 		
-		this.state = state;
-		this.model = model;
+		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
+		OAVAgentModel	amodel	= (OAVAgentModel)getComponent().getModel().getRawModel();
+		OAVTypeModel tmodel	= new OAVTypeModel(getComponent().getComponentDescription().getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
+		tmodel.addTypeModel(amodel.getState().getTypeModel());
+		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
+		state.addSubstate(amodel.getState());
+			
 		this.parent	= parent;
 		this.kernelprops = kernelprops;
 		this.planexecutors = new HashMap();

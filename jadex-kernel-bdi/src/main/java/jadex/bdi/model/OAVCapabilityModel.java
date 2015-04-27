@@ -79,6 +79,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		this.state	= state;
 		this.handle	= handle;
 		this.modelinfo	= modelinfo;
+		this.modelinfo.internalSetRawModel(this);
 		this.types	= types;
 		this.rulebase	= new Rulebase();
 		this.lastmod	= lastmod;
