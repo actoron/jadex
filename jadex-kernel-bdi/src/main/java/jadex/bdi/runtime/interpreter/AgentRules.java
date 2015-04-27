@@ -1196,7 +1196,6 @@ public class AgentRules
 	 */
 	public static IFuture	initializeCapabilityInstance(final IOAVState state, final Object rcapa)
 	{
-		
 		final Future	ret	= new Future();
 		
 		// Get configuration.

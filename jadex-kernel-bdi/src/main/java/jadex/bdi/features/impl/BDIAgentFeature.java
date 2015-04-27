@@ -367,6 +367,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public IFuture<Void> init()
 	{
+		assert !isExternalThread();
+		
 //		if(kernelprops!=null)
 //		{
 //			Boolean mps = (Boolean)kernelprops.get("microplansteps");
@@ -381,7 +383,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		this.ea = new ExternalAccessFlyweight(state, ragent);
 
 		getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		return init(getModel(), cinfo.getConfiguration());
+		
+		return initCapability(this.model,cinfo.getConfiguration());
 	}
 	
 	/**
@@ -402,8 +405,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 
 		rulesystem.init();
 		
+		Map parents = new HashMap(); 
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+		AgentRules.createCapabilityInstance(state, ragent, parents);
+		
+		return AgentRules.initializeCapabilityInstance(state, ragent);
+		
 //		System.out.println("sb end: "+getComponentIdentifier());
-		return IFuture.DONE;
+//		return IFuture.DONE;
 	}
 	
 //	/**
@@ -419,17 +428,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //	public void	afterBlock()
 //	{
 //	}
-	
-	/**
-	 *  Extended init procedure including subcapabilities.
-	 */
-	public IFuture init(IModelInfo model, String config)
-	{
-//		assert isAgentThread();
-		assert !isExternalThread();
-		
-		return initCapability(this.model, config);
-	}
 	
 	/**
 	 *  Init the component portion of a capability.
