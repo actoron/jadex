@@ -160,9 +160,4 @@ public interface IInternalBDIAgentFeature
 	 */
 	// Hack!!! Used for debugging.
 	public RuleSystem	getRuleSystem();
-
-	/**
-	 *  Test if is external thread.
-	 */
-	public boolean isExternalThread();
 }
