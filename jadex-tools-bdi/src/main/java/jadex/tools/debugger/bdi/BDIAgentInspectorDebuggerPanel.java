@@ -1,7 +1,8 @@
 package jadex.tools.debugger.bdi;
 
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
+import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -10,6 +11,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.kernelbase.ExternalAccess;
 import jadex.rules.tools.stateviewer.OAVPanel;
 import jadex.tools.debugger.IDebuggerPanel;
 
@@ -56,18 +58,20 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, final IExternalAccess access)
 	{
-		if(access instanceof ElementFlyweight)
+		if(access instanceof ExternalAccess)
 		{
 			this.component	= new JPanel(new BorderLayout());
 			
 			// Hack!!!
-			final IInternalAccess bdii = ((ElementFlyweight)access).getInterpreter();
+			final IInternalAccess bdii = ((ExternalAccess)access).getInternalAccess();
 			// Open tool on introspected agent thread as required for copy state constructor (hack!!!)
 			bdii.getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					oavpanel	= new OAVPanel(((ElementFlyweight)access).getBDIFeature().getRuleSystem().getState());
+					IInternalBDIAgentFeature bdii = (IInternalBDIAgentFeature)((ExternalAccess)access)
+						.getInternalAccess().getComponentFeature(IBDIAgentFeature.class);
+					oavpanel	= new OAVPanel(bdii.getRuleSystem().getState());
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
