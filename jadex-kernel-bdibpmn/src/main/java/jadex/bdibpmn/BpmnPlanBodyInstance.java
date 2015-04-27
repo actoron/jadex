@@ -1,5 +1,7 @@
 package jadex.bdibpmn;
 
+import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
@@ -35,7 +37,6 @@ import jadex.bdi.runtime.impl.flyweights.ParameterSetFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.WaitqueueFlyweight;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
@@ -46,20 +47,17 @@ import jadex.bdibpmn.handler.EventIntermediateMessageActivityHandler;
 import jadex.bdibpmn.handler.EventIntermediateRuleActicityHandler;
 import jadex.bdibpmn.handler.EventIntermediateSignalActivityHandler;
 import jadex.bdibpmn.handler.EventIntermediateTimerActivityHandler;
+import jadex.bpmn.features.impl.BpmnComponentFeature;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.handler.CompositeCancelable;
-import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.IExpressionParser;
@@ -79,7 +77,7 @@ import java.util.logging.Logger;
 /**
  *  A BPMN instance that is executed as a plan body.
  */
-public class BpmnPlanBodyInstance extends BpmnInterpreter
+public class BpmnPlanBodyInstance extends BpmnComponentFeature
 {
 	//-------- static part --------
 	
@@ -91,7 +89,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	
 	static
 	{
-		Map	defhandlers	= new HashMap(BpmnInterpreter.DEFAULT_ACTIVITY_HANDLERS);
+		Map	defhandlers	= new HashMap(BpmnComponentFeature.DEFAULT_ACTIVITY_HANDLERS);
 		defhandlers.put(MBpmnModel.EVENT_START_TIMER, new EventIntermediateTimerActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
@@ -103,7 +101,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	//-------- attributes --------
 	
 	/** The bdi interpreter. */
-	protected BDIInterpreter interpreter;
+	protected IInternalBDIAgentFeature interpreter;
 	
 	/** The last plan lifecycle state. */
 	protected String lifecyclestate;
@@ -512,7 +510,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public Logger getLogger()
 	{
-		return BDIInterpreter.getInterpreter(state).getLogger(rcapa);
+		return BDIAgentFeature.getInterpreter(state).getLogger(rcapa);
 	}
 
 	

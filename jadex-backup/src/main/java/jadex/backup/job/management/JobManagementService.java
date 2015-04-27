@@ -5,7 +5,7 @@ import jadex.backup.job.Job;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -74,7 +74,7 @@ public class JobManagementService implements IJobManagementService
 		this.jobs = new LinkedHashMap<String, Job>();
 		this.jobagents = new HashMap<String, IExternalAccess>();
 
-		String[] cmdargs = (String[])agent.getComponentFeature(IArgumentsFeature.class).getArguments().get("cmdargs");
+		String[] cmdargs = (String[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("cmdargs");
 		if(cmdargs!=null)
 		{
 			for(int i=0; i<cmdargs.length; i++)

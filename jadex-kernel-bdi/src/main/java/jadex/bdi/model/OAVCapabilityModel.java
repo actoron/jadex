@@ -60,7 +60,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	
 	// todo: use some internal report for collecting error stuff?!
 	/** The multi-collection holding the report messages. */
-	protected MultiCollection	entries;
+	protected MultiCollection<Tuple, String>	entries;
 	
 	/** The documents for external elements (e.g. capabilities). */
 	protected Map externals;
@@ -518,10 +518,10 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		if(entries==null)
 			// Use index map to keep insertion order for elements.
-			this.entries	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
+			this.entries	= new MultiCollection<Tuple, String>(new IndexMap<Tuple, Collection<String>>().getAsMap(), LinkedHashSet.class);
 
 		if(!entries.getCollection(stack).contains(message))
-			entries.put(stack, message);
+			entries.add(stack, message);
 	}
 	
 	/**
