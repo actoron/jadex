@@ -2,6 +2,7 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
 
@@ -87,7 +88,7 @@ public class PlanInfo	extends AbstractBDIInfo
 		String type	= (String)state.getAttributeValue(mgoal, OAVBDIMetaModel.modelelement_has_name);
 		if(scope!=null)
 		{
-			IBDIAgentFeature interpreter	= BDIAgentFeature.getInterpreter(state);
+			IInternalBDIAgentFeature interpreter	= BDIAgentFeature.getInterpreter(state);
 			List	path	= new ArrayList();
 			if(interpreter.findSubcapability(interpreter.getAgent(), scope, path))
 			{

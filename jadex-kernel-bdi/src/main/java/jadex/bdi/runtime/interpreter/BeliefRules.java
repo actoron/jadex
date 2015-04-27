@@ -2,6 +2,7 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
@@ -123,7 +124,7 @@ public class BeliefRules
 			state.setAttributeValue(rbelief, OAVBDIRuntimeModel.belief_has_fact, fact);
 			
 			// Set belief value as result
-			IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+			IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 			Object magent = state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.element_has_model);
 			Collection mbels = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefs);
 			
@@ -218,7 +219,7 @@ public class BeliefRules
 	{
 		// Set beliefset value as result
 		Object	mbelset	= state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model);
-		IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 		Object magent = state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.element_has_model);
 		Collection mbelsets = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefsets);
 		

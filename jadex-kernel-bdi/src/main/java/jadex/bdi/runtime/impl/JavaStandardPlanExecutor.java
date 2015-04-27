@@ -76,7 +76,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		String refname= ""+Thread.currentThread()+"_"+Thread.currentThread().hashCode();
 		AbstractPlan.planinit.put(refname, new Object[]{interpreter, rplan, rcapability});
 
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getBDIAgentFeature(interpreter);
+		IInternalBDIAgentFeature bdif = getBDIAgentFeature(interpreter);
 		IOAVState state = bdif.getState();
 		
 		Object	mplan	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);

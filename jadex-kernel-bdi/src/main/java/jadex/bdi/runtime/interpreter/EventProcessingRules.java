@@ -2,6 +2,7 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.ICandidateInfo;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
@@ -370,7 +371,7 @@ public class EventProcessingRules
 			if(!state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type)
 				|| state.getAttributeValues(rpe, OAVBDIRuntimeModel.goal_has_triedmplans)==null)
 			{
-				IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+				IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 				ip.getLogger(rcapa).warning("Warning: Event/goal not handled: "+BDIAgentFeature.getInternalAccess(state).getComponentIdentifier().getLocalName()+rpe+" "
 					+state.getAttributeValue(state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 				
