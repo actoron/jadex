@@ -2,6 +2,7 @@ package jadex.bdi;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.BDIExecutionComponentFeature;
 import jadex.bdi.features.impl.BDIMessageComponentFeature;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
@@ -82,7 +83,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
 			new ComponentFeatureFactory(IBDIAgentFeature.class, BDIAgentFeature.class),
-			BDIMessageComponentFeature.FACTORY
+			BDIMessageComponentFeature.FACTORY,
+			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class)
 //			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class),
 		));
 	
