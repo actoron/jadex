@@ -1,6 +1,7 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.features.IBDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.Plan;
@@ -75,7 +76,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		String refname= ""+Thread.currentThread()+"_"+Thread.currentThread().hashCode();
 		AbstractPlan.planinit.put(refname, new Object[]{interpreter, rplan, rcapability});
 
-		IBDIAgentFeature bdif = interpreter.getComponentFeature(IBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getBDIAgentFeature(interpreter);
 		IOAVState state = bdif.getState();
 		
 		Object	mplan	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
@@ -439,10 +440,10 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 */
 	public void	eventWaitFor(IInternalAccess interpreter, Object rplan)
 	{
-		if(interpreter.getComponentFeature(IBDIAgentFeature.class).isAtomic())
+		if(getBDIAgentFeature(interpreter).isAtomic())
 			throw new RuntimeException("WaitFor not allowed in atomic block.");
 
-		Object	rbody	= interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
+		Object	rbody	= getBDIAgentFeature(interpreter).getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
 		if(rbody==null)
 			throw new RuntimeException("Plan body nulls. waitFor() calls from plan constructors not allowed.");
 
@@ -589,10 +590,10 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			
 			// Save the execution thread for this task.
 			this.thread = Thread.currentThread();
-			interpreter.getComponentFeature(IBDIAgentFeature.class).setPlanThread(thread);
+			getBDIAgentFeature(interpreter).setPlanThread(thread);
 			ClassLoader oldcl = thread.getContextClassLoader();
-			assert interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getTypeModel().getClassLoader()!=null;
-			thread.setContextClassLoader(interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getTypeModel().getClassLoader());
+			assert getBDIAgentFeature(interpreter).getState().getTypeModel().getClassLoader()!=null;
+			thread.setContextClassLoader(getBDIAgentFeature(interpreter).getState().getTypeModel().getClassLoader());
 
 			// Execute the plan (interrupted by pause() calls).
 			// While the plan is executing its plan steps
@@ -604,7 +605,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			boolean	interrupted	= false;	// Plan is interrupted, exit plan thread.
 			try
 			{
-				Object	tmp	= interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
+				Object	tmp	= getBDIAgentFeature(interpreter).getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
 				if(tmp==null)
 					tmp = createPlanBody(interpreter, rcapability, rplan);
 				pi = (Plan)tmp;
@@ -637,9 +638,9 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				// is necessary.
 				if(!aborted)
 				{
-					PlanRules.endPlanPart(interpreter.getComponentFeature(IBDIAgentFeature.class).getState(), rcapability, rplan, false);
+					PlanRules.endPlanPart(getBDIAgentFeature(interpreter).getState(), rcapability, rplan, false);
 					// Hack!!! Should not change state?
-					interpreter.getComponentFeature(IBDIAgentFeature.class).getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
+					getBDIAgentFeature(interpreter).getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
 						this.throwable==null? OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED : OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
 					
 //					if(throwable!=null)
@@ -683,10 +684,10 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				}
 			}
 
-			PlanRules.endPlanPart(interpreter.getComponentFeature(IBDIAgentFeature.class).getState(), rcapability, rplan, true);
+			PlanRules.endPlanPart(getBDIAgentFeature(interpreter).getState(), rcapability, rplan, true);
 
 			// Set plan processing state.
-			interpreter.getComponentFeature(IBDIAgentFeature.class).getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);
+			getBDIAgentFeature(interpreter).getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);
 			
 			// Cleanup the plan execution thread.
 			tasks.remove(rplan);
@@ -696,7 +697,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			synchronized(monitor)
 			{
 //				System.out.println("finish1: "+rplan);
-				interpreter.getComponentFeature(IBDIAgentFeature.class).setPlanThread(null);
+				getBDIAgentFeature(interpreter).setPlanThread(null);
 				thread.setContextClassLoader(oldcl);
 				monitor.notify();
 //				System.out.println("finish2: "+rplan);
@@ -726,14 +727,14 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				String planstate	= steptype;
 				
 				// Set processing state to "waiting"
-				interpreter.getComponentFeature(IBDIAgentFeature.class).getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, procstate);
+				getBDIAgentFeature(interpreter).getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, procstate);
 
 				// Transfer execution from plan thread to agent thread using notify/wait pair.
 				this.exestate	= exestate;
 				monitor.notify();
 				try
 				{
-					interpreter.getComponentFeature(IBDIAgentFeature.class).setPlanThread(null);
+					getBDIAgentFeature(interpreter).setPlanThread(null);
 //					System.out.println("givebackcontrol: "+rplan);
 					monitor.wait();
 				}
@@ -746,7 +747,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 
 				// Execution continues when the executors executeStep() transfers
 				// execution from agent thread to plan thread (using another notify/wait pair).
-				interpreter.getComponentFeature(IBDIAgentFeature.class).setPlanThread(thread);
+				getBDIAgentFeature(interpreter).setPlanThread(thread);
 				
 				// When plan must be terminated unconditionally stop execution.
 				if(terminate)
@@ -757,7 +758,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				// When planstate has changed from body to aborted, leave body method
 				// by throwing an error, which is catched by plan execution task.
 				else if(planstate.equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY) 
-					&& interpreter.getComponentFeature(IBDIAgentFeature.class).getState().getAttributeValue(rplan, OAVBDIRuntimeModel
+					&& getBDIAgentFeature(interpreter).getState().getAttributeValue(rplan, OAVBDIRuntimeModel
 					.plan_has_lifecyclestate).equals(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED))
 				{
 //					System.out.println("abort plan: "+rplan);
@@ -890,6 +891,14 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		return ret;
 	}
 	
+	/**
+	 *  Get the feature.
+	 */
+	private IInternalBDIAgentFeature	getBDIAgentFeature(IInternalAccess interpreter)
+	{
+		return (IInternalBDIAgentFeature)interpreter.getComponentFeature(IBDIAgentFeature.class);
+	}
+		
 	// todo remove me
 //	public static int n;
 }

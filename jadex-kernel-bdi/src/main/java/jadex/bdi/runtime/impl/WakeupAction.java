@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.TimeoutException;
@@ -137,7 +137,7 @@ public class WakeupAction extends CheckedAction
 		
 		if(observeds!=null)
 		{
-			IBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
+			IInternalBDIAgentFeature ip = BDIAgentFeature.getInterpreter(state);
 			for(int i=0; i<observeds.size(); i++)
 				ip.getEventReificator().removeObservedElement(observeds.get(i));
 		}

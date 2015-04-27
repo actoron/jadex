@@ -2,6 +2,7 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
@@ -12,6 +13,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -3366,11 +3368,9 @@ public class AgentRules
 		activateEndState(state, ragent);
 		
 		// Hack! Make timeout explicit/configurable.
-		final IBDIAgentFeature interpreter = BDIAgentFeature.getInterpreter(state);
+		final IInternalBDIAgentFeature interpreter = BDIAgentFeature.getInterpreter(state);
 		final IInternalAccess ia = BDIAgentFeature.getInternalAccess(state);
-		Map	props	= interpreter.getProperties();
-		Long prop	= props!=null ? (Long)props.get(TERMINATION_TIMEOUT) : null;
-		long tt = prop!=null? prop.longValue(): 10000;
+		long tt = 10000;
 //		System.out.println("Adding termination timeout: "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName()+", "+tt);
 		
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer,  SServiceProvider.getLocalService(BDIAgentFeature.getInternalAccess(state), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).createTimer(tt, 
@@ -3388,28 +3388,15 @@ public class AgentRules
 //					{
 						// todo: cleanup? or in terminated action?
 //						System.out.println("Forcing termination (timeout): "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
-						BDIAgentFeature.getInterpreter(state).getLogger(ragent).info("Forcing termination (timeout): "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
+						BDIAgentFeature.getInterpreter(state).getLogger(ragent).info("Forcing termination (timeout): "+ia.getComponentIdentifier().getLocalName());
 						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 							OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
-						ia.getAgentAdapter().wakeup();
+						((IInternalExecutionFeature)ia.getComponentFeature(IExecutionFeature.class)).wakeup();
 //					}
 				}
 			})));
 	}
 	
-	/**
-	 *  Get a property value.
-	 *  @param state The state.
-	 *  @param rcapa The capability.
-	 *  @param name The name.
-	 *  @return The property value.
-	 */
-	public static Object getPropertyValue(IOAVState state, Object rcapa, String name)
-	{
-		Map	props	= BDIAgentFeature.getInterpreter(state).getProperties(rcapa);
-		return props!=null ? props.get(name) : null;
-	}
-
 	/**
 	 *  Perform any cleanup required for the agent.
 	 *  Called after all endgoals and endplans have finished.
@@ -3417,7 +3404,7 @@ public class AgentRules
 	public static void cleanupAgent(IOAVState state, Object ragent)
 	{
 		Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
-		IBDIAgentFeature interpreter	= BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature interpreter	= BDIAgentFeature.getInterpreter(state);
 		
 //				String name = BDIAgentFeature.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
 //				if(name.indexOf("jcc")!=-1)
@@ -3475,7 +3462,7 @@ public class AgentRules
 	{
 		// Collect results for agent.
 		Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
-		IBDIAgentFeature	interpreter	= BDIAgentFeature.getInterpreter(state);
+		IInternalBDIAgentFeature	interpreter	= BDIAgentFeature.getInterpreter(state);
 		IArgument[] results = interpreter.getModel().getResults();
 		Map res = new HashMap();
 		
