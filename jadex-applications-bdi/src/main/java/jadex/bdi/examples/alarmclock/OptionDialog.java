@@ -277,7 +277,7 @@ public class OptionDialog extends JDialog
 										//System.out.println("Could not load settings: "+ex);
 									}
 									
-		//							agent.getServiceContainer().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+		//							agent.getComponentFeature(IRequiredServiceFeature.class).getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
 		//							{
 		//								public void customResultAvailable(Object source, Object result)
 		//								{

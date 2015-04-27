@@ -138,7 +138,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("dealerpan")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IFuture<IComponentManagementService>	cms	= ia.getServiceContainer().getRequiredService("cms");
+				IFuture<IComponentManagementService>	cms	= ia.getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms");
 //				if(cms.isDone() && cms.get(null)==null)
 //					Thread.dumpStack();
 				cms.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
@@ -167,7 +167,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("dealertf")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getServiceContainer().getRequiredService("cms")
+						ia.getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms")
 							.addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
@@ -389,7 +389,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("close")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getServiceContainer().getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						ia.getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -533,7 +533,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			{
 //				final IEAGoal start = (IEAGoal)result;
 //				
-////					IContextService	cs	= (IContextService)agent.getServiceContainer().getService(IContextService.class);
+////					IContextService	cs	= (IContextService)agent.getComponentFeature(IRequiredServiceFeature.class).getService(IContextService.class);
 ////					IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
 ////					// Hack! remove cast to ApplicationContext
 ////					String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
@@ -874,7 +874,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //					{
 //						final IEAGoal start = (IEAGoal)result;
 //						
-////						IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
+////						IContextService	cs	= (IContextService) agent.getComponentFeature(IRequiredServiceFeature.class).getService(IContextService.class);
 ////						IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
 ////						// Hack! remove cast to ApplicationContext
 ////						String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Player").getFilename();

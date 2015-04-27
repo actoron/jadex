@@ -40,7 +40,7 @@ public class GetExternalAccessPlan extends Plan
 
 		// Create component.
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-			.getServiceUpwards((IServiceProvider)getServiceContainer(), IComponentManagementService.class).get(this);
+			.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IComponentManagementService.class).get(this);
 		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
 		Map	args	= new HashMap();
 		args.put("future", wait);

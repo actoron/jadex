@@ -152,7 +152,7 @@ class ComponentAdapter implements IComponentAdapter
 		return null;
 	}
 	
-	public IServiceContainer getServiceContainer()
+	public IServiceContainer getComponentFeature(IRequiredServiceFeature.class)
 	{
 		return container;
 	}

@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.beans.PropertyChangeListener;
@@ -86,7 +87,7 @@ public class AlarmsGui extends JFrame
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-				ia.getServiceContainer().getRequiredService("clockservice")
+				ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")
 					.addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
 				{
 					public void customResultAvailable(Object result)
@@ -102,7 +103,7 @@ public class AlarmsGui extends JFrame
 								if(!isRowSelected(row))
 								{
 									Alarm alarm = (Alarm)tadata.getObjectForRow(row);
-	//								IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
+	//								IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServiceFeature.class).getService(IClockService.class);
 									if(alarm.getAlarmtime(cs.getTime())<cs.getTime())
 									{
 										c.setBackground(new Color(255, 211, 156));

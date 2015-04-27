@@ -30,7 +30,7 @@ public class DynamicModelPlan extends Plan
 	 */
 	public void body()
 	{
-		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getServiceContainer().getRequiredService("factory").get(this);
+		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("factory").get(this);
 		IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null, getScope().getModel().getResourceIdentifier()).get(this);
 			
 		IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
@@ -43,7 +43,7 @@ public class DynamicModelPlan extends Plan
 			
 		fac.registerAgentModel(agent, "helloagent.agent.xml").get(this);
 
-		IComponentManagementService cms	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
+		IComponentManagementService cms	= (IComponentManagementService)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms").get(this);
 
 		Future	finished	= new Future();
 		IComponentIdentifier hwc = (IComponentIdentifier)cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener(finished)).get(this);

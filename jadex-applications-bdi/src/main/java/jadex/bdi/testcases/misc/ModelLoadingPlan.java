@@ -41,10 +41,10 @@ public class ModelLoadingPlan extends Plan
 			throw new RuntimeException(fnfe);
 		}
 
-		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getServiceContainer().getRequiredService("factory").get(this);
+		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("factory").get(this);
 		fac.loadAgentModel("helloworld", input, "helloagent.agent.xml", getInterpreter().getModel().getResourceIdentifier()).get(this);
 
-		IComponentManagementService cms	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
+		IComponentManagementService cms	= (IComponentManagementService)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms").get(this);
 		Future<Collection<Tuple2<String, Object>>>	finished	= new Future<Collection<Tuple2<String, Object>>>();
 		cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener<Collection<Tuple2<String, Object>>>(finished)).get(this);
 

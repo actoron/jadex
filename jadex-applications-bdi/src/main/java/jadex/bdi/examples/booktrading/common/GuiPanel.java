@@ -371,7 +371,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getComponentFeature(IRequiredServiceFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -509,7 +509,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getComponentFeature(IRequiredServiceFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -776,7 +776,7 @@ public class GuiPanel extends JPanel
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+					ia.getComponentFeature(IRequiredServiceFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
 						.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 					{
 						public void resultAvailable(IClockService clock)

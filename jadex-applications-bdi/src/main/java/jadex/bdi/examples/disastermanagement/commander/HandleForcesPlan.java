@@ -27,7 +27,7 @@ public abstract class HandleForcesPlan extends Plan
 		while(true)
 		{
 			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
-			Collection forces = (Collection)getServiceContainer().getRequiredServices(servicename).get(this);
+			Collection forces = (Collection)getComponentFeature(IRequiredServiceFeature.class).getRequiredServices(servicename).get(this);
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 							

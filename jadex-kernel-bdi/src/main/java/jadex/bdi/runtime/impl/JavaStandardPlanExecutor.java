@@ -877,17 +877,10 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	/**
 	 *  Create the plan executor.
 	 */
-	public static IFuture<IPlanExecutor>	createPlanExecutor(IInternalAccess comp)
+	public static IPlanExecutor createPlanExecutor(IInternalAccess comp)
 	{
-		final Future<IPlanExecutor>	ret	= new Future<IPlanExecutor>();
-		SServiceProvider.getService(comp, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, IPlanExecutor>(ret)
-		{
-			public void customResultAvailable(IThreadPoolService threadpool)
-			{
-				ret.setResult(new JavaStandardPlanExecutor(threadpool));
-			}
-		});
+		IThreadPoolService tps = SServiceProvider.getLocalService(comp, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IPlanExecutor ret = new JavaStandardPlanExecutor(tps);
 		return ret;
 	}
 	

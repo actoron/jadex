@@ -20,7 +20,7 @@ public class RequestMasterPlan extends Plan
 		args.put("receiver", getComponentIdentifier());
 		
 		
-		IComponentManagementService	ces	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
+		IComponentManagementService	ces	= (IComponentManagementService)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms").get(this);
 		ces.createComponent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", new CreationInfo("default", args, getComponentIdentifier()), null);
 	}	
 }
