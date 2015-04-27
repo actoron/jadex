@@ -1,12 +1,14 @@
 package jadex.tools.debugger.bdi;
 
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.gui.SGUI;
+import jadex.kernelbase.ExternalAccess;
 import jadex.rules.tools.reteviewer.RetePanel;
 import jadex.tools.debugger.IDebuggerPanel;
 
@@ -53,9 +55,10 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
-		if(access instanceof ElementFlyweight)
+		if(access instanceof ExternalAccess)
 		{
-			IInternalBDIAgentFeature bdii = ((ElementFlyweight)access).getBDIFeature();
+			IInternalBDIAgentFeature bdii = (IInternalBDIAgentFeature)((ExternalAccess)access)
+				.getInternalAccess().getComponentFeature(IBDIAgentFeature.class);
 			this.retepanel = new RetePanel(bdii.getRuleSystem(), null, bpp);
 			this.component	= retepanel;
 		}

@@ -304,12 +304,20 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			
 			public void invokeSynchronized(Runnable code)
 			{
-				invokeSynchronized(code);
+				BDIAgentFeature.this.invokeSynchronized(code);
 			}
 			
-			public void invokeLater(Runnable action)
+			public void invokeLater(final Runnable action)
 			{
-				invokeLater(action);
+				getComponent().getComponentFeature(IExecutionFeature.class)
+					.scheduleImmediate(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						action.run();
+						return IFuture.DONE;
+					}
+				});
 			}
 		});
 		
