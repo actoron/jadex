@@ -1342,8 +1342,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */ 
 	public boolean isExternalThread()
 	{
-		return !isPlanThread() &&
-			!(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()) 
+		return !getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread()
+			&& !isPlanThread()
+			&& !(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()) 
 				&& Starter.isRescueThread(getComponent().getComponentIdentifier()));
 	}
 
