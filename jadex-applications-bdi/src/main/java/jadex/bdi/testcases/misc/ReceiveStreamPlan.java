@@ -25,7 +25,7 @@ public class ReceiveStreamPlan extends Plan
 //		{
 //			while(true)
 //			{
-//				byte b = con.areadNext().get(this);
+//				byte b = con.areadNext().get();
 //				cnt++;
 //				System.out.println("Read: "+b);
 //			}

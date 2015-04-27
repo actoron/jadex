@@ -21,7 +21,7 @@ public class ClearChemicalsPlan extends Plan
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		IClearChemicalsService force = (IClearChemicalsService)getParameter("rescueforce").getValue();
 		cc	= force.clearChemicals(disaster);
-		cc.get(this);
+		cc.get();
 	}
 	
 	/**

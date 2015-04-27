@@ -35,7 +35,7 @@ public class WaitqueueTestPlan	extends Plan
 		// Send message and remember answer filter. Note that the acl message
 		// should have ReplyWith or ConversationId to catch any answer messages!
 //		IFilter	filter	= sendMessage(request);
-		sendMessage(request).get(this);
+		sendMessage(request).get();
 
 		// Wait until timeout.
 		waitFor(2000);
@@ -80,7 +80,7 @@ public class WaitqueueTestPlan	extends Plan
 		// Send message and remember answer filter. Note that the acl message
 		// should have ReplyWith or ConversationId to catch any answer messages!
 //		filter	= sendMessage(request);
-		sendMessage(request).get(this);
+		sendMessage(request).get();
 
 
 		// Wait until timeout.

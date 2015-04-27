@@ -16,6 +16,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -138,7 +139,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("dealerpan")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IFuture<IComponentManagementService>	cms	= ia.getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms");
+				IFuture<IComponentManagementService>	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 //				if(cms.isDone() && cms.get(null)==null)
 //					Thread.dumpStack();
 				cms.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
@@ -167,7 +168,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("dealertf")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms")
+						ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms")
 							.addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
@@ -389,7 +390,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("close")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -493,7 +494,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
 				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
 				start.getParameter("name").setValue("BlackjackDealer");
-				start.getParameter("parent").setValue(ia.getParentAccess().getComponentIdentifier());
+				start.getParameter("parent").setValue(ia.getComponentIdentifier().getParent());
 				start.addGoalListener(new IGoalListener()
 				{
 					public void goalFinished(AgentEvent ae)
@@ -533,7 +534,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			{
 //				final IEAGoal start = (IEAGoal)result;
 //				
-////					IContextService	cs	= (IContextService)agent.getComponentFeature(IRequiredServiceFeature.class).getService(IContextService.class);
+////					IContextService	cs	= (IContextService)agent.getComponentFeature(IRequiredServicesFeature.class).getService(IContextService.class);
 ////					IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
 ////					// Hack! remove cast to ApplicationContext
 ////					String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
@@ -827,7 +828,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
 						start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
 						start.getParameter("name").setValue(player.getName());
-						start.getParameter("parent").setValue(ia.getParentAccess().getComponentIdentifier());
+						start.getParameter("parent").setValue(ia.getComponentIdentifier().getParent());
 						Map args = new HashMap();
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
@@ -874,7 +875,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //					{
 //						final IEAGoal start = (IEAGoal)result;
 //						
-////						IContextService	cs	= (IContextService) agent.getComponentFeature(IRequiredServiceFeature.class).getService(IContextService.class);
+////						IContextService	cs	= (IContextService) agent.getComponentFeature(IRequiredServicesFeature.class).getService(IContextService.class);
 ////						IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
 ////						// Hack! remove cast to ApplicationContext
 ////						String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Player").getFilename();

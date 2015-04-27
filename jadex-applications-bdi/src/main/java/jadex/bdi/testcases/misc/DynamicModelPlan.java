@@ -8,6 +8,7 @@ import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.bdi.model.editable.IMEPlan;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -30,8 +31,8 @@ public class DynamicModelPlan extends Plan
 	 */
 	public void body()
 	{
-		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("factory").get(this);
-		IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null, getScope().getModel().getResourceIdentifier()).get(this);
+		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("factory").get();
+		IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null, getScope().getModel().getResourceIdentifier()).get();
 			
 		IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
 		msgbelief.createFact("\"Welcome to editable models!\"", null);
@@ -41,14 +42,14 @@ public class DynamicModelPlan extends Plan
 		IMEConfiguration conf = agent.createConfiguration("default");
 		conf.createInitialPlan("hello");
 			
-		fac.registerAgentModel(agent, "helloagent.agent.xml").get(this);
+		fac.registerAgentModel(agent, "helloagent.agent.xml").get();
 
-		IComponentManagementService cms	= (IComponentManagementService)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms").get(this);
+		IComponentManagementService cms	= (IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 
 		Future	finished	= new Future();
-		IComponentIdentifier hwc = (IComponentIdentifier)cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener(finished)).get(this);
+		IComponentIdentifier hwc = (IComponentIdentifier)cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener(finished)).get();
 
-		finished.get(this);
+		finished.get();
 		
 		tr.setSucceeded(true);
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);

@@ -103,7 +103,7 @@ public class AlarmsGui extends JFrame
 								if(!isRowSelected(row))
 								{
 									Alarm alarm = (Alarm)tadata.getObjectForRow(row);
-	//								IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServiceFeature.class).getService(IClockService.class);
+	//								IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getService(IClockService.class);
 									if(alarm.getAlarmtime(cs.getTime())<cs.getTime())
 									{
 										c.setBackground(new Color(255, 211, 156));

@@ -9,6 +9,7 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -112,12 +113,12 @@ public class CustomerPanel extends JPanel
 						Future<Collection<IShopService>> ret = new Future<Collection<IShopService>>();
 						if(remote.isSelected())
 						{
-							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServiceFeature.class).getRequiredServices("remoteshopservices");
+							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("remoteshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						else
 						{
-							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServiceFeature.class).getRequiredServices("localshopservices");
+							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("localshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						return ret;

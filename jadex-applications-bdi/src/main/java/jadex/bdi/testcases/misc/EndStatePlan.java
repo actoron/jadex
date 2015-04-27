@@ -6,7 +6,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.df.IDF;
@@ -49,7 +49,7 @@ public class EndStatePlan extends Plan
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
 		IGoal	search	= createGoal("cmscap.cms_search_components");
 //		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-//			getComponentFeature(IRequiredServiceFeature.class), IComponentManagementService.class).get(this);
+//			getComponentFeature(IRequiredServicesFeature.class), IComponentManagementService.class).get();
 //		search.getParameter("description").setValue(cms.createComponentDescription(worker, null, null, null, null, null));
 		search.getParameter("description").setValue(new CMSComponentDescription(worker, null, false, false, false, false, false, null, null, null, null, -1, null, null, false));
 		dispatchSubgoalAndWait(search);
@@ -80,7 +80,7 @@ public class EndStatePlan extends Plan
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
-		IDF df = (IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this);
+		IDF df = (IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get();
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "endstate_testservice", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		

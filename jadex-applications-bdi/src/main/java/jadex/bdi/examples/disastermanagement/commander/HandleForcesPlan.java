@@ -6,6 +6,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public abstract class HandleForcesPlan extends Plan
 		while(true)
 		{
 			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
-			Collection forces = (Collection)getComponentFeature(IRequiredServiceFeature.class).getRequiredServices(servicename).get(this);
+			Collection forces = (Collection)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(servicename).get();
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 							
@@ -100,7 +101,7 @@ public abstract class HandleForcesPlan extends Plan
 //			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 //			String servicename = (String)getParameter("servicename").getValue();
 //			String typename = (String)getParameter("typename").getValue();
-//			Collection forces = (Collection)getScope().getRequiredServices(servicename).get(this);
+//			Collection forces = (Collection)getScope().getRequiredServices(servicename).get();
 //			int number = ((Integer)disaster.getProperty(typename)).intValue();
 //			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 //							

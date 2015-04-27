@@ -8,6 +8,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -371,7 +372,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServiceFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -509,7 +510,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServiceFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -776,7 +777,7 @@ public class GuiPanel extends JPanel
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getComponentFeature(IRequiredServiceFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
 						.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 					{
 						public void resultAvailable(IClockService clock)

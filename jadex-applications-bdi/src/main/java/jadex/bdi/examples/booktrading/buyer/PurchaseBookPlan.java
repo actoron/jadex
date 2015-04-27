@@ -8,6 +8,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
@@ -38,8 +39,8 @@ public class PurchaseBookPlan extends Plan
 			+ order.getStartPrice();
 
 		// Find available seller agents.
-//		IDF	df	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
-		IDF	df	= (IDF)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("dfservice").get(this);
+//		IDF	df	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get();
+		IDF	df	= (IDF)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("dfservice").get();
 		IDFServiceDescription	service	= df.createDFServiceDescription(null, "service_seller", null);
 		IDFComponentDescription	desc	= df.createDFComponentDescription(null, service);
 		IGoal df_search = createGoal("df_search");

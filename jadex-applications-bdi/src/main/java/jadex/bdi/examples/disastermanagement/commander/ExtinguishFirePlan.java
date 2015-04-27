@@ -21,7 +21,7 @@ public class ExtinguishFirePlan extends Plan
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		IExtinguishFireService force = (IExtinguishFireService)getParameter("rescueforce").getValue();
 		ef	= force.extinguishFire(disaster);
-		ef.get(this);
+		ef.get();
 	}
 	
 	/**

@@ -44,8 +44,8 @@ public class PlaySongPlan extends Plan
 		final URL song = (URL)getParameter("song").getValue();
 		final SyncResultListener lis = new SyncResultListener();
 		
-//		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), IThreadPoolService.class).get(this);
-		IThreadPoolService tp = (IThreadPoolService)getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tpservice").get(this);
+//		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), IThreadPoolService.class).get();
+		IThreadPoolService tp = (IThreadPoolService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tpservice").get();
 		final ClassLoader cl = getScope().getClassLoader();
 		tp.execute(new Runnable()
 		{

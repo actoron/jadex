@@ -4,6 +4,7 @@ import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
 import jadex.bdi.examples.booktrading.serviceimpl.IBuyBookService;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -39,7 +40,7 @@ public class PurchaseBookPlan extends Plan
 			+ order.getStartPrice();
 
 		// Find available seller agents.
-		IBuyBookService[]	services	= getComponentFeature(IRequiredServiceFeature.class).getRequiredServices("buyservice").get(this).toArray(new IBuyBookService[0]);
+		IBuyBookService[]	services	= getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
 		if(services.length == 0)
 		{
 //			System.out.println("No seller found, purchase failed.");
@@ -68,7 +69,7 @@ public class PurchaseBookPlan extends Plan
 			});
 		}
 		// Sort results by price.
-		Tuple2<IBuyBookService, Integer>[]	proposals	= cfp.get(this).toArray(new Tuple2[0]);
+		Tuple2<IBuyBookService, Integer>[]	proposals	= cfp.get().toArray(new Tuple2[0]);
 		Arrays.sort(proposals, new Comparator<Tuple2<IBuyBookService, Integer>>()
 		{
 			public int compare(Tuple2<IBuyBookService, Integer> o1, Tuple2<IBuyBookService, Integer> o2)
@@ -80,7 +81,7 @@ public class PurchaseBookPlan extends Plan
 		// Do we have a winner?
 		if(proposals.length>0 && proposals[0].getSecondEntity().intValue()<=acceptable_price)
 		{
-			proposals[0].getFirstEntity().acceptProposal(order.getTitle(), proposals[0].getSecondEntity().intValue()).get(this);
+			proposals[0].getFirstEntity().acceptProposal(order.getTitle(), proposals[0].getSecondEntity().intValue()).get();
 			
 			generateNegotiationReport(order, proposals, acceptable_price);
 			

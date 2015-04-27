@@ -26,7 +26,7 @@ public class TreatVictimsPlan extends Plan
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		ITreatVictimsService force = (ITreatVictimsService)getParameter("rescueforce").getValue();
 		tv	= force.treatVictims(disaster);
-		tv.get(this);
+		tv.get();
 	}
 	
 	/**
@@ -43,7 +43,7 @@ public class TreatVictimsPlan extends Plan
 			catch(Exception e)
 			{
 				// Wait until service is finished before superordinated goal is dropped.
-				tv.get(this);
+				tv.get();
 			}
 		}
 	}

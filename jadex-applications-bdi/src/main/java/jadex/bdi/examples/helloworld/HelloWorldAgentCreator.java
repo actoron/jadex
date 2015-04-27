@@ -37,7 +37,7 @@ public class HelloWorldAgentCreator
 				{
 					public void resultAvailable(Boolean result)
 					{
-						SServiceProvider.getService(plat.getServiceProvider(), IDynamicBDIFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService(plat, IDynamicBDIFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new DefaultResultListener<IDynamicBDIFactory>()
 						{
 							public void resultAvailable(final IDynamicBDIFactory fac)
@@ -57,7 +57,7 @@ public class HelloWorldAgentCreator
 										
 										fac.registerAgentModel(agent, "helloagent.agent.xml");
 										
-										SServiceProvider.getServiceUpwards(plat.getServiceProvider(), IComponentManagementService.class)
+										SServiceProvider.getService(plat, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 											.addResultListener(new DefaultResultListener<IComponentManagementService>()
 										{
 											public void resultAvailable(IComponentManagementService cms)

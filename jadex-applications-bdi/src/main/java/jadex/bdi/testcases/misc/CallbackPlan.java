@@ -269,7 +269,7 @@ public class CallbackPlan extends Plan
 		});
 		
 		mevent.addMessageEventListener(mel);
-		sendMessage(mevent).get(this);
+		sendMessage(mevent).get();
 		
 		waitFor(200);
 		if(!tr7.isSucceeded())
@@ -280,7 +280,7 @@ public class CallbackPlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr9);
 		
 		IMessageEvent rep = getEventbase().createReply(mevent, "message_event");
-		sendMessage(rep).get(this);
+		sendMessage(rep).get();
 		waitFor(200);
 		if(!tr8.isSucceeded())
 			tr8.setReason("Listener was not notified.");

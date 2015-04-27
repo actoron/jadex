@@ -423,7 +423,7 @@ public class AlarmSettingsDialog extends JDialog
 				}
 			});
 
-//			alarm.setClock((IClockService)agent.getComponentFeature(IRequiredServiceFeature.class).getService(IClockService.class));
+//			alarm.setClock((IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getService(IClockService.class));
 		}
 		else
 		{
@@ -471,7 +471,7 @@ public class AlarmSettingsDialog extends JDialog
 		if(alarm==null)
 		{
 			this.alarm = new Alarm();
-//			alarm.setClock((IClockService)agent.getComponentFeature(IRequiredServiceFeature.class).getService(IClockService.class));
+//			alarm.setClock((IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getService(IClockService.class));
 		}
 
 		alarm.setMode((String)mode.getSelectedItem());

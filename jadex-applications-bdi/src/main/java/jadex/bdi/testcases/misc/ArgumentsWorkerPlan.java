@@ -14,7 +14,7 @@ public class ArgumentsWorkerPlan extends Plan
 	public void body()
 	{
 		IMessageEvent me = createMessageEvent("inform_created");
-		sendMessage(me).get(this);
+		sendMessage(me).get();
 //		waitFor(1000);
 		killAgent();
 	}

@@ -359,6 +359,6 @@ public class ConfigElementRefWorkerPlan extends Plan
 		// Finally send reports to test agent.
 		IMessageEvent	msg	= createMessageEvent("inform_reports");
 		msg.getParameter(SFipa.CONTENT).setValue(reports);
-		sendMessage(msg).get(this);
+		sendMessage(msg).get();
 	}
 }

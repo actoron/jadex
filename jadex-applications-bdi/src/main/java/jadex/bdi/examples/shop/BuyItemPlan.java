@@ -27,7 +27,7 @@ public class BuyItemPlan extends Plan
 //		System.out.println(getComponentName()+" buying item: "+name);
 		IFuture<ItemInfo>	future	= shop.buyItem(name, price);
 //		System.out.println(getComponentName()+" getting item: "+future);
-		ItemInfo item = (ItemInfo)future.get(this);
+		ItemInfo item = (ItemInfo)future.get();
 //		System.out.println(getComponentName()+" bought item: "+item);
 		getParameter("result").setValue(item);
 		

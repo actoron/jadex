@@ -30,7 +30,7 @@ public class CMSTestPlan extends Plan
 		
 		// Todo: support remote CMS agent!?
 //		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-//			getScope().getComponentFeature(IRequiredServiceFeature.class), IComponentManagementService.class).get(this);
+//			getScope().getComponentFeature(IRequiredServicesFeature.class), IComponentManagementService.class).get();
 //		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, getComponentIdentifier(), null);
 		IComponentIdentifier aa = new BasicComponentIdentifier(SFipa.CMS_COMPONENT, getComponentIdentifier());
 		performTests(num, aa); // test remotely

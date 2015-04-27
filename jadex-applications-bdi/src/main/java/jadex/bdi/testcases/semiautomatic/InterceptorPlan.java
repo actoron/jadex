@@ -1,6 +1,7 @@
 package jadex.bdi.testcases.semiautomatic;
 
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 
 /**
  *  Plan that adds a reasoning interceptor to the service and invokes it.
@@ -46,9 +47,9 @@ public class InterceptorPlan extends Plan
 //			}
 //		};
 		
-//		IPrintHelloService ps = (IPrintHelloService)getComponentFeature(IRequiredServiceFeature.class).getProvidedService("printservice");
-//		IServiceInvocationInterceptor[] ics = getComponentFeature(IRequiredServiceFeature.class).getInterceptors(ps);
-//		getComponentFeature(IRequiredServiceFeature.class).addInterceptor(ic, ps, ics.length-1);
+//		IPrintHelloService ps = (IPrintHelloService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getProvidedService("printservice");
+//		IServiceInvocationInterceptor[] ics = getComponentFeature(IRequiredServicesFeature.class).getInterceptors(ps);
+//		getComponentFeature(IRequiredServicesFeature.class).addInterceptor(ic, ps, ics.length-1);
 
 		for(int i=0; i<3; i++)
 			callPrintService();
@@ -61,8 +62,8 @@ public class InterceptorPlan extends Plan
 	{
 		try
 		{
-			IPrintHelloService ps = (IPrintHelloService)getComponentFeature(IRequiredServiceFeature.class).getProvidedService("printservice");
-			ps.printHello().get(this);
+			IPrintHelloService ps = (IPrintHelloService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getProvidedService("printservice");
+			ps.printHello().get();
 		}
 		catch(Exception e)
 		{

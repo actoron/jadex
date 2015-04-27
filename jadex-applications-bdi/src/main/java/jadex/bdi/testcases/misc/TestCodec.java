@@ -5,7 +5,6 @@ import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
 

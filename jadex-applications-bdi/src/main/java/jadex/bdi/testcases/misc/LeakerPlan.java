@@ -230,7 +230,7 @@ public class LeakerPlan extends Plan
 			IMessageEvent me = createMessageEvent("testmsg");
 			if(send)
 			{
-				sendMessage(me).get(this);
+				sendMessage(me).get();
 			}
 			//getLogger().info("Message event created and sent: "+i);
 			if(i%500==0)

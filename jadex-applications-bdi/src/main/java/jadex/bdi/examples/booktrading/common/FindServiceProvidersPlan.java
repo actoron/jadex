@@ -3,6 +3,7 @@ package jadex.bdi.examples.booktrading.common;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 
@@ -20,7 +21,7 @@ public class FindServiceProvidersPlan extends Plan
 		IDFComponentDescription dfadesc = (IDFComponentDescription)getParameter("description").getValue();
 		
 //		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class);
-		IDF df = (IDF)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("dfservice").get(this);
+		IDF df = (IDF)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("dfservice").get();
 		ISearchConstraints constraints = df.createSearchConstraints(-1, 0);
 
 		// Use a subgoal to search at the df.

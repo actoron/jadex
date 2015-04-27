@@ -1,6 +1,6 @@
 package jadex.bdi.benchmarks;
 
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
 import jadex.rules.rulesystem.rete.builder.BuildReport;
 import jadex.rules.rulesystem.rete.builder.ReteBuilder;
@@ -21,7 +21,7 @@ public class ReteBuilderPerformanceTest
 		
 		for(int i=0; i<1000; i++)
 		{
-			RetePatternMatcherFunctionality pm = new RetePatternMatcherFunctionality(BDIInterpreter.RULEBASE);
+			RetePatternMatcherFunctionality pm = new RetePatternMatcherFunctionality(BDIAgentFeature.RULEBASE);
 			ReteBuilder builder = pm.getReteNode().getBuilder();
 			if(builder!=null && builder.getBuildReport()!=null)
 			{

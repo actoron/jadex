@@ -9,7 +9,7 @@ import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.df.IDF;
@@ -39,7 +39,7 @@ public class DFTestPlan extends Plan
 		
 		// Todo: support remote DF agent!?
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			(IServiceProvider)getScope().getComponentFeature(IRequiredServiceFeature.class), IComponentManagementService.class).get(this);
+			(IServiceProvider)getScope().getComponentFeature(IRequiredServicesFeature.class), IComponentManagementService.class).get();
 //		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_COMPONENT, getComponentIdentifier(), null);
 		IComponentIdentifier da = new BasicComponentIdentifier(SFipa.DF_COMPONENT, getComponentIdentifier());
 		performTests(num, da); // test remotely
@@ -50,14 +50,14 @@ public class DFTestPlan extends Plan
 	 */
 	public int	performInitialTests(int num)
 	{
-		IDFComponentDescription desc = ((IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getScope().getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this))
+		IDFComponentDescription desc = ((IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getScope().getComponentFeature(IRequiredServicesFeature.class), IDF.class).get())
 			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get())
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get())
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get())
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 
@@ -121,21 +121,21 @@ public class DFTestPlan extends Plan
 	 */
 	public int performTests(int num, IComponentIdentifier df)
 	{
-		IDFComponentDescription desc = ((IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this))
+		IDFComponentDescription desc = ((IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get())
 			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get())
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get())
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this))
+				((IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get())
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 		
 		long olt = getTime()+2000;
 //		desc_clone.setLeaseTime(new Date(olt));
 		
-		IDF dfservice = (IDF)SServiceProvider.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IDF.class).get(this);
+		IDF dfservice = (IDF)SServiceProvider.getServiceUpwards(getInterpreter(), IDF.class).get();
 		// Hack! does not clone services
 		IDFComponentDescription desc_clone = dfservice.createDFComponentDescription(desc.getName(), desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), new Date(olt));
 

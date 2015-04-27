@@ -38,7 +38,7 @@ public class MessageForwardPlan extends AbstractMultipleAgentsPlan
 				IMessageEvent me = (IMessageEvent)getReason();
 				me.getParameterSet(SFipa.RECEIVERS).removeValues();
 				me.getParameterSet(SFipa.RECEIVERS).addValue(agents.get(0));
-				sendMessage(me).get(this);
+				sendMessage(me).get();
 				tr.setSucceeded(true);
 			}
 			catch(Exception e)

@@ -3,6 +3,7 @@ package jadex.bdi.testcases.misc;
 import jadex.base.test.TestReport;
 import jadex.bdi.IDynamicBDIFactory;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
@@ -41,14 +42,14 @@ public class ModelLoadingPlan extends Plan
 			throw new RuntimeException(fnfe);
 		}
 
-		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("factory").get(this);
-		fac.loadAgentModel("helloworld", input, "helloagent.agent.xml", getInterpreter().getModel().getResourceIdentifier()).get(this);
+		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("factory").get();
+		fac.loadAgentModel("helloworld", input, "helloagent.agent.xml", getInterpreter().getModel().getResourceIdentifier()).get();
 
-		IComponentManagementService cms	= (IComponentManagementService)getComponentFeature(IRequiredServiceFeature.class).getRequiredService("cms").get(this);
+		IComponentManagementService cms	= (IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 		Future<Collection<Tuple2<String, Object>>>	finished	= new Future<Collection<Tuple2<String, Object>>>();
-		cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener<Collection<Tuple2<String, Object>>>(finished)).get(this);
+		cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener<Collection<Tuple2<String, Object>>>(finished)).get();
 
-		finished.get(this);
+		finished.get();
 		
 		tr.setSucceeded(true);
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
