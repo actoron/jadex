@@ -193,9 +193,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	
 	//-------- null on init --------
 	
-	/** The plan thread currently executing (null for none). */
-	protected transient Thread planthread;
-	
 	/** The atomic state. */
 	protected transient boolean atomic;
 	
@@ -367,7 +364,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public IFuture<Void> init()
 	{
-		assert !isExternalThread();
+		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
 //		if(kernelprops!=null)
 //		{
@@ -392,7 +389,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public IFuture<Void> body()
 	{
-		assert !isExternalThread();
+		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 
 //		System.out.println("sb start: "+getComponentIdentifier());
 		
@@ -434,8 +431,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	protected IFuture<Void>	initCapability(final OAVCapabilityModel oavmodel, final String config)
 	{
-//		assert isAgentThread();
-		assert !isExternalThread();
+		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
 		final Future<Void>	ret	= new Future<Void>();
 //		initcapa	= oavmodel.getHandle();
@@ -542,7 +538,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	protected IFuture	init0()
 	{
 //		assert isAgentThread();
-		assert !isExternalThread();
+		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
 		final Future	ret	= new Future();
 		
@@ -615,8 +611,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	protected IFuture	init1()
 	{
-//		assert isAgentThread();
-		assert !isExternalThread();
+		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
 		return AgentRules.initializeCapabilityInstance(state, ragent);
 	}
@@ -827,8 +822,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
-//		assert isAgentThread();
-		assert !isExternalThread();
+		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
 		boolean	isatbreakpoint	= false;
 		
@@ -1239,7 +1233,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public void invokeSynchronized(final Runnable code)
 	{
-		if(isExternalThread())
+		if(!getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
 			System.err.println("Unsynchronized internal thread.");
 			Thread.dumpStack();
@@ -1308,45 +1302,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		});
 	}
 	
-	/**
-	 *  Set the current plan thread.
-	 *  @param planthread The planthread.
-	 */ 
-	public void setPlanThread(Thread planthread)
-	{
-		this.planthread = planthread;
-	}
-	
-//	/**
-//	 *  Check if the agent thread is accessing.
-//	 *  @return True, if access is ok.
-//	 */ 
-//	public boolean isAgentThread()
-//	{
-//		return initthread==Thread.currentThread();
-//	}
-	
-	/**
-	 *  Check if the agent thread is accessing.
-	 *  @return True, if access is ok.
-	 */ 
-	public boolean isPlanThread()
-	{
-		return planthread==Thread.currentThread();
-	}
-	
-	/**
-	 *  Check if the external thread is accessing.
-	 *  @return True, if access is ok.
-	 */ 
-	public boolean isExternalThread()
-	{
-		return !getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread()
-			&& !isPlanThread()
-			&& !(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()) 
-				&& Starter.isRescueThread(getComponent().getComponentIdentifier()));
-	}
-
 	/**
 	 *  Get the currently executed plan.
 	 *  @return The currently executed plan.
@@ -1956,7 +1911,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public void setResultValue(String name, Object value)
 	{
-		assert !isExternalThread();
+		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 		
 		// todo: store results only within listener?!
 		if(results==null)

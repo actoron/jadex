@@ -105,12 +105,6 @@ public interface IInternalBDIAgentFeature
 	public boolean	isAtomic();
 	
 	/**
-	 *  Set the current plan thread.
-	 *  @param planthread The planthread.
-	 */ 
-	public void setPlanThread(Thread planthread);
-	
-	/**
 	 *  Put an element into the cache.
 	 */
 	public void putFlyweightCache(Class<?> type, Object key, Object flyweight);
@@ -148,12 +142,6 @@ public interface IInternalBDIAgentFeature
 	 */
 	public <T> IFuture<T> scheduleImmediate(IComponentStep<T> step, Object scope);
 	
-	/**
-	 *  Check if the agent thread is accessing.
-	 *  @return True, if access is ok.
-	 */ 
-	public boolean isPlanThread();
-
 	/**
 	 *  Add a default value for an argument (if not already present).
 	 *  Called once for each argument during init.
