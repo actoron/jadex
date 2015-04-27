@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
+import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -69,7 +70,9 @@ public class AnalyzeTargetPlan extends Plan
 	{
 //		System.out.println("Calling some Production Agent...");
 
-		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
+		// Todo: multiple spaces by name...
+		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getInterpreter()).get();
+//			((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
 
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	producers	= group.getAgentsForRole("producer");

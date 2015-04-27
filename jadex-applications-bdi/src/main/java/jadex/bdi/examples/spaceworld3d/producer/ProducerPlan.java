@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
+import jadex.extension.envsupport.EnvironmentService;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -65,7 +66,9 @@ public class ProducerPlan extends Plan
 	 */
 	protected void callCarryAgent(ISpaceObject target)
 	{
-		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
+		// Todo: multiple spaces by name...
+		AGRSpace agrs = (AGRSpace)EnvironmentService.getSpace(getInterpreter()).get();
+//			((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get();
 
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
