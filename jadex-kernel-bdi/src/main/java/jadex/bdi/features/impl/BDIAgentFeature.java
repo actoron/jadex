@@ -379,50 +379,43 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 *  Start the component behavior.
 	 */
-	public void startBehavior()
+	public IFuture<Void> body()
 	{
 		assert !isExternalThread();
 
-		// Use step in case agent is started as suspended.
-		scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-//				System.out.println("sb start: "+getComponentIdentifier());
-				
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
-				
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
-				// Remove arguments from state.
-				if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
-					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
+//		System.out.println("sb start: "+getComponentIdentifier());
+		
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
+		
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
+		// Remove arguments from state.
+		if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
+			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
 
-				rulesystem.init();
-				
-//				System.out.println("sb end: "+getComponentIdentifier());
-				return IFuture.DONE;
-			}
-		});
+		rulesystem.init();
+		
+//		System.out.println("sb end: "+getComponentIdentifier());
+		return IFuture.DONE;
 	}
 	
-	/**
-	 *  Called before blocking the component thread.
-	 */
-	public void	beforeBlock()
-	{
-	}
-	
-	/**
-	 *  Called after unblocking the component thread.
-	 */
-	public void	afterBlock()
-	{
-	}
+//	/**
+//	 *  Called before blocking the component thread.
+//	 */
+//	public void	beforeBlock()
+//	{
+//	}
+//	
+//	/**
+//	 *  Called after unblocking the component thread.
+//	 */
+//	public void	afterBlock()
+//	{
+//	}
 	
 	/**
 	 *  Extended init procedure including subcapabilities.
 	 */
-	public IFuture init(IModelInfo model,String config)
+	public IFuture init(IModelInfo model, String config)
 	{
 //		assert isAgentThread();
 		assert !isExternalThread();
