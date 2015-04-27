@@ -82,6 +82,7 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVTypeModel;
+import jadex.rules.state.javaimpl.OAVState;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.io.IOException;
@@ -117,7 +118,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	
 	/** The interpreters, one per agent (ragent -> interpreter). */
 	// Hack e.g. for fetching agent-dependent plan executors
-	public static final Map interpreters;
+	public static final Map<IOAVState, IInternalAccess> interpreters;
 	
 	//-------- attributes --------
 	
@@ -274,12 +275,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		this.initthread = Thread.currentThread();
 		
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-		OAVAgentModel	amodel	= (OAVAgentModel)getComponent().getModel().getRawModel();
-		OAVTypeModel tmodel	= new OAVTypeModel(getComponent().getComponentDescription().getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
-		tmodel.addTypeModel(amodel.getState().getTypeModel());
+		this.model	= (OAVAgentModel)getComponent().getModel().getRawModel();
+		OAVTypeModel tmodel	= new OAVTypeModel(getComponent().getComponentDescription().getName().getLocalName()+"_typemodel", model.getState().getTypeModel().getClassLoader());
+		tmodel.addTypeModel(model.getState().getTypeModel());
 		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
-		state.addSubstate(amodel.getState());
+		state.addSubstate(model.getState());
 			
 		this.parent	= parent;
 		this.kernelprops = kernelprops;
@@ -294,7 +295,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		this.emitlevelsub = PublishEventLevel.OFF;
 		
 		// Hack! todo:
-		interpreters.put(state, this);
+		interpreters.put(state, getComponent());
 		
 //		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
 		
