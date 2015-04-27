@@ -1,7 +1,6 @@
 package jadex.bdi.features.impl;
 
 
-import jadex.base.Starter;
 import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
@@ -49,8 +48,6 @@ import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -157,11 +154,11 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/** The results. */
 	protected Map<String, Object> results;
 
-	/** The external service bindings. */
-	protected RequiredServiceBinding[] bindings;
+//	/** The external service bindings. */
+//	protected RequiredServiceBinding[] bindings;
 	
-	/** The external service infos. */
-	protected ProvidedServiceInfo[] pinfos;
+//	/** The external service infos. */
+//	protected ProvidedServiceInfo[] pinfos;
 	
 	//-------- recreate on init (no state) --------
 	
@@ -348,8 +345,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, cinfo.getConfiguration());
 		if(arguments!=null && !arguments.isEmpty())
 			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, arguments);
-		this.bindings	= bindings;
-		this.pinfos	= pinfos;
+//		this.bindings	= bindings;
+//		this.pinfos	= pinfos;
 
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0);
 		
@@ -1840,23 +1837,23 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return findServicePrefix(initcapa!=null ? findSubcapability(initcapa) : ragent);
 	}
 	
-	/**
-	 *  Get the bindings.
-	 *  @return The bindings.
-	 */
-	public RequiredServiceBinding[]	getBindings()
-	{
-		return bindings;
-	}
-
-	/**
-	 *  Get the service infos.
-	 *  @return The service infos.
-	 */
-	public ProvidedServiceInfo[]	getProvidedServiceInfos()
-	{
-		return pinfos;
-	}
+//	/**
+//	 *  Get the bindings.
+//	 *  @return The bindings.
+//	 */
+//	public RequiredServiceBinding[]	getBindings()
+//	{
+//		return bindings;
+//	}
+//
+//	/**
+//	 *  Get the service infos.
+//	 *  @return The service infos.
+//	 */
+//	public ProvidedServiceInfo[]	getProvidedServiceInfos()
+//	{
+//		return pinfos;
+//	}
 
 	/**
 	 *  The prefix is the name of the capability starting from the agent.
@@ -2337,4 +2334,15 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //	{
 //		return registry;
 //	}
+	
+	/**
+	 *  The feature can inject parameters for expression evaluation
+	 *  by providing an optional value fetcher. The fetch order is the reverse
+	 *  init order, i.e., later features can override values from earlier features.
+	 */
+	public IValueFetcher	getValueFetcher()
+	{
+		// todo: capabilities
+		return new OAVBDIFetcher(getState(), ragent);
+	}
 }
