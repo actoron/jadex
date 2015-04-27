@@ -10,6 +10,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.df.IDF;
@@ -38,8 +39,8 @@ public class DFTestPlan extends Plan
 		num = performTests(num, null); // test locally
 		
 		// Todo: support remote DF agent!?
-		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			(IServiceProvider)getScope().getComponentFeature(IRequiredServiceFeature.class), IComponentManagementService.class).get(this);
+		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getLocalService(
+			getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 //		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_COMPONENT, getComponentIdentifier(), null);
 		IComponentIdentifier da = new BasicComponentIdentifier(SFipa.DF_COMPONENT, getComponentIdentifier());
 		performTests(num, da); // test remotely

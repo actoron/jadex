@@ -1,6 +1,8 @@
 package jadex.bdi.testcases.semiautomatic;
 
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 
 /**
  *  Plan that adds a reasoning interceptor to the service and invokes it.
@@ -61,8 +63,8 @@ public class InterceptorPlan extends Plan
 	{
 		try
 		{
-			IPrintHelloService ps = (IPrintHelloService)getComponentFeature(IRequiredServiceFeature.class).getProvidedService("printservice");
-			ps.printHello().get(this);
+			IPrintHelloService ps = (IPrintHelloService)getInterpreter().getComponentFeature(IProvidedServicesFeature.class).getProvidedService("printservice");
+			ps.printHello().get();
 		}
 		catch(Exception e)
 		{

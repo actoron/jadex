@@ -3,7 +3,7 @@ package jadex.bdi.testcases.misc;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -19,14 +19,14 @@ public class FlagPlan extends Plan
 	  */
 	public void body()
 	{
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			(IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IComponentManagementService.class).get(this);
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getLocalService(
+			getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		
 		TestReport tr = new TestReport("#1", "Start agent as suspended.");
 		CreationInfo ci =  new CreationInfo("donothing", null, getComponentIdentifier());
 		ci.setSuspend(Boolean.TRUE);
-		IComponentIdentifier cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
-		IComponentDescription desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
+		IComponentIdentifier cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get();
+		IComponentDescription desc = (IComponentDescription)cms.getComponentDescription(cid).get();
 		
 		if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 		{
@@ -41,8 +41,8 @@ public class FlagPlan extends Plan
 		tr = new TestReport("#2", "Start agent as master.");
 		ci =  new CreationInfo("donothing", null, getComponentIdentifier());
 		ci.setMaster(Boolean.TRUE);
-		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
-		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
+		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get();
+		desc = (IComponentDescription)cms.getComponentDescription(cid).get();
 		
 		if(desc.isMaster())
 		{
@@ -57,8 +57,8 @@ public class FlagPlan extends Plan
 		tr = new TestReport("#3", "Start agent as daemon.");
 		ci =  new CreationInfo("donothing", null, getComponentIdentifier());
 		ci.setDaemon(Boolean.TRUE);
-		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
-		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
+		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get();
+		desc = (IComponentDescription)cms.getComponentDescription(cid).get();
 		
 		if(desc.isDaemon())
 		{
@@ -73,8 +73,8 @@ public class FlagPlan extends Plan
 		tr = new TestReport("#4", "Start agent as autoshutdown.");
 		ci =  new CreationInfo("donothing", null, getComponentIdentifier());
 		ci.setAutoShutdown(Boolean.TRUE);
-		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
-		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
+		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get();
+		desc = (IComponentDescription)cms.getComponentDescription(cid).get();
 		
 		if(desc.isAutoShutdown())
 		{
@@ -88,8 +88,8 @@ public class FlagPlan extends Plan
 		
 		tr = new TestReport("#5", "Start agent as suspended.");
 		ci =  new CreationInfo("suspend", null, getComponentIdentifier());
-		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
-		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
+		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get();
+		desc = (IComponentDescription)cms.getComponentDescription(cid).get();
 		
 		if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 		{
@@ -103,8 +103,8 @@ public class FlagPlan extends Plan
 		
 		tr = new TestReport("#6", "Start agent as master.");
 		ci =  new CreationInfo("master", null, getComponentIdentifier());
-		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
-		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
+		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get();
+		desc = (IComponentDescription)cms.getComponentDescription(cid).get();
 		
 		if(desc.isMaster())
 		{
@@ -118,8 +118,8 @@ public class FlagPlan extends Plan
 		
 		tr = new TestReport("#7", "Start agent as daemon.");
 		ci =  new CreationInfo("daemon", null, getComponentIdentifier());
-		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
-		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
+		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get();
+		desc = (IComponentDescription)cms.getComponentDescription(cid).get();
 		
 		if(desc.isDaemon())
 		{
@@ -133,8 +133,8 @@ public class FlagPlan extends Plan
 		
 		tr = new TestReport("#8", "Start agent as autoshutdown.");
 		ci =  new CreationInfo("autoshutdown", null, getComponentIdentifier());
-		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
-		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
+		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get();
+		desc = (IComponentDescription)cms.getComponentDescription(cid).get();
 		
 		if(desc.isAutoShutdown())
 		{

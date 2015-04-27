@@ -8,7 +8,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -40,7 +41,7 @@ public class GetExternalAccessPlan extends Plan
 
 		// Create component.
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-			.getServiceUpwards((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), IComponentManagementService.class).get(this);
+			.getLocalService(getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
 		Map	args	= new HashMap();
 		args.put("future", wait);
@@ -91,10 +92,10 @@ public class GetExternalAccessPlan extends Plan
 		// External access should be made available after component is inited.
 		TestReport	tr	= new TestReport("#2", "External access after init.");
 		wait.setResult(null);
-		init.get(this);
+		init.get();
 		done	= new Future();
 		ces.getExternalAccess(cid).addResultListener(lis);
-		done.get(this);
+		done.get();
 		if(gotexta[0] && gotexta[1])
 			tr.setSucceeded(true);
 		else

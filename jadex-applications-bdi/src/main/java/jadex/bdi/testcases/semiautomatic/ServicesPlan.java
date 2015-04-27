@@ -2,10 +2,10 @@ package jadex.bdi.testcases.semiautomatic;
 
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.service.IInternalService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
 
@@ -21,16 +21,17 @@ public class ServicesPlan extends Plan
 	 */
 	public void body()
 	{
-		IInternalService	service	= getInterpreter().createInternalService(new PrintHelloService(), IPrintHelloService.class, null);
-		ProvidedServiceInfo	psi	= new ProvidedServiceInfo();
-		psi.setPublish(new PublishInfo("http://localhost:8080/hello/", IPublishService.PUBLISH_RS, IPrintHelloService.class));
-		getComponentFeature(IRequiredServiceFeature.class).addService(service, psi);
+//		IInternalService service = getInterpreter().getComponentFeature(IProvidedServicesFeature.class).createService(new PrintHelloService(), IPrintHelloService.class, null);
+		PublishInfo pi = new PublishInfo("http://localhost:8080/hello/", IPublishService.PUBLISH_RS, IPrintHelloService.class);
+//		ProvidedServiceInfo	psi	= new ProvidedServiceInfo();
+//		psi.setPublish(new PublishInfo("http://localhost:8080/hello/", IPublishService.PUBLISH_RS, IPrintHelloService.class));
+		getInterpreter().getComponentFeature(IProvidedServicesFeature.class).addService("ser", IPrintHelloService.class, new PrintHelloService(), pi, null);
 		
 		waitFor(500);
 		
 		// Call service internally
-		IPrintHelloService phs = (IPrintHelloService)SServiceProvider.getService((IServiceProvider)getComponentFeature(IRequiredServiceFeature.class), 
-			IPrintHelloService.class, RequiredServiceInfo.SCOPE_LOCAL).get(this);
+		IPrintHelloService phs = (IPrintHelloService)SServiceProvider.getLocalService(getInterpreter(), 
+			IPrintHelloService.class, RequiredServiceInfo.SCOPE_LOCAL);
 		phs.printHello();
 		
 		// Call service via REST
