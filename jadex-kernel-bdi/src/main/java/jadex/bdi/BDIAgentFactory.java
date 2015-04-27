@@ -485,7 +485,11 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	{
 //		init();
 		boolean loadable = model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
+		
+//		System.out.println("bdifac is load: "+loadable+" "+model);
+		
 		return new Future<Boolean>(loadable? Boolean.TRUE: Boolean.FALSE);
+		
 //		return loader.isLoadable(model, null);
 //		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
 		
