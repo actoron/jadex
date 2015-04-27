@@ -3463,7 +3463,7 @@ public class AgentRules
 		// Collect results for agent.
 		Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
 		IInternalBDIAgentFeature	interpreter	= BDIAgentFeature.getInterpreter(state);
-		IArgument[] results = interpreter.getModel().getResults();
+		IArgument[] results = BDIAgentFeature.getInternalAccess(state).getModel().getResults();
 		Map res = new HashMap();
 		
 		for(int i=0; i<results.length; i++)
