@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
@@ -210,7 +211,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						getInterpreter().createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+						getInterpreter().getComponentFeature(ISubcomponentsFeature.class).createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 						return IFuture.DONE;
 					}
 				}); 
@@ -228,7 +229,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IExtern
 		}
 		else
 		{
-			getInterpreter().createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+			getInterpreter().getComponentFeature(ISubcomponentsFeature.class).createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 		}
 		
 		return ret;

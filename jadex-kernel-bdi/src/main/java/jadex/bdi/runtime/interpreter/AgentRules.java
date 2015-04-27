@@ -987,7 +987,7 @@ public class AgentRules
 	 *  @param rcapa The reference to the capability instance.
 	 *  @param inivals Initial values for beliefs (e.g. arguments or config elements from outer capability);
 	 */
-	protected static void	createCapabilityInstance(final IOAVState state, final Object rcapa, Map parents)//, Map arguments)
+	public static void	createCapabilityInstance(final IOAVState state, final Object rcapa, Map parents)//, Map arguments)
 	{
 //		List	futures	= new ArrayList();
 		
@@ -1163,7 +1163,7 @@ public class AgentRules
 	/**
 	 *  Get the initial capability (if any) from the configuration.
 	 */
-	protected static Object getInitialCapability(IOAVState state, Object mcapa, Object mconfig, Object mcaparef)
+	public static Object getInitialCapability(IOAVState state, Object mcapa, Object mconfig, Object mcaparef)
 	{
 		Object	inicap	= null;
 		if(mconfig!=null)
@@ -1192,7 +1192,7 @@ public class AgentRules
 	 *  @param rcapa The reference to the capability instance.
 	 *  @param inivals Initial values for beliefs (e.g. arguments or config elements from outer capability);
 	 */
-	protected static IFuture	initializeCapabilityInstance(final IOAVState state, final Object rcapa)
+	public static IFuture	initializeCapabilityInstance(final IOAVState state, final Object rcapa)
 	{
 		
 		final Future	ret	= new Future();
@@ -3414,7 +3414,7 @@ public class AgentRules
 	 *  Perform any cleanup required for the agent.
 	 *  Called after all endgoals and endplans have finished.
 	 */
-	protected static void cleanupAgent(IOAVState state, Object ragent)
+	public static void cleanupAgent(IOAVState state, Object ragent)
 	{
 		Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
 		IBDIAgentFeature interpreter	= BDIAgentFeature.getInterpreter(state);
