@@ -1,6 +1,7 @@
 package jadex.bdi.planlib.df;
 
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.commons.future.IFuture;
@@ -16,7 +17,7 @@ public class DFLocalDeregisterPlan extends Plan
 	 */
 	public void body()
 	{
-		IDF	dfservice	= (IDF)getServiceContainer().getRequiredService("df").get(this);
+		IDF	dfservice	= (IDF)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("df").get();
 		
 		// In case of a remote request the agent description is already
 		// set via the remote deregister plan.
@@ -32,6 +33,6 @@ public class DFLocalDeregisterPlan extends Plan
 		}
 
 		IFuture ret = dfservice.deregister(desc);
-		ret.get(this);
+		ret.get();
 	}
 }

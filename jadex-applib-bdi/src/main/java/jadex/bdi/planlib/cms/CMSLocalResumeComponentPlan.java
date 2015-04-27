@@ -2,6 +2,7 @@ package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
@@ -18,8 +19,8 @@ public class CMSLocalResumeComponentPlan extends Plan
 	{	
 		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("componentidentifier").getValue();
 		
-		IFuture ret = ((IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this)).resumeComponent(aid);
-		IComponentDescription desc =  (IComponentDescription) ret.get(this);
+		IFuture ret = ((IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).resumeComponent(aid);
+		IComponentDescription desc =  (IComponentDescription) ret.get();
 		
 		getParameter("componentdescription").setValue(desc);
 	}

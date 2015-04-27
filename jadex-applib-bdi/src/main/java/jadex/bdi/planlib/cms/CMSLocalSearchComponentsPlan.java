@@ -2,6 +2,7 @@ package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
@@ -22,9 +23,9 @@ public class CMSLocalSearchComponentsPlan extends Plan
 		boolean remote = getParameter("remote").getValue()!=null? 
 			((Boolean)getParameter("remote").getValue()).booleanValue(): false;
 		
-		IFuture ret = ((IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this))
+		IFuture ret = ((IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get())
 			.searchComponents(desc, constraints, remote);
-		IComponentDescription[]	result =  (IComponentDescription[])ret.get(this);
+		IComponentDescription[]	result =  (IComponentDescription[])ret.get();
 		for(int i=0; i<result.length; i++)
 			getParameterSet("result").addValue(result[i]);
 	}

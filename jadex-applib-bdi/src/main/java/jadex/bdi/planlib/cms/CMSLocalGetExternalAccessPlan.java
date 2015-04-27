@@ -2,6 +2,7 @@ package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 
@@ -19,8 +20,8 @@ public class CMSLocalGetExternalAccessPlan extends Plan
 
 		try
 		{
-			IFuture fut = ((IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this)).getExternalAccess(aid);
-			Object ret = fut.get(this);
+			IFuture fut = ((IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get()).getExternalAccess(aid);
+			Object ret = fut.get();
 			getParameter("result").setValue(ret);
 		}
 		catch(Exception e)

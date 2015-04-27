@@ -5,6 +5,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -31,7 +32,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	 */
 	public void body()
 	{
-		final IComponentManagementService	ces	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
+		final IComponentManagementService	ces	= (IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 		this.listener	= new ICMSComponentListener()
 		{
 			public IFuture componentAdded(final IComponentDescription desc)
@@ -85,7 +86,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 		ces.addComponentListener(null, listener);
 		
 		IFuture fut = ces.getComponentDescriptions();
-		IComponentDescription[] descs = (IComponentDescription[])fut.get(this);
+		IComponentDescription[] descs = (IComponentDescription[])fut.get();
 		getBeliefbase().getBeliefSet("components").addFacts(descs);
 		
 //		getScope().addComponentListener(new TerminationAdapter()
