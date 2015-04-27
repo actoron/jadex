@@ -23,7 +23,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@Argument(name="defaultkernels", description= "Kernel default locations.", 
 		clazz=String[].class, defaultvalue="null"),
 	@Argument(name="ignorekernels", description="Kernels that are ignored.",
-		clazz=String[].class, defaultvalue="new String[] {\"KernelBDI.component.xml\"}"),
+		clazz=String[].class, defaultvalue="new String[] {}"),//{\"KernelBDI.component.xml\"}"),
 	@Argument(name="ignoreextensions", description="File extensions that are ignored.",
 		clazz=String[].class, defaultvalue="new String[] {\".png\", \".jpg\", \".dll\", \".gif\", \".exe\", \".doc\", \".docx\", \".txt\" }"),
 	@Argument(name="kerneluriregex", description="Regular expression identifying kernel URIs  (ignored on android as there is only the DEX file).",

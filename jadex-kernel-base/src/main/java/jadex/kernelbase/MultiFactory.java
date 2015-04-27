@@ -238,7 +238,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							{
 								for(Iterator<String> it = affectedkernels.iterator(); it.hasNext(); )
 								{
-//											System.out.println("rid removed: "+uri+", "+keys[i]);
+//									System.out.println("rid removed: "+uri+", "+keys[i]);
 									kernellocationcache.removeObject(keys[i], it.next());
 								}
 							}
@@ -261,7 +261,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-//									extensionblacklist = new HashSet(baseextensionblacklist);
+//							extensionblacklist = new HashSet(baseextensionblacklist);
 							validuris.add(uri);
 							potentialuris.add(uri);
 							return IFuture.DONE;
@@ -281,8 +281,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				String regexstr = (String) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("kerneluriregex");
 				Pattern regex = Pattern.compile(regexstr!=null ? regexstr : "");
 				
-//						potentialurls.addAll();
-//						validurls.addAll((Collection) result);
+//				potentialurls.addAll();
+//				validurls.addAll((Collection) result);
 				
 				if (result != null)
 				{
@@ -305,10 +305,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				}
 				
 				// Sort uris (for repeatability during debugging)
-//						List	tmp	= new ArrayList(potentialuris);
-//						Collections.sort(tmp);
-//						potentialuris.clear();
-//						potentialuris.addAll(tmp);
+//				List	tmp	= new ArrayList(potentialuris);
+//				Collections.sort(tmp);
+//				potentialuris.clear();
+//				potentialuris.addAll(tmp);
 				
 				if(kerneldefaultlocations.isEmpty())
 					ret.setResult(null);
@@ -482,7 +482,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void resultAvailable(Object result)
 			{
-				if (result != null)
+				if(result != null)
 					((IComponentFactory) result).isStartable(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 				else
 					ret.setResult(false);
