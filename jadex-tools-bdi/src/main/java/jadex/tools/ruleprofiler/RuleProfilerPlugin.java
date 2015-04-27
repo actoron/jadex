@@ -7,6 +7,7 @@ import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bdi.BDIAgentFactory;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -266,8 +267,8 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 
 		split.setDividerLocation(150);
 
-		SServiceProvider.getServiceUpwards(jcc.getPlatformAccess(),
-			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
+		SServiceProvider.getService(jcc.getPlatformAccess(),
+			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
 		{
 			public void customResultAvailable(Object result)
 			{

@@ -5,6 +5,7 @@ import jadex.bdi.runtime.interpreter.EventReificator;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.future.IFuture;
+import jadex.rules.rulesystem.RuleSystem;
 import jadex.rules.state.IOAVState;
 
 import java.util.List;
@@ -165,4 +166,10 @@ public interface IInternalBDIAgentFeature
 	 *  Called when the agent is removed from the platform.
 	 */
 	public void cleanup();
+	
+	/**
+	 *  Get the rule system.
+	 */
+	// Hack!!! Used for debugging.
+	public RuleSystem	getRuleSystem();
 }

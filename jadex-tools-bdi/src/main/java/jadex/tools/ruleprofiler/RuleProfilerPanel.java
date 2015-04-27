@@ -1,12 +1,16 @@
 package jadex.tools.ruleprofiler;
 
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -73,8 +77,8 @@ public class RuleProfilerPanel	extends JPanel
 	{
 		this.observed	= observed;
 
-		SServiceProvider.getServiceUpwards(provider,
-			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(RuleProfilerPanel.this)
+		SServiceProvider.getService(provider,
+			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(RuleProfilerPanel.this)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -86,7 +90,7 @@ public class RuleProfilerPanel	extends JPanel
 //						StandaloneAgentAdapter	adapter	= (StandaloneAgentAdapter)result;
 //						final BDIInterpreter	bdii	= (BDIInterpreter)adapter.getJadexAgent();
 						// Hack!!!
-						final BDIInterpreter bdii = ((ElementFlyweight)result).getInterpreter();
+						final IInternalBDIAgentFeature bdii = ((ElementFlyweight)result).getBDIFeature();
 
 						// Load profiling info.
 						IProfiler	tmp	= bdii.getState().getProfiler();
@@ -105,11 +109,12 @@ public class RuleProfilerPanel	extends JPanel
 						{
 							tmp	= new Profiler(null);
 							final IProfiler prof	= tmp;
-							bdii.getComponentAdapter().invokeLater(new Runnable()
+							((ElementFlyweight)result).getInterpreter().getComponentFeature(IExecutionFeature.class).scheduleImmediate(new IComponentStep<Void>()
 							{
-								public void run()
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
 									bdii.getState().setProfiler(prof);
+									return IFuture.DONE;
 								}
 							});
 						}

@@ -1,6 +1,7 @@
 package jadex.tools.debugger.bdi;
 
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -54,7 +55,7 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 	{
 		if(access instanceof ElementFlyweight)
 		{
-			BDIInterpreter bdii = ((ElementFlyweight)access).getInterpreter();
+			IInternalBDIAgentFeature bdii = ((ElementFlyweight)access).getBDIFeature();
 			this.retepanel = new RetePanel(bdii.getRuleSystem(), null, bpp);
 			this.component	= retepanel;
 		}
