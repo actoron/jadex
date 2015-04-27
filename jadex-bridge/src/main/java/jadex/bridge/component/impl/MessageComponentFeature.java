@@ -10,7 +10,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.MessageConversationFilter;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
