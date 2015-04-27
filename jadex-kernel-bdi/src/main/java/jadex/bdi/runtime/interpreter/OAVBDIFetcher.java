@@ -1,12 +1,8 @@
 package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.features.impl.BDIAgentFeature;
-import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.runtime.IBeliefbase;
-import jadex.bdi.runtime.IParameterElement;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
-import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExpressionbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
@@ -16,11 +12,8 @@ import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.state.IOAVState;
-
-import java.lang.reflect.Array;
 
 /**
  *  Fetcher allows to inject parameters during expression/condition evaluation. 
@@ -124,81 +117,81 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 		return ret;
 	}
 	
-	/**
-	 *  Fetch a value via its name from an object.
-	 *  @param name The name.
-	 *  @param object The object.
-	 *  @return The value.
-	 */
-	public Object fetchValue(String name, Object object)
-	{
-		Object ret = null;
-		
-		if(object instanceof IBeliefbase)
-		{
-			IBeliefbase bb = (IBeliefbase)object;
-			if(bb.containsBelief(name))
-				ret = bb.getBelief(name).getFact();
-			else if(bb.containsBeliefSet(name))
-				ret = bb.getBeliefSet(name).getFacts();
-			else
-				throw new RuntimeException("Unknown belief/set: "+name);
-		}
-		else if(object instanceof IParameterElement)
-		{
-			IParameterElement pe = (IParameterElement)object;
-			if(pe.hasParameter(name))
-			{
-				ret = pe.getParameter(name).getValue();
-			}
-			else if(pe.hasParameterSet(name))
-			{
-				ret = pe.getParameterSet(name).getValues();
-			}
-			else
-			{
-				// Check if parameter exists, but has not been instantiated (return null or empty array).
-				boolean	exists	= false;
-				
-				IOAVState	state	= ((ElementFlyweight)pe).getState();
-				Object	pehandle	= ((ElementFlyweight)pe).getHandle();
-				Object	mpe	= state.getAttributeValue(pehandle, OAVBDIRuntimeModel.element_has_model);
-				if(state.getType(mpe).isSubtype(OAVBDIMetaModel.messageevent_type))
-				{
-					MessageType	mtype	= MessageEventRules.getMessageEventType(state, mpe);
-					MessageType.ParameterSpecification	spec	= mtype.getParameter(name);
-					if(spec!=null)
-					{
-						exists	= true;
-						if(spec.isSet())
-						{
-							ret	= Array.newInstance(spec.getClazz(), 0);
-						}
-					}
-				}
-				else if(state.containsKey(mpe, OAVBDIMetaModel.parameterelement_has_parameters, name))
-				{
-					exists	= true;
-				}
-				else if(state.containsKey(mpe, OAVBDIMetaModel.parameterelement_has_parametersets, name))
-				{
-					exists	= true;
-					Object	paramset	= state.getAttributeValue(mpe, OAVBDIMetaModel.parameterelement_has_parametersets, name);
-					Class	clazz	= (Class)state.getAttributeValue(paramset, OAVBDIMetaModel.typedelement_has_class);
-					ret	= Array.newInstance(clazz, 0);
-				}
-				
-				if(!exists)
-					throw new RuntimeException("Unknown parameter/set: "+name);
-			}
-		}
-		else
-		{
-			super.fetchValue(name, object);
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Fetch a value via its name from an object.
+//	 *  @param name The name.
+//	 *  @param object The object.
+//	 *  @return The value.
+//	 */
+//	public Object fetchValue(String name, Object object)
+//	{
+//		Object ret = null;
+//		
+//		if(object instanceof IBeliefbase)
+//		{
+//			IBeliefbase bb = (IBeliefbase)object;
+//			if(bb.containsBelief(name))
+//				ret = bb.getBelief(name).getFact();
+//			else if(bb.containsBeliefSet(name))
+//				ret = bb.getBeliefSet(name).getFacts();
+//			else
+//				throw new RuntimeException("Unknown belief/set: "+name);
+//		}
+//		else if(object instanceof IParameterElement)
+//		{
+//			IParameterElement pe = (IParameterElement)object;
+//			if(pe.hasParameter(name))
+//			{
+//				ret = pe.getParameter(name).getValue();
+//			}
+//			else if(pe.hasParameterSet(name))
+//			{
+//				ret = pe.getParameterSet(name).getValues();
+//			}
+//			else
+//			{
+//				// Check if parameter exists, but has not been instantiated (return null or empty array).
+//				boolean	exists	= false;
+//				
+//				IOAVState	state	= ((ElementFlyweight)pe).getState();
+//				Object	pehandle	= ((ElementFlyweight)pe).getHandle();
+//				Object	mpe	= state.getAttributeValue(pehandle, OAVBDIRuntimeModel.element_has_model);
+//				if(state.getType(mpe).isSubtype(OAVBDIMetaModel.messageevent_type))
+//				{
+//					MessageType	mtype	= MessageEventRules.getMessageEventType(state, mpe);
+//					MessageType.ParameterSpecification	spec	= mtype.getParameter(name);
+//					if(spec!=null)
+//					{
+//						exists	= true;
+//						if(spec.isSet())
+//						{
+//							ret	= Array.newInstance(spec.getClazz(), 0);
+//						}
+//					}
+//				}
+//				else if(state.containsKey(mpe, OAVBDIMetaModel.parameterelement_has_parameters, name))
+//				{
+//					exists	= true;
+//				}
+//				else if(state.containsKey(mpe, OAVBDIMetaModel.parameterelement_has_parametersets, name))
+//				{
+//					exists	= true;
+//					Object	paramset	= state.getAttributeValue(mpe, OAVBDIMetaModel.parameterelement_has_parametersets, name);
+//					Class	clazz	= (Class)state.getAttributeValue(paramset, OAVBDIMetaModel.typedelement_has_class);
+//					ret	= Array.newInstance(clazz, 0);
+//				}
+//				
+//				if(!exists)
+//					throw new RuntimeException("Unknown parameter/set: "+name);
+//			}
+//		}
+//		else
+//		{
+//			super.fetchValue(name, object);
+//		}
+//		
+//		return ret;
+//	}
 
 	//-------- additional methods --------
 	

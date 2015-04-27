@@ -36,20 +36,14 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanInfo;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.BulkMonitoringEvent;
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.DefaultMessageAdapter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
@@ -292,23 +286,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		this.volcache = new LRU(0);	// 50
 		this.stacache = new LRU(20);
 		this.microplansteps = true;
-		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 		this.copy = copy;
 		this.realtime = realtime;
-		this.registry = registry;
 //		this.resultlistener = resultlistener;
 		this.inited = inited;
 		this.emitlevelsub = PublishEventLevel.OFF;
 		
-		// In case of platform the listener nulls?
-		if(resultlistener!=null)
-		{
-			cmssub = new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
-			cmssub.addResultListener(resultlistener);
-			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();
-			resultsubscriptions.add(cmssub);
-		}
-				
 		// Hack! todo:
 		interpreters.put(state, this);
 		
@@ -454,26 +437,26 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/**
 	 *  Init the component portion of a capability.
 	 */
-	protected IFuture	initCapability(final OAVCapabilityModel oavmodel, final String config)
+	protected IFuture<Void>	initCapability(final OAVCapabilityModel oavmodel, final String config)
 	{
 //		assert isAgentThread();
 		assert !isExternalThread();
 		
-		final Future	ret	= new Future();
-		initcapa	= oavmodel.getHandle();
-		BDIInterpreter.super.init(oavmodel.getModelInfo(), config, null)
-			.addResultListener(createResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				initcapa	= null;
+		final Future<Void>	ret	= new Future<Void>();
+//		initcapa	= oavmodel.getHandle();
+//		BDIInterpreter.super.init(oavmodel.getModelInfo(), config, null)
+//			.addResultListener(createResultListener(new DelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				initcapa	= null;
 				Collection subcaps	= state.getAttributeValues(oavmodel.getHandle(), OAVBDIMetaModel.capability_has_capabilityrefs);
 				if(subcaps!=null)
 				{
 					final Iterator it	= subcaps.iterator();
-					IResultListener	lis	= new DelegationResultListener(ret)
+					IResultListener<Void>	lis	= new DelegationResultListener<Void>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Void result)
 						{
 							if(it.hasNext())
 							{
@@ -494,7 +477,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 							}
 							else
 							{
-								super.customResultAvailable(result);
+								super.customResultAvailable(null);
 							}
 						}
 					};
@@ -502,11 +485,11 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				}
 				else
 				{
-					super.customResultAvailable(result);
+					ret.setResult(null);
 				}
-			}
-		}));
-		
+//			}
+//		}));
+//		
 		return ret;
 	}
 

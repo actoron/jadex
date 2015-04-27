@@ -1495,11 +1495,11 @@ public class EventProcessingRules
 						ret = fetcher.fetchValue(name);
 					return ret;
 				}
-				
-				public Object fetchValue(String name, Object object)
-				{
-					return fetcher.fetchValue(name, object);
-				}
+//				
+//				public Object fetchValue(String name, Object object)
+//				{
+//					return fetcher.fetchValue(name, object);
+//				}
 			};
 		}
 		
