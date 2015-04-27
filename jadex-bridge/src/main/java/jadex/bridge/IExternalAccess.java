@@ -160,12 +160,12 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 	
 	//-------- exclude --------
 	
-	/**
-	 *  Get a space of the application.
-	 *  @param name	The name of the space.
-	 *  @return	The space.
-	 */
-	public IFuture<IExtensionInstance> getExtension(final String name);
+//	/**
+//	 *  Get a space of the application.
+//	 *  @param name	The name of the space.
+//	 *  @return	The space.
+//	 */
+//	public IFuture<IExtensionInstance> getExtension(final String name);
 	
 	// todo: do we want this? should getArg() deliver only args supplied from
 	// outside or also values that are default/initial values in the model.
