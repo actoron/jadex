@@ -159,15 +159,21 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static <T> IFuture<T> getService(final IInternalAccess provider, final Class<T> type, final String scope, final IAsyncFilter<T> filter)
+	public static <T> IFuture<T> getService(final IInternalAccess access, final Class<T> type, final String scope, final IAsyncFilter<T> filter)
 	{
 		final Future<T> ret = new Future<T>();
 
+		if(access==null)
+		{
+			ret.setException(new IllegalArgumentException("Access must not null."));
+			return ret;
+		}
+		
 		if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
 			if(filter==null)
 			{
-				T ser = PlatformServiceRegistry.getRegistry(provider).searchService(type, provider.getComponentIdentifier(), scope);
+				T ser = PlatformServiceRegistry.getRegistry(access).searchService(type, access.getComponentIdentifier(), scope);
 				if(ser!=null)
 				{
 					ret.setResult(ser);
@@ -179,14 +185,14 @@ public class SServiceProvider
 			}
 			else
 			{
-				PlatformServiceRegistry.getRegistry(provider).searchService(type, provider.getComponentIdentifier(), scope, filter)
-					.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
+				PlatformServiceRegistry.getRegistry(access).searchService(type, access.getComponentIdentifier(), scope, filter)
+					.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), access));
 			}
 		}
 		else
 		{
-			PlatformServiceRegistry.getRegistry(provider).searchGlobalService(type, provider.getComponentIdentifier(), filter)
-				.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), provider));
+			PlatformServiceRegistry.getRegistry(access).searchGlobalService(type, access.getComponentIdentifier(), filter)
+				.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), access));
 		}
 		
 		return ret;

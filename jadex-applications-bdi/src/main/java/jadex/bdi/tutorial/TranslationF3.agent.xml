@@ -46,23 +46,15 @@
 		</achievegoalref> -->
 	</goals>
 
-	<properties>
- 		<!-- Only log outputs >= level are printed. -->
-		<!-- <property name="logging.level">Level.INFO</property> -->
- 		<!-- The default parent handler prints out log messages on the console. -->
-		<!-- <property name="logging.useParentHandlers">true</property> -->
-		<!--<property name="debugging">true</property>-->
-		<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
-    </properties>
-
 	<configurations>
 		<configuration name="default">
 			<goals>
 				<initialgoal ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							$properties.dfservice.createDFComponentDescription(null,
-								$properties.dfservice.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"))
+							SServiceProvider.getLocalService($component, IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).createDFComponentDescription(null,
+								SServiceProvider.getLocalService($component, IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"))
  						</value>
 					</parameter>
 					<parameter ref="leasetime">
