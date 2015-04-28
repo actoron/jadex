@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.SReflect;
 
@@ -44,7 +45,8 @@ public class BDIClassReaderAndroid extends BDIClassReader
 	/**
 	 *  Load the model.
 	 */
-	protected BDIModel read(String model, Class<?> cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root)
+	@Override
+	protected BDIModel read(String model, Class<?> cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root,  List<IComponentFeatureFactory> features)
 	{
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		
@@ -79,7 +81,7 @@ public class BDIClassReaderAndroid extends BDIClassReader
 		
 		fillMicroModelFromAnnotations(ret, model, cma, cl);
 		
-		fillBDIModelFromAnnotations(ret, model, cma, cl, rid, root);
+		fillBDIModelFromAnnotations(ret, model, cma, cl, rid, root, features);
 		
 		return ret;
 	}

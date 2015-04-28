@@ -134,8 +134,7 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 			}
 			if(item.getItemId()==R.id.benchmark_remote || item.getItemId()==R.id.benchmark_remotecodec)
 			{
-				args.put("echo", new BasicComponentIdentifier("echo@echo",
-					new String[]{SRelay.DEFAULT_ADDRESS}));
+				args.put("echo", new BasicComponentIdentifier("echo@echo"));
 //					new String[]{SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/"}));
 //					new String[]{SRelay.ADDRESS_SCHEME+"grisougarfield.dyndns.org:52339/relay/"}));
 			}

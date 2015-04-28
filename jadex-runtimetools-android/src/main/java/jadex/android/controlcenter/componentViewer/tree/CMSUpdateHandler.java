@@ -37,13 +37,13 @@ public class CMSUpdateHandler
 	protected IRemoteChangeListener<?> rcl;
 
 	/** The local listeners for the remote CMSs (cms cid->listeners). */
-	protected MultiCollection listeners;
+	protected MultiCollection<IComponentIdentifier, ICMSComponentListener> listeners;
 
 	/**
 	 * The futures of listeners registered during ongoing installation (cms
 	 * cid->futures).
 	 */
-	protected MultiCollection futures;
+	protected MultiCollection<IComponentIdentifier, IFuture<Void>> futures;
 
 	// -------- constructors --------
 
@@ -132,17 +132,17 @@ public class CMSUpdateHandler
 		Future<Void> ret = new Future<Void>();
 		if (listeners == null)
 		{
-			this.listeners = new MultiCollection();
+			this.listeners = new MultiCollection<IComponentIdentifier, ICMSComponentListener>();
 		}
 
 		// Already registered
 		if (listeners.containsKey(cid))
 		{
-			listeners.put(cid, listener);
+			listeners.add(cid, listener);
 			// Ongoing registration.
 			if (futures != null && futures.containsKey(cid))
 			{
-				futures.put(cid, ret);
+				futures.add(cid, ret);
 			}
 			// Registration already finished.
 			else
@@ -156,10 +156,10 @@ public class CMSUpdateHandler
 		{
 			if (futures == null)
 			{
-				this.futures = new MultiCollection();
+				this.futures = new MultiCollection<IComponentIdentifier, IFuture<Void>>();
 			}
-			futures.put(cid, ret);
-			listeners.put(cid, listener);
+			futures.add(cid, ret);
+			listeners.add(cid, listener);
 
 			SRemoteGui.installRemoteCMSListener(access, cid, rcl, buildId(cid)).addResultListener(new DefaultResultListener<Void>()
 			{

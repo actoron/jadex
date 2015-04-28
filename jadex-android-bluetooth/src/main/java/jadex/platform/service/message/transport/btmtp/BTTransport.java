@@ -2,7 +2,6 @@ package jadex.platform.service.message.transport.btmtp;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.AndroidContextManager.AndroidContextChangeListener;
-import jadex.android.bluetooth.JadexBluetoothActivity;
 import jadex.android.bluetooth.exceptions.ActivityIsNotJadexBluetoothActivityException;
 import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.message.DataPacket;
@@ -10,14 +9,10 @@ import jadex.android.bluetooth.service.ConnectionService;
 import jadex.android.bluetooth.service.IBTP2PMessageCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.android.bluetooth.util.Helper;
-import jadex.android.service.JadexPlatformManager;
-import jadex.platform.service.message.ISendTask;
-import jadex.platform.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -26,12 +21,12 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.platform.service.message.ISendTask;
+import jadex.platform.service.message.transport.ITransport;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -69,7 +64,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	// -------- attributes --------
 
 	/** The platform. */
-	protected IServiceProvider container;
+	protected IInternalAccess container;
 
 	/** The addresses. */
 	protected String[] addresses;
@@ -100,7 +95,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	/**
 	 * Init the transport.
 	 */
-	public BTTransport(final IServiceProvider container) {
+	public BTTransport(IInternalAccess container) {
 		this.container = container;
 		AndroidContextManager.getInstance().addContextChangeListener(this);
 	}
@@ -180,7 +175,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 *  @param task A task representing the message to send.
 	 *  
 	 */
-	public void sendMessage(String address, final ISendTask task) {
+	public void sendMessage(final String address, final ISendTask task) {
 
 		IResultCommand<IFuture<Void>, Void> send = new IResultCommand<IFuture<Void>, Void>() {
 
@@ -191,19 +186,19 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 				IComponentIdentifier[] receivers = task.getReceivers();
 
 				// Fetch all addresses
-				Set<String> addresses = new LinkedHashSet<String>();
-				for (int i = 0; i < receivers.length; i++) {
-					String[] raddrs = receivers[i].getAddresses();
-					for (int j = 0; j < raddrs.length; j++) {
-						if (isApplicable(raddrs[j])) {
-							addresses.add(raddrs[j]);
-						}
-					}
-				}
+//				Set<String> addresses = new LinkedHashSet<String>();
+//				for (int i = 0; i < receivers.length; i++) {
+//					String[] raddrs = receivers[i].getAddresses();
+//					for (int j = 0; j < raddrs.length; j++) {
+//						if (isApplicable(raddrs[j])) {
+//							addresses.add(raddrs[j]);
+//						}
+//					}
+//				}
 
 				// Iterate over all different addresses and try to send
 				// to missing and appropriate receivers
-				String[] addrs = addresses.toArray(new String[addresses.size()]);
+//				String[] addrs = addresses.toArray(new String[addresses.size()]);
 
 				boolean delivered = false;
 				BluetoothMessage bluetoothMessage;
@@ -217,18 +212,19 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 					Log.e(Helper.LOG_TAG, "Could not encode Message: " + e1.toString());
 				}
 				byte[] msgData = stream.toByteArray();
-				for (int i = 0; !delivered && i < addrs.length; i++) {
+//				for (int i = 0; !delivered && i < addrs.length; i++) {
 
-					bluetoothMessage = new BluetoothMessage(addrs[i], msgData, DataPacket.TYPE_DATA);
+				bluetoothMessage = new BluetoothMessage(address, msgData, DataPacket.TYPE_DATA);
 
-					try {
-						binder.sendMessage(bluetoothMessage);
-						ret	= IFuture.DONE;
-					} catch (RemoteException e) {
-						ret	= new Future<Void>(new RuntimeException("Send failed: "+bluetoothMessage));
-						e.printStackTrace();
-					}
+				try {
+					binder.sendMessage(bluetoothMessage);
+					ret	= IFuture.DONE;
+				} catch (RemoteException e) {
+					ret	= new Future<Void>(new RuntimeException("Send failed: "+bluetoothMessage));
+					e.printStackTrace();
 				}
+				
+//				}
 				
 				if(ret==null)
 				{

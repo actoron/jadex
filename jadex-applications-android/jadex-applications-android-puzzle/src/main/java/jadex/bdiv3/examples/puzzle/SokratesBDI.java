@@ -2,7 +2,6 @@ package jadex.bdiv3.examples.puzzle;
 
 import jadex.android.puzzle.SokratesService.SokratesListener;
 import jadex.android.puzzle.ui.GuiProxy;
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
@@ -14,7 +13,9 @@ import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -23,8 +24,6 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,7 +85,7 @@ public class SokratesBDI
 	 *  Setup the gui and start playing.
 	 */
 	@AgentBody
-	public IFuture<Void>	body(BDIAgent agent)
+	public IFuture<Void>	body(IInternalAccess agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 
@@ -95,7 +94,7 @@ public class SokratesBDI
 		
 		gui_proxy.showMessage("Now puzzling:");
 		final long	start	= System.currentTimeMillis();
-		IFuture<MoveGoal> fut = agent.dispatchTopLevelGoal(new MoveGoal());
+		IFuture<MoveGoal> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MoveGoal());
 		fut.addResultListener(new IResultListener<MoveGoal>()
 		{
 			public void resultAvailable(MoveGoal movegoal)
@@ -118,7 +117,7 @@ public class SokratesBDI
 	/**
 	 *  Create the GUI (if any).
 	 */
-	protected void	createGui(final BDIAgent agent)
+	protected void	createGui(final IInternalAccess agent)
 	{
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
