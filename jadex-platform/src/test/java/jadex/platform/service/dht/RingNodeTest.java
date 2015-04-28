@@ -271,6 +271,18 @@ public class RingNodeTest extends TestCase
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public <T> T getComponentFeature0(Class<? extends T> type) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Exception getException() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	};
 	
 	

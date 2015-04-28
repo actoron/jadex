@@ -207,6 +207,7 @@ public class Fingertable
 
 	public void setInvalid(IFinger rn)
 	{
+		Finger.killedId = rn.getNodeId();
 		for(int i = 0; i < fingers.length; i++)
 		{
 			if (rn.equals(fingers[i])) {

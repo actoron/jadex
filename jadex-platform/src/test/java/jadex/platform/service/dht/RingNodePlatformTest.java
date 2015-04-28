@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -53,7 +54,10 @@ public class RingNodePlatformTest extends TestCase
 	
 	@Before
 	public void setUp() {
-		timeout = BasicService.getLocalDefaultTimeout();
+		
+//		System.out.println("Default timeout is: " + timeout);
+		timeout = Starter.getLocalDefaultTimeout(null);
+		
 		String	pid	= SUtil.createUniqueId(name.getMethodName(), 3)+"-*";
 		
 		platform1 = Starter.createPlatform(new String[]{"-platformname", pid,
@@ -140,7 +144,7 @@ public class RingNodePlatformTest extends TestCase
 	@Test
 	public void testJoin() {
 		rn2.join(rn1).get();
-		stabilize(new IDebugRingNode[]{rn1, rn2}).get();
+		stabilize2(new IDebugRingNode[]{rn1, rn2}).get();
 //		rn2.stabilize().get();
 //		rn1.stabilize().get();
 //		System.out.println(rn1.getFingerTableString().get());
@@ -151,9 +155,9 @@ public class RingNodePlatformTest extends TestCase
 	@Test
 	public void testJoin3() throws InterruptedException {
 		rn2.join(rn1).get();
-		stabilize(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
 		rn3.join(rn1).get();
-		stabilize(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
 //		System.out.println(rn1.getFingerTableString().get());
 		assertCircle(rn1, rn2, rn3);
 	}
@@ -161,9 +165,10 @@ public class RingNodePlatformTest extends TestCase
 	@Test
 	public void testKillPlatform() {
 		rn2.join(rn1).get();
-		stabilize(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
 		rn3.join(rn1).get();
-		stabilize(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
 		
 //		System.out.println(rn1.getFingerTableString().get());
 //		System.out.println(rn2.getFingerTableString().get());
@@ -252,11 +257,16 @@ public class RingNodePlatformTest extends TestCase
 		}
 	}
 
+	private IFuture<Void> stabilize2(IDebugRingNode[] nodes) {
+		stabilize(nodes).get();
+		return stabilize(nodes);
+	}
+	
 	private IFuture<Void> stabilize(IDebugRingNode[] nodes)
 	{
 		final Future<Void> future = new Future<Void>();
 
-		CounterResultListener<Void> rejoinListener = new CounterResultListener<Void>((nodes.length * nodes.length), new DelegationResultListener<Void>(future))
+		CounterResultListener<Void> rejoinListener = new CounterResultListener<Void>((nodes.length), new DelegationResultListener<Void>(future))
 		{
 
 			@Override
@@ -273,16 +283,19 @@ public class RingNodePlatformTest extends TestCase
 				{
 					System.out.println("initiate re-join");
 					rn2.join(rn1);
+				} else {
+					exception.printStackTrace();
 				}
 			}
 		};
 
-		for(int j = 0; j < nodes.length; j++)
-		{
+//		for(int j = 0; j < nodes.length; j++)
+//		{
 			for(int i = 0; i < nodes.length; i++)
 			{
 				try
 				{
+//					ServiceCall.getOrCreateNextInvocation().setTimeout(5000);
 					nodes[i].stabilize().addResultListener(rejoinListener);
 					// stabilize.addResultListener(rejoinListener);
 					// nodes[i].fixFingers().get(10000);
@@ -294,7 +307,7 @@ public class RingNodePlatformTest extends TestCase
 //					e.printStackTrace();
 				}
 			}
-		}
+//		}
 		return future;
 	}
 }

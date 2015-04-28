@@ -14,7 +14,7 @@ import jadex.micro.annotation.RequiredServices;
 @Agent
 @ProvidedServices({
 	@ProvidedService(name="providedRing", type = IRingNode.class, implementation = @Implementation(RingNode.class), scope = RequiredServiceInfo.SCOPE_GLOBAL),
-//	@ProvidedService(name="providedDebugRing", type = IDebugRingNode.class, implementation = @Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"providedRing\")"), scope = RequiredServiceInfo.SCOPE_GLOBAL),
+	@ProvidedService(name="providedDebugRing", type = IDebugRingNode.class, implementation = @Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"providedRing\")"), scope = RequiredServiceInfo.SCOPE_GLOBAL),
 })
 @RequiredServices({
 	@RequiredService(name = "ringnodes", type = IRingNode.class, multiple = true, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = true))
