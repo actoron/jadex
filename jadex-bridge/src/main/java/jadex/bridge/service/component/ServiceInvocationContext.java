@@ -171,11 +171,11 @@ public class ServiceInvocationContext
 		
 		this.caller = IComponentIdentifier.LOCAL.get();
 //		this.calleradapter	= IComponentAdapter.LOCAL.get();
-		
-		this.lastcall = CallAccess.getCurrentInvocation();
-		
+
 		// Is next call defined by user?
 		this.call = CallAccess.getNextInvocation();
+		
+		this.lastcall = CallAccess.getCurrentInvocation();
 		
 //		if(caller!=null && caller.toString().startsWith("rms@") && method.getName().equals("getExternalAccess") && call==null)
 //		{

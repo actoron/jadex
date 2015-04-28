@@ -42,7 +42,6 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 
 	/** The required service infos. */
 	protected Map<String, RequiredServiceInfo> requiredserviceinfos;
-
 	
 	//-------- constructors --------
 	

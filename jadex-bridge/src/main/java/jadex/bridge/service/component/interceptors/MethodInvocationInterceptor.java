@@ -133,10 +133,10 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 				
 				CallAccess.setLastInvocation(ServiceCall.getCurrentInvocation());
 				CallAccess.setCurrentInvocation(sic.getLastServiceCall()); // current is last
-				CallAccess.resetNextInvocation(); // next is null
 				
 				sic.setCurrentCall(CallAccess.getLastInvocation()); // remember invocation made
 			}
+			CallAccess.resetNextInvocation(); // next is null
 			
 			sic.setResult(res);
 		}

@@ -65,6 +65,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							{
 								CallAccess.setCurrentInvocation(sic.getLastServiceCall());
 								CallAccess.setLastInvocation(sic.getServiceCall());
+								CallAccess.resetNextInvocation();
 								
 								if(isUndone() && listener instanceof IUndoneResultListener)
 								{
@@ -83,6 +84,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									{
 										CallAccess.setCurrentInvocation(sic.getLastServiceCall());
 										CallAccess.setLastInvocation(sic.getServiceCall());
+										CallAccess.resetNextInvocation();
 										
 										if(isUndone() && listener instanceof IUndoneResultListener)
 										{

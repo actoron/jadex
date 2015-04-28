@@ -16,7 +16,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import java.util.Collection;
 
 /**
- *  Feature for provided services.
+ *  Feature for required services.
  */
 // Todo: synchronous or asynchronous (for search)?
 public class BDIRequiredServicesComponentFeature extends RequiredServicesComponentFeature
