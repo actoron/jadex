@@ -403,11 +403,11 @@ public class XMLTests extends TestCase
 	 */
 	public void testMultiCollection() throws Exception
 	{
-		MultiCollection col = new MultiCollection();
-		col.put("a", "a");
-		col.put("a", "b");
-		col.put("a", "c");
-		col.put("b", "b");
+		MultiCollection<String, String> col = new MultiCollection<String, String>();
+		col.add("a", "a");
+		col.add("a", "b");
+		col.add("a", "c");
+		col.add("b", "b");
 
 		doWriteAndRead(col);
 	}
