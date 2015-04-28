@@ -44,6 +44,39 @@ import junit.framework.TestSuite;
  */
 public class ComponentTestSuite extends TestSuite
 {
+	//-------- constants --------
+	
+	/**
+	 *  The default test platform arguments.
+	 */
+	public static final String[]	DEFARGS	= new String[]
+	{
+		"-platformname", "testcases_*",
+//			"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
+		"-simulation", "true",
+		"-asyncexecution", "true",
+//			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
+//			"-logging", "true",
+//			"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
+		"-logging_level", "java.util.logging.Level.WARNING",
+//			"-debugfutures", "true",
+//			"-nostackcompaction", "true",
+		"-gui", "false",
+		"-awareness", "false",
+		"-saveonexit", "false",
+		"-welcome", "false",
+		"-autoshutdown", "false",
+		"-opengl", "false",
+		"-cli", "false",
+//			"-persist", "true", // for testing persistence
+//			"-niotcptransport", "false",
+//			"-tcptransport", "true",
+//			"-deftimeout", "-1",
+		"-printpass", "false",
+		// Hack!!! include ssl transport if available
+		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
+	};
+
 	//-------- attributes --------
 	
 	/** Indicate when the suite is aborted due to excessive run time. */
@@ -85,33 +118,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes, boolean test, boolean broken, boolean start) throws Exception
 	{
-		this(new String[]
-		{
-			"-platformname", "testcases_*",
-//			"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
-			"-simulation", "true",
-			"-asyncexecution", "true",
-//			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-//			"-logging", "true",
-//			"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
-			"-logging_level", "java.util.logging.Level.WARNING",
-//			"-debugfutures", "true",
-//			"-nostackcompaction", "true",
-			"-gui", "false",
-			"-awareness", "false",
-			"-saveonexit", "false",
-			"-welcome", "false",
-			"-autoshutdown", "false",
-			"-opengl", "false",
-			"-cli", "false",
-//			"-persist", "true", // for testing persistence
-//			"-niotcptransport", "false",
-//			"-tcptransport", "true",
-//			"-deftimeout", "-1",
-			"-printpass", "false",
-			// Hack!!! include ssl transport if available
-			"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
-		}, path, root, excludes, test, broken, start);
+		this(DEFARGS, path, root, excludes, test, broken, start);
 	}
 	
 	/**
@@ -207,17 +214,7 @@ public class ComponentTestSuite extends TestSuite
 									ComponentTest test = new ComponentTest(cms, model, this);
 									test.setName(abspath);
 									addTest(test);
-									
-									Object	to	= model.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, getClassLoader());
-									if(to!=null)
-									{
-										ctimeout	+= ((Number)to).longValue();
-									}
-									else
-									{
-										ctimeout	+= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
-									}
-
+									ctimeout	+= test.getTimeout();
 								}
 							}
 							else if(model.getReport()!=null)
@@ -238,7 +235,7 @@ public class ComponentTestSuite extends TestSuite
 									ComponentStartTest test = new ComponentStartTest(cms, model, this);
 									test.setName(abspath);
 									addTest(test);
-									ctimeout	+= ComponentStartTest.DELAY;
+									ctimeout	+= test.getDelay();	// Delay instead of timeout as start test should be finished after that.
 								}
 							}
 						}

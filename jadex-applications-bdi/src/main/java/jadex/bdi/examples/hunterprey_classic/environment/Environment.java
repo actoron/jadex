@@ -355,7 +355,7 @@ public class Environment implements IEnvironment
 	public void addFood(Food nfood)
 	{
 		this.food.add(nfood);
-		this.world.put(nfood.getLocation(), nfood);
+		this.world.add(nfood.getLocation(), nfood);
 	}
 
 	/**
@@ -375,7 +375,7 @@ public class Environment implements IEnvironment
 	public void addObstacle(Obstacle obstacle)
 	{
 		this.obstacles.add(obstacle);
-		this.world.put(obstacle.getLocation(), obstacle);
+		this.world.add(obstacle.getLocation(), obstacle);
 	}
 
 	/**
@@ -412,7 +412,7 @@ public class Environment implements IEnvironment
 //					copy.setVisionRange(5);
 //				else
 					copy.setVisionRange(3);					
-				this.world.put(copy.getLocation(), copy);
+				this.world.add(copy.getLocation(), copy);
 				this.highscore.add(copy);
 			}
 			//System.out.println("Environment, creature added: "+copy.getName()+" "+copy.getLocation());
@@ -577,7 +577,7 @@ public class Environment implements IEnvironment
 			{
 				world.removeObject(me.getLocation(), me);
 				me.setLocation(newloc);
-				world.put(me.getLocation(), me);
+				world.add(me.getLocation(), me);
 			}
 			catch(Exception e)
 			{

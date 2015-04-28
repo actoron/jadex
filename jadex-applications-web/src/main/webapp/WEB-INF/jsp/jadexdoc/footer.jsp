@@ -16,7 +16,7 @@
 	for(Iterator<IModelInfo> it=models.iterator(); it.hasNext(); )
 	{
 		IModelInfo	info	= it.next();
-		pmodels.put(info.getPackage(), info);
+		pmodels.add(info.getPackage(), info);
 	}
 	String[]	packages	= (String[])pmodels.getKeys(String.class);
 	Arrays.sort(packages);

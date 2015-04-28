@@ -63,10 +63,10 @@ public class GameStatistics
 	{
 		// Add data.
 		// Todo: clone player objects instead of using tuples?
-		this.playerModels.put(dealer, new Tuple(Integer.valueOf(dealer.getGameCount()), Integer.valueOf(dealer.getAccount())));
+		this.playerModels.add(dealer, new Tuple(Integer.valueOf(dealer.getGameCount()), Integer.valueOf(dealer.getAccount())));
 		for(int i=0; i<players.length; i++)
 		{
-			this.playerModels.put(players[i], new Tuple(Integer.valueOf(dealer.getGameCount()), Integer.valueOf(players[i].getAccount())));
+			this.playerModels.add(players[i], new Tuple(Integer.valueOf(dealer.getGameCount()), Integer.valueOf(players[i].getAccount())));
 		}
 
 		// Recalculates the minimum and maximum-values needed to scale

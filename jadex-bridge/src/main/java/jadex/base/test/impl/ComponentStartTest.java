@@ -8,9 +8,14 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -18,23 +23,29 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import junit.framework.TestResult;
 
 /**
  *  Test if a component can be started.
  */
 public class ComponentStartTest extends	ComponentTest
 {
-	//-------- constants --------
+	//-------- attributes --------
 	
 	/** The delay before the component is stopped. */
-	public static long DELAY;
+	// Extra to super.timeout, because timeout is used by super class also to stop init...
+	public long delay;
 	
 	//-------- constructors --------
 	
-	public ComponentStartTest() {
+	public ComponentStartTest()
+	{
 		Logger.getLogger("ComponentStartTest").log(Level.SEVERE, "ComponentSTartTest empty constructor called");
 	}
 	
@@ -44,7 +55,8 @@ public class ComponentStartTest extends	ComponentTest
 	public ComponentStartTest(IComponentManagementService cms, IModelInfo comp, ComponentTestSuite suite)
 	{
 		super(cms, comp, suite);
-		DELAY = Starter.getScaledLocalDefaultTimeout(((IService)cms).getServiceIdentifier().getProviderId(), 1.0/60);
+		// Hack??? 
+		delay = Starter.getScaledLocalDefaultTimeout(((IService)cms).getServiceIdentifier().getProviderId(), 1.0/60);
 	}
 	
 	//-------- methods --------
@@ -77,14 +89,14 @@ public class ComponentStartTest extends	ComponentTest
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(DELAY, false);
+					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, false);
 				}
 			}).addResultListener(lis);
 			ea.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(DELAY, true);
+					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, true);
 				}
 			}).addResultListener(lis);
 		}
@@ -117,5 +129,52 @@ public class ComponentStartTest extends	ComponentTest
 	public String toString()
 	{
 		return "start: "+super.toString();
-	}	
+	}
+	
+	/**
+	 *  Get the delay.
+	 */
+	public long	getDelay()
+	{
+		return delay;
+	}
+	
+	/**
+	 *  Command line test: start the given agent in the given rid
+	 *  @param args Two arguments representing the component file name and the rid file name.
+	 */
+	public static void main(String[] args) throws IOException
+	{
+		IExternalAccess	platform	= Starter.createPlatform(ComponentTestSuite.DEFARGS).get();
+		IComponentManagementService	cms	= SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		
+		String	filename	= null;
+		String	ridname	= null;
+		if(args.length==2)
+		{
+			filename	= args[0];
+			ridname	= args[1];			
+		}
+		else if(args.length==0)
+		{
+			filename	= "jadex/bdi/tutorial/TranslationA1.agent.xml";
+			ridname	= "../jadex-applications-bdi/target/classes";
+		}
+		else
+		{
+			System.out.println("Usage: ComponentStartTest <model file name> <RID file/directory name>");
+			System.exit(0);
+		}
+		
+		IResourceIdentifier	rid	= new ResourceIdentifier(new LocalResourceIdentifier(platform.getComponentIdentifier(), new File(ridname).getCanonicalFile().toURI()), null);
+		IModelInfo	model	= cms.loadComponentModel(filename, rid).get();
+		
+		ComponentStartTest	test	= new ComponentStartTest(cms, model, null);
+		
+		TestResult	result	= test.run();
+		
+		System.out.println("Result (run/error/failure): "+result.runCount()+"/"+result.errorCount()+"/"+result.failureCount());
+		
+		platform.killComponent().get();
+	}
 }

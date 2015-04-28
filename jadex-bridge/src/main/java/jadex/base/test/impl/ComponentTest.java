@@ -8,7 +8,6 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -72,7 +71,7 @@ public class ComponentTest extends TestCase
 		this.rid	= comp.getResourceIdentifier();
 		this.fullname	= comp.getFullName();
 		this.type	= comp.getType();
-		Object	to	= comp.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, suite.getClassLoader());
+		Object	to	= comp.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, getClass().getClassLoader());
 		if(to!=null)
 		{
 			this.timeout	= ((Number)to).longValue();
@@ -99,7 +98,7 @@ public class ComponentTest extends TestCase
 	 */
 	public void runBare()
 	{
-		if(suite.isAborted())
+		if(suite!=null && suite.isAborted())
 		{
 			return;
 		}
@@ -209,5 +208,13 @@ public class ComponentTest extends TestCase
 	public String toString()
 	{
 		return fullname + " (" + type + ")";
+	}
+
+	/**
+	 *  Get the timeout.
+	 */
+	public long	getTimeout()
+	{
+		return timeout;
 	}
 }

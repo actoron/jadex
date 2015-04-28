@@ -193,7 +193,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		}
 		catch(Exception e)
 		{
-			entries.put(new Tuple(new Object[]{new StackElement(new QName("capability"), "XML file")}), e.toString());
+			entries.add(new Tuple(new Object[]{new StackElement(new QName("capability"), "XML file")}), e.toString());
 		}
 		state.removeStateListener(listener);
 		
@@ -224,11 +224,11 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			mi.setResourceIdentifier(rid);
 			if(!mi.checkName())
 			{
-				entries.put(new Tuple(new Object[]{new StackElement(new QName("capability"), handle)}), "Name '"+mi.getName()+"' does not match file name '"+mi.getFilename()+"'.");				
+				entries.add(new Tuple(new Object[]{new StackElement(new QName("capability"), handle)}), "Name '"+mi.getName()+"' does not match file name '"+mi.getFilename()+"'.");				
 			}
 			if(!mi.checkPackage())
 			{
-				entries.put(new Tuple(new Object[]{new StackElement(new QName("capability"), handle)}), "Package '"+mi.getPackage()+"' does not match file name '"+mi.getFilename()+"'.");				
+				entries.add(new Tuple(new Object[]{new StackElement(new QName("capability"), handle)}), "Package '"+mi.getPackage()+"' does not match file name '"+mi.getFilename()+"'.");				
 			}
 			createAgentModelEntry(ret, mi);
 			

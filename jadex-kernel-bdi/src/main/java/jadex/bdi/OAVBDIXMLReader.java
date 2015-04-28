@@ -625,7 +625,7 @@ public class OAVBDIXMLReader
 		{
 			pos	= " (line 0, column 0)";			
 		}
-		report.put(stack, error+pos);
+		report.add(stack, error+pos);
 	}
 	
 	protected static Object getOAVRoot(String uri, AReadContext context, Map user, IOAVState state)

@@ -128,7 +128,7 @@ public class Environment
 				newpos = getRandomPosition();
 			wo = new WorldObject(name, type, newpos);
 			name_objects.put(name, wo);
-			pos_objects.put(wo.getPosition(), wo);
+			pos_objects.add(wo.getPosition(), wo);
 		}
 
 		pcs.firePropertyChange("worldObjects", null, wo);
@@ -172,7 +172,7 @@ public class Environment
 			wo = getWorldObject(name);
 			pos_objects.removeObject(wo.getPosition(), wo);
 			getWorldObject(name).setPosition(newpos);
-			pos_objects.put(wo.getPosition(), wo);
+			pos_objects.add(wo.getPosition(), wo);
 		}
 
 		//System.out.println("Agent moved: "+name+" "+getPosition(name));
@@ -197,7 +197,7 @@ public class Environment
 			WorldObject robot = getWorldObject(name);
 			garb = (WorldObject)robot.getProperty(GARBAGE);
 			garb.setPosition(robot.getPosition());
-			pos_objects.put(garb.getPosition(), garb);
+			pos_objects.add(garb.getPosition(), garb);
 			name_objects.put(garb.getName(), garb);
 			robot.setProperty(GARBAGE, null);
 		}
