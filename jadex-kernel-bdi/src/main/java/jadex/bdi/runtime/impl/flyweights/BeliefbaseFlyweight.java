@@ -10,12 +10,13 @@ import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
+import jadex.javaparser.IMapAccess;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for the belief base.
  */
-public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase 
+public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase, IMapAccess
 {
 	//-------- constructors --------
 	
@@ -410,4 +411,28 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 //		
 //		return new BeliefSetReferenceFlyweight(state, mbelset, new BeliefSetFlyweight(state, refcapa, beliefsetref));
 //	}
+	
+	/**
+	 *  Get an object from the map.
+	 *  @param key The key
+	 *  @return The value.
+	 */
+	public Object get(Object key)
+	{
+		String name = (String)key;
+		Object ret = null;
+		if(containsBelief(name))
+		{
+			ret = getBelief(name).getFact();
+		}
+		else if(containsBeliefSet(name))
+		{
+			ret = getBeliefSet(name).getFacts();
+		}
+		else
+		{
+			throw new RuntimeException("Unknown belief/set: "+name);
+		}
+		return ret;
+	}
 }

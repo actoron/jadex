@@ -56,6 +56,8 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	 */
 	public IFuture<Void> init()
 	{
+//		System.out.println("cl: "+getComponent().getClassLoader());
+		
 		if(cinfo.getArguments()!=null)
 		{
 			for(Iterator<Map.Entry<String, Object>> it=cinfo.getArguments().entrySet().iterator(); it.hasNext(); )

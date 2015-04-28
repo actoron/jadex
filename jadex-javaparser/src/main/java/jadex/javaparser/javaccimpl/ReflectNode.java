@@ -4,6 +4,7 @@ import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.javaparser.IMapAccess;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -805,7 +806,8 @@ public class ReflectNode	extends ExpressionNode
 		// Find map accessor if not precomputed.
 		Method	accessor0	= this.accessor;
 		Object[]	args0	= this.args;
-		if(!fetched && field0==null && accessor0==null && SReflect.isSupertype(Map.class, clazz))
+		if(!fetched && field0==null && accessor0==null && 
+			(SReflect.isSupertype(Map.class, clazz) || SReflect.isSupertype(IMapAccess.class, clazz)))
 		{
 			accessor0	= SReflect.getMethod(clazz, "get", new Class[]{Object.class});
 			if(accessor0==null)

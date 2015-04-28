@@ -42,7 +42,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -50,15 +49,12 @@ import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.ServiceGetter;
-import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
-import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
@@ -70,22 +66,17 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.rules.rulesystem.Activation;
-import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
 import jadex.rules.rulesystem.PriorityAgenda;
 import jadex.rules.rulesystem.RuleSystem;
 import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
-import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -95,12 +86,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 
 /**
@@ -142,11 +128,11 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //	/** The kernel properties. */
 //	protected Map kernelprops;
 	
-	/** The extensions. */
-	protected Map<String, IExtensionInstance> extensions;
+//	/** The extensions. */
+//	protected Map<String, IExtensionInstance> extensions;
 	
-	/** The properties. */
-	protected Map<String, Object> properties;
+//	/** The properties. */
+//	protected Map<String, Object> properties;
 	
 	/** The arguments. */
 	protected Map<String, Object> arguments;
@@ -343,8 +329,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		ragent = state.createRootObject(OAVBDIRuntimeModel.agent_type);
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model, model.getHandle());
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, cinfo.getConfiguration());
-		if(arguments!=null && !arguments.isEmpty())
-			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, arguments);
+		if(cinfo.getArguments()!=null && !cinfo.getArguments().isEmpty())
+			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, cinfo.getArguments());
 //		this.bindings	= bindings;
 //		this.pinfos	= pinfos;
 
@@ -388,14 +374,13 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
 
+		Future<Void> ret = new Future<Void>();
+		
 //		System.out.println("sb start: "+getComponentIdentifier());
 		
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
 		
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
-		// Remove arguments from state.
-		if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
-			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
 
 		rulesystem.init();
 		
@@ -403,10 +388,18 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
 		AgentRules.createCapabilityInstance(state, ragent, parents);
 		
-		return AgentRules.initializeCapabilityInstance(state, ragent);
+		AgentRules.initializeCapabilityInstance(state, ragent).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				// Remove arguments from state.
+				if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
+					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
+				super.customResultAvailable(result);
+			}
+		});
 		
-//		System.out.println("sb end: "+getComponentIdentifier());
-//		return IFuture.DONE;
+		return ret;
 	}
 	
 //	/**
@@ -529,166 +522,93 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //	}
 
 	
-	/**
-	 *  First init step of agent.
-	 */
-	protected IFuture	init0()
-	{
-//		assert isAgentThread();
-		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
-		
-		final Future	ret	= new Future();
-		
-		// Init the external access
-//		ea = new ExternalAccessFlyweight(state, ragent);
-		
-		// Get the services.
-//		final boolean services[]	= new boolean[3];
-//		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//			.addResultListener(createResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				clockservice	= (IClockService)result;
-//				boolean	startagent;
-//				synchronized(services)
-//				{
-//					services[0]	= true;
-//					startagent	= services[0] && services[1] && services[2];// && services[3];
-//				}
-//				if(startagent)
-//				{
-//					ret.setResult(null);
-//				}
-//			}
-//		}));
-//		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//			.addResultListener(createResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				cms	= (IComponentManagementService)result;
-//				boolean	startagent;
-//				synchronized(services)
-//				{
-//					services[1]	= true;
-//					startagent	= services[0] && services[1] && services[2];// && services[3];
-//				}
-//				if(startagent)
-//					ret.setResult(null);
-//			}
-//		}));
-//		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//			.addResultListener(createResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				msgservice	= (IMessageService)result;
-//				boolean	startagent;
-//				synchronized(services)
-//				{
-//					services[2]	= true;
-//					startagent	= services[0] && services[1] && services[2];// && services[3];
-//				}
-//				if(startagent)
-//					ret.setResult(null);
-//			}
-//		}));
-
-		// Previously done in createStartAgentRule
-		Map parents = new HashMap(); 
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
-		AgentRules.createCapabilityInstance(state, ragent, parents);
-		
-		return ret;
-	}
-	
-	/**
-	 *  Second init step of agent.
-	 */
-	protected IFuture	init1()
-	{
-		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
-		
-		return AgentRules.initializeCapabilityInstance(state, ragent);
-	}
+//	/**
+//	 *  First init step of agent.
+//	 */
+//	protected IFuture	init0()
+//	{
+////		assert isAgentThread();
+//		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+//		
+//		final Future	ret	= new Future();
+//		
+//		// Init the external access
+////		ea = new ExternalAccessFlyweight(state, ragent);
+//		
+//		// Get the services.
+////		final boolean services[]	= new boolean[3];
+////		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+////			.addResultListener(createResultListener(new DefaultResultListener()
+////		{
+////			public void resultAvailable(Object result)
+////			{
+////				clockservice	= (IClockService)result;
+////				boolean	startagent;
+////				synchronized(services)
+////				{
+////					services[0]	= true;
+////					startagent	= services[0] && services[1] && services[2];// && services[3];
+////				}
+////				if(startagent)
+////				{
+////					ret.setResult(null);
+////				}
+////			}
+////		}));
+////		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+////			.addResultListener(createResultListener(new DefaultResultListener()
+////		{
+////			public void resultAvailable(Object result)
+////			{
+////				cms	= (IComponentManagementService)result;
+////				boolean	startagent;
+////				synchronized(services)
+////				{
+////					services[1]	= true;
+////					startagent	= services[0] && services[1] && services[2];// && services[3];
+////				}
+////				if(startagent)
+////					ret.setResult(null);
+////			}
+////		}));
+////		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+////			.addResultListener(createResultListener(new DefaultResultListener()
+////		{
+////			public void resultAvailable(Object result)
+////			{
+////				msgservice	= (IMessageService)result;
+////				boolean	startagent;
+////				synchronized(services)
+////				{
+////					services[2]	= true;
+////					startagent	= services[0] && services[1] && services[2];// && services[3];
+////				}
+////				if(startagent)
+////					ret.setResult(null);
+////			}
+////		}));
+//
+//		// Previously done in createStartAgentRule
+//		Map parents = new HashMap(); 
+//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+//		AgentRules.createCapabilityInstance(state, ragent, parents);
+//		
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Second init step of agent.
+//	 */
+//	protected IFuture	init1()
+//	{
+//		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+//		
+//		return AgentRules.initializeCapabilityInstance(state, ragent);
+//	}
 	
 	//-------- IKernelAgent interface --------
 	
 	//	Lock lock = new ReentrantLock(); 
-	/**
-	 *  Main method to perform agent execution.
-	 *  Whenever this method is called, the agent executes.
-	 *  The platform can provide different execution models for agents
-	 *  (e.g. thread based, or synchronous).
-	 *  To avoid idle waiting, the return value can be checked. 
-	 *  @return True, when there are more steps waiting to be executed. 
-	 */
-	public boolean executeStep()
-	{
-		try
-		{
-			// check st!=null is not enough as agent could be terminated during init.
-			// In this case the rulesystem may never has been inited.
-//			String st = (String)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
-			if(rulesystem.isInited())
-			{
-				// Hack!!! platform should inform about ext entries to update agenda.
-				Activation	act	= rulesystem.getAgenda().getLastActivation();
-				state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-				state.expungeStaleObjects();
-				state.notifyEventListeners();
-				state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-	
-				if(!rulesystem.getAgenda().isEmpty())
-				{					
-//					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-//						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
-					
-					if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-					{
-						getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
-					}
-					
-					rulesystem.getAgenda().fireRule();
-					act	= rulesystem.getAgenda().getLastActivation();
-//					System.out.println("here: "+getComponentIdentifier()+" "+act+", "+rulesystem.getAgenda().getActivations());
-					state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-					state.expungeStaleObjects();
-					state.notifyEventListeners();
-					state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-					
-					if(getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-					{
-						getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
-					}
-				}
-	
-				return !rulesystem.getAgenda().isEmpty();
-			}
-			else
-			{
-				// still in init
-				return false;
-			}
-		}
-		catch(Throwable e)
-		{
-			// Catch fatal error and cleanup before propagating error to platform.
-			cleanup();
-			if(e instanceof RuntimeException)
-				throw (RuntimeException)e;
-			else if(e instanceof Error)
-				throw (Error)e;
-			else // Shouldn't happen!? 
-				throw new RuntimeException(e);
-		}
-	}
-	
-	long last;
-	int lastmax;
-	int lastmin;
-	String	lastmsg;
 	
 	/**
 	 *  Request agent to kill itself.
@@ -720,52 +640,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return ret;
 	}
 	
-	/**
-	 *  Get the external access for this agent.
-	 *  The specific external access interface is kernel specific
-	 *  and has to be casted to its corresponding incarnation.
-	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
-	 */
-	public IExternalAccess getExternalAccess()
-	{
-		return ea;
-//		return new ExternalAccessFlyweight(state, ragent);
-		
-//		final Future ret = new Future();
-//		
-//		getAgentAdapter().invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)))
-//				{
-//					if(eal==null)
-//						eal	= new HashSet();
-//					eal.add(new DelegationResultListener(ret));
-//				}
-//				else
-//				{
-//					ret.setResult(new ExternalAccessFlyweight(state, ragent));
-//				}
-//			}
-//		});
-//		
-//		return ret;
-	}
-
-	/**
-	 *  Get the class loader of the agent.
-	 *  The agent class loader is required to avoid incompatible class issues,
-	 *  when changing the platform class loader while agents are running. 
-	 *  This may occur e.g. when decoding messages and instantiating parameter values.
-	 *  @return	The agent class loader. 
-	 */
-	public ClassLoader getClassLoader()
-	{
-//		return model.getModelInfo().getClassLoader();
-		return model.getState().getTypeModel().getClassLoader();
-	}
-	
 //	/**
 //	 *  Get the results of the component (considering it as a functionality).
 //	 *  @return The results map (name -> value). 
@@ -788,56 +662,34 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //		System.out.println(BDIInterpreter.interpreters.size());
 	}
 
-	/**
-	 *  Called when a component has been created as a subcomponent of this component.
-	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
-	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-	 *  @param comp	The newly created component.
-	 */
-	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
-	{
-		return IFuture.DONE;
-	}
-
-	/**
-	 *  Called when a subcomponent of this component has been destroyed.
-	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
-	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-	 *  @param comp	The destroyed component.
-	 */
-	public IFuture	componentDestroyed(IComponentDescription desc)
-	{
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Test if the component's execution is currently at one of the
-	 *  given breakpoints. If yes, the component will be suspended by
-	 *  the platform.
-	 *  @param breakpoints	An array of breakpoints.
-	 *  @return True, when some breakpoint is triggered.
-	 */
-	public boolean isAtBreakpoint(String[] breakpoints)
-	{
-		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
-		
-		boolean	isatbreakpoint	= false;
-		
-		Object	cs	= state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
-		if(cs!=null && !OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(cs))
-		{
-			Set	bps	= new HashSet(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
-			Iterator	it	= getRuleSystem().getAgenda().getActivations().iterator();
-			while(!isatbreakpoint && it.hasNext())
-			{
-				IRule	rule	= ((Activation)it.next()).getRule();
-				isatbreakpoint	= bps.contains(rule.getName());
-			}
-		}
-		// else still in init
-		
-		return isatbreakpoint;
-	}
+//	/**
+//	 *  Test if the component's execution is currently at one of the
+//	 *  given breakpoints. If yes, the component will be suspended by
+//	 *  the platform.
+//	 *  @param breakpoints	An array of breakpoints.
+//	 *  @return True, when some breakpoint is triggered.
+//	 */
+//	public boolean isAtBreakpoint(String[] breakpoints)
+//	{
+//		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+//		
+//		boolean	isatbreakpoint	= false;
+//		
+//		Object	cs	= state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
+//		if(cs!=null && !OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(cs))
+//		{
+//			Set	bps	= new HashSet(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
+//			Iterator	it	= getRuleSystem().getAgenda().getActivations().iterator();
+//			while(!isatbreakpoint && it.hasNext())
+//			{
+//				IRule	rule	= ((Activation)it.next()).getRule();
+//				isatbreakpoint	= bps.contains(rule.getName());
+//			}
+//		}
+//		// else still in init
+//		
+//		return isatbreakpoint;
+//	}
 
 //	/**
 //	 *  Get the logger.
@@ -962,126 +814,126 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	
 	//-------- other methods --------
 	
-	/**
-	 *  Init the logger with capability settings.
-	 *  @param path The list of capability references from agent to subcapability.
-	 *  @param logger The logger.
-	 */
-	protected void initLogger(List path, Logger logger)
-	{
-		// Outer settings overwrite inner settings.
-		Level	level	= null;
-		Boolean	useparent	= null;
-		Level	addconsole	= null;
-		String	logfile	= null;
-		Object	handlers = null;
-		
-//		for(int i=-1; i<path.size(); i++)
+//	/**
+//	 *  Init the logger with capability settings.
+//	 *  @param path The list of capability references from agent to subcapability.
+//	 *  @param logger The logger.
+//	 */
+//	protected void initLogger(List path, Logger logger)
+//	{
+//		// Outer settings overwrite inner settings.
+//		Level	level	= null;
+//		Boolean	useparent	= null;
+//		Level	addconsole	= null;
+//		String	logfile	= null;
+//		Object	handlers = null;
+//		
+////		for(int i=-1; i<path.size(); i++)
+////		{
+////			Object	rcapa	= i==-1 ? ragent
+////				: state.getAttributeValue(path.get(i), OAVBDIRuntimeModel.capabilityreference_has_capability);
+////			if(level==null)
+////			{
+////				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.level");
+////				level	= prop!=null ? (Level)prop : null;
+////			}
+////			if(useparent==null)
+////			{
+////				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.useParentHandlers");
+////				useparent	= prop!=null ? (Boolean)prop : null;
+////			}
+////			if(addconsole==null)
+////			{
+////				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.addConsoleHandler");
+////				addconsole	= prop!=null ? (Level)prop : null;
+////			}
+////			if(logfile==null)
+////			{
+////				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.file");
+////				logfile	= prop!=null ? (String)prop : null;
+////			}
+////			if(logfile==null)
+////			{
+////				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.handlers");
+////				handlers	= prop!=null ? prop : null;
+////			}
+////		}
+//		
+//		// the level of the logger
+//		logger.setLevel(level==null? Level.WARNING: level);
+//
+//		// if logger should use Handlers of parent (global) logger
+//		// the global logger has a ConsoleHandler(Level:INFO) by default
+//		if(useparent!=null)
 //		{
-//			Object	rcapa	= i==-1 ? ragent
-//				: state.getAttributeValue(path.get(i), OAVBDIRuntimeModel.capabilityreference_has_capability);
-//			if(level==null)
+//			logger.setUseParentHandlers(useparent.booleanValue());
+//		}
+//			
+//		// add a ConsoleHandler to the logger to print out
+//        // logs to the console. Set Level to given property value
+//		if(addconsole!=null)
+//		{
+//			Handler console;
+//			/*if[android]
+//			console = new jadex.commons.android.AndroidHandler();
+//			 else[android]*/
+//			console = new ConsoleHandler();
+//			/* end[android]*/
+//            console.setLevel(addconsole);
+//            logger.addHandler(console);
+//        }
+//		
+//		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
+//		// if logger should add a filehandler to capture log data in a file. 
+//		// The user specifies the directory to contain the log file.
+//		// $scope.getAgentName() can be used to have agent-specific log files 
+//		//
+//		// The directory name can use special patterns defined in the
+//		// class, java.util.logging.FileHandler, 
+//		// such as "%h" for the user's home directory.
+//		// 
+//		if(logfile!=null)
+//		{
+//		    try
+//		    {
+//			    Handler fh	= new FileHandler(logfile);
+//		    	fh.setFormatter(new SimpleFormatter());
+//		    	logger.addHandler(fh);
+//		    }
+//		    catch (IOException e)
+//		    {
+//		    	System.err.println("I/O Error attempting to create logfile: "
+//		    		+ logfile + "\n" + e.getMessage());
+//		    }
+//		}
+//		
+//		if(handlers!=null)
+//		{
+//			if(handlers instanceof Handler)
 //			{
-//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.level");
-//				level	= prop!=null ? (Level)prop : null;
+//				logger.addHandler((Handler)handlers);
 //			}
-//			if(useparent==null)
+//			else if(SReflect.isIterable(handlers))
 //			{
-//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.useParentHandlers");
-//				useparent	= prop!=null ? (Boolean)prop : null;
+//				for(Iterator it=SReflect.getIterator(handlers); it.hasNext(); )
+//				{
+//					Object obj = it.next();
+//					if(obj instanceof Handler)
+//					{
+//						logger.addHandler((Handler)obj);
+//					}
+//					else
+//					{
+//						logger.warning("Property is not a logging handler: "+obj);
+//					}
+//				}
 //			}
-//			if(addconsole==null)
+//			else
 //			{
-//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.addConsoleHandler");
-//				addconsole	= prop!=null ? (Level)prop : null;
-//			}
-//			if(logfile==null)
-//			{
-//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.file");
-//				logfile	= prop!=null ? (String)prop : null;
-//			}
-//			if(logfile==null)
-//			{
-//				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.handlers");
-//				handlers	= prop!=null ? prop : null;
+//				logger.warning("Property 'logging.handlers' must be Handler or list of handlers: "+handlers);
 //			}
 //		}
-		
-		// the level of the logger
-		logger.setLevel(level==null? Level.WARNING: level);
-
-		// if logger should use Handlers of parent (global) logger
-		// the global logger has a ConsoleHandler(Level:INFO) by default
-		if(useparent!=null)
-		{
-			logger.setUseParentHandlers(useparent.booleanValue());
-		}
-			
-		// add a ConsoleHandler to the logger to print out
-        // logs to the console. Set Level to given property value
-		if(addconsole!=null)
-		{
-			Handler console;
-			/*if[android]
-			console = new jadex.commons.android.AndroidHandler();
-			 else[android]*/
-			console = new ConsoleHandler();
-			/* end[android]*/
-            console.setLevel(addconsole);
-            logger.addHandler(console);
-        }
-		
-		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
-		// if logger should add a filehandler to capture log data in a file. 
-		// The user specifies the directory to contain the log file.
-		// $scope.getAgentName() can be used to have agent-specific log files 
-		//
-		// The directory name can use special patterns defined in the
-		// class, java.util.logging.FileHandler, 
-		// such as "%h" for the user's home directory.
-		// 
-		if(logfile!=null)
-		{
-		    try
-		    {
-			    Handler fh	= new FileHandler(logfile);
-		    	fh.setFormatter(new SimpleFormatter());
-		    	logger.addHandler(fh);
-		    }
-		    catch (IOException e)
-		    {
-		    	System.err.println("I/O Error attempting to create logfile: "
-		    		+ logfile + "\n" + e.getMessage());
-		    }
-		}
-		
-		if(handlers!=null)
-		{
-			if(handlers instanceof Handler)
-			{
-				logger.addHandler((Handler)handlers);
-			}
-			else if(SReflect.isIterable(handlers))
-			{
-				for(Iterator it=SReflect.getIterator(handlers); it.hasNext(); )
-				{
-					Object obj = it.next();
-					if(obj instanceof Handler)
-					{
-						logger.addHandler((Handler)obj);
-					}
-					else
-					{
-						logger.warning("Property is not a logging handler: "+obj);
-					}
-				}
-			}
-			else
-			{
-				logger.warning("Property 'logging.handlers' must be Handler or list of handlers: "+handlers);
-			}
-		}
-	}
+//	}
 	
 	/**
 	 *  Get the agent instance reference.
@@ -1191,33 +1043,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return this.state;
 	}
 
-//	/**
-//	 *  Get the cached clock service.
-//	 */
-//	// hack!!! to avoid dealing with futures.
-//	public IClockService	getClockService()
-//	{
-//		return clockservice;
-//	}
-//
-//	/**
-//	 *  Get the cached component management service.
-//	 */
-//	// hack!!! to avoid dealing with futures.
-//	public IComponentManagementService	getCMS()
-//	{
-//		return cms;
-//	}
-//
-//	/**
-//	 *  Get the cached message service.
-//	 */
-//	// hack!!! to avoid dealing with futures.
-//	public IMessageService	getMessageService()
-//	{
-//		return msgservice;
-//	}
-	
 	/**
 	 *  Invoke some code with agent behaviour synchronized on the agent.
 	 *  @param code The code to execute.
@@ -1745,70 +1570,70 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //		return IFuture.DONE;
 //	}
 	
-	/**
-	 *  Add an extension instance.
-	 *  @param extension The extension instance.
-	 */
-	public void	addExtension(String name, IExtensionInstance ext)
-	{
-		if(extensions==null)
-		{
-			extensions = new HashMap();
-		}
-		extensions.put(name, ext);
-	}
+//	/**
+//	 *  Add an extension instance.
+//	 *  @param extension The extension instance.
+//	 */
+//	public void	addExtension(String name, IExtensionInstance ext)
+//	{
+//		if(extensions==null)
+//		{
+//			extensions = new HashMap();
+//		}
+//		extensions.put(name, ext);
+//	}
+//	
+//	/**
+//	 *  Get a space of the application.
+//	 *  @param name	The name of the space.
+//	 *  @return	The space.
+//	 */
+//	public IExtensionInstance getExtension(String name)
+//	{
+//		return extensions==null? null: (IExtensionInstance)extensions.get(name);
+//	}
+//	
+//	/**
+//	 *  Get a space of the application.
+//	 *  @param name	The name of the space.
+//	 *  @return	The space.
+//	 */
+//	public IExtensionInstance[] getExtensions()
+//	{
+//		return extensions==null? new IExtensionInstance[0]: 
+//			(IExtensionInstance[])extensions.values().toArray(new IExtensionInstance[extensions.size()]);
+//	}
 	
-	/**
-	 *  Get a space of the application.
-	 *  @param name	The name of the space.
-	 *  @return	The space.
-	 */
-	public IExtensionInstance getExtension(String name)
-	{
-		return extensions==null? null: (IExtensionInstance)extensions.get(name);
-	}
-	
-	/**
-	 *  Get a space of the application.
-	 *  @param name	The name of the space.
-	 *  @return	The space.
-	 */
-	public IExtensionInstance[] getExtensions()
-	{
-		return extensions==null? new IExtensionInstance[0]: 
-			(IExtensionInstance[])extensions.values().toArray(new IExtensionInstance[extensions.size()]);
-	}
-	
-	/**
-	 *  Get the properties.
-	 *  @return the properties.
-	 */
-	public Map getProperties()
-	{
-		return properties;
-	}
-	
-	/**
-	 *  Get the properties for a subcapability.
-	 *  @return the properties.
-	 */
-	public Map getProperties(Object rcapa)
-	{
-		// Todo
-		return properties==null? Collections.EMPTY_MAP: properties;
-	}
-	
-	/**
-	 *  Add a property value.
-	 *  @param name The name.
-	 *  @param val The value.
-	 */
-	public void addProperty(String name, Object val)
-	{
-		if(properties==null)
-			properties = new HashMap();
-		properties.put(name, val);
-	}
+//	/**
+//	 *  Get the properties.
+//	 *  @return the properties.
+//	 */
+//	public Map getProperties()
+//	{
+//		return properties;
+//	}
+//	
+//	/**
+//	 *  Get the properties for a subcapability.
+//	 *  @return the properties.
+//	 */
+//	public Map getProperties(Object rcapa)
+//	{
+//		// Todo
+//		return properties==null? Collections.EMPTY_MAP: properties;
+//	}
+//	
+//	/**
+//	 *  Add a property value.
+//	 *  @param name The name.
+//	 *  @param val The value.
+//	 */
+//	public void addProperty(String name, Object val)
+//	{
+//		if(properties==null)
+//			properties = new HashMap();
+//		properties.put(name, val);
+//	}
 
 	/**
 	 *  Get the arguments.

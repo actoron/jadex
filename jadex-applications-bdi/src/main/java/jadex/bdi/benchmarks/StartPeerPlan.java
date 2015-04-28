@@ -4,7 +4,9 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.SCollection;
@@ -162,7 +164,8 @@ public class StartPeerPlan extends Plan
 	 */
 	protected IComponentIdentifier serviceCreateAgent(String name, Map args)
 	{
-		final IComponentManagementService ces = (IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
+//		final IComponentManagementService ces = (IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
+		IComponentManagementService ces = SServiceProvider.getLocalService(getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 //		SyncResultListener lis = new SyncResultListener();
 //		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
 //		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
@@ -197,8 +200,10 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void serviceDestroyAgent(String name)
 	{
-		final IComponentManagementService ces = (IComponentManagementService)getInterpreter()
-			.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
+		IComponentManagementService ces = SServiceProvider.getLocalService(getInterpreter(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+
+//		final IComponentManagementService ces = (IComponentManagementService)getInterpreter()
+//			.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 //		SyncResultListener lis = new SyncResultListener();
 //		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 //		ces.destroyComponent(aid, lis);

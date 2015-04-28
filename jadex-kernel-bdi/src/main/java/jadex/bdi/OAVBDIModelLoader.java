@@ -210,7 +210,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			}
 			
 			// Need to set class loader before create agent model entry to load subcapabilities.
-//			mi.setClassloader(classloader);
+			mi.setClassloader(classloader);
 			IResourceIdentifier rid = (IResourceIdentifier)((Object[])context)[0];
 			IComponentIdentifier root = (IComponentIdentifier)((Object[])context)[1];
 			mi.setFilename(info.getFilename());

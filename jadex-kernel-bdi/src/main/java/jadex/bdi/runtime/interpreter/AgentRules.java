@@ -1194,7 +1194,7 @@ public class AgentRules
 	 *  @param rcapa The reference to the capability instance.
 	 *  @param inivals Initial values for beliefs (e.g. arguments or config elements from outer capability);
 	 */
-	public static IFuture	initializeCapabilityInstance(final IOAVState state, final Object rcapa)
+	public static IFuture<Void>	initializeCapabilityInstance(final IOAVState state, final Object rcapa)
 	{
 		final Future	ret	= new Future();
 		
@@ -1659,7 +1659,8 @@ public class AgentRules
 	 */
 	public static IFuture	initBelief(final IOAVState state, final Object rcapa, final Object mbel, IValueFetcher fetcher)
 	{
-//		System.out.println("iB "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+", "+rcapa);
+		final String name = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
+//		System.out.println("iB "+name+", "+rcapa);
 		final Future	ret	= new Future();
 		
 		Object agent = BDIAgentFeature.getInterpreter(state).getAgent();
@@ -1682,6 +1683,7 @@ public class AgentRules
 			{
 				public void customResultAvailable(Object result)
 				{
+//					System.out.println("fact is: "+name+" "+result);
 					BeliefRules.setBeliefValue(state, rbel, result, rcapa);
 					
 					// Set also argument value if belief is declared as argument.
