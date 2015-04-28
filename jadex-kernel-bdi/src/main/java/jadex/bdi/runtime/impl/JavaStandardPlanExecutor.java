@@ -16,6 +16,7 @@ import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.ISuspendable;
 import jadex.rules.state.IOAVState;
 
 import java.io.Serializable;
@@ -116,7 +117,6 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			throw new RuntimeException("Classname must not be null: "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 		}
 		
-
 		AbstractPlan.planinit.remove(refname);
 
 		if(body==null)
@@ -153,6 +153,8 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 //			OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 		synchronized(monitor)
 		{
+			
+			
 			task.setStepType(steptype);
 			task.setState(PlanExecutionTask.STATE_RUNNING);
 			if(newthread)
@@ -608,6 +610,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				if(tmp==null)
 					tmp = createPlanBody(interpreter, rcapability, rplan);
 				pi = (Plan)tmp;
+				ISuspendable.SUSPENDABLE.set(pi);
 				pi.body();
 			}
 			catch(BodyAborted e)
@@ -691,6 +694,8 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			// Cleanup the plan execution thread.
 			tasks.remove(rplan);
 			exestate	= PlanExecutionTask.STATE_TERMINATED;
+			
+			ISuspendable.SUSPENDABLE.set(null);
 
 			// Finally, transfer execution back to agent thread.
 			synchronized(monitor)
