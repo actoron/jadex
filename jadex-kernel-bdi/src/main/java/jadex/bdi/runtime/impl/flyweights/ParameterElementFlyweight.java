@@ -1,16 +1,22 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import java.lang.reflect.Array;
+
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterElement;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
+import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.service.types.message.MessageType;
+import jadex.javaparser.IMapAccess;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for parameter elements.
  */
-public abstract class ParameterElementFlyweight extends ElementFlyweight implements IParameterElement
+public abstract class ParameterElementFlyweight extends ElementFlyweight implements IParameterElement, IMapAccess
 {
 	//-------- attributes --------
 	
@@ -195,5 +201,61 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	public String getType()
 	{
 		return type;
+	}
+	
+	/**
+	 *  Get an object from the map.
+	 *  @param key The key
+	 *  @return The value.
+	 */
+	public Object get(Object key)
+	{
+		Object ret = null;
+		String name = (String)key;
+//		IParameterElement pe = (IParameterElement)object;
+		if(hasParameter(name))
+		{
+			ret = getParameter(name).getValue();
+		}
+		else if(hasParameterSet(name))
+		{
+			ret = getParameterSet(name).getValues();
+		}
+		else
+		{
+			// Check if parameter exists, but has not been instantiated (return null or empty array).
+			boolean	exists	= false;
+			
+			Object	mpe	= getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+			if(getState().getType(mpe).isSubtype(OAVBDIMetaModel.messageevent_type))
+			{
+				MessageType	mtype	= MessageEventRules.getMessageEventType(getState(), mpe);
+				MessageType.ParameterSpecification	spec	= mtype.getParameter(name);
+				if(spec!=null)
+				{
+					exists	= true;
+					if(spec.isSet())
+					{
+						ret	= Array.newInstance(spec.getClazz(), 0);
+					}
+				}
+			}
+			else if(getState().containsKey(mpe, OAVBDIMetaModel.parameterelement_has_parameters, name))
+			{
+				exists	= true;
+			}
+			else if(getState().containsKey(mpe, OAVBDIMetaModel.parameterelement_has_parametersets, name))
+			{
+				exists	= true;
+				Object	paramset	= getState().getAttributeValue(mpe, OAVBDIMetaModel.parameterelement_has_parametersets, name);
+				Class	clazz	= (Class)getState().getAttributeValue(paramset, OAVBDIMetaModel.typedelement_has_class);
+				ret	= Array.newInstance(clazz, 0);
+			}
+			
+			if(!exists)
+				throw new RuntimeException("Unknown parameter/set: "+name);
+		}
+		
+		return ret;
 	}
 }
