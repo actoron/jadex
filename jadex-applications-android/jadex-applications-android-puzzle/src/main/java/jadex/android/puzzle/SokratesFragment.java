@@ -101,8 +101,7 @@ public class SokratesFragment extends ClientAppMainFragment implements ServiceCo
 		super.onDestroy();
 		if (service != null)
 		{
-			ThreadSuspendable suspendable = new ThreadSuspendable();
-			service.stopSokrates().get(suspendable);
+			service.stopSokrates().get();
 			unbindService(this);
 		}
 	}

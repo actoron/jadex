@@ -470,9 +470,8 @@ public class AndroidChatService extends JadexPlatformService
 
 	private Collection<TransferInfo> getTransfers()
 	{
-		ThreadSuspendable sus = new ThreadSuspendable();
 		IIntermediateFuture<TransferInfo> fileTransfers = chatgui.getFileTransfers();
-		Collection<TransferInfo> collection = fileTransfers.get(sus);
+		Collection<TransferInfo> collection = fileTransfers.get();
 		return collection;
 	}
 

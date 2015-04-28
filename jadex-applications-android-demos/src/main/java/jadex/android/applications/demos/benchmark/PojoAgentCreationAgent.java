@@ -5,7 +5,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IArgumentsFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
@@ -23,7 +24,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-import jadex.micro.features.IMicroLifecycleFeature;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -267,9 +267,9 @@ public class PojoAgentCreationAgent
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
-				agent.getComponentFeature(IArgumentsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 				agent.killComponent();
 			}
 		});
