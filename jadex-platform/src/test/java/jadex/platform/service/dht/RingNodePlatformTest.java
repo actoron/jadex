@@ -173,6 +173,8 @@ public class RingNodePlatformTest extends TestCase
 //		System.out.println(rn1.getFingerTableString().get());
 //		System.out.println(rn2.getFingerTableString().get());
 		
+		long timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
+		System.out.println("timeout is: " + timeout2);
 		IID iid = rn3.getId().get();
 		Finger.killedId = iid;
 		System.out.println("killing platform of node: " + iid);
@@ -180,6 +182,8 @@ public class RingNodePlatformTest extends TestCase
 		
 		System.out.println("platform killed");
 		
+		timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
+		System.out.println("timeout is: " + timeout2);
 		stabilize(new IDebugRingNode[]{rn1, rn2}).get();
 //		stabilize(new IDebugRingNode[]{rn1, rn2});
 		
@@ -303,7 +307,7 @@ public class RingNodePlatformTest extends TestCase
 				}
 				catch(TimeoutException e)
 				{
-					System.out.println("to for node " + nodes[i].getId().get());
+					System.out.println("to for node " + nodes[i]);
 //					e.printStackTrace();
 				}
 			}

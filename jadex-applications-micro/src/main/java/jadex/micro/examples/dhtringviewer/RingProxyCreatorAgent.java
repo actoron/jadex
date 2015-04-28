@@ -34,6 +34,7 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.micro.examples.fireflies.MoveAction;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -385,13 +386,13 @@ public class RingProxyCreatorAgent
 		
 		System.out.println("positioning...");
 		
-		final List<IID> order = new ArrayList<IID>();
+		final ArrayList<IID> order = new ArrayList<IID>();
 		
 		Set<IID> keySet = proxies.keySet();
 		
 		order.addAll(keySet);
 		
-		order.sort(new Comparator<IID>()
+		Collections.sort(order, new Comparator<IID>()
 		{
 
 			@Override
