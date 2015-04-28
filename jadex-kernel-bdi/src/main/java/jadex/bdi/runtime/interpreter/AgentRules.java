@@ -1204,7 +1204,9 @@ public class AgentRules
 		final Object	mconfig = getConfiguration(state, rcapa);
 		
 //		// Hack!!! cache expression parameters?
-		final OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rcapa);
+		
+		final OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rcapa, BDIAgentFeature.getInternalAccess(state).getFetcher());
+		
 //		InitFetcher fet = new InitFetcher(state, rcapa, parents, arguments);
 
 		// Register belief(set) types for mplan triggers (must be done before beliefs are initialized).

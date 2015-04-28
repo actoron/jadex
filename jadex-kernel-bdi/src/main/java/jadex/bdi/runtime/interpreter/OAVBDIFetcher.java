@@ -12,6 +12,7 @@ import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.state.IOAVState;
 
@@ -50,6 +51,16 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 	 */
 	public OAVBDIFetcher(IOAVState state, Object rcapa)
 	{
+		this(state, rcapa, null);
+	}
+	
+	
+	/**
+	 *  Create a new fetcher.
+	 */
+	public OAVBDIFetcher(IOAVState state, Object rcapa, IValueFetcher parent)
+	{
+		super(parent);
 		this.state = state;
 		this.agent = BDIAgentFeature.getInternalAccess(state);
 		this.rcapa = rcapa;
