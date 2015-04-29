@@ -38,7 +38,7 @@ public class ApplicationXMLReader extends ComponentXMLReader
 	/**
 	 *  Get the type of loaded models.
 	 */
-	protected	String getModelType()
+	protected	String getModelType(String filename)
 	{
 		return ApplicationComponentFactory.FILETYPE_APPLICATION;
 	}
