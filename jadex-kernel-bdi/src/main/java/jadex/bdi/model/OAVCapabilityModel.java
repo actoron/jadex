@@ -634,25 +634,26 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				Object val = beliefset? findBeliefSetDefaultValue(state, capa, handle, configname, name)
 					: findBeliefDefaultValue(state, capa, handle, configname, name);
 				
-				if(isarg)
-				{
-					modelinfo.getConfiguration(configname).addArgument(new UnparsedExpression(name, (String)null, ""+val, null));
-				}
-				else
-				{
-					modelinfo.getConfiguration(configname).addResult(new UnparsedExpression(name, (String)null, ""+val, null));					
-				}
+				// Do not add default value (from potentially wrong capability) as value.
+//				if(isarg)
+//				{
+//					modelinfo.getConfiguration(configname).addArgument(new UnparsedExpression(name, (String)null, ""+val, null));
+//				}
+//				else
+//				{
+//					modelinfo.getConfiguration(configname).addResult(new UnparsedExpression(name, (String)null, ""+val, null));					
+//				}
 			}
 		}
 		Object val =beliefset? findBeliefSetDefaultValue(state, capa, handle, null, name)
 			: findBeliefDefaultValue(state, capa, handle, null, name);
 		if(isarg)
 		{
-			modelinfo.addArgument(new Argument(name, description, typename, ""+val));
+			modelinfo.addArgument(new Argument(name, description!=null ? description+": "+val : ""+val, typename, null));	// Do not add default value (from potentially wrong capability) as value, but only as description.
 		}
 		else
 		{
-			modelinfo.addResult(new Argument(name, description, typename, ""+val));					
+			modelinfo.addResult(new Argument(name, description!=null ? description+": "+val : ""+val, typename, null));	// Do not add default value (from potentially wrong capability) as value, but only as description.
 		}
 	}
 	

@@ -9,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.concurrent.TimeoutException;
@@ -106,18 +107,22 @@ public class ComponentTest extends TestCase
 		// Start the component.
 		final IComponentIdentifier[]	cid	= new IComponentIdentifier[1];
 		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
-		Timer	t	= new Timer(true);
-		t.schedule(new TimerTask()
+		Timer	t	= null;
+		if(timeout!=Timeout.NONE)
 		{
-			public void run()
+			t	= new Timer(true);
+			t.schedule(new TimerTask()
 			{
-				boolean	b	= finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
-				if(b && cid[0]!=null)
+				public void run()
 				{
-					cms.destroyComponent(cid[0]);
+					boolean	b	= finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
+					if(b && cid[0]!=null)
+					{
+						cms.destroyComponent(cid[0]);
+					}
 				}
-			}
-		}, timeout);
+			}, timeout);
+		}
 
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
 		componentStarted(fut);
@@ -141,7 +146,10 @@ public class ComponentTest extends TestCase
 			}
 		});
 		Map<String, Object>	res	= finished.get();
-		t.cancel();
+		if(t!=null)
+		{
+			t.cancel();
+		}
 		checkTestResults(res);
 		
 		// Remove references to Jadex resources to aid GC cleanup.

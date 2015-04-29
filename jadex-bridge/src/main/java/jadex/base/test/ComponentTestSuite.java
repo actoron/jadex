@@ -10,6 +10,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -52,15 +53,15 @@ public class ComponentTestSuite extends TestSuite
 	public static final String[]	DEFARGS	= new String[]
 	{
 		"-platformname", "testcases_*",
-//			"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
+//		"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 		"-simulation", "true",
 		"-asyncexecution", "true",
-//			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-//			"-logging", "true",
-//			"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
+//		"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
+//		"-logging", "true",
+//		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
 		"-logging_level", "java.util.logging.Level.WARNING",
-//			"-debugfutures", "true",
-//			"-nostackcompaction", "true",
+//		"-debugfutures", "true",
+//		"-nostackcompaction", "true",
 		"-gui", "false",
 		"-awareness", "false",
 		"-saveonexit", "false",
@@ -68,10 +69,10 @@ public class ComponentTestSuite extends TestSuite
 		"-autoshutdown", "false",
 		"-opengl", "false",
 		"-cli", "false",
-//			"-persist", "true", // for testing persistence
-//			"-niotcptransport", "false",
-//			"-tcptransport", "true",
-//			"-deftimeout", "-1",
+//		"-persist", "true", // for testing persistence
+//		"-niotcptransport", "false",
+//		"-tcptransport", "true",
+//		"-deftimeout", "-1",
 		"-printpass", "false",
 		// Hack!!! include ssl transport if available
 		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
@@ -214,7 +215,14 @@ public class ComponentTestSuite extends TestSuite
 									ComponentTest test = new ComponentTest(cms, model, this);
 									test.setName(abspath);
 									addTest(test);
-									ctimeout	+= test.getTimeout();
+									if(ctimeout==Timeout.NONE || test.getTimeout()==Timeout.NONE)
+									{
+										ctimeout	= Timeout.NONE;
+									}
+									else
+									{
+										ctimeout	+= test.getTimeout();
+									}
 								}
 							}
 							else if(model.getReport()!=null)
@@ -235,7 +243,15 @@ public class ComponentTestSuite extends TestSuite
 									ComponentStartTest test = new ComponentStartTest(cms, model, this);
 									test.setName(abspath);
 									addTest(test);
-									ctimeout	+= test.getDelay();	// Delay instead of timeout as start test should be finished after that.
+									if(ctimeout==Timeout.NONE)
+									{
+										ctimeout	= Timeout.NONE;
+									}
+									else
+									{
+										// Delay instead of timeout as start test should be finished after that.
+										ctimeout	+= test.getTimeout();
+									}
 								}
 							}
 						}
@@ -279,7 +295,7 @@ public class ComponentTestSuite extends TestSuite
 	{
 		final Thread	runner	= Thread.currentThread();
 		
-		if(timeout>0)
+		if(timeout!=Timeout.NONE)
 		{
 			timer	= new Timer(true);
 			timer.schedule(new TimerTask()

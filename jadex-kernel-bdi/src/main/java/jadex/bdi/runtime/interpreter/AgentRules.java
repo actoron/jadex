@@ -1,6 +1,5 @@
 package jadex.bdi.runtime.interpreter;
 
-import jadex.bdi.features.IBDIAgentFeature;
 import jadex.bdi.features.impl.BDIAgentFeature;
 import jadex.bdi.features.impl.IInternalBDIAgentFeature;
 import jadex.bdi.model.OAVBDIMetaModel;
@@ -1708,7 +1707,7 @@ public class AgentRules
 						if(isarg)
 						{
 							String name = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
-							BDIAgentFeature.getInterpreter(state).addArgument(name, result);
+							BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsResultsFeature.class).getArguments().put(name, result);
 						}
 					}
 					
@@ -2018,8 +2017,7 @@ public class AgentRules
 						if(isarg)
 						{
 							String name = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
-							BDIAgentFeature.getInterpreter(state).addArgument(name, result);
-//							BDIAgentFeature.
+							BDIAgentFeature.getInternalAccess(state).getComponentFeature(IArgumentsResultsFeature.class).getArguments().put(name, result);
 						}
 					}
 
