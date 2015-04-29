@@ -13,7 +13,6 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -56,7 +55,7 @@ public class ComponentStartTest extends	ComponentTest
 	{
 		super(cms, comp, suite);
 		// Hack??? 
-		delay = Starter.getScaledLocalDefaultTimeout(((IService)cms).getServiceIdentifier().getProviderId(), 1.0/60);
+		delay = 500;	// Do not use scaled default timeout, because delay of Timeout.NONE makes no sense.
 	}
 	
 	//-------- methods --------
