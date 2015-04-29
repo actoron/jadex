@@ -11,6 +11,7 @@ import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.IntelligentProxyInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -159,7 +160,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 //		ServiceCall invoc = ServiceCall.getCurrentInvocation();
 		Map<String, Object>	props	= new HashMap<String, Object>();
 //		props.put("method2", method.getName());
+		// Must use call from ServiceCall because could not have required chain
 		ServiceCall invoc = ServiceCall.getOrCreateNextInvocation(props);
+//		ServiceCall invoc = sic.getServiceCall();
 		
 		// Get method timeout
 		final long to = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): pi.getMethodTimeout(rsms.getComponent().getComponentIdentifier(), method);
@@ -242,6 +245,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 				future	= new Future(null);
 			}
 		}
+		
+		CallAccess.resetNextInvocation();
+		// todo: also set last call in future
 		
 		return future;
 	}
