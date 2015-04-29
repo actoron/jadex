@@ -214,7 +214,6 @@ public class RingNode implements IRingNode, IDebugRingNode
 			IComponentStep<IFinger> thisStep = this;
 			IFinger nDash = beginDash;
 			IRingNode nDashRing = beginDashRing;
-			private boolean	wasNull;
 			
 			public IFuture<IFinger> execute(IInternalAccess ia)
 			{
@@ -225,7 +224,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 					public void resultAvailable(IFinger successor)
 					{
 						IID sucId = successor.getNodeId();
-						if (id.isInInterval(nDash.getNodeId(), sucId, false, true)) {
+						if (!id.isInInterval(nDash.getNodeId(), sucId, false, true)) {
 							nDashRing.getClosestPrecedingFinger(id).addResultListener(new DefaultResultListener<IFinger>()
 							{
 								
@@ -234,7 +233,6 @@ public class RingNode implements IRingNode, IDebugRingNode
 									nDash = result;
 									if (nDash == null) {
 										nDash = fingertable.getSelf();
-										wasNull = true;
 										ret.setResult(nDash);
 									} else {
 										getRingService(nDash).addResultListener(new DefaultResultListener<IRingNode>() {

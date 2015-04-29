@@ -45,6 +45,7 @@ import javax.swing.JPanel;
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
 
+import edu.uci.ics.jung.algorithms.layout.CircleLayout;
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -115,12 +116,12 @@ protected IFinger predecessor;
 		proxies = new HashMap<IID, ProxyHolder>();
 		this.setLayout(new BorderLayout());
 		this.g = new DirectedSparseGraph<IID, String>();
-//		this.layout = new KKLayout(g);
-		this.layout = new GraphCircleLayout(g);
+		this.layout = new KKLayout(g);
+//		CircleLayout circleLayout = new CircleLayout(g);
+//		this.layout = circleLayout;
 //		this.layout = new SpringLayout(g);
 //		this.layout = new DAGLayout(g);
 		this.access = agent;
-		
 		startSearch();
 		
 		buildGraph(g);
@@ -287,6 +288,7 @@ protected IFinger predecessor;
 			{
 				refreshConnections().get();
 				buildGraph(g);
+				layout.reset();
 				vv.repaint();
 			}
 		});
@@ -298,6 +300,9 @@ protected IFinger predecessor;
 			public void componentResized(ComponentEvent e)
 			{
 				layout.setSize(vv.getSize());
+//				((CircleLayout) layout).setRadius(Math.min(vv.getSize().getWidth(), vv.getSize().getHeight())/2);
+				layout.reset();
+				
 			}
 		});
 		

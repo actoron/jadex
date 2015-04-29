@@ -65,6 +65,7 @@ public class Fingertable
 				break;
 			}
 		}
+		
 		if (!ret.isDone()) {
 			log("No closest preceding node for id " + key + ", returning null");
 			ret.setResult(null);

@@ -193,6 +193,35 @@ public class RingNodePlatformTest extends TestCase
 		assertCircle(rn1, rn2);
 	}
 	
+	
+	@Test
+	public void testFindSuccessor() throws InterruptedException {
+		rn2.join(rn1).get();
+		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		rn3.join(rn1).get();
+		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		
+//		System.out.println("RN1: " + rn1.getId().get());
+//		System.out.println("RN2: " + rn2.getId().get());
+//		System.out.println("RN3: " + rn3.getId().get());
+//		assertCircle(rn1, rn2, rn3);
+		
+		IFinger suc1_2 = rn1.findSuccessor(rn2.getId().get()).get();
+		IFinger suc1_3 = rn1.findSuccessor(rn3.getId().get()).get();
+		assertEquals(rn2.getId().get(), suc1_2.getNodeId());
+		assertEquals(rn3.getId().get(), suc1_3.getNodeId());
+		
+		IFinger suc2_1 = rn2.findSuccessor(rn1.getId().get()).get();
+		IFinger suc2_3 = rn2.findSuccessor(rn3.getId().get()).get();
+		assertEquals(rn1.getId().get(), suc2_1.getNodeId());
+		assertEquals(rn3.getId().get(), suc2_3.getNodeId());
+		
+		IFinger suc3_1 = rn3.findSuccessor(rn1.getId().get()).get();
+		IFinger suc3_2 = rn3.findSuccessor(rn2.getId().get()).get();
+		assertEquals(rn1.getId().get(), suc3_1.getNodeId());
+		assertEquals(rn2.getId().get(), suc3_2.getNodeId());
+	}
+	
 	private void assertCircle(IDebugRingNode ... rns)
 	{
 		IRingNode[] circleContents = new IRingNode[rns.length];
