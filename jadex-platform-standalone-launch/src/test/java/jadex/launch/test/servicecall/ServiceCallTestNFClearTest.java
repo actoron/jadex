@@ -10,6 +10,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
@@ -53,186 +54,166 @@ public class ServiceCallTestNFClearTest {
 			}).get(timeout);
 		
 		createProxies(platform1, platform2);
+		
+		CallAccess.resetNextInvocation();
 	}
 	
 	/**
 	 * main thread -> decoupled provided service
 	 */
 	@Test
-	public void testInvocationMainToProvided_decoupled() {
+	public void testMain_toProvidedRaw() {
+		IExternalAccess exta = createServiceAgent(platform1, RawServiceAgent.class);
+		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
+		assertServiceCallResetsServiceInvocation(service);
+	}
+	
+	/**
+	 * main thread -> direct provided service
+	 */
+	@Test
+	public void testMain_toProvidedDirect() {
+		IExternalAccess exta = createServiceAgent(platform1, DirectServiceAgent.class);
+		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
+		assertServiceCallResetsServiceInvocation(service);
+	}
+	
+	/**
+	 * main thread -> decoupled provided service
+	 */
+	@Test
+	public void testMain_toProvidedDecoupled() {
 		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		
 		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
 	
 	// ----------------- Single Platform tests -------------------
 	
-	/**
-	 * agent -> decoupled provided service
-	 */
-	@Test
-	public void testInvocationAgentToProvided_decoupled() {
-		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-
-		exta.scheduleStep(new IComponentStep<Void>() {
-
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
-				assertServiceCallResetsServiceInvocation(service);
-				return Future.DONE;
-			}
-		}).get();
-	}
 	
 	/**
 	 * agent -> raw provided service
 	 */
 	@Test
-	public void testInvocationAgentToProvided_raw() {
-		IExternalAccess exta = createServiceAgent(platform1, RawServiceAgent.class);
-
-		exta.scheduleStep(new IComponentStep<Void>() {
-
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
-				assertServiceCallResetsServiceInvocation(service);
-				return Future.DONE;
-			}
-		}).get();
+	public void testAgent_toProvidedRaw() {
+		testProvided(platform1, RawServiceAgent.class);
 	}
 	
 	/**
 	 * agent -> direct provided service
 	 */
 	@Test
-	public void testInvocationAgentToProvided_direct() {
-		IExternalAccess exta = createServiceAgent(platform1, DirectServiceAgent.class);
-
-		exta.scheduleStep(new IComponentStep<Void>() {
-
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
-				assertServiceCallResetsServiceInvocation(service);
-				return Future.DONE;
-			}
-		}).get();
+	public void testAgent_toProvidedDirect() {
+		testProvided(platform1, DirectServiceAgent.class);
+	}
+	
+	/**
+	 * agent -> decoupled provided service
+	 */
+	@Test
+	public void testAgent_toProvidedDecoupled() {
+		testProvided(platform1, DecoupledServiceAgent.class);
 	}
 	
 	/**
 	 * agent -> raw required service -> provided service -> impl
 	 */
 	@Test
-	public void testInvocationAgentToRequired_raw() {
-		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
-
-		exta2.scheduleStep(new IComponentStep<Void>() {
-
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("raw").get();
-				assertServiceCallResetsServiceInvocation(service);
-				return Future.DONE;
-			}
-		}).get();
+	public void testAgent_toRequiredRaw_toProvidedDecoupled_local() {
+		testRequiredToProvided(platform1, platform1, DecoupledServiceAgent.class, ServiceCallAgent.class, "raw", false);
 	}
 	
 	/**
-	 * agent -> raw required service -> provided service -> impl
+	 * agent -> direct required service -> provided service -> impl
 	 */
 	@Test
-	public void testInvocationAgentToRequired_direct() {
-		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
-
-		exta2.scheduleStep(new IComponentStep<Void>() {
-
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("direct").get();
-				assertServiceCallResetsServiceInvocation(service);
-				return Future.DONE;
-			}
-		}).get();
+	public void testAgent_toRequiredDirect_toProvidedDecoupled_local() {
+		testRequiredToProvided(platform1, platform1, DecoupledServiceAgent.class, ServiceCallAgent.class, "direct", false);
 	}
 	
 	/**
 	 * agent -> decoupled required service -> provided service -> impl
 	 */
 	@Test
-	public void testInvocationAgentToRequired_decoupled() {
-		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
-
-		exta2.scheduleStep(new IComponentStep<Void>() {
-
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("decoupled").get();
-				assertServiceCallResetsServiceInvocation(service);
-				return Future.DONE;
-			}
-		}).get();
+	public void testAgent_toRequiredDecoupled_toProvidedDecoupled_local() {
+		testRequiredToProvided(platform1, platform1, DecoupledServiceAgent.class, ServiceCallAgent.class, "decoupled", false);
 	}
 	
 	
 	// ----------------- Remote Platform tests -------------------
 	
 	/**
-	 * agent -> raw required service -> Remote -> provided service -> impl
+	 * agent -> raw required service -> Remote -> raw provided service -> impl
 	 */
 	@Test
-	public void testInvocationAgentToRemoteRequired_raw() {
-		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
-
-		exta2.scheduleStep(new IComponentStep<Void>() {
-
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("raw").get();
-				assertServiceCallResetsServiceInvocation(service);
-				return Future.DONE;
-			}
-		}).get();
+	public void testAgent_toRequiredRaw_toProvidedRaw_remote() {
+		testRequiredToProvided(platform1, platform2, RawServiceAgent.class, ServiceCallAgent.class, "raw", false);
 	}
 	
 	/**
-	 * agent -> raw required service -> remote -> provided service -> impl
+	 * agent -> direct required service -> Remote -> raw provided service -> impl
 	 */
 	@Test
-	public void testInvocationAgentToRemoteRequired_direct() {
-		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
-
-		exta2.scheduleStep(new IComponentStep<Void>() {
-
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("direct").get();
-				assertServiceCallResetsServiceInvocation(service);
-				return Future.DONE;
-			}
-		}).get();
+	public void testAgent_toRequiredDirect_toProvidedRaw_remote() {
+		testRequiredToProvided(platform1, platform2, RawServiceAgent.class, ServiceCallAgent.class, "direct", false);
+	}
+	
+	/**
+	 * agent -> decoupled required service -> Remote -> raw provided service -> impl
+	 */
+	@Test
+	public void testAgent_toRequiredDecoupled_toProvidedRaw_remote() {
+		testRequiredToProvided(platform1, platform2, RawServiceAgent.class, ServiceCallAgent.class, "decoupled", false);
+	}
+	
+	/**
+	 * agent -> raw required service -> Remote -> provided service -> impl
+	 */
+	@Test
+	public void testAgent_toRequiredRaw_toProvidedDecoupled_remote() {
+		testRequiredToProvided(platform1, platform2, DecoupledServiceAgent.class, ServiceCallAgent.class, "raw", false);
+	}
+	
+	/**
+	 * agent -> direct required service -> remote -> provided service -> impl
+	 */
+	@Test
+	public void testAgent_toRequiredDirect_toProvidedDecoupled_remote() {
+		testRequiredToProvided(platform1, platform2, DecoupledServiceAgent.class, ServiceCallAgent.class, "direct", false);	
 	}
 	
 	/**
 	 * agent -> decoupled required service -> remote -> provided service -> impl
 	 */
 	@Test
-	public void testInvocationAgentToRemoteRequired_decoupled() {
-		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
+	public void testAgent_toRequiredDecoupled_toProvidedDecoupled_remote() {
+		testRequiredToProvided(platform1, platform2, DecoupledServiceAgent.class, ServiceCallAgent.class, "decoupled", false);
+	}
+	
+	private void testProvided(IExternalAccess p1, Class<?> provider) {
+		testRequiredToProvided(p1, null, provider, null, null, true);
+	}
+	
+	private void testRequiredToProvided(IExternalAccess p1, IExternalAccess p2, Class<?> provider, Class<?> consumer, final String requiredOrProvidedServiceName, final boolean useProvided) {
+		IExternalAccess exta = createServiceAgent(p1, provider);
+		if (consumer != null) {
+			exta = createServiceAgent(p2, consumer);
+		}
 
-		exta2.scheduleStep(new IComponentStep<Void>() {
+		exta.scheduleStep(new IComponentStep<Void>() {
 
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("decoupled").get();
+				IServiceCallService service;
+				if (useProvided) {
+//					if (requiredOrProvidedServiceName != null) {
+//						service = (IServiceCallService) ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(requiredOrProvidedServiceName);
+//					} else {
+						service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
+//					}
+				} else {
+					service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName).get();
+				}
 				assertServiceCallResetsServiceInvocation(service);
 				return Future.DONE;
 			}
