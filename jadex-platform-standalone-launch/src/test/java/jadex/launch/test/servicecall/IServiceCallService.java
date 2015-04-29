@@ -11,6 +11,5 @@ public interface IServiceCallService
 	/**
 	 *  Dummy method for service call benchmark.
 	 */
-	@Timeout(2015)
 	public IFuture<Void>	call();
 }
