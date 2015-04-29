@@ -27,12 +27,14 @@ import org.junit.rules.TestName;
 public class ServiceCallTestNFClearTest {
 
 	
+	private static final int USER_TIMEOUT = 2015;
+
 	@Rule 
 	public TestName name = new TestName();
 	
 	private IExternalAccess platform1;
 
-//	private IExternalAccess platform2;
+	private IExternalAccess platform2;
 
 	private long timeout;
 	
@@ -46,34 +48,37 @@ public class ServiceCallTestNFClearTest {
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 			}).get(timeout);
 		
-//		platform2 = Starter.createPlatform(new String[]{"-platformname", pid,
-//				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
-//			}).get(timeout);
+		platform2 = Starter.createPlatform(new String[]{"-platformname", pid,
+				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			}).get(timeout);
+		
+		createProxies(platform1, platform2);
 	}
 	
 	/**
-	 * testcase -> remote invocation handler
+	 * main thread -> decoupled provided service
 	 */
 	@Test
-	public void testReset_AfterRemoteInvocationOnly() {
+	public void testInvocationMainToProvided_decoupled() {
 		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
 		
 		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
 	
+	// ----------------- Single Platform tests -------------------
+	
 	/**
-	 * agent -> provided service
+	 * agent -> decoupled provided service
 	 */
 	@Test
-	public void testReset_AfterLocalProvidedInvocation() {
+	public void testInvocationAgentToProvided_decoupled() {
 		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
 
 		exta.scheduleStep(new IComponentStep<Void>() {
 
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
-//				IServiceCallService service = SServiceProvider.getService(ia, IServiceCallService.class).get(timeout);
 				IServiceCallService service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
 				assertServiceCallResetsServiceInvocation(service);
 				return Future.DONE;
@@ -85,14 +90,13 @@ public class ServiceCallTestNFClearTest {
 	 * agent -> raw provided service
 	 */
 	@Test
-	public void testReset_AfterLocalRawProvidedInvocation() {
+	public void testInvocationAgentToProvided_raw() {
 		IExternalAccess exta = createServiceAgent(platform1, RawServiceAgent.class);
 
 		exta.scheduleStep(new IComponentStep<Void>() {
 
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
-//				IServiceCallService service = SServiceProvider.getService(ia, IServiceCallService.class).get(timeout);
 				IServiceCallService service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
 				assertServiceCallResetsServiceInvocation(service);
 				return Future.DONE;
@@ -101,12 +105,30 @@ public class ServiceCallTestNFClearTest {
 	}
 	
 	/**
-	 * agent -> raw required service -> (proxy?) -> provided service -> impl
+	 * agent -> direct provided service
 	 */
 	@Test
-	public void testReset_AfterRawRequiredInvocation() {
+	public void testInvocationAgentToProvided_direct() {
+		IExternalAccess exta = createServiceAgent(platform1, DirectServiceAgent.class);
+
+		exta.scheduleStep(new IComponentStep<Void>() {
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				IServiceCallService service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
+				assertServiceCallResetsServiceInvocation(service);
+				return Future.DONE;
+			}
+		}).get();
+	}
+	
+	/**
+	 * agent -> raw required service -> provided service -> impl
+	 */
+	@Test
+	public void testInvocationAgentToRequired_raw() {
 		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IExternalAccess exta2 = createServiceAgent(platform1, ServiceCallAgent.class);
+		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
 
 		exta2.scheduleStep(new IComponentStep<Void>() {
 
@@ -120,12 +142,12 @@ public class ServiceCallTestNFClearTest {
 	}
 	
 	/**
-	 * agent -> raw required service -> (proxy?) -> provided service -> impl
+	 * agent -> raw required service -> provided service -> impl
 	 */
 	@Test
-	public void testReset_AfterDirectRequiredInvocation() {
+	public void testInvocationAgentToRequired_direct() {
 		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IExternalAccess exta2 = createServiceAgent(platform1, ServiceCallAgent.class);
+		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
 
 		exta2.scheduleStep(new IComponentStep<Void>() {
 
@@ -139,12 +161,72 @@ public class ServiceCallTestNFClearTest {
 	}
 	
 	/**
-	 * agent -> decoupled required service -> (proxy?) -> provided service -> impl
+	 * agent -> decoupled required service -> provided service -> impl
 	 */
 	@Test
-	public void testReset_AfterDecoupledRequiredInvocation() {
+	public void testInvocationAgentToRequired_decoupled() {
 		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IExternalAccess exta2 = createServiceAgent(platform1, ServiceCallAgent.class);
+		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
+
+		exta2.scheduleStep(new IComponentStep<Void>() {
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("decoupled").get();
+				assertServiceCallResetsServiceInvocation(service);
+				return Future.DONE;
+			}
+		}).get();
+	}
+	
+	
+	// ----------------- Remote Platform tests -------------------
+	
+	/**
+	 * agent -> raw required service -> Remote -> provided service -> impl
+	 */
+	@Test
+	public void testInvocationAgentToRemoteRequired_raw() {
+		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
+		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
+
+		exta2.scheduleStep(new IComponentStep<Void>() {
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("raw").get();
+				assertServiceCallResetsServiceInvocation(service);
+				return Future.DONE;
+			}
+		}).get();
+	}
+	
+	/**
+	 * agent -> raw required service -> remote -> provided service -> impl
+	 */
+	@Test
+	public void testInvocationAgentToRemoteRequired_direct() {
+		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
+		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
+
+		exta2.scheduleStep(new IComponentStep<Void>() {
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("direct").get();
+				assertServiceCallResetsServiceInvocation(service);
+				return Future.DONE;
+			}
+		}).get();
+	}
+	
+	/**
+	 * agent -> decoupled required service -> remote -> provided service -> impl
+	 */
+	@Test
+	public void testInvocationAgentToRemoteRequired_decoupled() {
+		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
+		IExternalAccess exta2 = createServiceAgent(platform2, ServiceCallAgent.class);
 
 		exta2.scheduleStep(new IComponentStep<Void>() {
 
@@ -158,7 +240,7 @@ public class ServiceCallTestNFClearTest {
 	}
 	
 	private void assertServiceCallResetsServiceInvocation(IServiceCallService service) {
-//		ServiceCall.getOrCreateNextInvocation().setTimeout(2015);
+		ServiceCall.getOrCreateNextInvocation().setTimeout(USER_TIMEOUT);
 		service.call().get();
 		long timeout2 = -1;
 		ServiceCall nextInvocation = ServiceCall.getOrCreateNextInvocation();
@@ -197,5 +279,16 @@ public class ServiceCallTestNFClearTest {
 		IComponentIdentifier identifier = future.get();
 		
 		return cms.getExternalAccess(identifier).get();
+	}
+	
+	private void createProxies(IExternalAccess ... platforms)
+	{
+		for(int i = 0; i < platforms.length; i++)
+		{
+			for(int j = 0; j < platforms.length; j++)
+			{
+				Starter.createProxy(platforms[i], platforms[j]).get(timeout);
+			}
+		}
 	}
 }
