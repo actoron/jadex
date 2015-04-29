@@ -143,14 +143,6 @@ public interface IInternalBDIAgentFeature
 	public <T> IFuture<T> scheduleImmediate(IComponentStep<T> step, Object scope);
 	
 	/**
-	 *  Add a default value for an argument (if not already present).
-	 *  Called once for each argument during init.
-	 *  @param name	The argument name.
-	 *  @param value	The argument value.
-	 */
-	public boolean	addArgument(String name, Object value);
-
-	/**
 	 *  Called when the agent is removed from the platform.
 	 */
 	public void cleanup();

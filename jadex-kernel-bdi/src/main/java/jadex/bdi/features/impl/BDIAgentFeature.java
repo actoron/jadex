@@ -41,6 +41,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.IExtensionInstance;
@@ -1488,41 +1489,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return new OAVBDIFetcher(state, initcapa!=null ? findSubcapability(initcapa) : ragent);
 	}
 	
-	/**
-	 *  Init the arguments and results.
-	 */
-	public IFuture initArguments(IModelInfo model, final String config, Map arguments)
-	{
-		// Do nothing: args and results are inited as beliefs.
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Add a default value for an argument (if not already present).
-	 *  Called once for each argument during init.
-	 *  @param name	The argument name.
-	 *  @param value	The argument value.
-	 */
-	public boolean	addArgument(String name, Object value)
-	{
-		// Not supported by BDI XML schema -> Called during belief init to make arguments available to outside.
-		if(arguments==null)
-			arguments = new HashMap();
-		return arguments.put(name, value) == null;
-	}
-
-	/**
-	 *  Add a default value for a result (if not already present).
-	 *  Called once for each result during init.
-	 *  @param name	The result name.
-	 *  @param value	The result value.
-	 */
-	public void	addDefaultResult(String name, Object value)
-	{
-		// Not supported by BDI XML schema -> Shouldn't be called
-		throw new UnsupportedOperationException();		
-	}
-
 	/**
 	 *  Get the internal access.
 	 *  @return The internal access.
