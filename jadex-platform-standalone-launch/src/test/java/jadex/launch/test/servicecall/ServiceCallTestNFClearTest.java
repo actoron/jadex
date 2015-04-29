@@ -1,9 +1,6 @@
 package jadex.launch.test.servicecall;
 
-import java.util.Map;
-
-import javax.validation.constraints.AssertTrue;
-
+import static org.junit.Assert.assertNotEquals;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -11,22 +8,21 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.dht.IDebugRingNode;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.platform.service.dht.RingAgent;
+
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-
-import static org.junit.Assert.*;
 
 public class ServiceCallTestNFClearTest {
 
@@ -36,7 +32,7 @@ public class ServiceCallTestNFClearTest {
 	
 	private IExternalAccess platform1;
 
-	private IExternalAccess platform2;
+//	private IExternalAccess platform2;
 
 	private long timeout;
 	
@@ -50,9 +46,9 @@ public class ServiceCallTestNFClearTest {
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 			}).get(timeout);
 		
-		platform2 = Starter.createPlatform(new String[]{"-platformname", pid,
-				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
-			}).get(timeout);
+//		platform2 = Starter.createPlatform(new String[]{"-platformname", pid,
+//				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+//			}).get(timeout);
 	}
 	
 	/**
@@ -77,7 +73,84 @@ public class ServiceCallTestNFClearTest {
 
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
-				IServiceCallService service = SServiceProvider.getService(ia, IServiceCallService.class).get(timeout);
+//				IServiceCallService service = SServiceProvider.getService(ia, IServiceCallService.class).get(timeout);
+				IServiceCallService service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
+				assertServiceCallResetsServiceInvocation(service);
+				return Future.DONE;
+			}
+		}).get();
+	}
+	
+	/**
+	 * agent -> raw provided service
+	 */
+	@Test
+	public void testReset_AfterLocalRawProvidedInvocation() {
+		IExternalAccess exta = createServiceAgent(platform1, RawServiceAgent.class);
+
+		exta.scheduleStep(new IComponentStep<Void>() {
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+//				IServiceCallService service = SServiceProvider.getService(ia, IServiceCallService.class).get(timeout);
+				IServiceCallService service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
+				assertServiceCallResetsServiceInvocation(service);
+				return Future.DONE;
+			}
+		}).get();
+	}
+	
+	/**
+	 * agent -> raw required service -> (proxy?) -> provided service -> impl
+	 */
+	@Test
+	public void testReset_AfterRawRequiredInvocation() {
+		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
+		IExternalAccess exta2 = createServiceAgent(platform1, ServiceCallAgent.class);
+
+		exta2.scheduleStep(new IComponentStep<Void>() {
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("raw").get();
+				assertServiceCallResetsServiceInvocation(service);
+				return Future.DONE;
+			}
+		}).get();
+	}
+	
+	/**
+	 * agent -> raw required service -> (proxy?) -> provided service -> impl
+	 */
+	@Test
+	public void testReset_AfterDirectRequiredInvocation() {
+		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
+		IExternalAccess exta2 = createServiceAgent(platform1, ServiceCallAgent.class);
+
+		exta2.scheduleStep(new IComponentStep<Void>() {
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("direct").get();
+				assertServiceCallResetsServiceInvocation(service);
+				return Future.DONE;
+			}
+		}).get();
+	}
+	
+	/**
+	 * agent -> decoupled required service -> (proxy?) -> provided service -> impl
+	 */
+	@Test
+	public void testReset_AfterDecoupledRequiredInvocation() {
+		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
+		IExternalAccess exta2 = createServiceAgent(platform1, ServiceCallAgent.class);
+
+		exta2.scheduleStep(new IComponentStep<Void>() {
+
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				IServiceCallService service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("decoupled").get();
 				assertServiceCallResetsServiceInvocation(service);
 				return Future.DONE;
 			}
@@ -85,7 +158,7 @@ public class ServiceCallTestNFClearTest {
 	}
 	
 	private void assertServiceCallResetsServiceInvocation(IServiceCallService service) {
-		ServiceCall.getOrCreateNextInvocation().setTimeout(2015);
+//		ServiceCall.getOrCreateNextInvocation().setTimeout(2015);
 		service.call().get();
 		long timeout2 = -1;
 		ServiceCall nextInvocation = ServiceCall.getOrCreateNextInvocation();
