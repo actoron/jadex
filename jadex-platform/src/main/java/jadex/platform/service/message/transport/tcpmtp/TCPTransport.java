@@ -709,7 +709,7 @@ public class TCPTransport implements ITransport
 		
 		if(msgservice==null)
 		{
-			SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 				.addResultListener(new DelegationResultListener<IMessageService>(ret)
 			{
 				public void customResultAvailable(IMessageService result)

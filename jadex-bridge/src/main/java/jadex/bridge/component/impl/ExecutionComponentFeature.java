@@ -255,16 +255,23 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		final Future<T> ret = new Future<T>();
 		
+		if(delay==0)
+			System.out.println("sched start");
+		
 //		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 		{
 			public void customResultAvailable(IClockService cs)
 			{
+				if(delay==0)
+					System.out.println("sched mid");
 				ITimedObject	to	= new ITimedObject()
 				{
 					public void timeEventOccurred(long currenttime)
 					{
+						if(delay==0)
+							System.out.println("sched end");
 						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
 					}
 					

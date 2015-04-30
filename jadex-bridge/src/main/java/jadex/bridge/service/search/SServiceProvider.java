@@ -1043,6 +1043,7 @@ public class SServiceProvider
 			{
 				if(proxy)
 				{
+//					ret.setException(new RuntimeException("Wrong calling thread: "+Thread.currentThread()));
 					component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)

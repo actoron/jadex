@@ -209,6 +209,7 @@ public class ComponentTestSuite extends TestSuite
 							
 							if(istest)
 							{
+								System.out.print(".");
 //								System.out.println("Test: "+abspath);
 								if(runtests)
 								{
@@ -227,6 +228,7 @@ public class ComponentTestSuite extends TestSuite
 							}
 							else if(model.getReport()!=null)
 							{
+								System.out.print(".");
 //								System.out.println("Broken: "+abspath);
 								if(broken)
 								{
@@ -237,6 +239,7 @@ public class ComponentTestSuite extends TestSuite
 							}
 							else
 							{
+								System.out.print(".");
 //								System.out.println("Start: "+abspath);
 								if(start)
 								{
