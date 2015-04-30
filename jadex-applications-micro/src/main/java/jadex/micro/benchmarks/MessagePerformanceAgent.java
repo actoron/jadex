@@ -296,7 +296,17 @@ public class MessagePerformanceAgent
 								if(current<=msgcnt)
 								{
 //									System.out.println("send step scheduled");
-									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, this);
+									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, this).addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result)
+										{
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											exception.printStackTrace();
+										}
+									});
 								}
 								else
 								{
