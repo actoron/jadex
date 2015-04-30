@@ -171,7 +171,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			{
 				final boolean[]	services	= new boolean[2];
 
-				SServiceProvider.getService(access, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(access, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -194,7 +194,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					}
 				}));
 						
-				SServiceProvider.getService(access, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(access, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -382,7 +382,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				SServiceProvider.getService(access, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.getService(access, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)

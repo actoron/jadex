@@ -1127,8 +1127,8 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else
 				{
-					exeservice	= SServiceProvider.getLocalService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-					cms	=  SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					exeservice	= SServiceProvider.getLocalService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+					cms	=  SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 					ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
 					CollectionResultListener<Void> lis = new CollectionResultListener<Void>(tps.length, true,
 						new ExceptionDelegationResultListener<Collection<Void>, Void>(ret)
@@ -1141,7 +1141,7 @@ public class MessageService extends BasicService implements IMessageService
 							}
 							else
 							{
-								addrservice	= SServiceProvider.getLocalService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+								addrservice	= SServiceProvider.getLocalService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 								addrservice.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<TransportAddressBook, Void>(ret)
 								{
 									public void customResultAvailable(TransportAddressBook result)
@@ -1153,8 +1153,8 @@ public class MessageService extends BasicService implements IMessageService
 										{
 											public void customResultAvailable(Void result) 
 											{
-												clockservice	= SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-												libservice	= SServiceProvider.getLocalService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+												clockservice	= SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+												libservice	= SServiceProvider.getLocalService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 												libservice.getClassLoader(component.getModel().getResourceIdentifier())
 													.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 												{
@@ -2732,7 +2732,7 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else if(!releasedatecache.containsKey(rec.getRoot()))
 				{
-					SServiceProvider.getService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener<IAwarenessManagementService>()
+					SServiceProvider.getService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false).addResultListener(new IResultListener<IAwarenessManagementService>()
 					{
 						public void resultAvailable(IAwarenessManagementService ams)
 						{

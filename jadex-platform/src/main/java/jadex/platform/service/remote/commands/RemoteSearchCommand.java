@@ -239,7 +239,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 							{
 								Class<?> cl = type!=null ? type.getType(ia.getClassLoader(), ia.getModel().getAllImports()) : null;
 								
-								ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(ia, cl, scope, (IAsyncFilter)filter);
+								ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(ia, cl, scope, (IAsyncFilter)filter, false);
 								res.addResultListener(new IIntermediateResultListener<IService>()
 								{
 									int cnt = 0;	

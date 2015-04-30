@@ -140,7 +140,8 @@ public class UserAgent
 		};
 		
 		ITerminableIntermediateFuture<ICryptoService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
-		SServiceProvider.rankServicesWithScores(sfut, ranker, null).addResultListener(new IResultListener<Collection<Tuple2<ICryptoService, Double>>>()
+		SServiceProvider.rankServicesWithScores(sfut, ranker, null).addResultListener(agent.getComponentFeature(IExecutionFeature.class)
+			.createResultListener(new IResultListener<Collection<Tuple2<ICryptoService, Double>>>()
 		{
 			public void resultAvailable(Collection<Tuple2<ICryptoService, Double>> res)
 			{
@@ -169,7 +170,7 @@ public class UserAgent
 //					exception.printStackTrace();
 				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, step);
 			}	
-		});
+		}));
 	}
 	
 	/**

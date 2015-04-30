@@ -136,7 +136,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		// Fetch marshal service first time.		
 		if(marshal==null)
 		{
-			marshal	= SServiceProvider.getLocalService(ia, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			marshal	= SServiceProvider.getLocalService(ia, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 			filter = new IFilter()
 			{
 				public boolean filter(Object object)

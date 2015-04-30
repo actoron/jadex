@@ -174,8 +174,10 @@ public class ServiceInvocationContext
 
 		// Is next call defined by user?
 		this.call = CallAccess.getNextInvocation();
-		
 		this.lastcall = CallAccess.getCurrentInvocation();
+		// Delete next invocation to ensure that data is erased before decoupling
+		// Problem: how to ensure that results are set in lastcall
+		CallAccess.resetNextInvocation();
 		
 //		if(caller!=null && caller.toString().startsWith("rms@") && method.getName().equals("getExternalAccess") && call==null)
 //		{

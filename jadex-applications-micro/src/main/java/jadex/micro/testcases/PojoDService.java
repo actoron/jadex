@@ -59,7 +59,6 @@ public class PojoDService implements IDService
 							{
 								public void customResultAvailable(IDService otherser)
 								{
-//									IDService otherser = (IDService)result;
 									otherser.testServiceArgument(PojoDService.this)
 										.addResultListener(new DelegationResultListener<Boolean>(res));
 								}

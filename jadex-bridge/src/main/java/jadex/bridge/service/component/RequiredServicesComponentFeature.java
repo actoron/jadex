@@ -476,11 +476,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getService(getComponent(), type).addResultListener(new DelegationResultListener<T>(fut)
 		{
-			public void customResultAvailable(Object result)
-			{
-				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
-			}
+			// Not necessary any longer
+//			public void customResultAvailable(Object result)
+//			{
+//				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
+//					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
+//			}
 		});
 		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
 	}
@@ -495,11 +496,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getService(getComponent(), type, scope).addResultListener(new DelegationResultListener<T>(fut)
 		{
-			public void customResultAvailable(Object result)
-			{
-				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
-			}
+			// Not necessary any longer
+//			public void customResultAvailable(Object result)
+//			{
+//				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
+//					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
+//			}
 		});
 		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
 	}
@@ -515,11 +517,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		final TerminableIntermediateFuture<T>	fut	= new TerminableIntermediateFuture<T>();
 		SServiceProvider.getServices(getComponent(), type).addResultListener(new IntermediateDelegationResultListener<T>(fut)
 		{
-			public void customIntermediateResultAvailable(Object result)
-			{
-				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(),
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
-			}
+			// Not necessary any longer
+//			public void customIntermediateResultAvailable(Object result)
+//			{
+//				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(),
+//					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
+//			}
 		});
 		return (ITerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
 	}
@@ -535,11 +538,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		final TerminableIntermediateFuture<T>	fut	= new TerminableIntermediateFuture<T>();
 		SServiceProvider.getServices(getComponent(), type, scope).addResultListener(new IntermediateDelegationResultListener<T>(fut)
 		{
-			public void customIntermediateResultAvailable(Object result)
-			{
-				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(),
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
-			}
+			// Not necessary any longer
+//			public void customIntermediateResultAvailable(Object result)
+//			{
+//				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(),
+//					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
+//			}
 		});
 		return (ITerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
 	}
@@ -555,11 +559,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getService(getComponent(), cid, type).addResultListener(new DelegationResultListener<T>(fut)
 		{
-			public void customResultAvailable(Object result)
-			{
-				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
-			}
+			// Not necessary any longer
+//			public void customResultAvailable(Object result)
+//			{
+//				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
+//					(IService)result, null, new RequiredServiceInfo(type), null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier())));
+//			}
 		});
 		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent()));
 	}

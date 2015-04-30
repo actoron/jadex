@@ -982,7 +982,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 												{
 													// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
 													ls.getClassLoader(ia.getModel().getResourceIdentifier())
-														.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Object>(future)
+														.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ClassLoader, Object>(future)
 													{
 														public void customResultAvailable(final ClassLoader cl)
 														{
@@ -1018,7 +1018,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 																}
 															});
 														}
-													});
+													}));
 												}
 											});
 										}
@@ -1613,6 +1613,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
 		
+		// Update component identifiers with addresses
 		ITraverseProcessor bpreproc = new ITraverseProcessor()
 		{
 			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
@@ -1644,6 +1645,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		};
 		procs.add(bpreproc);
 		
+		// Handle pojo services
 		bpreproc = new ITraverseProcessor()
 		{
 			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
@@ -1667,6 +1669,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		};
 		procs.add(bpreproc);
 
+		// Handle remote references
 		bpreproc = new ITraverseProcessor()
 		{
 			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)

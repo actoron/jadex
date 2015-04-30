@@ -227,6 +227,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	protected void	addService(IInternalService service, ProvidedServiceInfo info)
 	{
+		if(BasicServiceInvocationHandler.isRequiredServiceProxy(service))
+			System.out.println("sdfsddgsdgg");
+		
 		// Find service types
 //		Class<?>	type	= info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
 		Class<?>	type	= service.getServiceIdentifier().getServiceType().getType(component.getClassLoader(), component.getModel().getAllImports());

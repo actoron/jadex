@@ -309,8 +309,7 @@ public abstract class TestAgent
 						exception.printStackTrace();
 						super.exceptionOccurred(exception);
 					}
-				}
-				);
+				});
 			}
 		});
 		

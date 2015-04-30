@@ -108,9 +108,9 @@ public class RemoteServiceManagementAgent
 		STransformation.registerClass(DefaultHashcodeMethodReplacement.class);
 		STransformation.registerClass(GetComponentFeatureMethodReplacement.class);
 		
-		final ILibraryService libservice = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		final IMarshalService marshalservice = SServiceProvider.getLocalService(agent, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		final IMessageService msgservice = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		final ILibraryService libservice = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+		final IMarshalService marshalservice = SServiceProvider.getLocalService(agent, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+		final IMessageService msgservice = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 //		boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
 		
 		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
@@ -362,7 +362,7 @@ public class RemoteServiceManagementAgent
 									pre.setResult(null);
 								}
 								
-								pre.addResultListener(new IResultListener<Void>()
+								pre.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void v)
 									{
@@ -426,7 +426,7 @@ public class RemoteServiceManagementAgent
 											agent.getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
 										}
 									}
-								});
+								}));
 							}
 						}
 						

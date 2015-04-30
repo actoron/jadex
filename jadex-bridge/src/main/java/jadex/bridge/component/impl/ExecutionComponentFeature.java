@@ -256,7 +256,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		final Future<T> ret = new Future<T>();
 		
 //		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 		{
 			public void customResultAvailable(IClockService cs)
@@ -302,7 +302,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(IClockService cs)
@@ -469,7 +469,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
 				.addResultListener(new IResultListener<IExecutionService>()
 			{
 				public void resultAvailable(IExecutionService exe)

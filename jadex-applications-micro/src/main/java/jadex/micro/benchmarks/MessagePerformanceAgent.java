@@ -220,11 +220,13 @@ public class MessagePerformanceAgent
 					public void resultAvailable(final IComponentIdentifier receiver)
 					{
 						IComponentStep<Void> send = new IComponentStep<Void>()
-						{
+						{							
 							Random r = new Random();
 							
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
+//								System.out.println("send step started");
+								
 								if(current==1)
 								{
 									System.out.println("Now sending " + msgcnt + " messages to " + receiver);
@@ -267,11 +269,12 @@ public class MessagePerformanceAgent
 									
 									IFuture<Void>	fut	= agent.getComponentFeature(IMessageFeature.class).sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
 									fut.addResultListener(crl);
+									final int fi = i;
 									fut.addResultListener(new IResultListener<Void>()
 									{
 										public void resultAvailable(Void result)
 										{
-//													System.out.println("message sent");
+											System.out.println("message sent: "+fi);
 										}
 										
 										public void exceptionOccurred(Exception exception)
@@ -292,10 +295,12 @@ public class MessagePerformanceAgent
 								current = i+1;
 								if(current<=msgcnt)
 								{
+//									System.out.println("send step scheduled");
 									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, this);
 								}
 								else
 								{
+//									System.out.println("send step end");
 									System.out.println("all messages queued for sending");
 								}
 								

@@ -840,78 +840,79 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public <T> IFuture<T> createProxy(final IService service, final RequiredServiceInfo info, final RequiredServiceBinding binding)
 	{
-		final Future<T> ret = new Future<T>();
-//		final Class type = info.getType(info, cl)
-//		ret.addResultListener(new IResultListener()
+		return new Future<T>((T)service);
+	}
+////		final Class type = info.getType(info, cl)
+////		ret.addResultListener(new IResultListener()
+////		{
+////			public void exceptionOccurred(Exception exception)
+////			{
+////			}
+////			public void resultAvailable(Object result)
+////			{
+////				System.out.println("createProxy for "+service+": "+result);
+////			}
+////		});
+////		return service;
+////		if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
+//		
+//		SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 //		{
-//			public void exceptionOccurred(Exception exception)
+//			public void customResultAvailable(final IComponentManagementService cms)
 //			{
-//			}
-//			public void resultAvailable(Object result)
-//			{
-//				System.out.println("createProxy for "+service+": "+result);
+////				System.out.println("createProxy 1:"+service);
+////				cms.getComponentAdapter((IComponentIdentifier)provider.getId())
+////					.addResultListener(new ExceptionDelegationResultListener<IComponentAdapter, T>(ret)
+////				{
+////					public void customResultAvailable(final IComponentAdapter adapter)
+////					{
+//						IFuture<T>	fut	= ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<T>()
+//						{
+//							public IFuture<T> execute(IInternalAccess ia)
+//							{
+////								System.out.println("createProxy 2:"+service);
+//								
+//								T ret = (T)BasicServiceInvocationHandler.createRequiredServiceProxy(ia, service, DefaultServiceFetcher.this, info, binding, realtime);
+//								
+//								IServiceIdentifier sid = service.getServiceIdentifier();
+//								
+//								// Check if no property provider has been created before and then create and init properties
+//								if(!ia.getComponentFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(sid))
+//								{
+//									INFMixedPropertyProvider nfpp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(service.getServiceIdentifier());
+//									
+//									List<NFRPropertyInfo> nfprops = info.getNFRProperties();
+//									if(nfprops!=null && nfprops.size()>0)
+//									{
+//										for(NFRPropertyInfo nfprop: nfprops)
+//										{
+//											MethodInfo mi = nfprop.getMethodInfo();
+//											Class<?> clazz = nfprop.getClazz().getType(ia.getClassLoader(), ia.getModel().getAllImports());
+//											INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, ia, (IService)ret, nfprop.getMethodInfo());
+//											if(mi==null)
+//											{
+//												nfpp.addNFProperty(nfp);
+//											}
+//											else
+//											{
+//												nfpp.addMethodNFProperty(mi, nfp);
+//											}
+//										}
+//									}
+//								}
+//								
+//								return new Future<T>(ret);
+//							}
+//						});
+//						fut.addResultListener(new DelegationResultListener<T>(ret));
+////					}
+////				});
 //			}
 //		});
-//		return service;
-//		if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
-		
-		SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
-			{
-//				System.out.println("createProxy 1:"+service);
-//				cms.getComponentAdapter((IComponentIdentifier)provider.getId())
-//					.addResultListener(new ExceptionDelegationResultListener<IComponentAdapter, T>(ret)
-//				{
-//					public void customResultAvailable(final IComponentAdapter adapter)
-//					{
-						IFuture<T>	fut	= ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<T>()
-						{
-							public IFuture<T> execute(IInternalAccess ia)
-							{
-//								System.out.println("createProxy 2:"+service);
-								
-								T ret = (T)BasicServiceInvocationHandler.createRequiredServiceProxy(ia, service, DefaultServiceFetcher.this, info, binding, realtime);
-								
-								IServiceIdentifier sid = service.getServiceIdentifier();
-								
-								// Check if no property provider has been created before and then create and init properties
-								if(!ia.getComponentFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(sid))
-								{
-									INFMixedPropertyProvider nfpp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(service.getServiceIdentifier());
-									
-									List<NFRPropertyInfo> nfprops = info.getNFRProperties();
-									if(nfprops!=null && nfprops.size()>0)
-									{
-										for(NFRPropertyInfo nfprop: nfprops)
-										{
-											MethodInfo mi = nfprop.getMethodInfo();
-											Class<?> clazz = nfprop.getClazz().getType(ia.getClassLoader(), ia.getModel().getAllImports());
-											INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, ia, (IService)ret, nfprop.getMethodInfo());
-											if(mi==null)
-											{
-												nfpp.addNFProperty(nfp);
-											}
-											else
-											{
-												nfpp.addMethodNFProperty(mi, nfp);
-											}
-										}
-									}
-								}
-								
-								return new Future<T>(ret);
-							}
-						});
-						fut.addResultListener(new DelegationResultListener<T>(ret));
-//					}
-//				});
-			}
-		});
-		
-		return ret;
-	}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Simple listener that can store the result in a member variable.

@@ -90,6 +90,7 @@ public class ChatE5Agent
 									{
 										public void resultAvailable(IChatService cs)
 										{
+											System.out.println("is on: "+IComponentIdentifier.LOCAL.get());
 											cs.message(agent.getComponentIdentifier().toString(), "Private hello from: "+nickname);
 										}
 									});
