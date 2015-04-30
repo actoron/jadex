@@ -59,6 +59,12 @@ public class MBody
 	/** The precondition method cached for speed. */
 	protected volatile MethodInfo contextconditionmethod;
 
+	/**
+	 *	Bean Constructor. 
+	 */
+	public MBody()
+	{
+	}
 	
 	/**
 	 *  Create a new mbody.

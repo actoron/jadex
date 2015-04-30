@@ -31,6 +31,13 @@ public class MParameter extends MElement
 	protected Boolean multi;
 	
 	/**
+	 *	Bean Constructor. 
+	 */
+	public MParameter()
+	{
+	}
+	
+	/**
 	 *  Create a new parameter.
 	 */
 	public MParameter(FieldInfo ftarget)

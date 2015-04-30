@@ -31,6 +31,13 @@ public class MProcessableElement extends MElement
 	protected String excludemode;
 	
 	/**
+	 *	Bean Constructor. 
+	 */
+	public MProcessableElement()
+	{
+	}
+	
+	/**
 	 * 
 	 */
 	public MProcessableElement(String name, boolean posttoall, boolean randomselection, String excludemode)

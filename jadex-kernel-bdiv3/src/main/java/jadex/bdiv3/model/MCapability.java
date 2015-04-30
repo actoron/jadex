@@ -26,6 +26,13 @@ public class MCapability extends MElement
 	protected List<MConfiguration> configurations;
 	
 	/**
+	 *	Bean Constructor. 
+	 */
+	public MCapability()
+	{
+	}
+	
+	/**
 	 *  Create a capability.
 	 */
 	public MCapability(String name)

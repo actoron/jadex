@@ -2,6 +2,7 @@ package jadex.bdiv3.model;
 
 import jadex.bridge.modelinfo.UnparsedExpression;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public class MConfiguration
 	protected List<UnparsedExpression> initialplans;
 
 	/**
-	 * 
+	 *	Bean Constructor. 
 	 */
 	public MConfiguration()
 	{
@@ -109,5 +110,42 @@ public class MConfiguration
 		this.initialbeliefs = initialbeliefs;
 	}
 	
+	/**
+	 *  Add an initial belief.
+	 *  @param upex	The expression.
+	 */
+	public void	addInitialBelief(UnparsedExpression upex)
+	{
+		if(initialbeliefs==null)
+		{
+			initialbeliefs	= new ArrayList<UnparsedExpression>();
+		}
+		initialbeliefs.add(upex);
+	}
 	
+	/**
+	 *  Add an initial goal.
+	 *  @param upex	The expression.
+	 */
+	public void	addInitialGoal(UnparsedExpression upex)
+	{
+		if(initialgoals==null)
+		{
+			initialgoals	= new ArrayList<UnparsedExpression>();
+		}
+		initialgoals.add(upex);
+	}
+	
+	/**
+	 *  Add an initial plan.
+	 *  @param upex	The expression.
+	 */
+	public void	addInitialPlan(UnparsedExpression upex)
+	{
+		if(initialplans==null)
+		{
+			initialplans	= new ArrayList<UnparsedExpression>();
+		}
+		initialplans.add(upex);
+	}
 }

@@ -113,7 +113,7 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 		{
 			public void customResultAvailable(Void result)
 			{
-				ILibraryService	libservice	= SServiceProvider.getLocalService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				libservice	= SServiceProvider.getLocalService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				loader = new BDIV3XModelLoader();
 				
 				libservicelistener = new ILibraryServiceListener()

@@ -21,6 +21,13 @@ public class MCondition extends MElement
 	protected ConstructorInfo ctarget;
 	
 	/**
+	 *	Bean Constructor. 
+	 */
+	public MCondition()
+	{
+	}
+	
+	/**
 	 *  Create a new mcondition. 
 	 */
 	public MCondition(String name, List<EventType> events)

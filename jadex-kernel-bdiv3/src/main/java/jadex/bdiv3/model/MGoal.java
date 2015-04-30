@@ -96,6 +96,13 @@ public class MGoal extends MClassBasedElement
 	protected Map<String, MethodInfo> srmappings;
 	
 	/**
+	 *	Bean Constructor. 
+	 */
+	public MGoal()
+	{
+	}
+	
+	/**
 	 *  Create a new goal model element.
 	 */
 	public MGoal(String name, String target, boolean posttoall, boolean randomselection, String excludemode,
