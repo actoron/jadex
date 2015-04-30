@@ -17,16 +17,18 @@
 		<!-- A translation plan, from which an instance is created
 			when the agent is born. Reacts on translation request messages. -->
 		<plan name="egtrans">
-			<body class="EnglishGermanTranslationPlanB1"/>
-			<waitqueue>
+		    			<body class="EnglishGermanTranslationPlanB1"/>
+<!-- 
+		    									<waitqueue>
 				<messageevent ref="request_translation"/>
 			</waitqueue>
+			 -->
 		</plan>
 	</plans>
-
+<!-- 
 	<events>
-		<!-- Specifies a translation request being all
-			messages with performative request. -->
+		<!- - Specifies a translation request being all
+			messages with performative request. - ->
 		<messageevent name="request_translation" direction="receive" type="fipa">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>jadex.bridge.fipa.SFipa.REQUEST</value>
@@ -37,7 +39,8 @@
 	<properties>
 		<property name="debugging">false</property>
     </properties>
-
+ -->
+    
 	<configurations>
 		<configuration name="default">
 			<plans>
@@ -45,6 +48,6 @@
 			</plans>
 		</configuration>
 	</configurations>
-
+	
 </agent>
 

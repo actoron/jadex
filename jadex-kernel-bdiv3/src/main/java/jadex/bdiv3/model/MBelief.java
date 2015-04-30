@@ -49,6 +49,13 @@ public class MBelief extends MElement
 	protected Collection<EventType> rawevents;
 	
 	/**
+	 *	Bean Constructor. 
+	 */
+	public MBelief()
+	{
+	}
+	
+	/**
 	 *  Create a new belief.
 	 */
 	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, String[] events, Collection<EventType> rawevents)

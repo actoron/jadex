@@ -11,6 +11,16 @@ public class MElement
 	/** The element name. */
 	protected String name;
 
+	/** The element description. */
+	protected String description;
+
+	/**
+	 *	Bean Constructor. 
+	 */
+	public MElement()
+	{
+	}
+	
 	/**
 	 *  Create a new element.
 	 */
@@ -35,6 +45,24 @@ public class MElement
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	
+	/**
+	 *  Get the description.
+	 *  @return The description.
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+
+	/**
+	 *  Set the description.
+	 *  @param description The description to set.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
 	}
 	
 	/**

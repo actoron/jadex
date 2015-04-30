@@ -25,6 +25,13 @@ public class MDeliberation
 	protected Set<String> inhnames;
 	
 	/**
+	 *	Bean Constructor. 
+	 */
+	public MDeliberation()
+	{
+	}
+	
+	/**
 	 *  Create a new deliberation.
 	 */
 	public MDeliberation(Set<String> inhnames, Map<String, MethodInfo> inhmethods, boolean cardinalityone)

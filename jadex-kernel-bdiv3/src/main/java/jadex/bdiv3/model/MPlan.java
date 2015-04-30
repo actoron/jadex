@@ -17,6 +17,13 @@ public class MPlan extends MElement
 	
 	/** The plan priority. */
 	protected int priority;
+		
+	/**
+	 *	Bean Constructor. 
+	 */
+	public MPlan()
+	{
+	}
 	
 	/**
 	 *  Create a new belief.

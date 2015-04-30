@@ -12,6 +12,13 @@ public class MClassBasedElement extends MProcessableElement
 	protected Class<?> targetclass;
 	
 	/**
+	 *	Bean Constructor. 
+	 */
+	public MClassBasedElement()
+	{
+	}
+	
+	/**
 	 *  Create a new belief.
 	 */
 	public MClassBasedElement(String name, String target, boolean posttoall, boolean randomselection, String excludemode)

@@ -464,7 +464,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				boolean	set	= setElementValue(accessinfo, xmlattrname, object, val, converter, id, context);
 				if(!set)
 				{
-					context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
+					context.getReporter().report("Failure in setting attribute: "+(xmlattrname!=null?xmlattrname:attrinfo)+" on object: "+object+" (unknown attribute?)",
 						"attribute error", context, context.getLocation());
 				}
 			}
@@ -473,7 +473,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				boolean	set	= setElementValue(accessinfo, xmlattrname, object, ((AccessInfo)accessinfo).getDefaultValue(), converter, id, context);
 				if(!set)
 				{
-					context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
+					context.getReporter().report("Failure in setting attribute: "+(xmlattrname!=null?xmlattrname:attrinfo)+" on object: "+object+" (unknown attribute?)",
 						"attribute error", context, context.getLocation());
 				}
 			}
