@@ -52,6 +52,12 @@
 			<version>${project.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-component</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<!-- cannot use original 4.0 as leads to conflicts with asm3.1 used by jersey :-( -->
 		<!--  <dependency>
 			<groupId>org.ow2.asm</groupId>

@@ -205,7 +205,7 @@ public class ComponentXMLReader
 		if(mi!=null)
 		{
 			mi.setFilename(rinfo.getFilename());
-			mi.setType(getModelType());
+			mi.setType(getModelType(rinfo.getFilename()));
 			mi.setClassloader(classloader);
 			mi.setStartable(true);
 			if(rid==null)
@@ -250,7 +250,7 @@ public class ComponentXMLReader
 	/**
 	 *  Get the type of loaded models.
 	 */
-	protected	String getModelType()
+	protected	String getModelType(String filename)
 	{
 		return ComponentComponentFactory.FILETYPE_COMPONENT;
 	}
@@ -282,7 +282,7 @@ public class ComponentXMLReader
 	/**
 	 *  Get the XML mapping.
 	 */
-	public static Set getXMLMapping(Set[] mappings)
+	public static Set<TypeInfo> getXMLMapping(Set<TypeInfo>[] mappings)
 	{
 		Set<TypeInfo> types = new HashSet<TypeInfo>();
 		
