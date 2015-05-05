@@ -2,6 +2,7 @@ package jadex.bdiv3.model;
 
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.ClassInfo;
@@ -377,7 +378,7 @@ public class MGoal extends MClassBasedElement
 				{
 					try
 					{
-						Object[] pvals = ((IInternalBDIAgentFeature)ip.getComponentFeature(IBDIAgentFeature.class)).getInjectionValues(sc.getParameterTypes(), null, this, null, null, parent);
+						Object[] pvals = BDIAgentFeature.getInjectionValues(sc.getParameterTypes(), null, this, null, null, parent, ip);
 						ret = sc.newInstance(pvals);
 					}
 					catch(Exception ex)

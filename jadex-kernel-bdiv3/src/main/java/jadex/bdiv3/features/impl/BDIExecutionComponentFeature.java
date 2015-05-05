@@ -5,6 +5,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 
 /**
@@ -32,7 +33,8 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 		// Evaluate conditions in addition to executing steps.
 		boolean	again = false;
 		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class);
-		if(bdif.isInited() && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable())
+		boolean inited = ((BDILifecycleAgentFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited();
+		if(inited && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable())
 		{
 			bdif.getRuleSystem().processAllEvents();
 			again = true;

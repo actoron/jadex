@@ -107,8 +107,8 @@ public class ClassPlanBody extends AbstractPlanBody
 					Constructor<?>[] cons = body.getDeclaredConstructors();
 					for(Constructor<?> c: cons)
 					{
-						Object[] params = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
-							.getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(), rplan.getModelElement(), null, rplan, null);
+						Object[] params = BDIAgentFeature
+							.getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(), rplan.getModelElement(), null, rplan, null, ia);
 						if(params!=null)
 						{
 							try

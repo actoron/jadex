@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IInternalAccess;
@@ -296,8 +297,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		if(ptypes==null)
 			return null;
 		
-		return ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
-			.getInjectionValues(ptypes, null, rplan.getModelElement(), null, rplan, null);
+		return BDIAgentFeature.getInjectionValues(ptypes, null, rplan.getModelElement(), null, rplan, null, ia);
 	}
 
 	/**

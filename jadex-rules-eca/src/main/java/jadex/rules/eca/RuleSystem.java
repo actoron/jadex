@@ -32,7 +32,6 @@ import java.util.Map;
  */
 public class RuleSystem
 {
-	
 	//-------- attributes --------
 	
 	/** The rulebase. */

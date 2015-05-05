@@ -4,6 +4,7 @@ import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
@@ -907,8 +908,8 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 				m.setAccessible(true);
 				List<Object> res = new ArrayList<Object>();
 				res.add(result);
-				Object[] params = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), 
-					rplan!=null? rplan.getModelElement(): rpe.getModelElement(), event, rplan, rpe, res);
+				Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), 
+					rplan!=null? rplan.getModelElement(): rpe.getModelElement(), event, rplan, rpe, res, ia);
 				if(params==null)
 					System.out.println("Invalid parameter assignment");
 				m.invoke(getPojoElement(), params);

@@ -124,8 +124,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	/** The bdi state. */
 	protected RCapability capa;
 	
-	/** Is the agent inited and allowed to execute rules? */
-	protected boolean	inited;
+//	/** Is the agent inited and allowed to execute rules? */
+//	protected boolean	inited;
 	
 	//-------- constructors --------
 	
@@ -248,7 +248,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
 				rs.addEvent(new jadex.rules.eca.Event(ev1, new ChangeInfo<Object>(val, oldval, null)));
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
-				rs.processAllEvents(); 
+				if(((BDILifecycleAgentFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited())
+					rs.processAllEvents(); 
 			}
 			
 			// observe new value for property changes
@@ -400,7 +401,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		// agent is not null any more due to deferred exe of init expressions but rules are
 		// available only after startBehavior
-		if(((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).isInited())
+		if(((BDILifecycleAgentFeature)agent.getComponentFeature(ILifecycleComponentFeature.class)).isInited())
 		{
 			((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).writeField(val, belname, fieldname, obj);
 		}
@@ -836,7 +837,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		// agent is not null any more due to deferred exe of init expressions but rules are
 		// available only after startBehavior
-		if(((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).isInited())
+		if(((BDILifecycleAgentFeature)agent.getComponentFeature(ILifecycleComponentFeature.class)).isInited())
 		{
 			EventType chev1 = new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, fieldname});
 			EventType chev2 = new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, fieldname});
@@ -1118,7 +1119,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 *  @param obj	The object to adapt (e.g. a change event)
 	 *  @param capa	The capability name or null for agent.
 	 */
-	protected Object adaptToCapability(Object obj, String capa)
+	protected static Object adaptToCapability(Object obj, String capa, IBDIModel bdimodel)
 	{
 		if(obj instanceof ChangeEvent && capa!=null)
 		{
@@ -1691,1209 +1692,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		getRuleSystem().getRulebase().removeRule(rulename);
 	}
-
-	/**
-	 *  Start the component behavior.
-	 */
-	public void startBehavior()
-	{
-//		super.startBehavior();
-		
-//		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
-		final Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-				
-		// Init bdi configuration
-		String confname = getComponent().getConfiguration();
-		if(confname!=null)
-		{
-			MConfiguration mconf = bdimodel.getCapability().getConfiguration(confname);
-			
-			if(mconf!=null)
-			{
-				// Set initial belief values
-				List<UnparsedExpression> ibels = mconf.getInitialBeliefs();
-				if(ibels!=null)
-				{
-					for(UnparsedExpression uexp: ibels)
-					{
-						try
-						{
-							MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
-							Object val = SJavaParser.parseExpression(uexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader()).getValue(null);
-	//						Field f = mbel.getTarget().getField(getClassLoader());
-	//						f.setAccessible(true);
-	//						f.set(agent, val);
-							mbel.setValue(getComponent(), val);
-						}
-						catch(RuntimeException e)
-						{
-							throw e;
-						}
-						catch(Exception e)
-						{
-							throw new RuntimeException(e);
-						}
-					}
-				}
-				
-				// Create initial goals
-				List<UnparsedExpression> igoals = mconf.getInitialGoals();
-				if(igoals!=null)
-				{
-					for(UnparsedExpression uexp: igoals)
-					{
-						MGoal mgoal = null;
-						Object goal = null;
-						Class<?> gcl = null;
-						
-						// Create goal if expression available
-						if(uexp.getValue()!=null && uexp.getValue().length()>0)
-						{
-							Object o = SJavaParser.parseExpression(uexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader()).getValue(getComponent().getFetcher());
-							if(o instanceof Class)
-							{
-								gcl = (Class<?>)o;
-							}
-							else
-							{
-								goal = o;
-								gcl = o.getClass();
-							}
-						}
-						
-						if(gcl==null && uexp.getClazz()!=null)
-						{
-							gcl = uexp.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-						}
-						if(gcl==null)
-						{
-							// try to fetch via name
-							mgoal = bdimodel.getCapability().getGoal(uexp.getName());
-							if(mgoal==null && uexp.getName().indexOf(".")==-1)
-							{
-								// try with package
-								mgoal = bdimodel.getCapability().getGoal(getComponent().getModel().getPackage()+"."+uexp.getName());
-							}
-							if(mgoal!=null)
-							{
-								gcl = mgoal.getTargetClass(getComponent().getClassLoader());
-							}
-						}
-						if(mgoal==null)
-						{
-							mgoal = bdimodel.getCapability().getGoal(gcl.getName());
-						}
-						if(goal==null)
-						{
-							try
-							{
-								Class<?> agcl = agent.getClass();
-								Constructor<?>[] cons = gcl.getDeclaredConstructors();
-								for(Constructor<?> c: cons)
-								{
-									Class<?>[] params = c.getParameterTypes();
-									if(params.length==0)
-									{
-										// perfect found empty con
-										goal = gcl.newInstance();
-										break;
-									}
-									else if(params.length==1 && params[0].equals(agcl))
-									{
-										// found (first level) inner class constructor
-										goal = c.newInstance(new Object[]{agent});
-										break;
-									}
-								}
-							}
-							catch(RuntimeException e)
-							{
-								throw e;
-							}
-							catch(Exception e)
-							{
-								throw new RuntimeException(e);
-							}
-						}
-						
-						if(mgoal==null || goal==null)
-						{
-							throw new RuntimeException("Could not create initial goal: "+uexp);
-						}
-						
-						RGoal rgoal = new RGoal(getComponent(), mgoal, goal, (RPlan)null);
-						RGoal.adoptGoal(rgoal, getComponent());
-					}
-				}
-				
-				// Create initial plans
-				List<UnparsedExpression> iplans = mconf.getInitialPlans();
-				if(iplans!=null)
-				{
-					for(UnparsedExpression uexp: iplans)
-					{
-						MPlan mplan = bdimodel.getCapability().getPlan(uexp.getName());
-						// todo: allow Java plan constructor calls
-	//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
-					
-						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, getComponent());
-						RPlan.executePlan(rplan, getComponent(), null);
-					}
-				}
-			}
-		}
-		
-		// Observe dynamic beliefs
-		List<MBelief> beliefs = bdimodel.getCapability().getBeliefs();
-		
-		for(final MBelief mbel: beliefs)
-		{
-			List<EventType> events = new ArrayList<EventType>();
-			
-			Collection<String> evs = mbel.getEvents();
-			Object	cap = null;
-			if(evs!=null && !evs.isEmpty())
-			{
-				Object	ocapa	= agent;
-				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
-				if(i!=-1)
-				{
-					ocapa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
-				}
-				cap	= ocapa;
-
-				for(String ev: evs)
-				{
-					addBeliefEvents(getComponent(), events, ev);
-				}
-			}
-			
-			Collection<EventType> rawevents = mbel.getRawEvents();
-			if(rawevents!=null)
-			{
-				Collection<EventType> revs = mbel.getRawEvents();
-				if(revs!=null)
-					events.addAll(revs);
-			}
-		
-			if(!events.isEmpty())
-			{
-				final Object fcapa = cap;
-				Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
-					ICondition.TRUE_CONDITION, new IAction<Void>()
-				{
-					Object oldval = null;
-					
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-					{
-//							System.out.println("belief update: "+event);
-						if(mbel.isFieldBelief())
-						{
-							try
-							{
-								Method um = fcapa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
-								um.invoke(fcapa, new Object[0]);
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-							}
-						}
-						else
-						{
-							Object value = mbel.getValue(getComponent());
-							// todo: save old value?!
-							createChangeEvent(value, oldval, null, getComponent(), mbel.getName());
-							oldval = value;
-						}
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				getRuleSystem().getRulebase().addRule(rule);
-			}
-			
-			if(mbel.getUpdaterate()>0)
-			{
-				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
-				final String	name;
-				final Object	capa;
-				if(i!=-1)
-				{
-					capa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
-					name	= mbel.getName().substring(mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)+1); 
-				}
-				else
-				{
-					capa	= agent;
-					name	= mbel.getName();
-				}
-
-				final IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
-				{
-					ITimedObject	self	= this;
-					Object oldval = null;
-					
-					public void timeEventOccurred(long currenttime)
-					{
-						try
-						{
-							getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-							{
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									try
-									{
-										// Invoke dynamic update method if field belief
-										if(mbel.isFieldBelief())
-										{
-											Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(name), new Class[0]);
-											um.invoke(capa, new Object[0]);
-										}
-										// Otherwise just call getValue and throw event
-										else
-										{
-											Object value = mbel.getValue(capa, getComponent().getClassLoader());
-											createChangeEvent(value, oldval, null, getComponent(), mbel.getName());
-											oldval = value;
-										}
-									}
-									catch(Exception e)
-									{
-										e.printStackTrace();
-									}
-									
-									cs.createTimer(mbel.getUpdaterate(), self);
-									return IFuture.DONE;
-								}
-							});
-						}
-						catch(ComponentTerminatedException cte)
-						{
-							
-						}
-					}
-				
-					public void exceptionOccurred(Exception exception)
-					{
-						getComponent().getLogger().severe("Cannot update belief "+mbel.getName()+": "+exception);
-					}
-				});
-			}
-		}
-		
-		// Observe goal types
-		List<MGoal> goals = bdimodel.getCapability().getGoals();
-		for(final MGoal mgoal: goals)
-		{
-//				 todo: explicit bdi creation rule
-//				rulesystem.observeObject(goals.get(i).getTargetClass(getClassLoader()));
-		
-//				boolean fin = false;
-			
-			final Class<?> gcl = mgoal.getTargetClass(getComponent().getClassLoader());
-//				boolean declarative = false;
-//				boolean maintain = false;
-			
-			List<MCondition> conds = mgoal.getConditions(MGoal.CONDITION_CREATION);
-			if(conds!=null)
-			{
-				for(MCondition cond: conds)
-				{
-					if(cond.getConstructorTarget()!=null)
-					{
-						final Constructor<?> c = cond.getConstructorTarget().getConstructor(getComponent().getClassLoader());
-						
-						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
-							ICondition.TRUE_CONDITION, new IAction<Void>()
-						{
-							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-							{
-	//							System.out.println("create: "+context);
-								
-								Object pojogoal = null;
-								try
-								{
-									boolean ok = true;
-									Class<?>[] ptypes = c.getParameterTypes();
-									Object[] pvals = new Object[ptypes.length];
-									
-									Annotation[][] anns = c.getParameterAnnotations();
-									int skip = ptypes.length - anns.length;
-									
-									for(int i=0; i<ptypes.length; i++)
-									{
-										Object	o	= event.getContent();
-										if(o!=null && SReflect.isSupertype(ptypes[i], o.getClass()))
-										{
-											pvals[i] = o;
-										}
-										else if(o instanceof ChangeInfo<?> && ((ChangeInfo)o).getValue()!=null && SReflect.isSupertype(ptypes[i], ((ChangeInfo)o).getValue().getClass()))
-										{
-											pvals[i] = ((ChangeInfo)o).getValue();
-										}
-										else if(SReflect.isSupertype(agent.getClass(), ptypes[i]))
-										{
-											pvals[i] = agent;
-										}
-										
-										// ignore implicit parameters of inner class constructor
-										if(pvals[i]==null && i>=skip)
-										{
-											for(int j=0; anns!=null && j<anns[i-skip].length; j++)
-											{
-												if(anns[i-skip][j] instanceof CheckNotNull)
-												{
-													ok = false;
-													break;
-												}
-											}
-										}
-									}
-									
-									if(ok)
-									{
-										pojogoal = c.newInstance(pvals);
-									}
-								}
-								catch(RuntimeException e)
-								{
-									throw e;
-								}
-								catch(Exception e)
-								{
-									throw new RuntimeException(e);
-								}
-								
-								if(pojogoal!=null && !getCapability().containsGoal(pojogoal))
-								{
-									final Object fpojogoal = pojogoal;
-									dispatchTopLevelGoal(pojogoal)
-										.addResultListener(new IResultListener<Object>()
-									{
-										public void resultAvailable(Object result)
-										{
-											getComponent().getLogger().info("Goal succeeded: "+result);
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											getComponent().getLogger().info("Goal failed: "+fpojogoal+" "+exception);
-										}
-									});
-								}
-//									else
-//									{
-//										System.out.println("new goal not adopted, already contained: "+pojogoal);
-//									}
-								
-								return IFuture.DONE;
-							}
-						});
-						rule.setEvents(cond.getEvents());
-						getRuleSystem().getRulebase().addRule(rule);
-					}
-					else if(cond.getMethodTarget()!=null)
-					{
-						final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
-						
-						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
-							new MethodCondition(null, m)
-						{
-							protected Object invokeMethod(IEvent event) throws Exception
-							{
-								m.setAccessible(true);
-								Object[] pvals = getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
-									mgoal, new ChangeEvent(event), null, null);
-								return pvals!=null? m.invoke(null, pvals): null;
-							}
-														
-//								public Tuple2<Boolean, Object> prepareResult(Object res)
-//								{
-//									Tuple2<Boolean, Object> ret = null;
-//									if(res instanceof Boolean)
-//									{
-//										ret = new Tuple2<Boolean, Object>((Boolean)res, null);
-//									}
-//									else if(res!=null)
-//									{
-//										ret = new Tuple2<Boolean, Object>(Boolean.TRUE, res);
-//									}
-//									else
-//									{
-//										ret = new Tuple2<Boolean, Object>(Boolean.FALSE, null);
-//									}
-//									return ret;
-//								}
-						}, new IAction<Void>()
-						{
-							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-							{
-		//						System.out.println("create: "+context);
-								
-								if(condresult!=null)
-								{
-									if(SReflect.isIterable(condresult))
-									{
-										for(Iterator<Object> it = SReflect.getIterator(condresult); it.hasNext(); )
-										{
-											Object pojogoal = it.next();
-											dispatchTopLevelGoal(pojogoal);
-										}
-									}
-									else
-									{
-										dispatchTopLevelGoal(condresult);
-									}
-								}
-								else
-								{
-//										Object pojogoal = null;
-//										if(event.getContent()!=null)
-//										{
-//											try
-//											{
-//												Class<?> evcl = event.getContent().getClass();
-//												Constructor<?> c = gcl.getConstructor(new Class[]{evcl});
-//												pojogoal = c.newInstance(new Object[]{event.getContent()});
-//												dispatchTopLevelGoal(pojogoal);
-//											}
-//											catch(Exception e)
-//											{
-//												e.printStackTrace();
-//											}
-//										}
-//										else
-//										{
-										Constructor<?>[] cons = gcl.getConstructors();
-										Object pojogoal = null;
-										boolean ok = false;
-										for(Constructor<?> c: cons)
-										{
-											try
-											{
-												Object[] vals = getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(),
-													mgoal, new ChangeEvent(event), null, null);
-												if(vals!=null)
-												{
-													pojogoal = c.newInstance(vals);
-													dispatchTopLevelGoal(pojogoal);
-													break;
-												}
-												else
-												{
-													ok = true;
-												}
-											}
-											catch(Exception e)
-											{
-											}
-										}
-										if(pojogoal==null && !ok)
-											throw new RuntimeException("Unknown how to create goal: "+gcl);
-									}
-//									}
-								
-								return IFuture.DONE;
-							}
-						});
-						rule.setEvents(cond.getEvents());
-						getRuleSystem().getRulebase().addRule(rule);
-					}
-				}
-			}
-			
-			conds = mgoal.getConditions(MGoal.CONDITION_DROP);
-			if(conds!=null)
-			{
-				for(MCondition cond: conds)
-				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
-					
-					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_drop", 
-						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
-					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-						{
-							for(final RGoal goal: getCapability().getGoals(mgoal))
-							{
-								if(!RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
-									 && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
-								{
-									executeGoalMethod(m, goal, event)
-										.addResultListener(new IResultListener<Boolean>()
-									{
-										public void resultAvailable(Boolean result)
-										{
-											if(result.booleanValue())
-											{
-//													System.out.println("Goal dropping triggered: "+goal);
-				//								rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
-												if(!goal.isFinished())
-												{
-													goal.setException(new GoalFailureException("drop condition: "+m.getName()));
-//														{
-//															public void printStackTrace() 
-//															{
-//																super.printStackTrace();
-//															}
-//														});
-													goal.setProcessingState(getComponent(), RGoal.GoalProcessingState.FAILED);
-												}
-											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-										}
-									});
-								}
-							}
-							
-							return IFuture.DONE;
-						}
-					});
-					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
-					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, mgoal.getName()}));
-					rule.setEvents(events);
-					getRuleSystem().getRulebase().addRule(rule);
-//						rule.setEvents(cond.getEvents());
-//						getRuleSystem().getRulebase().addRule(rule);
-				}
-			}
-			
-			conds = mgoal.getConditions(MGoal.CONDITION_CONTEXT);
-			if(conds!=null)
-			{
-				for(final MCondition cond: conds)
-				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
-					
-					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_suspend", 
-						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
-					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-						{
-							for(final RGoal goal: getCapability().getGoals(mgoal))
-							{
-								if(!RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState())
-								  && !RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
-								  && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
-								{	
-									executeGoalMethod(m, goal, event)
-										.addResultListener(new IResultListener<Boolean>()
-									{
-										public void resultAvailable(Boolean result)
-										{
-											if(!result.booleanValue())
-											{
-//													if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-//														System.out.println("Goal suspended: "+goal);
-												goal.setLifecycleState(getComponent(), RGoal.GoalLifecycleState.SUSPENDED);
-												goal.setState(RProcessableElement.State.INITIAL);
-											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-										}
-									});
-								}
-							}
-							return IFuture.DONE;
-						}
-					});
-					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
-					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, mgoal.getName()}));
-					rule.setEvents(events);
-					getRuleSystem().getRulebase().addRule(rule);
-					
-//						rule.setEvents(cond.getEvents());
-//						getRuleSystem().getRulebase().addRule(rule);
-					
-					rule = new Rule<Void>(mgoal.getName()+"_goal_option", 
-						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
-					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-						{
-							for(final RGoal goal: getCapability().getGoals(mgoal))
-							{
-								if(RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState()))
-								{	
-									executeGoalMethod(m, goal, event)
-										.addResultListener(new IResultListener<Boolean>()
-									{
-										public void resultAvailable(Boolean result)
-										{
-											if(result.booleanValue())
-											{
-//													if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-//														System.out.println("Goal made option: "+goal);
-												goal.setLifecycleState(getComponent(), RGoal.GoalLifecycleState.OPTION);
-//													setState(ia, PROCESSABLEELEMENT_INITIAL);
-											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-										}
-									});
-								}
-							}
-							
-							return IFuture.DONE;
-						}
-					});
-					rule.setEvents(events);
-					getRuleSystem().getRulebase().addRule(rule);
-					
-//						rule.setEvents(cond.getEvents());
-//						getRuleSystem().getRulebase().addRule(rule);
-				}
-			}
-			
-			conds = mgoal.getConditions(MGoal.CONDITION_TARGET);
-			if(conds!=null)
-			{
-				for(final MCondition cond: conds)
-				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
-					
-					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_target", 
-						new CombinedCondition(new ICondition[]{
-							new GoalsExistCondition(mgoal, capa)
-		//							, new LifecycleStateCondition(SUtil.createHashSet(new String[]
-		//							{
-		//								RGoal.GOALLIFECYCLESTATE_ACTIVE,
-		//								RGoal.GOALLIFECYCLESTATE_ADOPTED,
-		//								RGoal.GOALLIFECYCLESTATE_OPTION,
-		//								RGoal.GOALLIFECYCLESTATE_SUSPENDED
-		//							}))
-						}),
-						new IAction<Void>()
-					{
-						public IFuture<Void> execute(final IEvent event, final IRule<Void> rule, final Object context, Object condresult)
-						{
-							for(final RGoal goal: getCapability().getGoals(mgoal))
-							{
-								executeGoalMethod(m, goal, event)
-									.addResultListener(new IResultListener<Boolean>()
-								{
-									public void resultAvailable(Boolean result)
-									{
-										if(result.booleanValue())
-										{
-											goal.targetConditionTriggered(getComponent(), event, rule, context);
-										}
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-									}
-								});
-							}
-						
-							return IFuture.DONE;
-						}
-					});
-					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
-					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, mgoal.getName()}));
-					rule.setEvents(events);
-					getRuleSystem().getRulebase().addRule(rule);
-				}
-			}
-			
-			conds = mgoal.getConditions(MGoal.CONDITION_RECUR);
-			if(conds!=null)
-			{
-				for(final MCondition cond: conds)
-				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
-					
-					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_recur",
-						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
-	//						new CombinedCondition(new ICondition[]{
-	//							new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
-	//							new ProcessingStateCondition(GOALPROCESSINGSTATE_PAUSED),
-	//							new MethodCondition(getPojoElement(), m),
-	//						}), new IAction<Void>()
-					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-						{
-							for(final RGoal goal: getCapability().getGoals(mgoal))
-							{
-								if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
-									&& RGoal.GoalProcessingState.PAUSED.equals(goal.getProcessingState()))
-								{	
-									executeGoalMethod(m, goal, event)
-										.addResultListener(new IResultListener<Boolean>()
-									{
-										public void resultAvailable(Boolean result)
-										{
-											if(result.booleanValue())
-											{
-												goal.setTriedPlans(null);
-												goal.setApplicablePlanList(null);
-												goal.setProcessingState(getComponent(), RGoal.GoalProcessingState.INPROCESS);
-											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-										}
-									});
-								}
-							}
-							return IFuture.DONE;
-						}
-					});
-					rule.setEvents(cond.getEvents());
-					getRuleSystem().getRulebase().addRule(rule);
-				}
-			}
-			
-			conds = mgoal.getConditions(MGoal.CONDITION_MAINTAIN);
-			if(conds!=null)
-			{
-				for(final MCondition cond: conds)
-				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
-					
-					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_maintain", 
-						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
-	//						new CombinedCondition(new ICondition[]{
-	//							new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
-	//							new ProcessingStateCondition(GOALPROCESSINGSTATE_IDLE),
-	//							new MethodCondition(getPojoElement(), mcond, true),
-	//						}), new IAction<Void>()
-					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-						{
-							for(final RGoal goal: getCapability().getGoals(mgoal))
-							{
-								if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
-									&& RGoal.GoalProcessingState.IDLE.equals(goal.getProcessingState()))
-								{	
-									executeGoalMethod(m, goal, event)
-										.addResultListener(new IResultListener<Boolean>()
-									{
-										public void resultAvailable(Boolean result)
-										{
-											if(!result.booleanValue())
-											{
-//													System.out.println("Goal maintain triggered: "+goal);
-//													System.out.println("state was: "+goal.getProcessingState());
-												goal.setProcessingState(getComponent(), RGoal.GoalProcessingState.INPROCESS);
-											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-										}
-									});
-								}
-							}
-							return IFuture.DONE;
-						}
-					});
-					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
-					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, mgoal.getName()}));
-					rule.setEvents(events);
-					getRuleSystem().getRulebase().addRule(rule);
-					
-					// if has no own target condition
-					if(mgoal.getConditions(MGoal.CONDITION_TARGET)==null)
-					{
-						// if not has own target condition use the maintain cond
-						rule = new Rule<Void>(mgoal.getName()+"_goal_target", 
-							new GoalsExistCondition(mgoal, capa), new IAction<Void>()
-	//							new MethodCondition(getPojoElement(), mcond), new IAction<Void>()
-						{
-							public IFuture<Void> execute(final IEvent event, final IRule<Void> rule, final Object context, Object condresult)
-							{
-								for(final RGoal goal: getCapability().getGoals(mgoal))
-								{
-									executeGoalMethod(m, goal, event)
-										.addResultListener(new IResultListener<Boolean>()
-									{
-										public void resultAvailable(Boolean result)
-										{
-											if(result.booleanValue())
-											{
-												goal.targetConditionTriggered(getComponent(), event, rule, context);
-											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-										}
-									});
-								}
-								
-								return IFuture.DONE;
-							}
-						});
-						rule.setEvents(cond.getEvents());
-						getRuleSystem().getRulebase().addRule(rule);
-					}
-				}
-			}
-		}
-		
-		// Observe plan types
-		List<MPlan> mplans = bdimodel.getCapability().getPlans();
-		for(int i=0; i<mplans.size(); i++)
-		{
-			final MPlan mplan = mplans.get(i);
-			
-			IAction<Void> createplan = new IAction<Void>()
-			{
-				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-				{
-					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), getComponent());
-					RPlan.executePlan(rplan, getComponent(), null);
-					return IFuture.DONE;
-				}
-			};
-			
-			MTrigger trigger = mplan.getTrigger();
-			
-			if(trigger!=null)
-			{
-				List<String> fas = trigger.getFactAddeds();
-				if(fas!=null && fas.size()>0)
-				{
-					Rule<Void> rule = new Rule<Void>("create_plan_factadded_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
-					for(String fa: fas)
-					{
-						rule.addEvent(new EventType(new String[]{ChangeEvent.FACTADDED, fa}));
-					}
-					rulesystem.getRulebase().addRule(rule);
-				}
-	
-				List<String> frs = trigger.getFactRemoveds();
-				if(frs!=null && frs.size()>0)
-				{
-					Rule<Void> rule = new Rule<Void>("create_plan_factremoved_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
-					for(String fr: frs)
-					{
-						rule.addEvent(new EventType(new String[]{ChangeEvent.FACTREMOVED, fr}));
-					}
-					rulesystem.getRulebase().addRule(rule);
-				}
-				
-				List<String> fcs = trigger.getFactChangeds();
-				if(fcs!=null && fcs.size()>0)
-				{
-					Rule<Void> rule = new Rule<Void>("create_plan_factchanged_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
-					for(String fc: fcs)
-					{
-						rule.addEvent(new EventType(new String[]{ChangeEvent.FACTCHANGED, fc}));
-						rule.addEvent(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, fc}));
-					}
-					rulesystem.getRulebase().addRule(rule);
-				}
-				
-				List<MGoal> gfs = trigger.getGoalFinisheds();
-				if(gfs!=null && gfs.size()>0)
-				{
-					Rule<Void> rule = new Rule<Void>("create_plan_goalfinished_"+mplan.getName(), new ICondition()
-					{
-						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-						{
-							return new Future<Tuple2<Boolean, Object>>(TRUE);
-						}
-					}, createplan);
-					for(MGoal gf: gfs)
-					{
-						rule.addEvent(new EventType(new String[]{ChangeEvent.GOALDROPPED, gf.getName()}));
-					}
-					rulesystem.getRulebase().addRule(rule);
-				}
-			}
-			
-			// context condition
-			
-			final MethodInfo mi = mplan.getBody().getContextConditionMethod(getComponent().getClassLoader());
-			if(mi!=null)
-			{
-				PlanContextCondition pcc = mi.getMethod(getComponent().getClassLoader()).getAnnotation(PlanContextCondition.class);
-				String[] evs = pcc.beliefs();
-				RawEvent[] rawevs = pcc.rawevents();
-				List<EventType> events = new ArrayList<EventType>();
-				for(String ev: evs)
-				{
-					addBeliefEvents(getComponent(), events, ev);
-				}
-				for(RawEvent rawev: rawevs)
-				{
-					events.add(createEventType(rawev));
-				}
-				
-				IAction<Void> abortplans = new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-					{
-						Collection<RPlan> coll = capa.getPlans(mplan);
-						
-						for(final RPlan plan: coll)
-						{
-							invokeBooleanMethod(plan.getBody().getBody(), mi.getMethod(getComponent().getClassLoader()), plan.getModelElement(), event, plan)
-								.addResultListener(new IResultListener<Boolean>()
-							{
-								public void resultAvailable(Boolean result)
-								{
-									if(!result.booleanValue())
-									{
-										plan.abort();
-									}
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-								}
-							});
-						}
-						return IFuture.DONE;
-					}
-				};
-				
-				Rule<Void> rule = new Rule<Void>("plan_context_abort_"+mplan.getName(), 
-					new PlansExistCondition(mplan, capa), abortplans);
-				rule.setEvents(events);
-				rulesystem.getRulebase().addRule(rule);
-			}
-		}
-		
-		// add/rem goal inhibitor rules
-		if(!goals.isEmpty())
-		{
-			boolean	usedelib	= false;
-			for(int i=0; !usedelib && i<goals.size(); i++)
-			{
-				usedelib	= goals.get(i).getDeliberation()!=null;
-			}
-			
-			if(usedelib)
-			{
-				List<EventType> events = new ArrayList<EventType>();
-				events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, EventType.MATCHALL}));
-				Rule<Void> rule = new Rule<Void>("goal_addinitialinhibitors", 
-					ICondition.TRUE_CONDITION, new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-					{
-						// create the complete inhibitorset for a newly adopted goal
-						
-						RGoal goal = (RGoal)event.getContent();
-						for(RGoal other: getCapability().getGoals())
-						{
-	//						if(other.getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) 
-	//							&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
-							if(!other.isInhibitedBy(goal) && other.inhibits(goal, getComponent()))
-							{
-								goal.addInhibitor(other, getComponent());
-							}
-						}
-						
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				getRuleSystem().getRulebase().addRule(rule);
-				
-				events = getGoalEvents(null);
-				rule = new Rule<Void>("goal_addinhibitor", 
-					new ICondition()
-					{
-						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-						{
-	//						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
-	//							System.out.println("maintain");
-//								if(getComponentIdentifier().getName().indexOf("Ambu")!=-1)
-//									System.out.println("addin");
-							
-							// return true when other goal is active and inprocess
-							boolean ret = false;
-							EventType type = event.getType();
-							RGoal goal = (RGoal)event.getContent();
-							ret = ChangeEvent.GOALACTIVE.equals(type.getType(0)) && RGoal.GoalProcessingState.INPROCESS.equals(goal.getProcessingState())
-								|| (ChangeEvent.GOALINPROCESS.equals(type.getType(0)) && RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState()));
-//								return ret? ICondition.TRUE: ICondition.FALSE;
-							return new Future<Tuple2<Boolean,Object>>(ret? ICondition.TRUE: ICondition.FALSE);
-						}
-					}, new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-					{
-						RGoal goal = (RGoal)event.getContent();
-//							if(goal.getId().indexOf("PerformPatrol")!=-1)
-//								System.out.println("addinh: "+goal);
-						MDeliberation delib = goal.getMGoal().getDeliberation();
-						if(delib!=null)
-						{
-							Set<MGoal> inhs = delib.getInhibitions();
-							if(inhs!=null)
-							{
-								for(MGoal inh: inhs)
-								{
-									Collection<RGoal> goals = getCapability().getGoals(inh);
-									for(RGoal other: goals)
-									{
-	//									if(!other.isInhibitedBy(goal) && goal.inhibits(other, getInternalAccess()))
-										if(!goal.isInhibitedBy(other) && goal.inhibits(other, getComponent()))
-										{
-											other.addInhibitor(goal, getComponent());
-										}
-									}
-								}
-							}
-						}
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				getRuleSystem().getRulebase().addRule(rule);
-				
-				rule = new Rule<Void>("goal_removeinhibitor", 
-					new ICondition()
-					{
-						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-						{
-//								if(getComponentIdentifier().getName().indexOf("Ambu")!=-1)
-//									System.out.println("remin");
-							
-							// return true when other goal is active and inprocess
-							boolean ret = false;
-							EventType type = event.getType();
-							if(event.getContent() instanceof RGoal)
-							{
-								RGoal goal = (RGoal)event.getContent();
-								ret = ChangeEvent.GOALSUSPENDED.equals(type.getType(0)) || ChangeEvent.GOALOPTION.equals(type.getType(0))
-									|| !RGoal.GoalProcessingState.INPROCESS.equals(goal.getProcessingState());
-							}
-//								return ret? ICondition.TRUE: ICondition.FALSE;
-							return new Future<Tuple2<Boolean,Object>>(ret? ICondition.TRUE: ICondition.FALSE);
-						}
-					}, new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-					{
-						// Remove inhibitions of this goal 
-						RGoal goal = (RGoal)event.getContent();
-						MDeliberation delib = goal.getMGoal().getDeliberation();
-						if(delib!=null)
-						{
-							Set<MGoal> inhs = delib.getInhibitions();
-							if(inhs!=null)
-							{
-								for(MGoal inh: inhs)
-								{
-		//							if(goal.getId().indexOf("AchieveCleanup")!=-1)
-		//								System.out.println("reminh: "+goal);
-									Collection<RGoal> goals = getCapability().getGoals(inh);
-									for(RGoal other: goals)
-									{
-										if(goal.equals(other))
-											continue;
-										
-										if(other.isInhibitedBy(goal))
-											other.removeInhibitor(goal, getComponent());
-									}
-								}
-							}
-							
-							// Remove inhibitor from goals of same type if cardinality is used
-							if(delib.isCardinalityOne())
-							{
-								Collection<RGoal> goals = getCapability().getGoals(goal.getMGoal());
-								if(goals!=null)
-								{
-									for(RGoal other: goals)
-									{
-										if(goal.equals(other))
-											continue;
-										
-										if(other.isInhibitedBy(goal))
-											other.removeInhibitor(goal, getComponent());
-									}
-								}
-							}
-						}
-					
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				getRuleSystem().getRulebase().addRule(rule);
-				
-				
-				rule = new Rule<Void>("goal_inhibit", 
-					new LifecycleStateCondition(RGoal.GoalLifecycleState.ACTIVE), new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-					{
-						RGoal goal = (RGoal)event.getContent();
-	//					System.out.println("optionizing: "+goal+" "+goal.inhibitors);
-						goal.setLifecycleState(getComponent(), RGoal.GoalLifecycleState.OPTION);
-						return IFuture.DONE;
-					}
-				});
-				rule.addEvent(new EventType(new String[]{ChangeEvent.GOALINHIBITED, EventType.MATCHALL}));
-				getRuleSystem().getRulebase().addRule(rule);
-			}
-			
-			Rule<Void> rule = new Rule<Void>("goal_activate", 
-				new CombinedCondition(new ICondition[]{
-					new LifecycleStateCondition(RGoal.GoalLifecycleState.OPTION),
-					new ICondition()
-					{
-						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-						{
-							RGoal goal = (RGoal)event.getContent();
-//								return !goal.isInhibited()? ICondition.TRUE: ICondition.FALSE;
-							return new Future<Tuple2<Boolean,Object>>(!goal.isInhibited()? ICondition.TRUE: ICondition.FALSE);
-						}
-					}
-				}), new IAction<Void>()
-			{
-				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-				{
-					RGoal goal = (RGoal)event.getContent();
-//						if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-//							System.out.println("reactivating: "+goal);
-					goal.setLifecycleState(getComponent(), RGoal.GoalLifecycleState.ACTIVE);
-					return IFuture.DONE;
-				}
-			});
-			rule.addEvent(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED, EventType.MATCHALL}));
-			rule.addEvent(new EventType(new String[]{ChangeEvent.GOALOPTION, EventType.MATCHALL}));
-//				rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALNOTINHIBITED, ChangeEvent.GOALOPTION}));
-			getRuleSystem().getRulebase().addRule(rule);
-		}
-		
-		// perform init write fields (after injection of bdiagent)
-		performInitWrites(getComponent());
-		
-		// Start rule system
-		inited	= true;
-//			if(getComponentIdentifier().getName().indexOf("Cleaner")!=-1)// && getComponentIdentifier().getName().indexOf("Burner")==-1)
-//				getCapability().dumpPlansPeriodically(getInternalAccess());
-//			if(getComponentIdentifier().getName().indexOf("Ambulance")!=-1)
-//			{
-//				getCapability().dumpGoalsPeriodically(getInternalAccess());
-//				getCapability().dumpPlansPeriodically(getInternalAccess());
-//			}
-		
-//			}
-//			catch(Exception e)
-//			{
-//				e.printStackTrace();
-//			}
-		
-//			throw new RuntimeException();
-	}
 		
 //	/**
 //	 *  Called before blocking the component thread.
@@ -2942,21 +1740,13 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			throw new BodyAborted();
 		}
 	}
-		
-	/**
-	 *  Execute a goal method.
-	 */
-	protected IFuture<Boolean> executeGoalMethod(Method m, RProcessableElement goal, IEvent event)
-	{
-		return invokeBooleanMethod(goal.getPojoElement(), m, goal.getModelElement(), event, null);
-	}
 	
 	/**
 	 *  Get parameter values for injection into method and constructor calls.
 	 */
-	public Object[] getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
+	public static Object[] getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, IInternalAccess component)
 	{
-		return getInjectionValues(ptypes, anns, melement, event, rplan, rpe, null);
+		return getInjectionValues(ptypes, anns, melement, event, rplan, rpe, null, component);
 	}
 		
 	// todo: support parameter names via annotation in guesser (guesser with meta information)
@@ -2964,7 +1754,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 *  Get parameter values for injection into method and constructor calls.
 	 *  @return A valid assigment or null if no assignment could be found.
 	 */
-	public Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs)
+	public static Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs, IInternalAccess component)
 	{
 		Collection<Object> vals = new LinkedHashSet<Object>();
 		if(vs!=null)
@@ -2980,13 +1770,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				capaname = melement.getName().substring(0, idx);
 			}
 		}
-		Object capa = capaname!=null ? getCapabilityObject(capaname): getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class);
+		Object capa = capaname!=null ? bdif.getCapabilityObject(capaname): component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 //			: getAgent() instanceof PojoBDIAgent? ((PojoBDIAgent)getAgent()).getPojoAgent(): getAgent();
 		
 		vals.add(capa);
-		vals.add(new CapabilityWrapper(getComponent(), capa, capaname));
-		vals.add(getComponent());
-		vals.add(getComponent().getExternalAccess());
+		vals.add(new CapabilityWrapper(component, capa, capaname));
+		vals.add(component);
+		vals.add(component.getExternalAccess());
 
 		// Add plan values if any.
 		if(rplan!=null)
@@ -3038,7 +1829,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					List<MParameter> params = mgoal.getParameters();
 					for(MParameter param: params)
 					{
-						Object val = param.getValue(pojo, getComponent().getClassLoader());
+						Object val = param.getValue(pojo, component.getClassLoader());
 						vals.add(val);
 					}
 				}
@@ -3067,9 +1858,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					{
 						source	= capaname + MElement.CAPABILITY_SEPARATOR + source;
 					}
-					if(bdimodel.getBeliefMappings().containsKey(source))
+					if(bdif.getBDIModel().getBeliefMappings().containsKey(source))
 					{
-						source	= bdimodel.getBeliefMappings().get(source);
+						source	= bdif.getBDIModel().getBeliefMappings().get(source);
 					}
 					
 					if(event!=null && event.getSource()!=null && event.getSource().equals(source))
@@ -3123,8 +1914,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					}
 					else
 					{
-						MBelief	mbel	= getBDIModel().getCapability().getBelief(source);
-						ret[i]	= mbel.getValue(getComponent());
+						MBelief	mbel	= bdif.getBDIModel().getCapability().getBelief(source);
+						ret[i]	= mbel.getValue(component);
 
 					}
 				}
@@ -3146,7 +1937,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			for(int i=0; i<ret.length; i++)
 			{
-				ret[i]	= adaptToCapability(ret[i], capaname);
+				ret[i]	= adaptToCapability(ret[i], capaname, bdif.getBDIModel());
 			}
 		}
 		
@@ -3251,14 +2042,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			return params;
 //		}
 		
-	/**
-	 *  Get the inited.
-	 *  @return The inited.
-	 */
-	public boolean isInited()
-	{
-		return inited;
-	}
+//	/**
+//	 *  Get the inited.
+//	 *  @return The inited.
+//	 */
+//	public boolean isInited()
+//	{
+//		return inited;
+//	}
 		
 //		/**
 //		 *  Create a result listener which is executed as an component step.
@@ -3277,40 +2068,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //				return super.createResultListener(listener);
 //			}
 //		}
-		
-	/**
-	 * 
-	 */
-	protected IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, MElement modelelement, IEvent event, RPlan rplan)
-	{
-		final Future<Boolean> ret = new Future<Boolean>();
-		try
-		{
-			m.setAccessible(true);
 			
-			Object[] vals = getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
-				modelelement, event!=null ? new ChangeEvent(event) : null, rplan, null);
-			if(vals==null)
-				System.out.println("Invalid parameter assignment");
-			Object app = m.invoke(pojo, vals);
-			if(app instanceof Boolean)
-			{
-				ret.setResult((Boolean)app);
-			}
-			else if(app instanceof IFuture)
-			{
-				((IFuture<Boolean>)app).addResultListener(new DelegationResultListener<Boolean>(ret));
-			}
-		}
-		catch(Exception e)
-		{
-			System.err.println("method: "+m);
-			e.printStackTrace();
-			ret.setException(e);
-		}
-		return ret;
-	}
-		
 	/**
 	 *  Create belief events from a belief name.
 	 *  For normal beliefs 

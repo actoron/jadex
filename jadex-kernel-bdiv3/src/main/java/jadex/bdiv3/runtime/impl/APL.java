@@ -3,6 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.annotation.GoalAPLBuild;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
@@ -355,8 +356,7 @@ public class APL
 				{
 					m.setAccessible(true);
 					
-					Object[] params = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
-						.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element);
+					Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element, ia);
 					if(params==null)
 						System.out.println("Invalid parameter assignment");
 					Object app = m.invoke(pojo, params);
