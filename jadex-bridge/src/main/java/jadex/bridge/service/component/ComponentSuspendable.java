@@ -5,16 +5,18 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
+import jadex.commons.future.ThreadLocalTransferHelper;
+
+import java.util.Map;
 
 /**
  *  Allow waiting for futures by blocking a component.
  */
-public class ComponentSuspendable implements ISuspendable
+public class ComponentSuspendable extends ThreadLocalTransferHelper implements ISuspendable
 {
 	/** The component suspendables. */
 	public static final ThreadLocal<ComponentSuspendable> COMSUPS = new ThreadLocal<ComponentSuspendable>();
@@ -26,6 +28,9 @@ public class ComponentSuspendable implements ISuspendable
 	
 	/** The current future. */
 	protected Future<?>	future;
+	
+	/** The thread locals. */
+	protected Map<ThreadLocal<Object>, Object> vals;
 	
 	//-------- constructors --------
 	
@@ -63,6 +68,7 @@ public class ComponentSuspendable implements ISuspendable
 			}
 			finally
 			{
+				afterSwitch();
 				this.future	= null;
 //				System.out.println("ComponentSuspendable.unsuspend "+Thread.currentThread());
 			}
@@ -87,6 +93,7 @@ public class ComponentSuspendable implements ISuspendable
 						// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 						if(future==ComponentSuspendable.this.future)
 						{
+							beforeSwitch();
 							((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
 								.unblock(ComponentSuspendable.this, null);
 						}

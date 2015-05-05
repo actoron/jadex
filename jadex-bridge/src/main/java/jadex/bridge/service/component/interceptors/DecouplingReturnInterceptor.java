@@ -63,9 +63,10 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							// Don't reschedule if already on correct thread.
 							if(caller==null || caller.getComponentFeature(IExecutionFeature.class).isComponentThread())
 							{
-								CallAccess.setCurrentInvocation(sic.getLastServiceCall());
-								CallAccess.setLastInvocation(sic.getServiceCall());
-								CallAccess.resetNextInvocation();
+								// Is now done in future resume
+//								CallAccess.setCurrentInvocation(sic.getLastServiceCall());
+//								CallAccess.setLastInvocation(sic.getServiceCall());
+//								CallAccess.resetNextInvocation();
 								
 								if(isUndone() && listener instanceof IUndoneResultListener)
 								{
@@ -82,9 +83,10 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										CallAccess.setCurrentInvocation(sic.getLastServiceCall());
-										CallAccess.setLastInvocation(sic.getServiceCall());
-										CallAccess.resetNextInvocation();
+										// Is now done in future resume
+//										CallAccess.setCurrentInvocation(sic.getLastServiceCall());
+//										CallAccess.setLastInvocation(sic.getServiceCall());
+//										CallAccess.resetNextInvocation();
 										
 										if(isUndone() && listener instanceof IUndoneResultListener)
 										{

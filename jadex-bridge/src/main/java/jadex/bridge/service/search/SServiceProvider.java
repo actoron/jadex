@@ -178,6 +178,21 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
+	public static <T> T getLocalService0(final IInternalAccess component, final Class<T> type, final String scope, final IFilter<T> filter, boolean proxy)
+	{
+		checkThreadAccess(component, proxy);
+		
+		T ret = PlatformServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
+		return proxy && ret!=null? createRequiredProxy(component, ret, type): ret;
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param component The internal access.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
 	public static <T> T getLocalService(final IInternalAccess component, final Class<T> type, final IComponentIdentifier target, boolean proxy)
 	{
 		checkThreadAccess(component, proxy);

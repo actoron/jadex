@@ -134,7 +134,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 //						System.out.println("Signed: "+SUtil.arrayToString(signed));
 						
 						// get service call meta object and set the timeout
-						context.getServiceCall().setProperty(Authenticated.AUTHENTICATED, signed);		
+						context.getNextServiceCall().setProperty(Authenticated.AUTHENTICATED, signed);		
 						ret.setResult(null);
 					}
 				});
@@ -152,7 +152,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		final Future<Void> ret = new Future<Void>();
 		
 //		final ServiceCall call = ServiceCall.getCurrentInvocation();
-		final ServiceCall call = context.getServiceCall();
+		final ServiceCall call = context.getNextServiceCall();
 		final IComponentIdentifier caller = call.getCaller();
 		final String callername = caller.getPlatformPrefix();
 		final byte[] signed = (byte[])call.getProperty(Authenticated.AUTHENTICATED);

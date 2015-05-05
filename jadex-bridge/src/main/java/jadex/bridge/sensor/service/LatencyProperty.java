@@ -63,9 +63,9 @@ public class LatencyProperty extends TimedProperty
 							if(context!=null)
 							{
 								ServiceInvocationContext sic = (ServiceInvocationContext)context;
-								if(sic.getServiceCall()!=null)
+								if(sic.getNextServiceCall()!=null)
 								{
-									Long exe = (Long)sic.getServiceCall().getProperty("__duration");
+									Long exe = (Long)sic.getNextServiceCall().getProperty("__duration");
 									if(exe!=null)
 									{
 										long dur = System.currentTimeMillis() - start.longValue() - exe.longValue();

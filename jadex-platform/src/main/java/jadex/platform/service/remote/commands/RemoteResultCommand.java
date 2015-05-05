@@ -3,10 +3,8 @@ package jadex.platform.service.remote.commands;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Security;
-import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -140,9 +138,14 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		else //if(!future.isDone())
 		if(wci!=null)
 		{
-			if(nonfunc!=null && wci.getContext()!=null)
+			if(nonfunc!=null)// && wci.getContext()!=null)
 			{
-				ServiceCall sc = ((ServiceInvocationContext)wci.getContext()).getServiceCall();
+//				ServiceCall sc = ((ServiceInvocationContext)wci.getContext()).getServiceCall();
+//				ServiceCall sc1 = ((ServiceInvocationContext)wci.getContext()).getServiceCall();
+//				ServiceCall sc2 = ((ServiceInvocationContext)wci.getContext()).getLastServiceCall();
+				ServiceCall sc = ServiceCall.getLastInvocation();
+//				ServiceCall sc1 = ServiceCall.getCurrentInvocation();
+//				ServiceCall sc2 = ServiceCall.getNextInvocation();
 				for(String name: nonfunc.keySet())
 				{
 					sc.setProperty(name, nonfunc.get(name));

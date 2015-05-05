@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import jadex.bridge.service.annotation.Timeout;
+import jadex.commons.future.ThreadLocalTransferHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class ServiceCall
 	public static final String INHERIT = "inherit";
 	
 	/** The current service calls mapped to threads. */
-	protected static final ThreadLocal<ServiceCall> CALLS = new ThreadLocal<ServiceCall>();
+	protected static final ThreadLocal<ServiceCall> CURRENT = new ThreadLocal<ServiceCall>();
 	
 	/** The upcoming service invocations. */
 	protected static final ThreadLocal<ServiceCall> NEXT = new ThreadLocal<ServiceCall>();
@@ -41,6 +42,12 @@ public class ServiceCall
 	/** The upcoming service invocations. */
 	protected static final ThreadLocal<ServiceCall> LAST = new ThreadLocal<ServiceCall>();
 
+	static
+	{
+		ThreadLocalTransferHelper.addThreadLocal(CURRENT);
+		ThreadLocalTransferHelper.addThreadLocal(NEXT);
+		ThreadLocalTransferHelper.addThreadLocal(LAST);
+	}
 	
 	//-------- attributes --------
 	
@@ -88,7 +95,7 @@ public class ServiceCall
 	 */
 	public static ServiceCall	getCurrentInvocation()
 	{
-		return CALLS.get();
+		return CURRENT.get();
 	}
 	
 	/**

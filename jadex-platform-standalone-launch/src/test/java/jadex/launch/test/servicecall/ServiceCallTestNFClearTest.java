@@ -25,218 +25,258 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-public class ServiceCallTestNFClearTest {
+/**
+ *  Test if non functional properties are being reset after service call.
+ *  
+ *  Test cases: R = required service proxy, P = provided service proxy, S = service impl, RS = remote proxy of service
+ *  
+ *  R -> P -> S			normal case from component that has used a required service (service is local)
+ *  R -> S				+ service is raw
+ *  R -> RS -> P -> S	normal case from component that has used a required service (service is remote)
+ *  R -> RS -> S		+ service is raw
+ *  P -> S				non-component thread has searched for a service (service is local)
+ *  S					+ service is raw
+ *  RS -> P	-> S		non-component thread has searched for a service (service is remote)
+ *  RS -> S				+ service is raw
+ *
+ *  (R) -> (RS) -> (P) -> S	maximal chain, all () parts are optional	
+ */
+public class ServiceCallTestNFClearTest
+{
+	private static final int	USER_TIMEOUT	= 2015;
 
-	
-	private static final int USER_TIMEOUT = 2015;
+	@Rule
+	public TestName				name			= new TestName();
 
-	@Rule 
-	public TestName name = new TestName();
-	
-	private IExternalAccess platform1;
+	private IExternalAccess		platform1;
 
-	private IExternalAccess platform2;
+	private IExternalAccess		platform2;
 
-	private long timeout;
-	
+	private long				timeout;
+
 	@Before
-	public void setUp() {
+	public void setUp()
+	{
 		timeout = Starter.getLocalDefaultTimeout(null);
-		
-		String	pid	= SUtil.createUniqueId(name.getMethodName(), 3)+"-*";
-		
-		platform1 = Starter.createPlatform(new String[]{"-platformname", pid,
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
-			}).get(timeout);
-		
-		platform2 = Starter.createPlatform(new String[]{"-platformname", pid,
-				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
-			}).get(timeout);
-		
+
+		String pid = SUtil.createUniqueId(name.getMethodName(), 3) + "-*";
+
+		platform1 = Starter.createPlatform(
+			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",}).get(timeout);
+
+		platform2 = Starter.createPlatform(
+			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",}).get(timeout);
+
 		createProxies(platform1, platform2);
-		
+
 		CallAccess.resetNextInvocation();
 	}
-	
+
 	/**
 	 * main thread -> decoupled provided service
 	 */
 	@Test
-	public void testMain_toProvidedRaw() {
+	public void testMain_toProvidedRaw()
+	{
 		IExternalAccess exta = createServiceAgent(platform1, RawServiceAgent.class);
 		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
-	
+
 	/**
 	 * main thread -> direct provided service
 	 */
 	@Test
-	public void testMain_toProvidedDirect() {
+	public void testMain_toProvidedDirect()
+	{
 		IExternalAccess exta = createServiceAgent(platform1, DirectServiceAgent.class);
 		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
-	
+
 	/**
 	 * main thread -> decoupled provided service
 	 */
 	@Test
-	public void testMain_toProvidedDecoupled() {
+	public void testMain_toProvidedDecoupled()
+	{
 		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
 		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
-	
+
 	// ----------------- Single Platform tests -------------------
-	
-	
+
+
 	/**
 	 * agent -> raw provided service
 	 */
 	@Test
-	public void testAgent_toProvidedRaw() {
+	public void testAgent_toProvidedRaw()
+	{
 		testProvided(platform1, RawServiceAgent.class);
 	}
-	
+
 	/**
 	 * agent -> direct provided service
 	 */
 	@Test
-	public void testAgent_toProvidedDirect() {
+	public void testAgent_toProvidedDirect()
+	{
 		testProvided(platform1, DirectServiceAgent.class);
 	}
-	
+
 	/**
 	 * agent -> decoupled provided service
 	 */
 	@Test
-	public void testAgent_toProvidedDecoupled() {
+	public void testAgent_toProvidedDecoupled()
+	{
 		testProvided(platform1, DecoupledServiceAgent.class);
 	}
-	
+
 	/**
 	 * agent -> raw required service -> provided service -> impl
 	 */
 	@Test
-	public void testAgent_toRequiredRaw_toProvidedDecoupled_local() {
+	public void testAgent_toRequiredRaw_toProvidedDecoupled_local()
+	{
 		testRequiredToProvided(platform1, platform1, DecoupledServiceAgent.class, ServiceCallAgent.class, "raw", false);
 	}
-	
+
 	/**
 	 * agent -> direct required service -> provided service -> impl
 	 */
 	@Test
-	public void testAgent_toRequiredDirect_toProvidedDecoupled_local() {
+	public void testAgent_toRequiredDirect_toProvidedDecoupled_local()
+	{
 		testRequiredToProvided(platform1, platform1, DecoupledServiceAgent.class, ServiceCallAgent.class, "direct", false);
 	}
-	
+
 	/**
 	 * agent -> decoupled required service -> provided service -> impl
 	 */
 	@Test
-	public void testAgent_toRequiredDecoupled_toProvidedDecoupled_local() {
+	public void testAgent_toRequiredDecoupled_toProvidedDecoupled_local()
+	{
 		testRequiredToProvided(platform1, platform1, DecoupledServiceAgent.class, ServiceCallAgent.class, "decoupled", false);
 	}
-	
-	
+
 	// ----------------- Remote Platform tests -------------------
-	
+
 	/**
 	 * agent -> raw required service -> Remote -> raw provided service -> impl
 	 */
 	@Test
-	public void testAgent_toRequiredRaw_toProvidedRaw_remote() {
+	public void testAgent_toRequiredRaw_toProvidedRaw_remote()
+	{
 		testRequiredToProvided(platform1, platform2, RawServiceAgent.class, ServiceCallAgent.class, "raw", false);
 	}
-	
+
 	/**
-	 * agent -> direct required service -> Remote -> raw provided service -> impl
+	 * agent -> direct required service -> Remote -> raw provided service ->
+	 * impl
 	 */
 	@Test
-	public void testAgent_toRequiredDirect_toProvidedRaw_remote() {
+	public void testAgent_toRequiredDirect_toProvidedRaw_remote()
+	{
 		testRequiredToProvided(platform1, platform2, RawServiceAgent.class, ServiceCallAgent.class, "direct", false);
 	}
-	
+
 	/**
-	 * agent -> decoupled required service -> Remote -> raw provided service -> impl
+	 * agent -> decoupled required service -> Remote -> raw provided service ->
+	 * impl
 	 */
 	@Test
-	public void testAgent_toRequiredDecoupled_toProvidedRaw_remote() {
+	public void testAgent_toRequiredDecoupled_toProvidedRaw_remote()
+	{
 		testRequiredToProvided(platform1, platform2, RawServiceAgent.class, ServiceCallAgent.class, "decoupled", false);
 	}
-	
+
 	/**
 	 * agent -> raw required service -> Remote -> provided service -> impl
 	 */
 	@Test
-	public void testAgent_toRequiredRaw_toProvidedDecoupled_remote() {
+	public void testAgent_toRequiredRaw_toProvidedDecoupled_remote()
+	{
 		testRequiredToProvided(platform1, platform2, DecoupledServiceAgent.class, ServiceCallAgent.class, "raw", false);
 	}
-	
+
 	/**
 	 * agent -> direct required service -> remote -> provided service -> impl
 	 */
 	@Test
-	public void testAgent_toRequiredDirect_toProvidedDecoupled_remote() {
-		testRequiredToProvided(platform1, platform2, DecoupledServiceAgent.class, ServiceCallAgent.class, "direct", false);	
+	public void testAgent_toRequiredDirect_toProvidedDecoupled_remote()
+	{
+		testRequiredToProvided(platform1, platform2, DecoupledServiceAgent.class, ServiceCallAgent.class, "direct", false);
 	}
-	
+
 	/**
 	 * agent -> decoupled required service -> remote -> provided service -> impl
 	 */
 	@Test
-	public void testAgent_toRequiredDecoupled_toProvidedDecoupled_remote() {
+	public void testAgent_toRequiredDecoupled_toProvidedDecoupled_remote()
+	{
 		testRequiredToProvided(platform1, platform2, DecoupledServiceAgent.class, ServiceCallAgent.class, "decoupled", false);
 	}
-	
-	private void testProvided(IExternalAccess p1, Class<?> provider) {
+
+	private void testProvided(IExternalAccess p1, Class< ? > provider)
+	{
 		testRequiredToProvided(p1, null, provider, null, null, true);
 	}
-	
-	private void testRequiredToProvided(IExternalAccess p1, IExternalAccess p2, Class<?> provider, Class<?> consumer, final String requiredOrProvidedServiceName, final boolean useProvided) {
+
+	private void testRequiredToProvided(IExternalAccess p1, IExternalAccess p2, Class< ? > provider, Class< ? > consumer, final String requiredOrProvidedServiceName, final boolean useProvided)
+	{
 		IExternalAccess exta = createServiceAgent(p1, provider);
-		if (consumer != null) {
+		if(consumer != null)
+		{
 			exta = createServiceAgent(p2, consumer);
 		}
 
-		exta.scheduleStep(new IComponentStep<Void>() {
-
+		exta.scheduleStep(new IComponentStep<Void>()
+		{
 			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
 				IServiceCallService service;
-				if (useProvided) {
-//					if (requiredOrProvidedServiceName != null) {
-//						service = (IServiceCallService) ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(requiredOrProvidedServiceName);
-//					} else {
-						service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
-//					}
-				} else {
-					service = (IServiceCallService) ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName).get();
+				if(useProvided)
+				{
+					// if (requiredOrProvidedServiceName != null) {
+					// service = (IServiceCallService)
+					// ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(requiredOrProvidedServiceName);
+					// } else {
+					service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
+					// }
+				}
+				else
+				{
+					service = (IServiceCallService)ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName).get();
 				}
 				assertServiceCallResetsServiceInvocation(service);
 				return Future.DONE;
 			}
 		}).get();
 	}
-	
-	private void assertServiceCallResetsServiceInvocation(IServiceCallService service) {
+
+	private void assertServiceCallResetsServiceInvocation(IServiceCallService service)
+	{
 		ServiceCall.getOrCreateNextInvocation().setTimeout(USER_TIMEOUT);
 		service.call().get();
 		long timeout2 = -1;
 		ServiceCall nextInvocation = ServiceCall.getOrCreateNextInvocation();
-		if (nextInvocation.hasUserTimeout()) {
+		if(nextInvocation.hasUserTimeout())
+		{
 			timeout2 = nextInvocation.getTimeout();
 			assertNotEquals(2015, timeout2);
 		}
 	}
-	
-	private IExternalAccess createServiceAgent(IExternalAccess platform, Class<?> clazz)
+
+	private IExternalAccess createServiceAgent(IExternalAccess platform, Class< ? > clazz)
 	{
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
-		
+
 		final Future<IComponentIdentifier> future = new Future<IComponentIdentifier>();
-		cms.createComponent(clazz.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>()
+		cms.createComponent(clazz.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			@Override
 			public void firstResultAvailable(IComponentIdentifier result)
@@ -255,14 +295,14 @@ public class ServiceCallTestNFClearTest {
 				exception.printStackTrace();
 			}
 		});
-		
+
 		// wait for creation
 		IComponentIdentifier identifier = future.get();
-		
+
 		return cms.getExternalAccess(identifier).get();
 	}
-	
-	private void createProxies(IExternalAccess ... platforms)
+
+	private void createProxies(IExternalAccess... platforms)
 	{
 		for(int i = 0; i < platforms.length; i++)
 		{

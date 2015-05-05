@@ -284,14 +284,16 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			
 			final Object res = method.invoke(target, parametervalues);
 			
-			Map<String, Object> nfunc = nonfunc;
-			ServiceCall sc = ServiceCall.getOrCreateNextInvocation(); // hmm has not been switched during call to last
-			if(sc!=null)
-			{
-				nfunc = sc.getProperties();
-			}
+//			if(methodname.indexOf("method")!=-1)
+//				System.out.println("gggg");
 			
-			handleResultFuture(terminable, rsms, callid, res, terminable, methodname, ridcom, ret, nfunc);
+//			Map<String, Object> nfunc = nonfunc;
+//			ServiceCall sc = ServiceCall.getOrCreateNextInvocation(); // hmm has not been switched during call to last
+//			ServiceCall sc = ServiceCall.getCurrentInvocation();
+//			if(sc!=null)
+//				nfunc = sc.getProperties();
+			
+			handleResultFuture(terminable, rsms, callid, res, terminable, methodname, ridcom, ret);
 			
 //			// Remember invocation for termination invocation
 //			if(terminable) // or pullable
@@ -579,9 +581,9 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  Handle the result future by checking what future it is and
 	 *  sending intermediate results as commands. 
 	 */
-	public static void handleResultFuture(boolean terminable, final RemoteServiceManagementService rsms, final String callid, final Object res,
-		final boolean returnisref, final String methodname, final IComponentIdentifier rec, final IntermediateFuture<IRemoteCommand> ret,
-		final Map<String, Object> nonfunc)
+	public void handleResultFuture(boolean terminable, final RemoteServiceManagementService rsms, final String callid, final Object res,
+		final boolean returnisref, final String methodname, final IComponentIdentifier rec, final IntermediateFuture<IRemoteCommand> ret)
+//		final Map<String, Object> nonfunc)
 	{
 		// Remember invocation for termination invocation
 		if(terminable) // or pullable
@@ -606,14 +608,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				{
 //					System.out.println("inter: "+result);
 					ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, result, callid, 
-						returnisref, methodname, false, nonfunc, (IFuture<?>)res, cnt++));
+						returnisref, methodname, false, getNFProps(true), (IFuture<?>)res, cnt++));
 				}
 				
 				public void finished()
 				{
 //					System.out.println("fin");
 					ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, null, callid, 
-						returnisref, methodname, true, nonfunc, (IFuture<?>)res, cnt));
+						returnisref, methodname, true, getNFProps(false), (IFuture<?>)res, cnt));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
 				}
@@ -622,7 +624,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				{
 //					System.out.println("ra");
 					ret.addIntermediateResult(new RemoteResultCommand(rec, result, null, callid, 
-						returnisref, methodname, nonfunc));
+						returnisref, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
 				}
@@ -631,7 +633,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				{
 //					System.out.println("ra");
 					ret.addIntermediateResult(new RemoteResultCommand(rec, result, null, callid, 
-						returnisref, methodname, nonfunc));
+						returnisref, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
 				}
@@ -640,14 +642,15 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				{
 //					System.out.println("ex: "+exception);
 					ret.addIntermediateResult(new RemoteResultCommand(rec, null, exception, callid, 
-						false, methodname, nonfunc));
+						false, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
 				}
+				
 				public void commandAvailable(Object command)
 				{
 					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, command, callid, 
-						returnisref, methodname, nonfunc));
+						returnisref, methodname, getNFProps(true)));
 				}
 			});
 		}
@@ -658,7 +661,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				public void resultAvailable(Object result)
 				{
 					ret.addIntermediateResult(new RemoteResultCommand(rec, result, null, callid, 
-						returnisref, methodname, nonfunc));
+						returnisref, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
 				}
@@ -666,7 +669,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				public void exceptionOccurred(Exception exception)
 				{
 					ret.addIntermediateResult(new RemoteResultCommand(rec, null, exception, callid, 
-						false, methodname, nonfunc));
+						false, methodname, getNFProps(false)));
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
 				}
@@ -674,18 +677,33 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				public void commandAvailable(Object command)
 				{
 					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, command, callid, 
-						returnisref, methodname, nonfunc));
+						returnisref, methodname, getNFProps(true)));
 				}
 			});
 		}
 		else
 		{
 			ret.addIntermediateResult(new RemoteResultCommand(rec, res, null, callid, 
-				returnisref, methodname, nonfunc));
+				returnisref, methodname, getNFProps(false)));
 			ret.setFinished();
 			rsms.removeProcessingCall(callid);
 		}
 	}
 	
+	/**
+	 *  Get the non functional props from the executed call.
+	 *  @return The call props.
+	 */
+	protected Map<String, Object> getNFProps(boolean intermediate)
+	{
+//		if(method.getName().indexOf("method")!=-1)
+//			System.out.println("aas");
+		Map<String, Object> ret = nonfunc;
+		// During intermediate results the call is still running and nf vals must be fetched from current invoc
+		ServiceCall sc = intermediate? ServiceCall.getCurrentInvocation(): ServiceCall.getLastInvocation();
+		if(sc!=null)
+			ret = sc.getProperties();
+		return ret;
+	}
 }
 
