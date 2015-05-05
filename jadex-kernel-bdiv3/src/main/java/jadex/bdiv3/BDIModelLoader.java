@@ -61,8 +61,6 @@ public class BDIModelLoader extends AbstractModelLoader
 		ClassLoader classloader, Object context) throws Exception
 	{
 //		System.out.println("cache miss: "+name);
-		if(((Object[])context).length!=3)
-			System.out.println("sdgdf");
 		return (ICacheableModel)reader.read(name, imports, classloader, 
 			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1], (List<IComponentFeatureFactory>)((Object[])context)[2]);
 	}

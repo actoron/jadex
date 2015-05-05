@@ -1,14 +1,5 @@
 package jadex.bdiv3.features.impl;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.RawEvent;
@@ -16,7 +7,6 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature.GoalsExistCondition;
 import jadex.bdiv3.features.impl.BDIAgentFeature.LifecycleStateCondition;
 import jadex.bdiv3.features.impl.BDIAgentFeature.PlansExistCondition;
-import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCondition;
@@ -70,10 +60,19 @@ import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.CombinedCondition;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
  */
-public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
+public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature implements IInternalBDILifecycleFeature
 {
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(ILifecycleComponentFeature.class, BDILifecycleAgentFeature.class,
@@ -89,9 +88,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 	{
 		super(component, cinfo);
 		
-//		BDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class);
-//		Object pojo = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-//		bdif.injectAgent(getComponent(), pojo, bdif.getBDIModel(), null);
+//		BDIAgentFeature bdif = (IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class);
+//		Object pojo = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+//		bdif.injectAgent(component, pojo, bdif.getBDIModel(), null);
 //		bdif.invokeInitCalls(pojo);
 //		bdif.initCapabilities(pojo, bdif.getBDIModel().getSubcapabilities() , 0);
 	}
@@ -112,26 +111,26 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 	 */
 	public IFuture<Void> body()
 	{
-		startBehavior();
+		startBehavior(getComponent());
+		inited	= true;
 		return super.body();
 	}
 	
 	/**
 	 *  Start the component behavior.
 	 */
-	public void startBehavior()
+	public static void startBehavior(final IInternalAccess component)
 	{
 //		super.startBehavior();
 		
 //		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
-		final Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				
-		final IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class);
+		final IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class);
 		final IBDIModel bdimodel = bdif.getBDIModel();
 		final RuleSystem rulesystem = bdif.getRuleSystem();
 		
 		// Init bdi configuration
-		String confname = getComponent().getConfiguration();
+		String confname = component.getConfiguration();
 		if(confname!=null)
 		{
 			MConfiguration mconf = bdimodel.getCapability().getConfiguration(confname);
@@ -147,11 +146,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 						try
 						{
 							MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
-							Object val = SJavaParser.parseExpression(uexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader()).getValue(null);
+							Object val = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(null);
 	//						Field f = mbel.getTarget().getField(getClassLoader());
 	//						f.setAccessible(true);
 	//						f.set(agent, val);
-							mbel.setValue(getComponent(), val);
+							mbel.setValue(component, val);
 						}
 						catch(RuntimeException e)
 						{
@@ -177,7 +176,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 						// Create goal if expression available
 						if(uexp.getValue()!=null && uexp.getValue().length()>0)
 						{
-							Object o = SJavaParser.parseExpression(uexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader()).getValue(getComponent().getFetcher());
+							Object o = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
 							if(o instanceof Class)
 							{
 								gcl = (Class<?>)o;
@@ -191,7 +190,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 						
 						if(gcl==null && uexp.getClazz()!=null)
 						{
-							gcl = uexp.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
+							gcl = uexp.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports());
 						}
 						if(gcl==null)
 						{
@@ -200,11 +199,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 							if(mgoal==null && uexp.getName().indexOf(".")==-1)
 							{
 								// try with package
-								mgoal = bdimodel.getCapability().getGoal(getComponent().getModel().getPackage()+"."+uexp.getName());
+								mgoal = bdimodel.getCapability().getGoal(component.getModel().getPackage()+"."+uexp.getName());
 							}
 							if(mgoal!=null)
 							{
-								gcl = mgoal.getTargetClass(getComponent().getClassLoader());
+								gcl = mgoal.getTargetClass(component.getClassLoader());
 							}
 						}
 						if(mgoal==null)
@@ -215,6 +214,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 						{
 							try
 							{
+								Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 								Class<?> agcl = agent.getClass();
 								Constructor<?>[] cons = gcl.getDeclaredConstructors();
 								for(Constructor<?> c: cons)
@@ -249,8 +249,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 							throw new RuntimeException("Could not create initial goal: "+uexp);
 						}
 						
-						RGoal rgoal = new RGoal(getComponent(), mgoal, goal, (RPlan)null);
-						RGoal.adoptGoal(rgoal, getComponent());
+						RGoal rgoal = new RGoal(component, mgoal, goal, (RPlan)null);
+						RGoal.adoptGoal(rgoal, component);
 					}
 				}
 				
@@ -264,8 +264,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 						// todo: allow Java plan constructor calls
 	//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 					
-						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, getComponent());
-						RPlan.executePlan(rplan, getComponent(), null);
+						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component);
+						RPlan.executePlan(rplan, component, null);
 					}
 				}
 			}
@@ -282,6 +282,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 			Object	cap = null;
 			if(evs!=null && !evs.isEmpty())
 			{
+				Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 				Object	ocapa	= agent;
 				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
 				if(i!=-1)
@@ -292,7 +293,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 
 				for(String ev: evs)
 				{
-					BDIAgentFeature.addBeliefEvents(getComponent(), events, ev);
+					BDIAgentFeature.addBeliefEvents(component, events, ev);
 				}
 			}
 			
@@ -329,9 +330,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 						}
 						else
 						{
-							Object value = mbel.getValue(getComponent());
+							Object value = mbel.getValue(component);
 							// todo: save old value?!
-							BDIAgentFeature.createChangeEvent(value, oldval, null, getComponent(), mbel.getName());
+							BDIAgentFeature.createChangeEvent(value, oldval, null, component, mbel.getName());
 							oldval = value;
 						}
 						return IFuture.DONE;
@@ -353,11 +354,12 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 				}
 				else
 				{
+					Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 					capa	= agent;
 					name	= mbel.getName();
 				}
 
-				final IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
 				{
 					ITimedObject	self	= this;
@@ -367,7 +369,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 					{
 						try
 						{
-							getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+							component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
@@ -382,8 +384,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 										// Otherwise just call getValue and throw event
 										else
 										{
-											Object value = mbel.getValue(capa, getComponent().getClassLoader());
-											BDIAgentFeature.createChangeEvent(value, oldval, null, getComponent(), mbel.getName());
+											Object value = mbel.getValue(capa, component.getClassLoader());
+											BDIAgentFeature.createChangeEvent(value, oldval, null, component, mbel.getName());
 											oldval = value;
 										}
 									}
@@ -405,7 +407,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 				
 					public void exceptionOccurred(Exception exception)
 					{
-						getComponent().getLogger().severe("Cannot update belief "+mbel.getName()+": "+exception);
+						component.getLogger().severe("Cannot update belief "+mbel.getName()+": "+exception);
 					}
 				});
 			}
@@ -420,7 +422,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 		
 //			boolean fin = false;
 			
-			final Class<?> gcl = mgoal.getTargetClass(getComponent().getClassLoader());
+			final Class<?> gcl = mgoal.getTargetClass(component.getClassLoader());
 //			boolean declarative = false;
 //			boolean maintain = false;
 			
@@ -431,7 +433,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 				{
 					if(cond.getConstructorTarget()!=null)
 					{
-						final Constructor<?> c = cond.getConstructorTarget().getConstructor(getComponent().getClassLoader());
+						final Constructor<?> c = cond.getConstructorTarget().getConstructor(component.getClassLoader());
 						
 						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
 							ICondition.TRUE_CONDITION, new IAction<Void>()
@@ -452,6 +454,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 									
 									for(int i=0; i<ptypes.length; i++)
 									{
+										Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 										Object	o	= event.getContent();
 										if(o!=null && SReflect.isSupertype(ptypes[i], o.getClass()))
 										{
@@ -502,12 +505,12 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 									{
 										public void resultAvailable(Object result)
 										{
-											getComponent().getLogger().info("Goal succeeded: "+result);
+											component.getLogger().info("Goal succeeded: "+result);
 										}
 										
 										public void exceptionOccurred(Exception exception)
 										{
-											getComponent().getLogger().info("Goal failed: "+fpojogoal+" "+exception);
+											component.getLogger().info("Goal failed: "+fpojogoal+" "+exception);
 										}
 									});
 								}
@@ -524,7 +527,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 					}
 					else if(cond.getMethodTarget()!=null)
 					{
-						final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
+						final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
 						
 						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
 							new MethodCondition(null, m)
@@ -533,7 +536,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 							{
 								m.setAccessible(true);
 								Object[] pvals = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
-									mgoal, new ChangeEvent(event), null, null, getComponent());
+									mgoal, new ChangeEvent(event), null, null, component);
 								return pvals!=null? m.invoke(null, pvals): null;
 							}
 														
@@ -602,7 +605,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 											try
 											{
 												Object[] vals = BDIAgentFeature.getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(),
-													mgoal, new ChangeEvent(event), null, null, getComponent());
+													mgoal, new ChangeEvent(event), null, null, component);
 												if(vals!=null)
 												{
 													pojogoal = c.newInstance(vals);
@@ -637,7 +640,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 			{
 				for(MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
+					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_drop", 
 						new GoalsExistCondition(mgoal, bdif.getCapability()), new IAction<Void>()
@@ -649,7 +652,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 								if(!RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
 									 && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
 								{
-									executeGoalMethod(m, goal, event)
+									executeGoalMethod(m, goal, event, component)
 										.addResultListener(new IResultListener<Boolean>()
 									{
 										public void resultAvailable(Boolean result)
@@ -667,7 +670,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 //																super.printStackTrace();
 //															}
 //														});
-													goal.setProcessingState(getComponent(), RGoal.GoalProcessingState.FAILED);
+													goal.setProcessingState(component, RGoal.GoalProcessingState.FAILED);
 												}
 											}
 										}
@@ -696,7 +699,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 			{
 				for(final MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
+					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_suspend", 
 						new GoalsExistCondition(mgoal, bdif.getCapability()), new IAction<Void>()
@@ -709,7 +712,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 								  && !RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
 								  && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
 								{	
-									executeGoalMethod(m, goal, event)
+									executeGoalMethod(m, goal, event, component)
 										.addResultListener(new IResultListener<Boolean>()
 									{
 										public void resultAvailable(Boolean result)
@@ -718,7 +721,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 											{
 //													if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
 //														System.out.println("Goal suspended: "+goal);
-												goal.setLifecycleState(getComponent(), RGoal.GoalLifecycleState.SUSPENDED);
+												goal.setLifecycleState(component, RGoal.GoalLifecycleState.SUSPENDED);
 												goal.setState(RProcessableElement.State.INITIAL);
 											}
 										}
@@ -749,7 +752,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 							{
 								if(RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState()))
 								{	
-									executeGoalMethod(m, goal, event)
+									executeGoalMethod(m, goal, event, component)
 										.addResultListener(new IResultListener<Boolean>()
 									{
 										public void resultAvailable(Boolean result)
@@ -758,7 +761,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 											{
 //													if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
 //														System.out.println("Goal made option: "+goal);
-												goal.setLifecycleState(getComponent(), RGoal.GoalLifecycleState.OPTION);
+												goal.setLifecycleState(component, RGoal.GoalLifecycleState.OPTION);
 //													setState(ia, PROCESSABLEELEMENT_INITIAL);
 											}
 										}
@@ -786,7 +789,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 			{
 				for(final MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
+					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_target", 
 						new CombinedCondition(new ICondition[]{
@@ -805,14 +808,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 						{
 							for(final RGoal goal: bdif.getCapability().getGoals(mgoal))
 							{
-								executeGoalMethod(m, goal, event)
+								executeGoalMethod(m, goal, event, component)
 									.addResultListener(new IResultListener<Boolean>()
 								{
 									public void resultAvailable(Boolean result)
 									{
 										if(result.booleanValue())
 										{
-											goal.targetConditionTriggered(getComponent(), event, rule, context);
+											goal.targetConditionTriggered(component, event, rule, context);
 										}
 									}
 									
@@ -837,7 +840,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 			{
 				for(final MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
+					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_recur",
 						new GoalsExistCondition(mgoal, bdif.getCapability()), new IAction<Void>()
@@ -854,7 +857,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 								if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
 									&& RGoal.GoalProcessingState.PAUSED.equals(goal.getProcessingState()))
 								{	
-									executeGoalMethod(m, goal, event)
+									executeGoalMethod(m, goal, event, component)
 										.addResultListener(new IResultListener<Boolean>()
 									{
 										public void resultAvailable(Boolean result)
@@ -863,7 +866,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 											{
 												goal.setTriedPlans(null);
 												goal.setApplicablePlanList(null);
-												goal.setProcessingState(getComponent(), RGoal.GoalProcessingState.INPROCESS);
+												goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
 											}
 										}
 										
@@ -886,7 +889,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 			{
 				for(final MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(getComponent().getClassLoader());
+					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_maintain", 
 						new GoalsExistCondition(mgoal, bdif.getCapability()), new IAction<Void>()
@@ -903,7 +906,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 								if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
 									&& RGoal.GoalProcessingState.IDLE.equals(goal.getProcessingState()))
 								{	
-									executeGoalMethod(m, goal, event)
+									executeGoalMethod(m, goal, event, component)
 										.addResultListener(new IResultListener<Boolean>()
 									{
 										public void resultAvailable(Boolean result)
@@ -912,7 +915,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 											{
 //													System.out.println("Goal maintain triggered: "+goal);
 //													System.out.println("state was: "+goal.getProcessingState());
-												goal.setProcessingState(getComponent(), RGoal.GoalProcessingState.INPROCESS);
+												goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
 											}
 										}
 										
@@ -942,14 +945,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 							{
 								for(final RGoal goal: bdif.getCapability().getGoals(mgoal))
 								{
-									executeGoalMethod(m, goal, event)
+									executeGoalMethod(m, goal, event, component)
 										.addResultListener(new IResultListener<Boolean>()
 									{
 										public void resultAvailable(Boolean result)
 										{
 											if(result.booleanValue())
 											{
-												goal.targetConditionTriggered(getComponent(), event, rule, context);
+												goal.targetConditionTriggered(component, event, rule, context);
 											}
 										}
 										
@@ -979,8 +982,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 			{
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 				{
-					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), getComponent());
-					RPlan.executePlan(rplan, getComponent(), null);
+					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component);
+					RPlan.executePlan(rplan, component, null);
 					return IFuture.DONE;
 				}
 			};
@@ -1043,16 +1046,16 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 			
 			// context condition
 			
-			final MethodInfo mi = mplan.getBody().getContextConditionMethod(getComponent().getClassLoader());
+			final MethodInfo mi = mplan.getBody().getContextConditionMethod(component.getClassLoader());
 			if(mi!=null)
 			{
-				PlanContextCondition pcc = mi.getMethod(getComponent().getClassLoader()).getAnnotation(PlanContextCondition.class);
+				PlanContextCondition pcc = mi.getMethod(component.getClassLoader()).getAnnotation(PlanContextCondition.class);
 				String[] evs = pcc.beliefs();
 				RawEvent[] rawevs = pcc.rawevents();
 				List<EventType> events = new ArrayList<EventType>();
 				for(String ev: evs)
 				{
-					BDIAgentFeature.addBeliefEvents(getComponent(), events, ev);
+					BDIAgentFeature.addBeliefEvents(component, events, ev);
 				}
 				for(RawEvent rawev: rawevs)
 				{
@@ -1067,7 +1070,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 						
 						for(final RPlan plan: coll)
 						{
-							invokeBooleanMethod(plan.getBody().getBody(), mi.getMethod(getComponent().getClassLoader()), plan.getModelElement(), event, plan)
+							invokeBooleanMethod(plan.getBody().getBody(), mi.getMethod(component.getClassLoader()), plan.getModelElement(), event, plan, component)
 								.addResultListener(new IResultListener<Boolean>()
 							{
 								public void resultAvailable(Boolean result)
@@ -1119,9 +1122,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 						{
 	//						if(other.getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) 
 	//							&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
-							if(!other.isInhibitedBy(goal) && other.inhibits(goal, getComponent()))
+							if(!other.isInhibitedBy(goal) && other.inhibits(goal, component))
 							{
-								goal.addInhibitor(other, getComponent());
+								goal.addInhibitor(other, component);
 							}
 						}
 						
@@ -1170,9 +1173,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 									for(RGoal other: goals)
 									{
 	//									if(!other.isInhibitedBy(goal) && goal.inhibits(other, getInternalAccess()))
-										if(!goal.isInhibitedBy(other) && goal.inhibits(other, getComponent()))
+										if(!goal.isInhibitedBy(other) && goal.inhibits(other, component))
 										{
-											other.addInhibitor(goal, getComponent());
+											other.addInhibitor(goal, component);
 										}
 									}
 								}
@@ -1227,7 +1230,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 											continue;
 										
 										if(other.isInhibitedBy(goal))
-											other.removeInhibitor(goal, getComponent());
+											other.removeInhibitor(goal, component);
 									}
 								}
 							}
@@ -1244,7 +1247,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 											continue;
 										
 										if(other.isInhibitedBy(goal))
-											other.removeInhibitor(goal, getComponent());
+											other.removeInhibitor(goal, component);
 									}
 								}
 							}
@@ -1264,7 +1267,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 					{
 						RGoal goal = (RGoal)event.getContent();
 	//					System.out.println("optionizing: "+goal+" "+goal.inhibitors);
-						goal.setLifecycleState(getComponent(), RGoal.GoalLifecycleState.OPTION);
+						goal.setLifecycleState(component, RGoal.GoalLifecycleState.OPTION);
 						return IFuture.DONE;
 					}
 				});
@@ -1291,7 +1294,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 					RGoal goal = (RGoal)event.getContent();
 //						if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
 //							System.out.println("reactivating: "+goal);
-					goal.setLifecycleState(getComponent(), RGoal.GoalLifecycleState.ACTIVE);
+					goal.setLifecycleState(component, RGoal.GoalLifecycleState.ACTIVE);
 					return IFuture.DONE;
 				}
 			});
@@ -1302,10 +1305,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 		}
 		
 		// perform init write fields (after injection of bdiagent)
-		BDIAgentFeature.performInitWrites(getComponent());
+		BDIAgentFeature.performInitWrites(component);
 		
 		// Start rule system
-		inited	= true;
 //			if(getComponentIdentifier().getName().indexOf("Cleaner")!=-1)// && getComponentIdentifier().getName().indexOf("Burner")==-1)
 //				getCapability().dumpPlansPeriodically(getInternalAccess());
 //			if(getComponentIdentifier().getName().indexOf("Ambulance")!=-1)
@@ -1326,15 +1328,15 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 	/**
 	 *  Execute a goal method.
 	 */
-	protected IFuture<Boolean> executeGoalMethod(Method m, RProcessableElement goal, IEvent event)
+	protected static IFuture<Boolean> executeGoalMethod(Method m, RProcessableElement goal, IEvent event, IInternalAccess component)
 	{
-		return invokeBooleanMethod(goal.getPojoElement(), m, goal.getModelElement(), event, null);
+		return invokeBooleanMethod(goal.getPojoElement(), m, goal.getModelElement(), event, null, component);
 	}
 	
 	/**
 	 * 
 	 */
-	protected IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, MElement modelelement, IEvent event, RPlan rplan)
+	protected static IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, MElement modelelement, IEvent event, RPlan rplan, IInternalAccess component)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
 		try
@@ -1342,7 +1344,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 			m.setAccessible(true);
 			
 			Object[] vals = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
-				modelelement, event!=null ? new ChangeEvent(event) : null, rplan, null, getComponent());
+				modelelement, event!=null ? new ChangeEvent(event) : null, rplan, null, component);
 			if(vals==null)
 				System.out.println("Invalid parameter assignment");
 			Object app = m.invoke(pojo, vals);

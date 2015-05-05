@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  *  Common interface for micro- and xml-based BDI agent models.
  */
-public interface IBDIModel
+public interface IBDIModel 
 {
 	/**
 	 *  Get the mcapa.

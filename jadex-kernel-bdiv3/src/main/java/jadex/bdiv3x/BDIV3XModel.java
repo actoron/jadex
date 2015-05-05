@@ -1,12 +1,15 @@
 package jadex.bdiv3x;
 
+import java.util.Map;
+
+import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MCapability;
 import jadex.bridge.modelinfo.ModelInfo;
 
 /**
  *  Model for BDI v3x agents
  */
-public class BDIV3XModel	extends ModelInfo
+public class BDIV3XModel	extends ModelInfo implements IBDIModel
 {
 	//-------- attributes --------
 	
@@ -31,5 +34,13 @@ public class BDIV3XModel	extends ModelInfo
 	public MCapability	getCapability()
 	{
 		return capa;
+	}
+	
+	/**
+	 *  Get the belief mappings (target->source).
+	 */
+	public Map<String, String> getBeliefMappings()
+	{
+		throw new UnsupportedOperationException();
 	}
 }

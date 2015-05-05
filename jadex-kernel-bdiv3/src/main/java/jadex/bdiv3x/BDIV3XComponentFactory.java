@@ -1,11 +1,11 @@
 package jadex.bdiv3x;
 
-import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
-import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
 import jadex.bdiv3.features.impl.BDIMonitoringComponentFeature;
 import jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature;
 import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
+import jadex.bdiv3x.features.BDIAgentFeature;
+import jadex.bdiv3x.features.BDILifecycleAgentFeature;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -30,7 +30,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
-import jadex.micro.MicroAgentFactory;
 
 import java.io.IOException;
 import java.util.Arrays;

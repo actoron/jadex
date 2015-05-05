@@ -1,18 +1,25 @@
-package jadex.bdiv3.features.impl;
+package jadex.bdiv3x.features;
 
 import jadex.bdiv3.ASMBDIClassGenerator;
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.annotation.Capability;
+import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MCondition;
+import jadex.bdiv3.model.MConfiguration;
+import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
@@ -22,6 +29,7 @@ import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.BodyAborted;
 import jadex.bdiv3.runtime.impl.CapabilityWrapper;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.GoalInfo;
 import jadex.bdiv3.runtime.impl.InvocationInfo;
 import jadex.bdiv3.runtime.impl.PlanInfo;
@@ -44,14 +52,21 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.FieldInfo;
 import jadex.commons.IResultCommand;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.SimpleParameterGuesser;
@@ -61,6 +76,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
 import jadex.rules.eca.ChangeInfo;
@@ -69,12 +86,15 @@ import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
+import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
+import jadex.rules.eca.annotations.CombinedCondition;
 import jadex.rules.eca.annotations.Event;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -82,6 +102,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +119,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		null, new Class[]{ILifecycleComponentFeature.class, IProvidedServicesFeature.class});
 	
 	/** The bdi model. */
-	protected BDIModel bdimodel;
+	protected IBDIModel bdimodel;
 	
 	/** The rule system. */
 	protected RuleSystem rulesystem;
@@ -118,11 +139,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		super(component, cinfo);
 		
-		Object pojo = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-		ASMBDIClassGenerator.checkEnhanced(pojo.getClass());
-		this.bdimodel = (BDIModel)getComponent().getModel().getRawModel();
+		this.bdimodel = (IBDIModel)getComponent().getModel();
 		this.capa = new RCapability(bdimodel.getCapability());
-		this.rulesystem = new RuleSystem(pojo);
+		this.rulesystem = new RuleSystem(null);
 	}
 
 	/**
@@ -133,10 +152,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		// cannot do this in constructor because it needs access to this feature in expressions
 		
-		Object pojo = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-		injectAgent(getComponent(), pojo, bdimodel, null);
-		invokeInitCalls(pojo);
-		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
+//		injectAgent(getComponent(), pojo, bdimodel, null);
+//		invokeInitCalls(pojo);
+//		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
 //		startBehavior();
 		return IFuture.DONE;
 	}
@@ -171,521 +189,6 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
 		}
 	}
-	
-	/**
-	 *  Get the init calls.
-	 *  Cleans the initargs field on return.
-	 */
-	public static List<Tuple2<Class<?>[], Object[]>>	getInitCalls(Object obj, Class<?> clazz)
-	{
-		try
-		{
-			Field f	= clazz.getDeclaredField("__initargs");
-			f.setAccessible(true);
-			List<Tuple2<Class<?>[], Object[]>> initcalls	= (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
-			f.set(obj, null);
-			return initcalls;
-		}
-		catch(Exception e)
-		{
-			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
-		}
-	}
-	
-	/**
-	 *  Method that is called automatically when a belief 
-	 *  is written as field access.
-	 */
-	protected void writeField(Object val, String belname, String fieldname, Object obj)
-	{
-		writeField(val, belname, fieldname, obj, new EventType(ChangeEvent.BELIEFCHANGED+"."+belname), new EventType(ChangeEvent.FACTCHANGED+"."+belname));
-	}
-	
-	/**
-	 *  Method that is called automatically when a belief 
-	 *  is written as field access.
-	 */
-	protected void writeField(Object val, String belname, String fieldname, Object obj, EventType ev1, EventType ev2)
-	{
-		assert isComponentThread();
-		
-		// todo: support for belief sets (un/observe values? insert mappers when setting value etc.
-		
-		try
-		{
-//				System.out.println("write: "+val+" "+fieldname+" "+obj);
-//			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-			RuleSystem rs = ((IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
-
-			Object oldval = setFieldValue(obj, fieldname, val);
-			
-			// unobserve old value for property changes
-			rs.unobserveObject(oldval);
-
-			MBelief	mbel = ((MCapability)((IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
-		
-			if(!SUtil.equals(val, oldval))
-			{
-				publishToolBeliefEvent(getComponent(), mbel);
-//					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
-				rs.addEvent(new jadex.rules.eca.Event(ev1, new ChangeInfo<Object>(val, oldval, null)));
-				// execute rulesystem immediately to ensure that variable values are not changed afterwards
-				if(((IInternalBDILifecycleFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited())
-					rs.processAllEvents(); 
-			}
-			
-			// observe new value for property changes
-//				observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname, mbel);
-			observeValue(rs, val, getComponent(), ev2, mbel);
-			
-			// initiate a step to reevaluate the conditions
-			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep()
-			{
-				public IFuture execute(IInternalAccess ia)
-				{
-					return IFuture.DONE;
-				}
-			});
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/**
-	 *  Set the value of a field.
-	 *  @param obj The object.
-	 *  @param fieldname The name of the field.
-	 *  @return The old field value.
-	 */
-	protected static Object setFieldValue(Object obj, String fieldname, Object val) throws IllegalAccessException
-	{
-		Tuple2<Field, Object> res = findFieldWithOuterClass(obj, fieldname);
-		Field f = res.getFirstEntity();
-		if(f==null)
-			throw new RuntimeException("Field not found: "+fieldname);
-		
-		Object tmp = res.getSecondEntity();
-		f.setAccessible(true);
-		Object oldval = f.get(tmp);
-		f.set(tmp, val);
-	
-		return oldval;
-	}
-	
-	/**
-	 * 
-	 * @param obj
-	 * @param fieldname
-	 * @return
-	 */
-	protected static Tuple2<Field, Object> findFieldWithOuterClass(Object obj, String fieldname)
-	{
-		Field f = null;
-		Object tmp = obj;
-		while(f==null && tmp!=null)
-		{
-			f = findFieldWithSuperclass(tmp.getClass(), fieldname);
-			if(f==null)
-			{
-				try
-				{
-					Field fi = tmp.getClass().getDeclaredField("this$0");
-					fi.setAccessible(true);
-					tmp = fi.get(tmp);
-				}
-				catch(Exception e)
-				{
-//						e.printStackTrace();
-					tmp=null;
-				}
-			}
-		}
-		return new Tuple2<Field, Object>(f, tmp);
-	}
-	
-	/**
-	 * 
-	 * @param cl
-	 * @param fieldname
-	 * @return
-	 */
-	protected static Field findFieldWithSuperclass(Class<?> cl, String fieldname)
-	{
-		Field ret = null;
-		while(ret==null && !Object.class.equals(cl))
-		{
-			try
-			{
-				ret = cl.getDeclaredField(fieldname);
-			}
-			catch(Exception e)
-			{
-				cl = cl.getSuperclass();
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Method that is called automatically when a belief 
-	 *  is written as field access.
-	 */
-	public static void writeField(Object val, String fieldname, Object obj, IInternalAccess agent)
-	{
-//		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
-		
-		// This is the case in inner classes
-		if(agent==null)
-		{
-			try
-			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, "__agent");
-//					System.out.println("res: "+res);
-				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-		
-		String belname	= getBeliefName(obj, fieldname);
-
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-		MBelief mbel = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getBelief(belname);
-		
-		// Wrap collections of multi beliefs (if not already a wrapper)
-		if(mbel.isMulti(agent.getClassLoader()))
-		{
-			String addev = ChangeEvent.FACTADDED+"."+belname;
-			String remev = ChangeEvent.FACTREMOVED+"."+belname;
-			String chev = ChangeEvent.FACTCHANGED+"."+belname;
-			if(val instanceof List && !(val instanceof jadex.commons.collection.wrappers.ListWrapper))
-			{
-				val = new ListWrapper((List<?>)val, agent, addev, remev, chev, mbel);
-			}
-			else if(val instanceof Set && !(val instanceof jadex.commons.collection.wrappers.SetWrapper))
-			{
-				val = new SetWrapper((Set<?>)val, agent, addev, remev, chev, mbel);
-			}
-			else if(val instanceof Map && !(val instanceof jadex.commons.collection.wrappers.MapWrapper))
-			{
-				val = new MapWrapper((Map<?,?>)val, agent, addev, remev, chev, mbel);
-			}
-		}
-		
-		// agent is not null any more due to deferred exe of init expressions but rules are
-		// available only after startBehavior
-		if(((IInternalBDILifecycleFeature)agent.getComponentFeature(ILifecycleComponentFeature.class)).isInited())
-		{
-			((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).writeField(val, belname, fieldname, obj);
-		}
-		else
-		{
-			// In init set field immediately but throw events later, when agent is available.
-			
-			try
-			{
-				setFieldValue(obj, fieldname, val);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
-			synchronized(initwrites)
-			{
-				List<Object[]> inits = initwrites.get(agent);
-				if(inits==null)
-				{
-					inits = new ArrayList<Object[]>();
-					initwrites.put(agent, inits);
-				}
-				inits.add(new Object[]{val, belname});
-			}
-		}
-	}
-	
-	/** Saved init writes. */
-	protected final static Map<Object, List<Object[]>> initwrites = new HashMap<Object, List<Object[]>>();
-	
-	/**
-	 * 
-	 */
-	public static void performInitWrites(IInternalAccess agent)
-	{
-		synchronized(initwrites)
-		{
-			List<Object[]> writes = initwrites.remove(agent);
-			if(writes!=null)
-			{
-				for(Object[] write: writes)
-				{
-//					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
-//					agent.writeField(write[0], (String)write[1], write[2]);
-//					BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-					RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
-					final String belname = (String)write[1];
-					Object val = write[0];
-//						rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
-					rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, null, null)));
-					MBelief	mbel = ((MCapability)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
-					observeValue(rs, val, agent, ChangeEvent.FACTCHANGED+"."+belname, mbel);
-				}
-			}
-		}
-	}
-	
-	/**
-	 *  Method that is called automatically when a belief 
-	 *  is written as array access.
-	 */
-	// todo: allow init writes in constructor also for arrays
-	public static void writeArrayField(Object array, final int index, Object val, Object agentobj, String fieldname)
-	{
-		// This is the case in inner classes
-		IInternalAccess agent = null;
-		if(agentobj instanceof IInternalAccess)
-		{
-			agent = (IInternalAccess)agentobj;
-		}
-		else
-		{
-			try
-			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, "__agent");
-//					System.out.println("res: "+res);
-				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-		
-//		final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-		
-		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-
-		// Test if array store is really a belief store instruction by
-		// looking up the current belief value and comparing it with the
-		// array that is written
-		
-		String belname	= getBeliefName(agentobj, fieldname);
-		MBelief	mbel = ((MCapability)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
-		
-		Object curval = mbel.getValue(agent);
-		boolean isbeliefwrite = curval==array;
-		
-		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
-//			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
-		
-		Object oldval = null;
-		if(isbeliefwrite)
-		{
-			oldval = Array.get(array, index);
-			rs.unobserveObject(oldval);	
-		}
-		
-		Class<?> ct = array.getClass().getComponentType();
-		if(boolean.class.equals(ct))
-		{
-			val = ((Integer)val)==1? Boolean.TRUE: Boolean.FALSE;
-		}
-		else if(byte.class.equals(ct))
-		{
-//				val = new Byte(((Integer)val).byteValue());
-			val = Byte.valueOf(((Integer)val).byteValue());
-		}
-		Array.set(array, index, val);
-		
-		if(isbeliefwrite)
-		{
-			observeValue(rs, val, agent, new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}), mbel);
-			
-			if(!SUtil.equals(val, oldval))
-			{
-				publishToolBeliefEvent(agent, mbel);
-
-				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}), new ChangeInfo<Object>(val, oldval, Integer.valueOf(index))); // todo: index
-				rs.addEvent(ev);
-				// execute rulesystem immediately to ensure that variable values are not changed afterwards
-				rs.processAllEvents(); 
-			}
-		}
-	}
-	
-	/**
-	 *  Unobserving an old belief value.
-	 *  @param agent The agent.
-	 *  @param belname The belief name.
-	 */
-	public static void unobserveValue(IInternalAccess agent, final String belname)
-	{
-//		System.out.println("unobserve: "+agent+" "+belname);
-		
-		try
-		{
-			Object pojo = agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-		
-			Method getter = pojo.getClass().getMethod("get"+belname.substring(0,1).toUpperCase()+belname.substring(1), new Class[0]);
-			Object oldval = getter.invoke(pojo, new Object[0]);
-		
-			RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
-			rs.unobserveObject(oldval);	
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 *  Observe a value.
-	 */
-	public static void observeValue(RuleSystem rs, Object val, final IInternalAccess agent, final String etype, final MBelief mbel)
-	{
-		observeValue(rs, val, agent, new EventType(etype), mbel);
-	}
-	
-	/**
-	 *  Observe a value.
-	 */
-	public static void observeValue(final RuleSystem rs, final Object val, final IInternalAccess agent, final EventType etype, final MBelief mbel)
-	{
-		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-
-		if(val!=null)
-		{
-			rs.observeObject(val, true, false, new IResultCommand<IFuture<Void>, PropertyChangeEvent>()
-			{
-				public IFuture<Void> execute(final PropertyChangeEvent event)
-				{
-					final Future<Void> ret = new Future<Void>();
-					try
-					{
-						IFuture<Void> fut = agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								publishToolBeliefEvent(agent, mbel);
-								
-		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
-		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
-								jadex.rules.eca.Event ev = new jadex.rules.eca.Event(etype, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
-								rs.addEvent(ev);
-								return IFuture.DONE;
-//									return new Future<IEvent>(ev);
-							}
-						});
-						fut.addResultListener(new DelegationResultListener<Void>(ret)
-						{
-							public void exceptionOccurred(Exception exception)
-							{
-								if(exception instanceof ComponentTerminatedException)
-								{
-//										System.out.println("Ex in observe: "+exception.getMessage());
-									rs.unobserveObject(val);
-									ret.setResult(null);
-								}
-								else
-								{
-									super.exceptionOccurred(exception);
-								}
-							}
-						});
-					}
-					catch(Exception e)
-					{
-						if(!(e instanceof ComponentTerminatedException))
-							System.out.println("Ex in observe: "+e.getMessage());
-						rs.unobserveObject(val);
-						ret.setResult(null);
-					}
-					return ret;
-				}
-			});
-		}
-	}
-
-	/**
-	 *  Get the value of an abstract belief.
-	 */
-	public static Object	getAbstractBeliefValue(IInternalAccess component, String capa, String name, Class<?> type)
-	{
-//			System.out.println("getAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name+", "+type);
-		BDIModel bdimodel = (BDIModel)((IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
-		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
-		if(belname==null)
-		{
-			throw new RuntimeException("No mapping for abstract belief: "+capa+MElement.CAPABILITY_SEPARATOR+name);
-		}
-		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
-		Object	ret	= bel.getValue(component);
-		
-		if(ret==null)
-		{
-			if(type.equals(boolean.class))
-			{
-				ret	= Boolean.FALSE;
-			}
-			else if(type.equals(char.class))
-			{
-				ret	= Character.valueOf((char)0);
-			}
-			else if(SReflect.getWrappedType(type)!=type)	// Number type
-			{
-				ret	= Integer.valueOf(0);
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Set the value of an abstract belief.
-	 */
-	public static void	setAbstractBeliefValue(IInternalAccess component, String capa, String name, Object value)
-	{
-//			System.out.println("setAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
-		BDIModel bdimodel = (BDIModel)((IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
-		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
-		if(belname==null)
-		{
-			throw new RuntimeException("No mapping for abstract belief: "+capa+MElement.CAPABILITY_SEPARATOR+name);
-		}
-		MBelief	mbel = bdimodel.getCapability().getBelief(belname);
-
-		// Maybe unobserve old value
-		Object	old	= mbel.getValue(component);
-
-		boolean	field = mbel.setValue(component, value);
-		
-		if(field)
-		{
-//			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-			RuleSystem rs = ((IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
-			rs.unobserveObject(old);	
-			createChangeEvent(value, old, null, component, mbel.getName());
-			observeValue(rs, value, component, ChangeEvent.FACTCHANGED+"."+mbel.getName(), mbel);
-		}
-	}
-	
-//		public static void createChangeEvent(Object val, final BDIAgent agent, final String belname)
-//		{
-//			createChangeEvent(val, null, null, agent, belname);
-//		}
 	
 	/**
 	 *  Caution: this method is used from byte engineered code, change signature with caution
@@ -757,185 +260,185 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	
 	//-------- methods for goal/plan parameter rewrites --------
 	
-	/**
-	 *  Method that is called automatically when a parameter 
-	 *  is written as field access.
-	 */
-	public static void writeParameterField(Object val, String fieldname, Object obj, IInternalAccess agent)
-	{
-//			System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
-		
-		// This is the case in inner classes
-		if(agent==null)
-		{
-			try
-			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, "__agent");
-//						System.out.println("res: "+res);
-				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-		String elemname = obj.getClass().getName();
-		MGoal mgoal = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getGoal(elemname);
-		
-//			String paramname = elemname+"."+fieldname; // ?
-
-		if(mgoal!=null)
-		{
-			MParameter mparam = mgoal.getParameter(fieldname);
-			if(mparam!=null)
-			{
-				// Wrap collections of multi beliefs (if not already a wrapper)
-				if(mparam.isMulti(agent.getClassLoader()))
-				{
-					EventType addev = new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, fieldname});
-					EventType remev = new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, fieldname});
-					EventType chev = new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, fieldname});
-					if(val instanceof List && !(val instanceof ListWrapper))
-					{
-						val = new ListWrapper((List<?>)val, agent, addev, remev, chev, null);
-					}
-					else if(val instanceof Set && !(val instanceof SetWrapper))
-					{
-						val = new SetWrapper((Set<?>)val, agent, addev, remev, chev, null);
-					}
-					else if(val instanceof Map && !(val instanceof MapWrapper))
-					{
-						val = new MapWrapper((Map<?,?>)val, agent, addev, remev, chev, null);
-					}
-				}
-			}
-		}
-		
-		// agent is not null any more due to deferred exe of init expressions but rules are
-		// available only after startBehavior
-		if(((IInternalBDILifecycleFeature)agent.getComponentFeature(ILifecycleComponentFeature.class)).isInited())
-		{
-			EventType chev1 = new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, fieldname});
-			EventType chev2 = new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, fieldname});
-			((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).writeField(val, null, fieldname, obj, chev1, chev2);
-		}
-//				else
+//	/**
+//	 *  Method that is called automatically when a parameter 
+//	 *  is written as field access.
+//	 */
+//	public static void writeParameterField(Object val, String fieldname, Object obj, IInternalAccess agent)
+//	{
+////			System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
+//		
+//		// This is the case in inner classes
+//		if(agent==null)
+//		{
+//			try
+//			{
+//				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, "__agent");
+////						System.out.println("res: "+res);
+//				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
+//			}
+//			catch(RuntimeException e)
+//			{
+//				throw e;
+//			}
+//			catch(Exception e)
+//			{
+//				throw new RuntimeException(e);
+//			}
+//		}
+//
+////		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+//		String elemname = obj.getClass().getName();
+//		MGoal mgoal = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getGoal(elemname);
+//		
+////			String paramname = elemname+"."+fieldname; // ?
+//
+//		if(mgoal!=null)
+//		{
+//			MParameter mparam = mgoal.getParameter(fieldname);
+//			if(mparam!=null)
+//			{
+//				// Wrap collections of multi beliefs (if not already a wrapper)
+//				if(mparam.isMulti(agent.getClassLoader()))
 //				{
-//					// In init set field immediately but throw events later, when agent is available.
-//					
-//					try
+//					EventType addev = new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, fieldname});
+//					EventType remev = new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, fieldname});
+//					EventType chev = new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, fieldname});
+//					if(val instanceof List && !(val instanceof ListWrapper))
 //					{
-//						setFieldValue(obj, fieldname, val);
+//						val = new ListWrapper((List<?>)val, agent, addev, remev, chev, null);
 //					}
-//					catch(Exception e)
+//					else if(val instanceof Set && !(val instanceof SetWrapper))
 //					{
-//						e.printStackTrace();
-//						throw new RuntimeException(e);
+//						val = new SetWrapper((Set<?>)val, agent, addev, remev, chev, null);
 //					}
-//					synchronized(initwrites)
+//					else if(val instanceof Map && !(val instanceof MapWrapper))
 //					{
-//						List<Object[]> inits = initwrites.get(agent);
-//						if(inits==null)
-//						{
-//							inits = new ArrayList<Object[]>();
-//							initwrites.put(agent, inits);
-//						}
-//						inits.add(new Object[]{val, belname});
+//						val = new MapWrapper((Map<?,?>)val, agent, addev, remev, chev, null);
 //					}
 //				}
-	}
+//			}
+//		}
+//		
+//		// agent is not null any more due to deferred exe of init expressions but rules are
+//		// available only after startBehavior
+//		if(((IBDILifecycleAgentFeature)agent.getComponentFeature(ILifecycleComponentFeature.class)).isInited())
+//		{
+//			EventType chev1 = new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, fieldname});
+//			EventType chev2 = new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, fieldname});
+//			((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).writeField(val, null, fieldname, obj, chev1, chev2);
+//		}
+////				else
+////				{
+////					// In init set field immediately but throw events later, when agent is available.
+////					
+////					try
+////					{
+////						setFieldValue(obj, fieldname, val);
+////					}
+////					catch(Exception e)
+////					{
+////						e.printStackTrace();
+////						throw new RuntimeException(e);
+////					}
+////					synchronized(initwrites)
+////					{
+////						List<Object[]> inits = initwrites.get(agent);
+////						if(inits==null)
+////						{
+////							inits = new ArrayList<Object[]>();
+////							initwrites.put(agent, inits);
+////						}
+////						inits.add(new Object[]{val, belname});
+////					}
+////				}
+//	}
 	
-	/**
-	 *  Method that is called automatically when a belief 
-	 *  is written as array access.
-	 */
-	// todo: allow init writes in constructor also for arrays
-	public static void writeArrayParameterField(Object array, final int index, Object val, Object agentobj, String fieldname)
-	{
-		// This is the case in inner classes
-		IInternalAccess agent = null;
-		if(agentobj instanceof IInternalAccess)
-		{
-			agent = (IInternalAccess)agentobj;
-		}
-		else
-		{
-			try
-			{
-				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, "__agent");
-//					System.out.println("res: "+res);
-				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-		
-//		final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-		
-		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-
-		// Test if array store is really a belief store instruction by
-		// looking up the current belief value and comparing it with the
-		// array that is written
-		
-		boolean isparamwrite = false;
-		
-		MGoal mgoal = ((MCapability)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getGoal(agentobj.getClass().getName());
-		if(mgoal!=null)
-		{
-			MParameter mparam = mgoal.getParameter(fieldname);
-			if(mparam!=null)
-			{
-				Object curval = mparam.getValue(agentobj, agent.getClassLoader());
-				isparamwrite = curval==array;
-			}
-		}
-		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
-//			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
-		
-		Object oldval = null;
-		if(isparamwrite)
-		{
-			oldval = Array.get(array, index);
-			rs.unobserveObject(oldval);	
-		}
-		
-		Class<?> ct = array.getClass().getComponentType();
-		if(boolean.class.equals(ct))
-		{
-			val = ((Integer)val)==1? Boolean.TRUE: Boolean.FALSE;
-		}
-		else if(byte.class.equals(ct))
-		{
-//				val = new Byte(((Integer)val).byteValue());
-			val = Byte.valueOf(((Integer)val).byteValue());
-		}
-		Array.set(array, index, val);
-		
-		if(isparamwrite)
-		{
-			
-			if(!SUtil.equals(val, oldval))
-			{
-				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname}), new ChangeInfo<Object>(val, oldval, Integer.valueOf(index)));
-				rs.addEvent(ev);
-				// execute rulesystem immediately to ensure that variable values are not changed afterwards
-				rs.processAllEvents(); 
-			}
-		}
-	}
+//	/**
+//	 *  Method that is called automatically when a belief 
+//	 *  is written as array access.
+//	 */
+//	// todo: allow init writes in constructor also for arrays
+//	public static void writeArrayParameterField(Object array, final int index, Object val, Object agentobj, String fieldname)
+//	{
+//		// This is the case in inner classes
+//		IInternalAccess agent = null;
+//		if(agentobj instanceof IInternalAccess)
+//		{
+//			agent = (IInternalAccess)agentobj;
+//		}
+//		else
+//		{
+//			try
+//			{
+//				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, "__agent");
+////					System.out.println("res: "+res);
+//				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
+//			}
+//			catch(RuntimeException e)
+//			{
+//				throw e;
+//			}
+//			catch(Exception e)
+//			{
+//				throw new RuntimeException(e);
+//			}
+//		}
+//		
+////		final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+//		
+//		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
+//
+//		// Test if array store is really a belief store instruction by
+//		// looking up the current belief value and comparing it with the
+//		// array that is written
+//		
+//		boolean isparamwrite = false;
+//		
+//		MGoal mgoal = ((MCapability)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getGoal(agentobj.getClass().getName());
+//		if(mgoal!=null)
+//		{
+//			MParameter mparam = mgoal.getParameter(fieldname);
+//			if(mparam!=null)
+//			{
+//				Object curval = mparam.getValue(agentobj, agent.getClassLoader());
+//				isparamwrite = curval==array;
+//			}
+//		}
+//		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+////			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
+//		
+//		Object oldval = null;
+//		if(isparamwrite)
+//		{
+//			oldval = Array.get(array, index);
+//			rs.unobserveObject(oldval);	
+//		}
+//		
+//		Class<?> ct = array.getClass().getComponentType();
+//		if(boolean.class.equals(ct))
+//		{
+//			val = ((Integer)val)==1? Boolean.TRUE: Boolean.FALSE;
+//		}
+//		else if(byte.class.equals(ct))
+//		{
+////				val = new Byte(((Integer)val).byteValue());
+//			val = Byte.valueOf(((Integer)val).byteValue());
+//		}
+//		Array.set(array, index, val);
+//		
+//		if(isparamwrite)
+//		{
+//			
+//			if(!SUtil.equals(val, oldval))
+//			{
+//				jadex.rules.eca.Event ev = new jadex.rules.eca.Event(new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname}), new ChangeInfo<Object>(val, oldval, Integer.valueOf(index)));
+//				rs.addEvent(ev);
+//				// execute rulesystem immediately to ensure that variable values are not changed afterwards
+//				rs.processAllEvents(); 
+//			}
+//		}
+//	}
 	
 	/**
 	 * 
@@ -986,115 +489,115 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //		return ret;
 //	}
 		
-	/**
-	 *  Inject the agent into annotated fields.
-	 */
-	protected void	injectAgent(IInternalAccess pa, Object agent, MicroModel model, String globalname)
-	{
-		FieldInfo[] fields = model.getAgentInjections();
-		for(int i=0; i<fields.length; i++)
-		{
-			try
-			{
-				Field f = fields[i].getField(getComponent().getClassLoader());
-				if(SReflect.isSupertype(f.getType(), ICapability.class))
-				{
-					f.setAccessible(true);
-					f.set(agent, new CapabilityWrapper(pa, agent, globalname));						
-				}
-				else
-				{
-					f.setAccessible(true);
-					f.set(agent, pa);
-				}
-			}
-			catch(Exception e)
-			{
-				pa.getLogger().warning("Agent injection failed: "+e);
-			}
-		}
-	
-		// Additionally inject hidden agent fields
-		Class<?> agcl = agent.getClass();
-		while(agcl.isAnnotationPresent(Agent.class)
-			|| agcl.isAnnotationPresent(Capability.class))
-		{
-			try
-			{
-				Field field = agcl.getDeclaredField("__agent");
-				field.setAccessible(true);
-				field.set(agent, pa);
-				
-				field = agcl.getDeclaredField("__globalname");
-				field.setAccessible(true);
-				field.set(agent, globalname);
-				agcl = agcl.getSuperclass();
-
-			}
-			catch(Exception e)
-			{
-				pa.getLogger().warning("Hidden agent injection failed: "+e);
-				break;
-			}
-		}
-		// Add hidden agent field also to contained inner classes (goals, plans)
-		// Does not work as would have to be inserted in each object of that type :-(
-//			Class<?>[] inners = agent.getClass().getDeclaredClasses();
-//			if(inners!=null)
+//	/**
+//	 *  Inject the agent into annotated fields.
+//	 */
+//	protected void	injectAgent(IInternalAccess pa, Object agent, MicroModel model, String globalname)
+//	{
+//		FieldInfo[] fields = model.getAgentInjections();
+//		for(int i=0; i<fields.length; i++)
+//		{
+//			try
 //			{
-//				for(Class<?> icl: inners)
+//				Field f = fields[i].getField(getComponent().getClassLoader());
+//				if(SReflect.isSupertype(f.getType(), ICapability.class))
+//				{
+//					f.setAccessible(true);
+//					f.set(agent, new CapabilityWrapper(pa, agent, globalname));						
+//				}
+//				else
+//				{
+//					f.setAccessible(true);
+//					f.set(agent, pa);
+//				}
+//			}
+//			catch(Exception e)
+//			{
+//				pa.getLogger().warning("Agent injection failed: "+e);
+//			}
+//		}
+//	
+//		// Additionally inject hidden agent fields
+//		Class<?> agcl = agent.getClass();
+//		while(agcl.isAnnotationPresent(Agent.class)
+//			|| agcl.isAnnotationPresent(Capability.class))
+//		{
+//			try
+//			{
+//				Field field = agcl.getDeclaredField("__agent");
+//				field.setAccessible(true);
+//				field.set(agent, pa);
+//				
+//				field = agcl.getDeclaredField("__globalname");
+//				field.setAccessible(true);
+//				field.set(agent, globalname);
+//				agcl = agcl.getSuperclass();
+//
+//			}
+//			catch(Exception e)
+//			{
+//				pa.getLogger().warning("Hidden agent injection failed: "+e);
+//				break;
+//			}
+//		}
+//		// Add hidden agent field also to contained inner classes (goals, plans)
+//		// Does not work as would have to be inserted in each object of that type :-(
+////			Class<?>[] inners = agent.getClass().getDeclaredClasses();
+////			if(inners!=null)
+////			{
+////				for(Class<?> icl: inners)
+////				{
+////					try
+////					{
+////						Field field = icl.getDeclaredField("__agent");
+////						field.setAccessible(true);
+////						field.set(icl, pa);
+////					}
+////					catch(Exception e)
+////					{
+////						e.printStackTrace();
+////					}
+////				}
+////			}
+//	}
+		
+//	/**
+//	 *  Get a capability pojo object.
+//	 */
+//	public Object	getCapabilityObject(String name)
+//	{
+////		Object	ret	= ((PojoBDIAgent)microagent).getPojoAgent();
+//		Object ret = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+//		if(name!=null)
+//		{
+//			StringTokenizer	stok	= new StringTokenizer(name, MElement.CAPABILITY_SEPARATOR);
+//			while(stok.hasMoreTokens())
+//			{
+//				name	= stok.nextToken();
+//				
+//				boolean found = false;
+//				Class<?> cl = ret.getClass();
+//				while(!found && !Object.class.equals(cl))
 //				{
 //					try
 //					{
-//						Field field = icl.getDeclaredField("__agent");
-//						field.setAccessible(true);
-//						field.set(icl, pa);
+//						Field	f	= cl.getDeclaredField(name);
+//						f.setAccessible(true);
+//						ret	= f.get(ret);
+//						found = true;
+//						break;
 //					}
 //					catch(Exception e)
 //					{
-//						e.printStackTrace();
+//						cl	= cl.getSuperclass();
 //					}
 //				}
+//				if(!found)
+//					throw new RuntimeException("Could not fetch capability object: "+name);
 //			}
-	}
-		
-	/**
-	 *  Get a capability pojo object.
-	 */
-	public Object	getCapabilityObject(String name)
-	{
-//		Object	ret	= ((PojoBDIAgent)microagent).getPojoAgent();
-		Object ret = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-		if(name!=null)
-		{
-			StringTokenizer	stok	= new StringTokenizer(name, MElement.CAPABILITY_SEPARATOR);
-			while(stok.hasMoreTokens())
-			{
-				name	= stok.nextToken();
-				
-				boolean found = false;
-				Class<?> cl = ret.getClass();
-				while(!found && !Object.class.equals(cl))
-				{
-					try
-					{
-						Field	f	= cl.getDeclaredField(name);
-						f.setAccessible(true);
-						ret	= f.get(ret);
-						found = true;
-						break;
-					}
-					catch(Exception e)
-					{
-						cl	= cl.getSuperclass();
-					}
-				}
-				if(!found)
-					throw new RuntimeException("Could not fetch capability object: "+name);
-			}
-		}
-		return ret;
-	}
+//		}
+//		return ret;
+//	}
 		
 	/**
 	 * 	Adapt element for use in inner capabilities.
@@ -1144,288 +647,66 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 		
 //	/**
-//	 *  Get the component fetcher.
+//	 *  Init the capability pojo objects.
 //	 */
-//	protected IResultCommand<Object, Class<?>>	getComponentFetcher()
+//	protected IFuture<Void>	initCapabilities(final Object agent, final Tuple2<FieldInfo, BDIModel>[] caps, final int i)
 //	{
-//		return new IResultCommand<Object, Class<?>>()
+//		final Future<Void>	ret	= new Future<Void>();
+//		
+//		if(i<caps.length)
 //		{
-//			public Object execute(Class<?> type)
+//			try
 //			{
-//				Object ret	= null;
-//				if(SReflect.isSupertype(type, microagent.getClass()))
+//				Field	f	= caps[i].getFirstEntity().getField(getComponent().getClassLoader());
+//				f.setAccessible(true);
+//				final Object capa = f.get(agent);
+//				
+//				String globalname;
+//				try
 //				{
-//					ret	= microagent;
+//					Field	g	= agent.getClass().getDeclaredField("__globalname");
+//					g.setAccessible(true);
+//					globalname	= (String)g.get(agent);
+//					globalname	= globalname==null ? f.getName() : globalname+MElement.CAPABILITY_SEPARATOR+f.getName();
 //				}
-//				else if(microagent instanceof IPojoMicroAgent
-//					&& SReflect.isSupertype(type, ((IPojoMicroAgent)microagent).getPojoAgent().getClass()))
+//				catch(Exception e)
 //				{
-//					ret	= ((IPojoMicroAgent)microagent).getPojoAgent();
+//					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
 //				}
-//				return ret;
+//				
+////				injectAgent(getComponent(), capa, caps[i].getSecondEntity(), globalname);
+//				
+//				// Todo: capability features?
+////				MicroInjectionComponentFeature.injectServices(capa, caps[i].getSecondEntity(), getComponent())
+////					.addResultListener(new DelegationResultListener<Void>(ret)
+////				{
+////					public void customResultAvailable(Void result)
+////					{
+////						injectParent(capa, caps[i].getSecondEntity())
+////							.addResultListener(new DelegationResultListener<Void>(ret)
+////						{
+////							public void customResultAvailable(Void result)
+////							{
+//								initCapabilities(agent, caps, i+1)
+//									.addResultListener(new DelegationResultListener<Void>(ret));
+////							}
+////						});
+////					}
+////				});				
 //			}
-//		};
-//	}
-		
-//	/**
-//	 *  Create a service implementation from description.
-//	 */
-//	protected Object createServiceImplementation(ProvidedServiceInfo info, IModelInfo model)
-//	{
-//		// Support special case that BDI should implement provided service with plans.
-//		Object ret = null;
-//		ProvidedServiceImplementation impl = info.getImplementation();
-//		if(impl!=null && impl.getClazz()!=null && impl.getClazz().getType(getClassLoader()).equals(BDIAgent.class))
-//		{
-//			Class<?> iface = info.getType().getType(getComponent().getClassLoader());
-//			ret = Proxy.newProxyInstance(getComponent().getClassLoader(), new Class[]{iface}, 
-//				new BDIServiceInvocationHandler(getComponent(), iface));
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
 //		}
 //		else
 //		{
-//			ret = super.createServiceImplementation(info, model);
+//			ret.setResult(null);
 //		}
-//		return ret;
-//	}
-		
-//	/**
-//	 *  Init a service.
-//	 */
-//	protected IFuture<Void> initService(ProvidedServiceInfo info, IModelInfo model, IResultCommand<Object, Class<?>> componentfetcher)
-//	{
-//		Future<Void>	ret	= new Future<Void>();
-//		
-//		int i	= info.getName()!=null ? info.getName().indexOf(MElement.CAPABILITY_SEPARATOR) : -1;
-////		Object	ocapa	= ((PojoBDIAgent)microagent).getPojoAgent();
-//		Object ocapa = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-//		String	capa	= null;
-//		final IValueFetcher	oldfetcher	= getFetcher();
-//		if(i!=-1)
-//		{
-//			capa	= info.getName().substring(0, i); 
-//			SimpleValueFetcher fetcher = new SimpleValueFetcher(oldfetcher);
-////			if(microagent instanceof IPojoMicroAgent)
-////			{
-//				ocapa	= getCapabilityObject(capa);
-//				fetcher.setValue("$pojocapa", ocapa);
-////			}
-//			this.fetcher = fetcher;
-//			final Object	oocapa	= ocapa;
-//			final String	scapa	= capa;
-//			componentfetcher	= componentfetcher!=null ? componentfetcher :
-//				new IResultCommand<Object, Class<?>>()
-//			{
-//				public Object execute(Class<?> type)
-//				{
-//					Object ret	= null;
-////					if(SReflect.isSupertype(type, microagent.getClass()))
-////					{
-////						ret	= microagent;
-////					}
-////					else 
-//					if(SReflect.isSupertype(type, oocapa.getClass()))
-//					{
-//						ret	= oocapa;
-//					}
-//					else if(SReflect.isSupertype(type, ICapability.class))
-//					{
-//						ret	= new CapabilityWrapper(getComponent(), oocapa, scapa);
-//					}
-//					return ret;
-//				}
-//			};
-//		}
-//		super.initService(info, model, componentfetcher).addResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				BDIAgentInterpreter.this.fetcher	= oldfetcher;
-//				super.customResultAvailable(result);
-//			}
-//		});
 //		
 //		return ret;
 //	}
-		
-//	/**
-//	 *  Add init code after parent injection.
-//	 */
-//	protected IFuture<Void> injectParent(final Object agent, final MicroModel model)
-//	{
-//		final Future<Void>	ret	= new Future<Void>();
-//		super.injectParent(agent, model).addResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				// Find classes with generated init methods.
-//				List<Class<?>>	inits	= new ArrayList<Class<?>>();
-//				inits.add(agent.getClass());
-//				for(int i=0; i<inits.size(); i++)
-//				{
-//					Class<?>	clazz	= inits.get(i);
-//					if(clazz.getSuperclass().isAnnotationPresent(Agent.class)
-//						|| clazz.getSuperclass().isAnnotationPresent(Capability.class))
-//					{
-//						inits.add(clazz.getSuperclass());
-//					}
-//				}
-//				
-//				// Call init methods of superclasses first.
-//				for(int i=inits.size()-1; i>=0; i--)
-//				{
-//					Class<?>	clazz	= inits.get(i);
-//					List<Tuple2<Class<?>[], Object[]>>	initcalls	= BDIAgent.getInitCalls(agent, clazz);
-//					for(Tuple2<Class<?>[], Object[]> initcall: initcalls)
-//					{					
-//						try
-//						{
-//							String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+clazz.getName().replace("/", "_").replace(".", "_");
-//							Method um = agent.getClass().getMethod(name, initcall.getFirstEntity());
-////								System.out.println("Init: "+um);
-//							um.invoke(agent, initcall.getSecondEntity());
-//						}
-//						catch(InvocationTargetException e)
-//						{
-//							e.getTargetException().printStackTrace();
-//						}
-//						catch(Exception e)
-//						{
-//							e.printStackTrace();
-//						}
-//					}
-//				}
-//				
-//				initCapabilities(agent, ((BDIModel)model).getSubcapabilities(), 0).addResultListener(new DelegationResultListener<Void>(ret));
-//			}
-//		});
-//		return ret;
-//	}
-		
-	/**
-	 *  Init the capability pojo objects.
-	 */
-	protected IFuture<Void>	initCapabilities(final Object agent, final Tuple2<FieldInfo, BDIModel>[] caps, final int i)
-	{
-		final Future<Void>	ret	= new Future<Void>();
-		
-		if(i<caps.length)
-		{
-			try
-			{
-				Field	f	= caps[i].getFirstEntity().getField(getComponent().getClassLoader());
-				f.setAccessible(true);
-				final Object capa = f.get(agent);
-				
-				String globalname;
-				try
-				{
-					Field	g	= agent.getClass().getDeclaredField("__globalname");
-					g.setAccessible(true);
-					globalname	= (String)g.get(agent);
-					globalname	= globalname==null ? f.getName() : globalname+MElement.CAPABILITY_SEPARATOR+f.getName();
-				}
-				catch(Exception e)
-				{
-					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
-				}
-				
-				injectAgent(getComponent(), capa, caps[i].getSecondEntity(), globalname);
-				
-				// Todo: capability features?
-//				MicroInjectionComponentFeature.injectServices(capa, caps[i].getSecondEntity(), getComponent())
-//					.addResultListener(new DelegationResultListener<Void>(ret)
-//				{
-//					public void customResultAvailable(Void result)
-//					{
-//						injectParent(capa, caps[i].getSecondEntity())
-//							.addResultListener(new DelegationResultListener<Void>(ret)
-//						{
-//							public void customResultAvailable(Void result)
-//							{
-								invokeInitCalls(capa);
-						
-								initCapabilities(agent, caps, i+1)
-									.addResultListener(new DelegationResultListener<Void>(ret));
-//							}
-//						});
-//					}
-//				});				
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
 	
-	/**
-	 *  Invoke init constructor calls.
-	 */
-	protected void invokeInitCalls(Object pojo)
-	{
-		// Find classes with generated init methods.
-		List<Class<?>>	inits	= new ArrayList<Class<?>>();
-		inits.add(pojo.getClass());
-		for(int i=0; i<inits.size(); i++)
-		{
-			Class<?>	clazz	= inits.get(i);
-			if(clazz.getSuperclass().isAnnotationPresent(Agent.class)
-				|| clazz.getSuperclass().isAnnotationPresent(Capability.class))
-			{
-				inits.add(clazz.getSuperclass());
-			}
-		}
-		
-		// Call init methods of superclasses first.
-		for(int i=inits.size()-1; i>=0; i--)
-		{
-			Class<?>	clazz	= inits.get(i);
-			List<Tuple2<Class<?>[], Object[]>>	initcalls	= getInitCalls(pojo, clazz);
-			for(Tuple2<Class<?>[], Object[]> initcall: initcalls)
-			{					
-				try
-				{
-					String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+clazz.getName().replace("/", "_").replace(".", "_");
-					Method um = pojo.getClass().getMethod(name, initcall.getFirstEntity());
-//					System.out.println("Init: "+um);
-					um.invoke(pojo, initcall.getSecondEntity());
-				}
-				catch(InvocationTargetException e)
-				{
-					e.getTargetException().printStackTrace();
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-		
-//		/**
-//		 *  Add extra init code after components.
-//		 */
-//		public IFuture<Void> initComponents(final IModelInfo model, String config)
-//		{
-//			final Future<Void>	ret	= new Future<Void>();
-//			super.initComponents(model, config).addResultListener(new DelegationResultListener<Void>(ret)
-//			{
-//				public void customResultAvailable(Void result)
-//				{
-//					Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
-////					wrapCollections(bdimodel.getCapability(), agent);
-//					ret.setResult(null);
-//				}
-//			});
-//			return ret;
-//		}
-		
 	/**
 	 * 
 	 */
@@ -1542,7 +823,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			public void customResultAvailable(Void result)
 			{
-				Object res = RGoal.getGoalResult(goal, mgoal, bdimodel.getClassloader());
+				Object res = RGoal.getGoalResult(goal, mgoal, ((ModelInfo)bdimodel).getClassLoader());
 				ret.setResult((E)res);
 			}
 		});
@@ -1624,7 +905,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		addBeliefEvents(getComponent(), events, fname);
 
 		final boolean multi = ((MCapability)getCapability().getModelElement())
-			.getBelief(fname).isMulti(bdimodel.getClassloader());
+			.getBelief(fname).isMulti(((ModelInfo)bdimodel).getClassLoader());
 		
 		String rulename = fname+"_belief_listener_"+System.identityHashCode(listener);
 		Rule<Void> rule = new Rule<Void>(rulename, 
@@ -2393,4 +1674,13 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			}
 //		};
 //	}
+	
+	/**
+	 *  Get a capability pojo object.
+	 *  @return The capability pojo.
+	 */
+	public Object	getCapabilityObject(String name)
+	{
+		throw new UnsupportedOperationException();
+	}
 }
