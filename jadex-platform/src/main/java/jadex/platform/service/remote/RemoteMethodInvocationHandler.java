@@ -164,21 +164,16 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		ServiceCall invoc = ServiceCall.getOrCreateNextInvocation(props);
 //		ServiceCall invoc = sic.getServiceCall();
 		
-		// Get method timeout
-		final long to = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): pi.getMethodTimeout(rsms.getComponent().getComponentIdentifier(), method);
 		// The reatime property is not necessary, as currently message are sent with realtime timeouts always  
 		
 //		if(method.getName().indexOf("schedule")!=-1)
 //		System.out.println("step: "+method.getName()+", "+invoc);
 		
-		// Get the secure transmission
-		boolean sec = pi.isSecure(method);
-		
 		Map<String, Object> nf = invoc!=null? invoc.getProperties(): new HashMap<String, Object>();
+		boolean sec = pi.isSecure(method);
 		if(sec)
-		{
 			nf.put(SecureTransmission.SECURE_TRANSMISSION, sec? Boolean.TRUE: Boolean.FALSE);
-		}
+		final long to = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): pi.getMethodTimeout(rsms.getComponent().getComponentIdentifier(), method);
 		nf.put(Timeout.TIMEOUT, Long.valueOf(to));
 		final Map<String, Object> nonfunc = nf; 
 		

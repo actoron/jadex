@@ -19,6 +19,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
+import jadex.commons.future.ThreadLocalTransferHelper;
 
 import java.util.Collection;
 
@@ -28,6 +29,8 @@ import java.util.Collection;
  */
 public abstract class Plan extends AbstractPlan implements ISuspendable//, IExternalCondition
 {
+	protected ThreadLocalTransferHelper tlcopy = new ThreadLocalTransferHelper();
+	
 	//-------- methods --------
 
 	/**
@@ -576,6 +579,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 //	   	}
 	   	finally
 	   	{
+	   		tlcopy.afterSwitch();
 			this.future	= null;
 			lis.reset();
 //		   	if(toString().indexOf("ExtinguishFirePlan")!=-1)
@@ -592,6 +596,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		// (invalid resume might be called from outdated future after timeout already occurred or body aborted).
 		if(this.future==future)
 		{
+			tlcopy.beforeSwitch();
 //		   	if(toString().indexOf("ExtinguishFirePlan")!=-1)
 //				System.out.println("resume "+this+", "+lis);
 			lis.resultAvailable(null);

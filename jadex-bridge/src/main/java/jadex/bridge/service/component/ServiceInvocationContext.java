@@ -24,6 +24,20 @@ import java.util.TimerTask;
 /**
  *  Context for service invocations.
  *  Contains all method call information. 
+ *  
+ *  Invariants that must hold before, during and after a service call for the NEXT/CUR/LAST service calls
+ *  			caller 										callee
+ *  
+ *  before		next = null	|| user defined						
+ *  			cur = actual call
+ *  
+ *  during		next = null	(set in ServiceInvocContext)	cur = next
+ *  			cur = cur (same as in before)				(set in MethodInvocationInterceptor)
+ *  
+ *  after		next = null
+ *  			cur = cur (same as in before)
+ *  			last = next
+ *  			(set in MethodInvocationInterceptor)
  */
 public class ServiceInvocationContext
 {
@@ -121,17 +135,14 @@ public class ServiceInvocationContext
 	/** The stack of used interceptors. */
 	protected List<Integer> used;
 	
-	/** The service call. */
-	protected ServiceCall	call;
+	/** The next service call (will be current during call and last after call). */
+	protected ServiceCall	nextcall;
 	
-	/** The last service call (to be reestablished after call). */
-	protected ServiceCall	lastcall;
+	/** The current service call (to be reestablished after call). */
+	protected ServiceCall	currentcall;
 	
 	/** The caller component. */
 	protected IComponentIdentifier caller;
-	
-//	/** The caller component adapter. */
-//	protected IComponentAdapter calleradapter;
 	
 	/** The platform identifier. */
 	protected IComponentIdentifier platform;
@@ -170,11 +181,10 @@ public class ServiceInvocationContext
 		this.interceptors = interceptors;
 		
 		this.caller = IComponentIdentifier.LOCAL.get();
-//		this.calleradapter	= IComponentAdapter.LOCAL.get();
 
 		// Is next call defined by user?
-		this.call = CallAccess.getNextInvocation();
-		this.lastcall = CallAccess.getCurrentInvocation();
+		this.nextcall = CallAccess.getNextInvocation();
+		this.currentcall = CallAccess.getCurrentInvocation();
 		// Delete next invocation to ensure that data is erased before decoupling
 		// Problem: how to ensure that results are set in lastcall
 		CallAccess.resetNextInvocation();
@@ -184,15 +194,15 @@ public class ServiceInvocationContext
 //			System.out.println("hierskdfj");
 //		}
 
-		if(call==null)
+		if(nextcall==null)
 		{
 	//		Map<String, Object> props = call!=null ? new HashMap<String, Object>(call.getProperties()) : new HashMap<String, Object>();
 			Map<String, Object> props = null;
 			
-			Boolean inh = lastcall!=null? (Boolean)lastcall.getProperty(ServiceCall.INHERIT): null;
+			Boolean inh = currentcall!=null? (Boolean)currentcall.getProperty(ServiceCall.INHERIT): null;
 			if(inh!=null && inh.booleanValue())
 			{
-				props = new HashMap<String, Object>(lastcall.getProperties());
+				props = new HashMap<String, Object>(currentcall.getProperties());
 				props.remove(ServiceCall.CAUSE); // remove cause as it has to be adapted
 			}
 			else
@@ -200,7 +210,7 @@ public class ServiceInvocationContext
 				props = new HashMap<String, Object>();
 			}
 //			props.put("method", method.getName());
-			this.call = CallAccess.createServiceCall(caller, props);
+			this.nextcall = CallAccess.createServiceCall(caller, props);
 		}
 //		else
 //		{
@@ -208,7 +218,7 @@ public class ServiceInvocationContext
 //		}
 		
 		// If not user supplied a custom timeout value set to what the interface says
-		if(!call.getProperties().containsKey(ServiceCall.TIMEOUT))
+		if(!nextcall.getProperties().containsKey(ServiceCall.TIMEOUT))
 		{
 //			if(method.getName().indexOf("service")!=-1)
 //				System.out.println("ggo");
@@ -216,27 +226,27 @@ public class ServiceInvocationContext
 			long to = BasicService.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall());
 			if(Timeout.UNSET!=to)
 			{
-				call.setProperty(ServiceCall.TIMEOUT, Long.valueOf(to));			
+				nextcall.setProperty(ServiceCall.TIMEOUT, Long.valueOf(to));			
 			}
 			else 
 			{
-				call.setProperty(ServiceCall.DEFTIMEOUT, isRemoteCall()? Starter.getLocalDefaultTimeout(sid.getProviderId())
+				nextcall.setProperty(ServiceCall.DEFTIMEOUT, isRemoteCall()? Starter.getLocalDefaultTimeout(sid.getProviderId())
 					: Starter.getLocalDefaultTimeout(sid.getProviderId()));
 			}
 		}
-		if(!call.getProperties().containsKey(ServiceCall.REALTIME))
+		if(!nextcall.getProperties().containsKey(ServiceCall.REALTIME))
 		{
-			call.setProperty(ServiceCall.REALTIME, Starter.isRealtimeTimeout(sid.getProviderId())? Boolean.TRUE : Boolean.FALSE);
+			nextcall.setProperty(ServiceCall.REALTIME, Starter.isRealtimeTimeout(sid.getProviderId())? Boolean.TRUE : Boolean.FALSE);
 		}
 		
 		// Init the cause of the next call based on the last one
-		if(this.call.getCause()==null)
+		if(this.nextcall.getCause()==null)
 		{
 //			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);
 			String target = sid.toString();
-			if(lastcall!=null && lastcall.getCause()!=null)
+			if(currentcall!=null && currentcall.getCause()!=null)
 			{
-				this.call.setCause(new Cause(lastcall.getCause(), target));
+				this.nextcall.setCause(new Cause(currentcall.getCause(), target));
 //				if(method.getName().indexOf("test")!=-1 && lastcall!=null)
 //					System.out.println("Creating new cause based on: "+lastcall.getCause());
 //				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
@@ -249,7 +259,7 @@ public class ServiceInvocationContext
 //				newc.setOrigin(cause.getTargetId());
 				// This is on receiver side, i.e. must set the caller as origin
 				newc.setOrigin(caller!=null? caller.getName(): sid.getProviderId().getName());
-				this.call.setCause(new Cause(newc, target));
+				this.nextcall.setCause(new Cause(newc, target));
 				
 //				if(method.getName().indexOf("createCompo")!=-1)
 //					System.out.println("herer: "+cause);
@@ -265,8 +275,8 @@ public class ServiceInvocationContext
 		this.sid = context.sid;
 //		this.ex= context.ex;
 		
-		this.call	= context.call;
-		this.lastcall = context.lastcall;
+		this.nextcall	= context.nextcall;
+		this.currentcall = context.currentcall;
 //		this.realtime	= context.realtime;
 		this.platform = context.platform;
 		this.proxy = context.proxy;
@@ -645,27 +655,27 @@ public class ServiceInvocationContext
 	 *  Get the service call.
 	 *  @return The service call.
 	 */
-	public ServiceCall	getServiceCall()
+	public ServiceCall	getNextServiceCall()
 	{
-		return call;
+		return nextcall;
 	}
 	
 	/**
 	 *  Get the last service call.
 	 *  @return The last service call.
 	 */
-	public ServiceCall	getLastServiceCall()
+	public ServiceCall	getCurrentServiceCall()
 	{
-		return lastcall;
+		return currentcall;
 	}
 
 	/**
 	 *  Set the lastcall. 
-	 *  @param lastcall The lastcall to set.
+	 *  @param currentcall The lastcall to set.
 	 */
-	public void setCurrentCall(ServiceCall call)
+	public void setNextCall(ServiceCall call)
 	{
-		this.call = call;
+		this.nextcall = call;
 	}
 }
 

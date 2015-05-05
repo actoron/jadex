@@ -1,14 +1,15 @@
 package jadex.commons.future;
 
+
 /**
  *  Suspendable for threads.
  */
-public class ThreadSuspendable implements ISuspendable
+public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISuspendable
 {
 	//-------- attributes --------
 	
 	/** The future. */
-	protected IFuture<?>	future;
+	protected IFuture<?> future;
 	
 	//-------- methods --------
 	
@@ -42,6 +43,8 @@ public class ThreadSuspendable implements ISuspendable
 			}
 			finally
 			{
+				// Restore the thread local values after switch
+				afterSwitch();
 				this.future	= null;
 			}
 		}
@@ -57,6 +60,8 @@ public class ThreadSuspendable implements ISuspendable
 			// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 			if(future==this.future)
 			{
+				// Save the thread local values before switch
+				beforeSwitch();
 				this.notify();
 			}
 		}

@@ -43,7 +43,7 @@ public abstract class CallAccess	extends ServiceCall
 //		{
 //			System.out.println(Thread.currentThread().hashCode()+": set: "+call+", "+Thread.currentThread());
 //		}
-		ServiceCall.CALLS.set(call);
+		ServiceCall.CURRENT.set(call);
 	}
 
 	/**
@@ -52,7 +52,7 @@ public abstract class CallAccess	extends ServiceCall
 	public static void	resetCurrentInvocation()
 	{
 //		LAST.set(ServiceCall.CALLS.get());
-		ServiceCall.CALLS.set(null);
+		ServiceCall.CURRENT.set(null);
 	}
 	
 	/**
@@ -90,5 +90,15 @@ public abstract class CallAccess	extends ServiceCall
 	public static void	resetLastInvocation()
 	{
 		LAST.set(null);
+	}
+	
+	/**
+	 * 
+	 */
+	public static void roll()
+	{
+		LAST.set(CURRENT.get());
+		CURRENT.set(NEXT.get());
+		NEXT.set(null);
 	}
 }

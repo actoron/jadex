@@ -69,22 +69,25 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 //				if(sic.getMethod().getName().indexOf("test")!=-1)
 //					System.out.println("setting to a: "+sic.getServiceCall());
 				start = System.currentTimeMillis();
-				CallAccess.setCurrentInvocation(sic.getServiceCall()); // next becomes current
+				
+				// Set the saved service calls in the thread locals for the callee
+				CallAccess.setCurrentInvocation(sic.getNextServiceCall()); // next becomes current
 				CallAccess.resetNextInvocation(); // next is null
+				// last is not available
 			}
 			// No rolling if the method jumps from required to provided interceptor chain
 			else
 			{
 				// Remember context for rmi command (extracts and stores it until return command arrives and non-func can be set)
 				if(Proxy.getInvocationHandler(sic.getObject()).getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1)
-				{
 					ServiceInvocationContext.SICS.set(sic);
-				}	
 				
 //				if(sic.getMethod().getName().indexOf("test")!=-1)
 //					System.out.println("setting to b: "+sic.getLastServiceCall());
-				CallAccess.setCurrentInvocation(sic.getLastServiceCall());
-				CallAccess.setNextInvocation(sic.getServiceCall());
+				
+				// Set the saved service calls in the thread locals for the callee
+				CallAccess.setCurrentInvocation(sic.getCurrentServiceCall());
+				CallAccess.setNextInvocation(sic.getNextServiceCall());
 			}
 
 //			if(sic.getMethod().getName().indexOf("method")!=-1)
@@ -131,11 +134,12 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 					}
 				}
 				
-				CallAccess.setLastInvocation(ServiceCall.getCurrentInvocation());
-				CallAccess.setCurrentInvocation(sic.getLastServiceCall()); // current is last
+				// Set the invocations
+				CallAccess.setLastInvocation(ServiceCall.getCurrentInvocation()); // last will be current 
+				CallAccess.setCurrentInvocation(sic.getCurrentServiceCall()); // current will be old current
 				CallAccess.resetNextInvocation(); // next is null
 				
-				sic.setCurrentCall(CallAccess.getLastInvocation()); // remember invocation made
+				sic.setNextCall(CallAccess.getLastInvocation()); // remember invocation made
 			}
 			
 			sic.setResult(res);

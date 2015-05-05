@@ -26,10 +26,13 @@ public class ProviderAgent implements ITestService
 	public IFuture<Void> method(String msg)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
+		
+		System.out.println("Called method: "+msg+" "+sc.getTimeout()
+			+" "+sc.isRealtime()+" "+sc.getProperties());
+		
 		sc.setProperty("extra", "someotherval");
 		sc.setProperty("new", "new");
-//		System.out.println("Called method: "+msg+" "+sc.getTimeout()
-//			+" "+sc.isRealtime()+" "+sc.getProperties());
+		
 //		Future<Void> ret = new Future<Void>();
 //		return ret;
 		return IFuture.DONE;

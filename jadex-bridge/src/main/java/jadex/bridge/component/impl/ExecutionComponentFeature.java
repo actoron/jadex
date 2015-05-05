@@ -40,6 +40,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
+import jadex.commons.future.ThreadLocalTransferHelper;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -67,10 +68,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	//-------- attributes --------
 	
 	/** The component steps. */
-	protected List<Tuple2<IComponentStep<?>, Future<?>>>	steps;
+	protected List<StepInfo> steps;
 	
 	/** The immediate component steps. */
-	protected List<Tuple2<IComponentStep<?>, Future<?>>>	isteps;
+	protected List<StepInfo> isteps;
 	
 	/** The current timer. */
 	protected List<ITimer> timers = new ArrayList<ITimer>();
@@ -173,9 +174,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				if(steps==null)
 				{
-					steps	= new LinkedList<Tuple2<IComponentStep<?>,Future<?>>>();
+					steps	= new LinkedList<StepInfo>();
 				}
-				steps.add(new Tuple2<IComponentStep<?>, Future<?>>(step, ret));
+				steps.add(new StepInfo(step, ret, new ThreadLocalTransferHelper(true)));
 				
 				if(DEBUG)
 				{
@@ -215,9 +216,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				if(isteps==null)
 				{
-					isteps	= new LinkedList<Tuple2<IComponentStep<?>,Future<?>>>();
+					isteps	= new LinkedList<StepInfo>();
 				}
-				isteps.add(new Tuple2<IComponentStep<?>, Future<?>>(step, ret));
+				isteps.add(new StepInfo(step, ret, new ThreadLocalTransferHelper(true)));
 				
 				if(DEBUG)
 				{
@@ -913,7 +914,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			}				
 //		}	
 			
-		final Tuple2<IComponentStep<?>, Future<?>>	step;
+		final StepInfo step;
 		synchronized(this)
 		{
 			if(isteps!=null)
@@ -947,7 +948,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			Throwable ex = null;
 			try
 			{
-				stepfut	= step.getFirstEntity().execute(component);
+				step.getTransfer().afterSwitch();
+				stepfut	= step.getStep().execute(component);
 			}
 			catch(Throwable t)
 			{
@@ -961,11 +963,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
 					ex	= new ComponentTerminatedException(component.getComponentIdentifier());
 				}
-				step.getSecondEntity().setException(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
+				step.getFuture().setException(ex instanceof Exception? (Exception)ex: new RuntimeException(ex));
 
 				// If no listener, print failed step to console for developer.
 				// Hard step failure with uncatched exception is shown also when no debug.
-				if(!step.getSecondEntity().hasResultListener() &&
+				if(!step.getFuture().hasResultListener() &&
 					(!(ex instanceof ComponentTerminatedException)
 					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier())))
 				{
@@ -981,11 +983,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 								// Todo: fail fast vs robust components.
 								StringWriter	sw	= new StringWriter();
 								fex.printStackTrace(new PrintWriter(sw));
-								getComponent().getLogger().severe("Component step failed: "+step.getFirstEntity()+"\n"+sw);
+								getComponent().getLogger().severe("Component step failed: "+step.getStep()+"\n"+sw);
 								
-								if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+								if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getStep()))
 								{
-									stepadditions.get(step.getFirstEntity()).printStackTrace();
+									stepadditions.get(step.getStep()).printStackTrace();
 								}
 //							}
 //						}
@@ -1003,9 +1005,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				try
 				{
-					stepfut.addResultListener(new DelegationResultListener(step.getSecondEntity()));
+					stepfut.addResultListener(new DelegationResultListener(step.getFuture()));
 		
-					if(DEBUG && !step.getSecondEntity().hasResultListener())
+					if(DEBUG && !step.getFuture().hasResultListener())
 					{
 						// Wait for delayed listener addition.
 						waitForDelay(3000, true)
@@ -1013,17 +1015,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						{
 							public void resultAvailable(Void result)
 							{
-								if(!step.getSecondEntity().hasResultListener())
+								if(!step.getFuture().hasResultListener())
 								{
-									((Future<Object>)step.getSecondEntity()).addResultListener(new IResultListener<Object>()
+									((Future<Object>)step.getFuture()).addResultListener(new IResultListener<Object>()
 									{
 										public void resultAvailable(Object result)
 										{
-											getComponent().getLogger().warning("No listener for component step: "+step.getFirstEntity());
+											getComponent().getLogger().warning("No listener for component step: "+step.getFuture());
 											
-											if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+											if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFuture()))
 											{
-												stepadditions.get(step.getFirstEntity()).printStackTrace();
+												stepadditions.get(step.getStep()).printStackTrace();
 											}
 										}
 										
@@ -1033,11 +1035,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 											
 											StringWriter	sw	= new StringWriter();
 											exception.printStackTrace(new PrintWriter(sw));
-											getComponent().getLogger().severe("No listener for component step exception: "+step.getFirstEntity()+"\n"+sw);
+											getComponent().getLogger().severe("No listener for component step exception: "+step.getStep()+"\n"+sw);
 											
-											if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+											if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getStep()))
 											{
-												stepadditions.get(step.getFirstEntity()).printStackTrace();
+												stepadditions.get(step.getStep()).printStackTrace();
 											}
 										}
 									});
@@ -1058,11 +1060,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					
 					StringWriter	sw	= new StringWriter();
 					e.printStackTrace(new PrintWriter(sw));
-					getComponent().getLogger().severe("Component step listener failed: "+step.getFirstEntity()+"\n"+sw);
+					getComponent().getLogger().severe("Component step listener failed: "+step.getStep()+"\n"+sw);
 					
-					if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getFirstEntity()))
+					if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getStep()))
 					{
-						stepadditions.get(step.getFirstEntity()).printStackTrace();
+						stepadditions.get(step.getStep()).printStackTrace();
 					}
 				}
 			}
@@ -1306,5 +1308,125 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			return run;
 		}
+	}
+	
+	/**
+	 *  Info struct for steps.
+	 */
+	public static class StepInfo
+	{
+		/** The component step. */
+		protected IComponentStep<?> step; 
+		
+		/** The result future. */
+		protected Future<?> future; 
+		
+		/** The service call. */
+		protected ThreadLocalTransferHelper transfer;
+		
+//		/** The cause. */
+//		protected Cause cause;
+
+		/**
+		 *  Create a new StepInfo. 
+		 */
+		public StepInfo(IComponentStep<?> step, Future<?> future, ThreadLocalTransferHelper transfer)//ServiceCall call, Cause cause)
+		{
+			this.step = step;
+			this.future = future;
+			this.transfer = transfer;
+//			this.call = call;
+//			this.cause = cause;
+		}
+
+		/**
+		 *  Get the step.
+		 *  @return The step.
+		 */
+		public IComponentStep<?> getStep()
+		{
+			return step;
+		}
+
+		/**
+		 *  Set the step.
+		 *  @param step The step to set.
+		 */
+		public void setStep(IComponentStep<?> step)
+		{
+			this.step = step;
+		}
+
+		/**
+		 *  Get the future.
+		 *  @return The future.
+		 */
+		public Future<?> getFuture()
+		{
+			return future;
+		}
+
+		/**
+		 *  Set the future.
+		 *  @param future The future to set.
+		 */
+		public void setFuture(Future<?> future)
+		{
+			this.future = future;
+		}
+
+		/**
+		 *  Get the transfer.
+		 *  @return The transfer
+		 */
+		public ThreadLocalTransferHelper getTransfer()
+		{
+			return transfer;
+		}
+
+		/**
+		 *  The transfer to set.
+		 *  @param transfer The transfer to set
+		 */
+		public void setTransfer(ThreadLocalTransferHelper transfer)
+		{
+			this.transfer = transfer;
+		}
+		
+//		/**
+//		 *  Get the call.
+//		 *  @return The call.
+//		 */
+//		public ServiceCall getCall()
+//		{
+//			return call;
+//		}
+//
+//		/**
+//		 *  Set the call.
+//		 *  @param call The call to set.
+//		 */
+//		public void setCall(ServiceCall call)
+//		{
+//			this.call = call;
+//		}
+//
+//		/**
+//		 *  Get the cause.
+//		 *  @return The cause.
+//		 */
+//		public Cause getCause()
+//		{
+//			return cause;
+//		}
+//
+//		/**
+//		 *  Set the cause.
+//		 *  @param cause The cause to set.
+//		 */
+//		public void setCause(Cause cause)
+//		{
+//			this.cause = cause;
+//		}
 	}
 }
