@@ -10,7 +10,7 @@ public interface IPlanBody
 	/**
 	 *  Get the plan body.
 	 */
-	public Object getBody(Object agent);
+	public Object getBody();
 	
 	/**
 	 *  Execute the plan body.

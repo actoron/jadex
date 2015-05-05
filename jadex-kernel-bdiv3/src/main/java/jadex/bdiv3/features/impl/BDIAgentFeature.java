@@ -7,6 +7,7 @@ import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MCondition;
@@ -108,7 +109,7 @@ import java.util.StringTokenizer;
 /**
  * 
  */
-public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAgentFeature
+public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAgentFeature, IInternalBDIAgentFeature
 {
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IBDIAgentFeature.class, BDIAgentFeature.class, 
 //		new Class[]{IMicroLifecycleFeature.class}, null);
@@ -232,14 +233,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 //				System.out.println("write: "+val+" "+fieldname+" "+obj);
 //			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-			RuleSystem rs = ((BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+			RuleSystem rs = ((IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
 
 			Object oldval = setFieldValue(obj, fieldname, val);
 			
 			// unobserve old value for property changes
 			rs.unobserveObject(oldval);
 
-			MBelief	mbel = ((MCapability)((BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
+			MBelief	mbel = ((MCapability)((IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
 		
 			if(!SUtil.equals(val, oldval))
 			{
@@ -375,7 +376,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		String belname	= getBeliefName(obj, fieldname);
 
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-		MBelief mbel = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getBelief(belname);
+		MBelief mbel = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getBelief(belname);
 		
 		// Wrap collections of multi beliefs (if not already a wrapper)
 		if(mbel.isMulti(agent.getClassLoader()))
@@ -399,7 +400,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		// agent is not null any more due to deferred exe of init expressions but rules are
 		// available only after startBehavior
-		if(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).isInited())
+		if(((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).isInited())
 		{
 			((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).writeField(val, belname, fieldname, obj);
 		}
@@ -447,12 +448,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
 //					agent.writeField(write[0], (String)write[1], write[2]);
 //					BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-					RuleSystem rs = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+					RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
 					final String belname = (String)write[1];
 					Object val = write[0];
 //						rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
 					rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, null, null)));
-					MBelief	mbel = ((MCapability)((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
+					MBelief	mbel = ((MCapability)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
 					observeValue(rs, val, agent, ChangeEvent.FACTCHANGED+"."+belname, mbel);
 				}
 			}
@@ -499,12 +500,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		// array that is written
 		
 		String belname	= getBeliefName(agentobj, fieldname);
-		MBelief	mbel = ((MCapability)((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
+		MBelief	mbel = ((MCapability)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
 		
 		Object curval = mbel.getValue(agent);
 		boolean isbeliefwrite = curval==array;
 		
-		RuleSystem rs = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
 //			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
 		
 		Object oldval = null;
@@ -558,7 +559,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			Method getter = pojo.getClass().getMethod("get"+belname.substring(0,1).toUpperCase()+belname.substring(1), new Class[0]);
 			Object oldval = getter.invoke(pojo, new Object[0]);
 		
-			RuleSystem rs = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+			RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
 			rs.unobserveObject(oldval);	
 		}
 		catch(Exception e)
@@ -641,7 +642,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	public static Object	getAbstractBeliefValue(IInternalAccess component, String capa, String name, Class<?> type)
 	{
 //			System.out.println("getAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name+", "+type);
-		BDIModel bdimodel = (BDIModel)((BDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
+		BDIModel bdimodel = (BDIModel)((IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
 		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
@@ -675,7 +676,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	public static void	setAbstractBeliefValue(IInternalAccess component, String capa, String name, Object value)
 	{
 //			System.out.println("setAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
-		BDIModel bdimodel = (BDIModel)((BDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
+		BDIModel bdimodel = (BDIModel)((IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getBDIModel();
 		String	belname	= bdimodel.getBeliefMappings().get(capa+MElement.CAPABILITY_SEPARATOR+name);
 		if(belname==null)
 		{
@@ -691,7 +692,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		if(field)
 		{
 //			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-			RuleSystem rs = ((BDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+			RuleSystem rs = ((IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
 			rs.unobserveObject(old);	
 			createChangeEvent(value, old, null, component, mbel.getName());
 			observeValue(rs, value, component, ChangeEvent.FACTCHANGED+"."+mbel.getName(), mbel);
@@ -717,9 +718,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 //			System.out.println("createEv: "+val+" "+agent+" "+belname);
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 		
-		MBelief mbel = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getBelief(belname);
+		MBelief mbel = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getBelief(belname);
 		
-		RuleSystem rs = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
 		rs.addEvent(new jadex.rules.eca.Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, oldval, info)));
 		
 		publishToolBeliefEvent(agent, mbel);
@@ -802,7 +803,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 		String elemname = obj.getClass().getName();
-		MGoal mgoal = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getGoal(elemname);
+		MGoal mgoal = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getGoal(elemname);
 		
 //			String paramname = elemname+"."+fieldname; // ?
 
@@ -835,7 +836,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		// agent is not null any more due to deferred exe of init expressions but rules are
 		// available only after startBehavior
-		if(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).isInited())
+		if(((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).isInited())
 		{
 			EventType chev1 = new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, fieldname});
 			EventType chev2 = new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, fieldname});
@@ -908,7 +909,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		boolean isparamwrite = false;
 		
-		MGoal mgoal = ((MCapability)((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getGoal(agentobj.getClass().getName());
+		MGoal mgoal = ((MCapability)((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getGoal(agentobj.getClass().getName());
 		if(mgoal!=null)
 		{
 			MParameter mparam = mgoal.getParameter(fieldname);
@@ -918,7 +919,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				isparamwrite = curval==array;
 			}
 		}
-		RuleSystem rs = ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+		RuleSystem rs = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
 //			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
 		
 		Object oldval = null;
@@ -1133,7 +1134,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				// For abstract belief find corresponding mapping.
 				else
 				{
-					Map<String, String>	map	= getBDIModel().getBeliefMappings();
+					Map<String, String>	map	= bdimodel.getBeliefMappings();
 					for(String target: map.keySet())
 					{
 						if(source.equals(map.get(target)))
@@ -2638,7 +2639,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 						
 						for(final RPlan plan: coll)
 						{
-							invokeBooleanMethod(plan.getBody().getBody(agent), mi.getMethod(getComponent().getClassLoader()), plan.getModelElement(), event, plan)
+							invokeBooleanMethod(plan.getBody().getBody(), mi.getMethod(getComponent().getClassLoader()), plan.getModelElement(), event, plan)
 								.addResultListener(new IResultListener<Boolean>()
 							{
 								public void resultAvailable(Boolean result)
@@ -3066,9 +3067,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					{
 						source	= capaname + MElement.CAPABILITY_SEPARATOR + source;
 					}
-					if(getBDIModel().getBeliefMappings().containsKey(source))
+					if(bdimodel.getBeliefMappings().containsKey(source))
 					{
-						source	= getBDIModel().getBeliefMappings().get(source);
+						source	= bdimodel.getBeliefMappings().get(source);
 					}
 					
 					if(event!=null && event.getSource()!=null && event.getSource().equals(source))
@@ -3211,7 +3212,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 *  Get the bdimodel.
 	 *  @return the bdimodel.
 	 */
-	public BDIModel getBDIModel()
+	public IBDIModel getBDIModel()
 	{
 		return bdimodel;
 	}
@@ -3324,7 +3325,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
 		
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		MBelief mbel = ((MCapability)((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
+		MBelief mbel = ((MCapability)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement()).getBelief(belname);
 		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
 		{
 			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));

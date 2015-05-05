@@ -33,11 +33,26 @@
 			<artifactId>jadex-tools-base-swing</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applib-bdi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		 -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdiv3</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-extension-envsupport</artifactId>
@@ -51,11 +66,6 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applib-bdi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

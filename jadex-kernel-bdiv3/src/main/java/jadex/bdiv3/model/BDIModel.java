@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * 
  */
-public class BDIModel extends MicroModel
+public class BDIModel extends MicroModel	implements IBDIModel
 {
 	/** The subcapabilities. */
 	protected List<Tuple2<FieldInfo, BDIModel>> subcapabilities;

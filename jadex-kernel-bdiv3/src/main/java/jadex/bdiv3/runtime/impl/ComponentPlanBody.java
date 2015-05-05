@@ -42,7 +42,7 @@ public class ComponentPlanBody implements IPlanBody
 	/**
 	 *  Get the plan body.
 	 */
-	public Object getBody(Object agent)
+	public Object getBody()
 	{
 		return null;
 	}

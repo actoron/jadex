@@ -1,5 +1,8 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.model.MElement;
 import jadex.bridge.IInternalAccess;
 
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +18,9 @@ public class MethodPlanBody extends AbstractPlanBody
 	/** The method. */
 	protected Method body;
 	
+	/** The agent/capability object. */
+	protected Object agent;
+	
 	//-------- constructors --------
 	
 	/**
@@ -24,6 +30,10 @@ public class MethodPlanBody extends AbstractPlanBody
 	{
 		super(ia, rplan);
 		this.body = body;
+		String	pname	= rplan.getModelElement().getName();
+		String	capaname	= pname.indexOf(MElement.CAPABILITY_SEPARATOR)==-1
+			? null : pname.substring(0, pname.lastIndexOf(MElement.CAPABILITY_SEPARATOR));
+		this.agent	= ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname);
 	}
 	
 	//-------- methods --------
@@ -31,7 +41,7 @@ public class MethodPlanBody extends AbstractPlanBody
 	/**
 	 *  Invoke the body.
 	 */
-	public Object invokeBody(Object agent, Object[] params)
+	public Object invokeBody(Object[] params)
 	{
 		try
 		{
@@ -60,17 +70,17 @@ public class MethodPlanBody extends AbstractPlanBody
 		}
 	}
 	
-	public Object invokePassed(Object agent, Object[] params)
+	public Object invokePassed(Object[] params)
 	{
 		return null;
 	}
 
-	public Object invokeFailed(Object agent, Object[] params)
+	public Object invokeFailed(Object[] params)
 	{
 		return null;
 	}
 
-	public Object invokeAborted(Object agent, Object[] params)
+	public Object invokeAborted(Object[] params)
 	{
 		return null;
 	}

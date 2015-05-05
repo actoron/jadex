@@ -3,14 +3,17 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MBody;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
 import jadex.rules.eca.ChangeInfo;
 
 import java.lang.reflect.Constructor;
@@ -84,7 +87,7 @@ public class ClassPlanBody extends AbstractPlanBody
 			abortedmethod = mi.getMethod(ia.getClassLoader());
 		
 		if(plan!=null)
-			injectElements(ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent());
+			injectElements();//ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent());
 	}
 	
 	//-------- methods --------
@@ -92,7 +95,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	/**
 	 * 
 	 */
-	public Object getBody(Object agent)
+	public Object getBody()
 	{
 		if(plan==null)
 		{
@@ -104,37 +107,26 @@ public class ClassPlanBody extends AbstractPlanBody
 					Constructor<?>[] cons = body.getDeclaredConstructors();
 					for(Constructor<?> c: cons)
 					{
-						Class<?>[] ptypes = c.getParameterTypes();
-						if(ptypes.length==0)
+						Object[] params = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
+							.getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(), rplan.getModelElement(), null, rplan, null);
+						if(params!=null)
 						{
 							try
 							{
 								c.setAccessible(true);
-								plan = c.newInstance(new Object[0]);
+								plan = c.newInstance(params);
 								break;
 							}
 							catch(Exception e)
 							{
-							}
-						}
-						if(ptypes.length==1 && SReflect.isSupertype(ptypes[0], agent.getClass()))
-						{
-							try
-							{
-								c.setAccessible(true);
-								plan = c.newInstance(new Object[]{agent});
-								break;
-							}
-							catch(Exception e)
-							{
-							}
-						}
+							}							
+						}						
 					}
 					if(plan==null)
-						throw new RuntimeException("Plan body has no empty constructor: "+body);
+						throw new RuntimeException("Plan body has no accessible constructor (maybe wrong args?): "+body);
 				}
 				
-				injectElements(agent);
+				injectElements();
 			}
 			catch(RuntimeException e)
 			{
@@ -162,8 +154,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	/**
 	 *  Inject plan elements.
 	 */
-	// Todo: plan in subcapabilities!
-	protected void injectElements(Object agent)
+	protected void injectElements()
 	{
 		try
 		{
@@ -180,15 +171,26 @@ public class ClassPlanBody extends AbstractPlanBody
 					}
 					else if(f.isAnnotationPresent(PlanCapability.class))
 					{
+						// Find capability based on model element (or use agent). Todo remove pojo specific code.
+						String	capaname	= null;
+						int idx = rplan.getModelElement().getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR);
+						if(idx!=-1)
+						{
+							capaname = rplan.getModelElement().getName().substring(0, idx);
+						}
+						Object capa = capaname!=null ? ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname)
+							: ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+
+						
 						f.setAccessible(true);
 						Class<?> ft = f.getType();
 						if(ft.equals(ICapability.class))
 						{
-							f.set(plan, new CapabilityWrapper(ia, agent, null));
+							f.set(plan, new CapabilityWrapper(ia, capa, null));
 						}
 						else
 						{
-							f.set(plan, agent);
+							f.set(plan, capa);
 						}
 					}
 					else if(f.isAnnotationPresent(PlanReason.class))
@@ -251,11 +253,11 @@ public class ClassPlanBody extends AbstractPlanBody
 	/**
 	 *  Invoke the body.
 	 */
-	public Object invokeBody(Object agent, Object[] params) throws BodyAborted
+	public Object invokeBody(Object[] params) throws BodyAborted
 	{
 		try
 		{
-			getBody(agent);
+			getBody();
 			bodymethod.setAccessible(true);
 			return bodymethod.invoke(plan, params);
 		}
@@ -281,7 +283,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	/**
 	 *  Invoke the plan passed method.
 	 */
-	public Object invokePassed(Object agent, Object[] params)
+	public Object invokePassed(Object[] params)
 	{
 		Object ret = null;
 		if(passedmethod!=null)
@@ -303,7 +305,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	/**
 	 *  Invoke the plan failed method.
 	 */
-	public Object invokeFailed(Object agent, Object[] params)
+	public Object invokeFailed(Object[] params)
 	{
 		Object ret = null;
 		if(failedmethod!=null)
@@ -325,7 +327,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	/**
 	 *  Invoke the plan aborted method.
 	 */
-	public Object invokeAborted(Object agent, Object[] params)
+	public Object invokeAborted(Object[] params)
 	{
 		Object ret = null;
 		if(abortedmethod!=null)

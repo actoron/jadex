@@ -1,24 +1,13 @@
 package jadex.bdiv3.runtime.impl;
 
-import java.util.Map;
-import java.util.logging.Logger;
-
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.InternalAccessAdapter;
-import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RequiredServicesFeatureAdapter;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.IParameterGuesser;
-import jadex.commons.IValueFetcher;
-import jadex.commons.future.IFuture;
 
 /**
  *  Wrapper providing BDI methods to the user.

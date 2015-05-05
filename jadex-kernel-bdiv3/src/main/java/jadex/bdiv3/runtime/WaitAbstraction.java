@@ -1,7 +1,5 @@
 package jadex.bdiv3.runtime;
 
-import jadex.rules.eca.EventType;
-
 import java.util.HashSet;
 import java.util.Set;
 

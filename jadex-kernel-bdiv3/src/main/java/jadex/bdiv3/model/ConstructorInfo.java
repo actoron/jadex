@@ -4,7 +4,6 @@ package jadex.bdiv3.model;
 import jadex.commons.SReflect;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 /**
  *  Describes a constructor.

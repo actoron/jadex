@@ -28,7 +28,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature
 	{
 		super(component, cinfo);
 		
-//		BDIAgentFeature bdif = (BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class);
+//		BDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class);
 //		Object pojo = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 //		bdif.injectAgent(getComponent(), pojo, bdif.getBDIModel(), null);
 //		bdif.invokeInitCalls(pojo);

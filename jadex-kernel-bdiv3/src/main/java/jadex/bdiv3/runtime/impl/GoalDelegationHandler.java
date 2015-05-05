@@ -2,6 +2,7 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
@@ -67,7 +68,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 		if(goalname==null)
 			throw new RuntimeException("No method-goal mapping found: "+method.getName()+" "+goalnames);
 		
-		final BDIAgentFeature	bdif	= (BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		final IInternalBDIAgentFeature	bdif	= (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
 		MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
 		final MGoal mgoal = mcapa.getGoal(goalname);
 		
@@ -102,12 +103,12 @@ public class GoalDelegationHandler  implements InvocationHandler
 			public void terminate(Exception reason, IResultListener<Void> terminate)
 			{
 //				System.out.println("terminated call: "+fgoal);
-				bdif.dropGoal(fgoal);
+				((BDIAgentFeature)bdif).dropGoal(fgoal);
 				super.terminate(reason, terminate);
 			}
 		});
 		
-		bdif.dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
+		((BDIAgentFeature)bdif).dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{

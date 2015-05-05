@@ -1,7 +1,5 @@
 package jadex.bdiv3;
 
-import java.util.List;
-
 import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -9,6 +7,8 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
+
+import java.util.List;
 
 /**
  * 

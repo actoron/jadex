@@ -3,7 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.annotation.GoalAPLBuild;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
@@ -11,7 +11,6 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -258,8 +257,7 @@ public class APL
 	{
 		final Future<List<Object>> ret = new Future<List<Object>>();
 		
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		BDIAgentFeature bdif = (BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
 		
 //		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		
@@ -351,14 +349,13 @@ public class APL
 				if(!Modifier.isStatic(m.getModifiers()))
 				{
 					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia);
-					final Object agent = ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-					pojo = rp.getBody().getBody(agent);
+					pojo = rp.getBody().getBody();
 				}
 				try
 				{
 					m.setAccessible(true);
 					
-					Object[] params = ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
+					Object[] params = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
 						.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element);
 					if(params==null)
 						System.out.println("Invalid parameter assignment");

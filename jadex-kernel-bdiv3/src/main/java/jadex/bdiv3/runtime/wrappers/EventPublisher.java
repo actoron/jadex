@@ -2,6 +2,7 @@ package jadex.bdiv3.runtime.wrappers;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MBelief;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
@@ -74,7 +75,7 @@ public class EventPublisher
 	 */
 	public RuleSystem getRuleSystem()
 	{
-		return ((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
 	}
 
 	/**

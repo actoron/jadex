@@ -1,8 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3.model.MElement;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -39,7 +38,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 	/**
 	 * 
 	 */
-	public Object getBody(Object agent)
+	public Object getBody()
 	{
 		return null;
 	}
@@ -51,12 +50,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		String	pname	= rplan.getModelElement().getName();
-		String	capaname	= pname.indexOf(MElement.CAPABILITY_SEPARATOR)==-1
-			? null : pname.substring(0, pname.lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		final Object agent	= ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname);
-
-		internalInvokePart(agent, 0).addResultListener(new IResultListener<Object>()
+		internalInvokePart(0).addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -112,7 +106,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 //							}
 						}
 					}
-					internalInvokePart(agent, 1)
+					internalInvokePart(1)
 						.addResultListener(new IResultListener<Object>()
 					{
 						public void resultAvailable(Object result)
@@ -145,7 +139,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 //					System.out.println("exe abort of: "+rplan.getId());
 				
 				rplan.setException(exception);
-				internalInvokePart(agent, next)
+				internalInvokePart(next)
 					.addResultListener(new IResultListener<Object>()
 				{
 					public void resultAvailable(Object result)
@@ -181,7 +175,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 	/**
 	 * 
 	 */
-	protected IFuture<Object> internalInvokePart(Object agent, int part)
+	protected IFuture<Object> internalInvokePart(int part)
 	{
 		final Future<Object> ret = new Future<Object>();
 		
@@ -192,22 +186,22 @@ public abstract class AbstractPlanBody implements IPlanBody
 			if(part==0) 
 			{
 //				System.out.println("body of: "+rplan);
-				res = invokeBody(agent, guessParameters(getBodyParameterTypes()));
+				res = invokeBody(guessParameters(getBodyParameterTypes()));
 			}
 			else if(part==1)
 			{
 //				System.out.println("passed of: "+rplan);
-				res = invokePassed(agent, guessParameters(getPassedParameterTypes()));
+				res = invokePassed(guessParameters(getPassedParameterTypes()));
 			}
 			else if(part==2)
 			{
 //				System.out.println("failed of: "+rplan);
-				res = invokeFailed(agent, guessParameters(getFailedParameterTypes()));
+				res = invokeFailed(guessParameters(getFailedParameterTypes()));
 			}
 			else if(part==3)
 			{
 //				System.out.println("aborted of: "+rplan);
-				res = invokeAborted(agent, guessParameters(getAbortedParameterTypes()));
+				res = invokeAborted(guessParameters(getAbortedParameterTypes()));
 			}
 			
 			if(res instanceof IFuture)
@@ -256,22 +250,22 @@ public abstract class AbstractPlanBody implements IPlanBody
 	/**
 	 *  Invoke the plan body.
 	 */
-	public abstract Object invokeBody(Object agent, Object[] params) throws BodyAborted;
+	public abstract Object invokeBody(Object[] params) throws BodyAborted;
 
 	/**
 	 *  Invoke the plan passed method.
 	 */
-	public abstract Object invokePassed(Object agent, Object[] params);
+	public abstract Object invokePassed(Object[] params);
 
 	/**
 	 *  Invoke the plan failed method.
 	 */
-	public abstract Object invokeFailed(Object agent, Object[] params);
+	public abstract Object invokeFailed(Object[] params);
 
 	/**
 	 *  Invoke the plan aborted method.
 	 */
-	public abstract Object invokeAborted(Object agent, Object[] params);
+	public abstract Object invokeAborted(Object[] params);
 	
 	/**
 	 *  Get the body parameters.
@@ -302,8 +296,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 		if(ptypes==null)
 			return null;
 		
-		return ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
-			.getInjectionValues(ptypes, null, rplan.getModelElement(), null, rplan, null, null);
+		return ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class))
+			.getInjectionValues(ptypes, null, rplan.getModelElement(), null, rplan, null);
 	}
 
 	/**

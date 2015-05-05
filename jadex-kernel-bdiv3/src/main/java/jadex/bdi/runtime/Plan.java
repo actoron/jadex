@@ -5,5 +5,13 @@ package jadex.bdi.runtime;
  */
 public class Plan
 {
-
+	public void	waitFor(int timeout)
+	{
+		// tofu
+	}
+	
+	public void	killAgent()
+	{
+		// tofu
+	}
 }
