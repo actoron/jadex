@@ -1,25 +1,39 @@
 package jadex.bdiv3x;
 
+import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
+import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
+import jadex.bdiv3.features.impl.BDIMonitoringComponentFeature;
+import jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature;
+import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
+import jadex.micro.MicroAgentFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -49,6 +63,17 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	
 	/** The capability icon. */
 	protected static final LazyResource	ICON_CAPABILITY = new LazyResource(BDIV3XComponentFactory.class, "/jadex/bdiv3x/images/bdi_capability.png");
+
+	/** The specific component features for micro agents. */
+	public static final Collection<IComponentFeatureFactory> BDI_FEATURES = Collections.unmodifiableCollection(
+		Arrays.asList(
+			new ComponentFeatureFactory(IProvidedServicesFeature.class, BDIProvidedServicesComponentFeature.class),
+			BDIAgentFeature.FACTORY, 
+			BDILifecycleAgentFeature.FACTORY,
+			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class),
+			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BDIMonitoringComponentFeature.class),
+			new ComponentFeatureFactory(IRequiredServicesFeature.class, BDIRequiredServicesComponentFeature.class)
+		));
 	
 	//-------- attributes --------
 	
@@ -78,7 +103,6 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	{
 		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new BDIV3XModelLoader();
-		this.features	= SComponentFactory.DEFAULT_FEATURES;
 	}
 	
 	/**
@@ -89,7 +113,7 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	{
 		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
 		this.provider = provider;
-		this.features	= SComponentFactory.DEFAULT_FEATURES;
+		this.features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BDI_FEATURES));
 	}
 	
 	/**
