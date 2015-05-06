@@ -398,7 +398,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 	 */
 	public IFuture<Void> notify(IFinger nDash)
 	{
-		Future<Void> future = new Future<Void>();
+		final Future<Void> future = new Future<Void>();
 		IFinger pre = getPredecessor().get();
 		if (pre == null || nDash.getNodeId().isInInterval(pre.getNodeId(), myId)) {
 			setPredecessor(nDash).addResultListener(new DelegationResultListener<Void>(future));
@@ -408,6 +408,27 @@ public class RingNode implements IRingNode, IDebugRingNode
 		return future;
 	}
 	
+	/**
+	 * Notifies this node about another node that may be bad.
+	 */
+	@Override
+	public IFuture<Void> notifyBad(final IFinger x) {
+		final Future<Void> fut = new Future<Void>();
+		getRingService(x).addResultListener(new IResultListener<IRingNode>() {
+
+			@Override
+			public void resultAvailable(IRingNode result) {
+				fut.setResult(null);
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				revalidate(x).addResultListener(new DelegationResultListener<Void>(fut));
+			}
+		});
+		return fut;
+	}
+
 	/**
 	 * Informs about new successor relations to this node.
 	 * @return
@@ -439,8 +460,6 @@ public class RingNode implements IRingNode, IDebugRingNode
 							log("Got predecessor finger " + x);
 							if(x != null && x.getNodeId().isInInterval(myId, successor.getNodeId()))
 							{
-								// TODO: when my own successor is bad and i get a new one, the new one has the BAD node as predecessor.
-								// i will get this here again -> boom :(
 								getRingService(x).addResultListener(new DefaultResultListener<IRingNode>()
 								{
 									@Override
@@ -448,17 +467,20 @@ public class RingNode implements IRingNode, IDebugRingNode
 									{
 										fingertable.setSuccessor(x);
 										counter.resultAvailable(null);
-										log("Got service for finger " + x + " , counter: " + counter.getCnt());
+										log("Got service for finger " + x);
 									}
 									
 									public void exceptionOccurred(Exception exception) {
-										exception.printStackTrace();
 										counter.resultAvailable(null);
+										log("Could not get service for finger " + x + ", informing " + successor);
+										// when my own successor is bad and i get a new one, the new one may have the BAD node as predecessor.
+										// in this case, i inform my successor to avoid repeated errors.
+										successorRing.notifyBad(x);
 									};
 								});
 							} else {
 								counter.resultAvailable(null);
-								log("finger didnt fit: " + x + " , counter: " + counter.getCnt());
+								log("finger didnt fit: " + x );
 							}
 							
 //							log("notifying");
@@ -471,7 +493,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 								{
 //									ret.setResult(result);
 									counter.resultAvailable(null);
-									log("notify successful, counter: " + counter.getCnt());
+									log("notify successful");
 								}
 							});
 						}

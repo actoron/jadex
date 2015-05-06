@@ -42,4 +42,8 @@ public interface IRingNode
 	@Timeout(TIMEOUT)
 	IFuture<List<IFinger>> getFingers();
 
+	@Timeout(TIMEOUT)
+	IFuture<Void> notifyBad(IFinger x);
+	
+
 }

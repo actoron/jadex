@@ -919,8 +919,9 @@ public class DhtViewerPanel extends JPanel
 		{
 			final ProxyHolder proxyHolder = proxies.get(id);
 			if (proxyHolder != null) {
-				System.out.println("Removing proxy: " + proxyHolder);
+				System.out.println("Removing proxy: " + id);
 				proxies.remove(proxyHolder);
+				g.removeVertex(id);
 			}
 		}
 		
