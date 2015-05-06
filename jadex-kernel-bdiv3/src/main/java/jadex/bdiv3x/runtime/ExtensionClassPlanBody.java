@@ -1,6 +1,8 @@
 package jadex.bdiv3x.runtime;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.impl.AbstractPlanBody;
@@ -84,7 +86,30 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 	 */
 	public Object invokeBody(Object[] params) throws BodyAborted
 	{
-		throw new UnsupportedOperationException();
+		try
+		{
+			getBody();
+			Method bm = body.getMethod("body", new Class[0]);
+			bm.invoke(plan, new Object[0]);
+			return null;
+		}
+		catch(Exception e)
+		{
+			Throwable t = e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+			if(t instanceof Error)
+			{
+				throw (Error)t;
+			}
+			else if(t instanceof RuntimeException)
+			{
+				throw (RuntimeException)t;
+			}
+			else
+			{
+				throw new RuntimeException(t);
+			}
+//			throw t instanceof BodyAborted? (BodyAborted)t: t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+		}
 	}
 
 	/**
@@ -116,7 +141,7 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 	 */
 	public Class<?>[] getBodyParameterTypes()
 	{
-		throw new UnsupportedOperationException();
+		return null;
 	}
 	
 	/**
@@ -124,7 +149,7 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 	 */
 	public Class<?>[] getPassedParameterTypes()
 	{
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	/**
@@ -132,7 +157,7 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 	 */
 	public Class<?>[] getFailedParameterTypes()
 	{
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	/**
@@ -140,6 +165,6 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 	 */
 	public Class<?>[] getAbortedParameterTypes()
 	{
-		throw new UnsupportedOperationException();
+		return null;
 	}
 }

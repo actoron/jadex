@@ -1753,7 +1753,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			}
 		}
 		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class);
-		Object capa = capaname!=null ? bdif.getCapabilityObject(capaname): component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		Object capa = capaname!=null ? bdif.getCapabilityObject(capaname): component.getComponentFeature0(IPojoComponentFeature.class)!=null? 
+			component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(): null;
 //			: getAgent() instanceof PojoBDIAgent? ((PojoBDIAgent)getAgent()).getPojoAgent(): getAgent();
 		
 		vals.add(capa);
