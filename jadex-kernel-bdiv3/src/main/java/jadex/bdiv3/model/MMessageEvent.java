@@ -3,18 +3,58 @@ package jadex.bdiv3.model;
 import jadex.bridge.service.types.message.MessageType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
  */
 public class MMessageEvent extends MElement
 {
+	public static Map<String, Direction> dirs = new HashMap<String, MMessageEvent.Direction>();
+
+	/** The message direction. */
+	public enum Direction
+	{
+		SEND("send"),
+		RECEIVE("receive"),
+		SENDRECEIVE("send_receive");
+		
+		protected String str;
+		
+		/**
+		 *  Create a new direction
+		 */
+		Direction(String str)
+		{
+			this.str = str;
+			dirs.put(str, this);
+		} 
+		
+		/**
+		 *  Get the string representation.
+		 *  @return The string representation.
+		 */
+		public String getString()
+		{
+			return str;
+		}
+		
+		/**
+		 * 
+		 */
+		public static Direction getDirection(String name)
+		{
+			return dirs.get(name);
+		}
+	}
+	
 	/** The parameters. */
 	protected List<MParameter> parameters;
 	
 	/** The direction. */
-	protected String direction;
+	protected Direction direction;
 	
 	/** The message type. */
 	protected MessageType type;
@@ -23,7 +63,7 @@ public class MMessageEvent extends MElement
 	 *  Get the direction.
 	 *  @return The direction
 	 */
-	public String getDirection()
+	public Direction getDirection()
 	{
 		return direction;
 	}
@@ -32,11 +72,11 @@ public class MMessageEvent extends MElement
 	 *  The direction to set.
 	 *  @param direction The direction to set
 	 */
-	public void setDirection(String direction)
+	public void setDirection(Direction direction)
 	{
 		this.direction = direction;
 	}
-
+	
 	/**
 	 *  Get the type.
 	 *  @return The type

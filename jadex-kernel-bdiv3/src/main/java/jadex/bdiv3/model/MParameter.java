@@ -12,6 +12,7 @@ import jadex.commons.SReflect;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,45 @@ import java.util.Set;
  */
 public class MParameter extends MElement
 {
+	public static Map<String, Direction> dirs = new HashMap<String, Direction>();
+
+	/** The message direction. */
+	public enum Direction
+	{
+		IN("in"),
+		OUT("out"),
+		INOUT("inout"),
+		FIXED("fixed");
+		
+		protected String str;
+		
+		/**
+		 *  Create a new direction
+		 */
+		Direction(String str)
+		{
+			this.str = str;
+			dirs.put(str, this);
+		} 
+		
+		/**
+		 *  Get the string representation.
+		 *  @return The string representation.
+		 */
+		public String getString()
+		{
+			return str;
+		}
+		
+		/**
+		 * 
+		 */
+		public static Direction getDirection(String name)
+		{
+			return dirs.get(name);
+		}
+	}
+	
 	//-------- attributes --------
 	
 	/** The field target. */
@@ -37,7 +77,7 @@ public class MParameter extends MElement
 	//-------- additional xml properties --------
 	
 	/** The direction. */
-	protected String direction;
+	protected Direction direction;
 	
 	/** The type (if explicitly specified. */
 	protected ClassInfo clazz;
@@ -295,7 +335,7 @@ public class MParameter extends MElement
 	 *  Get the direction.
 	 *  @return The direction
 	 */
-	public String getDirection()
+	public Direction getDirection()
 	{
 		return direction;
 	}
@@ -304,7 +344,7 @@ public class MParameter extends MElement
 	 *  The direction to set.
 	 *  @param direction The direction to set
 	 */
-	public void setDirection(String direction)
+	public void setDirection(Direction direction)
 	{
 		this.direction = direction;
 	}

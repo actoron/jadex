@@ -27,6 +27,7 @@ public @interface Goal
 		{
 			this.str = str;
 		}
+		
 		/**
 		 *  Get the string representation.
 		 *  @return The string representation.

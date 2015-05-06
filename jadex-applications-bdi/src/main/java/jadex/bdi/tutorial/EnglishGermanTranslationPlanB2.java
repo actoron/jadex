@@ -1,6 +1,6 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 
@@ -16,7 +16,7 @@ public class EnglishGermanTranslationPlanB2 extends Plan
 	//-------- attributes --------
 
 	/** The wordtable. */
-	protected Map wordtable;
+	protected Map<String, String> wordtable;
 
 	//-------- constructors --------
 
@@ -27,7 +27,7 @@ public class EnglishGermanTranslationPlanB2 extends Plan
 	{
 		System.out.println("Created: "+this);
 
-		this.wordtable = new HashMap();
+		this.wordtable = new HashMap<String, String>();
 		this.wordtable.put("coffee", "Kaffee");
 		this.wordtable.put("milk", "Milch");
 		this.wordtable.put("cow", "Kuh");

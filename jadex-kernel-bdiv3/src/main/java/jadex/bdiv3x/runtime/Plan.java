@@ -1,9 +1,20 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MMessageEvent;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IMessageAdapter;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.IFilter;
+import jadex.commons.future.Future;
+import jadex.micro.AbstractMessageHandler;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 /**
@@ -67,9 +78,36 @@ public abstract class Plan
 	 */
 	public IMessageEvent waitForMessageEvent(String type, long timeout)
 	{
+		final Future<IMessageEvent> ret = new Future<IMessageEvent>();
+		
 		IMessageFeature mf = agent.getComponentFeature(IMessageFeature.class);
-//		mf.
-		return null;
+		mf.addMessageHandler(new AbstractMessageHandler(new IFilter<IMessageAdapter>()
+		{
+			public boolean filter(IMessageAdapter obj)
+			{
+//				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+//				List<MMessageEvent> mevents = bdif.getBDIModel().getCapability().getMessageEvents();
+//				for(MMessageEvent mevent: mevents)
+//				{
+//					if(mevent.getDirection())
+//				}
+				return true;
+			}
+		}, timeout, true, true)
+		{
+			public void handleMessage(final Map<String, Object> msg, final MessageType type)
+			{
+//				System.out.println("received reply: "+msg);
+				ret.setResult(new RMessageEvent(null, msg, type));
+			}
+			
+			public void timeoutOccurred()
+			{
+				ret.setException(new TimeoutException());
+			}
+		});
+		
+		return ret.get();
 	}
 	
 	/**

@@ -26,7 +26,7 @@ public class RElement
 	public RElement(MElement modelelement)
 	{
 		this.modelelement = modelelement;
-		this.id = modelelement.getName()+"_#"+cnt++;
+		this.id = modelelement==null? "nomodel": modelelement.getName()+"_#"+cnt++;
 	}
 
 	//-------- methods --------

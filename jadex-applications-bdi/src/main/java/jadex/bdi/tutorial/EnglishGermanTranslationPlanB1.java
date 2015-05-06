@@ -16,7 +16,7 @@ public class EnglishGermanTranslationPlanB1 extends Plan
 	//-------- attributes --------
 
 	/** The wordtable. */
-	protected Map wordtable;
+	protected Map<String, String> wordtable;
 
 	//-------- methods --------
 
@@ -27,7 +27,7 @@ public class EnglishGermanTranslationPlanB1 extends Plan
 	{
 		System.out.println("Created: "+this);
 
-		this.wordtable = new HashMap();
+		this.wordtable = new HashMap<String, String>();
 		this.wordtable.put("coffee", "Kaffee");
 		this.wordtable.put("milk", "Milch");
 		this.wordtable.put("cow", "Kuh");

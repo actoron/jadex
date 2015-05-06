@@ -5,6 +5,7 @@ import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.model.MMessageEvent.Direction;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
@@ -14,7 +15,6 @@ import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.component.ComponentXMLReader;
-import jadex.component.ComponentXMLReader.ExpressionProcessor;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -49,6 +49,38 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		public String convertObject(Object val, Object context)
 		{
 			return ((MessageType)val).getName();
+		}
+	};
+	
+	public static final IStringObjectConverter dirconv = new IStringObjectConverter()
+	{
+		public Object convertString(String val, Object context) throws Exception
+		{
+			return Direction.getDirection(val);
+		}
+	};
+	
+	public static final IObjectStringConverter redirconv = new IObjectStringConverter()
+	{
+		public String convertObject(Object val, Object context)
+		{
+			return ((Direction)val).getString();
+		}
+	};
+	
+	public static final IStringObjectConverter pdirconv = new IStringObjectConverter()
+	{
+		public Object convertString(String val, Object context) throws Exception
+		{
+			return jadex.bdiv3.model.MParameter.Direction.getDirection(val);
+		}
+	};
+	
+	public static final IObjectStringConverter repdirconv = new IObjectStringConverter()
+	{
+		public String convertObject(Object val, Object context)
+		{
+			return ((jadex.bdiv3.model.MParameter.Direction)val).getString();
 		}
 	};
 	
@@ -351,7 +383,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageevent")), new ObjectInfo(MMessageEvent.class),
 			new MappingInfo(null, null, null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("type", "type"), new AttributeConverter(msgtypeconv, remsgtypeconv))},
+				new AttributeInfo(new AccessInfo("type", "type"), new AttributeConverter(msgtypeconv, remsgtypeconv)),
+				new AttributeInfo(new AccessInfo("direction", "direction"), new AttributeConverter(dirconv, redirconv))},
 //				new SubobjectInfo[]{
 //					new SubobjectInfo(new AccessInfo(new QName(uri, "parameter"), )),	
 //					new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), OAVBDIMetaModel.parameterelement_has_parametersets))	
@@ -413,8 +446,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "parameter")), new ObjectInfo(MParameter.class), 
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
-			//new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AccessInfo.IGNORE_WRITE))
+			new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+			new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv))
 			})));
 		
 //		TypeInfo ti_paramset = new TypeInfo(new XMLInfo(new QName(uri, "parameterset")), new ObjectInfo(MParameter.class), 
