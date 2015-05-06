@@ -12,7 +12,6 @@ public interface IRingNode
 {
 
 	public static int TIMEOUT=2112;
-	public static int TIMEOUT2=2114;
 	
 	
 	@Timeout(TIMEOUT)
@@ -33,17 +32,18 @@ public interface IRingNode
 	@Timeout(TIMEOUT)
 	IFuture<Void> setPredecessor(IFinger predecessor);
 
-	@Timeout(TIMEOUT2)
+	@Timeout(TIMEOUT)
 	IFuture<IID> getId();
 
 	@Timeout(TIMEOUT)
 	IFuture<Void> notify(IFinger ringNode);
 
 	@Timeout(TIMEOUT)
+	IFuture<Void> notifyBad(IFinger x);
+	
+	@Timeout(TIMEOUT)
 	IFuture<List<IFinger>> getFingers();
 
-	@Timeout(TIMEOUT)
-	IFuture<Void> notifyBad(IFinger x);
 	
 
 }

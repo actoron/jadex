@@ -15,6 +15,7 @@ import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IKVStore;
 import jadex.bridge.service.types.dht.IRingNode;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -53,6 +54,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.Timer;
@@ -123,8 +125,6 @@ public class DhtViewerPanel extends JPanel
 	private JLabel idLabel;
 	private JLabel preLabel;
 	private JLabel sucLabel;
-	private List<JLabel> fingerStartLabels = new ArrayList<JLabel>();
-	private List<JLabel> fingerNodeLabels = new ArrayList<JLabel>();
 	
 	private JTextField saveKeyTf;
 	private JTextField saveValueTf;
@@ -134,13 +134,14 @@ public class DhtViewerPanel extends JPanel
 	private JTextField readValueTf;
 	private JButton readValueBtn;
 	
-	private JTextArea contentsTa;
+	private JContentsTable contentsTable;
 	
 	private JLabel statusTf;
+	
+	private JFingerTable fingerTable;
 
 	private HighlightablePaintTransformer<IID> paintTrans;
-
-	private Method hasher;
+	
 
 	//-------- constructors --------
 	
@@ -159,18 +160,6 @@ public class DhtViewerPanel extends JPanel
 		
 		buildGraph(g);
 		
-		Class<?> clazz = SReflect.classForName0("jadex.platform.service.dht.ID", getClass().getClassLoader());
-		if (clazz != null) {
-			try {
-				this.hasher = clazz.getMethod("get", String.class);
-			} catch (NoSuchMethodException e1) {
-				e1.printStackTrace();
-			} catch (SecurityException e1) {
-				e1.printStackTrace();
-			}
-		}
-		
-//		final NodePanel np = new NodePanel(null, mem, system.getState());
 		
 //		this.layout = new DAGLayout(g);
 		this.vv =  new VisualizationViewer<IID, String>(layout, new Dimension(600,600));
@@ -376,69 +365,45 @@ public class DhtViewerPanel extends JPanel
 				GridBagConstraints c = new GridBagConstraints();
 				
 				c.fill = GridBagConstraints.HORIZONTAL;
+				c.gridx = 0;
 				c.gridy = 0;
+				c.gridwidth = 2;
 				
 				add(new JLabel("comptext") {{ componentLabel = this; }}, c);
 				
-				c.gridy = 1;
+				c.gridwidth = 1;
+				c.gridy++;
+				c.gridx = 0;
+				add(new JLabel("ID: "),c);
+				c.gridx = 1;
+				add(new JLabel("idtext") {{ idLabel = this; }},c);
 				
-				add(new JPanel() {{
-					
-					setLayout(new GridLayout(13, 3));
-					
-					add(new JLabel("ID: "));
-					add(new JLabel("idtext") {{ idLabel = this; }});
-					add(new JLabel());
-					
-					add(new JLabel("Predecessor: "));
-					add(new JLabel("pretext") {{ preLabel = this; }});
-					add(new JLabel());
-					
-					add(new JLabel("Successor: "));
-					add(new JLabel("suctext") {{ sucLabel = this; }});
-					add(new JLabel());
-					
-					add(new JLabel("Fingers:"));
-					add(new JLabel());
-					add(new JLabel());
-					
-					add(new JLabel(""));
-					add(new JLabel("start "));
-					add(new JLabel("node"));
-					
-					add(new JLabel("0"));
-					add(new JLabel("-") {{fingerStartLabels.add(this);}});
-					add(new JLabel("-") {{fingerNodeLabels.add(this);}});
-					
-					add(new JLabel("1"));
-					add(new JLabel("-") {{fingerStartLabels.add(this);}});
-					add(new JLabel("-") {{fingerNodeLabels.add(this);}});
-					
-					add(new JLabel("2"));
-					add(new JLabel("-") {{fingerStartLabels.add(this);}});
-					add(new JLabel("-") {{fingerNodeLabels.add(this);}});
-					
-					add(new JLabel("3"));
-					add(new JLabel("-") {{fingerStartLabels.add(this);}});
-					add(new JLabel("-") {{fingerNodeLabels.add(this);}});
-					
-					add(new JLabel("4"));
-					add(new JLabel("-") {{fingerStartLabels.add(this);}});
-					add(new JLabel("-") {{fingerNodeLabels.add(this);}});
-					
-					add(new JLabel("5"));
-					add(new JLabel("-") {{fingerStartLabels.add(this);}});
-					add(new JLabel("-") {{fingerNodeLabels.add(this);}});
-					
-					add(new JLabel("6"));
-					add(new JLabel("-") {{fingerStartLabels.add(this);}});
-					add(new JLabel("-") {{fingerNodeLabels.add(this);}});
-					
-					add(new JLabel("7"));
-					add(new JLabel("-") {{fingerStartLabels.add(this);}});
-					add(new JLabel("-") {{fingerNodeLabels.add(this);}});
-					
-				}}, c);
+				c.gridy++;
+				c.gridx = 0;
+				add(new JLabel("Predecessor: "),c);
+				c.gridx = 1;
+				add(new JLabel("pretext") {{ preLabel = this; }},c);
+				
+				c.gridy++;
+				c.gridx = 0;
+				add(new JLabel("Successor: "),c);
+				c.gridx = 1;
+				add(new JLabel("suctext") {{ sucLabel = this; }},c);
+				
+				
+				c.gridy++;
+				c.gridx = 0;
+				c.gridwidth = 2;
+				
+				c.fill = GridBagConstraints.HORIZONTAL;
+				
+				add(new JScrollPane(new JFingerTable() 
+					{{
+						fingerTable = this;
+					}}) 
+				{{
+					setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				}},c);
 					
 			}}, BorderLayout.NORTH);
 				
@@ -455,10 +420,13 @@ public class DhtViewerPanel extends JPanel
 //				c.fill = GridBagConstraints.HORIZONTAL;
 				add(new JLabel("Contents:"), BorderLayout.NORTH);
 //				c.gridy = 1;
-				add(new JTextArea() {{
-					contentsTa = this;
-					setEditable(false);
-				}}, BorderLayout.CENTER);
+//				add(new JTextArea() {{
+//					contentsTa = this;
+//					setEditable(false);
+//				}}, BorderLayout.CENTER);
+				add(new JScrollPane(new JContentsTable() {{
+					contentsTable = this;
+				}}), BorderLayout.CENTER);
 			}}, BorderLayout.CENTER);
 			
 			add(new JPanel() {{ 
@@ -622,42 +590,67 @@ public class DhtViewerPanel extends JPanel
 			String preText = proxyHolder.predecessor == null ? "-" : proxyHolder.predecessor.getNodeId().toString();
 			preLabel.setText(preText);
 			
-			for (int i = 0; i < proxyHolder.fingers.size(); i++) {
-				JLabel startLabel = fingerStartLabels.get(i);
-				JLabel nodeIdLabel = fingerNodeLabels.get(i);
+//			for (int i = 0; i < proxyHolder.fingers.size(); i++) {
+//				JLabel startLabel = fingerStartLabels.get(i);
+//				JLabel nodeIdLabel = fingerNodeLabels.get(i);
 				
-				if (startLabel != null && nodeIdLabel != null) {
-					IFinger f = proxyHolder.fingers.get(i);
-					startLabel.setText("" + f.getStart());
-					nodeIdLabel.setText("" + f.getNodeId());
-				} else {
-					throw new RuntimeException("Too many finger entries: " + proxyHolder.fingers.size() +", i only support " + i);
-				}
+//				if (startLabel != null && nodeIdLabel != null) {
+//					IFinger f = proxyHolder.fingers.get(i);
+//					startLabel.setText("" + f.getStart());
+//					nodeIdLabel.setText("" + f.getNodeId());
+//				} else {
+//					throw new RuntimeException("Too many finger entries: " + proxyHolder.fingers.size() +", i only support " + i);
+//				}
+//			}
+			
+//			Collections.sort(proxyHolder.fingers, new Comparator<IFinger>() {
+//
+//				@Override
+//				public int compare(IFinger o1, IFinger o2) {
+//					return o1.
+//				}
+//			});
+			
+			fingerTable.setSortedFingers(proxyHolder.fingers);
+			
+			Set<String> set = proxyHolder.store.getLocallyStoredKeys().get();
+			ArrayList<String> keyList = new ArrayList<String>(set);
+			Collections.sort(keyList);
+			
+			ArrayList<Tuple2<String, String>> tuples = new ArrayList<Tuple2<String,String>>();
+			
+			for (String key : keyList) {
+				String value = proxyHolder.store.lookup(key).get();
+				Tuple2<String, String> tup = new Tuple2<String,String>(key, value);
+				tuples.add(tup);
 			}
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append("key\thash\tvalue\n");
-
-			if (proxyHolder.store != null) {
-				Set<String> set = proxyHolder.store.getLocallyStoredKeys().get();
-				if (set.isEmpty()) {
-					stringBuilder.append("No Values stored.");
-				} else {
-					ArrayList<String> arrayList = new ArrayList<String>(set);
-					Collections.sort(arrayList);
-					for (String key : arrayList) {
-						stringBuilder.append(key);
-						stringBuilder.append("\t");
-						stringBuilder.append(hash(key));
-						stringBuilder.append("\t");
-						String string = proxyHolder.store.lookup(key).get();
-						stringBuilder.append(string);
-						stringBuilder.append("\n");
-					}
-				}
-			} else {
-				stringBuilder.append("Could not get contents");
-			}
-			contentsTa.setText(stringBuilder.toString());
+			
+			contentsTable.setSortedContent(tuples);
+			
+//			StringBuilder stringBuilder = new StringBuilder();
+//			stringBuilder.append("key\thash\tvalue\n");
+//
+//			if (proxyHolder.store != null) {
+//				Set<String> set = proxyHolder.store.getLocallyStoredKeys().get();
+//				if (set.isEmpty()) {
+//					stringBuilder.append("No Values stored.");
+//				} else {
+//					ArrayList<String> arrayList = new ArrayList<String>(set);
+//					Collections.sort(arrayList);
+//					for (String key : arrayList) {
+//						stringBuilder.append(key);
+//						stringBuilder.append("\t");
+//						stringBuilder.append(hash(key));
+//						stringBuilder.append("\t");
+//						String string = proxyHolder.store.lookup(key).get();
+//						stringBuilder.append(string);
+//						stringBuilder.append("\n");
+//					}
+//				}
+//			} else {
+//				stringBuilder.append("Could not get contents");
+//			}
+//			contentsTa.setText(stringBuilder.toString());
 		}
 	}
 
@@ -920,8 +913,9 @@ public class DhtViewerPanel extends JPanel
 			final ProxyHolder proxyHolder = proxies.get(id);
 			if (proxyHolder != null) {
 				System.out.println("Removing proxy: " + id);
-				proxies.remove(proxyHolder);
+				proxies.remove(id);
 				g.removeVertex(id);
+				vv.repaint();
 			}
 		}
 		
@@ -974,25 +968,6 @@ public class DhtViewerPanel extends JPanel
 
 	}
 	
-	private IID hash(String key) {
-		if (hasher != null) {
-			try {
-				Object res = hasher.invoke(null, key);
-				return (IID) res;
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return null;
-	}
-
 	/**
 	 *  Create a frame for dr structure.
 	 *  @param title	The title for the frame.
