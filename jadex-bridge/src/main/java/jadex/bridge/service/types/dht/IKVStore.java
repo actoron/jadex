@@ -27,7 +27,7 @@ public interface IKVStore
 	
 	public IFuture<IRingNode> getRingNode();
 	
-	public Future<Set<String>> getStoredKeys();
+	public Future<Set<String>> getLocallyStoredKeys();
 	
 //	public IFuture<IKVStore> join();
 }

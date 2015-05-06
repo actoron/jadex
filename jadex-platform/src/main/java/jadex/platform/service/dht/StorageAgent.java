@@ -18,32 +18,34 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+/**
+ * Agent that includes a Ring component and provides a storage service additionally. 
+ */
 @Agent
 @ProvidedServices( {
 	@ProvidedService(type = IKVStore.class, implementation = @Implementation(value = KVStore.class), scope = RequiredServiceInfo.SCOPE_GLOBAL)
 })
 @RequiredServices( {
-//	@RequiredService(name="store", type = IKVStore.class, binding=@Binding(scope=Binding.SCOPE_LOCAL)),
 	@RequiredService(name="ring", type = IRingNode.class, binding=@Binding(scope=Binding.SCOPE_LOCAL, create = true,
 	creationinfo=@CreationInfo(type = "ringAgent")))
 })
 @ComponentTypes(@ComponentType(name="ringAgent", clazz=RingAgent.class))
 public class StorageAgent
 {
-//	@AgentService
-	IKVStore store;
+	/** The local store service **/
+	private IKVStore store;
 	
+	/** The local ringnode service **/
 	@AgentService
-	IRingNode ring;
-	
+	private IRingNode ring;
+
+	/** The agent access **/
 	@Agent
-	IInternalAccess agent;
+	private IInternalAccess agent;
 	
 	@AgentCreated
 	public void onCreate() {
 		store = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IKVStore.class);
-		
 		store.setRing(ring);
-//		store.publish("test", "0123");
 	}
 }

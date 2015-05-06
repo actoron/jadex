@@ -173,17 +173,17 @@ public class RingNodePlatformTest extends TestCase
 //		System.out.println(rn1.getFingerTableString().get());
 //		System.out.println(rn2.getFingerTableString().get());
 		
-		long timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
-		System.out.println("timeout is: " + timeout2);
+//		long timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
+//		System.out.println("timeout is: " + timeout2);
 		IID iid = rn3.getId().get();
-		Finger.killedId = iid;
+//		Finger.killedId = iid;
 		System.out.println("killing platform of node: " + iid);
 		platform3.killComponent().get();
 		
 		System.out.println("platform killed");
 		
-		timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
-		System.out.println("timeout is: " + timeout2);
+//		timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
+//		System.out.println("timeout is: " + timeout2);
 		stabilize(new IDebugRingNode[]{rn1, rn2}).get();
 //		stabilize(new IDebugRingNode[]{rn1, rn2});
 		
@@ -312,13 +312,13 @@ public class RingNodePlatformTest extends TestCase
 			@Override
 			public void exceptionOccurredIfUndone(Exception exception)
 			{
-				if(exception instanceof UnjoinedException)
-				{
-					System.out.println("initiate re-join");
-					rn2.join(rn1);
-				} else {
+//				if(exception instanceof UnjoinedException)
+//				{
+//					System.out.println("initiate re-join");
+//					rn2.join(rn1);
+//				} else {
 					exception.printStackTrace();
-				}
+//				}
 			}
 		};
 

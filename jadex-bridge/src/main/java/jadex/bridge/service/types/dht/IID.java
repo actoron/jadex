@@ -11,6 +11,6 @@ public interface IID extends Comparable<IID>
 	byte[] getBytes();
 	IID addPowerOfTwo(int i);
 	
-	IID createNew();
+//	IID createNew();
 	
 }

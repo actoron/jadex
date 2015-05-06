@@ -6,13 +6,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IKVStore;
 import jadex.bridge.service.types.dht.IRingNode;
-import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -28,54 +26,59 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Service that allows storing of key/value pairs in a DHT ring.
+ */
 @Service
 public class KVStore implements IKVStore
 {
-	private Map<String, StoreEntry>	kvmap;
+	/** Map that stores the actual data. Key -> StoreEntry **/
+	protected Map<String, StoreEntry>	kvmap;
 	
-	private IRingNode ring;
+	/** The local Ring Node  to access the DHT Ring. **/
+	protected IRingNode ring;
+	/** The local CID **/
+	protected  IComponentIdentifier	myCid;
+	/** The local ID **/
+	protected  IID	myId;
 	
+	/** The local agent access. **/
 	@ServiceComponent
-	private IInternalAccess agent;
+	protected IInternalAccess agent;
 
-	private Logger	logger;
+	/** The logger. **/
+	protected  Logger	logger;
 
-	private IComponentIdentifier	myCid;
-	private IID	myId;
-	
-	class StoreEntry extends Tuple2<IID,String> {
-
-		private static final long serialVersionUID = 1L;
-
-		public StoreEntry(IID hash, String value) {
-			super(hash, value);
-		}
-		
-		public IID getIdHash() {
-			return getFirstEntity();
-		}
-		
-		public String getValue() {
-			return getSecondEntity();
-		}
-	}
-
+	/**
+	 * Constructor.
+	 */
 	public KVStore()
 	{
 		this.kvmap = new HashMap<String, StoreEntry>();
 		this.logger = Logger.getLogger(this.getClass().getName());
 	}
 	
+	/**
+	 * Set the local ringNode.
+	 * @param ring the new ringNode
+	 */
 	public void setRing(IRingNode ring)
 	{
 		this.ring = ring;
-		System.out.println("store: set ring");
 		myCid = ring.getCID().get();
 		myId = ring.getId().get();
-		System.out.println("store: done set ring");
 	}
 
-	@Override
+	/**
+	 * Publish a key/value pair in the corresponding node.
+	 * 
+	 * @param key
+	 *            The Key.
+	 * @param value
+	 *            The Value.
+	 * 
+	 * @return The ID of the node this key was saved in.
+	 */
 	public IFuture<IID> publish(final String key, final String value)
 	{
 		final Future<IID> ret = new Future<IID>();
@@ -108,6 +111,16 @@ public class KVStore implements IKVStore
 		return ret;
 	}
 	
+	/**
+	 * Store a key/value pair in the local map.
+	 * 
+	 * @param key
+	 *            The key
+	 * @param value
+	 *            The value
+	 * 
+	 * @return the ID of the local node.
+	 */
 	public IFuture<IID> storeLocal(String key, String value) {
 		if (!isResponsibleFor(ID.get(key))) {
 			logger.log(Level.WARNING, myId + ": storeLocal called even if i do not feel responsible for: " + ID.get(key) + ". My successor is " + ring.getSuccessor().get().getNodeId());
@@ -117,13 +130,14 @@ public class KVStore implements IKVStore
 		return ring.getId();
 	}
 
-	
-	@Override
-	public IFuture<String> lookup(String key) {
-		return lookup(key, ID.get(key));
-	}
-	
-	@Override
+	/**
+	 * Lookup a key and return the responsible Node ID.
+	 * 
+	 * @param key
+	 *            Requested key.
+	 * 
+	 * @return IID of the responsible node.
+	 */
 	public IFuture<IID> lookupResponsibleStore(String key) {
 		final Future<IID> ret = new Future<IID>();
 		final IExecutionFeature execFeature = agent.getComponentFeature(IExecutionFeature.class);
@@ -140,8 +154,29 @@ public class KVStore implements IKVStore
 		
 		return ret;
 	}
+	
+	/**
+	 * Lookup a key in the ring and return the saved value, if any.
+	 * 
+	 * @param key
+	 *            Requested key.
+	 * 
+	 * @return The retrieved value or null, if none.
+	 */
+	public IFuture<String> lookup(String key) {
+		return lookup(key, ID.get(key));
+	}
 
-	@Override
+	/**
+	 * Lookup a key in the ring and return the saved value, if any.
+	 * 
+	 * @param key
+	 *            Requested key.
+	 * @param idHash
+	 *            The hashed key to find the corresponding node.
+	 * 
+	 * @return The retrieved value or null, if none.
+	 */
 	public IFuture<String> lookup(final String key, final IID idHash)
 	{
 		final Future<String> ret = new Future<String>();
@@ -163,7 +198,7 @@ public class KVStore implements IKVStore
 						final Future<String> ret = new Future<String>();
 						if (providerId.equals(myCid)) {
 							// use local access
-							System.out.println(myId + ": retrieving from local map: "  +key+ " (hash: " + idHash +")");
+//							System.out.println(myId + ": retrieving from local map: "  +key+ " (hash: " + idHash +")");
 							if (!isResponsibleFor(idHash)) {
 								logger.log(Level.WARNING, myId + ": storeLocal called even if i do not feel responsible for: " + idHash + ". My successor is " + ring.getSuccessor().get().getNodeId());
 							}
@@ -175,23 +210,20 @@ public class KVStore implements IKVStore
 							}
 						} else {
 							// search for remote kvstore service
-							System.out.println(myId + ": retrieving from remote: " + " (hash: " + idHash +")");
+//							System.out.println(myId + ": retrieving from remote: " + " (hash: " + idHash +")");
 							IFuture<IKVStore> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IKVStore.class, providerId.getParent());
 							searchService.addResultListener(new DefaultResultListener<IKVStore>()
 							{
 								@Override
 								public void resultAvailable(IKVStore result)
 								{
-//												System.out.println("Found remote kvstore");
 									IFuture<String> string = result.lookup(key, idHash);
-//												System.out.println("adding listener");
 									string.addResultListener(new DefaultResultListener<String>()
 									{
 
 										@Override
 										public void resultAvailable(String result)
 										{
-//														System.out.println("got result: " + result);
 											ret.setResult(result);
 										}
 									});
@@ -206,7 +238,6 @@ public class KVStore implements IKVStore
 					@Override
 					public void resultAvailable(String result)
 					{
-//									System.out.println("got result #2: " + result);
 						ret.setResult(result);
 					}
 				});
@@ -214,13 +245,14 @@ public class KVStore implements IKVStore
 		});
 		return ret;
 	}
-	
-	
-	
 
+	/**
+	 * Returns all keys stored in this node.
+	 * @return Set of Keys.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public Future<Set<String>> getStoredKeys() {
+	public Future<Set<String>> getLocallyStoredKeys() {
 		Collection<String> values = kvmap.keySet();
 		HashSet<String> hashSet = new HashSet<String>();
 		for (String entry : values) {
@@ -229,16 +261,59 @@ public class KVStore implements IKVStore
 		return new Future<Set<String>>(hashSet);
 	}
 
-	private boolean isResponsibleFor(IID hash)
-	{
+	/**
+	 * Checks whether this store service is responsible for saving/retrieving a
+	 * key with the given hash value.
+	 * 
+	 * @param hash
+	 * @return true, if this store serviceis responsible, else false.
+	 */
+	private boolean isResponsibleFor(IID hash) {
 		IFinger suc = ring.getSuccessor().get();
-		return (suc == null) ? true : (myId.isInInterval(hash, suc.getNodeId(), true, false));
+		return (suc == null) ? true : (myId.isInInterval(hash, suc.getNodeId(),
+				true, false));
 	}
 
-	@Override
+	/**
+	 * Returns the local ring node.
+	 * @return The local ringnode. 
+	 */
 	public IFuture<IRingNode> getRingNode()
 	{
 		return new Future<IRingNode>(ring);
+	}
+	
+	/**
+	 * Entry in the storage map containing ID (hash) and value.
+	 */
+	static class StoreEntry extends Tuple2<IID,String> {
+
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Constructor.
+		 * @param hash
+		 * @param value
+		 */
+		public StoreEntry(IID hash, String value) {
+			super(hash, value);
+		}
+		
+		/**
+		 * Get the hash.
+		 * @return
+		 */
+		public IID getIdHash() {
+			return getFirstEntity();
+		}
+		
+		/**
+		 * Get the value.
+		 * @return
+		 */
+		public String getValue() {
+			return getSecondEntity();
+		}
 	}
 
 }

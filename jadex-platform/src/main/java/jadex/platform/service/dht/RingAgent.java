@@ -11,6 +11,9 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+/**
+ * This Agent represents a part of the DHT ring, providing a Ring Node Service.
+ */
 @Agent
 @ProvidedServices({
 	@ProvidedService(name="providedRing", type = IRingNode.class, implementation = @Implementation(RingNode.class), scope = RequiredServiceInfo.SCOPE_GLOBAL),

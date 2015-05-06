@@ -105,15 +105,17 @@ public class IDTest extends TestCase
 	
 	@Test
 	public void testNext() {
-//		ID.DEBUG = true;
+		ID.DEBUG = true;
 		ID myId = new ID(new byte[]{-128});
+		
+		System.out.println(myId);
 
 		for(int i = 0; i < 8; i++)
 		{
 			System.out.println(myId.addPowerOfTwo(i));
 			assertEquals("" + (int)Math.pow(2, i), myId.addPowerOfTwo(i).toString().trim());
 		}
-		
+		ID.DEBUG = false;
 	}
 	
 	public void testAdd() {

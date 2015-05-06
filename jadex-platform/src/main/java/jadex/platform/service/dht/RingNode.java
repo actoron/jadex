@@ -5,13 +5,11 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.dht.IDebugRingNode;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
@@ -31,23 +29,29 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This service provides a ring node, which connects to other ring nodes
+ * and forms a circular hierarchy using the Chord DHT protocol.  
+ */
 @Service
 public class RingNode implements IRingNode, IDebugRingNode
 {
+	/** Delay in ms between two fixfinger runs **/
 	protected static final long	FIX_DELAY	= 10000;
 
+	/** Delay in ms between two stabilize runs **/
 	protected static final long	STABILIZE_DELAY	= 5000;
 
-	private static final long	REMOTE_TIMEOUT	= 10000;
-	
+	/** Delay in ms to wait before restarting the search for other ring nodes **/
 	protected static final long	RETRY_SEARCH_DELAY	= 5000;
 	
+	/** Delay in ms to wait before retrying any remote calls **/
 	protected static final long	RETRY_OTHER_DELAY	= 5000;
 	
-//	private static final long	REMOTE_LONG_TIMEOUT	= REMOTE_TIMEOUT * 2;
-
+	/** State of this ring node. **/
 	private State state = State.UNJOINED;
-	
+
+	/** State enum. **/
 	enum State {
 		JOINED, UNJOINED
 	}
@@ -55,23 +59,22 @@ public class RingNode implements IRingNode, IDebugRingNode
 	/** The agent. */
 	@ServiceComponent
 	protected IInternalAccess agent;
-	
-	private IID	myId;
-	
-	private Fingertable fingertable;
-	
-	private Logger logger;
-	
+
+	/** ID of this ring node **/
+	protected IID myId;
+
+	/** The local fingertable **/
+	protected Fingertable fingertable;
+
+	/** The logger. **/
+	protected Logger logger;
+
+	/**
+	 * Constructor.
+	 */
 	public RingNode()
 	{
-//		LogManager.getLogManager().reset();
 		logger = Logger.getLogger(this.getClass().getName());
-//		logger.setUseParentHandlers(false);
-//		logger.addHandler(new ConsoleHandler() {
-//			
-//		});
-		
-		logger.log(Level.INFO, "created ringnode");
 	}
 	
 	@ServiceStart
@@ -81,18 +84,10 @@ public class RingNode implements IRingNode, IDebugRingNode
 		}
 		init(ID.get(agent.getComponentIdentifier()));
 		
-		log("Started ringnode");
-		
-		agent.getExternalAccess().scheduleStep(searchStep).addResultListener(new DefaultResultListener<Void>()
-		{
-
-			@Override
-			public void resultAvailable(Void result)
-			{
-			}
-		});
+		agent.getExternalAccess().scheduleStep(searchStep);
 	}
 	
+	/** Component step to search for other ringnodes. **/
 	IComponentStep<Void> searchStep = new IComponentStep<Void>()
 	{
 		@Override
@@ -108,16 +103,15 @@ public class RingNode implements IRingNode, IDebugRingNode
 			
 			requiredServices.addResultListener(new IntermediateDefaultResultListener<Object>()
 			{
-				Boolean join = false;
+				Boolean found = false;
 				
 				@Override
 				public void intermediateResultAvailable(Object result)
 				{
-					System.out.println("Found service " + result);
 					IRingNode other = (IRingNode)result;
-					if (!join && state != State.JOINED) {
+					if (!found && state != State.JOINED) {
 						if (!other.getId().get().equals(myId)) {
-							join = true;
+							found = true;
 							join(other);
 						}
 					}
@@ -143,20 +137,29 @@ public class RingNode implements IRingNode, IDebugRingNode
 		}
 	};
 
+	/**
+	 * Initialize the node with its own id.
+	 * @param id
+	 */
 	void init(IID id)
 	{
 		this.myId = id;
 		IRingNode me = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IRingNode.class);
-		
 		fingertable = new Fingertable(((IService) me).getServiceIdentifier(), myId, this);
 	}
 	
-	@Override
+	/**
+	 * Return own ID.
+	 * @return own ID.
+	 */
 	public IFuture<IID> getId()
 	{
 		return new Future<IID>(myId);
 	}
 	
+	/**
+	 * ComponentStep to find the successor of a given ID.
+	 */
 	class FindSuccessorStep implements IComponentStep<IFinger> {
 
 		private IID	id;
@@ -166,13 +169,18 @@ public class RingNode implements IRingNode, IDebugRingNode
 			this.id = id;
 		}
 		
-		@Override
 		public IFuture<IFinger> execute(IInternalAccess ia)
 		{
 			return findSuccessor(id);
 		}
 	}
-	
+
+	/**
+	 * Find the successor of a given ID in the ring.
+	 * 
+	 * @param id ID to find the successor of.
+	 * @return The finger entry of the best closest successor.
+	 */
 	public IFuture<IFinger> findSuccessor(final IID id) {
 		final Future<IFinger> ret = new Future<IFinger>();
 //		log("findSuccessor for: " + id);		
@@ -198,9 +206,13 @@ public class RingNode implements IRingNode, IDebugRingNode
 		return ret;
 	}
 	
+	/**
+	 * Find the predecessor of a given ID in the ring.
+	 * @param id the ID.
+	 * @return The closest predecessor of the given ID in the ring.
+	 */
 	protected IFuture<IFinger> findPredecessor(final IID id)
 	{
-//		Future<IFinger> ret = new Future<IFinger>();
 //		log("findPredecessor for: " + id);
 		final IFinger beginDash = fingertable.getSelf();
 		final IRingNode beginDashRing = this;
@@ -300,17 +312,30 @@ public class RingNode implements IRingNode, IDebugRingNode
 //		return ret;
 	}
 	
-	@Override
-	public IFuture<IFinger> getSuccessor()
-	{
+	/**
+	 * Return the successor of this node.
+	 * 
+	 * @return finger entry of the successor.
+	 */
+	public IFuture<IFinger> getSuccessor() {
 		return new Future<IFinger>(fingertable.getSuccessor());
 	}
-	
-	public IFuture<IFinger> getPredecessor()
-	{
+
+	/**
+	 * Return the predecessor of this node.
+	 * 
+	 * @return finger entry of the predecessor.
+	 */
+	public IFuture<IFinger> getPredecessor() {
 		return new Future<IFinger>(fingertable.getPredecessor());
 	}
 
+	/**
+	 * Set the predecessor of this node.
+	 * 
+	 * @param predecessor
+	 *            Finger entry of the new predecessor.
+	 */
 	public IFuture<Void> setPredecessor(IFinger predecessor)
 	{
 		this.fingertable.setPredecessor(predecessor);
@@ -318,20 +343,33 @@ public class RingNode implements IRingNode, IDebugRingNode
 		return Future.DONE;
 	}
 
-	@Override
+	/**
+	 * Return the finger that preceeds the given ID and is closest to it in the
+	 * local finger table.
+	 * 
+	 * @param key
+	 *            the ID
+	 * @return {@link IFinger} The finger that is closest preceeding the given
+	 *         key.
+	 */
 	public IFuture<IFinger> getClosestPrecedingFinger(IID id)
 	{
 //		log("getClosestPrecedingFinger for " + id);
 		return fingertable.getClosestPrecedingFinger(id);
 	}
 	
-	
-	@Override
+	/**
+	 * Return the CID of the provider of this Service.
+	 * @return CID.
+	 */
 	public IFuture<IComponentIdentifier> getCID()
 	{
 		return new Future<IComponentIdentifier>(this.agent.getComponentIdentifier());
 	}
 
+	/**
+	 * Component Step to join the ring with a known other ring node. 
+	 */
 	class JoinStep implements IComponentStep<Boolean> {
 
 		private IRingNode	nDashRing;
@@ -348,6 +386,12 @@ public class RingNode implements IRingNode, IDebugRingNode
 		}
 	}
 	
+	/**
+	 * Join the ring.
+	 * @param nDashRing Another known ringnode
+	 * 
+	 * @return true, if the join was successful, else false.
+	 */
 	public IFuture<Boolean> join(final IRingNode nDashRing) {
 		log("joining " + nDashRing);
 		final Future<Boolean> future = new Future<Boolean>();
@@ -376,7 +420,10 @@ public class RingNode implements IRingNode, IDebugRingNode
 		return future;
 	}
 	
-
+	/**
+	 * Set a new state and handle the transition.
+	 * @param state
+	 */
 	private void setState(State state)
 	{
 		if (state == State.JOINED) {
@@ -390,11 +437,10 @@ public class RingNode implements IRingNode, IDebugRingNode
 		this.state = state;
 	}
 	
-	// TODO: periodic predecessor/finger availability check!!
-
-	@Override
 	/**
 	 * Notifies this node about a possible new predecessor.
+	 * @param nDash possible new predecessor
+	 * 
 	 */
 	public IFuture<Void> notify(IFinger nDash)
 	{
@@ -410,6 +456,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 	
 	/**
 	 * Notifies this node about another node that may be bad.
+	 * @param x possible bad node.
 	 */
 	@Override
 	public IFuture<Void> notifyBad(final IFinger x) {
@@ -443,7 +490,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 		log("Stabilizing (suc: " 
 			+ (fingertable.getSuccessor() != null ? fingertable.getSuccessor().getNodeId(): "null") + ", pre: "
 			+ (fingertable.getPredecessor() != null ? fingertable.getPredecessor().getNodeId(): "null") + ")");
-		getRingService(successor).addResultListener(new InvalidateFingerAndTryAgainListener<IRingNode, Void>(successor, stabilizeDelayedStep, ret, "stabilize")
+		getRingService(successor).addResultListener(new InvalidateFingerAndTryAgainListener<IRingNode, Void>(successor, stabilizeRetryStep, ret, "stabilize")
 		{
 
 			@Override
@@ -452,7 +499,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 				log("Got ring service " + successorRing);
 				if (successorRing != null) {
 					IFuture<IFinger> predecessor = successorRing.getPredecessor();
-					predecessor.addResultListener(new InvalidateFingerAndTryAgainListener<IFinger, Void>(successor, stabilizeDelayedStep, ret, "stabilize")
+					predecessor.addResultListener(new InvalidateFingerAndTryAgainListener<IFinger, Void>(successor, stabilizeRetryStep, ret, "stabilize")
 					{
 						@Override
 						public void resultAvailable(final IFinger x)
@@ -485,7 +532,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 							
 //							log("notifying");
 							IFuture<Void> notify = successorRing.notify(fingertable.getSelf());
-							notify.addResultListener(new InvalidateFingerAndTryAgainListener<Void, Void>(successor, stabilizeDelayedStep, ret, "stabilize")
+							notify.addResultListener(new InvalidateFingerAndTryAgainListener<Void, Void>(successor, stabilizeRetryStep, ret, "stabilize")
 							{
 
 								@Override
@@ -517,9 +564,9 @@ public class RingNode implements IRingNode, IDebugRingNode
 		return ret;
 	}
 	
-	
-	
-	@Override
+	/**
+	 * Disable stabilize, fix and search for debug purposes.
+	 */
 	public void disableSchedules()
 	{
 		stabilizeStep = new IComponentStep<Void>()
@@ -554,25 +601,24 @@ public class RingNode implements IRingNode, IDebugRingNode
 		};
 	}
 
+	/**
+	 * Execute a fixfingers run.
+	 */
 	public IFuture<Void> fixFingers() {
 		return fingertable.fixFingers();
 	}
 
-//	@Override
-//	public IFuture<Void> updateFingerTable(IRingNode s, int i)
-//	{
-	// if s is the ith finger of me, update my finger table with s
-//		finger.updateFingerTable(s, i);
-//		return Future.DONE;
-//	}
 
 	/** Helper methods **/
 	
 	private void log(String message) {
-//		logger.log(Level.INFO, myId + ": " + message);
-		System.out.println(myId + ": " + message);
+		logger.log(Level.INFO, myId + ": " + message);
+//		System.out.println(myId + ": " + message);
 	}
 
+	/**
+	 * Returns a List of all fingers.
+	 */
 	public IFuture<List<IFinger>> getFingers()
 	{
 		ArrayList<IFinger> arrayList = new ArrayList<IFinger>(fingertable.fingers.length);
@@ -583,10 +629,23 @@ public class RingNode implements IRingNode, IDebugRingNode
 		return new Future<List<IFinger>>(arrayList);
 	}
 
-	public void setFinger(Fingertable finger)
-	{
-		this.fingertable = finger;
-	}
+//	/**
+//	 * Sets the fingertable.
+//	 * @param finger new Fingertable
+//	 */
+//	public void setFingertable(Fingertable finger)
+//	{
+//		this.fingertable = finger;
+//	}
+	
+//	/**
+//	 * Get the finger table.
+//	 * @return
+//	 */
+//	protected Fingertable getFingerTable()
+//	{
+//		return fingertable;
+//	}
 	
 	@Override
 	public String toString()
@@ -594,20 +653,10 @@ public class RingNode implements IRingNode, IDebugRingNode
 		return "Ringnode (" + myId + ")";
 	}
 	
-	IComponentStep<Void> stabilizeStep = new IComponentStep<Void>()
-	{
-
-		@Override
-		public IFuture<Void> execute(IInternalAccess ia)
-		{
-//			log("executing stabilize");
-			IFuture<Void> stabilize = stabilize();
-			ia.getExternalAccess().scheduleStep(stabilizeStep, STABILIZE_DELAY);
-			return stabilize;
-		}
-	};
-	
-	IComponentStep<Void> stabilizeDelayedStep = new IComponentStep<Void>()
+	/**
+	 * Component step to execute a stabilize run.
+	 */
+	IComponentStep<Void> stabilizeRetryStep = new IComponentStep<Void>()
 	{
 
 		@Override
@@ -625,6 +674,24 @@ public class RingNode implements IRingNode, IDebugRingNode
 		}
 	};
 	
+	/**
+	 * Component step to execute a stabilize run.
+	 */
+	IComponentStep<Void> stabilizeStep = new IComponentStep<Void>()
+	{
+
+		@Override
+		public IFuture<Void> execute(IInternalAccess ia)
+		{
+			IFuture<Void> stabilize = stabilize();
+			ia.getExternalAccess().scheduleStep(stabilizeStep, STABILIZE_DELAY);
+			return stabilize;
+		}
+	};
+	
+	/**
+	 * Component step to execute a fixfingers run.
+	 */
 	IComponentStep<Void> fixStep = new IComponentStep<Void>()
 	{
 
@@ -638,21 +705,34 @@ public class RingNode implements IRingNode, IDebugRingNode
 		}
 	};
 	
+	/**
+	 * ResultListener that invalidates a finger when exceptions occur. 
+	 *
+	 * @param <T> Type of the normal result returned by the asynchronous call.
+	 * @param <E> Return type of the asynchronous retry step.
+	 */
 	abstract class InvalidateFingerAndTryAgainListener<T, E> implements IResultListener<T> {
 
 		private IComponentStep< E >	tryAgainStep;
 		private String	name;
-		private Future<E> exceptionRet;
+		private Future<E> delegationFuture;
 		
 		private IFinger	rn;
 		private Exception ex = new DebugException();
 
-		public InvalidateFingerAndTryAgainListener(IFinger rn, IComponentStep<E> tryAgainStep, Future<E> exceptionRet, String name)
+		/**
+		 * Constructor
+		 * @param rn The finger to revalidate on exceptions.
+		 * @param tryAgainStep The step to execute after revalidation of the failed finger.
+		 * @param delegationRet The future to delegate the result of the tryAgainStep to.
+		 * @param name Name of the executed method, for logging purposes.
+		 */
+		public InvalidateFingerAndTryAgainListener(IFinger rn, IComponentStep<E> tryAgainStep, Future<E> delegationRet, String name)
 		{
 			this.rn = rn;
 			this.tryAgainStep = tryAgainStep;
 			this.name = name;
-			this.exceptionRet = exceptionRet;
+			this.delegationFuture = delegationRet;
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -668,6 +748,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 				public void resultAvailable(Void result)
 				{
 					if (state == State.JOINED) {
+						// since we're still in the ring, retry with the given step.
 						log("Retrying: " + name +".");
 						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(RETRY_OTHER_DELAY, tryAgainStep).addResultListener(new DefaultResultListener<E>() {
 
@@ -675,14 +756,17 @@ public class RingNode implements IRingNode, IDebugRingNode
 							public void resultAvailable(E result)
 							{
 								log("Retry result available, passing through...");
-								exceptionRet.setResult(result);							
+								delegationFuture.setResult(result);							
 							}
 							
 						});
 					} else {
+						// we have left the ring, don't retry.
 						log("Not trying: " + name +" again, state is unjoined.");
+						// instead, search for other ringnodes to re-join
 						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(RETRY_SEARCH_DELAY, searchStep);
-						exceptionRet.setException(exception);
+						// and pass the exception to the delegation future.
+						delegationFuture.setException(exception);
 					}
 				}
 				
@@ -697,6 +781,12 @@ public class RingNode implements IRingNode, IDebugRingNode
 		public abstract void resultAvailable(T result);
 	}
 	
+	/**
+	 * Set the given finger invalid and check what action has to be taken to
+	 * re-validate this node and its fingertable.
+	 * @param lostFinger the bad finger entry.
+	 * @return
+	 */
 	private IFuture<Void> revalidate(IFinger lostFinger)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -705,7 +795,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 //		System.out.println(finger);
 		IFinger successor = fingertable.getSuccessor();
 		if (successor.getSid() == null || successor.getSid().equals(fingertable.getSelf().getSid())) {
-			// no successor :(
+			// now we have no successor :(
 			if (fingertable.getPredecessor() == null || fingertable.getPredecessor().getSid() == null) {
 				// and no predecessor, so no connection at all.
 				log("No predecessor.. :(");
@@ -713,6 +803,7 @@ public class RingNode implements IRingNode, IDebugRingNode
 				ret.setResult(null);
 //				ret.setException(new UnjoinedException());
 			} else {
+				// because we still have our predecessor, we can find a new successor.
 				findSuccessor(myId).addResultListener(new DefaultResultListener<IFinger>()
 				{
 
@@ -740,10 +831,12 @@ public class RingNode implements IRingNode, IDebugRingNode
 		return ret;
 	}
 	
+	/**
+	 * Get the RingNode service for a given finger entry.
+	 * @param finger
+	 * @return ringnode service
+	 */
 	protected IFuture<IRingNode> getRingService(final IFinger finger) {
-//		if (finger.getNodeId().equals(Finger.killedId)) {
-//			throw new RuntimeException("Trying to contact dead finger");
-//		}
 		final Future<IRingNode> ret = new Future<IRingNode>();
 		IComponentIdentifier providerId = finger.getSid().getProviderId();
 		
@@ -765,13 +858,11 @@ public class RingNode implements IRingNode, IDebugRingNode
 		});
 		return ret;
 	}
-	
-	protected Fingertable getFingerTable()
-	{
-		return fingertable;
-	}
 
-	@Override
+	/**
+	 * Get the finger table as String for debugging purposes.
+	 * @return String
+	 */
 	public IFuture<String> getFingerTableString()
 	{
 		return new Future<String>(fingertable.toString());

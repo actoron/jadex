@@ -20,14 +20,15 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="storage", type=IKVStore.class, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = true)),
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM))
 })
+/**
+ * Agent to launch the DHT Viewer interface. 
+ */
 public class DhtViewerAgent {
 	
 	/** The agent. */
 	@Agent
 	protected IInternalAccess agent;
 	
-	protected static final long	SEARCH_DELAY	= 30000;
-
 	@AgentCreated
 	public void onCreate() {
 		Class<?> cl = SReflect.classForName0("jadex.tools.dhtgraph.DhtViewerPanel", null);

@@ -638,7 +638,7 @@ public class DhtViewerPanel extends JPanel
 			stringBuilder.append("key\thash\tvalue\n");
 
 			if (proxyHolder.store != null) {
-				Set<String> set = proxyHolder.store.getStoredKeys().get();
+				Set<String> set = proxyHolder.store.getLocallyStoredKeys().get();
 				if (set.isEmpty()) {
 					stringBuilder.append("No Values stored.");
 				} else {

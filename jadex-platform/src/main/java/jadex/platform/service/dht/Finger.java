@@ -5,83 +5,99 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IRingNode;
-import jadex.commons.future.DefaultResultListener;
 
+/**
+ * Finger entry. Contains a start IID, a nodeId >= startId and a
+ * ServiceIdentifier of the IRingNode pointed at.
+ */
+public class Finger implements IFinger {
+	
+	/** ServiceIdentifier of the Node **/
+	protected IServiceIdentifier sid;
+	/** ID of the Node **/
+	protected IID nodeId;
+	/** Start key of this finger **/
+	protected IID start;
 
-public class Finger implements IFinger
-{
-	/** DEBUG field **/
-	public static IID	killedId;
-	
-	private IServiceIdentifier sid;
-	private IID nodeId;
-	private IID start;
-	
+	/**
+	 * Constructor.
+	 */
 	public Finger() {
 	}
-	
-	public Finger(IServiceIdentifier sid, IID start, IID nodeId)
-	{
+
+	/**
+	 * Constructor.
+	 */
+	public Finger(IServiceIdentifier sid, IID start, IID nodeId) {
 		this.sid = sid;
 		this.start = start;
 		this.nodeId = nodeId;
 	}
-	
-	public Finger(IRingNode ringNode, IID start)
-	{
+
+	/**
+	 * Constructor.
+	 */
+	public Finger(IRingNode ringNode, IID start) {
 		this.start = start;
 		this.sid = ((IService) ringNode).getServiceIdentifier();
 		this.nodeId = ringNode.getId().get();
 	}
-	
-	public IID getStart()
-	{
+
+	/**
+	 * Get the start IID Key of this Finger.
+	 */
+	public IID getStart() {
 		return start;
 	}
-	
-	public void setStart(IID start)
-	{
+
+	/**
+	 * Set the start IID Key of this Finger.
+	 */
+	public void setStart(IID start) {
 		this.start = start;
 	}
-	
-	public void setSid(IServiceIdentifier sid)
-	{
+
+	/**
+	 * Set the SID of this Finger.
+	 */
+	public void setSid(IServiceIdentifier sid) {
 		this.sid = sid;
 	}
-	
-	public IServiceIdentifier getSid()
-	{
+
+	/**
+	 * Get the SID of this Finger.
+	 */
+	public IServiceIdentifier getSid() {
 		return sid;
 	}
-	
-	public IID getNodeId()
-	{
+
+	/**
+	 * Get the Node ID of this Finger.
+	 */
+	public IID getNodeId() {
 		return nodeId;
 	}
 
-	public void setNodeId(IID nodeId)
-	{
+	/**
+	 * Set the Node ID of this Finger.
+	 */
+	public void setNodeId(IID nodeId) {
 		this.nodeId = nodeId;
 	}
 
-//	public void set(IID nodeId, IServiceIdentifier sid) // TODO pass exception when node is down
-//	{
-//		this.nodeId = nodeId;
-//		this.sid = sid;
-//	}
-	
+	/**
+	 * Use nodeId and Sid of the given finger. (Keeps startId)
+	 * 
+	 * @param other
+	 *            The other finger.
+	 */
 	public void set(IFinger other) {
-//		System.out.println("Setting " + this.getNodeId() + " to : " + other.getNodeId());
 		this.nodeId = other.getNodeId();
 		this.sid = other.getSid();
-//		if (killedId != null && killedId.equals(nodeId)) {
-//			throw new RuntimeException("re-setting killed id to table :(");
-//		}
 	}
 
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((sid == null) ? 0 : sid.hashCode());
@@ -89,29 +105,25 @@ public class Finger implements IFinger
 	}
 
 	@Override
-	public boolean equals(Object obj)
-	{
-		if(this == obj)
+	public boolean equals(Object obj) {
+		if (this == obj)
 			return true;
-		if(obj == null)
+		if (obj == null)
 			return false;
-		if(getClass() != obj.getClass())
+		if (getClass() != obj.getClass())
 			return false;
-		Finger other = (Finger)obj;
-		if(sid == null)
-		{
-			if(other.sid != null)
+		Finger other = (Finger) obj;
+		if (sid == null) {
+			if (other.sid != null)
 				return false;
-		}
-		else if(!sid.equals(other.sid))
+		} else if (!sid.equals(other.sid))
 			return false;
 		return true;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "start: " + start + ", node: " + nodeId + ", sid: " + sid;
 	}
-	
+
 }
