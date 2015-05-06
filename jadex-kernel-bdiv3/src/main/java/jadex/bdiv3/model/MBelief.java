@@ -462,6 +462,4 @@ public class MBelief extends MElement
 	{
 		this.rawevents = rawevents;
 	}
-	
-	
 }

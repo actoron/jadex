@@ -9,15 +9,18 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * 
+ */
 public abstract class NodeHelper
 {
 	private static NodeHelper INSTANCE;
 
 	public static NodeHelper getInstance()
 	{
-		if (INSTANCE == null) 
+		if(INSTANCE == null) 
 		{
-			if (SReflect.isAndroid()) 
+			if(SReflect.isAndroid()) 
 			{
 				throw new Error("OpcodeHelper.getInstance() is not implemented for Android.");
 			} 

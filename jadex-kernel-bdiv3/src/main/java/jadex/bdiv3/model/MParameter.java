@@ -2,7 +2,9 @@ package jadex.bdiv3.model;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -16,10 +18,12 @@ import java.util.Set;
 
 
 /**
- *  Belief model.
+ *  Parameter model.
  */
 public class MParameter extends MElement
 {
+	//-------- attributes --------
+	
 	/** The field target. */
 	protected FieldInfo ftarget;
 
@@ -29,6 +33,17 @@ public class MParameter extends MElement
 	
 	/** Flag if is multi. */
 	protected Boolean multi;
+	
+	//-------- additional xml properties --------
+	
+	/** The direction. */
+	protected String direction;
+	
+	/** The type (if explicitly specified. */
+	protected ClassInfo clazz;
+	
+	/** The initial value. */
+	protected UnparsedExpression value;
 	
 	/**
 	 *	Bean Constructor. 
@@ -274,5 +289,59 @@ public class MParameter extends MElement
 			ret = mgetter.getReturnTypeInfo().getTypeName().charAt(0)=='['; 
 		}
 		return ret;
+	}
+
+	/**
+	 *  Get the direction.
+	 *  @return The direction
+	 */
+	public String getDirection()
+	{
+		return direction;
+	}
+
+	/**
+	 *  The direction to set.
+	 *  @param direction The direction to set
+	 */
+	public void setDirection(String direction)
+	{
+		this.direction = direction;
+	}
+
+	/**
+	 *  Get the clazz.
+	 *  @return The clazz
+	 */
+	public ClassInfo getClazz()
+	{
+		return clazz;
+	}
+
+	/**
+	 *  The clazz to set.
+	 *  @param clazz The clazz to set
+	 */
+	public void setClazz(ClassInfo clazz)
+	{
+		this.clazz = clazz;
+	}
+
+	/**
+	 *  Get the value.
+	 *  @return The value
+	 */
+	public UnparsedExpression getValue()
+	{
+		return value;
+	}
+
+	/**
+	 *  The value to set.
+	 *  @param value The value to set
+	 */
+	public void setValue(UnparsedExpression value)
+	{
+		this.value = value;
 	}
 }

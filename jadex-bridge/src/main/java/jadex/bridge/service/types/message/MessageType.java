@@ -4,6 +4,7 @@ import jadex.bridge.IMessageAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,28 @@ import java.util.Map;
  */
 public abstract class MessageType	implements Serializable //, Cloneable // todo
 {
+	/** The message types. */
+	private static Map<String, MessageType> messagetypes = Collections.synchronizedMap(new HashMap<String, MessageType>());
+	
+	/**
+	 *  Get the message type per name.
+	 *  @param type The type name. 
+	 *  @return The message type.
+	 */
+	public static MessageType getMessageType(String type)
+	{
+		return messagetypes.get(type);
+	}
+	
+	/**
+	 *  Add a new message type.
+	 *  @param type The message type.
+	 */
+	public static void addMessageType(MessageType type)
+	{
+		messagetypes.put(type.getName(), type);
+	}
+	
 	//-------- attributes --------
 
 	/** The name of the message type. */

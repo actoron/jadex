@@ -2,6 +2,9 @@ package jadex.bdiv3x.runtime;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
+
+import java.util.logging.Logger;
 
 /**
  *  Dummy class for loading v2 examples using v3x.
@@ -49,10 +52,49 @@ public abstract class Plan
 	}
 	
 	/**
+	 *  Wait for a message event.
+	 *  @param type The message event type.
+	 */
+	public IMessageEvent waitForMessageEvent(String type)
+	{
+		return waitForMessageEvent(type, -1);
+	}
+
+	/**
+	 *  Wait for a message event.
+	 *  @param type The message event type.
+	 *  @param timeout The timeout.
+	 */
+	public IMessageEvent waitForMessageEvent(String type, long timeout)
+	{
+		IMessageFeature mf = agent.getComponentFeature(IMessageFeature.class);
+//		mf.
+		return null;
+	}
+	
+	/**
 	 *  Kill this agent.
 	 */
 	public void	killAgent()
 	{
 		agent.killComponent();
+	}
+	
+	/**
+	 *  Get the logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger()
+	{
+		return agent.getLogger();
+	}
+	
+	/**
+	 *  Get the beliefbase.
+	 *  @return The beliefbase.
+	 */
+	public IBeliefbase getBeliefbase()
+	{
+		return null;
 	}
 }

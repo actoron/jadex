@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 
+ *  The capability model.
  */
 public class MCapability extends MElement
 {
@@ -19,6 +19,9 @@ public class MCapability extends MElement
 	/** The plans. */
 	protected List<MPlan> plans;
 
+	/** The message events. */
+	protected List<MMessageEvent> messages;
+	
 	/** The services. */
 	protected List<MServiceCall> services;
 	
@@ -227,6 +230,76 @@ public class MCapability extends MElement
 				}
 			});
 		}
+	}
+	
+	/**
+	 *  Get the messages.
+	 *  @return The messages.
+	 */
+	public List<MMessageEvent> getMessageEvents()
+	{
+		return messages==null? Collections.EMPTY_LIST: messages;
+	}
+
+	/**
+	 *  Set the messages.
+	 *  @param messages The messages to set.
+	 */
+	public void setMessageEvents(List<MMessageEvent> messages)
+	{
+		this.messages = messages;
+	}
+
+	/**
+	 *  Add a message.
+	 */
+	public void addMessageEvent(MMessageEvent message)
+	{
+		if(messages==null)
+			messages = new ArrayList<MMessageEvent>();
+		messages.add(message);
+	}
+	
+	/**
+	 *  Test if a message is contained.
+	 */
+	public boolean hasMessageEvent(String name)
+	{
+		boolean ret = false;
+		
+		if(messages!=null && name!=null)
+		{
+			for(MMessageEvent bel: messages)
+			{
+				ret = name.equals(bel.getName());
+				if(ret)
+					break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a message.
+	 */
+	public MMessageEvent getMessageEvent(String name)
+	{
+		MMessageEvent ret = null;
+		
+		if(messages!=null && name!=null)
+		{
+			for(MMessageEvent bel: messages)
+			{
+				if(name.equals(bel.getName()))
+				{
+					ret = bel;
+					break;
+				}
+			}
+		}
+		
+		return ret;
 	}
 
 	/**

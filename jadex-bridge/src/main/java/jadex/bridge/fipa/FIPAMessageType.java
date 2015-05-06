@@ -18,6 +18,11 @@ public class FIPAMessageType extends MessageType
 	protected static final String[] content_info = new String[]{SFipa.LANGUAGE, SFipa.ONTOLOGY};
 	protected static final String[] empty = new String[0];
 	
+	static
+	{
+		MessageType.addMessageType(new FIPAMessageType());
+	}
+	
 	//-------- constructors --------
 
 	/**
