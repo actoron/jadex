@@ -4,7 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefSetListener;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 
 /**

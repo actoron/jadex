@@ -3,7 +3,7 @@ package jadex.bdi.tutorial;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IInternalEventListener;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.IntermediateDefaultResultListener;

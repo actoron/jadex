@@ -1,7 +1,7 @@
 package jadex.bdi.examples.garbagecollector;
 
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 

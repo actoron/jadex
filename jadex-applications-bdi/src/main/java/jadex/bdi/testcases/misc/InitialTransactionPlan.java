@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Test if initial transaction works. 

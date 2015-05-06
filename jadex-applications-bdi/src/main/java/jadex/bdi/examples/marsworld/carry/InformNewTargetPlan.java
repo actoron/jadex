@@ -2,7 +2,7 @@ package jadex.bdi.examples.marsworld.carry;
 
 import jadex.bdi.runtime.IChangeEvent;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;

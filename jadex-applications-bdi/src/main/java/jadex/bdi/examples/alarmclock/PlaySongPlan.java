@@ -1,6 +1,6 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;

@@ -6,7 +6,7 @@ import jadex.bdi.examples.blackjack.Dealer;
 import jadex.bdi.examples.blackjack.GameStatistics;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
 
 

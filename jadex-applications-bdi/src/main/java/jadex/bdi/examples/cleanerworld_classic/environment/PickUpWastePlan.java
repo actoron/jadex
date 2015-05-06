@@ -3,7 +3,7 @@ package jadex.bdi.examples.cleanerworld_classic.environment;
 import jadex.bdi.examples.cleanerworld_classic.Environment;
 import jadex.bdi.examples.cleanerworld_classic.RequestPickUpWaste;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.Done;
 
 /**

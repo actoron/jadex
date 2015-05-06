@@ -3,7 +3,7 @@ package jadex.bdi.examples.cleanerworld_classic.cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
 import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 
 /**

@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Modify a beliefset continuously by remove values.

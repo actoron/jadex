@@ -1,7 +1,7 @@
 package jadex.bdi.examples.ping;
 
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 
 

@@ -2,7 +2,7 @@ package jadex.bdi.examples.booktrading.seller;
 
 import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 import java.util.Date;
 

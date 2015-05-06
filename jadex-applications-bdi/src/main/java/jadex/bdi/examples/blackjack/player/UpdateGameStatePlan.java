@@ -2,7 +2,7 @@ package jadex.bdi.examples.blackjack.player;
 
 import jadex.bdi.examples.blackjack.GameState;
 import jadex.bdi.examples.blackjack.Player;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
 
 import java.util.List;

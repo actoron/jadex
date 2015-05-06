@@ -2,7 +2,7 @@ package jadex.bdi.examples.hunterprey_classic.environment;
 
 import jadex.bdi.examples.hunterprey_classic.RequestEat;
 import jadex.bdi.examples.hunterprey_classic.TaskInfo;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.Done;
 
 /**

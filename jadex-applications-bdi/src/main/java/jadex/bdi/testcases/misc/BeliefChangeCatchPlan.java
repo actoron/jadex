@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Test if plan can be invoked when trigger is added dynamically at runtime.

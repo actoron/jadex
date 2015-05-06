@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.plans;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Change a belief (set) and test if a plan is triggerd in response.

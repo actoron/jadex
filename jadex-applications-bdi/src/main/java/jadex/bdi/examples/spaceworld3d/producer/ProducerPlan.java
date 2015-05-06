@@ -4,7 +4,7 @@ import jadex.bdi.examples.spaceworld3d.RequestCarry;
 import jadex.bdi.examples.spaceworld3d.RequestProduction;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;

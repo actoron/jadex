@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.beliefs;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Just acts facts to a beliefset.

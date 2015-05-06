@@ -1,7 +1,7 @@
 package jadex.web.examples.puzzle.agent;
 
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.web.examples.puzzle.Board;
 import jadex.web.examples.puzzle.Move;
 

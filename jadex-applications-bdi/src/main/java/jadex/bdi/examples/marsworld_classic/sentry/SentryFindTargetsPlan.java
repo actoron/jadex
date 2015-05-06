@@ -3,7 +3,7 @@ package jadex.bdi.examples.marsworld_classic.sentry;
 import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Location;
 import jadex.bdi.examples.marsworld_classic.Target;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Look if a target is near to my position.

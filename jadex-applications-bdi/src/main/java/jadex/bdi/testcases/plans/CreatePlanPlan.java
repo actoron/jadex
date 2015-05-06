@@ -3,7 +3,7 @@ package jadex.bdi.testcases.plans;
 import jadex.bdi.model.IMPlan;
 import jadex.bdi.model.IMPlanbase;
 import jadex.bdi.runtime.IPlan;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Plan that programmatically creates a plan.

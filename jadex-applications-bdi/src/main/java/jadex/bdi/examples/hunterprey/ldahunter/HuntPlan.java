@@ -3,7 +3,7 @@ package jadex.bdi.examples.hunterprey.ldahunter;
 import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bdi.examples.hunterprey.ldahunter.potentialfield.JointField;
 import jadex.bdi.examples.hunterprey.ldahunter.potentialfield.PotentialFrame;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;

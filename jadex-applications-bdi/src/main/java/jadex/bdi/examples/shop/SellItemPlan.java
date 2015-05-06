@@ -1,6 +1,6 @@
 package jadex.bdi.examples.shop;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Plan for selling an item.

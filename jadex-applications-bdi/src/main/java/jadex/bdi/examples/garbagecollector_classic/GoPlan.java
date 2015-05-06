@@ -1,6 +1,6 @@
 package jadex.bdi.examples.garbagecollector_classic;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Go to a specified position.

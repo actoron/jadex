@@ -2,7 +2,7 @@ package jadex.bdi.examples.disastermanagement.movement;
 
 import jadex.bdi.examples.disastermanagement.MoveTask;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;

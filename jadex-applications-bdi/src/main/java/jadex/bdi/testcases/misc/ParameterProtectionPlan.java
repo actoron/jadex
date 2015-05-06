@@ -5,7 +5,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  The print plan simply prints out the object

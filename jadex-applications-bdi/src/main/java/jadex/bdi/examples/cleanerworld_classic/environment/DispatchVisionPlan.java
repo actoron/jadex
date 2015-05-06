@@ -4,7 +4,7 @@ import jadex.bdi.examples.cleanerworld_classic.Cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Environment;
 import jadex.bdi.examples.cleanerworld_classic.RequestVision;
 import jadex.bdi.examples.cleanerworld_classic.Vision;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.Done;
 
 /**

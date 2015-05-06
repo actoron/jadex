@@ -4,8 +4,8 @@ import jadex.base.test.TestReport;
 import jadex.bdi.planlib.protocols.InteractionState;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 
 /**

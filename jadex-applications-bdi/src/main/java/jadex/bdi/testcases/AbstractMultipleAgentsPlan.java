@@ -2,7 +2,7 @@ package jadex.bdi.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;

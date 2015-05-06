@@ -2,8 +2,8 @@ package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.PlanFailureException;
+import jadex.bdiv3x.runtime.Plan;
+import jadex.bdiv3x.runtime.PlanFailureException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.IComponentAction;
 import jadex.bridge.service.RequiredServiceInfo;

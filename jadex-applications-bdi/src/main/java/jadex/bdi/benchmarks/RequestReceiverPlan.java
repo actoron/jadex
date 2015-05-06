@@ -1,6 +1,6 @@
 package jadex.bdi.benchmarks;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *	Handle requests and generate reply value.

@@ -4,7 +4,7 @@ import jadex.bdi.examples.spaceworld3d.producer.ProduceOreTask;
 import jadex.bdi.examples.spaceworld3d.sentry.AnalyzeTargetTask;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;

@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Plan that sends back a message to the creator.

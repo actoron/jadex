@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Plan to continuously wait for a condition.

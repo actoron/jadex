@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.beliefs;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Test if equal elements can be contained more once in a beliefset.

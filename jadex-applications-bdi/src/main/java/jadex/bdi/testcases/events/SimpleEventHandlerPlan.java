@@ -2,7 +2,7 @@ package jadex.bdi.testcases.events;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IParameterElement;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  This plan stores a test report in the reports belief set.

@@ -1,7 +1,7 @@
 package jadex.bdi.tutorial;
 
 import jadex.bdi.runtime.IExpression;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 import java.io.BufferedReader;
 import java.io.IOException;

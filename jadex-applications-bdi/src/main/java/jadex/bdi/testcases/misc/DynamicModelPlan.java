@@ -6,7 +6,7 @@ import jadex.bdi.model.editable.IMEBelief;
 import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.bdi.model.editable.IMEPlan;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;

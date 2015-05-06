@@ -4,8 +4,8 @@ package jadex.bdi.examples.moneypainter;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  * 

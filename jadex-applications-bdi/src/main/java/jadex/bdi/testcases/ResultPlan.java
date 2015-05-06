@@ -1,6 +1,6 @@
 package jadex.bdi.testcases;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  This plan waits for a specified time,

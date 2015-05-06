@@ -7,7 +7,7 @@ import jadex.bdi.examples.marsworld_classic.RequestCarry;
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 
 /**

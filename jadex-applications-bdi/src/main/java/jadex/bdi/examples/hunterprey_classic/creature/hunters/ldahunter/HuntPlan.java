@@ -7,7 +7,7 @@ import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.examples.hunterprey_classic.creature.hunters.ldahunter.potentialfield.JointField;
 import jadex.bdi.examples.hunterprey_classic.creature.hunters.ldahunter.potentialfield.PotentialFrame;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
 
 /**

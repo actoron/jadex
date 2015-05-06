@@ -2,7 +2,7 @@ package jadex.bdi.examples.marsworld_classic.movement;
 
 import jadex.bdi.examples.marsworld_classic.Location;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Wander around randomly.

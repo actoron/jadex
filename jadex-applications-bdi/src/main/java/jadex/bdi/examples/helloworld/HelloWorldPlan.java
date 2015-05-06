@@ -1,6 +1,6 @@
 package jadex.bdi.examples.helloworld;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  The hello world plan prints out a short welcome message.

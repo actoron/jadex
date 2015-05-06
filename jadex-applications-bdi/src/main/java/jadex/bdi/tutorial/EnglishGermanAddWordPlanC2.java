@@ -2,7 +2,7 @@ package jadex.bdi.tutorial;
 
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.Tuple;
 

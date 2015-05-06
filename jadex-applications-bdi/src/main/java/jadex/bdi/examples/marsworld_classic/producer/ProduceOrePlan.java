@@ -2,7 +2,7 @@ package jadex.bdi.examples.marsworld_classic.producer;
 
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Production of Ore is done by increasing the amount.

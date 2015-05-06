@@ -1,6 +1,6 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 import java.util.HashMap;
 import java.util.Map;

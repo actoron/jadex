@@ -1,7 +1,7 @@
 package jadex.bdi.examples.garbagecollector_classic;
 
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Check the grid for garbage.

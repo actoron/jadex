@@ -4,7 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdi.planlib.messaging.EmailAccount;
 import jadex.bdi.planlib.messaging.IMAccount;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 import java.io.File;
 import java.io.FileInputStream;

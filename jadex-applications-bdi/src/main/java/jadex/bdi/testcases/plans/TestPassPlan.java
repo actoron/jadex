@@ -2,7 +2,7 @@ package jadex.bdi.testcases.plans;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Test the passed() method.

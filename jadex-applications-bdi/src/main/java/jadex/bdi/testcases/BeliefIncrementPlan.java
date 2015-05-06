@@ -1,6 +1,6 @@
 package jadex.bdi.testcases;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  This plan increments a belief once or in time intervals.

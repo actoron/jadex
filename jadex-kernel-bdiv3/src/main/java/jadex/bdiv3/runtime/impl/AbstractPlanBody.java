@@ -1,8 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -37,7 +35,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 	//-------- methods --------
 	
 	/**
-	 * 
+	 *  Get the body impl (object that is actually invoked).
+	 *  @return The object representing the body. 
 	 */
 	public Object getBody()
 	{

@@ -2,7 +2,7 @@ package jadex.bdi.testcases.goals;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  This plan checks goal info events, if goal processing

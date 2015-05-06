@@ -102,8 +102,8 @@ public class ClassPlanBody extends AbstractPlanBody
 			try
 			{
 				// create plan  
-				if(plan==null)
-				{
+//				if(plan==null)
+//				{
 					Constructor<?>[] cons = body.getDeclaredConstructors();
 					for(Constructor<?> c: cons)
 					{
@@ -124,7 +124,7 @@ public class ClassPlanBody extends AbstractPlanBody
 					}
 					if(plan==null)
 						throw new RuntimeException("Plan body has no accessible constructor (maybe wrong args?): "+body);
-				}
+//				}
 				
 				injectElements();
 			}

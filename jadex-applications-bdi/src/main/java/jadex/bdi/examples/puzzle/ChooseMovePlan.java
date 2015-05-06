@@ -1,7 +1,7 @@
 package jadex.bdi.examples.puzzle;
 
 import jadex.bdi.runtime.ICandidateInfo;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;

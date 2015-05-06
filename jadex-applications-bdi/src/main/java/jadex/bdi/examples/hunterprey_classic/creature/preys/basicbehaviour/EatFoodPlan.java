@@ -3,7 +3,7 @@ package jadex.bdi.examples.hunterprey_classic.creature.preys.basicbehaviour;
 import jadex.bdi.examples.hunterprey_classic.Food;
 import jadex.bdi.examples.hunterprey_classic.Location;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Try to run away from a hunter.

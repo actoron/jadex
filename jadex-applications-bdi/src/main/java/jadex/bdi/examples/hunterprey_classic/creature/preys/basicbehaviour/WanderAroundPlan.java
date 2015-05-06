@@ -6,7 +6,7 @@ import jadex.bdi.examples.hunterprey_classic.Obstacle;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.examples.hunterprey_classic.WorldObject;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 import java.util.ArrayList;
 import java.util.List;

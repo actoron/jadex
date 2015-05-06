@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.planlib;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Decide about the next round and the cfp for it.

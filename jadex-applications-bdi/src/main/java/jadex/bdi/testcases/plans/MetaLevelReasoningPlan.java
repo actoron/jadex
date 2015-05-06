@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.plans;
 
 import jadex.bdi.runtime.ICandidateInfo;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  The meta-level reasoning plan for deciding between

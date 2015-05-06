@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.plans;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Testing waiting for sync results.

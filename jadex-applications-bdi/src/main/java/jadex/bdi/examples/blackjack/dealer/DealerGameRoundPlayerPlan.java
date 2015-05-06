@@ -9,7 +9,7 @@ import jadex.bdi.examples.blackjack.RequestBet;
 import jadex.bdi.examples.blackjack.RequestDraw;
 import jadex.bdi.examples.blackjack.RequestFinished;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.fipa.SFipa;
 

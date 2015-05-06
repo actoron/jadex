@@ -15,6 +15,7 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3x.runtime.ExtensionClassPlanBody;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -33,6 +34,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
@@ -159,14 +161,18 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 		}
 		else if(mbody.getClazz()!=null && mbody.getServiceName()==null)
 		{
-			Class<?>	clazz	= (Class<?>)mbody.getClazz().getType(ia.getClassLoader());
+			Class<?> clazz = (Class<?>)mbody.getClazz().getType(ia.getClassLoader());
 			if(clazz.isAnnotationPresent(Plan.class))
 			{
 				body = new ClassPlanBody(ia, rplan, clazz);
 			}
 			else if(clazz.isAnnotationPresent(Agent.class))
 			{
-				body	= new ComponentPlanBody(clazz.getName()+".class", ia);
+				body = new ComponentPlanBody(clazz.getName()+".class", ia);
+			}
+			else if(SReflect.isSupertype(jadex.bdiv3x.runtime.Plan.class, clazz))
+			{
+				body = new ExtensionClassPlanBody(ia, rplan, clazz);
 			}
 			else
 			{

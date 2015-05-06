@@ -5,7 +5,7 @@ import jadex.bdi.examples.cleanerworld_classic.IEnvironment;
 import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.examples.cleanerworld_classic.Vision;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 
 /**

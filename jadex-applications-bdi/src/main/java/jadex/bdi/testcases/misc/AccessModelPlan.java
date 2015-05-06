@@ -4,7 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdi.model.IMBelief;
 import jadex.bdi.model.IMPlan;
 import jadex.bdi.model.IMPlanbase;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Test accessing model information.
