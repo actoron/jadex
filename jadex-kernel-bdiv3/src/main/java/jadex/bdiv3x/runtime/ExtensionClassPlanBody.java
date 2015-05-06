@@ -1,6 +1,7 @@
 package jadex.bdiv3x.runtime;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -66,6 +67,9 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 				if(plan==null)
 					throw new RuntimeException("Plan body has no accessible constructor (maybe wrong args?): "+body);
 				
+				Field f = Plan.class.getDeclaredField("agent");
+				f.setAccessible(true);
+				f.set(plan, getAgent());
 			}
 			catch(RuntimeException e)
 			{
@@ -117,7 +121,17 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 	 */
 	public Object invokePassed(Object[] params)
 	{
-		throw new UnsupportedOperationException();
+		try
+		{
+			Method bm = body.getMethod("passed", new Class[0]);
+			bm.invoke(plan, new Object[0]);
+			return null;			
+		}
+		catch(Exception e)
+		{
+			Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+			throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+		}
 	}
 
 	/**
@@ -125,7 +139,17 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 	 */
 	public Object invokeFailed(Object[] params)
 	{
-		throw new UnsupportedOperationException();
+		try
+		{
+			Method bm = body.getMethod("failed", new Class[0]);
+			bm.invoke(plan, new Object[0]);
+			return null;			
+		}
+		catch(Exception e)
+		{
+			Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+			throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+		}
 	}
 
 	/**
@@ -133,7 +157,17 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 	 */
 	public Object invokeAborted(Object[] params)
 	{
-		throw new UnsupportedOperationException();
+		try
+		{
+			Method bm = body.getMethod("aborted", new Class[0]);
+			bm.invoke(plan, new Object[0]);
+			return null;			
+		}
+		catch(Exception e)
+		{
+			Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+			throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+		}
 	}
 	
 	/**

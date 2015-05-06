@@ -307,4 +307,13 @@ public abstract class AbstractPlanBody implements IPlanBody
 	{
 		return rplan;
 	}
+
+	/**
+	 *  Get the agent.
+	 *  @return The agent
+	 */
+	public IInternalAccess getAgent()
+	{
+		return ia;
+	}
 }

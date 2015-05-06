@@ -1,10 +1,16 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
+
 /**
  *  Dummy class for loading v2 examples using v3x.
  */
 public abstract class Plan
 {
+	/** The internal access. */
+	protected IInternalAccess agent;
+	
 	/**
 	 *  The body method is called on the
 	 *  instantiated plan instance from the scheduler.
@@ -33,13 +39,20 @@ public abstract class Plan
 	{
 	}
 	
+	/**
+	 *  Wait for a some time.
+	 *  @param duration The duration.
+	 */
 	public void	waitFor(int timeout)
 	{
-		// tofu
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(timeout).get();
 	}
 	
+	/**
+	 *  Kill this agent.
+	 */
 	public void	killAgent()
 	{
-		// tofu
+		agent.killComponent();
 	}
 }
