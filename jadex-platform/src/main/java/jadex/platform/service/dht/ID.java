@@ -198,7 +198,7 @@ public class ID implements IID
 		}
 	}
 	
-	public static ID get(final String str) {
+	public static IID get(final String str) {
 		if (DEBUG) {
 			return new ID(new byte[]{Hashing.md5().hashString(str, Charset.defaultCharset()).asBytes()[15]});
 		} else {
