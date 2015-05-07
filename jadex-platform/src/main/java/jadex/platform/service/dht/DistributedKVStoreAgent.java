@@ -3,8 +3,9 @@ package jadex.platform.service.dht;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.types.dht.IKVStore;
-import jadex.bridge.service.types.dht.IRingNode;
+import jadex.bridge.service.types.dht.IDistributedKVStoreService;
+import jadex.bridge.service.types.dht.IRingApplicationService;
+import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentService;
@@ -23,21 +24,21 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent
 @ProvidedServices( {
-	@ProvidedService(type = IKVStore.class, implementation = @Implementation(value = KVStore.class), scope = RequiredServiceInfo.SCOPE_GLOBAL)
+	@ProvidedService(type = IDistributedKVStoreService.class, implementation = @Implementation(value = DistributedKVStoreService.class), scope = RequiredServiceInfo.SCOPE_GLOBAL)
 })
 @RequiredServices( {
-	@RequiredService(name="ring", type = IRingNode.class, binding=@Binding(scope=Binding.SCOPE_LOCAL, create = true,
+	@RequiredService(name="ring", type = IRingApplicationService.class, binding=@Binding(scope=Binding.SCOPE_LOCAL, create = true,
 	creationinfo=@CreationInfo(type = "ringAgent")))
 })
-@ComponentTypes(@ComponentType(name="ringAgent", clazz=RingAgent.class))
-public class StorageAgent
+@ComponentTypes(@ComponentType(name="ringAgent", clazz=RingNodeAgent.class))
+public class DistributedKVStoreAgent
 {
 	/** The local store service **/
-	private IKVStore store;
+	private IDistributedKVStoreService store;
 	
 	/** The local ringnode service **/
 	@AgentService
-	private IRingNode ring;
+	private IRingApplicationService ring;
 
 	/** The agent access **/
 	@Agent
@@ -45,7 +46,7 @@ public class StorageAgent
 	
 	@AgentCreated
 	public void onCreate() {
-		store = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IKVStore.class);
-		store.setRing(ring);
+		store = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IDistributedKVStoreService.class);
+		store.setRingService(ring);
 	}
 }

@@ -5,8 +5,8 @@ import java.lang.reflect.Method;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.dht.IKVStore;
-import jadex.bridge.service.types.dht.IRingNode;
+import jadex.bridge.service.types.dht.IDistributedKVStoreService;
+import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.commons.SReflect;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -16,8 +16,8 @@ import jadex.micro.annotation.RequiredServices;
 
 @Agent
 @RequiredServices({
-	@RequiredService(name="ringnodes", type=IRingNode.class, multiple = true, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = true)),
-	@RequiredService(name="storage", type=IKVStore.class, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = true)),
+	@RequiredService(name="ringnodes", type=IRingNodeService.class, multiple = true, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = true)),
+	@RequiredService(name="storage", type=IDistributedKVStoreService.class, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = true)),
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM))
 })
 /**

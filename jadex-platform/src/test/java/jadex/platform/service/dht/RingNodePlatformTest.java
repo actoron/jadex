@@ -12,10 +12,10 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.dht.IDebugRingNode;
+import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
-import jadex.bridge.service.types.dht.IRingNode;
+import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.CounterResultListener;
@@ -39,9 +39,9 @@ public class RingNodePlatformTest extends TestCase
 	@Rule 
 	public TestName name = new TestName();
 
-	private IDebugRingNode	rn1;
-	private IDebugRingNode	rn2;
-	private IDebugRingNode	rn3;
+	private IRingNodeDebugService	rn1;
+	private IRingNodeDebugService	rn2;
+	private IRingNodeDebugService	rn3;
 
 	private long	timeout;
 
@@ -106,12 +106,12 @@ public class RingNodePlatformTest extends TestCase
 		}
 	}
 
-	private IDebugRingNode createRingAgent(IExternalAccess platform)
+	private IRingNodeDebugService createRingAgent(IExternalAccess platform)
 	{
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
 		
 		final Future<IComponentIdentifier> future = new Future<IComponentIdentifier>();
-		cms.createComponent(RingAgent.class.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>()
+		cms.createComponent(RingNodeAgent.class.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>()
 		{
 			@Override
 			public void firstResultAvailable(IComponentIdentifier result)
@@ -136,7 +136,7 @@ public class RingNodePlatformTest extends TestCase
 //		IDebugRingNode declaredService = SServiceProvider.getDeclaredService(platform, IDebugRingNode.class).get();
 //		System.out.println(declaredService);
 		
-		IDebugRingNode iDebugRingNode = SServiceProvider.getService(platform, identifier, IDebugRingNode.class).get(timeout);
+		IRingNodeDebugService iDebugRingNode = SServiceProvider.getService(platform, identifier, IRingNodeDebugService.class).get(timeout);
 		iDebugRingNode.disableSchedules();
 		return iDebugRingNode;
 	}
@@ -144,7 +144,7 @@ public class RingNodePlatformTest extends TestCase
 	@Test
 	public void testJoin() {
 		rn2.join(rn1).get();
-		stabilize2(new IDebugRingNode[]{rn1, rn2}).get();
+		stabilize2(new IRingNodeDebugService[]{rn1, rn2}).get();
 //		rn2.stabilize().get();
 //		rn1.stabilize().get();
 //		System.out.println(rn1.getFingerTableString().get());
@@ -155,9 +155,9 @@ public class RingNodePlatformTest extends TestCase
 	@Test
 	public void testJoin3() throws InterruptedException {
 		rn2.join(rn1).get();
-		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
 		rn3.join(rn1).get();
-		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
 //		System.out.println(rn1.getFingerTableString().get());
 		assertCircle(rn1, rn2, rn3);
 	}
@@ -165,10 +165,10 @@ public class RingNodePlatformTest extends TestCase
 	@Test
 	public void testKillPlatform() {
 		rn2.join(rn1).get();
-		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
 		rn3.join(rn1).get();
-		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
-		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
+		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
 		
 //		System.out.println(rn1.getFingerTableString().get());
 //		System.out.println(rn2.getFingerTableString().get());
@@ -184,7 +184,7 @@ public class RingNodePlatformTest extends TestCase
 		
 //		timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
 //		System.out.println("timeout is: " + timeout2);
-		stabilize(new IDebugRingNode[]{rn1, rn2}).get();
+		stabilize(new IRingNodeDebugService[]{rn1, rn2}).get();
 //		stabilize(new IDebugRingNode[]{rn1, rn2});
 		
 		System.out.println(rn1.getFingerTableString().get());
@@ -197,9 +197,9 @@ public class RingNodePlatformTest extends TestCase
 	@Test
 	public void testFindSuccessor() throws InterruptedException {
 		rn2.join(rn1).get();
-		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
 		rn3.join(rn1).get();
-		stabilize2(new IDebugRingNode[]{rn1, rn2, rn3}).get();
+		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
 		
 //		System.out.println("RN1: " + rn1.getId().get());
 //		System.out.println("RN2: " + rn2.getId().get());
@@ -222,10 +222,10 @@ public class RingNodePlatformTest extends TestCase
 		assertEquals(rn2.getId().get(), suc3_2.getNodeId());
 	}
 	
-	private void assertCircle(IDebugRingNode ... rns)
+	private void assertCircle(IRingNodeDebugService ... rns)
 	{
-		IRingNode[] circleContents = new IRingNode[rns.length];
-		IRingNode suc = rns[0];
+		IRingNodeService[] circleContents = new IRingNodeService[rns.length];
+		IRingNodeService suc = rns[0];
 		System.out.print("circle is: ");
 		System.out.print(suc.getId().get(timeout) + ", ");
 		for(int i = 0; i < rns.length; i++)
@@ -258,7 +258,7 @@ public class RingNodePlatformTest extends TestCase
 		assertEquals(rns[0].getId().get(), suc.getId().get());
 	}
 
-	private IDebugRingNode getService(IDebugRingNode[] rns, IServiceIdentifier sid)
+	private IRingNodeDebugService getService(IRingNodeDebugService[] rns, IServiceIdentifier sid)
 	{
 		for(int i = 0; i < rns.length; i++)
 		{
@@ -273,7 +273,7 @@ public class RingNodePlatformTest extends TestCase
 		
 	}
 	
-	private void fixFingers(IDebugRingNode[] nodes) {
+	private void fixFingers(IRingNodeDebugService[] nodes) {
 		for(int j = 0; j < nodes.length; j++)
 		{
 			for(int i = 0; i < nodes.length; i++)
@@ -290,12 +290,12 @@ public class RingNodePlatformTest extends TestCase
 		}
 	}
 
-	private IFuture<Void> stabilize2(IDebugRingNode[] nodes) {
+	private IFuture<Void> stabilize2(IRingNodeDebugService[] nodes) {
 		stabilize(nodes).get();
 		return stabilize(nodes);
 	}
 	
-	private IFuture<Void> stabilize(IDebugRingNode[] nodes)
+	private IFuture<Void> stabilize(IRingNodeDebugService[] nodes)
 	{
 		final Future<Void> future = new Future<Void>();
 

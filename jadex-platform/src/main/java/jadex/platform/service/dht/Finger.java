@@ -4,7 +4,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
-import jadex.bridge.service.types.dht.IRingNode;
+import jadex.bridge.service.types.dht.IRingNodeService;
 
 /**
  * Finger entry. Contains a start IID, a nodeId >= startId and a
@@ -37,7 +37,7 @@ public class Finger implements IFinger {
 	/**
 	 * Constructor.
 	 */
-	public Finger(IRingNode ringNode, IID start) {
+	public Finger(IRingNodeService ringNode, IID start) {
 		this.start = start;
 		this.sid = ((IService) ringNode).getServiceIdentifier();
 		this.nodeId = ringNode.getId().get();

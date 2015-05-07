@@ -23,7 +23,7 @@ public class Fingertable {
 	/** Predecessor of the local RingNode **/
 	protected IFinger predecessor;
 	/** The local ringnode **/
-	protected RingNode local;
+	protected RingNodeService local;
 
 	/**
 	 * Constructor.
@@ -35,7 +35,7 @@ public class Fingertable {
 	 * @param local
 	 *            the Local RingNode
 	 */
-	public Fingertable(IServiceIdentifier selfSid, IID selfId, RingNode local) {
+	public Fingertable(IServiceIdentifier selfSid, IID selfId, RingNodeService local) {
 		this.local = local;
 		selfFinger = new Finger(selfSid, null, selfId);
 		// use n finger entries, where n is the key/hash length.

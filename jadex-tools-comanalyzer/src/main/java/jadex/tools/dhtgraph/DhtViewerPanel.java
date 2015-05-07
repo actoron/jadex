@@ -12,8 +12,8 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
-import jadex.bridge.service.types.dht.IKVStore;
-import jadex.bridge.service.types.dht.IRingNode;
+import jadex.bridge.service.types.dht.IDistributedKVStoreService;
+import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
@@ -106,14 +106,14 @@ public class DhtViewerPanel extends JPanel
 	
 	public class ProxyHolder
 	{
-		public IRingNode	ringNode;
+		public IRingNodeService	ringNode;
 		public long lastSeen;
 		protected IFinger successor;
 		protected List<IFinger> fingers;
 		protected IFinger predecessor;
-		protected IKVStore store;
+		protected IDistributedKVStoreService store;
 
-		public ProxyHolder(IRingNode ringNode, long lastSeen) {
+		public ProxyHolder(IRingNodeService ringNode, long lastSeen) {
 			super();
 			this.lastSeen = lastSeen;
 			this.ringNode = ringNode;
@@ -489,7 +489,7 @@ public class DhtViewerPanel extends JPanel
 
 				@Override
 				public void resultAvailable(Object result) {
-					final IKVStore storage = (IKVStore) result;
+					final IDistributedKVStoreService storage = (IDistributedKVStoreService) result;
 					
 					storage.lookupResponsibleStore(key).addResultListener(new DefaultResultListener<IID>() {
 
@@ -544,7 +544,7 @@ public class DhtViewerPanel extends JPanel
 
 				@Override
 				public void resultAvailable(Object result) {
-					IKVStore storage = (IKVStore) result;
+					IDistributedKVStoreService storage = (IDistributedKVStoreService) result;
 					statusTf.setText("Status: Found corresponding store service: " + result);
 					storage.publish(key, value).addResultListener(new DefaultResultListener<IID>() {
 
@@ -613,7 +613,7 @@ public class DhtViewerPanel extends JPanel
 			
 			fingerTable.setSortedFingers(proxyHolder.fingers);
 			
-			Set<String> set = proxyHolder.store.getLocallyStoredKeys().get();
+			Set<String> set = proxyHolder.store.getLocalKeySet().get();
 			ArrayList<String> keyList = new ArrayList<String>(set);
 			Collections.sort(keyList);
 			
@@ -674,7 +674,7 @@ public class DhtViewerPanel extends JPanel
 					@Override
 					public void intermediateResultAvailable(Object result)
 					{
-						final IRingNode other = (IRingNode)result;
+						final IRingNodeService other = (IRingNodeService)result;
 						final IService service = (IService)result;
 						other.getId().addResultListener(new DefaultResultListener<IID>()
 						{
@@ -691,23 +691,23 @@ public class DhtViewerPanel extends JPanel
 									final ProxyHolder newProxyHolder = new ProxyHolder(other, System.currentTimeMillis());
 									proxyHolder = newProxyHolder;
 									
-									IFuture<IKVStore> storeFut = access.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<IKVStore>() {
+									IFuture<IDistributedKVStoreService> storeFut = access.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<IDistributedKVStoreService>() {
 
 										@Override
-										public IFuture<IKVStore> execute(
+										public IFuture<IDistributedKVStoreService> execute(
 												IInternalAccess ia) {
-											final Future<IKVStore> fut = new Future<IKVStore>();
+											final Future<IDistributedKVStoreService> fut = new Future<IDistributedKVStoreService>();
 											
 											IComponentManagementService cms = (IComponentManagementService) access.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
 											
 //											IComponentManagementService cms = SServiceProvider.getService(access, IComponentManagementService.class).get();
 											
 //											IComponentManagementService cms = SServiceProvider.getDeclaredService(access, IComponentManagementService.class).get();
-											cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IKVStore>(fut) {
+											cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IDistributedKVStoreService>(fut) {
 												@Override
 												public void customResultAvailable(
 														IExternalAccess result) {
-													SServiceProvider.getService(result, IKVStore.class).addResultListener(new DelegationResultListener<IKVStore>(fut));
+													SServiceProvider.getService(result, IDistributedKVStoreService.class).addResultListener(new DelegationResultListener<IDistributedKVStoreService>(fut));
 													super.customResultAvailable(result);
 												}
 											});
@@ -715,11 +715,11 @@ public class DhtViewerPanel extends JPanel
 										}
 									});
 									
-									storeFut.addResultListener(new ComponentResultListener<IKVStore>(new DefaultResultListener<IKVStore>() {
+									storeFut.addResultListener(new ComponentResultListener<IDistributedKVStoreService>(new DefaultResultListener<IDistributedKVStoreService>() {
 
 										@Override
 										public void resultAvailable(
-												IKVStore result) {
+												IDistributedKVStoreService result) {
 											newProxyHolder.store = result;
 											proxies.put(other.getId().get(), newProxyHolder);
 										}
