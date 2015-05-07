@@ -1,5 +1,6 @@
 package jadex.bdiv3.model;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
 
 import java.util.ArrayList;
@@ -58,7 +59,13 @@ public class MMessageEvent extends MElement
 	
 	/** The message type. */
 	protected MessageType type;
+	
+	/** The spec. degree. */
+	protected int degree;
 
+	/** The match expression. */
+	protected UnparsedExpression matchexp;
+	
 	/**
 	 *  Get the direction.
 	 *  @return The direction
@@ -150,5 +157,55 @@ public class MMessageEvent extends MElement
 		if(parameters==null)
 			parameters = new ArrayList<MParameter>();
 		this.parameters.add(parameter);
+	}
+	
+	/**
+	 *  Get the matchExpression.
+	 *  @return The matchExpression
+	 */
+	public UnparsedExpression getMatchExpression()
+	{
+		return matchexp;
+	}
+
+	/**
+	 *  The match expression to set.
+	 *  @param matchexp The matchExpression to set
+	 */
+	public void setMatchExpression(UnparsedExpression matchexp)
+	{
+		this.matchexp = matchexp;
+	}
+
+	/**
+	 *  Get the specialization degree.
+	 *  @return The degree.
+	 */
+	public int getSpecializationDegree()
+	{
+		if(degree==-1)
+		{
+			// Calculate specificity by summing up fixed parameters and parameter sets.
+			if(parameters!=null)
+			{
+				for(MParameter param: parameters)
+				{
+					if(param.getDirection().equals(jadex.bdiv3.model.MParameter.Direction.FIXED)
+						&& param.getValue()!=null)
+//						&& (parametersets[i].getDefaultValuesExpression()!=null || parametersets[i].getDefaultValues().length>0))
+					{
+						degree++;
+					}
+				}
+			}
+			
+			// Messages with match expression have higher degree.
+			if(getMatchExpression()!=null)
+				degree++;
+			
+			if(degree==-1)
+				degree = 0;
+		}
+		return degree;
 	}
 }

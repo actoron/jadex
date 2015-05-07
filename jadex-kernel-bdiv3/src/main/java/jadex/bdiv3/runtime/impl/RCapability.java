@@ -16,7 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- *  Runtime element for storing goal ans plan instances.
+ *  Runtime element for storing goal and plan instances.
  */
 public class RCapability extends RElement
 {
