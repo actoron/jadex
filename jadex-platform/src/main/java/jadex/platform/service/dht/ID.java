@@ -4,9 +4,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.dht.IID;
 
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-
-import com.google.common.hash.Hashing;
 
 /**
  * This class is an identifier. It is used to represent hash values that are too
@@ -23,6 +23,22 @@ public class ID implements IID {
 	 * The byte array containing the id information.
 	 */
 	protected byte[] id;
+	
+	/**
+	 * Cached message digest.
+	 */
+	private static MessageDigest messageDigest = null;
+	
+	private static MessageDigest getMessageDigest() {
+		if (messageDigest == null) {
+			try {
+				messageDigest = MessageDigest.getInstance("MD5");
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			}
+		}
+		return messageDigest;
+	}
 
 	/**
 	 * Constructor.
@@ -236,16 +252,8 @@ public class ID implements IID {
 	 *            CID to hash.
 	 * @return ID Resulting Id.
 	 */
-	public static ID get(final IComponentIdentifier cid) {
-		if (DEBUG) {
-			return new ID(new byte[] { Hashing.md5()
-					.hashString(cid.getName(), Charset.defaultCharset())
-					.asBytes()[15] });
-		} else {
-			return new ID(Hashing.md5()
-					.hashString(cid.getName(), Charset.defaultCharset())
-					.asBytes());
-		}
+	public static IID get(final IComponentIdentifier cid) {
+		return get(cid.getName());
 	}
 
 	/**
@@ -257,11 +265,12 @@ public class ID implements IID {
 	 */
 	public static IID get(final String str) {
 		if (DEBUG) {
-			return new ID(new byte[] { Hashing.md5()
-					.hashString(str, Charset.defaultCharset()).asBytes()[15] });
+//			return new ID(new byte[] { Hashing.md5()
+//					.hashString(str, Charset.defaultCharset())
+//					.asBytes()[15] });
+			return new ID(new byte[] {hash(str)[15]});
 		} else {
-			return new ID(Hashing.md5()
-					.hashString(str, Charset.defaultCharset()).asBytes());
+			return new ID(hash(str));
 		}
 	}
 
@@ -349,6 +358,10 @@ public class ID implements IID {
 		} else {
 			return toHexString(Integer.MAX_VALUE);
 		}
+	}
+	
+	private static byte[] hash(String str) {
+		return getMessageDigest().digest(str.getBytes());
 	}
 
 	// @Override

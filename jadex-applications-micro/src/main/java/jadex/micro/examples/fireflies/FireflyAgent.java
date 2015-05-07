@@ -67,7 +67,7 @@ public class FireflyAgent
 						if(space==null)
 							return IFuture.DONE;
 						
-						ISpaceObject avatar = space.getAvatar(agent.getComponentDescription(), FireflyAgent.class.getName() + ".class");
+						ISpaceObject avatar = space.getAvatar(agent.getComponentDescription());
 						IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 						double dir = ((Number)avatar.getProperty("direction")).doubleValue();
 						int clock = ((Number)avatar.getProperty("clock")).intValue();

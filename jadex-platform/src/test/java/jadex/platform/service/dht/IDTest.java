@@ -1,6 +1,7 @@
 package jadex.platform.service.dht;
 
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.service.types.dht.IID;
 
 import org.junit.Test;
 
@@ -10,9 +11,9 @@ public class IDTest extends TestCase
 
 {
 
-	private ID	firstId;
-	private ID	secondId;
-	private ID	thirdId;
+	private IID	firstId;
+	private IID	secondId;
+	private IID	thirdId;
 
 	@Override
 	protected void setUp() throws Exception
