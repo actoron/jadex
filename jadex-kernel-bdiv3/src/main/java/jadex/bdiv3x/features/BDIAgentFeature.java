@@ -888,7 +888,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			}
 		});
 		rplan.setReason(new ChangeEvent(null, null, args, null));
-		RPlan.executePlan(rplan, getComponent(), null);
+		RPlan.executePlan(rplan, getComponent());
 		return ret;
 	}
 	

@@ -70,6 +70,9 @@ public class ExtensionClassPlanBody extends AbstractPlanBody
 				Field f = Plan.class.getDeclaredField("agent");
 				f.setAccessible(true);
 				f.set(plan, getAgent());
+				f = Plan.class.getDeclaredField("rplan");
+				f.setAccessible(true);
+				f.set(plan, getRPlan());
 			}
 			catch(RuntimeException e)
 			{

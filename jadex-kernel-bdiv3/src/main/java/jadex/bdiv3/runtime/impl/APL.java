@@ -39,7 +39,7 @@ public class APL
 	protected RProcessableElement element;
 	
 	/** The list of candidates. */
-	protected List<?> candidates;
+	protected List<Object> candidates;
 	
 	/** The metagoal. */
 //	protected Object apl_has_metagoal;
@@ -126,7 +126,7 @@ public class APL
 							done	= true;
 							try
 							{
-								candidates	= (List<?>)ms[i].invoke(pojo, new Object[0]);
+								candidates	= (List<Object>)ms[i].invoke(pojo, new Object[0]);
 							}
 							catch(InvocationTargetException e)
 							{
@@ -152,11 +152,33 @@ public class APL
 			
 			if(!done)
 			{
+				// Handle waiting plans
+				Collection<RPlan> rplans = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().getPlans();
+				if(rplans!=null)
+				{
+					for(RPlan rplan: rplans)
+					{
+						if(rplan.isWaitingFor(element))
+						{
+							if(candidates==null)
+								candidates = new ArrayList<Object>();
+							candidates.add((Object)rplan);
+						}
+					}
+				}
+				
 				doBuild(ia).addResultListener(new ExceptionDelegationResultListener<List<Object>, Void>(ret)
 				{
 					public void customResultAvailable(List<Object> result)
 					{
-						candidates = result;
+						if(candidates==null)
+						{
+							candidates = result;
+						}
+						else
+						{
+							candidates.addAll(result);
+						}
 						ret.setResult(null);
 					}
 				});

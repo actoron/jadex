@@ -8,7 +8,6 @@ import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ICommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -26,20 +25,29 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	/** The plan. */
 	protected RPlan rplan;
 	
-	/** The resume command. */
-	protected ICommand<Boolean> rescom;
+//	/** The resume command. */
+//	protected ICommand<Boolean> rescom;
 	
 	/**
 	 *  Create a new action.
 	 */
-	public ExecutePlanStepAction(RPlan rplan, ICommand<Boolean> rescom)
+	public ExecutePlanStepAction(RPlan rplan)
 	{
-//		System.err.println("epsa: "+rplan);
-//		Thread.dumpStack();
-//		this.element = element;
+//		this(rplan, null);
 		this.rplan = rplan;
-		this.rescom = rescom;
 	}
+	
+//	/**
+//	 *  Create a new action.
+//	 */
+//	public ExecutePlanStepAction(RPlan rplan, ICommand<Boolean> rescom)
+//	{
+////		System.err.println("epsa: "+rplan);
+////		Thread.dumpStack();
+////		this.element = element;
+//		this.rplan = rplan;
+//		this.rescom = rescom;
+//	}
 	
 	/**
 	 *  Test if the action is valid.
@@ -102,13 +110,14 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 			}
 		}
 		
-		if(RPlan.PlanProcessingState.WAITING.equals(rplan.getProcessingState()))
-		{
-			rescom.execute(null);
-//			rplan.continueAfterWait(rescom);
-		}
+		// Rescom now directly executed 
+//		if(RPlan.PlanProcessingState.WAITING.equals(rplan.getProcessingState()))
+//		{
+//			rescom.execute(null);
+////			rplan.continueAfterWait(rescom);
+//		}else if
 		// A new plan body must only be executed if it hasn't been aborted 
-		else if(!rplan.aborted && RPlan.PlanLifecycleState.NEW.equals(rplan.getLifecycleState()))
+		if(!rplan.aborted && RPlan.PlanLifecycleState.NEW.equals(rplan.getLifecycleState()))
 		{
 			// Set plan as child of goal
 			if(element instanceof RGoal)

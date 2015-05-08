@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * 
  */
-public class MMessageEvent extends MElement
+public class MMessageEvent extends MProcessableElement
 {
 	public static Map<String, Direction> dirs = new HashMap<String, MMessageEvent.Direction>();
 

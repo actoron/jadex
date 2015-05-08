@@ -8,9 +8,12 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ICommand;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -79,7 +82,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				{
 					MPlan mplan = (MPlan)cand;
 					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
-					RPlan.executePlan(rplan, ia, null);
+					RPlan.executePlan(rplan, ia);
 					ret.setResult(null);
 				}
 				// direct subgoal for goal
@@ -112,17 +115,17 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				{
 					MPlan mplan = mcapa.getPlan(cand.getClass().getName());
 					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
-					RPlan.executePlan(rplan, ia, null);
+					RPlan.executePlan(rplan, ia);
 					ret.setResult(null);
 				}
-//				else if(cand instanceof RPlan)
-//				{
-//					// dispatch to running plan
-//					RPlan rplan = (RPlan)cand;
-//					rplan.setDispatchedElement(element);
-//					RPlan.adoptPlan(rplan, ia);
-//					ret.setResult(null);
-//				}
+				else if(cand instanceof RPlan)
+				{
+					// dispatch to running plan
+					final RPlan rplan = (RPlan)cand;
+					rplan.setDispatchedElement(element);
+					rplan.getResumeCommand().execute(new Tuple2<Boolean, Boolean>(null, Boolean.FALSE));
+					ret.setResult(null);
+				}
 				else
 				{
 					// todo: dispatch to waitqueue

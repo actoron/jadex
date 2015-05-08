@@ -6,6 +6,7 @@ import jadex.bdiv3.features.impl.BDIProvidedServicesComponentFeature;
 import jadex.bdiv3.features.impl.BDIRequiredServicesComponentFeature;
 import jadex.bdiv3x.features.BDIAgentFeature;
 import jadex.bdiv3x.features.BDILifecycleAgentFeature;
+import jadex.bdiv3x.features.BDIMessageComponentFeature;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -69,6 +70,7 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 			new ComponentFeatureFactory(IProvidedServicesFeature.class, BDIProvidedServicesComponentFeature.class),
 			BDIAgentFeature.FACTORY, 
 			BDILifecycleAgentFeature.FACTORY,
+			BDIMessageComponentFeature.FACTORY,
 			new ComponentFeatureFactory(IExecutionFeature.class, BDIExecutionComponentFeature.class),
 			new ComponentFeatureFactory(IMonitoringComponentFeature.class, BDIMonitoringComponentFeature.class),
 			new ComponentFeatureFactory(IRequiredServicesFeature.class, BDIRequiredServicesComponentFeature.class)

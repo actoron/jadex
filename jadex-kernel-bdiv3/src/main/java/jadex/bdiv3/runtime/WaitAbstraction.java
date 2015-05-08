@@ -1,5 +1,10 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3.model.MElement;
+import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.runtime.impl.RElement;
+import jadex.bdiv3.runtime.impl.RProcessableElement;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,29 +13,29 @@ import java.util.Set;
  */
 public class WaitAbstraction
 {	
-//	/** The model elements. */
-//	protected Set<MElement> modelelements;
-//	
-//	/** The runtime elements. */
-//	protected Set<RElement> runtimeelements;
+	/** The model elements. */
+	protected Set<MElement> modelelements;
+	
+	/** The runtime elements. */
+	protected Set<RElement> runtimeelements;
 
 	/** The event types. */
 	protected Set<String> changeeventtypes;
 	
-//	/**
-//	 *  Add a message event.
-//	 *  @param type The type.
-//	 */
-//	public void addMessageEvent(MMessageEvent mevent)
-//	{
-//		addModelElement(mevent);
-//	}
+	/**
+	 *  Add a message event.
+	 *  @param type The type.
+	 */
+	public void addMessageEvent(MMessageEvent mevent)
+	{
+		addModelElement(mevent);
+	}
 	
 //	/**
 //	 *  Add a message event reply.
 //	 *  @param me The message event.
 //	 */
-//	public void addReply(RMessageEvent me)
+//	public void addReply(RMessageEvent mevent)
 //	{
 //		if(runtimeelements==null)
 //		{
@@ -114,14 +119,14 @@ public class WaitAbstraction
 
 	//-------- remover methods --------
 
-//	/**
-//	 *  Remove a message event.
-//	 *  @param type The type.
-//	 */
-//	public void removeMessageEvent(MMessageEvent mevent)
-//	{
-//		removeModelElement(mevent);
-//	}
+	/**
+	 *  Remove a message event.
+	 *  @param type The type.
+	 */
+	public void removeMessageEvent(MMessageEvent mevent)
+	{
+		removeModelElement(mevent);
+	}
 
 //	/**
 //	 *  Remove a message event reply.
@@ -190,51 +195,51 @@ public class WaitAbstraction
 //	 */
 //	public void	removeExternalCondition(IExternalCondition condition);
 	
-//	/**
-//	 * 
-//	 */
-//	protected void addModelElement(MElement melement)
-//	{
-//		if(modelelements==null)
-//		{
-//			modelelements = new HashSet<MElement>();
-//		}
-//		modelelements.add(melement);
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	protected void removeModelElement(MElement melement)
-//	{
-//		if(modelelements!=null)
-//		{
-//			modelelements.remove(melement);
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	public void addRuntimeElement(RElement relement)
-//	{
-//		if(runtimeelements==null)
-//		{
-//			runtimeelements = new HashSet<RElement>();
-//		}
-//		runtimeelements.add(relement);
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	public void removeRuntimeElement(RElement relement)
-//	{
-//		if(runtimeelements!=null)
-//		{
-//			runtimeelements.remove(relement);
-//		}
-//	}
+	/**
+	 * 
+	 */
+	protected void addModelElement(MElement melement)
+	{
+		if(modelelements==null)
+		{
+			modelelements = new HashSet<MElement>();
+		}
+		modelelements.add(melement);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void removeModelElement(MElement melement)
+	{
+		if(modelelements!=null)
+		{
+			modelelements.remove(melement);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void addRuntimeElement(RElement relement)
+	{
+		if(runtimeelements==null)
+		{
+			runtimeelements = new HashSet<RElement>();
+		}
+		runtimeelements.add(relement);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeRuntimeElement(RElement relement)
+	{
+		if(runtimeelements!=null)
+		{
+			runtimeelements.remove(relement);
+		}
+	}
 	
 	/**
 	 * 
@@ -265,14 +270,21 @@ public class WaitAbstraction
 	public boolean isWaitingFor(Object procelem)
 	{
 		boolean ret = false;
-//		if(modelelements!=null)
-//		{
-//			ret = modelelements.contains(procelem);
-//		}
-//		if(!ret && runtimeelements!=null)
-//		{
-//			ret = runtimeelements.contains(procelem);
-//		}
+		if(modelelements!=null)
+		{
+			if(procelem instanceof RElement)
+			{
+				ret = modelelements.contains(((RElement)procelem).getModelElement());
+			}
+			else
+			{
+				ret = modelelements.contains(procelem);
+			}
+		}
+		if(!ret && runtimeelements!=null)
+		{
+			ret = runtimeelements.contains(procelem);
+		}
 		if(!ret && changeeventtypes!=null)
 		{
 			if(procelem instanceof ChangeEvent)

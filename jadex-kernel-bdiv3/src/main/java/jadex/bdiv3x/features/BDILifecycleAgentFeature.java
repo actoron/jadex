@@ -13,7 +13,9 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 
 /**
- *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
+ *  Feature that ensures the bdi behavior is started.
+ *  
+ *  Differs from pojo BDILifecycleAgentFeature by extending ComponentLifecycleFeature.
  */
 public class BDILifecycleAgentFeature extends ComponentLifecycleFeature implements IInternalBDILifecycleFeature
 {
@@ -30,23 +32,7 @@ public class BDILifecycleAgentFeature extends ComponentLifecycleFeature implemen
 	public BDILifecycleAgentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-		
-//		BDIAgentFeature bdif = (IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class);
-//		Object pojo = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-//		bdif.injectAgent(component, pojo, bdif.getBDIModel(), null);
-//		bdif.invokeInitCalls(pojo);
-//		bdif.initCapabilities(pojo, bdif.getBDIModel().getSubcapabilities() , 0);
 	}
-	
-//	/**
-//	 *  Initialize the feature.
-//	 *  Empty implementation that can be overridden.
-//	 */
-//	public IFuture<Void> init()
-//	{
-////		startBehavior();
-//		return super.init();
-//	}
 	
 	/**
 	 *  Execute the functional body of the agent.

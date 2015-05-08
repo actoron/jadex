@@ -35,6 +35,7 @@ import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
@@ -92,7 +93,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	protected List<RGoal> subgoals;
 		
 	/** The plan has a wait abstraction attribute. */
-//	protected WaitAbstraction waitabstraction;
+	protected WaitAbstraction waitabstraction;
 //		
 //	/** The plan has a waitqueue wait abstraction attribute. */
 //	protected WaitAbstraction waitqueuewa;
@@ -105,10 +106,10 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 //	protected ICommand<Boolean> resumecommand;
 	
 	/** The blocking resume. */
-	protected ICommand<Boolean> resumecommand;
+	protected ICommand<Tuple2<Boolean, Boolean>> resumecommand;
 	
 	/** The non-blocking resumes. */
-	protected List<ICommand<Boolean>> resumecommands;
+	protected List<ICommand<Tuple2<Boolean, Boolean>>> resumecommands;
 	
 	/** The plan has exception attribute. */
 	protected Exception exception;
@@ -292,13 +293,23 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	/**
 	 *  Execute a plan.
 	 */
-	public static void executePlan(RPlan rplan, IInternalAccess ia, ICommand<Boolean> resume)
+	public static void executePlan(RPlan rplan, IInternalAccess ia)
 	{
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-//		ip.getCapability().addPlan(rplan);
-		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan, resume);
+//		executePlan(rplan, ia, null);
+		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan);
 		ia.getExternalAccess().scheduleStep(action);
 	}
+	
+//	/**
+//	 *  Execute a plan.
+//	 */
+//	public static void executePlan(RPlan rplan, IInternalAccess ia, ICommand<Boolean> resume)
+//	{
+////		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+////		ip.getCapability().addPlan(rplan);
+//		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan, resume);
+//		ia.getExternalAccess().scheduleStep(action);
+//	}
 	
 	/**
 	 *  Create a new plan.
@@ -507,32 +518,32 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 		this.ia = ia;
 	}
 
-//	/**
-//	 *  Test if the plan is waiting for a process element.
-//	 */
-//	public boolean isWaitingFor(Object procelem)
-//	{
-//		return RPlan.PLANPROCESSINGTATE_WAITING.equals(getProcessingState()) 
-//			&& waitabstraction!=null && waitabstraction.isWaitingFor(procelem);
-//	}
-//	
-//	/**
-//	 *  Get the waitabstraction.
-//	 *  @return The waitabstraction.
-//	 */
-//	public WaitAbstraction getWaitabstraction()
-//	{
-//		return waitabstraction;
-//	}
-//
-//	/**
-//	 *  Set the waitabstraction.
-//	 *  @param waitabstraction The waitabstraction to set.
-//	 */
-//	public void setWaitAbstraction(WaitAbstraction waitabstraction)
-//	{
-//		this.waitabstraction = waitabstraction;
-//	}
+	/**
+	 *  Test if the plan is waiting for a process element.
+	 */
+	public boolean isWaitingFor(Object procelem)
+	{
+		return RPlan.PlanProcessingState.WAITING.equals(getProcessingState()) 
+			&& waitabstraction!=null && waitabstraction.isWaitingFor(procelem);
+	}
+	
+	/**
+	 *  Get the waitabstraction.
+	 *  @return The waitabstraction.
+	 */
+	public WaitAbstraction getWaitAbstraction()
+	{
+		return waitabstraction;
+	}
+	
+	/**
+	 *  Set the waitabstraction.
+	 *  @param waitabstraction The waitabstraction to set.
+	 */
+	public void setWaitAbstraction(WaitAbstraction waitabstraction)
+	{
+		this.waitabstraction = waitabstraction;
+	}
 
 	/**
 	 * 
@@ -652,24 +663,24 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 			{
 //				if(this.toString().indexOf("Move")!=-1)
 //					System.out.println("performing abort: "+this);
-				RPlan.executePlan(this, ia, new ICommand<Boolean>()
-				{
-					public void execute(Boolean args)
-					{
-						ICommand<Boolean> resc = getResumeCommand();
+//				RPlan.executePlan(this, ia, new ICommand<Boolean>()
+//				{
+//					public void execute(Boolean args)
+//					{
+						ICommand<Tuple2<Boolean, Boolean>> resc = getResumeCommand();
 						if(resc!=null)
 							resc.execute(null);
-						List<ICommand<Boolean>> rescoms = getResumeCommands();
+						List<ICommand<Tuple2<Boolean, Boolean>>> rescoms = getResumeCommands();
 						if(rescoms!=null)
 						{
-							ICommand<Boolean>[] tmp = (ICommand<Boolean>[])rescoms.toArray(new ICommand[rescoms.size()]);
-							for(ICommand<Boolean> rescom: tmp)
+							ICommand<Tuple2<Boolean, Boolean>>[] tmp = (ICommand<Tuple2<Boolean, Boolean>>[])rescoms.toArray(new ICommand[rescoms.size()]);
+							for(ICommand<Tuple2<Boolean, Boolean>> rescom: tmp)
 							{
 								rescom.execute(null);
 							}
 						}
-					}
-				});
+//					}
+//				});
 			}
 //			// Can be currently executing and being abort due to e.g. goal condition triggering
 //			else if(PlanProcessingState.RUNNING.equals(getProcessingState()))
@@ -826,7 +837,8 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 			{
 //				if(rescom.equals(getResumeCommand()))
 				{
-					RPlan.executePlan(RPlan.this, ia, rescom);
+					rescom.execute(null);
+//					RPlan.executePlan(RPlan.this, ia, rescom);
 				}
 				
 //				if(getException()!=null)
@@ -903,7 +915,9 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 									setException(new PlanAbortedException());
 								}
 									
-								RPlan.executePlan(RPlan.this, ia, rescom);
+								rescom.execute(null);
+//								System.out.println("on comp: "+ia.getComponentFeature(IExecutionFeature.class).isComponentThread());
+//								RPlan.executePlan(RPlan.this, ia, rescom);
 								
 		//						if(!rgoal.isFinished() && (isAborted() || isFailed()))
 		//						{
@@ -924,7 +938,8 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 //							if(rescom.equals(getResumeCommand()))
 							{
 								setException(exception);
-								RPlan.executePlan(RPlan.this, ia, rescom);
+//								RPlan.executePlan(RPlan.this, ia, rescom);
+								rescom.execute(null);
 								removeSubgoal(rgoal);
 							}
 						}
@@ -1042,10 +1057,11 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 //							if(rescom.equals(getResumeCommand()))
-							{
+//							{
 								setDispatchedElement(new ChangeEvent(event));
-								RPlan.executePlan(RPlan.this, ia, rescom);
-							}
+								rescom.execute(null);
+//								RPlan.executePlan(RPlan.this, ia, rescom);
+//							}
 							return IFuture.DONE;
 						}
 					});
@@ -1207,11 +1223,12 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
-//							if(rescom.equals(getResumeCommand()))
-						{
+//						if(rescom.equals(getResumeCommand()))
+//						{
 							setDispatchedElement(new ChangeEvent(event));
-							RPlan.executePlan(RPlan.this, ia, rescom);
-						}
+							rescom.execute(null);
+//							RPlan.executePlan(RPlan.this, ia, rescom);
+//						}
 						return IFuture.DONE;
 					}
 				});
@@ -1230,7 +1247,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	/**
 	 * 
 	 */
-	protected IFuture<ITimer> createTimer(long timeout, final IInternalAccess ia, final ICommand<Boolean> rescom)
+	public IFuture<ITimer> createTimer(long timeout, final IInternalAccess ia, final ICommand<Tuple2<Boolean, Boolean>> rescom)
 	{
 		final Future<ITimer> ret = new Future<ITimer>();
 		if(timeout>-1)
@@ -1241,10 +1258,11 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 				public void timeEventOccurred(long currenttime)
 				{
 //					if(rescom.equals(getResumeCommand()))
-					{
+//					{
 						setException(new TimeoutException());
-						RPlan.executePlan(RPlan.this, ia, rescom);
-					}
+						rescom.execute(null);
+//						RPlan.executePlan(RPlan.this, ia, rescom);
+//					}
 				}
 			};
 			
@@ -1325,7 +1343,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	{
 		final Future<T> ret = new BDIFuture<T>();
 		
-		final ICommand<Boolean> rescom = new ResumeCommand<T>(ret, null, false);
+		final ICommand<Tuple2<Boolean, Boolean>> rescom = new ResumeCommand<T>(ret, null, false);
 //		setResumeCommand(rescom);
 		addResumeCommand(rescom);
 		
@@ -1336,7 +1354,8 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 //				if(rescom.equals(getResumeCommand()))
 				{
 					setDispatchedElement(result);
-					RPlan.executePlan(RPlan.this, ia, rescom);
+					rescom.execute(null);
+//					RPlan.executePlan(RPlan.this, ia, rescom);
 				}
 			}
 			
@@ -1345,7 +1364,8 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 //				if(rescom.equals(getResumeCommand()))
 				{
 					setException(exception);
-					RPlan.executePlan(RPlan.this, ia, rescom);
+					rescom.execute(null);
+//					RPlan.executePlan(RPlan.this, ia, rescom);
 				}
 			}
 		}));
@@ -1387,7 +1407,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 		if(resumecommand!=null)
 		{
 			// performs only cleanup without setting future
-			resumecommand.execute(Boolean.FALSE);
+			resumecommand.execute(new Tuple2<Boolean, Boolean>(Boolean.FALSE, null));
 			resumecommand = null;
 		}
 	}
@@ -1409,7 +1429,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	/**
 	 * 
 	 */
-	class ResumeCommand<T> implements ICommand<Boolean>
+	public class ResumeCommand<T> implements ICommand<Tuple2<Boolean, Boolean>>
 	{
 		protected ComponentSuspendable sus;
 		protected Future<T> waitfuture;
@@ -1442,8 +1462,14 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 			this.timer = timer;
 		}
 
-		public void execute(Boolean args)
+		/**
+		 *  first Boolean: notify (default true)
+		 *  second Boolean: abort (default false)
+		 */
+		public void execute(Tuple2<Boolean, Boolean> args)
 		{
+			assert ia.getComponentFeature(IExecutionFeature.class).isComponentThread();
+
 //			System.out.println("exe: "+this+" "+RPlan.this.getId());
 			
 			if(rulename!=null)
@@ -1457,23 +1483,26 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 				timer.cancel();
 			}
 			
-			if(args==null || args.booleanValue())
+			boolean notify = args!=null && args.getFirstEntity()!=null? args.getFirstEntity().booleanValue(): true;
+			boolean abort = args!=null && args.getSecondEntity()!=null? args.getSecondEntity().booleanValue(): sus!=null;
+			
+			if(notify && RPlan.PlanProcessingState.WAITING.equals(getProcessingState()))
 			{
-				boolean notify = false;
+				boolean donotify = false;
 				if(resumecommands!=null && resumecommands.contains(this))
 				{
 					resumecommands.remove(this);
-					notify = true;
+					donotify = true;
 				}
 				if(this.equals(resumecommand))
 				{
 					resumecommand = null;
-					notify = true;
+					donotify = true;
 				}
 				
-				if(notify)
+				if(donotify)
 				{
-					if(sus==null)
+					if(!abort)//sus==null)
 					{
 						if(getException()!=null)
 						{
@@ -1503,6 +1532,15 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 				}
 			}
 		}
+
+		/**
+		 *  Get the waitfuture.
+		 *  @return The waitfuture
+		 */
+		public Future<T> getWaitfuture()
+		{
+			return waitfuture;
+		}
 	}
 	
 	/**
@@ -1518,17 +1556,17 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	/**
 	 * 
 	 */
-	public void addResumeCommand(ICommand<Boolean> rescom)
+	public void addResumeCommand(ICommand<Tuple2<Boolean, Boolean>> rescom)
 	{
 		if(resumecommands==null)
-			resumecommands = new ArrayList<ICommand<Boolean>>();
+			resumecommands = new ArrayList<ICommand<Tuple2<Boolean, Boolean>>>();
 		resumecommands.add(rescom);
 	}
 	
 	/**
 	 * 
 	 */
-	public void removeResumeCommand(ICommand<Boolean> rescom)
+	public void removeResumeCommand(ICommand<Tuple2<Boolean, Boolean>> rescom)
 	{
 		if(resumecommands!=null)
 			resumecommands.remove(rescom);
@@ -1538,7 +1576,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	 *  Get the resumecommands.
 	 *  @return The resumecommands.
 	 */
-	public List<ICommand<Boolean>> getResumeCommands()
+	public List<ICommand<Tuple2<Boolean, Boolean>>> getResumeCommands()
 	{
 		return resumecommands;
 	}
@@ -1547,7 +1585,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	 *  Get the resumecommand.
 	 *  @return The resumecommand.
 	 */
-	public ICommand<Boolean> getResumeCommand()
+	public ICommand<Tuple2<Boolean, Boolean>> getResumeCommand()
 	{
 		return resumecommand;
 	}

@@ -4,6 +4,7 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.impl.RElement;
+import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.service.types.message.MessageType;
 
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
 /**
  * 
  */
-public class RMessageEvent extends RElement implements IMessageEvent 
+public class RMessageEvent extends RProcessableElement implements IMessageEvent 
 {
 	//-------- attributes --------
 	
@@ -21,14 +22,17 @@ public class RMessageEvent extends RElement implements IMessageEvent
 	/** The message type. */
 	protected MessageType mt;
 	
+	/** The finished flag. */
+	boolean finished;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new runtime element.
 	 */
-	public RMessageEvent(MElement modelelement, Map<String, Object> msg, MessageType mt)
+	public RMessageEvent(MMessageEvent modelelement, Map<String, Object> msg, MessageType mt)
 	{
-		super(modelelement);
+		super(modelelement, null);
 		this.msg = msg;
 		this.mt = mt;
 	}
@@ -177,5 +181,23 @@ public class RMessageEvent extends RElement implements IMessageEvent
 		{
 			return msg.get(name);
 		}
+	}
+
+	//todo: set finished
+	
+	/**
+	 *  Test if element is succeeded.
+	 */
+	public boolean isSucceeded()
+	{
+		return finished && exception==null;
+	}
+	
+	/**
+	 *  Test if element is failed.
+	 */
+	public boolean isFailed()
+	{
+		return finished && exception!=null;
 	}
 }
