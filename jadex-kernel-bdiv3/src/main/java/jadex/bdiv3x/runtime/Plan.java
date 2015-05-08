@@ -83,31 +83,38 @@ public abstract class Plan
 		final Future<IMessageEvent> ret = new Future<IMessageEvent>();
 
 		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
-		
-		// todo: add scope name if is in capa
 		MMessageEvent mevent = bdif.getBDIModel().getCapability().getMessageEvent(type);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addMessageEvent(mevent);
-		getRPlan().setWaitAbstraction(wa);
-		
-//		final ResumeCommand<IMessageEvent> rescom = getRPlan().new ResumeCommand<IMessageEvent>(ret, false);
-//
-//		if(timeout>-1)
-//		{
-//			IFuture<ITimer> cont = getRPlan().createTimer(timeout, agent, rescom);
-//			cont.addResultListener(new DefaultResultListener<ITimer>()
-//			{
-//				public void resultAvailable(final ITimer timer)
-//				{
-//					if(timer!=null)
-//						rescom.setTimer(timer);
-//				}
-//			});
-//		}
-		
-//		rplan.addResumeCommand(rescom);
-		
-		return ret.get();
+
+		IMessageEvent res = (IMessageEvent)getRPlan().getFromWaitqueue(wa);
+		if(res!=null)
+		{
+			return res;
+		}
+		else
+		{
+			// todo: add scope name if is in capa
+			getRPlan().setWaitAbstraction(wa);
+			
+	//		final ResumeCommand<IMessageEvent> rescom = getRPlan().new ResumeCommand<IMessageEvent>(ret, false);
+	//
+	//		if(timeout>-1)
+	//		{
+	//			IFuture<ITimer> cont = getRPlan().createTimer(timeout, agent, rescom);
+	//			cont.addResultListener(new DefaultResultListener<ITimer>()
+	//			{
+	//				public void resultAvailable(final ITimer timer)
+	//				{
+	//					if(timer!=null)
+	//						rescom.setTimer(timer);
+	//				}
+	//			});
+	//		}
+			
+	//		rplan.addResumeCommand(rescom);
+			return ret.get();
+		}
 	}
 	
 	/**

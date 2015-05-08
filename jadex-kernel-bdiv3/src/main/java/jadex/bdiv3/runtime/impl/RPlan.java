@@ -8,6 +8,7 @@ import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -94,9 +95,9 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 		
 	/** The plan has a wait abstraction attribute. */
 	protected WaitAbstraction waitabstraction;
-//		
-//	/** The plan has a waitqueue wait abstraction attribute. */
-//	protected WaitAbstraction waitqueuewa;
+		
+	/** The plan has a waitqueue wait abstraction attribute. */
+	protected WaitAbstraction waitqueuewa;
 	
 	/** The waitqueue. */
 	protected List<Object> waitqueue;
@@ -260,6 +261,21 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 				});
 				rule.setEvents(events);
 				((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getRuleSystem().getRulebase().addRule(rule);
+			}
+			
+			List<MMessageEvent> mevents = wqtr.getMessageEvents();
+			if(mevents!=null)
+			{
+				for(MMessageEvent mevent: mevents)
+				{
+					WaitAbstraction wa = rplan.getWaitqueueWaitAbstraction();
+					if(wa==null)
+					{
+						wa = new WaitAbstraction();
+						rplan.setWaitqueueWaitAbstraction(wa);
+					}
+					wa.addMessageEvent(mevent);
+				}
 			}
 		}
 		
@@ -544,6 +560,32 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	{
 		this.waitabstraction = waitabstraction;
 	}
+	
+	/**
+	 *  Test if the plan is always waiting for a process element (waitqueue wait).
+	 */
+	public boolean isWaitqueueWaitingFor(Object procelem)
+	{
+		return waitqueuewa!=null && waitqueuewa.isWaitingFor(procelem);
+	}
+	
+	/**
+	 *  Get the waitabstraction.
+	 *  @return The waitabstraction.
+	 */
+	public WaitAbstraction getWaitqueueWaitAbstraction()
+	{
+		return waitqueuewa;
+	}
+	
+	/**
+	 *  Set the waitabstraction.
+	 *  @param waitabstraction The waitabstraction to set.
+	 */
+	public void setWaitqueueWaitAbstraction(WaitAbstraction waitabstraction)
+	{
+		this.waitqueuewa = waitabstraction;
+	}
 
 	/**
 	 * 
@@ -558,7 +600,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	/**
 	 * 
 	 */
-	protected Object getFromWaitqueue(WaitAbstraction wa)
+	public Object getFromWaitqueue(WaitAbstraction wa)
 	{
 		Object ret = null;
 		if(waitqueue!=null)
@@ -781,6 +823,8 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 	 */
 	public List<Object> getWaitqueue()
 	{
+		if(waitqueue==null)
+			waitqueue = new ArrayList<Object>();
 		return waitqueue;
 	}
 
@@ -1482,6 +1526,7 @@ public class RPlan extends RElement implements IPlan, IInternalPlan
 			{
 				timer.cancel();
 			}
+			waitabstraction = null;
 			
 			boolean notify = args!=null && args.getFirstEntity()!=null? args.getFirstEntity().booleanValue(): true;
 			boolean abort = args!=null && args.getSecondEntity()!=null? args.getSecondEntity().booleanValue(): sus!=null;

@@ -17,12 +17,10 @@
 		<!-- A translation plan, from which an instance is created
 			when the agent is born. Reacts on translation request messages. -->
 		<plan name="egtrans">
-		    			<body class="EnglishGermanTranslationPlanB1"/>
-<!-- 
-		    									<waitqueue>
+		    <body class="EnglishGermanTranslationPlanB1"/>
+			<waitqueue>
 				<messageevent ref="request_translation"/>
 			</waitqueue>
-			 -->
 		</plan>
 	</plans>
  

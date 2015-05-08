@@ -56,6 +56,13 @@ public class EnglishGermanTranslationPlanB1 extends Plan
 			{
 				System.out.println("Sorry word is not in database: "+eword);
 			}
+			
+			waitFor(1000);
 		}
+	}
+	
+	public void failed()
+	{
+		System.out.println("Plan failed: "+this);
 	}
 }

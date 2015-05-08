@@ -126,9 +126,11 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					rplan.getResumeCommand().execute(new Tuple2<Boolean, Boolean>(null, Boolean.FALSE));
 					ret.setResult(null);
 				}
-				else
+				else if(cand instanceof List)
 				{
-					// todo: dispatch to waitqueue
+					// dispatch to waitqueue
+					((List)cand).add(element);
+					ret.setResult(null);
 				}
 			}
 		}

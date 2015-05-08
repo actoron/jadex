@@ -160,11 +160,19 @@ public class APL
 				{
 					for(RPlan rplan: rplans)
 					{
+						// check if plan is currently waiting for this proc elem
 						if(rplan.isWaitingFor(element))
 						{
 							if(candidates==null)
 								candidates = new ArrayList<Object>();
 							candidates.add((Object)rplan);
+						}
+						// check if plan always waits for this proc elem
+						else if(rplan.isWaitqueueWaitingFor(element))
+						{
+							if(candidates==null)
+								candidates = new ArrayList<Object>();
+							candidates.add(rplan.getWaitqueue());
 						}
 					}
 				}
