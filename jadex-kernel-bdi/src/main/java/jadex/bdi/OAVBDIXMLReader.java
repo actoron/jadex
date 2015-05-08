@@ -98,7 +98,7 @@ public class OAVBDIXMLReader
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "exclude")),  new ObjectInfo(new IBeanObjectCreator()
 		{
-			public Object createObject(IContext context, Map rawattributes) throws Exception
+			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 			{
 				return rawattributes.get("parameterref");
 			}
@@ -158,7 +158,7 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "deliberation")), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "unique")), new ObjectInfo(new IBeanObjectCreator()
 			{
-				public Object createObject(IContext context, Map rawattributes) throws Exception
+				public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 				{
 					return Boolean.TRUE;
 				}

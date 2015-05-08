@@ -115,7 +115,7 @@ public class STypeInfosAWT
 		TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName[]
 		{ new QName(SXML.PROTOCOL_TYPEINFO + "java.awt.image", "Image") }), new ObjectInfo(new IBeanObjectCreator()
 		{
-			public Object createObject(IContext context, Map rawattributes) throws Exception
+			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 			{
 				Image ret = null;
 				String encdata = (String) rawattributes.get("imgdata");
@@ -144,7 +144,7 @@ public class STypeInfosAWT
 		TypeInfo ti_rect = new TypeInfo(new XMLInfo(new QName[]
 		{ new QName(SXML.PROTOCOL_TYPEINFO + "java.awt", "Rectangle") }), new ObjectInfo(new IBeanObjectCreator()
 		{
-			public Object createObject(IContext context, Map rawattributes) throws Exception
+			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 			{
 				int x = (int) Double.parseDouble((String) rawattributes.get("x"));
 				int y = (int) Double.parseDouble((String) rawattributes.get("y"));

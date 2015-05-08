@@ -1,6 +1,5 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdi.runtime.IExpression;
 import jadex.bdiv3x.runtime.Plan;
 
 /**

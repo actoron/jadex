@@ -2,6 +2,7 @@ package jadex.bdiv3x;
 
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MBody;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
@@ -18,17 +19,22 @@ import jadex.component.ComponentXMLReader;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
+import jadex.xml.IContext;
+import jadex.xml.IPostProcessor;
 import jadex.xml.LinkingInfo;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.IObjectLinker;
 import jadex.xml.stax.QName;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -347,11 +353,36 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
 //			new MappingInfo(ti_expression)));
 //			
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "trigger")), new ObjectInfo(MTrigger.class), 
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "trigger")), new ObjectInfo(MTrigger.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				BDIV3XModel model = (BDIV3XModel)context.getRootObject();
+				MCapability mcapa = model.getCapability();
+				MTrigger mtr = (MTrigger)object;
+				List<String> names = mtr.getMessageNames();
+				if(names!=null)
+				{
+					for(String name: names)
+					{
+						// todo: capa scoping?!
+						if(mcapa.getMessageEvent(name)==null)
+							throw new RuntimeException("Message event not found: "+name);
+						mtr.addMessageEvent(mcapa.getMessageEvent(name));
+					}
+				}
+				return null;
+			}
+			
+			public int getPass()
+			{
+				return 1;
+			}
+		}), 
 			new MappingInfo(null, 
 			new SubobjectInfo[]{
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), OAVBDIMetaModel.trigger_has_internalevents)),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), OAVBDIMetaModel.trigger_has_messageevents)),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), OAVBDIMetaModel.trigger_has_goalfinisheds)),
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "factadded"), OAVBDIMetaModel.trigger_has_factaddeds)),
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "factremoved"), OAVBDIMetaModel.trigger_has_factremoveds)),
@@ -362,8 +393,14 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "internalevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
 //			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "messageevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
-//				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "messageevent")}), new ObjectInfo(new IBeanObjectCreator()
+		{
+			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
+			{
+				return rawattributes.get("ref");
+			}
+		}),
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))})));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goalfinished")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
 //				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),

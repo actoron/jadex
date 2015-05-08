@@ -509,7 +509,7 @@ public class BpmnXMLReader
 //			new ObjectInfo(MActivity.class, new ActivityPostProcessor()),
 			new ObjectInfo(new IBeanObjectCreator()
 			{
-				public Object createObject(IContext context, Map rawattributes)
+				public Object createObject(IContext context, Map<String, String> rawattributes)
 						throws Exception
 				{
 					MActivity ret = null;

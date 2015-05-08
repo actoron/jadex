@@ -197,7 +197,7 @@ public class JavaReader
 			TypeInfo ti_emptyset = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-EmptySet")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Collections.EMPTY_SET;
 					}
@@ -209,7 +209,7 @@ public class JavaReader
 			TypeInfo ti_emptylist = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-EmptyList")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Collections.EMPTY_LIST;
 					}
@@ -221,7 +221,7 @@ public class JavaReader
 			TypeInfo ti_emptymap = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-EmptyMap")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Collections.EMPTY_MAP;
 					}
@@ -257,7 +257,7 @@ public class JavaReader
 			TypeInfo ti_class = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Class")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return SReflect.classForName((String)rawattributes.get("classname"), context.getClassLoader());
 					}
@@ -270,7 +270,7 @@ public class JavaReader
 			TypeInfo ti_timestamp = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.sql", "Timestamp")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						long time = Long.parseLong((String)rawattributes.get("time"));
 						return new Timestamp(time);
@@ -288,7 +288,7 @@ public class JavaReader
 			TypeInfo ti_calendar = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Calendar")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						Class<?> cl = SReflect.classForName((String)rawattributes.get("classname"), context.getClassLoader());
 						Calendar cal = (Calendar)cl.newInstance();
@@ -339,7 +339,7 @@ public class JavaReader
 			TypeInfo ti_boolean = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Boolean")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Boolean.valueOf((String)rawattributes.get("content"));
 					}
@@ -352,7 +352,7 @@ public class JavaReader
 			TypeInfo ti_integer = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Integer")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Integer.valueOf((String)rawattributes.get("content"));
 					}
@@ -365,7 +365,7 @@ public class JavaReader
 			TypeInfo ti_double = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Double")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Double.valueOf((String)rawattributes.get("content"));
 					}
@@ -378,7 +378,7 @@ public class JavaReader
 			TypeInfo ti_float = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Float")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Float.valueOf((String)rawattributes.get("content"));
 					}
@@ -391,7 +391,7 @@ public class JavaReader
 			TypeInfo ti_long = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Long")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Long.valueOf((String)rawattributes.get("content"));
 					}
@@ -404,7 +404,7 @@ public class JavaReader
 			TypeInfo ti_short = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Short")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Short.valueOf((String)rawattributes.get("content"));
 					}
@@ -417,7 +417,7 @@ public class JavaReader
 			TypeInfo ti_byte = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Byte")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						byte[] bytes = Base64.decode(((String)rawattributes.get("content")).getBytes("UTF-8"));
 						return Byte.valueOf(bytes[0]);
@@ -431,7 +431,7 @@ public class JavaReader
 			TypeInfo ti_character = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Character")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return Character.valueOf(((String)rawattributes.get("content")).charAt(0));
 					}
@@ -444,7 +444,7 @@ public class JavaReader
 			TypeInfo ti_url = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "URL")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return new URL((String)rawattributes.get("protocol"), (String)rawattributes.get("host"), 
 							Integer.parseInt((String)rawattributes.get("port")), (String)rawattributes.get("file"));
@@ -463,7 +463,7 @@ public class JavaReader
 			TypeInfo ti_uri = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "URI")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return new URI((String)rawattributes.get("uri"));
 					}
@@ -479,7 +479,7 @@ public class JavaReader
 			TypeInfo ti_level = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util.logging", "Level")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						String name = (String)rawattributes.get("name");
 						Level ret = Level.parse(name);
@@ -495,7 +495,7 @@ public class JavaReader
 			TypeInfo ti_record = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util.logging", "LogRecord")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						String name = (String)rawattributes.get("level");
 						String msg = (String)rawattributes.get("message");
@@ -514,7 +514,7 @@ public class JavaReader
 			TypeInfo ti_inetaddr = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "InetAddress")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						return InetAddress.getByName((String)rawattributes.get("hostAddress"));
 					}
@@ -528,7 +528,7 @@ public class JavaReader
 			TypeInfo ti_enum = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Enum")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						String tmp = (String)rawattributes.get("content");
 						int idx = tmp.indexOf("=");
@@ -546,7 +546,7 @@ public class JavaReader
 			TypeInfo ti_cert = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.security.cert", "Certificate")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						String type = (String)rawattributes.get("type");
 						if(type==null)
@@ -885,7 +885,7 @@ public class JavaReader
 			TypeInfo ti_uuid	= new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "UUID")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						long msb = Long.parseLong((String)rawattributes.get("mostSignificantBits"));
 						long lsb = Long.parseLong((String)rawattributes.get("leastSignificantBits"));
@@ -902,7 +902,7 @@ public class JavaReader
 			TypeInfo ti_th = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Throwable")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						Object ret = null;
 						String clname = (String)rawattributes.get("class");
@@ -934,7 +934,7 @@ public class JavaReader
 			TypeInfo ti_ste = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "StackTraceElement")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
 						String decl = (String)rawattributes.get("className");
 						String mname = (String)rawattributes.get("methodName");

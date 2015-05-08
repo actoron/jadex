@@ -16,5 +16,5 @@ public interface IBeanObjectCreator
 	 *  @param rawattributes The raw attributes.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(IContext context, Map rawattributes) throws Exception;
+	public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception;
 }
