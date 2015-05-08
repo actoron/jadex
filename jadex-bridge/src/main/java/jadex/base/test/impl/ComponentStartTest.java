@@ -113,13 +113,16 @@ public class ComponentStartTest extends	TestCase
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		final Future<Collection<Tuple2<String,Object>>>	finished	= new Future<Collection<Tuple2<String,Object>>>();
 		Timer	t	= new Timer(true);
-		t.schedule(new TimerTask()
+		if(timeout>0)
 		{
-			public void run()
+			t.schedule(new TimerTask()
 			{
-				finished.setExceptionIfUndone(new TimeoutException(ComponentStartTest.this+" did not finish in "+timeout+" ms."));
-			}
-		}, timeout);
+				public void run()
+				{
+					finished.setExceptionIfUndone(new TimeoutException(ComponentStartTest.this+" did not finish in "+timeout+" ms."));
+				}
+			}, timeout);
+		}
 		final IComponentIdentifier	cid	= cms.createComponent(null, filename, new CreationInfo(rid), 
 			new DelegationResultListener<Collection<Tuple2<String,Object>>>(finished)).get();
 //		System.out.println("started: "+this);
