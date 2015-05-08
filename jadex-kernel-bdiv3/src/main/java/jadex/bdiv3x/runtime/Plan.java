@@ -145,4 +145,22 @@ public abstract class Plan
 		return rplan;
 	}
 	
+	/**
+	 *  Get the reason this plan was created for.
+	 *  @return The reason.
+	 */
+	public Object getReason()
+	{
+		return rplan.getReason();
+	}
+	
+	/**
+	 *  Get the reason this plan was created for.
+	 *  @return The reason.
+	 */
+	public Object getDispatchedElement()
+	{
+		return rplan.getDispatchedElement();
+	}
+	
 }
