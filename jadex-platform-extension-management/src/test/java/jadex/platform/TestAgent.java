@@ -206,7 +206,7 @@ public abstract class TestAgent
 //			"-libpath", url,
 			"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-//			"-logging", "true",
+			"-logging", "true",
 //			"-relaytransport", "false",
 			"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
 			"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
@@ -439,11 +439,12 @@ public abstract class TestAgent
 		
 		if(cnt<n)
 		{
+			System.out.println("creating platform: "+cnt);
 			createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess exta)
 				{
-					System.out.println("creating platform: "+cnt);
+					System.out.println("connecting platform: "+cnt+", waiting for "+platforms.size()*2+" proxies");
 					CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(platforms.size()*2, new DelegationResultListener<Void>(ret)
 					{
 						public void customResultAvailable(Void result) 
@@ -451,7 +452,14 @@ public abstract class TestAgent
 							platforms.add(exta);
 							setupRemotePlatforms(n, cnt+1, platforms).addResultListener(new DelegationResultListener<Void>(ret));
 						}
-					});
+					})
+					{
+						public void resultAvailable(IComponentIdentifier result)
+						{
+							System.out.println("Proxy started: "+(getCnt()+1));
+							super.resultAvailable(result);
+						}
+					};
 					
 					for(IExternalAccess other: platforms)
 					{

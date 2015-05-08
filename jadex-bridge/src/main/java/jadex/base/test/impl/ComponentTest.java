@@ -108,13 +108,16 @@ public class ComponentTest extends TestCase
 		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
 		Timer	t	= new Timer(true);
-		t.schedule(new TimerTask()
+		if(timeout>0)
 		{
-			public void run()
+			t.schedule(new TimerTask()
 			{
-				finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
-			}
-		}, timeout);
+				public void run()
+				{
+					finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
+				}
+			}, timeout);
+		}
 
 		final ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
 		fut.addResultListener(new ExceptionDelegationResultListener<Collection<TupleResult>, Map<String, Object>>(finished)
