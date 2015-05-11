@@ -459,6 +459,13 @@ public abstract class TestAgent
 							System.out.println("Proxy started: "+(getCnt()+1));
 							super.resultAvailable(result);
 						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							System.out.println("Proxy creation failed: "+(getCnt()+1));
+							exception.printStackTrace();
+							super.exceptionOccurred(exception);
+						}
 					};
 					
 					for(IExternalAccess other: platforms)
