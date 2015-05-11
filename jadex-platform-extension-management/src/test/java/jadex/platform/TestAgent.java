@@ -269,11 +269,21 @@ public abstract class TestAgent
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
+		if(filename.indexOf("Proxy")!=-1)
+		{
+			System.out.println("0: Creating proxy on "+root+" for "+args);
+		}
+		
 		agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
+				if(filename.indexOf("Proxy")!=-1)
+				{
+					System.out.println("1: Creating proxy on "+root+" for "+args+" using "+cms);
+				}
+				
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
@@ -286,6 +296,10 @@ public abstract class TestAgent
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
+						if(filename.indexOf("Proxy")!=-1)
+						{
+							System.out.println("2: Created proxy on "+root+" for "+args);
+						}
 						super.customResultAvailable(result);
 					}
 					
@@ -296,6 +310,16 @@ public abstract class TestAgent
 					}
 				}
 				);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				if(filename.indexOf("Proxy")!=-1)
+				{
+					System.out.println("4: Failed to create proxy on "+root+" for "+args);
+					exception.printStackTrace();
+				}
+				super.exceptionOccurred(exception);
 			}
 		});
 		
@@ -458,6 +482,13 @@ public abstract class TestAgent
 						{
 							System.out.println("Proxy started: "+(getCnt()+1));
 							super.resultAvailable(result);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							System.out.println("Proxy creation failed: "+(getCnt()+1));
+							exception.printStackTrace();
+							super.exceptionOccurred(exception);
 						}
 					};
 					
