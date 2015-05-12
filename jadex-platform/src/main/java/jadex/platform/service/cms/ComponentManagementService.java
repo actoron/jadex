@@ -21,6 +21,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -504,23 +505,44 @@ public class ComponentManagementService implements IComponentManagementService
 		{				
 			if(modelname.indexOf("Proxy")!=-1)
 			{
-				System.out.println("CMS2: Creating proxy on "+root+" for "+info.getArguments());
+				System.out.println("CMS3: Creating proxy on "+root+" for "+info.getArguments());
 			}
 			
 			getRemoteCMS(cinfo.getParent()).addResultListener(createResultListener(
 				new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(inited)
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				public void customResultAvailable(final IComponentManagementService rcms)
 				{
 					// todo: problem, the call will get a wrong caller due to IComponentIdentidier.LOCAL.get()
 					// will deliver the platform (as this second call is performed by the cms itself)
 					
 					if(modelname.indexOf("Proxy")!=-1)
 					{
-						System.out.println("CMS3: Creating proxy on "+root+" for "+info.getArguments());
+						System.out.println("CMS4: Creating proxy on "+((IService)rcms).getServiceIdentifier().getProviderId()+" for "+info.getArguments());
 					}
 					
-					rcms.createComponent(name, modelname, cinfo, resultlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
+					rcms.createComponent(name, modelname, cinfo, resultlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited)
+					{
+						public void customResultAvailable(IComponentIdentifier result)
+						{
+							if(modelname.indexOf("Proxy")!=-1)
+							{
+								System.out.println("CMS5: Creating proxy on "+((IService)rcms).getServiceIdentifier().getProviderId()+" for "+info.getArguments());
+							}
+							
+							super.customResultAvailable(result);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(modelname.indexOf("Proxy")!=-1)
+							{
+								System.out.println("CMS6: Creating proxy on "+((IService)rcms).getServiceIdentifier().getProviderId()+" for "+info.getArguments()+" "+exception);
+								exception.printStackTrace();
+							}
+							super.exceptionOccurred(exception);
+						}
+					});
 				}
 			}));
 		}
@@ -529,7 +551,7 @@ public class ComponentManagementService implements IComponentManagementService
 	//		System.out.println("create start1: "+model+" "+cinfo.getParent());
 			if(modelname.indexOf("Proxy")!=-1)
 			{
-				System.out.println("CMS4: Creating proxy on "+root+" for "+info.getArguments());
+				System.out.println("CMS2: Creating proxy on "+root+" for "+info.getArguments());
 			}
 			
 			if(name!=null && name.indexOf('@')!=-1)
