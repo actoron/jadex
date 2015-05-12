@@ -460,7 +460,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param resultlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(final String name, final String modelname, CreationInfo info, 
+	public IFuture<IComponentIdentifier> createComponent(final String name, final String modelname, final CreationInfo info, 
 		final IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{			
 		if(modelname==null)
@@ -468,6 +468,11 @@ public class ComponentManagementService implements IComponentManagementService
 
 //		if(name!=null && name.indexOf("abc")!=-1)
 //			System.out.println("create compo: "+modelname+" "+info);
+		
+		if(modelname.indexOf("Proxy")!=-1)
+		{
+			System.out.println("CMS1: Creating proxy on "+root+" for "+info.getArguments());
+		}
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
@@ -497,6 +502,11 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
 		{				
+			if(modelname.indexOf("Proxy")!=-1)
+			{
+				System.out.println("CMS2: Creating proxy on "+root+" for "+info.getArguments());
+			}
+			
 			getRemoteCMS(cinfo.getParent()).addResultListener(createResultListener(
 				new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(inited)
 			{
@@ -505,6 +515,11 @@ public class ComponentManagementService implements IComponentManagementService
 					// todo: problem, the call will get a wrong caller due to IComponentIdentidier.LOCAL.get()
 					// will deliver the platform (as this second call is performed by the cms itself)
 					
+					if(modelname.indexOf("Proxy")!=-1)
+					{
+						System.out.println("CMS3: Creating proxy on "+root+" for "+info.getArguments());
+					}
+					
 					rcms.createComponent(name, modelname, cinfo, resultlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
 				}
 			}));
@@ -512,6 +527,10 @@ public class ComponentManagementService implements IComponentManagementService
 		else
 		{
 	//		System.out.println("create start1: "+model+" "+cinfo.getParent());
+			if(modelname.indexOf("Proxy")!=-1)
+			{
+				System.out.println("CMS4: Creating proxy on "+root+" for "+info.getArguments());
+			}
 			
 			if(name!=null && name.indexOf('@')!=-1)
 			{
