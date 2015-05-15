@@ -2,6 +2,7 @@ package jadex.micro.examples.messagequeue.replicated;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -140,7 +141,8 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 */
 	public ISubscriptionIntermediateFuture<Event> subscribeForReplication(String topic) 
 	{
-		SubscriptionIntermediateFuture<Event> ret = new SubscriptionIntermediateFuture<Event>();
+		final SubscriptionIntermediateFuture<Event>	ret	= (SubscriptionIntermediateFuture<Event>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+//		SubscriptionIntermediateFuture<Event> ret = new SubscriptionIntermediateFuture<Event>();
 
 		List<SubscriptionIntermediateFuture<Event>> subs = repsubscribers.get(topic);
 		if (subs == null) 
@@ -187,7 +189,8 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 */
 	public ISubscriptionIntermediateFuture<Event> subscribe(final String topic) 
 	{
-		SubscriptionIntermediateFuture<Event> ret = new SubscriptionIntermediateFuture<Event>();
+//		SubscriptionIntermediateFuture<Event> ret = new SubscriptionIntermediateFuture<Event>();
+		final SubscriptionIntermediateFuture<Event>	ret	= (SubscriptionIntermediateFuture<Event>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 
 		List<SubscriptionIntermediateFuture<Event>> subs = localsubscribers.get(topic);
 		if(subs == null) 

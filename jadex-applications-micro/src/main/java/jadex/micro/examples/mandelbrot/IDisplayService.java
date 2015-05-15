@@ -22,6 +22,6 @@ public interface IDisplayService
 	/**
 	 *  Subscribe to display events.
 	 */
-	@Timeout(Timeout.NONE)
+//	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid);
 }

@@ -40,7 +40,8 @@ public interface IAwarenessManagementService
 	 *  	Otherwise only changes that happen after the subscription will be posted. 
 	 *  @return An intermediate future that is notified about any changes.
 	 */
-	@Timeout(Timeout.NONE)
+	// Not necessary due to SFuture.getNoTimeoutFuture
+	//	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<DiscoveryInfo> subscribeToPlatformList(boolean include_initial);
 	
 	// Todo: create / remove proxies?

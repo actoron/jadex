@@ -1,5 +1,6 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.IFuture;
@@ -85,7 +86,9 @@ public class DisplayService implements IDisplayService
 	 */
 	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid)
 	{
-		SubscriptionIntermediateFuture<Object> ret = new SubscriptionIntermediateFuture<Object>();
+//		SubscriptionIntermediateFuture<Object> ret = new SubscriptionIntermediateFuture<Object>();
+		final SubscriptionIntermediateFuture<Object>	ret	= (SubscriptionIntermediateFuture<Object>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent.agent);
+
 		subscribers.put(displayid, ret);
 		return ret;
 	}

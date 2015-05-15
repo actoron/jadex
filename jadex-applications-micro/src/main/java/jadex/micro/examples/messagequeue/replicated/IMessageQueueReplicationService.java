@@ -15,7 +15,7 @@ public interface IMessageQueueReplicationService
 	 * @param topic The topic.
 	 * @return The events.
 	 */
-	@Timeout(Timeout.NONE)
+//	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<Event> subscribeForReplication(String topic);
 
 	/**

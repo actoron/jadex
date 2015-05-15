@@ -1,6 +1,7 @@
 package jadex.micro.examples.messagequeue;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -55,8 +56,9 @@ public class MessageQueueAgent implements IMessageQueueService
 	 */
 	public ISubscriptionIntermediateFuture<Event> subscribe(String topic)
 	{
-		SubscriptionIntermediateFuture<Event> ret = new SubscriptionIntermediateFuture<Event>();
-		
+//		SubscriptionIntermediateFuture<Event> ret = new SubscriptionIntermediateFuture<Event>();
+		final SubscriptionIntermediateFuture<Event>	ret	= (SubscriptionIntermediateFuture<Event>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+
 		List<SubscriptionIntermediateFuture<Event>> subs = subscribers.get(topic);
 		if(subs==null)
 		{

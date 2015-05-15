@@ -42,7 +42,8 @@ public interface IChatGuiService
 	 *  Subscribe to events from the chat service.
 	 *  @return A future publishing chat events as intermediate results.
 	 */
-	@Timeout(Timeout.NONE)
+	// Not necessary due to SFuture.getNoTimeoutFuture
+//	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<ChatEvent>	subscribeToEvents();
 	
 	//-------- chatting --------

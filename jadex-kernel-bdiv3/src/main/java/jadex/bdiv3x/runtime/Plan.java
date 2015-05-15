@@ -97,6 +97,8 @@ public abstract class Plan
 			// todo: add scope name if is in capa
 			getRPlan().setWaitAbstraction(wa);
 			
+			// todo: timeout
+			
 	//		final ResumeCommand<IMessageEvent> rescom = getRPlan().new ResumeCommand<IMessageEvent>(ret, false);
 	//
 	//		if(timeout>-1)
@@ -113,6 +115,7 @@ public abstract class Plan
 	//		}
 			
 	//		rplan.addResumeCommand(rescom);
+			
 			return ret.get();
 		}
 	}
@@ -140,7 +143,7 @@ public abstract class Plan
 	 */
 	public IBeliefbase getBeliefbase()
 	{
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -170,4 +173,13 @@ public abstract class Plan
 		return rplan.getDispatchedElement();
 	}
 	
+	/**
+	 *  Get a parameter.
+	 *  @param name The name.
+	 *  @return The parameter.
+	 */
+	public IParameter getParameter(String name)
+	{
+		throw new UnsupportedOperationException();
+	}
 }

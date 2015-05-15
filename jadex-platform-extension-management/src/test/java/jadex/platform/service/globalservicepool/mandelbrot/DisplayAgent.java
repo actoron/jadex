@@ -3,6 +3,7 @@ package jadex.platform.service.globalservicepool.mandelbrot;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -253,7 +254,9 @@ public class DisplayAgent implements IDisplayService
 	 */
 	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid)
 	{
-		SubscriptionIntermediateFuture<Object> ret = new SubscriptionIntermediateFuture<Object>();
+//		SubscriptionIntermediateFuture<Object> ret = new SubscriptionIntermediateFuture<Object>();
+		final SubscriptionIntermediateFuture<Object>	ret	= (SubscriptionIntermediateFuture<Object>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+
 		subscribers.put(displayid, ret);
 		return ret;
 	}

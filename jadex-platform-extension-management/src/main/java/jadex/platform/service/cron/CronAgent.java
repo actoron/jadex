@@ -4,11 +4,13 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -165,8 +167,9 @@ public class CronAgent implements ICronService
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addJob(final CronJob<T> job)
 	{
-		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		
+//		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+		final SubscriptionIntermediateFuture<T>	ret	= (SubscriptionIntermediateFuture<T>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+
 		if(job.getFilter()==null || job.getCommand()==null)
 		{
 			ret.setException(new IllegalArgumentException("Job filter and command must not null: "+job));

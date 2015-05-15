@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
@@ -1518,7 +1519,9 @@ public class SecurityService implements ISecurityService
 	 */
 	public ISubscriptionIntermediateFuture<ChangeEvent<Object>> subscribeToEvents()
 	{
-		final SubscriptionIntermediateFuture<ChangeEvent<Object>> ret = new SubscriptionIntermediateFuture<ChangeEvent<Object>>();
+//		final SubscriptionIntermediateFuture<ChangeEvent<Object>> ret = new SubscriptionIntermediateFuture<ChangeEvent<Object>>();
+		final SubscriptionIntermediateFuture<ChangeEvent<Object>> ret	= (SubscriptionIntermediateFuture<ChangeEvent<Object>>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, component);
+
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			public void terminated(Exception reason)

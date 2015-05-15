@@ -6,6 +6,7 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -440,12 +441,13 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public ISubscriptionIntermediateFuture<ChatEvent>	subscribeToEvents()
 	{
+//		final SubscriptionIntermediateFuture<ChatEvent>	ret	= new SubscriptionIntermediateFuture<ChatEvent>();
+		final SubscriptionIntermediateFuture<ChatEvent>	ret	= (SubscriptionIntermediateFuture<ChatEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+
 		if(subscribers==null)
 		{
 			subscribers	= new LinkedHashSet<SubscriptionIntermediateFuture<ChatEvent>>();
 		}
-		
-		final SubscriptionIntermediateFuture<ChatEvent>	ret	= new SubscriptionIntermediateFuture<ChatEvent>();
 		subscribers.add(ret);
 		ret.setTerminationCommand(new TerminationCommand()
 		{

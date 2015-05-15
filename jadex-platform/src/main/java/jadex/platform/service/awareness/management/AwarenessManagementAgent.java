@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -534,11 +535,12 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	public ISubscriptionIntermediateFuture<DiscoveryInfo> subscribeToPlatformList(boolean include_initial)
 	{
+//		SubscriptionIntermediateDelegationFuture<DiscoveryInfo>	ret	= new SubscriptionIntermediateDelegationFuture<DiscoveryInfo>();
+		SubscriptionIntermediateDelegationFuture<DiscoveryInfo>	ret	= (SubscriptionIntermediateDelegationFuture<DiscoveryInfo>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, agent);
 		if(listeners==null)
 		{
 			listeners	= new LinkedHashSet<SubscriptionIntermediateDelegationFuture<DiscoveryInfo>>();
 		}
-		SubscriptionIntermediateDelegationFuture<DiscoveryInfo>	ret	= new SubscriptionIntermediateDelegationFuture<DiscoveryInfo>();
 		listeners.add(ret);
 		
 		if(include_initial)

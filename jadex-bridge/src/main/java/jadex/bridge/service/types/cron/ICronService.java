@@ -14,7 +14,7 @@ public interface ICronService
 	 *  Add a schedule job.
 	 *  @param job The cron job.
 	 */
-	@Timeout(Timeout.NONE)
+//	@Timeout(Timeout.NONE)
 	public <T> ISubscriptionIntermediateFuture<T> addJob(@CheckNotNull CronJob<T> job);
 	
 	/**
