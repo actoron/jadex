@@ -1,6 +1,5 @@
 package jadex.xml;
 
-import jadex.xml.stax.QName;
 
 /**
  *  Info object for subobjects, i.e. objects that are contained in another object.
@@ -100,7 +99,7 @@ public class SubobjectInfo extends AbstractInfo
 	 */
 	public SubobjectInfo(AccessInfo accessinfo, ISubObjectConverter converter, boolean multi, ObjectInfo objectinfo)
 	{
-		this(new XMLInfo(new QName[]{accessinfo.getXmlObjectName()}), accessinfo, converter, multi, objectinfo);
+		this(new XMLInfo(accessinfo.getXmlObjectNames()), accessinfo, converter, multi, objectinfo);
 	}
 	
 	/**
@@ -108,7 +107,7 @@ public class SubobjectInfo extends AbstractInfo
 	 */
 	public SubobjectInfo(AccessInfo accessinfo, ISubObjectConverter converter, boolean multi, ObjectInfo objectinfo, Boolean flattening)
 	{
-		this(new XMLInfo(new QName[]{accessinfo.getXmlObjectName()}), accessinfo, converter, multi, objectinfo, flattening);
+		this(new XMLInfo(accessinfo.getXmlObjectNames()), accessinfo, converter, multi, objectinfo, flattening);
 	}
 
 	

@@ -1,14 +1,18 @@
 package jadex.xml;
 
+import jadex.commons.Tuple;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.stax.QName;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -180,7 +184,7 @@ public class TypeInfo	extends AbstractInfo
 	 *  @param xmlname The xml name of the attribute.
 	 *  @return The attribute info.
 	 */
-	public Object getAttributeInfo(QName xmlname)
+	public Object getAttributeInfo(Object xmlname)
 	{
 		Object ret = attributeinfos==null? null: attributeinfos.get(xmlname);
 		if(ret==null && getSupertype()!=null)
@@ -399,24 +403,32 @@ public class TypeInfo	extends AbstractInfo
 	}
 	
 	/**
-	 *  Create the attribute info map (xml name -> attribute info).
+	 *  Create the attribute info map (xml name(s) -> attribute info).
 	 */
 	protected Map createAttributeInfos(AttributeInfo[] attributeinfos)
 	{
 		Map ret = new LinkedHashMap();
 		for(int i=0; i<attributeinfos.length; i++)
 		{
-			QName xmlname = attributeinfos[i].getXMLAttributeName();
-			if(xmlname==null)
+			QName[] xmlnames = attributeinfos[i].getXMLAttributeNames();
+			if(xmlnames!=null)
+			{
+				List<QName>	key	= new LinkedList<QName>();
+				for(int j=xmlnames.length-1; j>=0; j--)
+				{
+					key.add(0, xmlnames[j]);
+					ret.put(key.size()==1 ? key.get(0) : new Tuple(key.toArray()), attributeinfos[i]);
+				}
+			}
+			else
 			{
 				Object attrid = attributeinfos[i].getAttributeIdentifier();
 				if(attrid!=null)
 				{
-					xmlname = new QName(attrid.toString());
 //					System.out.println("Warning, no xml name for attribute:"+attrid);
+					ret.put(new QName(attrid.toString()), attributeinfos[i]);
 				}
 			}
-			ret.put(xmlname, attributeinfos[i]);
 		}
 		return ret;
 	}

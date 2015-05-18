@@ -28,7 +28,7 @@ public class AccessInfo
 	protected Object objectidentifier;
 
 	/** The xml object name. */
-	protected QName xmlobjectname;
+	protected QName[] xmlobjectnames;
 	
 	/** The default value read. */
 	protected Object defaultvalue;
@@ -81,8 +81,50 @@ public class AccessInfo
 	public AccessInfo(QName xmlobjectname, Object objectidentifier,
 		String ignore, Object defaultvalue, Object extrainfo)
 	{
-		this.xmlobjectname = xmlobjectname;
-		this.objectidentifier = objectidentifier!=null? objectidentifier: xmlobjectname!=null? xmlobjectname.getLocalPart(): null;
+		this(xmlobjectname!=null ? new QName[]{xmlobjectname} : null, objectidentifier, ignore, defaultvalue, extrainfo);
+	}
+	
+	/**
+	 *  Create a new access info.
+	 */
+	public AccessInfo(QName[] xmlobjectnames)
+	{
+		this(xmlobjectnames, null);
+	}
+	
+	/**
+	 *  Create a new access info.
+	 */
+	public AccessInfo(QName[] xmlobjectnames, Object objectidentifier)
+	{
+		this(xmlobjectnames, objectidentifier, null);
+	}
+	
+	/**
+	 *  Create a new access info.
+	 */
+	public AccessInfo(QName[] xmlobjectnames, Object objectidentifier, String ignore)
+	{
+		this(xmlobjectnames, objectidentifier, ignore, null);
+	}
+	
+	/**
+	 *  Create a new access info.
+	 */
+	public AccessInfo(QName[] xmlobjectnames, Object objectidentifier,
+		String ignore, Object defaultvalue)
+	{
+		this(xmlobjectnames, objectidentifier, ignore, defaultvalue, null);
+	}
+
+	/**
+	 *  Create a new access info.
+	 */
+	public AccessInfo(QName[] xmlobjectnames, Object objectidentifier,
+		String ignore, Object defaultvalue, Object extrainfo)
+	{
+		this.xmlobjectnames = xmlobjectnames;
+		this.objectidentifier = objectidentifier!=null? objectidentifier: xmlobjectnames!=null? xmlobjectnames[0].getLocalPart(): null;
 		this.ignore = ignore;
 		this.defaultvalue = defaultvalue;
 		this.extrainfo = extrainfo;
@@ -91,7 +133,7 @@ public class AccessInfo
 			throw new RuntimeException("Ignore must have one of predefined values: "+ignore);
 	
 		if(defaultvalue instanceof BeanAccessInfo)
-			throw new RuntimeException("here: "+xmlobjectname+" "+objectidentifier);
+			throw new RuntimeException("here: "+xmlobjectnames[0]+" "+objectidentifier);
 	}
 
 	/**
@@ -153,7 +195,16 @@ public class AccessInfo
 	 */
 	public QName getXmlObjectName()
 	{
-		return this.xmlobjectname;
+		return this.xmlobjectnames!=null ? xmlobjectnames[0] : null;
+	}
+
+	/**
+	 *  Get the xmlobjectnames.
+	 *  @return The xmlobjectnames.
+	 */
+	public QName[] getXmlObjectNames()
+	{
+		return this.xmlobjectnames;
 	}
 
 	/**

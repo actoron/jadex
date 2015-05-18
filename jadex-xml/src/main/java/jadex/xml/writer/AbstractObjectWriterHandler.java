@@ -1,7 +1,6 @@
 package jadex.xml.writer;
 
 import jadex.commons.SReflect;
-import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.annotations.IncludeFields;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
@@ -12,6 +11,7 @@ import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
+import jadex.xml.stax.QName;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -19,8 +19,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import jadex.xml.stax.QName;
 
 /**
  *  Abstract base class for an object writer handler. Is object type agnostic and
@@ -223,7 +221,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									// Do we want sometimes to write default values?
 									Object xmlattrname = null;
 									if(info instanceof AttributeInfo)
-										xmlattrname = ((AttributeInfo)info).getXMLAttributeName();
+										xmlattrname = ((AttributeInfo)info).getXMLAttributeNames()[0];	// hack!!!
 									if(xmlattrname==null)
 										xmlattrname = getPropertyName(property);
 									

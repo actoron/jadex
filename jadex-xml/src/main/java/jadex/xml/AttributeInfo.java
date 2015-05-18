@@ -85,12 +85,12 @@ public class AttributeInfo
 	}
 	
 	/**
-	 *  Get the attribut name.
-	 *  @return The attributename.
+	 *  Get the attribute name as path.
+	 *  @return The attribute names.
 	 */
-	public QName getXMLAttributeName()
+	public QName[] getXMLAttributeNames()
 	{
-		return accessinfo.getXmlObjectName();
+		return accessinfo.getXmlObjectNames();
 	}
 	
 	/**
