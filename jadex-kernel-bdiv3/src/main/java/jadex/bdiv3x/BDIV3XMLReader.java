@@ -311,7 +311,20 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //			}), null, new OAVObjectReaderHandler());
 //				
 //		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class),//, tepost), 
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				MBelief mbel = (MBelief)object;
+				mbel.setMulti(false);
+				return mbel;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		}),//, tepost), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, new SubobjectInfo[]{

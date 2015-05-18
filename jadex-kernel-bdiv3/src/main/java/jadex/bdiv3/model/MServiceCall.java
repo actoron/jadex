@@ -12,7 +12,7 @@ public class MServiceCall extends MProcessableElement
 	 *  Create a new service call.
 	 */
 //	public MServiceCall(String name, boolean posttoall, boolean randomselection, String excludemode, MethodInfo methodinfo)
-	public MServiceCall(String name, boolean posttoall, boolean randomselection, String excludemode)
+	public MServiceCall(String name, boolean posttoall, boolean randomselection, ExcludeMode excludemode)
 	{
 		super(name, posttoall, randomselection, excludemode);
 //		this.methodinfo = methodinfo;

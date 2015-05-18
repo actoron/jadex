@@ -306,24 +306,37 @@ public class MBelief extends MElement
 				Field f = ftarget.getField(cl);
 				ftype = f.getType();
 			}
-			else 
+			else if(mgetter!=null)
 			{
 				ftype = mgetter.getMethod(cl).getReturnType();
 			}
-			if(ftype.isArray() || SReflect.isSupertype(List.class, ftype) 
-				|| SReflect.isSupertype(Set.class, ftype)
-				|| SReflect.isSupertype(Map.class, ftype))
+			
+			if(ftype!=null)
 			{
-				multi = Boolean.TRUE;
-			}
-			else
-			{
-				multi = Boolean.FALSE;
+				if(ftype.isArray() || SReflect.isSupertype(List.class, ftype) 
+					|| SReflect.isSupertype(Set.class, ftype)
+					|| SReflect.isSupertype(Map.class, ftype))
+				{
+					multi = Boolean.TRUE;
+				}
+				else
+				{
+					multi = Boolean.FALSE;
+				}
 			}
 		}
 		return multi;
 	}
 	
+	/**
+	 *  The multi to set.
+	 *  @param multi The multi to set
+	 */
+	public void setMulti(boolean multi)
+	{
+		this.multi = multi? Boolean.TRUE: Boolean.FALSE;
+	}
+
 	/**
 	 *  Get the value of the belief.
 	 */

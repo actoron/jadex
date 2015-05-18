@@ -143,7 +143,7 @@ public abstract class Plan
 	 */
 	public IBeliefbase getBeliefbase()
 	{
-		throw new UnsupportedOperationException();
+		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getBeliefbase();
 	}
 
 	/**

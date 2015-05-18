@@ -1,21 +1,63 @@
 package jadex.bdiv3.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 
  */
 public class MProcessableElement extends MElement
 {
-	/** Never exclude plan candidates from apl. */
-	public static final String EXCLUDE_NEVER = "never";
-
-	/** Exclude tried plan candidates from apl. */ 
-	public static final String EXCLUDE_WHEN_TRIED = "when_tried";
+	public static Map<String, ExcludeMode> modes = new HashMap<String, ExcludeMode>();
 	
-	/** Exclude failed plan candidates from apl. */
-	public static final String EXCLUDE_WHEN_FAILED = "when_failed";
-
-	/** Exclude succeeded plan candidates from apl. */
-	public static final String EXCLUDE_WHEN_SUCCEEDED = "when_succeeded";
+	/** The message direction. */
+	public enum ExcludeMode
+	{
+		NEVER("never"),
+		WHEN_TRIED("when_tried"),
+		WHEN_FAILED("when_failed"),
+		WHEN_SUCCEEDED("when_succeeded");
+		
+		protected String str;
+		
+		/**
+		 *  Create a new direction
+		 */
+		ExcludeMode(String str)
+		{
+			this.str = str;
+			modes.put(str, this);
+		} 
+		
+		/**
+		 *  Get the string representation.
+		 *  @return The string representation.
+		 */
+		public String getString()
+		{
+			return str;
+		}
+		
+		/**
+		 * 
+		 */
+		public static ExcludeMode getDirection(String name)
+		{
+			return modes.get(name);
+		}
+	}
+	
+//	/** Never exclude plan candidates from apl. */
+//	public static final String EXCLUDE_NEVER = "never";
+//
+//	/** Exclude tried plan candidates from apl. */ 
+//	public static final String EXCLUDE_WHEN_TRIED = "when_tried";
+//	
+//	/** Exclude failed plan candidates from apl. */
+//	public static final String EXCLUDE_WHEN_FAILED = "when_failed";
+//
+//	/** Exclude succeeded plan candidates from apl. */
+//	public static final String EXCLUDE_WHEN_SUCCEEDED = "when_succeeded";
 
 	
 	/** Post to all flag. */
@@ -28,24 +70,26 @@ public class MProcessableElement extends MElement
 	protected boolean rebuild;
 
 	/** The exclude mode. */
-	protected String excludemode;
+	protected ExcludeMode excludemode;
 	
 	/**
 	 *	Bean Constructor. 
 	 */
 	public MProcessableElement()
 	{
+		// used by xml reader
+		this.excludemode = excludemode==null? ExcludeMode.WHEN_TRIED: excludemode;
 	}
 	
 	/**
 	 * 
 	 */
-	public MProcessableElement(String name, boolean posttoall, boolean randomselection, String excludemode)
+	public MProcessableElement(String name, boolean posttoall, boolean randomselection, ExcludeMode excludemode)
 	{
 		super(name);
 		this.posttoall = posttoall;
 		this.randomselection = randomselection;
-		this.excludemode = excludemode==null? EXCLUDE_WHEN_TRIED: excludemode;
+		this.excludemode = excludemode==null? ExcludeMode.WHEN_TRIED: excludemode;
 	}
 	
 	/**
@@ -106,7 +150,7 @@ public class MProcessableElement extends MElement
 	 *  Get the excludemode.
 	 *  @return The excludemode.
 	 */
-	public String getExcludeMode()
+	public ExcludeMode getExcludeMode()
 	{
 		return excludemode;
 	}
@@ -115,7 +159,7 @@ public class MProcessableElement extends MElement
 	 *  Set the excludemode.
 	 *  @param excludemode The excludemode to set.
 	 */
-	public void setExcludeMode(String excludemode)
+	public void setExcludeMode(ExcludeMode excludemode)
 	{
 		this.excludemode = excludemode;
 	}

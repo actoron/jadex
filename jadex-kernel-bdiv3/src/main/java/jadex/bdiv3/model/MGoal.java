@@ -40,19 +40,6 @@ public class MGoal extends MClassBasedElement
 	public static final String CONDITION_RECUR = "recur";
 
 	
-	/** Never exclude plan candidates from apl. */
-	public static final String EXCLUDE_NEVER = "never";
-
-	/** Exclude tried plan candidates from apl. */ 
-	public static final String EXCLUDE_WHEN_TRIED = "when_tried";
-	
-	/** Exclude failed plan candidates from apl. */
-	public static final String EXCLUDE_WHEN_FAILED = "when_failed";
-
-	/** Exclude succeeded plan candidates from apl. */
-	public static final String EXCLUDE_WHEN_SUCCEEDED = "when_succeeded";
-
-	
 	/** The retry flag. */
 	protected boolean retry;
 	
@@ -104,7 +91,7 @@ public class MGoal extends MClassBasedElement
 	/**
 	 *  Create a new goal model element.
 	 */
-	public MGoal(String name, String target, boolean posttoall, boolean randomselection, String excludemode,
+	public MGoal(String name, String target, boolean posttoall, boolean randomselection, ExcludeMode excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
 		boolean orsuccess, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
 		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings, List<ClassInfo> triggergoals)

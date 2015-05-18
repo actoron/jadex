@@ -19,7 +19,7 @@ public class EnglishGermanAddWordPlanC1 extends Plan
 	 */
 	public EnglishGermanAddWordPlanC1()
 	{
-		getLogger().info("Created:"+this);
+//		getLogger().info("Created:"+this);
 	}
 
 	//-------- methods --------

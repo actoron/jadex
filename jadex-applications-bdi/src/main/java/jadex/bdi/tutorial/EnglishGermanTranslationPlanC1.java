@@ -22,7 +22,7 @@ public class EnglishGermanTranslationPlanC1 extends Plan
 	 */
 	public EnglishGermanTranslationPlanC1()
 	{
-		getLogger().info("Created:"+this);
+//		getLogger().info("Created:"+this);
 	}
 
 	//-------- methods  --------

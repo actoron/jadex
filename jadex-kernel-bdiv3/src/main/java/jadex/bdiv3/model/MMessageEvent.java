@@ -67,6 +67,32 @@ public class MMessageEvent extends MProcessableElement
 	protected UnparsedExpression matchexp;
 	
 	/**
+	 *  Create a new message event.
+	 *  @param name
+	 *  @param posttoall
+	 *  @param randomselection
+	 *  @param excludemode
+	 *  @param type
+	 */
+	public MMessageEvent()
+	{
+		// bean constructor
+	}
+	
+//	/**
+//	 * @param name
+//	 * @param posttoall
+//	 * @param randomselection
+//	 * @param excludemode
+//	 * @param type
+//	 */
+//	public MMessageEvent(String name, boolean posttoall, boolean randomselection, String excludemode, MessageType type)
+//	{
+//		super(name, posttoall, randomselection, excludemode);
+//		this.type = type;
+//	}
+
+	/**
 	 *  Get the direction.
 	 *  @return The direction
 	 */

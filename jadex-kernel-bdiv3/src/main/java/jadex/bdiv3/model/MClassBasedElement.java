@@ -21,7 +21,7 @@ public class MClassBasedElement extends MProcessableElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MClassBasedElement(String name, String target, boolean posttoall, boolean randomselection, String excludemode)
+	public MClassBasedElement(String name, String target, boolean posttoall, boolean randomselection, ExcludeMode excludemode)
 	{
 		super(name, posttoall, randomselection, excludemode);
 		this.target = target;
