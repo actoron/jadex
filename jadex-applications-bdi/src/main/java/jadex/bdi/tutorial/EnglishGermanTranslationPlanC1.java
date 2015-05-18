@@ -32,7 +32,7 @@ public class EnglishGermanTranslationPlanC1 extends Plan
 	 */
 	public void body()
 	{
-		Map wordtable = (Map)getBeliefbase().getBelief("egwords").getFact();
+		Map<String, String> wordtable = (Map<String, String>)getBeliefbase().getBelief("egwords").getFact();
 		StringTokenizer stok = new StringTokenizer((String)((IMessageEvent)getReason())
 			.getParameter(SFipa.CONTENT).getValue(), " ");
 		if(stok.countTokens()==3)
@@ -57,16 +57,16 @@ public class EnglishGermanTranslationPlanC1 extends Plan
 		}
 	}
 
-	protected static Map dictionary;
+	protected static Map<String, String> dictionary;
 	/**
 	 *  Get the dictionary.
 	 *  @return The dictionary.
 	 */
-	public static Map getDictionary()
+	public static Map<String, String> getDictionary()
 	{
 		if(dictionary==null)
 		{
-			Map	m = new HashMap();
+			Map<String, String>	m = new HashMap<String, String>();
 			m.put("milk", "Milch");
 			m.put("cow", "Kuh");
 			m.put("cat", "Katze");

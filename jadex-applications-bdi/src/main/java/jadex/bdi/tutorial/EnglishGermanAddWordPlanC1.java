@@ -29,7 +29,7 @@ public class EnglishGermanAddWordPlanC1 extends Plan
 	 */
 	public void body()
 	{
-		Map wordtable = (Map)getBeliefbase().getBelief("egwords").getFact();
+		Map<String, String> wordtable = (Map<String, String>)getBeliefbase().getBelief("egwords").getFact();
 		StringTokenizer stok = new StringTokenizer((String)((IMessageEvent)getReason())
 			.getParameter(SFipa.CONTENT).getValue(), " ");
 		if(stok.countTokens()==4)

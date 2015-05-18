@@ -4,6 +4,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bridge.IInternalAccess;
 
 import java.util.Collection;
@@ -44,6 +45,12 @@ public class RCapability extends RElement
 	/** The plans by model element. */
 	protected Map<MPlan, Collection<RPlan>> mplans;
 
+	//-------- additional xml elements --------
+	
+	/** The beliefbase. */
+	protected RBeliefbase beliefbase;
+	
+	
 	//-------- constructors --------
 	
 	/**
@@ -331,6 +338,24 @@ public class RCapability extends RElement
 		}
 	}
 	
+	/**
+	 *  Get the beliefbase.
+	 *  @return The beliefbase
+	 */
+	public RBeliefbase getBeliefbase()
+	{
+		return beliefbase;
+	}
+	
+	/**
+	 *  The beliefbase to set.
+	 *  @param beliefbase The beliefbase to set
+	 */
+	public void setBeliefbase(RBeliefbase beliefbase)
+	{
+		this.beliefbase = beliefbase;
+	}
+
 	/**
 	 * 
 	 */

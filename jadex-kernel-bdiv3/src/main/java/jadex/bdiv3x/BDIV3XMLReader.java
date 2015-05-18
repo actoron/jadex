@@ -313,6 +313,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class),//, tepost), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
 			}), null));//, new OAVObjectReaderHandler()));	
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(OAVBDIMetaModel.beliefreference_type),
 //			null, null, new OAVObjectReaderHandler()));
@@ -442,11 +444,13 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new MappingInfo(null, null, null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "type"), new AttributeConverter(msgtypeconv, remsgtypeconv)),
 				new AttributeInfo(new AccessInfo("direction", "direction"), new AttributeConverter(dirconv, redirconv))},
-//				new SubobjectInfo[]{
-//					new SubobjectInfo(new AccessInfo(new QName(uri, "parameter"), )),	
+				new SubobjectInfo[]{
+					new SubobjectInfo(new XMLInfo(new QName(uri, "match")), new AccessInfo("match", "matchExpression")),
+//					new SubobjectInfo(new XMLInfo(new QName(uri, "parameter")), new AccessInfo("value", "defaultValue")),
+//					new SubobjectInfo(new AccessInfo(new QName(uri, "parameter"), new )),	
 //					new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), OAVBDIMetaModel.parameterelement_has_parametersets))	
-//				}),
-			null)));
+				}),
+			null));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageeventref")), new ObjectInfo(OAVBDIMetaModel.messageeventreference_type),
 //			null, null, new OAVObjectReaderHandler()));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "match")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
@@ -503,9 +507,12 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "parameter")), new ObjectInfo(MParameter.class), 
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-			new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv))
-			})));
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValue"))
+			}
+		)));
 		
 //		TypeInfo ti_paramset = new TypeInfo(new XMLInfo(new QName(uri, "parameterset")), new ObjectInfo(MParameter.class), 
 //			new MappingInfo(null, new AttributeInfo[]{
@@ -537,6 +544,17 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "fact")}), new ObjectInfo(UnparsedExpression.class, null),//new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null)));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "match")}), new ObjectInfo(UnparsedExpression.class, null),//new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null)));
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "values")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 //			new MappingInfo(ti_expression)));
 //

@@ -41,6 +41,7 @@ import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
+import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -151,12 +152,23 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	public IFuture<Void> init()
 	{
 		// cannot do this in constructor because it needs access to this feature in expressions
-		
+
+		initBeliefs();
 //		injectAgent(getComponent(), pojo, bdimodel, null);
 //		invokeInitCalls(pojo);
 //		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
 //		startBehavior();
 		return IFuture.DONE;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void initBeliefs()
+	{
+		RBeliefbase bb = new RBeliefbase(getComponent());
+		bb.init(bdimodel.getCapability());
+		getCapability().setBeliefbase(bb);
 	}
 	
 	//-------- internal method used for rewriting field access -------- 

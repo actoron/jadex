@@ -82,7 +82,7 @@ public class MParameter extends MElement
 	/** The type (if explicitly specified. */
 	protected ClassInfo clazz;
 	
-	/** The initial value. */
+	/** The default value. */
 	protected UnparsedExpression value;
 	
 	/**
@@ -371,7 +371,7 @@ public class MParameter extends MElement
 	 *  Get the value.
 	 *  @return The value
 	 */
-	public UnparsedExpression getValue()
+	public UnparsedExpression getDefaultValue()
 	{
 		return value;
 	}
@@ -380,7 +380,7 @@ public class MParameter extends MElement
 	 *  The value to set.
 	 *  @param value The value to set
 	 */
-	public void setValue(UnparsedExpression value)
+	public void setDefaultValue(UnparsedExpression value)
 	{
 		this.value = value;
 	}

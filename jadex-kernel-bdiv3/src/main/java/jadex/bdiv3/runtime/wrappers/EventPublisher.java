@@ -39,7 +39,7 @@ public class EventPublisher
 	protected MBelief mbel;
 
 	/**
-	 *  Create a new list wrapper.
+	 *  Create a new publisher.
 	 */
 	public EventPublisher(IInternalAccess agent, 
 		String addevent, String remevent, String changeevent, MBelief mbel)
@@ -48,7 +48,7 @@ public class EventPublisher
 	}
 	
 	/**
-	 *  Create a new list wrapper.
+	 *  Create a new publisher.
 	 */
 	public EventPublisher(IInternalAccess agent, 
 		EventType addevent, EventType remevent, EventType changeevent, MBelief mbel)

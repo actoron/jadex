@@ -20,11 +20,11 @@ public interface IBelief extends IElement
 	public Object	getFact();
 
 	/**
-	 *  Indicate that the fact of this belief was modified.
-	 *  Calling this method causes an internal fact changed
-	 *  event that might cause dependent actions.
-	 */
-	public void modified();
+//	 *  Indicate that the fact of this belief was modified.
+//	 *  Calling this method causes an internal fact changed
+//	 *  event that might cause dependent actions.
+//	 */
+//	public void modified();
 	
 	/**
 	 *  Get the value class.
@@ -40,16 +40,16 @@ public interface IBelief extends IElement
 	
 	//-------- listeners --------
 	
-	/**
-	 *  Add a belief listener.
-	 *  @param listener The belief listener.
-	 */
-	public <T> void addBeliefListener(IBeliefListener<T> listener);
-	
-	/**
-	 *  Remove a belief listener.
-	 *  @param listener The belief listener.
-	 */
-	public <T> void removeBeliefListener(IBeliefListener<T> listener);
+//	/**
+//	 *  Add a belief listener.
+//	 *  @param listener The belief listener.
+//	 */
+//	public <T> void addBeliefListener(IBeliefListener<T> listener);
+//	
+//	/**
+//	 *  Remove a belief listener.
+//	 *  @param listener The belief listener.
+//	 */
+//	public <T> void removeBeliefListener(IBeliefListener<T> listener);
 	
 }

@@ -2,7 +2,9 @@ package jadex.bdiv3.model;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -47,6 +49,14 @@ public class MBelief extends MElement
 	
 	/** The raw events. */
 	protected Collection<EventType> rawevents;
+
+	//-------- additional xml properties --------
+	
+	/** The default fact. */
+	protected UnparsedExpression fact;
+	
+	/** The type (if explicitly specified. */
+	protected ClassInfo clazz;
 	
 	/**
 	 *	Bean Constructor. 
@@ -232,6 +242,24 @@ public class MBelief extends MElement
 	public void setSetter(MethodInfo msetter)
 	{
 		this.msetter = msetter;
+	}
+	
+	/**
+	 *  Get the clazz.
+	 *  @return The clazz
+	 */
+	public ClassInfo getClazz()
+	{
+		return clazz;
+	}
+
+	/**
+	 *  The clazz to set.
+	 *  @param clazz The clazz to set
+	 */
+	public void setClazz(ClassInfo clazz)
+	{
+		this.clazz = clazz;
 	}
 	
 	/**
@@ -461,5 +489,23 @@ public class MBelief extends MElement
 	public void setRawEvents(Set<EventType> rawevents)
 	{
 		this.rawevents = rawevents;
+	}
+	
+	/**
+	 *  Get the value.
+	 *  @return The value
+	 */
+	public UnparsedExpression getDefaultFact()
+	{
+		return fact;
+	}
+
+	/**
+	 *  The value to set.
+	 *  @param value The value to set
+	 */
+	public void setDefaultFact(UnparsedExpression fact)
+	{
+		this.fact = fact;
 	}
 }

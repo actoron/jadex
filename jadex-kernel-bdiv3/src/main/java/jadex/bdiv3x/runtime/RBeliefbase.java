@@ -1,8 +1,19 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.RElement;
+import jadex.bdiv3.runtime.wrappers.EventPublisher;
+import jadex.bdiv3.runtime.wrappers.ListWrapper;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
+import jadex.javaparser.SJavaParser;
+import jadex.rules.eca.ChangeInfo;
+import jadex.rules.eca.Event;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,6 +21,9 @@ import java.util.Map;
  */
 public class RBeliefbase extends RElement implements IBeliefbase
 {
+	/** The internal access. */
+	protected IInternalAccess agent;
+	
 	/** The beliefs. */
 	protected Map<String, IBelief> beliefs;
 	
@@ -19,9 +33,10 @@ public class RBeliefbase extends RElement implements IBeliefbase
 	/**
 	 * 
 	 */
-	public RBeliefbase()
+	public RBeliefbase(IInternalAccess ia)
 	{
 		super(null);
+		this.agent = ia;
 	}
 	
 	/**
@@ -89,7 +104,50 @@ public class RBeliefbase extends RElement implements IBeliefbase
 	{
 		return beliefsets==null? SUtil.EMPTY_STRING_ARRAY: beliefsets.keySet().toArray(new String[beliefsets.size()]);
 	}
+	
+	/**
+	 * 
+	 */
+	public void init(MCapability mcapa)
+	{
+		List<MBelief> mbels = mcapa.getBeliefs();
+		if(mbels!=null)
+		{
+			for(MBelief mbel: mbels)
+			{
+				if(!mbel.isMulti(agent.getClassLoader()))
+				{
+					addBelief(new RBelief(mbel));
+				}
+				else
+				{
+					addBeliefSet(new RBeliefSet(mbel));
+				}
+				
+			}
+		}
+	}
 
+	/**
+	 * 
+	 */
+	public void addBelief(RBelief bel)
+	{
+		if(beliefs==null)
+			beliefs = new HashMap<String, IBelief>();
+		beliefs.put(bel.getName(), bel);
+	}
+	
+	/**
+	 * 
+	 */
+	public void addBeliefSet(RBeliefSet belset)
+	{
+		if(beliefsets==null)
+			beliefsets = new HashMap<String, IBeliefSet>();
+		beliefsets.put(belset.getName(), belset);
+	}
+	
 	/**
 	 *  Create a belief with given key and class.
 	 *  @param key The key identifying the belief.
@@ -168,4 +226,205 @@ public class RBeliefbase extends RElement implements IBeliefbase
 	 */
 //		public void deregisterBeliefSetReference(IMBeliefSetReference mbeliefsetref);
 
+	/**
+	 * 
+	 */
+	public class RBelief extends RElement implements IBelief
+	{
+		/** The value. */
+		protected Object value;
+		
+		/** The publisher. */
+		protected EventPublisher publisher;
+
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RBelief(MBelief modelelement)
+		{
+			super(modelelement);
+			String name = getModelElement().getName();
+			this.value = modelelement.getDefaultFact()==null? null: SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+			this.publisher = new EventPublisher(agent, ChangeEvent.FACTADDED+"."+name, 
+				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+		}
+
+		/**
+		 *  Get the name.
+		 *  @return The name
+		 */
+		public String getName()
+		{
+			return getModelElement().getName();
+		}
+		
+		/**
+		 *  Set a value of a parameter.
+		 *  @param value The new value.
+		 */
+		public void setFact(Object value)
+		{
+			publisher.unobserveValue(this.value);
+			publisher.getRuleSystem().addEvent(new Event(publisher.getChangeEvent(), new ChangeInfo<Object>(value, this.value, null)));
+			this.value = value;
+			publisher.observeValue(value);
+			publisher.publishToolBeliefEvent();
+		}
+
+		/**
+		 *  Get the value of a parameter.
+		 *  @return The value.
+		 */
+		public Object getFact()
+		{
+			return value;
+		}
+		
+		/**
+		 *  Get the value class.
+		 *  @return The valuec class.
+		 */
+		public Class<?>	getClazz()
+		{
+			return ((MBelief)getModelElement()).getType(agent.getClassLoader());
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public class RBeliefSet extends RElement implements IBeliefSet
+	{
+		/** The value. */
+		protected List<Object> facts;
+		
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RBeliefSet(MBelief modelelement)
+		{
+			super(modelelement);
+			String name = getModelElement().getName();
+			List<Object> tmpfacts = (List<Object>)(modelelement.getDefaultFact()==null? null: SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher()));
+			this.facts = new ListWrapper(tmpfacts, agent, ChangeEvent.FACTADDED+"."+name, 
+					ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+		}
+
+		/**
+		 *  Get the name.
+		 *  @return The name
+		 */
+		public String getName()
+		{
+			return getModelElement().getName();
+		}
+		
+		/**
+		 *  Add a fact to a belief.
+		 *  @param fact The new fact.
+		 */
+		public void addFact(Object fact)
+		{
+			facts.add(fact);
+		}
+
+		/**
+		 *  Remove a fact to a belief.
+		 *  @param fact The new fact.
+		 */
+		public void removeFact(Object fact)
+		{
+			facts.remove(fact);
+		}
+
+		/**
+		 *  Add facts to a parameter set.
+		 */
+		public void addFacts(Object[] facts)
+		{
+			if(facts!=null)
+			{
+				for(Object fact: facts)
+				{
+					addFact(fact);
+				}
+			}
+		}
+
+		/**
+		 *  Remove all facts from a belief.
+		 */
+		public void removeFacts()
+		{
+			if(facts!=null)
+				facts.clear();
+		}
+
+		/**
+		 *  Get a value equal to the given object.
+		 *  @param oldval The old value.
+		 */
+		public Object getFact(Object oldval)
+		{
+			Object ret = null;
+			if(facts!=null)
+			{
+				for(Object fact: facts)
+				{
+					if(SUtil.equals(fact, oldval))
+						ret = fact;
+				}
+			}
+			return ret;
+		}
+
+		/**
+		 *  Test if a fact is contained in a belief.
+		 *  @param fact The fact to test.
+		 *  @return True, if fact is contained.
+		 */
+		public boolean containsFact(Object fact)
+		{
+			return facts.contains(fact);
+		}
+
+		/**
+		 *  Get the facts of a beliefset.
+		 *  @return The facts.
+		 */
+		public Object[]	getFacts()
+		{
+			return facts==null? new Object[0]: facts.toArray(new Object[facts.size()]);
+		}
+
+		/**
+		 *  Update a fact to a new fact. Searches the old
+		 *  value with equals, removes it and stores the new fact.
+		 *  @param newfact The new fact.
+		 */
+//		public void updateFact(Object newfact);
+
+		/**
+		 *  Get the number of values currently
+		 *  contained in this set.
+		 *  @return The values count.
+		 */
+		public int size()
+		{
+			return facts==null? 0: facts.size();
+		}
+		
+		/**
+		 *  Get the value class.
+		 *  @return The valuec class.
+		 */
+		public Class<?>	getClazz()
+		{
+			return ((MBelief)getModelElement()).getType(agent.getClassLoader());
+		}
+	}
 }

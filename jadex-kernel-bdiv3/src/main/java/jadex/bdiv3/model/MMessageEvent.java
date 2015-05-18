@@ -191,7 +191,7 @@ public class MMessageEvent extends MProcessableElement
 				for(MParameter param: parameters)
 				{
 					if(param.getDirection().equals(jadex.bdiv3.model.MParameter.Direction.FIXED)
-						&& param.getValue()!=null)
+						&& param.getDefaultValue()!=null)
 //						&& (parametersets[i].getDefaultValuesExpression()!=null || parametersets[i].getDefaultValues().length>0))
 					{
 						degree++;

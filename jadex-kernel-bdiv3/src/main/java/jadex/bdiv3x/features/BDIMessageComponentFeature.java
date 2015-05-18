@@ -258,10 +258,10 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 		// Match against parameters specified in the event type.
 		for(MParameter param: msgevent.getParameters())
 		{
-			if(param.getDirection().equals(jadex.bdiv3.model.MParameter.Direction.FIXED) && param.getValue()!=null)
+			if(param.getDirection().equals(jadex.bdiv3.model.MParameter.Direction.FIXED) && param.getDefaultValue()!=null)
 			{
 				Object pvalue = msg.get(param.getName());
-				Object mvalue = SJavaParser.parseExpression(param.getValue(), getComponent().getModel().getAllImports(), 
+				Object mvalue = SJavaParser.parseExpression(param.getDefaultValue(), getComponent().getModel().getAllImports(), 
 					getComponent().getClassLoader()).getValue(getComponent().getFetcher());
 //				Object pvalue = RExpression.evaluateExpression(params[i].getDefaultValue(), scope.getExpressionParameters());
 //				Object mvalue = getValue(params[i].getName(), scope);
