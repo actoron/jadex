@@ -1,5 +1,7 @@
 package jadex.bdiv3.model;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,9 @@ public class MPlan extends MElement
 
 	/** The parameters. */
 	protected List<MParameter> parameters;
+		
+	/** The precondition. */
+	protected UnparsedExpression	precondition;
 		
 	/**
 	 *	Bean Constructor. 
@@ -172,5 +177,21 @@ public class MPlan extends MElement
 		if(parameters==null)
 			parameters = new ArrayList<MParameter>();
 		this.parameters.add(parameter);
+	}
+	
+	/**
+	 *  Get the precondition.
+	 */
+	public UnparsedExpression	getPrecondition()
+	{
+		return precondition;
+	}
+	
+	/**
+	 *  Set the precondition.
+	 */
+	public void	setPrecondition(UnparsedExpression precondition)
+	{
+		this.precondition	= precondition;
 	}
 }

@@ -365,8 +365,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("impl", "clazz"), new AttributeConverter(classconv, reclassconv))	// Todo: ignore on write?
 //			new AttributeInfo(new AccessInfo("impl", OAVBDIMetaModel.body_has_impl))
 			}, null)));//, bopost));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "precondition")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(ti_expression)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "precondition")), new ObjectInfo(UnparsedExpression.class, expost),
+			new MappingInfo(null, null, "value")));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
 //			new MappingInfo(ti_expression)));
 //			
