@@ -1,6 +1,6 @@
 package jadex.bdiv3.annotation;
 
-import jadex.bdiv3.model.MProcessableElement;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,28 +15,28 @@ import java.lang.annotation.Target;
 public @interface Goal
 {
 	/** The exclude mode. */
-	public enum ExcludeMode
-	{
-		Never(MProcessableElement.EXCLUDE_NEVER), 
-		WhenTried(MProcessableElement.EXCLUDE_WHEN_TRIED), 
-		WhenSucceeded(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED), 
-		WhenFailed(MProcessableElement.EXCLUDE_WHEN_FAILED);
-		
-		protected String str;
-		ExcludeMode(String str)
-		{
-			this.str = str;
-		}
-		
-		/**
-		 *  Get the string representation.
-		 *  @return The string representation.
-		 */
-		public String getString()
-		{
-			return str;
-		}
-	}
+//	public enum ExcludeMode
+//	{
+//		Never(MProcessableElement.EXCLUDE_NEVER), 
+//		WhenTried(MProcessableElement.EXCLUDE_WHEN_TRIED), 
+//		WhenSucceeded(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED), 
+//		WhenFailed(MProcessableElement.EXCLUDE_WHEN_FAILED);
+//		
+//		protected String str;
+//		ExcludeMode(String str)
+//		{
+//			this.str = str;
+//		}
+//		
+//		/**
+//		 *  Get the string representation.
+//		 *  @return The string representation.
+//		 */
+//		public String getString()
+//		{
+//			return str;
+//		}
+//	}
 	
 	/**
 	 *  The goal class.
@@ -63,7 +63,7 @@ public @interface Goal
 	 *  Default is to execute it after it has been tried without consideration
 	 *  of its success state.
 	 */
-	public ExcludeMode excludemode() default ExcludeMode.WhenTried;//MProcessableElement.EXCLUDE_WHEN_TRIED;
+	public ExcludeMode excludemode() default ExcludeMode.WHEN_TRIED;//MProcessableElement.EXCLUDE_WHEN_TRIED;
 	
 	/** 
 	 *  The retry flag. Is means-end reasoning allowed to select a new plan and execute it.

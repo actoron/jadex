@@ -10,6 +10,7 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3x.runtime.RMessageEvent;
@@ -591,24 +592,24 @@ public class APL
 	public void planFinished(IInternalPlan rplan)
 	{
 		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
-		String exclude = mpe.getExcludeMode();
+		ExcludeMode exclude = mpe.getExcludeMode();
 
 		// Do nothing is APL is always rebuilt or exclude is never
 		if(((MProcessableElement)element.getModelElement()).isRebuild()
-			|| MProcessableElement.EXCLUDE_NEVER.equals(exclude))
+			|| MProcessableElement.ExcludeMode.NEVER.equals(exclude))
 		{
 			return;
 		}
 
-		if(exclude.equals(MProcessableElement.EXCLUDE_WHEN_TRIED))
+		if(exclude.equals(MProcessableElement.ExcludeMode.WHEN_TRIED))
 		{
 			candidates.remove(rplan.getCandidate());
 		}
 		else
 		{
 //			PlanLifecycleState state = rplan.getLifecycleState();
-			if((rplan.isPassed() && exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED))
-				|| (rplan.isFailed() && exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
+			if((rplan.isPassed() && exclude.equals(MProcessableElement.ExcludeMode.WHEN_SUCCEEDED))
+				|| (rplan.isFailed() && exclude.equals(MProcessableElement.ExcludeMode.WHEN_FAILED)))
 			{
 //			if(state.equals(RPlan.PlanLifecycleState.PASSED)
 //				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)

@@ -852,7 +852,7 @@ public class BDIClassReader extends MicroClassReader
 			ret = bdimodel.getCapability().getService(m.toString());
 			if(ret==null)
 			{
-				ret = new MServiceCall(m.toString(), false, false, MProcessableElement.EXCLUDE_WHEN_TRIED);
+				ret = new MServiceCall(m.toString(), false, false, MProcessableElement.ExcludeMode.WHEN_TRIED);
 				bdimodel.getCapability().addservice(ret);
 			}
 		}
@@ -1091,7 +1091,7 @@ public class BDIClassReader extends MicroClassReader
 			}
 		}
 		
-		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode().getString(), 
+		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
 			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.orsuccess(), goal.unique(), mdel, params,
 			spmappings.size()>0? spmappings: null, srmappings.size()>0? srmappings: null, triggergoals);
 		
