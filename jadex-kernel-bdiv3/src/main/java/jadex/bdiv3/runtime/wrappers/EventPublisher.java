@@ -146,7 +146,7 @@ public class EventPublisher
 	 */
 	public void publishToolBeliefEvent()//String evtype)
 	{
-		((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).publishToolBeliefEvent(agent, mbel);//, evtype);
+		BDIAgentFeature.publishToolBeliefEvent(agent, mbel);//, evtype);
 	}
 
 	/**

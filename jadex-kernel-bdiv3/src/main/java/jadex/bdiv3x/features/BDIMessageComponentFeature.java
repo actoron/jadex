@@ -17,11 +17,18 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -106,7 +113,7 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 			List<MMessageEvent>	matched	= SCollection.createArrayList();
 			int	degree	= 0;
 
-			degree = matchMessageEvents(message.getParameterMap(), bdif.getBDIModel().getCapability().getMessageEvents(), matched, events, degree);
+			degree = matchMessageEvents(message.getParameterMap(), bdif.getBDIModel().getCapability().getMessageEvents(), matched, events, degree, message.getMessageType());
 			
 			// For messages without conversation all capabilities are considered.
 //			if(original==null)
@@ -208,7 +215,7 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 	/**
 	 *  Match message events with a message adapter.
 	 */
-	protected int matchMessageEvents(Map<String, Object> message, List<MMessageEvent> mevents, List<MMessageEvent> matched, List<MMessageEvent> events, int degree)
+	protected int matchMessageEvents(Map<String, Object> message, List<MMessageEvent> mevents, List<MMessageEvent> matched, List<MMessageEvent> events, int degree, MessageType mt)
 	{
 		for(MMessageEvent mevent: mevents)
 		{
@@ -218,7 +225,7 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 			{
 				if((dir.equals(Direction.RECEIVE)
 					|| dir.equals(Direction.SENDRECEIVE))
-					&& match(mevent, message))
+					&& match(mevent, message, mt))
 				{
 					matched.add(mevent);
 					if(mevent.getSpecializationDegree()>degree)
@@ -248,7 +255,7 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 	 *  @param msgevent The message event.
 	 *  @return True, if message matches the message event.
 	 */
-	public boolean match(MMessageEvent msgevent, Map<String, Object> msg)//, MessageType mt)
+	public boolean match(MMessageEvent msgevent, Map<String, Object> msg, MessageType mt)
 	{
 		boolean	match	= true;
 
@@ -308,12 +315,33 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 //				}
 //			}
 
-		// todo:
 		// Match against match expression.
-//		UnparsedExpression matchexp = msgevent.getMatchExpression();
-//		if(match && matchexp!=null)
-//		{
-//			NestedMap exparams = SCollection.createNestedMap(scope.getExpressionParameters());
+		UnparsedExpression matchexp = msgevent.getMatchExpression();
+		if(match && matchexp!=null)
+		{
+			Map<String, Object> exparams = new HashMap<String, Object>();
+			
+			List<String> names = new ArrayList<String>();
+			for(String name: mt.getParameterNames())
+				names.add(name);
+			for(String name: mt.getParameterSetNames())
+				names.add(name);
+			
+			for(String name: mt.getParameterNames())
+			{
+				try
+				{
+					Object pvalue = msg.get(name);
+					// Hack! converts "-" to "_" because variable names must not contain "-" in Java
+					String paramname = "$"+ SUtil.replace(name, "-", "_");
+					exparams.put(paramname, pvalue);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
 //			for(int i=0; i<params.length; i++)
 //			{
 //				try
@@ -342,18 +370,21 @@ public class BDIMessageComponentFeature extends MessageComponentFeature
 //					e.printStackTrace();
 //				}
 //			}
-//
-//			try
-//			{
-//				exparams.put("$messagemap", exparams.getLocalMap());
-//				match = ((Boolean)RExpression.evaluateExpression(matchexp, exparams)).booleanValue();
-//			}
-//			catch(Exception e)
-//			{
-//				e.printStackTrace();
-//				match = false;
-//			}
-//		}
+
+			try
+			{
+				exparams.put("$messagemap", msg);
+				IParsedExpression exp = SJavaParser.parseExpression(matchexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader());
+				SimpleValueFetcher fet = new SimpleValueFetcher(getComponent().getFetcher());
+				fet.setValues(exparams);
+				match = ((Boolean)exp.getValue(fet)).booleanValue();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				match = false;
+			}
+		}
 
 		return match;
 	}

@@ -35,6 +35,8 @@ public class MProcessableElement extends MElement
 	 */
 	public MProcessableElement()
 	{
+		// used by xml reader
+		this.excludemode = excludemode==null? EXCLUDE_WHEN_TRIED: excludemode;
 	}
 	
 	/**
