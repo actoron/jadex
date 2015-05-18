@@ -28,6 +28,11 @@ public class MCapability extends MElement
 	/** The configurations. */
 	protected List<MConfiguration> configurations;
 	
+	//-------- additional xml properties --------
+
+	/** The subcapabilities. */
+	protected List<MCapabilityReference>	subcapabilities;
+	
 	/**
 	 *	Bean Constructor. 
 	 */
@@ -399,4 +404,33 @@ public class MCapability extends MElement
 			services = new ArrayList<MServiceCall>();
 		services.add(ser);
 	}
+	
+	/**
+	 *  Get the sub capabilities.
+	 *  @return The sub capabilities.
+	 */
+	public List<MCapabilityReference> getCapabilities()
+	{
+		return subcapabilities==null? Collections.EMPTY_LIST: subcapabilities;
+	}
+
+	/**
+	 *  Set the sub capabilities.
+	 *  @param subcapabilities The sub capabilities to set.
+	 */
+	public void setCapabilities(List<MCapabilityReference> subcapabilities)
+	{
+		this.subcapabilities = subcapabilities;
+	}
+
+	/**
+	 *  Add a sub capability.
+	 */
+	public void addCapability(MCapabilityReference subcapability)
+	{
+		if(subcapabilities==null)
+			subcapabilities = new ArrayList<MCapabilityReference>();
+		subcapabilities.add(subcapability);
+	}
+
 }

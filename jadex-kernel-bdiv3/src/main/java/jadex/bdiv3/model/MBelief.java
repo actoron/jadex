@@ -58,6 +58,9 @@ public class MBelief extends MElement
 	/** The type (if explicitly specified. */
 	protected ClassInfo clazz;
 	
+	/** The exported flag. */
+	protected boolean exported;
+	
 	/**
 	 *	Bean Constructor. 
 	 */
@@ -206,6 +209,24 @@ public class MBelief extends MElement
 	public void setDynamic(boolean dynamic)
 	{
 		this.dynamic = dynamic;
+	}
+	
+	/**
+	 *  Get the exported flag.
+	 *  @return The exported flag.
+	 */
+	public boolean isExported()
+	{
+		return exported;
+	}
+
+	/**
+	 *  Set the exported flag.
+	 *  @param exported The exported to set.
+	 */
+	public void setExported(boolean exported)
+	{
+		this.exported = exported;
 	}
 	
 	/**

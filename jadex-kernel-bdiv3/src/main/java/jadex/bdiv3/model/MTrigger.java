@@ -14,7 +14,6 @@ public class MTrigger
 //	protected List<MInternalEvent> internalevents;
 	
 	protected List<MMessageEvent> messageevents;
-	protected List<String> messagenames;
 	
 	protected List<MGoal> goals;
 	
@@ -27,6 +26,16 @@ public class MTrigger
 	protected List<String> factchangeds;
 	
 	protected List<MServiceCall> services;
+	
+	//-------- additional xml properties --------
+	
+	// hack!!! required for two pass reading.
+	protected List<String> messagenames;
+	protected List<String> goalnames;
+	protected List<String> goalfinishednames;
+	
+	/** The trigger condition. */
+	protected MCondition	condition;
 	
 	/**
 	 *  Create a new trigger.
@@ -126,6 +135,42 @@ public class MTrigger
 		return messagenames;
 	}
 
+	/**
+	 *  Add a goal finished name.
+	 */
+	public void addGoalFinishedName(String event)
+	{
+		if(goalfinishednames==null)
+			this.goalfinishednames = new ArrayList<String>();
+		goalfinishednames.add(event);
+	}
+	
+	/**
+	 *  Get the goal finished events.
+	 */
+	public List<String> getGoalFinishedNames()
+	{
+		return goalfinishednames;
+	}
+
+	/**
+	 *  Add a goal name.
+	 */
+	public void addGoalName(String event)
+	{
+		if(goalnames==null)
+			this.goalnames = new ArrayList<String>();
+		goalnames.add(event);
+	}
+	
+	/**
+	 *  Get the goal events.
+	 */
+	public List<String> getGoalNames()
+	{
+		return goalnames;
+	}
+
 //	/**
 //	 *  Get the goal finished events.
 //	 */
@@ -204,5 +249,21 @@ public class MTrigger
 	public List<MServiceCall>	getServices()
 	{
 		return services==null? Collections.EMPTY_LIST: services;
+	}
+	
+	/**
+	 *  Get the condition.
+	 */
+	public MCondition getCondition()
+	{
+		return condition;
+	}
+	
+	/**
+	 *  Set the condition.
+	 */
+	public void setCondition(MCondition condition)
+	{
+		this.condition = condition;
 	}
 }
