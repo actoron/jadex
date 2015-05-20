@@ -18,7 +18,7 @@
 	package="jadex.bdi.tutorial">
 
 	<imports>
-<!--		<import>java.util.logging.*</import>-->
+		<import>java.util.logging.*</import>
 		<import>jadex.bridge.fipa.*</import>
 	</imports>
 

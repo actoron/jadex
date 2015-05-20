@@ -6,14 +6,9 @@ import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RPlan;
-import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.types.clock.ITimer;
-import jadex.commons.ICommand;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 import java.util.logging.Logger;
 

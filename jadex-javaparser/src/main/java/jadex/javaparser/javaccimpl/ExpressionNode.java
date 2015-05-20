@@ -242,7 +242,7 @@ public abstract class ExpressionNode	extends SimpleNode	implements IParsedExpres
 	 *  Get unbound parameter nodes.
 	 *  @return The unbound parameter nodes.
 	 */
-	protected ParameterNode[]	getUnboundParameterNodes()
+	public ParameterNode[]	getUnboundParameterNodes()
 	{
 		// Default: Return unbound parameters of subnodes.
 		ParameterNode[]	ret	= new ParameterNode[0];
