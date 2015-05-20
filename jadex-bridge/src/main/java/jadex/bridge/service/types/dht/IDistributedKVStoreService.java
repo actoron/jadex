@@ -1,12 +1,11 @@
 package jadex.bridge.service.types.dht;
 
-import java.util.Set;
-
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Exclude;
+
+import java.util.Set;
 
 /**
  * This Service provides Distributed Key-Value storage using the DHT-based Chord protocol. 
@@ -78,6 +77,14 @@ public interface IDistributedKVStoreService
 	 * 
 	 * @return Set of Keys.
 	 */
-	public Future<Set<String>> getLocalKeySet();
+	public IFuture<Set<String>> getLocalKeySet();
+
+	/**
+	 * Returns all entries that belong to the given node Id
+	 * and deletes them on this node.
+	 * @param targetNodeId
+	 * @return Set of all matching entries.
+	 */
+	public IFuture<Set<StoreEntry>> moveEntries(IID targetNodeId);
 	
 }

@@ -1,7 +1,6 @@
 package jadex.bridge.service.types.dht;
 
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 
 

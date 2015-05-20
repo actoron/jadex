@@ -322,16 +322,29 @@ public class DhtViewerPanel extends JPanel
 			setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
 			c.gridy = 0;
-			final JButton refresh = new JButton("Refresh");
+			
+			c.gridx = 0;
+			
+			final JButton refreshNodes = new JButton("Refresh Nodes");
+			
+			refreshNodes.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent ae)
+				{
+					startSearch();
+				}
+			});
+			add(refreshNodes, c);
+			
+			c.gridx = 1;
+			
+			final JButton refresh = new JButton("Refresh connections");
 			
 			refresh.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent ae)
 				{
-					refreshConnections().get();
-					buildGraph(g);
-					layout.reset();
-					vv.repaint();
+					refresh();
 				}
 			});
 			
@@ -572,6 +585,14 @@ public class DhtViewerPanel extends JPanel
 		}
 	}
 	
+	private void refresh()
+	{
+		refreshConnections().get();
+		buildGraph(g);
+		layout.reset();
+		vv.repaint();
+	}
+	
 	private void blink(IID result) {
 		if (g.containsVertex(result)) {
 			PickedState<IID> pickedVertexState = vv.getPickedVertexState();
@@ -663,7 +684,7 @@ public class DhtViewerPanel extends JPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final IComponentStep<Void> myStep = this;
-				System.out.println("proxy creator searching");
+				statusTf.setText("Looking up nodes...");
 				IRequiredServicesFeature componentFeature = access.getComponentFeature(IRequiredServicesFeature.class);
 				ITerminableIntermediateFuture<Object> requiredServices = componentFeature.getRequiredServices("ringnodes");
 				
@@ -722,11 +743,19 @@ public class DhtViewerPanel extends JPanel
 												IDistributedKVStoreService result) {
 											newProxyHolder.store = result;
 											proxies.put(other.getId().get(), newProxyHolder);
+											
+											buildGraph(g);
+											layout.reset();
+											vv.repaint();
 										}
 										
 										public void exceptionOccurred(Exception exception) {
 											super.exceptionOccurred(exception);
 											proxies.put(other.getId().get(), newProxyHolder);
+											
+											buildGraph(g);
+											layout.reset();
+											vv.repaint();
 										};
 									}, access));
 									
@@ -738,9 +767,8 @@ public class DhtViewerPanel extends JPanel
 					@Override
 					public void finished()
 					{
-						refreshConnections().get();
-						buildGraph(g);
-						vv.repaint();
+						statusTf.setText("Lookup finished.");
+						refresh();
 						access.getExternalAccess().scheduleStep(myStep, SEARCH_DELAY);
 						super.finished();
 					}
@@ -831,6 +859,9 @@ public class DhtViewerPanel extends JPanel
 	
 	
 	private IFuture<Void> refreshConnections() {
+		
+		statusTf.setText("Retrieving successors...");
+		
 		Future<Void> future = new Future<Void>();
 		
 		Set<Entry<IID, ProxyHolder>> entrySet = proxies.entrySet();
@@ -895,6 +926,15 @@ public class DhtViewerPanel extends JPanel
 				}
 			});
 		}
+		future.addResultListener(new DefaultResultListener<Void>()
+		{
+
+			@Override
+			public void resultAvailable(Void result)
+			{
+				statusTf.setText("Ready.");				
+			}
+		});
 		return future;
 	}
 	

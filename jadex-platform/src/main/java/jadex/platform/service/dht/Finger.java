@@ -95,6 +95,12 @@ public class Finger implements IFinger {
 		this.nodeId = other.getNodeId();
 		this.sid = other.getSid();
 	}
+	
+	@Override
+	protected Finger clone()
+	{
+		return new Finger(sid, start, nodeId);
+	}
 
 	@Override
 	public int hashCode() {

@@ -2,6 +2,7 @@ package jadex.bridge.service.types.dht;
 
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 
 /**
@@ -36,4 +37,11 @@ public interface IRingApplicationService
 	 */
 	@Timeout(TIMEOUT)
 	IFuture<IID> getId();
+
+	/**
+	 * Subscribes for RingNodeEvents.
+	 * @return subscription
+	 */
+	@Timeout(Timeout.NONE)
+	ISubscriptionIntermediateFuture<RingNodeEvent> subscribeForEvents();
 }

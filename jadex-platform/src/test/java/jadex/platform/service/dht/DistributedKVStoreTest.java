@@ -12,11 +12,13 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.dht.IDistributedKVStoreService;
 import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -34,14 +36,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-public class RingNodePlatformTest extends TestCase
+public class DistributedKVStoreTest extends TestCase
 {
 	@Rule 
 	public TestName name = new TestName();
 
-	private IRingNodeDebugService	rn1;
-	private IRingNodeDebugService	rn2;
-	private IRingNodeDebugService	rn3;
+	private IDistributedKVStoreService	store1;
+	private IDistributedKVStoreService	store2;
+	private IDistributedKVStoreService	store3;
+	
+	private IRingNodeDebugService	ring1;
+	private IRingNodeDebugService 	ring2;
+	private IRingNodeDebugService 	ring3;
 
 	private long	timeout;
 
@@ -88,9 +94,17 @@ public class RingNodePlatformTest extends TestCase
 //		rn1 = SServiceProvider
 //			.getService(platform1, IDebugRingNode.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
 		
-		rn1 = createRingAgent(platform1);
-		rn2 = createRingAgent(platform2);
-		rn3 = createRingAgent(platform3);
+		Tuple2<IDistributedKVStoreService, IRingNodeDebugService> t1 = createRingAgent(platform1);
+		store1 = t1.getFirstEntity();
+		ring1 = t1.getSecondEntity();
+		
+		Tuple2<IDistributedKVStoreService, IRingNodeDebugService> t2 = createRingAgent(platform2);
+		store2 = t2.getFirstEntity();
+		ring2 = t2.getSecondEntity();
+		
+		Tuple2<IDistributedKVStoreService, IRingNodeDebugService> t3 = createRingAgent(platform3);
+		store3 = t3.getFirstEntity();
+		ring3 = t3.getSecondEntity();
 		
 		createProxies(platform1, platform2, platform3);
 	}
@@ -106,12 +120,12 @@ public class RingNodePlatformTest extends TestCase
 		}
 	}
 
-	private IRingNodeDebugService createRingAgent(IExternalAccess platform)
+	private Tuple2<IDistributedKVStoreService, IRingNodeDebugService> createRingAgent(IExternalAccess platform)
 	{
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
 		
 		final Future<IComponentIdentifier> future = new Future<IComponentIdentifier>();
-		cms.createComponent(RingNodeAgent.class.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>()
+		cms.createComponent(DistributedKVStoreAgent.class.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>()
 		{
 			@Override
 			public void firstResultAvailable(IComponentIdentifier result)
@@ -136,91 +150,57 @@ public class RingNodePlatformTest extends TestCase
 //		IDebugRingNode declaredService = SServiceProvider.getDeclaredService(platform, IDebugRingNode.class).get();
 //		System.out.println(declaredService);
 		
-		IRingNodeDebugService iDebugRingNode = SServiceProvider.getService(platform, identifier, IRingNodeDebugService.class).get(timeout);
+		IDistributedKVStoreService storeService = SServiceProvider.getService(platform, identifier, IDistributedKVStoreService.class).get(timeout);
+		
+		IRingNodeDebugService iDebugRingNode = null; 
+		
+		IComponentIdentifier[] iComponentIdentifiers = cms.getChildren(identifier).get();
+		for(IComponentIdentifier cid : iComponentIdentifiers)
+		{
+			if (cid.getLocalName().equals("RingNode")) {
+				iDebugRingNode = SServiceProvider.getService(platform, cid, IRingNodeDebugService.class).get(timeout);		
+			}
+		}
+		
 		iDebugRingNode.disableSchedules();
-		return iDebugRingNode;
+		return new Tuple2<IDistributedKVStoreService, IRingNodeDebugService>(storeService, iDebugRingNode);
 	}
 	
 	@Test
-	public void testJoin() {
-		rn2.join(rn1).get();
-		stabilize2(new IRingNodeDebugService[]{rn1, rn2}).get();
-//		rn2.stabilize().get();
-//		rn1.stabilize().get();
-//		System.out.println(rn1.getFingerTableString().get());
-//		System.out.println(rn2.getFingerTableString().get());
-		assertCircle(rn1, rn2);
+	public void testSave() {
+		store1.storeLocal("test", "testValue");
+		assertEquals("testValue", store1.lookup("test").get());
 	}
 	
-	@Test
-	public void testJoin3() throws InterruptedException {
-		rn2.join(rn1).get();
-		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
-		rn3.join(rn1).get();
-		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
-//		System.out.println(rn1.getFingerTableString().get());
-		assertCircle(rn1, rn2, rn3);
-	}
+//	@Test
+//	public void testJoin() {
+//		store2.join(store1).get();
+//		stabilize2(new IRingNodeDebugService[]{store1, store2}).get();
+//	}
 	
-	@Test
-	public void testKillPlatform() {
-		rn2.join(rn1).get();
-		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
-		rn3.join(rn1).get();
-		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
-		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
-		
-//		System.out.println(rn1.getFingerTableString().get());
-//		System.out.println(rn2.getFingerTableString().get());
-		
-//		long timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
-//		System.out.println("timeout is: " + timeout2);
-		IID iid = rn3.getId().get();
-//		Finger.killedId = iid;
-		System.out.println("killing platform of node: " + iid);
-		platform3.killComponent().get();
-		
-		System.out.println("platform killed");
-		
-//		timeout2 = ServiceCall.getOrCreateNextInvocation().getTimeout();
-//		System.out.println("timeout is: " + timeout2);
-		stabilize(new IRingNodeDebugService[]{rn1, rn2}).get();
-//		stabilize(new IDebugRingNode[]{rn1, rn2});
-		
-		System.out.println(rn1.getFingerTableString().get());
-		System.out.println(rn2.getFingerTableString().get());
-
-		assertCircle(rn1, rn2);
-	}
+//	@Test
+//	public void testKillPlatform() {
+//		store2.join(store1).get();
+//		stabilize2(new IRingNodeDebugService[]{store1, store2, store3}).get();
+//		store3.join(store1).get();
+//		stabilize2(new IRingNodeDebugService[]{store1, store2, store3}).get();
+//		stabilize2(new IRingNodeDebugService[]{store1, store2, store3}).get();
+//		
+//		IID iid = store3.getId().get();
+//		System.out.println("killing platform of node: " + iid);
+//		platform3.killComponent().get();
+//		
+//		System.out.println("platform killed");
+//		
+//		stabilize(new IRingNodeDebugService[]{store1, store2}).get();
+//		
+//		System.out.println(store1.getFingerTableString().get());
+//		System.out.println(store2.getFingerTableString().get());
+//
+//		assertCircle(store1, store2);
+//	}
 	
 	
-	@Test
-	public void testFindSuccessor() throws InterruptedException {
-		rn2.join(rn1).get();
-		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
-		rn3.join(rn1).get();
-		stabilize2(new IRingNodeDebugService[]{rn1, rn2, rn3}).get();
-		
-//		System.out.println("RN1: " + rn1.getId().get());
-//		System.out.println("RN2: " + rn2.getId().get());
-//		System.out.println("RN3: " + rn3.getId().get());
-//		assertCircle(rn1, rn2, rn3);
-		
-		IFinger suc1_2 = rn1.findSuccessor(rn2.getId().get()).get();
-		IFinger suc1_3 = rn1.findSuccessor(rn3.getId().get()).get();
-		assertEquals(rn2.getId().get(), suc1_2.getNodeId());
-		assertEquals(rn3.getId().get(), suc1_3.getNodeId());
-		
-		IFinger suc2_1 = rn2.findSuccessor(rn1.getId().get()).get();
-		IFinger suc2_3 = rn2.findSuccessor(rn3.getId().get()).get();
-		assertEquals(rn1.getId().get(), suc2_1.getNodeId());
-		assertEquals(rn3.getId().get(), suc2_3.getNodeId());
-		
-		IFinger suc3_1 = rn3.findSuccessor(rn1.getId().get()).get();
-		IFinger suc3_2 = rn3.findSuccessor(rn2.getId().get()).get();
-		assertEquals(rn1.getId().get(), suc3_1.getNodeId());
-		assertEquals(rn2.getId().get(), suc3_2.getNodeId());
-	}
 	
 	// -----------------------------
 	// --------- HELPER ------------
