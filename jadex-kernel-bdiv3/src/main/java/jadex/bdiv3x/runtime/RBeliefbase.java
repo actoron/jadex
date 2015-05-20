@@ -9,6 +9,7 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
+import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
@@ -21,7 +22,7 @@ import java.util.Map;
 /**
  * 
  */
-public class RBeliefbase extends RElement implements IBeliefbase
+public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 {
 	/** The internal access. */
 	protected IInternalAccess agent;
@@ -148,6 +149,30 @@ public class RBeliefbase extends RElement implements IBeliefbase
 		if(beliefsets==null)
 			beliefsets = new HashMap<String, IBeliefSet>();
 		beliefsets.put(belset.getName(), belset);
+	}
+	
+	/**
+	 *  Get an object from the map.
+	 *  @param key The key
+	 *  @return The value.
+	 */
+	public Object get(Object key)
+	{
+		String name = (String)key;
+		Object ret = null;
+		if(containsBelief(name))
+		{
+			ret = getBelief(name).getFact();
+		}
+		else if(containsBeliefSet(name))
+		{
+			ret = getBeliefSet(name).getFacts();
+		}
+		else
+		{
+			throw new RuntimeException("Unknown belief/set: "+name);
+		}
+		return ret;
 	}
 	
 	/**

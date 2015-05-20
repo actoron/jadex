@@ -8,15 +8,15 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class ThankYouPlanC3 extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ThankYouPlanC3()
-	{
-		getLogger().info("Created:"+this);
-	}
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public ThankYouPlanC3()
+//	{
+//		getLogger().info("Created:"+this);
+//	}
 
 	//-------- methods --------
 
