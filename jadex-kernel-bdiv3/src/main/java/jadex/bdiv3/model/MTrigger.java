@@ -13,18 +13,25 @@ public class MTrigger
 {
 //	protected List<MInternalEvent> internalevents;
 	
+	/** The message events. */
 	protected List<MMessageEvent> messageevents;
 	
+	/** The goal types. */
 	protected List<MGoal> goals;
 	
+	/** The goal types of finished goals. */
 	protected List<MGoal> goalfinisheds;
 	
+	/** The belief names. */
 	protected List<String> factaddeds;
 	
+	/** The belief names. */
 	protected List<String> factremoveds;
 	
+	/** The belief names. */
 	protected List<String> factchangeds;
 	
+	/** The service types. */
 	protected List<MServiceCall> services;
 	
 	//-------- additional xml properties --------
@@ -35,7 +42,7 @@ public class MTrigger
 	protected List<String> goalfinishednames;
 	
 	/** The trigger condition. */
-	protected MCondition	condition;
+	protected MCondition condition;
 	
 	/**
 	 *  Create a new trigger.

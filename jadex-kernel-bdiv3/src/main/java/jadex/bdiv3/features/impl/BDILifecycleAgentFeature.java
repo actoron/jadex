@@ -47,6 +47,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.rules.eca.ChangeInfo;
@@ -1029,17 +1030,30 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				List<MGoal> gfs = trigger.getGoalFinisheds();
 				if(gfs!=null && gfs.size()>0)
 				{
-					Rule<Void> rule = new Rule<Void>("create_plan_goalfinished_"+mplan.getName(), new ICondition()
-					{
-						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-						{
-							return new Future<Tuple2<Boolean, Object>>(TRUE);
-						}
-					}, createplan);
+					Rule<Void> rule = new Rule<Void>("create_plan_goalfinished_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
 					for(MGoal gf: gfs)
 					{
 						rule.addEvent(new EventType(new String[]{ChangeEvent.GOALDROPPED, gf.getName()}));
 					}
+					rulesystem.getRulebase().addRule(rule);
+				}
+				
+				final MCondition mcond = trigger.getCondition();
+				if(mcond!=null)
+				{
+					Rule<Void> rule = new Rule<Void>("create_plan_condition_"+mplan.getName(), new ICondition()
+					{
+						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+						{
+							UnparsedExpression uexp = mcond.getExpression();
+							if(uexp.getParsed()==null)
+								SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
+							IParsedExpression exp = (IParsedExpression)uexp.getParsed();
+							Boolean ret = (Boolean)exp.getValue(component.getFetcher());
+							return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
+						}
+					}, createplan);
+//					rule.setEvents();
 					rulesystem.getRulebase().addRule(rule);
 				}
 			}

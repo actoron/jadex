@@ -466,17 +466,17 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			})));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "waitqueue")), new ObjectInfo(MTrigger.class, mtrpp),
-		new MappingInfo(null, 
-			new SubobjectInfo[]{
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), OAVBDIMetaModel.trigger_has_internalevents)),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName")),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "factadded"), OAVBDIMetaModel.trigger_has_factaddeds)),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "factremoved"), OAVBDIMetaModel.trigger_has_factremoveds)),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "factchanged"), OAVBDIMetaModel.trigger_has_factchangeds)),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "condition"), OAVBDIMetaModel.plantrigger_has_condition))
-		})));
+			new MappingInfo(null, 
+				new SubobjectInfo[]{
+	//			new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), OAVBDIMetaModel.trigger_has_internalevents)),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName")),
+	//			new SubobjectInfo(new AccessInfo(new QName(uri, "factadded"), OAVBDIMetaModel.trigger_has_factaddeds)),
+	//			new SubobjectInfo(new AccessInfo(new QName(uri, "factremoved"), OAVBDIMetaModel.trigger_has_factremoveds)),
+	//			new SubobjectInfo(new AccessInfo(new QName(uri, "factchanged"), OAVBDIMetaModel.trigger_has_factchangeds)),
+	//			new SubobjectInfo(new AccessInfo(new QName(uri, "condition"), OAVBDIMetaModel.plantrigger_has_condition))
+			})));
 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "messageevent")}), new ObjectInfo(refcr),
 			new MappingInfo(null, new AttributeInfo[]{

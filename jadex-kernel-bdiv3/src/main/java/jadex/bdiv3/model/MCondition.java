@@ -15,6 +15,8 @@ public class MCondition extends MElement
 //	protected Set<String> events;
 	protected List<EventType> events;
 	
+	//-------- pojo part --------
+	
 	/** The target method. */
 	protected MethodInfo mtarget;
 	
@@ -24,7 +26,7 @@ public class MCondition extends MElement
 	//-------- additional xml properties --------
 	
 	/** Expression. */
-	protected UnparsedExpression	expression;
+	protected UnparsedExpression expression;
 	
 	/**
 	 *	Bean Constructor. 
