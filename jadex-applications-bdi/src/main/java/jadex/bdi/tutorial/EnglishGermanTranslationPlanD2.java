@@ -1,7 +1,7 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdi.runtime.IExpression;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.IExpression;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 
@@ -36,6 +36,7 @@ public class EnglishGermanTranslationPlanD2 extends Plan
 	 */
 	public void body()
 	{
+		IExpression	query_word = getExpression("query_egword");
 		String	reply;
 		Object	cont;
 		StringTokenizer stok = new StringTokenizer(

@@ -1,5 +1,6 @@
 package jadex.bdi.tutorial;
 
+import jadex.bdiv3x.runtime.IExpression;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
@@ -12,34 +13,42 @@ import java.util.StringTokenizer;
  */
 public class EnglishGermanTranslationPlanF1 extends Plan
 {
-	//-------- attributes --------
-
-	/** Query the tuples for a word. */
-	protected IExpression	query_word;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public EnglishGermanTranslationPlanF1()
-	{
-		getLogger().info("Created:"+this);
-
-		// Create precompiled queries.
-		String	query	= "select one $wordpair.get(1) "
-			//+"from Tuple $wordpair in $beliefbase.egwords "
-			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"egwords\").getFacts() "
-			+"where $wordpair.get(0).equals($eword)";
-
-		this.query_word	= createExpression(query);
-	}
+//	//-------- attributes --------
+//
+//	/** Query the tuples for a word. */
+//	protected IExpression	query_word;
+//
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public EnglishGermanTranslationPlanF1()
+//	{
+//		getLogger().info("Created:"+this);
+//
+//		// Create precompiled queries.
+//		String	query	= "select one $wordpair.get(1) "
+//			//+"from Tuple $wordpair in $beliefbase.egwords "
+//			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"egwords\").getFacts() "
+//			+"where $wordpair.get(0).equals($eword)";
+//
+//		this.query_word	= createExpression(query);
+//	}
 
 	/**
 	 *  Do a plan step.
 	 */
 	public void body()
 	{
+		 
+		String	query	= "select one $wordpair.get(1) "
+		//+"from Tuple $wordpair in $beliefbase.egwords "
+		+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"egwords\").getFacts() "
+		+"where $wordpair.get(0).equals($eword)";
+
+		IExpression	query_word = createExpression(query);
+		
 		StringTokenizer stok = new StringTokenizer((String)((IMessageEvent)getReason())
 			.getParameter(SFipa.CONTENT).getValue(), " ");
 		if(stok.countTokens()==3)

@@ -4,6 +4,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
 import jadex.bridge.IInternalAccess;
@@ -194,4 +195,22 @@ public abstract class Plan
 			.getCapability().getExpressionbase().getExpression(name);
 	}
 	
+	/**
+	 *  Get an expression by name.
+	 *  @name The expression name.
+	 *  @return The expression.
+	 */
+	public IExpression createExpression(String exp)
+	{
+		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class))
+			.getCapability().getExpressionbase().createExpression(exp);
+	}
+	
+	/**
+	 *  Let the plan fail.
+	 */
+	public void fail()
+	{
+		throw new PlanFailureException();
+	}
 }

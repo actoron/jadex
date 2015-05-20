@@ -1,6 +1,6 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdi.runtime.IExpression;
+import jadex.bdiv3x.runtime.IExpression;
 import jadex.bdiv3x.runtime.Plan;
 
 
@@ -10,21 +10,21 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class EnglishGermanTranslationPlanE1 extends Plan
 {
-	//-------- attributes --------
-
-	/** Query the tuples for a word. */
-	protected IExpression	queryword;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public EnglishGermanTranslationPlanE1()
-	{
-		getLogger().info("Created: "+this);
-		this.queryword	= getExpression("query_egword");
-	}
+//	//-------- attributes --------
+//
+//	/** Query the tuples for a word. */
+//	protected IExpression	queryword;
+//
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public EnglishGermanTranslationPlanE1()
+//	{
+//		getLogger().info("Created: "+this);
+//		this.queryword	= getExpression("query_egword");
+//	}
 
 	//-------- methods --------
 
@@ -33,6 +33,7 @@ public class EnglishGermanTranslationPlanE1 extends Plan
 	 */
 	public void body()
 	{
+		IExpression	queryword = getExpression("query_egword");
 		String eword = (String)getParameter("word").getValue();
 		String gword = (String)queryword.execute("$eword", eword);
 		if(gword!=null)

@@ -1,5 +1,6 @@
 package jadex.bdi.tutorial;
 
+import jadex.bdiv3x.runtime.IExpression;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
@@ -12,48 +13,48 @@ import java.util.StringTokenizer;
  */
 public class FindEnglishSynonymsPlanD2 extends Plan
 {
-	//-------- attributes --------
-
-	/** Query the tuples for a word. */
-	protected IExpression	querytranslate;
-
-	/** Query to find synonyms. */
-	protected IExpression	queryfind;
-
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public FindEnglishSynonymsPlanD2()
-	{
-		getLogger().info("Created: "+this);
-
-		// Create precompiled queries.
-//		String	translate	= "select one $wordpair.get(1) "
-//			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
-//			+"where $wordpair.get(0).equals($eword)";
-		
-//		String	translate	= "select one $wordpair.get(1) "
-//			+"from Tuple $wordpair in $beliefbase.egwords "
-//			+"where $wordpair.get(0).equals($eword)";
-
+//	//-------- attributes --------
+//
+//	/** Query the tuples for a word. */
+//	protected IExpression	querytranslate;
+//
+//	/** Query to find synonyms. */
+//	protected IExpression	queryfind;
+//
+//
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public FindEnglishSynonymsPlanD2()
+//	{
+//		getLogger().info("Created: "+this);
+//
+//		// Create precompiled queries.
+////		String	translate	= "select one $wordpair.get(1) "
+////			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
+////			+"where $wordpair.get(0).equals($eword)";
+//		
+////		String	translate	= "select one $wordpair.get(1) "
+////			+"from Tuple $wordpair in $beliefbase.egwords "
+////			+"where $wordpair.get(0).equals($eword)";
+//
+////		String	find	= "select $wordpair.get(0) "
+////			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
+////			+"where $wordpair.get(1).equals($gword) && !$wordpair.get(0).equals($eword)";
+//		
 //		String	find	= "select $wordpair.get(0) "
-//			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
+//			+"from Tuple $wordpair in $beliefbase.egwords "
 //			+"where $wordpair.get(1).equals($gword) && !$wordpair.get(0).equals($eword)";
-		
-		String	find	= "select $wordpair.get(0) "
-			+"from Tuple $wordpair in $beliefbase.egwords "
-			+"where $wordpair.get(1).equals($gword) && !$wordpair.get(0).equals($eword)";
-
-//		this.querytranslate	= createExpression(translate, new String[]{"$eword"}, new Class[]{String.class});
-//		this.querytranslate	= getExpression("transcap.query_egword");
-		this.querytranslate	= getExpression("query_egword");
-		
-		this.queryfind	= createExpression(find, new String[]{"$gword", "$eword"}
-			, new Class[]{String.class, String.class});
-	}
+//
+////		this.querytranslate	= createExpression(translate, new String[]{"$eword"}, new Class[]{String.class});
+////		this.querytranslate	= getExpression("transcap.query_egword");
+//		this.querytranslate	= getExpression("query_egword");
+//		
+//		this.queryfind	= createExpression(find, new String[]{"$gword", "$eword"}
+//			, new Class[]{String.class, String.class});
+//	}
 
 	//-------- methods --------
 
@@ -62,6 +63,14 @@ public class FindEnglishSynonymsPlanD2 extends Plan
 	 */
 	public void body()
 	{
+		String	find	= "select $wordpair.get(0) "
+			+"from Tuple $wordpair in $beliefbase.egwords "
+			+"where $wordpair.get(1).equals($gword) && !$wordpair.get(0).equals($eword)";
+		
+		IExpression querytranslate = getExpression("query_egword");
+		IExpression	queryfind = createExpression(find);//, new String[]{"$gword", "$eword"}
+//		, new Class[]{String.class, String.class});
+		
 		IMessageEvent me = (IMessageEvent)getReason();
 		String reply, cont;
 		StringTokenizer stok = new StringTokenizer((String)me.getParameter(SFipa.CONTENT).getValue(), " ");

@@ -1,6 +1,6 @@
 package jadex.bdi.tutorial;
 
-import jadex.bdi.runtime.IExpression;
+import jadex.bdiv3x.runtime.IExpression;
 import jadex.bdiv3x.runtime.Plan;
 
 /**
@@ -9,21 +9,21 @@ import jadex.bdiv3x.runtime.Plan;
  */
 public class EnglishGermanTranslationPlanE2 extends Plan
 {
-	//-------- attributes --------
-
-	/** Query the tuples for a word. */
-	protected IExpression	queryword;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public EnglishGermanTranslationPlanE2()
-	{
-		getLogger().info("Created: "+this);
-		this.queryword	= getExpression("query_egword");
-	}
+//	//-------- attributes --------
+//
+//	/** Query the tuples for a word. */
+//	protected IExpression	queryword;
+//
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public EnglishGermanTranslationPlanE2()
+//	{
+//		getLogger().info("Created: "+this);
+//		this.queryword	= getExpression("query_egword");
+//	}
 
 	//-------- methods --------
 
@@ -31,7 +31,8 @@ public class EnglishGermanTranslationPlanE2 extends Plan
 	 *  The plan body.
 	 */
 	public void body()
-	{
+	{ 
+		IExpression	queryword = getExpression("query_egword");
 		if(!"english_german".equals(getParameter("direction").getValue()))
 		{
 			getLogger().warning("Cannot translate direction: "+getParameter("direction").getValue());

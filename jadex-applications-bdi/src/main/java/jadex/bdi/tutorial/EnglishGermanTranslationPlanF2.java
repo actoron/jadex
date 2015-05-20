@@ -16,7 +16,7 @@ public class EnglishGermanTranslationPlanF2 extends Plan
 	//-------- attributes --------
 
 	/** The wordtable. */
-	protected Map wordtable;
+	protected Map<String, String> wordtable;
 
 	//-------- constructors --------
 
@@ -27,7 +27,7 @@ public class EnglishGermanTranslationPlanF2 extends Plan
 	{
 		getLogger().info("Created: "+this);
 
-		this.wordtable = new HashMap();
+		this.wordtable = new HashMap<String, String>();
 		this.wordtable.put("coffee", "Kaffee");
 		this.wordtable.put("milk", "Milch");
 		this.wordtable.put("cow", "Kuh");

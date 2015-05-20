@@ -1,5 +1,6 @@
 package jadex.bdi.tutorial;
 
+import jadex.bdiv3x.runtime.IExpression;
 import jadex.bdiv3x.runtime.Plan;
 
 import java.io.BufferedReader;
@@ -15,29 +16,30 @@ import java.net.Socket;
  */
 public class EnglishGermanTranslationPlanG1 extends Plan
 {
-	//-------- attributes --------
-
-	/** Query the tuples for a word. */
-	protected IExpression	queryword;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public EnglishGermanTranslationPlanG1()
-	{
-		getLogger().info("Created:"+this);
-		this.queryword	= getExpression("query_egword");
-	}
-
-	//-------- methods --------
+//	//-------- attributes --------
+//
+//	/** Query the tuples for a word. */
+//	protected IExpression	queryword;
+//
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public EnglishGermanTranslationPlanG1()
+//	{
+//		getLogger().info("Created:"+this);
+//		this.queryword	= getExpression("query_egword");
+//	}
+//
+//	-------- methods --------
 
 	/**
 	 *  The plan body.
 	 */
 	public void body()
 	{
+		IExpression	queryword = getExpression("query_egword");
 		Socket client = (Socket)getParameter("client").getValue();
 
 		try
