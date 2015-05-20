@@ -1053,7 +1053,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							return new Future<Tuple2<Boolean, Object>>(ret!=null && ret.booleanValue()? TRUE: FALSE);
 						}
 					}, createplan);
-//					rule.setEvents();
+					rule.setEvents(mcond.getEvents());
 					rulesystem.getRulebase().addRule(rule);
 				}
 			}
