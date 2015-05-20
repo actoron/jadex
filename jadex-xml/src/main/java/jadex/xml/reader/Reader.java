@@ -1,6 +1,7 @@
 package jadex.xml.reader;
 
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IPostProcessor;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -411,11 +413,11 @@ public class Reader extends AReader
 					}
 					if(atcnt>0)
 					{
-						List	attrpath	= null;
+						List<QName>	attrpath	= null;
 						// If no type use last element from stack to map attributes.
 						if(object==null)	
 						{
-							attrpath = new ArrayList();
+							attrpath = new ArrayList<QName>();
 							attrpath.add(readcontext.getTopStackElement().getTag());
 							for(int i=readcontext.getStackSize()-2; i>=0 && object==null; i--)
 							{
@@ -443,6 +445,19 @@ public class Reader extends AReader
 									attrs.remove(attrname);
 									
 									Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
+									
+									// Try finding attr info by path.
+									if(attrinfo==null && typeinfo!=null && attrpath!=null)
+									{
+										List<QName>	key	= new LinkedList<QName>();
+										key.add(attrname);
+										for(int j=0; attrinfo==null && j<attrpath.size(); j++)
+										{
+											key.add(0, attrpath.get(j));
+											attrinfo	= typeinfo.getAttributeInfo(new Tuple(key.toArray()));
+										}
+									}
+									
 									if(!(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).isIgnoreRead()))
 									{
 			//							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
@@ -461,11 +476,14 @@ public class Reader extends AReader
 							// Handle unset attributes (possibly have default value).
 							for(Iterator it=attrs.iterator(); it.hasNext(); )
 							{
-								QName attrname = (QName) it.next();
-								Object attrinfo = typeinfo.getAttributeInfo(attrname);
-								
-								// Hack. want to read attribute info here
-								handler.handleAttributeValue(object, attrname, attrpath, null, attrinfo, readcontext);
+								Object key = it.next();
+								if(key instanceof QName)	// ignore path entries of same attributes.
+								{
+									Object attrinfo = typeinfo.getAttributeInfo(key);
+									
+									// Hack. want to read attribute info here
+									handler.handleAttributeValue(object, (QName)key , attrpath, null, attrinfo, readcontext);
+								}
 							}
 						}
 						else

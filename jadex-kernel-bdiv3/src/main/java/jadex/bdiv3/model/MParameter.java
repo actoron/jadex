@@ -85,6 +85,9 @@ public class MParameter extends MElement
 	/** The default value. */
 	protected UnparsedExpression value;
 	
+	/** The optional flag. */
+	protected boolean	optional; 
+	
 	/**
 	 *	Bean Constructor. 
 	 */
@@ -383,5 +386,23 @@ public class MParameter extends MElement
 	public void setDefaultValue(UnparsedExpression value)
 	{
 		this.value = value;
+	}
+	
+	/**
+	 *  Get the optional flag.
+	 *  @return The otpional flag
+	 */
+	public boolean isOptional()
+	{
+		return optional;
+	}
+
+	/**
+	 *  Set the optional flag.
+	 *  @param optional The value to set
+	 */
+	public void setOptional(boolean optional)
+	{
+		this.optional = optional;
 	}
 }
