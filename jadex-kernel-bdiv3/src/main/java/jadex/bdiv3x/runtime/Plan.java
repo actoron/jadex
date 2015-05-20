@@ -8,8 +8,11 @@ import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -199,6 +202,16 @@ public abstract class Plan
 	{
 		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class))
 			.getCapability().getExpressionbase().createExpression(exp);
+	}
+	
+	/**
+	 *  Send a message after some delay.
+	 *  @param me	The message event.
+	 *  @return The filter to wait for an answer.
+	 */
+	public IFuture<Void> sendMessage(IMessageEvent me)
+	{	
+		return agent.getComponentFeature(IMessageFeature.class).sendMessage((Map<String, Object>)me.getMessage(), me.getMessageType());
 	}
 	
 	/**

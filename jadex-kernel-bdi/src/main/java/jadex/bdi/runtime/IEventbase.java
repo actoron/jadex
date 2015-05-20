@@ -17,7 +17,7 @@ public interface IEventbase extends IElement
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public IFuture	sendMessage(IMessageEvent me);
+	public IFuture<Void> sendMessage(IMessageEvent me);
 
 	/**
 	 *  Dispatch an event.
