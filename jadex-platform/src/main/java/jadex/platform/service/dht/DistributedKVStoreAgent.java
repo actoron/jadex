@@ -5,7 +5,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
 import jadex.bridge.service.types.dht.IRingApplicationService;
-import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentService;

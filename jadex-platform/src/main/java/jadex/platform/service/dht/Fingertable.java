@@ -3,9 +3,6 @@ package jadex.platform.service.dht;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -16,15 +13,27 @@ import jadex.commons.future.IFuture;
  * >= startID of the entry.
  */
 public class Fingertable {
-	/** Finger entry of the local RingNode **/
-	protected IFinger selfFinger;
-	/** All other fingers **/
-	protected Finger[] fingers;
-	/** Predecessor of the local RingNode **/
-	protected IFinger predecessor;
-	/** The local ringnode **/
-	protected RingNodeService local;
 
+	/** Finger entry of the local RingNode **/
+	private Finger selfFinger;
+	/** All other fingers **/
+	private Finger[] fingers;
+	/** Predecessor of the local RingNode **/
+	private IFinger predecessor;
+	/** The local ringnode **/
+	
+	private FingerTableListener listener;
+	
+	/**
+	 * Receives events regarding changes in the fingertable. 
+	 */
+	public interface FingerTableListener
+	{
+		public void fingerChanged(int index, IFinger oldFinger, IFinger newFinger);
+		public void successorChanged(IFinger oldFinger, IFinger newFinger);
+		public void predecessorChanged(IFinger oldFinger, IFinger newFinger);
+	}
+	
 	/**
 	 * Constructor.
 	 * 
@@ -35,8 +44,7 @@ public class Fingertable {
 	 * @param local
 	 *            the Local RingNode
 	 */
-	public Fingertable(IServiceIdentifier selfSid, IID selfId, RingNodeService local) {
-		this.local = local;
+	public Fingertable(IServiceIdentifier selfSid, IID selfId, FingerTableListener listener) {
 		selfFinger = new Finger(selfSid, null, selfId);
 		// use n finger entries, where n is the key/hash length.
 		this.fingers = new Finger[selfId.getLength()];
@@ -44,8 +52,17 @@ public class Fingertable {
 		for (int i = 0; i < fingers.length; i++) {
 			fingers[i] = new Finger(selfSid, selfId.addPowerOfTwo(i), selfId);
 		}
+		this.listener = listener;
 	}
-
+	
+	/**
+	 * Sets the listener for this fingertable.
+	 * @param listener
+	 */
+//	public void setListener(FingerTableListener listener) {
+//		this.listener = listener;
+//	}
+	
 	/**
 	 * Return the local finger entry.
 	 * 
@@ -60,8 +77,8 @@ public class Fingertable {
 	 * 
 	 * @return {@link IFinger}
 	 */
-	public IFinger getSuccessor() {
-		IFinger result = fingers[0].getSid() == null ? selfFinger : fingers[0];
+	public Finger getSuccessor() {
+		Finger result = fingers[0].getSid() == null ? selfFinger : fingers[0];
 		return result;
 	}
 
@@ -72,7 +89,29 @@ public class Fingertable {
 	 *            new successor.
 	 */
 	public void setSuccessor(IFinger node) {
-		fingers[0].set(node);
+		Finger oldSuccessor = getSuccessor().clone();
+		getSuccessor().set(node);
+//		if (listener != null) {
+			listener.successorChanged(oldSuccessor, node);
+//		}
+	}
+	
+	/**
+	 * Return the finger at the given index.
+	 * @param i index
+	 * @return {@link Finger}
+	 */
+	public Finger getFinger(int i)
+	{
+		return fingers[i];
+	}
+	
+	/**
+	 * Return all fingers.
+	 * @return Array of Fingers
+	 */
+	public Finger[] getFingers() {
+		return fingers;
 	}
 
 	/**
@@ -124,7 +163,11 @@ public class Fingertable {
 	 *            The new predecessor.
 	 */
 	public void setPredecessor(IFinger predecessor) {
+		IFinger oldFinger = this.predecessor;
 		this.predecessor = predecessor;
+//		if (listener != null) {
+			listener.predecessorChanged(oldFinger, predecessor);
+//		}
 	}
 
 	// public void init(IRingNode nDash)
@@ -145,32 +188,6 @@ public class Fingertable {
 	// }
 
 	/**
-	 * Run the fixfingers algorithm. This implementation iterates over all
-	 * fingers and checks if there is a better candidate.
-	 * 
-	 * @return
-	 */
-	public IFuture<Void> fixFingers() {
-		Future<Void> future = new Future<Void>();
-		int idLength = selfFinger.getNodeId().getLength();
-		final CounterResultListener<Void> counter = new CounterResultListener<Void>(
-				idLength, new DelegationResultListener<Void>(future));
-		for (int i = 0; i < idLength; i++) {
-			final Finger finger = fingers[i];
-			local.findSuccessor(finger.getStart()).addResultListener(
-					new DefaultResultListener<IFinger>() {
-
-						@Override
-						public void resultAvailable(IFinger result) {
-							finger.set(result);
-							counter.resultAvailable(null);
-						}
-					});
-		}
-		return future;
-	}
-
-	/**
 	 * Marks a finger entry as invalid by setting its node entry to the local
 	 * node.
 	 * 
@@ -179,8 +196,12 @@ public class Fingertable {
 	public void setInvalid(IFinger rn) {
 		for (int i = 0; i < fingers.length; i++) {
 			if (rn.equals(fingers[i])) {
-				fingers[i].set(selfFinger);
 				log("resetting finger " + i + " to " + selfFinger);
+				Finger oldFinger = fingers[i].clone();
+				fingers[i].set(selfFinger);
+//				if (listener != null) {
+					listener.fingerChanged(i, oldFinger, selfFinger);
+//				}
 				// } else {
 				// if (rn.getNodeId().equals(fingers[i].getNodeId())) {
 				// System.out.println("should have been replaced: " + i);
@@ -190,7 +211,7 @@ public class Fingertable {
 
 		if (rn.equals(predecessor)) {
 			log("Resetting predecessor");
-			predecessor = selfFinger;
+			setPredecessor(selfFinger);
 		}
 	}
 
@@ -199,7 +220,7 @@ public class Fingertable {
 	private void log(String message) {
 		System.out.println(selfFinger.getNodeId() + ": " + message);
 	}
-
+	
 	@Override
 	public String toString() {
 		String str = new String();

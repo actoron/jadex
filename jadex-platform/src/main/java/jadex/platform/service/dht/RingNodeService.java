@@ -10,10 +10,11 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
+import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IRingNodeService;
+import jadex.bridge.service.types.dht.RingNodeEvent;
 import jadex.commons.DebugException;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -21,8 +22,12 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
+import jadex.platform.service.dht.Fingertable.FingerTableListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +54,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	/** Delay in ms to wait before retrying any remote calls **/
 	protected static final long	RETRY_OTHER_DELAY	= 5000;
 
+
 	/** State of this ring node. **/
 	private State				state				= State.UNJOINED;
 
@@ -71,12 +77,16 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	/** The logger. **/
 	protected Logger			logger;
 
+	/** Event subscriptions. **/
+	protected List<SubscriptionIntermediateFuture<RingNodeEvent>> subscriptions;
+	
 	/**
 	 * Constructor.
 	 */
 	public RingNodeService()
 	{
 		logger = Logger.getLogger(this.getClass().getName());
+		subscriptions = new ArrayList<SubscriptionIntermediateFuture<RingNodeEvent>>();
 	}
 	
 	@ServiceStart
@@ -150,7 +160,27 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	{
 		this.myId = id;
 		IRingNodeService me = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IRingNodeService.class);
-		fingertable = new Fingertable(((IService)me).getServiceIdentifier(), myId, this);
+		fingertable = new Fingertable(((IService)me).getServiceIdentifier(), myId, new FingerTableListener()
+		{
+			
+			@Override
+			public void successorChanged(IFinger oldFinger, IFinger newFinger)
+			{
+				notifySubscribers(RingNodeEvent.successorChange(myId, oldFinger, newFinger));
+			}
+			
+			@Override
+			public void predecessorChanged(IFinger oldFinger, IFinger newFinger)
+			{
+				notifySubscribers(RingNodeEvent.predecessorChange(myId, oldFinger, newFinger));
+			}
+			
+			@Override
+			public void fingerChanged(int index, IFinger oldFinger, IFinger newFinger)
+			{
+				notifySubscribers(RingNodeEvent.fingerChange(myId, index, oldFinger, newFinger));
+			}
+		});
 	}
 
 	/**
@@ -435,14 +465,46 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	private void setState(State state)
 	{
 		if (state == State.JOINED) {
+			notifySubscribers(RingNodeEvent.join(myId, fingertable.getSuccessor()));
 			agent.getExternalAccess().scheduleStep(fixStep, FIX_DELAY);
 			agent.getExternalAccess().scheduleStep(stabilizeStep, STABILIZE_DELAY);
 		} else {
+			notifySubscribers(RingNodeEvent.part(myId, fingertable.getSuccessor()));
 			// reschedule search
 			log("State set to unjoined, initiating search");
 			agent.getExternalAccess().scheduleStep(searchStep, RETRY_SEARCH_DELAY);
 		}
 		this.state = state;
+	}
+	
+	/**
+	 * Subscribes for RingNodeEvents.
+	 * @return subscription
+	 */
+	public ISubscriptionIntermediateFuture<RingNodeEvent> subscribeForEvents() {
+		final SubscriptionIntermediateFuture<RingNodeEvent> sub = new SubscriptionIntermediateFuture<RingNodeEvent>();
+		TerminationCommand terminate = new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				subscriptions.remove(sub);
+			}
+		};
+		sub.setTerminationCommand(terminate);
+		this.subscriptions.add(sub);
+		return sub;
+	}
+	
+	/**
+	 * Notify all subscribers about events.
+	 * @param e
+	 */
+	protected void notifySubscribers(RingNodeEvent e) {
+//		System.out.println(e);
+		for(SubscriptionIntermediateFuture<RingNodeEvent> sub : subscriptions)
+		{
+			sub.addIntermediateResult(e);
+		}
 	}
 	
 	/**
@@ -585,7 +647,6 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				// TODO Auto-generated method stub
 				return null;
 			}
 		};
@@ -596,7 +657,6 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				// TODO Auto-generated method stub
 				return null;
 			}
 		};
@@ -612,10 +672,35 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	}
 
 	/**
-	 * Execute a fixfingers run.
+	 * Run the fixfingers algorithm. This implementation iterates over all
+	 * fingers and checks if there is a better candidate.
+	 * 
+	 * @return void
 	 */
-	public IFuture<Void> fixFingers() {
-		return fingertable.fixFingers();
+	public IFuture<Void> fixFingers()
+	{
+		Future<Void> future = new Future<Void>();
+		Finger[] fingers = fingertable.getFingers();
+		final CounterResultListener<Void> counter = new CounterResultListener<Void>(fingers.length, new DelegationResultListener<Void>(future));
+		for(int i = 0; i < fingers.length; i++)
+		{
+			final Finger finger = fingers[i];
+			final int index = i;
+			findSuccessor(finger.getStart()).addResultListener(new DefaultResultListener<IFinger>()
+			{
+				public void resultAvailable(IFinger result)
+				{
+					if (!result.getNodeId().equals(finger.getNodeId())) {
+						Finger oldFinger = finger.clone();
+						finger.set(result);
+						notifySubscribers(RingNodeEvent.fingerChange(myId, index, oldFinger, finger));
+						counter.resultAvailable(null);
+					}
+				}
+			});
+		}
+		return future;
+
 	}
 
 
@@ -623,7 +708,6 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	
 	private void log(String message) {
 		logger.log(Level.INFO, myId + ": " + message);
-//		System.out.println(myId + ": " + message);
 	}
 
 	/**
@@ -631,38 +715,15 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	 */
 	public IFuture<List<IFinger>> getFingers()
 	{
-		ArrayList<IFinger> arrayList = new ArrayList<IFinger>(fingertable.fingers.length);
-		for(int i = 0; i < fingertable.fingers.length; i++)
+		Finger[] fingers = fingertable.getFingers();
+		ArrayList<IFinger> arrayList = new ArrayList<IFinger>(fingers.length);
+		for(int i = 0; i < fingers.length; i++)
 		{
-			arrayList.add(fingertable.fingers[i]);
+			arrayList.add(fingers[i]);
 		}
 		return new Future<List<IFinger>>(arrayList);
 	}
 
-//	/**
-//	 * Sets the fingertable.
-//	 * @param finger new Fingertable
-//	 */
-//	public void setFingertable(Fingertable finger)
-//	{
-//		this.fingertable = finger;
-//	}
-	
-//	/**
-//	 * Get the finger table.
-//	 * @return
-//	 */
-//	protected Fingertable getFingerTable()
-//	{
-//		return fingertable;
-//	}
-	
-	@Override
-	public String toString()
-	{
-		return "Ringnode (" + myId + ")";
-	}
-	
 	/**
 	 * Component step to execute a stabilize run.
 	 */
@@ -877,6 +938,12 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	public IFuture<String> getFingerTableString()
 	{
 		return new Future<String>(fingertable.toString());
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "Ringnode (" + myId + ")";
 	}
 	
 	
