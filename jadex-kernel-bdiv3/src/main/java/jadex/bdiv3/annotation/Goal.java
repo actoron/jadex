@@ -63,7 +63,7 @@ public @interface Goal
 	 *  Default is to execute it after it has been tried without consideration
 	 *  of its success state.
 	 */
-	public ExcludeMode excludemode() default ExcludeMode.WHEN_TRIED;//MProcessableElement.EXCLUDE_WHEN_TRIED;
+	public ExcludeMode excludemode() default ExcludeMode.WhenTried;//MProcessableElement.EXCLUDE_WHEN_TRIED;
 	
 	/** 
 	 *  The retry flag. Is means-end reasoning allowed to select a new plan and execute it.

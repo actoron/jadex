@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -34,7 +35,7 @@ public class GoalArrayParameterBDI
 	/**
 	 * 
 	 */
-	@Goal(excludemode=Goal.ExcludeMode.WhenFailed)
+	@Goal(excludemode=ExcludeMode.WhenFailed)
 	public class TestGoal
 	{
 		@GoalParameter

@@ -1,7 +1,7 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
 import jadex.bdiv3.annotation.Goal;
-import jadex.bdiv3.annotation.Goal.ExcludeMode;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.rules.eca.annotations.Event;

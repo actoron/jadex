@@ -596,20 +596,20 @@ public class APL
 
 		// Do nothing is APL is always rebuilt or exclude is never
 		if(((MProcessableElement)element.getModelElement()).isRebuild()
-			|| MProcessableElement.ExcludeMode.NEVER.equals(exclude))
+			|| MProcessableElement.ExcludeMode.Never.equals(exclude))
 		{
 			return;
 		}
 
-		if(exclude.equals(MProcessableElement.ExcludeMode.WHEN_TRIED))
+		if(exclude.equals(MProcessableElement.ExcludeMode.WhenTried))
 		{
 			candidates.remove(rplan.getCandidate());
 		}
 		else
 		{
 //			PlanLifecycleState state = rplan.getLifecycleState();
-			if((rplan.isPassed() && exclude.equals(MProcessableElement.ExcludeMode.WHEN_SUCCEEDED))
-				|| (rplan.isFailed() && exclude.equals(MProcessableElement.ExcludeMode.WHEN_FAILED)))
+			if((rplan.isPassed() && exclude.equals(MProcessableElement.ExcludeMode.WhenSucceeded))
+				|| (rplan.isFailed() && exclude.equals(MProcessableElement.ExcludeMode.WhenFailed)))
 			{
 //			if(state.equals(RPlan.PlanLifecycleState.PASSED)
 //				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)

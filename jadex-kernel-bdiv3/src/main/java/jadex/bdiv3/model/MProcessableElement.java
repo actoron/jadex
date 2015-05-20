@@ -13,10 +13,10 @@ public class MProcessableElement extends MElement
 	/** The message direction. */
 	public enum ExcludeMode
 	{
-		NEVER("never"),
-		WHEN_TRIED("when_tried"),
-		WHEN_FAILED("when_failed"),
-		WHEN_SUCCEEDED("when_succeeded");
+		Never("never"),
+		WhenTried("when_tried"),
+		WhenFailed("when_failed"),
+		WhenSucceeded("when_succeeded");
 		
 		protected String str;
 		
@@ -78,7 +78,7 @@ public class MProcessableElement extends MElement
 	public MProcessableElement()
 	{
 		// used by xml reader
-		this.excludemode = excludemode==null? ExcludeMode.WHEN_TRIED: excludemode;
+		this.excludemode = excludemode==null? ExcludeMode.WhenTried: excludemode;
 	}
 	
 	/**
@@ -89,7 +89,7 @@ public class MProcessableElement extends MElement
 		super(name);
 		this.posttoall = posttoall;
 		this.randomselection = randomselection;
-		this.excludemode = excludemode==null? ExcludeMode.WHEN_TRIED: excludemode;
+		this.excludemode = excludemode==null? ExcludeMode.WhenTried: excludemode;
 	}
 	
 	/**

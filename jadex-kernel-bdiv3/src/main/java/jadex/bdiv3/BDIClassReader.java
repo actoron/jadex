@@ -852,7 +852,7 @@ public class BDIClassReader extends MicroClassReader
 			ret = bdimodel.getCapability().getService(m.toString());
 			if(ret==null)
 			{
-				ret = new MServiceCall(m.toString(), false, false, MProcessableElement.ExcludeMode.WHEN_TRIED);
+				ret = new MServiceCall(m.toString(), false, false, MProcessableElement.ExcludeMode.WhenTried);
 				bdimodel.getCapability().addservice(ret);
 			}
 		}
