@@ -3,6 +3,8 @@ package jadex.bdiv3x;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MCapabilityReference;
+import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
@@ -119,9 +121,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		
 		String uri = "http://jadex.sourceforge.net/jadex";
 		
-//		// Post processors.
-//		IPostProcessor expost = new ExpressionProcessor();
-//
+		// Post processors.
+		final IPostProcessor expost = new ExpressionProcessor();
+
 //		IObjectStringConverter exconv = new ExpressionToStringConverter();
 //		
 //		IAttributeConverter exatconv = new AttributeConverter(null, exconv);
@@ -143,8 +145,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //				new AttributeInfo(new AccessInfo("parameterref", null, AccessInfo.IGNORE_READ))
 //			})));
 //
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "capabilities"), new QName(uri, "capability")}), new ObjectInfo(OAVBDIMetaModel.capabilityref_type),
-//			null, null, new OAVObjectReaderHandler()));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "capabilities"), new QName(uri, "capability")}), new ObjectInfo(MCapabilityReference.class)));
 		
 		TypeInfo ti_performgoal = new TypeInfo(new XMLInfo(new QName(uri, "performgoal")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
@@ -220,7 +221,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		{
 			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 			{
-				if(object instanceof MBelief || object instanceof MGoal || object instanceof MPlan || object instanceof MMessageEvent)
+				if(object instanceof MBelief || object instanceof MGoal || object instanceof MPlan || object instanceof MMessageEvent 
+					|| object instanceof MCapabilityReference
+					|| (object instanceof UnparsedExpression && pathname[pathname.length-1].getLocalPart().equals("expression"))) // hack for bdi expressions
 				{
 					parent	= ((BDIV3XModel)parent).getCapability();
 				}
@@ -310,25 +313,52 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //			}), null, new OAVObjectReaderHandler());
 //				
 //		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, new IPostProcessor()
-		{
-			public Object postProcess(IContext context, Object object)
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(MBelief.class, 
+			new IPostProcessor()
 			{
-				MBelief mbel = (MBelief)object;
-				mbel.setMulti(false);
-				return mbel;
-			}
-			
-			public int getPass()
-			{
-				return 0;
-			}
-		}),//, tepost), 
+				public Object postProcess(IContext context, Object object)
+				{
+					MBelief mbel = (MBelief)object;
+					mbel.setMulti(false);
+					return mbel;
+				}
+				
+				public int getPass()
+				{
+					return 0;
+				}
+			}),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
+			}), null));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefset")), new ObjectInfo(MBelief.class, 
+			new IPostProcessor()
+			{
+				public Object postProcess(IContext context, Object object)
+				{
+					MBelief mbel = (MBelief)object;
+					mbel.setMulti(true);
+					return mbel;
+				}
+				
+				public int getPass()
+				{
+					return 0;
+				}
+			}), 
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, new SubobjectInfo[]{
+				// because there is only MBelief the facts expression is stored as default fact
+				// and multiple facts are added to a list
+				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFacts")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "facts"), "defaultFact"))
 			}), null));//, new OAVObjectReaderHandler()));	
+		
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefref")), new ObjectInfo(OAVBDIMetaModel.beliefreference_type),
 //			null, null, new OAVObjectReaderHandler()));
 //		
@@ -399,7 +429,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		{
 			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 			{
-				return rawattributes.get("ref");
+				return rawattributes.containsKey("ref") ? rawattributes.get("ref") : rawattributes.get("cref");
 			}
 		};
 		
@@ -407,7 +437,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new MappingInfo(null, 
 			new SubobjectInfo[]{
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), OAVBDIMetaModel.trigger_has_internalevents)),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName")),
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), OAVBDIMetaModel.trigger_has_goalfinisheds)),
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "factadded"), OAVBDIMetaModel.trigger_has_factaddeds)),
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "factremoved"), OAVBDIMetaModel.trigger_has_factremoveds)),
@@ -419,11 +451,20 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "internalevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
 //			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "messageevent")}), new ObjectInfo(refcr),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ))})));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goalfinished")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
-//				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
-//				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
+				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
+			})));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(refcr),
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
+				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
+			})));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goalfinishes")}), new ObjectInfo(refcr),
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
+				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
+			})));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "waitqueue")), new ObjectInfo(MTrigger.class, mtrpp),
 		new MappingInfo(null, 
@@ -474,9 +515,27 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expressionref")), new ObjectInfo(OAVBDIMetaModel.expressionreference_type),
 //			null, null, new OAVObjectReaderHandler()));
 //
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost),
-//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_text), null, new OAVObjectReaderHandler()));
-//				
+
+		// Exchange expression with condition for trigger.
+		IPostProcessor	condexpost	= new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				expost.postProcess(context, object);
+				MCondition	cond	= new MCondition();
+				cond.setExpression((UnparsedExpression)object);
+				return cond;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		};
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(UnparsedExpression.class, condexpost),
+			new MappingInfo(null, null, "value")));
+				
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "achievegoal"), new QName(uri, "publish")}), new ObjectInfo(OAVBDIMetaModel.publish_type, scpost), 
 //				new MappingInfo(null, new AttributeInfo[]{
 //					new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.publish_has_classname)),
@@ -568,6 +627,11 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "expression")}), new ObjectInfo(UnparsedExpression.class, null),//new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null)));
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "values")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 //			new MappingInfo(ti_expression)));
 //
@@ -597,9 +661,16 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //				
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialcapability")), new ObjectInfo(OAVBDIMetaModel.initialcapability_type),
 //			null, null, new OAVObjectReaderHandler()));
+
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbelief"), new QName(uri, "fact")}), new ObjectInfo(String.class)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbelief")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("ref", "name")),
+				new AttributeInfo(new AccessInfo("cref", "name"))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new XMLInfo(new QName(uri, "fact")), new AccessInfo("fact", "value"))
+			}), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbeliefset")), new ObjectInfo(UnparsedExpression.class),
 			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(UnparsedExpression.class),

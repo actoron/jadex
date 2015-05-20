@@ -1,35 +1,23 @@
 package jadex.bdiv3x.features;
 
-import jadex.bdiv3.ASMBDIClassGenerator;
-import jadex.bdiv3.IBDIClassGenerator;
-import jadex.bdiv3.annotation.Capability;
-import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
-import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
-import jadex.bdiv3.model.MCondition;
-import jadex.bdiv3.model.MConfiguration;
-import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
-import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.BodyAborted;
 import jadex.bdiv3.runtime.impl.CapabilityWrapper;
-import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.GoalInfo;
 import jadex.bdiv3.runtime.impl.InvocationInfo;
 import jadex.bdiv3.runtime.impl.PlanInfo;
@@ -42,8 +30,7 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bdiv3x.runtime.RBeliefbase;
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentStep;
+import jadex.bdiv3x.runtime.RExpressionBase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -54,61 +41,40 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.FieldInfo;
-import jadex.commons.IResultCommand;
-import jadex.commons.MethodInfo;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple2;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.javaparser.SJavaParser;
-import jadex.micro.MicroModel;
-import jadex.micro.annotation.Agent;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
-import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
-import jadex.rules.eca.annotations.CombinedCondition;
 import jadex.rules.eca.annotations.Event;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  * 
@@ -153,22 +119,18 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		// cannot do this in constructor because it needs access to this feature in expressions
 
-		initBeliefs();
+		RBeliefbase bb = new RBeliefbase(getComponent());
+		bb.init(bdimodel.getCapability());
+		getCapability().setBeliefbase(bb);
+		
+		RExpressionBase eb = new RExpressionBase(getComponent());
+		getCapability().setExpressionbase(eb);
+		
 //		injectAgent(getComponent(), pojo, bdimodel, null);
 //		invokeInitCalls(pojo);
 //		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
 //		startBehavior();
 		return IFuture.DONE;
-	}
-	
-	/**
-	 * 
-	 */
-	protected void initBeliefs()
-	{
-		RBeliefbase bb = new RBeliefbase(getComponent());
-		bb.init(bdimodel.getCapability());
-		getCapability().setBeliefbase(bb);
 	}
 	
 	//-------- internal method used for rewriting field access -------- 
@@ -1665,27 +1627,30 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		return agent.getComponentFeature(IBDIAgentFeature.class);
 	}
 	
-//	/**
-//	 *  Get the value fetcher.
-//	 */
-//	public IValueFetcher getValueFetcher()
-//	{
-//		return new IValueFetcher()
-//		{
-//			public Object fetchValue(String name)
-//			{
-//				// Hack!
-//				if("$pojocapa".equals(name))
-//				{
-//					return curcapa;
-//				}
-//				else
-//				{
-//					throw new RuntimeException("Value not found: "+name);
-//				}
-//			}
-//		};
-//	}
+	/**
+	 *  Get the value fetcher.
+	 */
+	public IValueFetcher getValueFetcher()
+	{
+		return new IValueFetcher()
+		{
+			public Object fetchValue(String name)
+			{
+				if("$beliefbase".equals(name))
+				{
+					return getCapability().getBeliefbase();
+				}
+				else if("$expressionbase".equals(name))
+				{
+					return getCapability().getExpressionbase();
+				}
+				else
+				{
+					throw new RuntimeException("Value not found: "+name);
+				}
+			}
+		};
+	}
 	
 	/**
 	 *  Get a capability pojo object.

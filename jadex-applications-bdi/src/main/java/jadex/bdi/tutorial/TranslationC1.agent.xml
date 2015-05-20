@@ -65,14 +65,13 @@
 		</messageevent>
 	</events>
 
-	<!-- <properties>
-		<!- - Only log outputs >= level are printed. - ->
-		<!- - <property name="logging.level">Level.INFO</property> - ->
- 		<!- - The default parent handler prints out log messages on the console. - ->
+	<properties>
+ 		<!-- Only log outputs >= level are printed. -->
+		<property name="logging.level">Level.INFO</property>
+ 		<!-- The default parent handler prints out log messages on the console. -->
 		<property name="logging.useParentHandlers">true</property>
-		<!- - Debugging flag. - ->
-		<!- - <property name="debugging">true</property> - ->
-    </properties> -->
+		<!-- <property name="debugging">true</property>-->
+    </properties>
 
 </agent>
 

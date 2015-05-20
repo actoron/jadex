@@ -810,9 +810,13 @@ public class OAVBDIXMLReader
 		{
 			for(int i=0; i<postprocessors.length; i++)
 			{
-				postprocessors[i].postProcess(context, object);
+				Object	ret	= postprocessors[i].postProcess(context, object);
+				if(getPass()==0)
+				{
+					object	= ret;
+				}
 			}
-			return null;
+			return getPass()==0 ? object : null;
 		}
 		
 		/**

@@ -13,6 +13,7 @@ import jadex.rules.eca.EventType;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -55,8 +56,14 @@ public class MBelief extends MElement
 	/** The default fact. */
 	protected UnparsedExpression fact;
 	
+	/** The default facts (multi). */
+	protected List<UnparsedExpression> facts;
+	
 	/** The type (if explicitly specified. */
 	protected ClassInfo clazz;
+	
+	/** The exported flag. */
+	protected boolean exported;
 	
 	/**
 	 *	Bean Constructor. 
@@ -206,6 +213,24 @@ public class MBelief extends MElement
 	public void setDynamic(boolean dynamic)
 	{
 		this.dynamic = dynamic;
+	}
+	
+	/**
+	 *  Get the exported flag.
+	 *  @return The exported flag.
+	 */
+	public boolean isExported()
+	{
+		return exported;
+	}
+
+	/**
+	 *  Set the exported flag.
+	 *  @param exported The exported to set.
+	 */
+	public void setExported(boolean exported)
+	{
+		this.exported = exported;
 	}
 	
 	/**
@@ -520,5 +545,26 @@ public class MBelief extends MElement
 	public void setDefaultFact(UnparsedExpression fact)
 	{
 		this.fact = fact;
+	}
+	
+	
+	/**
+	 *  Get the value.
+	 *  @return The value
+	 */
+	public List<UnparsedExpression> getDefaultFacts()
+	{
+		return facts;
+	}
+
+	/**
+	 *  The value to set.
+	 *  @param value The value to set
+	 */
+	public void addDefaultFacts(UnparsedExpression fact)
+	{
+		if(facts==null)
+			facts = new ArrayList<UnparsedExpression>();
+		facts.add(fact);
 	}
 }

@@ -1,5 +1,6 @@
 package jadex.bdiv3.model;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
 import jadex.rules.eca.EventType;
 
@@ -19,6 +20,11 @@ public class MCondition extends MElement
 	
 	/** The target constructor. */
 	protected ConstructorInfo ctarget;
+	
+	//-------- additional xml properties --------
+	
+	/** Expression. */
+	protected UnparsedExpression	expression;
 	
 	/**
 	 *	Bean Constructor. 
@@ -79,5 +85,21 @@ public class MCondition extends MElement
 	public List<EventType> getEvents()
 	{
 		return events;
+	}
+	
+	/**
+	 *  Get the expression.
+	 */
+	public UnparsedExpression getExpression()
+	{
+		return expression;
+	}
+	
+	/**
+	 *  Set the expression.
+	 */
+	public void setExpression(UnparsedExpression expression)
+	{
+		this.expression = expression;
 	}
 }

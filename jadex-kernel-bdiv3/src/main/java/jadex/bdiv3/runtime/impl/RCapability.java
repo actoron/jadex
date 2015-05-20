@@ -5,6 +5,7 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3x.runtime.RBeliefbase;
+import jadex.bdiv3x.runtime.RExpressionBase;
 import jadex.bridge.IInternalAccess;
 
 import java.util.Collection;
@@ -50,6 +51,8 @@ public class RCapability extends RElement
 	/** The beliefbase. */
 	protected RBeliefbase beliefbase;
 	
+	/** The expressionbase. */
+	protected RExpressionBase expressionbase;
 	
 	//-------- constructors --------
 	
@@ -354,6 +357,24 @@ public class RCapability extends RElement
 	public void setBeliefbase(RBeliefbase beliefbase)
 	{
 		this.beliefbase = beliefbase;
+	}
+	
+	/**
+	 *  Get the expressionbase.
+	 *  @return The expressionbase
+	 */
+	public RExpressionBase getExpressionbase()
+	{
+		return expressionbase;
+	}
+
+	/**
+	 *  The expressionbase to set.
+	 *  @param expressionbase The expressionbase to set
+	 */
+	public void setExpressionbase(RExpressionBase expressionbase)
+	{
+		this.expressionbase = expressionbase;
 	}
 
 	/**

@@ -10,13 +10,13 @@
 	                    http://jadex.sourceforge.net/jadex-bdi-2.5.xsd"
 	name="HelloWorld"
 	package="jadex.bdi.examples.helloworld">
-	 
+	
 	<beliefs>
 		<belief name="msg" class="String" exported="true">
 			<fact>"Welcome to Jadex."</fact>
 		</belief>
 	</beliefs>
- 
+	
 	<plans>
 		<!-- Plan which prints out a message and kills the agent. -->
 		<plan name="hello">

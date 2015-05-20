@@ -182,4 +182,16 @@ public abstract class Plan
 	{
 		throw new UnsupportedOperationException();
 	}
+	
+	/**
+	 *  Get an expression by name.
+	 *  @name The expression name.
+	 *  @return The expression.
+	 */
+	public IExpression getExpression(String name)
+	{
+		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class))
+			.getCapability().getExpressionbase().getExpression(name);
+	}
+	
 }

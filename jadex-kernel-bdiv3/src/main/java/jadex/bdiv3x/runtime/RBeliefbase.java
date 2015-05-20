@@ -7,11 +7,13 @@ import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.wrappers.EventPublisher;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +33,7 @@ public class RBeliefbase extends RElement implements IBeliefbase
 	protected Map<String, IBeliefSet> beliefsets;
 	
 	/**
-	 * 
+	 *  Create a new beliefbase.
 	 */
 	public RBeliefbase(IInternalAccess ia)
 	{
@@ -106,7 +108,7 @@ public class RBeliefbase extends RElement implements IBeliefbase
 	}
 	
 	/**
-	 * 
+	 *  
 	 */
 	public void init(MCapability mcapa)
 	{
@@ -309,8 +311,26 @@ public class RBeliefbase extends RElement implements IBeliefbase
 		{
 			super(modelelement);
 			String name = getModelElement().getName();
-			List<Object> tmpfacts = (List<Object>)(modelelement.getDefaultFact()==null? null: SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher()));
-			this.facts = new ListWrapper(tmpfacts, agent, ChangeEvent.FACTADDED+"."+name, 
+			
+			List<Object> tmpfacts;
+			if(modelelement.getDefaultFact()!=null)
+			{
+				tmpfacts = (List<Object>)SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+			}
+			else 
+			{
+				tmpfacts = new ArrayList<Object>();
+				if(modelelement.getDefaultFacts()!=null)
+				{
+					for(UnparsedExpression uexp: modelelement.getDefaultFacts())
+					{
+						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+						tmpfacts.add(fact);
+					}
+				}
+			}
+			
+			this.facts = new ListWrapper<Object>(tmpfacts, agent, ChangeEvent.FACTADDED+"."+name, 
 					ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
 		}
 

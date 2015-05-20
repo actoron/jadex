@@ -1,5 +1,7 @@
 package jadex.bdiv3.model;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,8 +27,16 @@ public class MCapability extends MElement
 	/** The services. */
 	protected List<MServiceCall> services;
 	
+	/** The expressions. */
+	protected List<UnparsedExpression> expressions;
+	
 	/** The configurations. */
 	protected List<MConfiguration> configurations;
+	
+	//-------- additional xml properties --------
+
+	/** The subcapabilities. */
+	protected List<MCapabilityReference>	subcapabilities;
 	
 	/**
 	 *	Bean Constructor. 
@@ -399,4 +409,104 @@ public class MCapability extends MElement
 			services = new ArrayList<MServiceCall>();
 		services.add(ser);
 	}
+	
+	/**
+	 *  Get the sub capabilities.
+	 *  @return The sub capabilities.
+	 */
+	public List<MCapabilityReference> getCapabilities()
+	{
+		return subcapabilities==null? Collections.EMPTY_LIST: subcapabilities;
+	}
+
+	/**
+	 *  Set the sub capabilities.
+	 *  @param subcapabilities The sub capabilities to set.
+	 */
+	public void setCapabilities(List<MCapabilityReference> subcapabilities)
+	{
+		this.subcapabilities = subcapabilities;
+	}
+
+	/**
+	 *  Add a sub capability.
+	 */
+	public void addCapability(MCapabilityReference subcapability)
+	{
+		if(subcapabilities==null)
+			subcapabilities = new ArrayList<MCapabilityReference>();
+		subcapabilities.add(subcapability);
+	}
+	
+	
+	/**
+	 *  Get the expressions.
+	 *  @return The expressions.
+	 */
+	public List<UnparsedExpression> getExpressions()
+	{
+		return expressions==null? Collections.EMPTY_LIST: expressions;
+	}
+
+	/**
+	 *  Set the expressions.
+	 *  @param expressions The expressions to set.
+	 */
+	public void setExpressions(List<UnparsedExpression> expressions)
+	{
+		this.expressions = expressions;
+	}
+
+	/**
+	 *  Add a expression.
+	 */
+	public void addExpression(UnparsedExpression expression)
+	{
+		if(expressions==null)
+			expressions = new ArrayList<UnparsedExpression>();
+		expressions.add(expression);
+	}
+	
+	/**
+	 *  Test if a expression is contained.
+	 */
+	public boolean hasExpression(String name)
+	{
+		boolean ret = false;
+		
+		if(expressions!=null && name!=null)
+		{
+			for(UnparsedExpression bel: expressions)
+			{
+				ret = name.equals(bel.getName());
+				if(ret)
+					break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a expression.
+	 */
+	public UnparsedExpression getExpression(String name)
+	{
+		UnparsedExpression ret = null;
+		
+		if(expressions!=null && name!=null)
+		{
+			for(UnparsedExpression bel: expressions)
+			{
+				if(name.equals(bel.getName()))
+				{
+					ret = bel;
+					break;
+				}
+			}
+		}
+		
+		return ret;
+	}
+
 }

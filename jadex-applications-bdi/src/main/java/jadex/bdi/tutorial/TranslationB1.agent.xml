@@ -33,11 +33,10 @@
 			</parameter>
 		</messageevent>
 	</events>
-<!--
+
 	<properties>
 		<property name="debugging">false</property>
     </properties>
- -->
     
 	<configurations>
 		<configuration name="default">

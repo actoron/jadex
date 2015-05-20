@@ -1,5 +1,6 @@
 package jadex.bdi.tutorial;
 
+import jadex.bdiv3x.runtime.IExpression;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
@@ -12,21 +13,21 @@ import java.util.StringTokenizer;
  */
 public class EnglishGermanTranslationPlanC2 extends Plan
 {
-	//-------- attributes --------
-
-	/** Query the tuples for a word. */
-	protected IExpression	queryword;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public EnglishGermanTranslationPlanC2()
-	{
-		getLogger().info("Created:"+this);
-		this.queryword	= getExpression("query_egword");
-	}
+//	//-------- attributes --------
+//
+//	/** Query the tuples for a word. */
+//	protected IExpression	queryword;
+//
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public EnglishGermanTranslationPlanC2()
+//	{
+//		getLogger().info("Created:"+this);
+//		this.queryword	= getExpression("query_egword");
+//	}
 
 	//-------- methods --------
 
@@ -35,6 +36,7 @@ public class EnglishGermanTranslationPlanC2 extends Plan
 	 */
 	public void body()
 	{
+		IExpression	queryword = getExpression("query_egword");
 		StringTokenizer stok = new StringTokenizer((String)((IMessageEvent)getReason())
 			.getParameter(SFipa.CONTENT).getValue(), " ");
 		if(stok.countTokens()==3)
