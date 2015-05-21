@@ -224,6 +224,26 @@ public abstract class Plan
 	}
 	
 	/**
+	 *  Get a parameter.
+	 *  @param name The name.
+	 *  @return The parameter.
+	 */
+	public IParameter getParameter(String name)
+	{
+		return rplan.getParameter(name);
+	}
+	
+	/**
+	 *  Get a parameter.
+	 *  @param name The name.
+	 *  @return The parameter.
+	 */
+	public IParameterSet getParameterSet(String name)
+	{
+		return rplan.getParameterSet(name);
+	}
+	
+	/**
 	 *  Get an expression by name.
 	 *  @name The expression name.
 	 *  @return The expression.
@@ -527,26 +547,6 @@ public abstract class Plan
 	 *  @return All parameter sets.
 	 */
 	public IParameterSet[]	getParameterSets()
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *  Get a parameter.
-	 *  @param name The name.
-	 *  @return The parameter.
-	 */
-	public IParameter getParameter(String name)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *  Get a parameter.
-	 *  @param name The name.
-	 *  @return The parameter set.
-	 */
-	public IParameterSet getParameterSet(String name)
 	{
 		throw new UnsupportedOperationException();
 	}

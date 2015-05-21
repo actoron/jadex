@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 /**
  * 
@@ -42,10 +43,8 @@ public class MClassBasedElement extends MProcessableElement
 	 */
 	public Class<?> getTargetClass(ClassLoader cl)
 	{
-		if(targetclass==null)
-		{
+		if(targetclass==null && target!=null)
 			targetclass = SReflect.findClass0(target, null, cl);
-		}
 		return targetclass;
 	}
 
@@ -63,7 +62,12 @@ public class MClassBasedElement extends MProcessableElement
 	 */
 	public boolean equals(Object other)
 	{
-		return other instanceof MGoal && target.equals(((MGoal)other).getTarget());
+		String oname = ((MGoal)other).getName();
+		String otarget = ((MGoal)other).getTarget();
+		
+		return other instanceof MGoal && 
+			(SUtil.equals(name, oname) && SUtil.equals(target, otarget));
+//			target.equals(((MGoal)other).getTarget()))
 	}
 
 	/**
@@ -71,6 +75,6 @@ public class MClassBasedElement extends MProcessableElement
 	 */
 	public int hashCode()
 	{
-		return target.hashCode()*23;
+		return target!=null? target.hashCode(): getName().hashCode();
 	}
 }

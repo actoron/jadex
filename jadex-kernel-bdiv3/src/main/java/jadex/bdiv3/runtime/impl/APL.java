@@ -23,6 +23,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -384,11 +385,49 @@ public class APL
 			lis.resultAvailable(mgoal);
 		}
 		
-		SimpleValueFetcher	fetcher	= null;
+		SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ia.getFetcher());
+		if(element instanceof RGoal)
+		{
+			fetcher.setValue("$goal", element);
+		}
+		else if(element instanceof RMessageEvent)
+		{
+			fetcher.setValue("$event", element);
+		}
+		else if(element instanceof RServiceCall)
+		{
+			fetcher.setValue("$call", element);
+		}
 		
 		for(final MPlan mplan: precandidates)
 		{
 			boolean	valid	= true;
+			
+			// chack match expression
+			if(element instanceof RGoal)
+			{
+				RGoal rgoal = (RGoal)element;
+				UnparsedExpression uexp = mplan.getTrigger().getGoalMatchExpression((MGoal)rgoal.getModelElement());
+				if(uexp.getParsed()==null)
+					SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader());
+				IParsedExpression exp = (IParsedExpression)uexp.getParsed();
+				Object val = exp.getValue(fetcher);
+				if(val instanceof Boolean)
+				{
+					valid	= ((Boolean)val).booleanValue();
+				}
+				else
+				{
+					ia.getLogger().warning("Match expression of plan trigger "+mplan.getName()+" not boolean: "+val);
+					valid	= false;						
+				}
+				
+				if(!valid)
+				{
+					lis.exceptionOccurred(null);
+					continue;
+				}
+			}
 			
 			// check xml precondition
 			UnparsedExpression	upex	= mplan.getPrecondition();
@@ -396,23 +435,6 @@ public class APL
 			{
 				try
 				{
-					if(fetcher==null)
-					{
-						fetcher	= new SimpleValueFetcher(ia.getFetcher());
-						if(element instanceof RGoal)
-						{
-							fetcher.setValue("$goal", element);
-						}
-						else if(element instanceof RMessageEvent)
-						{
-							fetcher.setValue("$event", element);
-						}
-						else if(element instanceof RServiceCall)
-						{
-							fetcher.setValue("$call", element);
-						}
-					}
-					
 					Object	val	= SJavaParser.getParsedValue(upex, null, fetcher, null);
 					if(val instanceof Boolean)
 					{

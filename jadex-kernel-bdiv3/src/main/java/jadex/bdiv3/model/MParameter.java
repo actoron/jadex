@@ -329,6 +329,7 @@ public class MParameter extends MElement
 	 */
 	public void setMulti(boolean multi)
 	{
+//		System.out.println("setmulti: "+multi+" "+getName());
 		this.multi = multi? Boolean.TRUE: Boolean.FALSE;
 	}
 	

@@ -14,15 +14,15 @@ import java.util.StringTokenizer;
  */
 public class ProcessTranslationRequestPlanE1 extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public ProcessTranslationRequestPlanE1()
-	{
-		getLogger().info("Created: "+this);
-	}
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public ProcessTranslationRequestPlanE1()
+//	{
+//		getLogger().info("Created: "+this);
+//	}
 
 	//-------- methods --------
 

@@ -336,7 +336,6 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	{
 		super(mplan, agent);
 		this.candidate = candidate;
-//		this.ia = ia;
 		setLifecycleState(PlanLifecycleState.NEW);
 		setProcessingState(PlanProcessingState.READY);
 	}

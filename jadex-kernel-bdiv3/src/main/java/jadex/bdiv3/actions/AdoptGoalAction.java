@@ -67,47 +67,50 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 //			goal.observeGoal(ia);
 			
 			// inject goal elements
-			Class<?> cl = goal.getPojoElement().getClass();
-			
-			while(cl.isAnnotationPresent(Goal.class))
+			if(goal.getPojoElement()!=null)
 			{
-				Field[] fields = cl.getDeclaredFields();
-				for(Field f: fields)
+				Class<?> cl = goal.getPojoElement().getClass();
+			
+				while(cl.isAnnotationPresent(Goal.class))
 				{
-					if(f.isAnnotationPresent(GoalAPI.class))
+					Field[] fields = cl.getDeclaredFields();
+					for(Field f: fields)
 					{
-						f.setAccessible(true);
-						f.set(goal.getPojoElement(), goal);
-					}
-					else if(f.isAnnotationPresent(GoalParent.class))
-					{
-						if(goal.getParent()!=null)
+						if(f.isAnnotationPresent(GoalAPI.class))
 						{
-							Object pa = goal.getParent();
-							Object pojopa = null;
-							if(pa instanceof RPlan)
+							f.setAccessible(true);
+							f.set(goal.getPojoElement(), goal);
+						}
+						else if(f.isAnnotationPresent(GoalParent.class))
+						{
+							if(goal.getParent()!=null)
 							{
-								pojopa = ((RPlan)pa).getPojoPlan();
-							}
-							else if(pa instanceof RGoal)
-							{
-								pojopa = ((RGoal)pa).getPojoElement();
-							}	
-								
-							if(SReflect.isSupertype(f.getType(), pa.getClass()))
-							{
-								f.setAccessible(true);
-								f.set(goal.getPojoElement(), pa);
-							}
-							else if(pojopa!=null && SReflect.isSupertype(f.getType(), pojopa.getClass()))
-							{
-								f.setAccessible(true);
-								f.set(goal.getPojoElement(), pojopa);
+								Object pa = goal.getParent();
+								Object pojopa = null;
+								if(pa instanceof RPlan)
+								{
+									pojopa = ((RPlan)pa).getPojoPlan();
+								}
+								else if(pa instanceof RGoal)
+								{
+									pojopa = ((RGoal)pa).getPojoElement();
+								}	
+									
+								if(SReflect.isSupertype(f.getType(), pa.getClass()))
+								{
+									f.setAccessible(true);
+									f.set(goal.getPojoElement(), pa);
+								}
+								else if(pojopa!=null && SReflect.isSupertype(f.getType(), pojopa.getClass()))
+								{
+									f.setAccessible(true);
+									f.set(goal.getPojoElement(), pojopa);
+								}
 							}
 						}
 					}
+					cl = cl.getSuperclass();
 				}
-				cl = cl.getSuperclass();
 			}
 			
 			((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().addGoal(goal);
