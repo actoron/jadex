@@ -16,6 +16,7 @@ import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -24,6 +25,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -383,6 +385,8 @@ public class APL
 			lis.resultAvailable(mgoal);
 		}
 		
+		SimpleValueFetcher	fetcher	= null;
+		
 		for(final MPlan mplan: precandidates)
 		{
 			boolean	valid	= true;
@@ -393,7 +397,24 @@ public class APL
 			{
 				try
 				{
-					Object	val	= SJavaParser.getParsedValue(upex, null, ia.getFetcher(), null);
+					if(fetcher==null)
+					{
+						fetcher	= new SimpleValueFetcher(ia.getFetcher());
+						if(element instanceof RGoal)
+						{
+							fetcher.setValue("$goal", element);
+						}
+						else if(element instanceof RMessageEvent)
+						{
+							fetcher.setValue("$event", element);
+						}
+						else if(element instanceof RServiceCall)
+						{
+							fetcher.setValue("$call", element);
+						}
+					}
+					
+					Object	val	= SJavaParser.getParsedValue(upex, null, fetcher, null);
 					if(val instanceof Boolean)
 					{
 						valid	= ((Boolean)val).booleanValue();
@@ -423,7 +444,7 @@ public class APL
 			{
 				// check pojo precondition
 				MethodInfo mi = mplan.getBody().getPreconditionMethod(ia.getClassLoader());
-				if(valid && mi!=null)
+				if(mi!=null)
 				{
 					Method m = mi.getMethod(ia.getClassLoader());
 					Object pojo = null;
@@ -479,6 +500,10 @@ public class APL
 					{
 						lis.exceptionOccurred(e);
 					}
+				}
+				else
+				{
+					lis.resultAvailable(mplan);
 				}
 			}
 		}
