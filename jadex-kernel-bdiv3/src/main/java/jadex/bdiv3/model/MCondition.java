@@ -123,22 +123,21 @@ public class MCondition extends MElement
 							addEvent(events, done, ChangeEvent.FACTREMOVED, ref.getText());
 						}
 						
-						else if(ref.getType()==ReflectNode.METHOD && "getBelief".equals(ref.getText()) && ref.jjtGetNumChildren()==1
-							&& ((ExpressionNode)ref.jjtGetChild(0)).isConstant() && ((ExpressionNode)ref.jjtGetChild(0)).getConstantValue() instanceof String
-							&& !done.contains(((ExpressionNode)ref.jjtGetChild(0)).getConstantValue()))
+						else if(ref.getType()==ReflectNode.METHOD)
 						{
-							String	name	= (String)((ExpressionNode)ref.jjtGetChild(0)).getConstantValue();
-							addEvent(events, done, ChangeEvent.FACTCHANGED, name);
-						}
-						
-						else if(ref.getType()==ReflectNode.METHOD && "getBeliefSet".equals(ref.getText()) && ref.jjtGetNumChildren()==1
-							&& ((ExpressionNode)ref.jjtGetChild(0)).isConstant() && ((ExpressionNode)ref.jjtGetChild(0)).getConstantValue() instanceof String
-							&& !done.contains(((ExpressionNode)ref.jjtGetChild(0)).getConstantValue()))
-						{
-							String	name	= (String)((ExpressionNode)ref.jjtGetChild(0)).getConstantValue();
-							addEvent(events, done, ChangeEvent.FACTCHANGED, name);
-							addEvent(events, done, ChangeEvent.FACTADDED, name);
-							addEvent(events, done, ChangeEvent.FACTREMOVED, name);
+							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+							if("getBelief".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, done, ChangeEvent.FACTCHANGED, name);
+							}
+							else if("getBeliefSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, done, ChangeEvent.FACTCHANGED, name);
+								addEvent(events, done, ChangeEvent.FACTADDED, name);
+								addEvent(events, done, ChangeEvent.FACTREMOVED, name);
+							}
 						}
 					}
 				}
@@ -157,21 +156,21 @@ public class MCondition extends MElement
 							addEvent(events, done, ChangeEvent.VALUEREMOVED, pe.getName(), ref.getText());
 						}
 						
-						else if(ref.getType()==ReflectNode.METHOD && "getParameter".equals(ref.getText()) && ref.jjtGetNumChildren()==1
-							&& ((ExpressionNode)ref.jjtGetChild(0)).isConstant() && ((ExpressionNode)ref.jjtGetChild(0)).getConstantValue() instanceof String)
+						else if(ref.getType()==ReflectNode.METHOD)
 						{
-							String	name	= (String)((ExpressionNode)ref.jjtGetChild(0)).getConstantValue();
-							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
-						}
-						
-						else if(ref.getType()==ReflectNode.METHOD && "getParameterSet".equals(ref.getText()) && ref.jjtGetNumChildren()==1
-							&& ((ExpressionNode)ref.jjtGetChild(0)).isConstant() && ((ExpressionNode)ref.jjtGetChild(0)).getConstantValue() instanceof String
-							&& !done.contains(((ExpressionNode)ref.jjtGetChild(0)).getConstantValue()))
-						{
-							String	name	= (String)((ExpressionNode)ref.jjtGetChild(0)).getConstantValue();
-							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
-							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
-							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
+							ExpressionNode	arg	= (ExpressionNode)ref.jjtGetChild(1).jjtGetChild(0);
+							if("getParameter".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
+							}
+							else if("getParameterSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
+							{
+								String	name	= (String)arg.getConstantValue();
+								addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
+								addEvent(events, done, ChangeEvent.VALUEADDED, pe.getName(), name);
+								addEvent(events, done, ChangeEvent.VALUEREMOVED, pe.getName(), name);
+							}
 						}
 					}
 				}
