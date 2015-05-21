@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.wrappers;
 
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MElement;
 import jadex.bridge.IInternalAccess;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
@@ -20,19 +21,19 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	 *  Create a new list wrapper.
 	 */
 	public ListWrapper(List<T> delegate, IInternalAccess agent, 
-		String addevent, String remevent, String changeevent, MBelief mbel)
+		String addevent, String remevent, String changeevent, MElement melem)
 	{
-		this(delegate, agent, new EventType(addevent), new EventType(remevent), new EventType(changeevent), mbel);
+		this(delegate, agent, new EventType(addevent), new EventType(remevent), new EventType(changeevent), melem);
 	}
 	
 	/**
 	 *  Create a new list wrapper.
 	 */
 	public ListWrapper(List<T> delegate, IInternalAccess agent, 
-		EventType addevent, EventType remevent, EventType changeevent, MBelief mbel)
+		EventType addevent, EventType remevent, EventType changeevent, MElement melem)
 	{
 		super(delegate);
-		this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, mbel);
+		this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, melem);
 	}
 	
 	/**
@@ -40,10 +41,7 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	 */
 	protected void entryAdded(T value, int index)
 	{
-//		unobserveValue(ret);
-		publisher.observeValue(value);
-		publisher.getRuleSystem().addEvent(new Event(publisher.getAddEvent(), new ChangeInfo<T>(value, null, index>-1? Integer.valueOf(index): null)));
-		publisher.publishToolBeliefEvent();
+		publisher.entryAdded(value, index);
 	}
 	
 	/**
@@ -51,10 +49,7 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	 */
 	protected void entryRemoved(T value, int index)
 	{
-		publisher.unobserveValue(value);
-//		observeValue(value);
-		publisher.getRuleSystem().addEvent(new Event(publisher.getRemEvent(), new ChangeInfo<T>(value, null, index>-1? Integer.valueOf(index): null)));
-		publisher.publishToolBeliefEvent();
+		publisher.entryRemoved(value, index);
 	}
 	
 	/**
@@ -62,9 +57,6 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	 */
 	protected void entryChanged(T oldvalue, T newvalue, int index)
 	{
-		publisher.unobserveValue(oldvalue);
-		publisher.observeValue(newvalue);
-		publisher.getRuleSystem().addEvent(new Event(publisher.getChangeEvent(), new ChangeInfo<T>(newvalue, oldvalue,  index>-1? Integer.valueOf(index): null)));
-		publisher.publishToolBeliefEvent();
+		publisher.entryChanged(oldvalue, newvalue, index);
 	}
 }

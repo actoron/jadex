@@ -12,6 +12,7 @@ import jadex.commons.SReflect;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +86,11 @@ public class MParameter extends MElement
 	/** The default value. */
 	protected UnparsedExpression value;
 	
+	/** The default values (multi). */
+	protected List<UnparsedExpression> values;
+	
 	/** The optional flag. */
-	protected boolean	optional; 
+	protected boolean optional; 
 	
 	/**
 	 *	Bean Constructor. 
@@ -399,6 +403,26 @@ public class MParameter extends MElement
 	public void setDefaultValue(UnparsedExpression value)
 	{
 		this.value = value;
+	}
+	
+	/**
+	 *  Get the value.
+	 *  @return The value
+	 */
+	public List<UnparsedExpression> getDefaultValues()
+	{
+		return values;
+	}
+
+	/**
+	 *  The value to set.
+	 *  @param value The value to set
+	 */
+	public void addDefaultValues(UnparsedExpression fact)
+	{
+		if(values==null)
+			values = new ArrayList<UnparsedExpression>();
+		values.add(fact);
 	}
 	
 	/**

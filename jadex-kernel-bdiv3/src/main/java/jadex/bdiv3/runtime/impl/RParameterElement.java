@@ -1,19 +1,20 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.model.MCapability;
-import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameterElement;
+import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.wrappers.EventPublisher;
+import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.bdiv3x.runtime.IParameterSet;
-import jadex.bdiv3x.runtime.RBeliefbase.RBelief;
-import jadex.bdiv3x.runtime.RBeliefbase.RBeliefSet;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.javaparser.IMapAccess;
+import jadex.javaparser.SJavaParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,34 +34,56 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	protected Map<String, IParameterSet> parametersets;
 	
 	/**
-	 *  Create a new beliefbase.
+	 *  Create a new parameter element.
 	 */
 	public RParameterElement(MParameterElement melement, IInternalAccess agent)
 	{
 		super(melement, agent);
 	}
 	
-//	/**
-//	 *  
-//	 */
-//	public void init()
-//	{
-//		List<MParameter> mbels = ((MParameterElement)getModelElement()).getParameters();
-//		if(mbels!=null)
-//		{
-//			for(MParameter mbel: mbels)
-//			{
-//				if(!mbel.isMulti(agent.getClassLoader()))
-//				{
-//					addParameter(new RBelief(mbel, getAgent()));
-//				}
-//				else
-//				{
-//					addParameterSet(new RBeliefSet(mbel, getAgent()));
-//				}
-//			}
-//		}
-//	}
+	/**
+	 *  
+	 */
+	public void init()
+	{
+		List<MParameter> mparams = ((MParameterElement)getModelElement()).getParameters();
+		if(mparams!=null)
+		{
+			for(MParameter mbel: mparams)
+			{
+				if(!mbel.isMulti(agent.getClassLoader()))
+				{
+					addParameter(new RParameter(mbel, getAgent()));
+				}
+				else
+				{
+					addParameterSet(new RParameterSet(mbel, getAgent()));
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Add a parameter.
+	 *  @param bel The parameter.
+	 */
+	public void addParameter(RParameter bel)
+	{
+		if(parameters==null)
+			parameters = new HashMap<String, IParameter>();
+		parameters.put(bel.getName(), bel);
+	}
+	
+	/**
+	 *  Add a parameterset.
+	 *  @param bel The parameterset.
+	 */
+	public void addParameterSet(RParameterSet belset)
+	{
+		if(parametersets==null)
+			parametersets = new HashMap<String, IParameterSet>();
+		parametersets.put(belset.getName(), belset);
+	}
 	
 	/**
 	 *  Get all parameters.
@@ -153,21 +176,23 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	 */
 	public static class RParameter extends RElement implements IParameter
 	{
-		/** The name. */
-		protected String name;
-		
 		/** The value. */
 		protected Object value;
 
+		/** The publisher. */
+		protected EventPublisher publisher;
+		
 		/**
 		 *  Create a new parameter.
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameter(MElement modelelement, String name, IInternalAccess agent)
+		public RParameter(MParameter modelelement, IInternalAccess agent)
 		{
 			super(modelelement, agent);
-			this.name = name;
+			String name = modelelement.getName();
+			this.value = modelelement.getDefaultValue()==null? null: SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+name, (MParameter)getModelElement());
 		}
 
 		/**
@@ -176,7 +201,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public String getName()
 		{
-			return name;
+			return getModelElement().getName();
 		}
 		
 		/**
@@ -185,6 +210,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public void setValue(Object value)
 		{
+			publisher.entryChanged(this.value, value, -1);
 			this.value = value;
 		}
 
@@ -203,9 +229,6 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	 */
 	public static class RParameterSet extends RElement implements IParameterSet
 	{
-		/** The name. */
-		protected String name;
-		
 		/** The value. */
 		protected List<Object> values;
 
@@ -214,10 +237,31 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameterSet(MElement modelelement, String name, IInternalAccess agent)
+		public RParameterSet(MParameter modelelement, IInternalAccess agent)
 		{
 			super(modelelement, agent);
-			this.name = name;
+			
+			List<Object> tmpvalues;
+			if(modelelement.getDefaultValue()!=null)
+			{
+				tmpvalues = (List<Object>)SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+			}
+			else 
+			{
+				tmpvalues = new ArrayList<Object>();
+				if(modelelement.getDefaultValues()!=null)
+				{
+					for(UnparsedExpression uexp: modelelement.getDefaultValues())
+					{
+						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+						tmpvalues.add(fact);
+					}
+				}
+			}
+			
+			String name = modelelement.getName();
+			this.values = new ListWrapper<Object>(new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+name, 
+				ChangeEvent.VALUEREMOVED+"."+name, ChangeEvent.VALUECHANGED+"."+name, getModelElement());
 		}
 
 		/**
@@ -226,7 +270,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public String getName()
 		{
-			return name;
+			return getModelElement().getName();
 		}
 		
 		/**
@@ -235,8 +279,6 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public void addValue(Object value)
 		{
-			if(values==null)
-				values = new ArrayList<Object>();
 			values.add(value);
 		}
 
@@ -246,8 +288,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public void removeValue(Object value)
 		{
-			if(values!=null)
-				values.remove(value);
+			values.remove(value);
 		}
 
 		/**
@@ -269,8 +310,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public void removeValues()
 		{
-			if(values!=null)
-				values.clear();
+			values.clear();
 		}
 
 		/**
@@ -286,7 +326,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public boolean containsValue(Object value)
 		{
-			return values==null? false: values.contains(value);
+			return values.contains(value);
 		}
 
 		/**
@@ -295,7 +335,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public Object[]	getValues()
 		{
-			return values==null? new Object[0]: values.toArray();
+			return values.toArray();
 		}
 
 		/**
@@ -305,7 +345,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public int size()
 		{
-			return values==null? 0: values.size();
+			return values.size();
 		}
 	}
 	

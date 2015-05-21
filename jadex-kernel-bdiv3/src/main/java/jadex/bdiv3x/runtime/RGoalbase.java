@@ -129,13 +129,5 @@ public class RGoalbase extends RElement implements IGoalbase
 //	 *  @param listener The goal listener.
 //	 */
 //	public void removeGoalListener(String type, IGoalListener listener);
-	
-	/**
-	 *  Get the capability.
-	 *  @return The capability.
-	 */
-	protected RCapability getCapability()
-	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability();
-	}
+
 }
