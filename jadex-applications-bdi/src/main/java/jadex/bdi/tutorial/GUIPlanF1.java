@@ -18,17 +18,6 @@ public class GUIPlanF1 extends Plan
 	/** The gui. */
 	protected TranslationGuiF1 gui;
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public GUIPlanF1()
-	{
-		getLogger().info("Created: "+this);
-		//this.gui = new TranslationGuiF1();
-	}
-
 	//-------- methods --------
 
 	/**

@@ -16,7 +16,6 @@ import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;

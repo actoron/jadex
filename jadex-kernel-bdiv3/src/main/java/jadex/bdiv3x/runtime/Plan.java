@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
@@ -16,9 +17,16 @@ import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -216,16 +224,6 @@ public abstract class Plan
 	}
 	
 	/**
-	 *  Get a parameter.
-	 *  @param name The name.
-	 *  @return The parameter.
-	 */
-	public IParameter getParameter(String name)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
 	 *  Get an expression by name.
 	 *  @name The expression name.
 	 *  @return The expression.
@@ -270,5 +268,306 @@ public abstract class Plan
 	protected RCapability getCapability()
 	{
 		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability();
+	}
+	
+	//-------- legacy --------
+	
+
+	/**
+	 *  Let a plan fail.
+	 *  @param cause The cause.
+	 */
+	public void fail(Throwable cause)
+	{
+		throw new PlanFailureException(null, cause);
+	}
+
+	/**
+	 *  Let a plan fail.
+	 *  @param message The message.
+	 *  @param cause The cause.
+	 */
+	public void fail(String message, Throwable cause)
+	{
+		throw new PlanFailureException(message, cause);
+	}
+
+	/**
+	 *  Get the scope.
+	 *  @return The scope.
+	 */
+	public ICapability getScope()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Start an atomic transaction.
+	 *  All possible side-effects (i.e. triggered conditions)
+	 *  of internal changes (e.g. belief changes)
+	 *  will be delayed and evaluated after endAtomic() has been called.
+	 *  @see #endAtomic()
+	 */
+	public void	startAtomic()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  End an atomic transaction.
+	 *  Side-effects (i.e. triggered conditions)
+	 *  of all internal changes (e.g. belief changes)
+	 *  performed after the last call to startAtomic()
+	 *  will now be evaluated and performed.
+	 *  @see #startAtomic()
+	 */
+	public void	endAtomic()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Dispatch a new subgoal.
+	 *  @param subgoal The new subgoal.
+	 *  Note: plan step is interrupted after call.
+	 */
+	public void dispatchSubgoal(IGoal subgoal)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append(SReflect.getInnerClassName(this.getClass()));
+		buf.append("(");
+		buf.append(rplan);
+		buf.append(")");
+		return buf.toString();
+	}
+
+	/**
+	 *  Get the agent name.
+	 *  @return The agent name.
+	 */
+	public String getComponentName()
+	{
+		return getComponentIdentifier().getLocalName();
+	}
+	
+	/**
+	 * Get the agent identifier.
+	 * @return The agent identifier.
+	 */
+	public IComponentIdentifier	getComponentIdentifier()
+	{
+		return agent.getComponentIdentifier();
+	}
+	
+	/**
+	 * Get the agent description.
+	 * @return The agent description.
+	 */
+	public IComponentDescription getComponentDescription()
+	{
+		return agent.getComponentDescription();
+	}
+
+	/**
+	 *  Get the uncatched exception that occurred in the body (if any).
+	 *  Method should only be called when in failed() method.
+	 *  @return The exception.
+	 */
+	public Exception getException()
+	{
+		return getRPlan().getException();
+	} 
+
+	/**
+	 *  Get the goal base.
+	 *  @return The goal base.
+	 */
+	public IGoalbase getGoalbase()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get the plan base.
+	 *  @return The plan base.
+	 */
+	public IPlanbase getPlanbase()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get the event base.
+	 *  @return The event base.
+	 */
+	public IEventbase getEventbase()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Get the expression base.
+	 * @return The expression base.
+	 */
+	public IExpressionbase getExpressionbase()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get the clock.
+	 *  @return The clock.
+	 */
+	public IClockService getClock()
+	{
+		return SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+	}
+
+	/**
+	 *  Get the current time.
+	 *  The time unit depends on the currently running clock implementation.
+	 *  For the default system clock, the time value adheres to the time
+	 *  representation as used by {@link System#currentTimeMillis()}, i.e.,
+	 *  the value of milliseconds passed since 0:00 'o clock, January 1st, 1970, UTC.
+	 *  For custom simulation clocks, arbitrary representations can be used.
+	 *  @return The current time.
+	 */
+	public long getTime()
+	{
+		return getClock().getTime();
+	}
+	
+	/**
+	 *  Dispatch a new top-level goal.
+	 *  @param goal The new goal.
+	 *  Note: plan step is interrupted after call.
+	 */
+	public void dispatchTopLevelGoal(IGoal goal)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Send a message after some delay.
+	 *  @param me	The message event.
+	 *  @return The filter to wait for an answer.
+	 */
+	public IFuture<Void> sendMessage(IMessageEvent me, byte[] codecids)
+	{	
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Dispatch an internal event.
+	 *  @param event The event.
+	 *  Note: plan step is interrupted after call.
+	 */
+	public void dispatchInternalEvent(IInternalEvent event)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Create a new message event.
+	 *  @return The new message event.
+	 */
+	public IMessageEvent createMessageEvent(String type)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Create a new intenal event.
+	 *  @return The new intenal event.
+	 */
+	public IInternalEvent createInternalEvent(String type)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get the scope.
+	 *  @return The scope.
+	 */
+	public IExternalAccess getExternalAccess()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Create a precompiled expression.
+	 *  @param expression	The expression string.
+	 *  @return The precompiled expression.
+	 */
+	public IExpression	createExpression(String expression, String[] paramnames, Class<?>[] paramtypes)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get all parameters.
+	 *  @return All parameters.
+	 */
+	public IParameter[]	getParameters()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get all parameter sets.
+	 *  @return All parameter sets.
+	 */
+	public IParameterSet[]	getParameterSets()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get a parameter.
+	 *  @param name The name.
+	 *  @return The parameter.
+	 */
+	public IParameter getParameter(String name)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get a parameter.
+	 *  @param name The name.
+	 *  @return The parameter set.
+	 */
+	public IParameterSet getParameterSet(String name)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Has the element a parameter element.
+	 *  @param name The name.
+	 *  @return True, if it has the parameter.
+	 */
+	public boolean hasParameter(String name)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Has the element a parameter set element.
+	 *  @param name The name.
+	 *  @return True, if it has the parameter set.
+	 */
+	public boolean hasParameterSet(String name)
+	{
+		throw new UnsupportedOperationException();
 	}
 }

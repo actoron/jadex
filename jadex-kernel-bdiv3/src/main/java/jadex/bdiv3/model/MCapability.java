@@ -38,6 +38,9 @@ public class MCapability extends MElement
 	/** The subcapabilities. */
 	protected List<MCapabilityReference>	subcapabilities;
 	
+	/** The internal events. */
+	protected List<MInternalEvent> ievents;
+	
 	/**
 	 *	Bean Constructor. 
 	 */
@@ -242,6 +245,76 @@ public class MCapability extends MElement
 		}
 	}
 	
+	/**
+	 *  Get the Internals.
+	 *  @return The Internals.
+	 */
+	public List<MInternalEvent> getInternalEvents()
+	{
+		return ievents==null? Collections.EMPTY_LIST: ievents;
+	}
+
+	/**
+	 *  Set the internal events.
+	 *  @param ievents The internal events to set.
+	 */
+	public void setInternalEvents(List<MInternalEvent> ievents)
+	{
+		this.ievents = ievents;
+	}
+
+	/**
+	 *  Add an internal event.
+	 */
+	public void addInternalEvent(MInternalEvent event)
+	{
+		if(ievents==null)
+			ievents = new ArrayList<MInternalEvent>();
+		ievents.add(event);
+	}
+	
+	/**
+	 *  Test if an internal event is contained.
+	 */
+	public boolean hasInternalEvent(String name)
+	{
+		boolean ret = false;
+		
+		if(ievents!=null && name!=null)
+		{
+			for(MInternalEvent bel: ievents)
+			{
+				ret = name.equals(bel.getName());
+				if(ret)
+					break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get an internal event.
+	 */
+	public MInternalEvent getInternalEvent(String name)
+	{
+		MInternalEvent ret = null;
+		
+		if(ievents!=null && name!=null)
+		{
+			for(MInternalEvent bel: ievents)
+			{
+				if(name.equals(bel.getName()))
+				{
+					ret = bel;
+					break;
+				}
+			}
+		}
+		
+		return ret;
+	}
+
 	/**
 	 *  Get the messages.
 	 *  @return The messages.
@@ -508,5 +581,4 @@ public class MCapability extends MElement
 		
 		return ret;
 	}
-
 }

@@ -8,6 +8,7 @@ import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
 import jadex.bdiv3.model.MParameter;
@@ -224,7 +225,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		{
 			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 			{
-				if(object instanceof MBelief || object instanceof MGoal || object instanceof MPlan || object instanceof MMessageEvent 
+				if(object instanceof MBelief || object instanceof MGoal || object instanceof MPlan || object instanceof MMessageEvent || object instanceof MInternalEvent 
 					|| object instanceof MCapabilityReference
 					|| (object instanceof UnparsedExpression && pathname[pathname.length-1].getLocalPart().equals("expression"))) // hack for bdi expressions
 				{
@@ -298,9 +299,11 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "plans"), new QName(uri, "plan")}), new AccessInfo(new QName(uri, "plan"), "plan")),
 		
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "events"), new QName(uri, "messageevent")}), new AccessInfo(new QName(uri, "messageevent"), "messageEvent")),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "events"), new QName(uri, "messageeventref")}), new AccessInfo(new QName(uri, "messageeventref"), "event")),
-					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "events"), new QName(uri, "internaleventref")}), new AccessInfo(new QName(uri, "internaleventref"), "event")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "events"), new QName(uri, "messageeventref")}), new AccessInfo(new QName(uri, "messageeventref"), "messageEvent")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "events"), new QName(uri, "internalevent")}), new AccessInfo(new QName(uri, "internalevent"), "internalEvent")),
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "events"), new QName(uri, "internaleventref")}), new AccessInfo(new QName(uri, "internaleventref"), "internalEvent")),
 		
+					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expression")}), new AccessInfo(new QName(uri, "expression"), "expression")),
 					new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "expressions"), new QName(uri, "expressionref")}), new AccessInfo(new QName(uri, "expressionref"), "expression")),
 			
 			}), new LinkingInfo(capalinker));
@@ -332,7 +335,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				}
 			}),
 			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+				new AttributeInfo(new AccessInfo("argument", "exported"))
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "fact"), "defaultFact"))
 			}), null));
@@ -353,7 +357,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				}
 			}), 
 			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+				new AttributeInfo(new AccessInfo("argument", "exported"))
 			}, new SubobjectInfo[]{
 				// because there is only MBelief the facts expression is stored as default fact
 				// and multiple facts are added to a list
@@ -419,6 +424,18 @@ public class BDIV3XMLReader extends ComponentXMLReader
 						mtr.addMessageEvent(mcapa.getMessageEvent(name));
 					}
 				}
+				names = mtr.getInternalEventNames();
+				if(names!=null)
+				{
+					for(String name: names)
+					{
+						// todo: capa scoping?!
+						if(mcapa.getInternalEvent(name)==null)
+							throw new RuntimeException("Internal event not found: "+name);
+						mtr.addInternalEvent(mcapa.getInternalEvent(name));
+					}
+				}
+
 				return null;
 			}
 			
@@ -439,7 +456,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "trigger")), new ObjectInfo(MTrigger.class, mtrpp), 
 			new MappingInfo(null, 
 			new SubobjectInfo[]{
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), OAVBDIMetaModel.trigger_has_internalevents)),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), "internalEventName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName")),
@@ -448,9 +465,12 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "factchanged"), OAVBDIMetaModel.trigger_has_factchangeds)),
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "condition"), OAVBDIMetaModel.plantrigger_has_condition))
 			})));
-//		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "internalevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
-//			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "internalevent")}), new ObjectInfo(MInternalEvent.class),
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
+				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
+			})));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "messageevent")}), new ObjectInfo(refcr),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
@@ -470,7 +490,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "waitqueue")), new ObjectInfo(MTrigger.class, mtrpp),
 			new MappingInfo(null, 
 				new SubobjectInfo[]{
-	//			new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), OAVBDIMetaModel.trigger_has_internalevents)),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), "internalEventName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName")),
@@ -498,8 +518,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "internalevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
 //				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
 //		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internalevent")), new ObjectInfo(OAVBDIMetaModel.internalevent_type),
-//			null, null, new OAVObjectReaderHandler()));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internalevent")), new ObjectInfo(MInternalEvent.class),
+			null, null));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internaleventref")), new ObjectInfo(OAVBDIMetaModel.internaleventreference_type),
 //			null, null, new OAVObjectReaderHandler()));
 		

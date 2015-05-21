@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class MTrigger
 {
-//	protected List<MInternalEvent> internalevents;
+	protected List<MInternalEvent> internalevents;
 	
 	/** The message events. */
 	protected List<MMessageEvent> messageevents;
@@ -36,6 +36,7 @@ public class MTrigger
 	
 	// hack!!! required for two pass reading.
 	protected List<String> messagenames;
+	protected List<String> ieventnames;
 	protected List<String> goalnames;
 	protected List<String> goalfinishednames;
 	
@@ -49,13 +50,13 @@ public class MTrigger
 	{
 	}
 	
-//	/**
-//	 *  Get the internal events.
-//	 */
-//	public List<MInternalEvent>	getInternalEvents()
-//	{
-//		return internalevents;
-//	}
+	/**
+	 *  Get the internal events.
+	 */
+	public List<MInternalEvent>	getInternalEvents()
+	{
+		return internalevents;
+	}
 
 	/**
 	 *  Get the message events.
@@ -102,15 +103,15 @@ public class MTrigger
 		goalfinisheds.add(goal);
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	public void addInternalEvent(MInternalEvent event)
-//	{
-//		if(internalevents==null)
-//			this.internalevents = new ArrayList<MInternalEvent>();
-//		internalevents.add(event);
-//	}
+	/**
+	 * 
+	 */
+	public void addInternalEvent(MInternalEvent event)
+	{
+		if(internalevents==null)
+			this.internalevents = new ArrayList<MInternalEvent>();
+		internalevents.add(event);
+	}
 	
 	/**
 	 *  Add a message event.
@@ -138,6 +139,24 @@ public class MTrigger
 	public List<String> getMessageNames()
 	{
 		return messagenames;
+	}
+	
+	/**
+	 *  Add an internal event name.
+	 */
+	public void addInternalEventName(String event)
+	{
+		if(ieventnames==null)
+			this.ieventnames = new ArrayList<String>();
+		ieventnames.add(event);
+	}
+	
+	/**
+	 *  Get the message events.
+	 */
+	public List<String> getInternalEventNames()
+	{
+		return ieventnames;
 	}
 
 	/**
