@@ -40,6 +40,16 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		this.mt = mt;
 	}
 	
+	/**
+	 *  Create the parameters from model spec.
+	 */
+	public void initParameters()
+	{
+		// do nothing
+		// todo: do we want to create all parameters of the message template
+		// or only when getParameters() is called?!
+	}
+	
 	//-------- methods --------
 	
 	/**

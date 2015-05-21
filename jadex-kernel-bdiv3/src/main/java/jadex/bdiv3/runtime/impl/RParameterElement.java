@@ -39,25 +39,26 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	public RParameterElement(MParameterElement melement, IInternalAccess agent)
 	{
 		super(melement, agent);
+		initParameters();
 	}
 	
 	/**
-	 *  
+	 *  Create the parameters from model spec.
 	 */
-	public void init()
+	public void initParameters()
 	{
 		List<MParameter> mparams = ((MParameterElement)getModelElement()).getParameters();
 		if(mparams!=null)
 		{
-			for(MParameter mbel: mparams)
+			for(MParameter mparam: mparams)
 			{
-				if(!mbel.isMulti(agent.getClassLoader()))
+				if(!mparam.isMulti(agent.getClassLoader()))
 				{
-					addParameter(new RParameter(mbel, getAgent()));
+					addParameter(new RParameter(mparam, getAgent()));
 				}
 				else
 				{
-					addParameterSet(new RParameterSet(mbel, getAgent()));
+					addParameterSet(new RParameterSet(mparam, getAgent()));
 				}
 			}
 		}

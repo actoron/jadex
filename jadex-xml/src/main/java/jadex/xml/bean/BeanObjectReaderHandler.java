@@ -68,7 +68,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	protected IBeanIntrospector introspector = BeanIntrospectorFactory.getInstance().getBeanIntrospector();
 	
 	/** The filter based post processors. */
-	protected Map<IFilter, IPostProcessor> postprocessors;
+	protected Map<IFilter<Object>, IPostProcessor> postprocessors;
 	
 	//-------- constructors --------
 	
@@ -1696,9 +1696,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(postprocessors!=null)
 		{
-			for(Iterator<IFilter> it = postprocessors.keySet().iterator(); it.hasNext(); )
+			for(Iterator<IFilter<Object>> it = postprocessors.keySet().iterator(); it.hasNext(); )
 			{
-				IFilter fil = it.next();
+				IFilter<Object> fil = it.next();
 				if(fil.filter(object))
 				{
 					ret.add(postprocessors.get(fil));
@@ -1714,10 +1714,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param filter The filter.
 	 *  @param processor The post processor.
 	 */
-	public synchronized void addPostProcessor(IFilter filter, IPostProcessor processor)
+	public synchronized void addPostProcessor(IFilter<Object> filter, IPostProcessor processor)
 	{
 		if(postprocessors==null)
-			postprocessors = new LinkedHashMap<IFilter, IPostProcessor>();
+			postprocessors = new LinkedHashMap<IFilter<Object>, IPostProcessor>();
 		postprocessors.put(filter, processor);
 	}
 	/**

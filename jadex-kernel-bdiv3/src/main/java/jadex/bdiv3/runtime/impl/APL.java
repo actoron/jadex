@@ -25,6 +25,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -384,71 +385,147 @@ public class APL
 			lis.resultAvailable(mgoal);
 		}
 		
+		SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ia.getFetcher());
+		if(element instanceof RGoal)
+		{
+			fetcher.setValue("$goal", element);
+		}
+		else if(element instanceof RMessageEvent)
+		{
+			fetcher.setValue("$event", element);
+		}
+		else if(element instanceof RServiceCall)
+		{
+			fetcher.setValue("$call", element);
+		}
+		
 		for(final MPlan mplan: precandidates)
 		{
+			boolean	valid	= true;
 			
-			
-			// check precondition
-			MethodInfo mi = mplan.getBody().getPreconditionMethod(ia.getClassLoader());
-			if(mi!=null)
+			// chack match expression
+			if(element instanceof RGoal)
 			{
-				Method m = mi.getMethod(ia.getClassLoader());
-				Object pojo = null;
-				if(!Modifier.isStatic(m.getModifiers()))
+				RGoal rgoal = (RGoal)element;
+				UnparsedExpression uexp = mplan.getTrigger().getGoalMatchExpression((MGoal)rgoal.getModelElement());
+				if(uexp.getParsed()==null)
+					SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader());
+				IParsedExpression exp = (IParsedExpression)uexp.getParsed();
+				Object val = exp.getValue(fetcher);
+				if(val instanceof Boolean)
 				{
-					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia);
-					pojo = rp.getBody().getBody();
+					valid	= ((Boolean)val).booleanValue();
 				}
+				else
+				{
+					ia.getLogger().warning("Match expression of plan trigger "+mplan.getName()+" not boolean: "+val);
+					valid	= false;						
+				}
+				
+				if(!valid)
+				{
+					lis.exceptionOccurred(null);
+					continue;
+				}
+			}
+			
+			// check xml precondition
+			UnparsedExpression	upex	= mplan.getPrecondition();
+			if(upex!=null)
+			{
 				try
 				{
-					m.setAccessible(true);
-					
-					Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element, ia);
-					if(params==null)
-						System.out.println("Invalid parameter assignment");
-					Object app = m.invoke(pojo, params);
-					if(app instanceof Boolean)
+					Object	val	= SJavaParser.getParsedValue(upex, null, fetcher, null);
+					if(val instanceof Boolean)
 					{
-						if(((Boolean)app).booleanValue())
-						{
-							lis.resultAvailable(mplan);
-						}
-						else
-						{
-							lis.exceptionOccurred(null);
-						}
+						valid	= ((Boolean)val).booleanValue();
 					}
-					else if(app instanceof IFuture)
+					else
 					{
-						((IFuture<Boolean>)app).addResultListener(new IResultListener<Boolean>()
-						{
-							public void resultAvailable(Boolean result)
-							{
-								if(result.booleanValue())
-								{
-									lis.resultAvailable(mplan);
-								}
-								else
-								{
-									lis.exceptionOccurred(null);
-								}
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								lis.exceptionOccurred(exception);
-							}
-						});
+						ia.getLogger().warning("Precondition of plan "+mplan.getName()+" not boolean: "+val);
+						valid	= false;						
 					}
 				}
 				catch(Exception e)
 				{
-					lis.exceptionOccurred(e);
+					ia.getLogger().warning("Precondition of plan "+mplan.getName()+" threw exception: "+e);
+					valid	= false;
+				}
+				
+				if(valid)
+				{
+					lis.resultAvailable(mplan);				
+				}
+				else
+				{
+					lis.exceptionOccurred(null);
 				}
 			}
 			else
 			{
-				lis.resultAvailable(mplan);
+				// check pojo precondition
+				MethodInfo mi = mplan.getBody().getPreconditionMethod(ia.getClassLoader());
+				if(mi!=null)
+				{
+					Method m = mi.getMethod(ia.getClassLoader());
+					Object pojo = null;
+					if(!Modifier.isStatic(m.getModifiers()))
+					{
+						RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia);
+						pojo = rp.getBody().getBody();
+					}
+					
+					try
+					{
+						m.setAccessible(true);
+						
+						Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element, ia);
+						if(params==null)
+							System.out.println("Invalid parameter assignment");
+						Object app = m.invoke(pojo, params);
+						if(app instanceof Boolean)
+						{
+							if(((Boolean)app).booleanValue())
+							{
+								lis.resultAvailable(mplan);
+							}
+							else
+							{
+								lis.exceptionOccurred(null);
+							}
+						}
+						else if(app instanceof IFuture)
+						{
+							((IFuture<Boolean>)app).addResultListener(new IResultListener<Boolean>()
+							{
+								public void resultAvailable(Boolean result)
+								{
+									if(result.booleanValue())
+									{
+										lis.resultAvailable(mplan);
+									}
+									else
+									{
+										lis.exceptionOccurred(null);
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									lis.exceptionOccurred(exception);
+								}
+							});
+						}
+					}
+					catch(Exception e)
+					{
+						lis.exceptionOccurred(e);
+					}
+				}
+				else
+				{
+					lis.resultAvailable(mplan);
+				}
 			}
 		}
 		

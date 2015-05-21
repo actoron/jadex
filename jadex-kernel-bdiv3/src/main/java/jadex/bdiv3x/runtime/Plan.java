@@ -222,7 +222,17 @@ public abstract class Plan
 	 */
 	public IParameter getParameter(String name)
 	{
-		throw new UnsupportedOperationException();
+		return rplan.getParameter(name);
+	}
+	
+	/**
+	 *  Get a parameter.
+	 *  @param name The name.
+	 *  @return The parameter.
+	 */
+	public IParameterSet getParameterSet(String name)
+	{
+		return rplan.getParameterSet(name);
 	}
 	
 	/**

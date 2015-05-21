@@ -6,6 +6,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MCapabilityReference;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfiguration;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
@@ -27,6 +28,7 @@ import jadex.xml.IPostProcessor;
 import jadex.xml.LinkingInfo;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
@@ -405,7 +407,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			{
 				BDIV3XModel model = (BDIV3XModel)context.getRootObject();
 				MCapability mcapa = model.getCapability();
+				
 				MTrigger mtr = (MTrigger)object;
+				
 				List<String> names = mtr.getMessageNames();
 				if(names!=null)
 				{
@@ -417,6 +421,31 @@ public class BDIV3XMLReader extends ComponentXMLReader
 						mtr.addMessageEvent(mcapa.getMessageEvent(name));
 					}
 				}
+				
+				names = mtr.getGoalNames();
+				if(names!=null)
+				{
+					for(String name: names)
+					{
+						// todo: capa scoping?!
+						if(mcapa.getGoal(name)==null)
+							throw new RuntimeException("Goal not found: "+name);
+						mtr.addGoal(mcapa.getGoal(name));
+					}
+				}
+				
+				names = mtr.getGoalFinishedNames();
+				if(names!=null)
+				{
+					for(String name: names)
+					{
+						// todo: capa scoping?!
+						if(mcapa.getGoal(name)==null)
+							throw new RuntimeException("GoalFinished not found: "+name);
+						mtr.addGoalFinished(mcapa.getGoal(name));
+					}
+				}
+				
 				return null;
 			}
 			
@@ -542,6 +571,18 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				expost.postProcess(context, object);
 				MCondition	cond	= new MCondition();
 				cond.setExpression((UnparsedExpression)object);
+				
+				AReadContext<?>	ar	= (AReadContext<?>)context;
+				MElement	pe	= null;
+				for(StackElement se: ar.getStack())
+				{
+					if(se.getObject() instanceof MGoal || se.getObject() instanceof MPlan)
+					{
+						pe	= (MElement)se.getObject();
+					}
+				}				
+				cond.initEvents(pe);
+				
 				return cond;
 			}
 			
@@ -595,7 +636,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //					new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.publish_has_class, AccessInfo.IGNORE_WRITE))
 //				})));	
 //		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "parameter")), new ObjectInfo(MParameter.class), 
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "parameter")), new ObjectInfo(MParameter.class, 
+			new ParamMultiProc(false)), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv))
@@ -604,18 +647,19 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}
 		)));
 		
-//		TypeInfo ti_paramset = new TypeInfo(new XMLInfo(new QName(uri, "parameterset")), new ObjectInfo(MParameter.class), 
-//			new MappingInfo(null, new AttributeInfo[]{
-//			new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.typedelement_has_classname)),
-//			new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AccessInfo.IGNORE_WRITE))
-//			},
-//			new SubobjectInfo[]{
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "values"), OAVBDIMetaModel.parameterset_has_valuesexpression)),	
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "value"), OAVBDIMetaModel.parameterset_has_values))	
-//			}));
-//		typeinfos.add(ti_paramset);
-//		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "plan"), new QName(uri, "parameter")}), new ObjectInfo(MPlanParameter.class), 
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "parameterset")), new ObjectInfo(MParameter.class, 
+			new ParamMultiProc(true)), 
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, new SubobjectInfo[]{
+				// because there is only MParameter the values expression is stored as default value
+				// and multiple facts are added to a list
+				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValues")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "values"), "defaultValue"))
+			}), null));//, new OAVObjectReaderHandler()));	
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "plan"), new QName(uri, "parameter")}), new ObjectInfo(MPlanParameter.class, 
+			new ParamMultiProc(false)), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
@@ -749,4 +793,25 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		return typeinfos;
 	}
 	
+	public static class ParamMultiProc implements IPostProcessor
+	{
+		boolean multi;
+		
+		ParamMultiProc(boolean multi)
+		{
+			this.multi = multi;
+		}
+		
+		public Object postProcess(IContext context, Object object)
+		{
+			MParameter mparam = (MParameter)object;
+			mparam.setMulti(multi);
+			return mparam;
+		}
+		
+		public int getPass()
+		{
+			return 0;
+		}
+	}
 }

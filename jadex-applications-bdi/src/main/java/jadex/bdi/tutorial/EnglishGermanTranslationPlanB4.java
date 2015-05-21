@@ -13,16 +13,6 @@ import java.util.Map;
  */
 public class EnglishGermanTranslationPlanB4 extends Plan
 {
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public EnglishGermanTranslationPlanB4()
-	{
-		getLogger().info("Created: "+this);
-	}
-
 	//-------- methods --------
 
 	/**
