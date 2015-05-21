@@ -10,46 +10,7 @@ public abstract class CollectionWrapper <T> implements Collection<T>
 {
 	/** The delegate list. */
 	protected Collection<T> delegate;
-//	
-//	/** The agent interpreter. */
-//	protected BDIAgentInterpreter interpreter;
-//	
-//	/** The add event name. */
-//	protected EventType addevent;
-//	
-//	/** The remove event name. */
-//	protected EventType remevent;
-//	
-//	/** The change event name. */
-//	protected EventType changeevent;
-//	
-//	/** The belief model. */
-//	protected MBelief mbel;
-//	
-//	/**
-//	 *  Create a new collection wrapper.
-//	 */
-//	public CollectionWrapper(Collection<T> delegate, BDIAgentInterpreter interpreter, 
-//		String addevent, String remevent, String changeevent, MBelief mbel)
-//	{
-//		this(delegate, interpreter, new EventType(addevent), new EventType(remevent), new EventType(changeevent), mbel);
-//	}
-//	
-//	/**
-//	 *  Create a new collection wrapper.
-//	 */
-//	public CollectionWrapper(Collection<T> delegate, BDIAgentInterpreter interpreter, 
-//		EventType addevent, EventType remevent, EventType changeevent, MBelief mbel)
-//	{
-//		this.delegate = delegate;
-//		this.interpreter = interpreter;
-//		this.addevent = addevent;
-//		this.remevent = remevent;
-//		this.changeevent = changeevent;
-//		this.mbel = mbel;
-//	}
-//
-	
+
 	/**
 	 *  Create a new wrapper.
 	 *  @param delegate The delegate.

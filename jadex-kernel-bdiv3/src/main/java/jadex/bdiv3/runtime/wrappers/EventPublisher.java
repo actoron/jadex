@@ -4,6 +4,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MElement;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -19,7 +20,7 @@ import jadex.rules.eca.EventType;
 import jadex.rules.eca.RuleSystem;
 
 /**
- * 
+ *  Helper object for publishing change events (beliefs, parameters).
  */
 public class EventPublisher
 {
@@ -36,28 +37,36 @@ public class EventPublisher
 	protected EventType changeevent;
 	
 	/** The belief model. */
-	protected MBelief mbel;
+	protected MElement melement;
 
 	/**
 	 *  Create a new publisher.
 	 */
-	public EventPublisher(IInternalAccess agent, 
-		String addevent, String remevent, String changeevent, MBelief mbel)
+	public EventPublisher(IInternalAccess agent, String changeevent, MElement melement)
 	{
-		this(agent, new EventType(addevent), new EventType(remevent), new EventType(changeevent), mbel);
+		this(agent, null, null, new EventType(changeevent), melement);
 	}
 	
 	/**
 	 *  Create a new publisher.
 	 */
 	public EventPublisher(IInternalAccess agent, 
-		EventType addevent, EventType remevent, EventType changeevent, MBelief mbel)
+		String addevent, String remevent, String changeevent, MElement melement)
+	{
+		this(agent, new EventType(addevent), new EventType(remevent), new EventType(changeevent), melement);
+	}
+	
+	/**
+	 *  Create a new publisher.
+	 */
+	public EventPublisher(IInternalAccess agent, 
+		EventType addevent, EventType remevent, EventType changeevent, MElement melement)
 	{
 		this.agent = agent;
 		this.addevent = addevent;
 		this.remevent = remevent;
 		this.changeevent = changeevent;
-		this.mbel = mbel;
+		this.melement = melement;
 	}
 	
 //	/**
@@ -146,14 +155,15 @@ public class EventPublisher
 	 */
 	public void publishToolBeliefEvent()//String evtype)
 	{
-		BDIAgentFeature.publishToolBeliefEvent(agent, mbel);//, evtype);
+		if(melement instanceof MBelief)
+			BDIAgentFeature.publishToolBeliefEvent(agent, (MBelief)melement);//, evtype);
 	}
 
 	/**
 	 *  Get the addevent.
 	 *  @return The addevent
 	 */
-	public EventType getAddEvent()
+	protected EventType getAddEvent()
 	{
 		return addevent;
 	}
@@ -162,7 +172,7 @@ public class EventPublisher
 	 *  Get the remevent.
 	 *  @return The remevent
 	 */
-	public EventType getRemEvent()
+	protected EventType getRemEvent()
 	{
 		return remevent;
 	}
@@ -171,10 +181,72 @@ public class EventPublisher
 	 *  Get the changeevent.
 	 *  @return The changeevent
 	 */
-	public EventType getChangeEvent()
+	protected EventType getChangeEvent()
 	{
 		return changeevent;
 	}
 	
+	/**
+	 *  An entry was added to the collection.
+	 */
+	public void entryAdded(Object value, int index)
+	{
+//		unobserveValue(ret);
+		observeValue(value);
+		getRuleSystem().addEvent(new Event(getAddEvent(), new ChangeInfo<Object>(value, null, index>-1? Integer.valueOf(index): null)));
+		publishToolBeliefEvent();
+	}
 	
+	/**
+	 *  An entry was removed from the collection.
+	 */
+	public void entryRemoved(Object value, int index)
+	{
+		unobserveValue(value);
+//		observeValue(value);
+		getRuleSystem().addEvent(new Event(getRemEvent(), new ChangeInfo<Object>(value, null, index>-1? Integer.valueOf(index): null)));
+		publishToolBeliefEvent();
+	}
+	
+	/**
+	 *  An entry was changed in the collection.
+	 */
+	public void entryChanged(Object oldvalue, Object newvalue, int index)
+	{
+		unobserveValue(oldvalue);
+		observeValue(newvalue);
+		getRuleSystem().addEvent(new Event(getChangeEvent(), new ChangeInfo<Object>(newvalue, oldvalue,  index>-1? Integer.valueOf(index): null)));
+		publishToolBeliefEvent();
+	}
+	
+	/**
+	 *  An entry was added to the map.
+	 */
+	public void	entryAdded(Object key, Object value)
+	{
+		observeValue(value);
+		getRuleSystem().addEvent(new Event(getAddEvent(), new ChangeInfo<Object>(value, null, key)));
+		publishToolBeliefEvent();
+	}
+	
+	/**
+	 *  An entry was removed from the map.
+	 */
+	public void	entryRemoved(Object key, Object value)
+	{
+		unobserveValue(value);
+		getRuleSystem().addEvent(new Event(getRemEvent(), new ChangeInfo<Object>(null, value, key)));
+		publishToolBeliefEvent();
+	}
+	
+	/**
+	 *  An entry was changed in the map.
+	 */
+	public void	entryChanged(Object key, Object oldvalue, Object newvalue)
+	{
+		unobserveValue(oldvalue);
+		observeValue(newvalue);
+		getRuleSystem().addEvent(new Event(getChangeEvent(), new ChangeInfo<Object>(newvalue, oldvalue, key)));
+		publishToolBeliefEvent();
+	}
 }

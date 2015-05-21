@@ -41,9 +41,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	/**
 	 *  
 	 */
-	public void init(MCapability mcapa)
-	{
-		List<MBelief> mbels = mcapa.getBeliefs();
+	public void init()
+	{	
+		List<MBelief> mbels = getMCapability().getBeliefs();
 		if(mbels!=null)
 		{
 			for(MBelief mbel: mbels)
@@ -56,7 +56,6 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				{
 					addBeliefSet(new RBeliefSet(mbel, getAgent()));
 				}
-				
 			}
 		}
 	}
@@ -128,7 +127,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	}
 
 	/**
-	 * 
+	 *  Add a belief.
+	 *  @param bel The belief.
 	 */
 	public void addBelief(RBelief bel)
 	{
@@ -138,7 +138,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	}
 	
 	/**
-	 * 
+	 *  Add a beliefset.
+	 *  @param bel The beliefset.
 	 */
 	public void addBeliefSet(RBeliefSet belset)
 	{
@@ -270,8 +271,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			super(modelelement, agent);
 			String name = getModelElement().getName();
 			this.value = modelelement.getDefaultFact()==null? null: SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
-			this.publisher = new EventPublisher(agent, ChangeEvent.FACTADDED+"."+name, 
-				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
 		}
 
 		/**
@@ -289,11 +289,13 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public void setFact(Object value)
 		{
-			publisher.unobserveValue(this.value);
-			publisher.getRuleSystem().addEvent(new Event(publisher.getChangeEvent(), new ChangeInfo<Object>(value, this.value, null)));
+			publisher.entryChanged(this.value, value, -1);
 			this.value = value;
-			publisher.observeValue(value);
-			publisher.publishToolBeliefEvent();
+//			publisher.unobserveValue(this.value);
+//			publisher.getRuleSystem().addEvent(new Event(publisher.getChangeEvent(), new ChangeInfo<Object>(value, this.value, null)));
+//			this.value = value;
+//			publisher.observeValue(value);
+//			publisher.publishToolBeliefEvent();
 		}
 
 		/**
@@ -331,8 +333,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public RBeliefSet(MBelief modelelement, IInternalAccess agent)
 		{
 			super(modelelement, agent);
-			String name = getModelElement().getName();
 			
+			String name = getModelElement().getName();
 			List<Object> tmpfacts;
 			if(modelelement.getDefaultFact()!=null)
 			{

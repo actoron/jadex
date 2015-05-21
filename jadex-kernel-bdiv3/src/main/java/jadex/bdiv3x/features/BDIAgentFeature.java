@@ -121,7 +121,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		// cannot do this in constructor because it needs access to this feature in expressions
 
 		RBeliefbase bb = new RBeliefbase(getComponent());
-		bb.init(bdimodel.getCapability());
+		bb.init();
 		getCapability().setBeliefbase(bb);
 		
 		RExpressionBase eb = new RExpressionBase(getComponent());

@@ -1,9 +1,7 @@
 package jadex.bdiv3.runtime.wrappers;
 
-import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MElement;
 import jadex.bridge.IInternalAccess;
-import jadex.rules.eca.ChangeInfo;
-import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 
 import java.util.Set;
@@ -20,7 +18,7 @@ public class SetWrapper<T> extends jadex.commons.collection.wrappers.SetWrapper<
 	 *  Create a new set wrapper.
 	 */
 	public SetWrapper(Set<T> delegate, IInternalAccess agent, 
-		String addevent, String remevent, String changeevent, MBelief mbel)
+		String addevent, String remevent, String changeevent, MElement mbel)
 	{
 		this(delegate, agent, new EventType(addevent), new EventType(remevent), new EventType(changeevent), mbel);
 	}
@@ -29,7 +27,7 @@ public class SetWrapper<T> extends jadex.commons.collection.wrappers.SetWrapper<
 	 *  Create a new set wrapper.
 	 */
 	public SetWrapper(Set<T> delegate, IInternalAccess agent, 
-		EventType addevent, EventType remevent, EventType changeevent, MBelief mbel)
+		EventType addevent, EventType remevent, EventType changeevent, MElement mbel)
 	{
 		super(delegate);
 		this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, mbel);
@@ -40,10 +38,7 @@ public class SetWrapper<T> extends jadex.commons.collection.wrappers.SetWrapper<
 	 */
 	protected void entryAdded(T value, int index)
 	{
-//		unobserveValue(ret);
-		publisher.observeValue(value);
-		publisher.getRuleSystem().addEvent(new Event(publisher.getAddEvent(), new ChangeInfo<T>(value, null, index>-1? Integer.valueOf(index): null)));
-		publisher.publishToolBeliefEvent();
+		publisher.entryAdded(value, index);
 	}
 	
 	/**
@@ -51,10 +46,7 @@ public class SetWrapper<T> extends jadex.commons.collection.wrappers.SetWrapper<
 	 */
 	protected void entryRemoved(T value, int index)
 	{
-		publisher.unobserveValue(value);
-//		observeValue(value);
-		publisher.getRuleSystem().addEvent(new Event(publisher.getRemEvent(), new ChangeInfo<T>(value, null, index>-1? Integer.valueOf(index): null)));
-		publisher.publishToolBeliefEvent();
+		publisher.entryRemoved(value, index);
 	}
 	
 	/**
@@ -62,9 +54,6 @@ public class SetWrapper<T> extends jadex.commons.collection.wrappers.SetWrapper<
 	 */
 	protected void entryChanged(T oldvalue, T newvalue, int index)
 	{
-		publisher.unobserveValue(oldvalue);
-		publisher.observeValue(newvalue);
-		publisher.getRuleSystem().addEvent(new Event(publisher.getRemEvent(), new ChangeInfo<T>(newvalue, oldvalue,  index>-1? Integer.valueOf(index): null)));
-		publisher.publishToolBeliefEvent();
+		publisher.entryChanged(oldvalue, newvalue, index);
 	}
 }
