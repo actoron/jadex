@@ -15,6 +15,7 @@ import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -22,6 +23,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -383,67 +385,101 @@ public class APL
 		
 		for(final MPlan mplan: precandidates)
 		{
-			// check precondition
-			MethodInfo mi = mplan.getBody().getPreconditionMethod(ia.getClassLoader());
-			if(mi!=null)
+			boolean	valid	= true;
+			
+			// check xml precondition
+			UnparsedExpression	upex	= mplan.getPrecondition();
+			if(upex!=null)
 			{
-				Method m = mi.getMethod(ia.getClassLoader());
-				Object pojo = null;
-				if(!Modifier.isStatic(m.getModifiers()))
-				{
-					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia);
-					pojo = rp.getBody().getBody();
-				}
 				try
 				{
-					m.setAccessible(true);
-					
-					Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element, ia);
-					if(params==null)
-						System.out.println("Invalid parameter assignment");
-					Object app = m.invoke(pojo, params);
-					if(app instanceof Boolean)
+					Object	val	= SJavaParser.getParsedValue(upex, null, ia.getFetcher(), null);
+					if(val instanceof Boolean)
 					{
-						if(((Boolean)app).booleanValue())
-						{
-							lis.resultAvailable(mplan);
-						}
-						else
-						{
-							lis.exceptionOccurred(null);
-						}
+						valid	= ((Boolean)val).booleanValue();
 					}
-					else if(app instanceof IFuture)
+					else
 					{
-						((IFuture<Boolean>)app).addResultListener(new IResultListener<Boolean>()
-						{
-							public void resultAvailable(Boolean result)
-							{
-								if(result.booleanValue())
-								{
-									lis.resultAvailable(mplan);
-								}
-								else
-								{
-									lis.exceptionOccurred(null);
-								}
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								lis.exceptionOccurred(exception);
-							}
-						});
+						ia.getLogger().warning("Precondition of plan "+mplan.getName()+" not boolean: "+val);
+						valid	= false;						
 					}
 				}
 				catch(Exception e)
 				{
-					lis.exceptionOccurred(e);
+					ia.getLogger().warning("Precondition of plan "+mplan.getName()+" threw exception: "+e);
+					valid	= false;
+				}
+				
+				if(valid)
+				{
+					lis.resultAvailable(mplan);				
+				}
+				else
+				{
+					lis.exceptionOccurred(null);
 				}
 			}
 			else
 			{
-				lis.resultAvailable(mplan);
+				// check pojo precondition
+				MethodInfo mi = mplan.getBody().getPreconditionMethod(ia.getClassLoader());
+				if(valid && mi!=null)
+				{
+					Method m = mi.getMethod(ia.getClassLoader());
+					Object pojo = null;
+					if(!Modifier.isStatic(m.getModifiers()))
+					{
+						RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia);
+						pojo = rp.getBody().getBody();
+					}
+					
+					try
+					{
+						m.setAccessible(true);
+						
+						Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element, ia);
+						if(params==null)
+							System.out.println("Invalid parameter assignment");
+						Object app = m.invoke(pojo, params);
+						if(app instanceof Boolean)
+						{
+							if(((Boolean)app).booleanValue())
+							{
+								lis.resultAvailable(mplan);
+							}
+							else
+							{
+								lis.exceptionOccurred(null);
+							}
+						}
+						else if(app instanceof IFuture)
+						{
+							((IFuture<Boolean>)app).addResultListener(new IResultListener<Boolean>()
+							{
+								public void resultAvailable(Boolean result)
+								{
+									if(result.booleanValue())
+									{
+										lis.resultAvailable(mplan);
+									}
+									else
+									{
+										lis.exceptionOccurred(null);
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									lis.exceptionOccurred(exception);
+								}
+							});
+						}
+					}
+					catch(Exception e)
+					{
+						lis.exceptionOccurred(e);
+					}
+				}
 			}
 		}
 		

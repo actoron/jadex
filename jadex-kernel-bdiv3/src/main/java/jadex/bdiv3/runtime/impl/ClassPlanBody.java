@@ -13,7 +13,6 @@ import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
-import jadex.micro.annotation.Agent;
 import jadex.rules.eca.ChangeInfo;
 
 import java.lang.reflect.Constructor;

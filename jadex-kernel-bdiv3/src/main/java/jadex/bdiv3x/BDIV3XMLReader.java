@@ -6,6 +6,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MCapabilityReference;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfiguration;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
@@ -27,6 +28,7 @@ import jadex.xml.IPostProcessor;
 import jadex.xml.LinkingInfo;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
@@ -531,6 +533,18 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				expost.postProcess(context, object);
 				MCondition	cond	= new MCondition();
 				cond.setExpression((UnparsedExpression)object);
+				
+				AReadContext<?>	ar	= (AReadContext<?>)context;
+				MElement	pe	= null;
+				for(StackElement se: ar.getStack())
+				{
+					if(se.getObject() instanceof MGoal || se.getObject() instanceof MPlan)
+					{
+						pe	= (MElement)se.getObject();
+					}
+				}				
+				cond.initEvents(pe);
+				
 				return cond;
 			}
 			

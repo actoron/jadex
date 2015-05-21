@@ -94,7 +94,15 @@ public class MCondition extends MElement
 	 */
 	public List<EventType> getEvents()
 	{
-		if(events==null && expression!=null && expression.getParsed() instanceof ExpressionNode)
+		return events;
+	}
+	
+	/**
+	 *  Init the event, when loaded from xml.
+	 */
+	public void	initEvents(MElement pe)
+	{
+		if(expression!=null && expression.getParsed() instanceof ExpressionNode)
 		{
 			Set<String>	done	= new HashSet<String>();
 			events	= new ArrayList<EventType>();
@@ -107,21 +115,94 @@ public class MCondition extends MElement
 					if(parent instanceof ReflectNode)
 					{
 						ReflectNode	ref	= (ReflectNode)parent;
-						if(ref.getType()==ReflectNode.FIELD && !done.contains(ref.getText()))
+						if(ref.getType()==ReflectNode.FIELD)
 						{
 							// Todo: differentiate between beliefs/sets
-							events.add(new EventType(ChangeEvent.FACTCHANGED+"."+ref.getText()));
-							events.add(new EventType(ChangeEvent.FACTADDED+"."+ref.getText()));
-							events.add(new EventType(ChangeEvent.FACTREMOVED+"."+ref.getText()));
-							
-							done.add(ref.getText());
+							addEvent(events, done, ChangeEvent.FACTCHANGED, ref.getText());
+							addEvent(events, done, ChangeEvent.FACTADDED, ref.getText());
+							addEvent(events, done, ChangeEvent.FACTREMOVED, ref.getText());
 						}
-						// todo: getBelief("xxx")
+						
+						else if(ref.getType()==ReflectNode.METHOD && "getBelief".equals(ref.getText()) && ref.jjtGetNumChildren()==1
+							&& ((ExpressionNode)ref.jjtGetChild(0)).isConstant() && ((ExpressionNode)ref.jjtGetChild(0)).getConstantValue() instanceof String
+							&& !done.contains(((ExpressionNode)ref.jjtGetChild(0)).getConstantValue()))
+						{
+							String	name	= (String)((ExpressionNode)ref.jjtGetChild(0)).getConstantValue();
+							addEvent(events, done, ChangeEvent.FACTCHANGED, name);
+						}
+						
+						else if(ref.getType()==ReflectNode.METHOD && "getBeliefSet".equals(ref.getText()) && ref.jjtGetNumChildren()==1
+							&& ((ExpressionNode)ref.jjtGetChild(0)).isConstant() && ((ExpressionNode)ref.jjtGetChild(0)).getConstantValue() instanceof String
+							&& !done.contains(((ExpressionNode)ref.jjtGetChild(0)).getConstantValue()))
+						{
+							String	name	= (String)((ExpressionNode)ref.jjtGetChild(0)).getConstantValue();
+							addEvent(events, done, ChangeEvent.FACTCHANGED, name);
+							addEvent(events, done, ChangeEvent.FACTADDED, name);
+							addEvent(events, done, ChangeEvent.FACTREMOVED, name);
+						}
+					}
+				}
+				
+				else if("$goal".equals(param.getText()) || "$plan".equals(param.getText()))
+				{
+					Node parent	= param.jjtGetParent();
+					if(parent instanceof ReflectNode)
+					{
+						ReflectNode	ref	= (ReflectNode)parent;
+						if(ref.getType()==ReflectNode.FIELD && !done.contains(ref.getText()))
+						{
+							// Todo: differentiate between parameters/sets
+							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), ref.getText());
+							addEvent(events, done, ChangeEvent.VALUEADDED, pe.getName(), ref.getText());
+							addEvent(events, done, ChangeEvent.VALUEREMOVED, pe.getName(), ref.getText());
+						}
+						
+						else if(ref.getType()==ReflectNode.METHOD && "getParameter".equals(ref.getText()) && ref.jjtGetNumChildren()==1
+							&& ((ExpressionNode)ref.jjtGetChild(0)).isConstant() && ((ExpressionNode)ref.jjtGetChild(0)).getConstantValue() instanceof String)
+						{
+							String	name	= (String)((ExpressionNode)ref.jjtGetChild(0)).getConstantValue();
+							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
+						}
+						
+						else if(ref.getType()==ReflectNode.METHOD && "getParameterSet".equals(ref.getText()) && ref.jjtGetNumChildren()==1
+							&& ((ExpressionNode)ref.jjtGetChild(0)).isConstant() && ((ExpressionNode)ref.jjtGetChild(0)).getConstantValue() instanceof String
+							&& !done.contains(((ExpressionNode)ref.jjtGetChild(0)).getConstantValue()))
+						{
+							String	name	= (String)((ExpressionNode)ref.jjtGetChild(0)).getConstantValue();
+							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
+							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
+							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
+						}
 					}
 				}
 			}
 		}
-		return events;
+
+	}
+	
+	/**
+	 *  Add event if not already added.
+	 */
+	private void	addEvent(List<EventType> events, Set<String> done, String... event)
+	{
+		String	ev	= null;
+		for(String part: event)
+		{
+			if(ev==null)
+			{
+				ev	= part;
+			}
+			else
+			{
+				ev	+= "." + part;
+			}
+		}
+		
+		if(!done.contains(ev))
+		{
+			events.add(new EventType(ev));	
+			done.add(ev);
+		}
 	}
 	
 	/**
