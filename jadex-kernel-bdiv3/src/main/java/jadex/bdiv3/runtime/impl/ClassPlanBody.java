@@ -5,7 +5,6 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
-import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MPlan;
@@ -14,6 +13,7 @@ import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
+import jadex.micro.annotation.Agent;
 import jadex.rules.eca.ChangeInfo;
 
 import java.lang.reflect.Constructor;
@@ -119,7 +119,8 @@ public class ClassPlanBody extends AbstractPlanBody
 							}
 							catch(Exception e)
 							{
-							}							
+								e.printStackTrace();
+							}
 						}						
 					}
 					if(plan==null)
@@ -171,26 +172,38 @@ public class ClassPlanBody extends AbstractPlanBody
 					}
 					else if(f.isAnnotationPresent(PlanCapability.class))
 					{
-						// Find capability based on model element (or use agent). Todo remove pojo specific code.
+						// Find capability based on model element (or use agent).
 						String	capaname	= null;
 						int idx = rplan.getModelElement().getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR);
 						if(idx!=-1)
 						{
 							capaname = rplan.getModelElement().getName().substring(0, idx);
 						}
-						Object capa = capaname!=null ? ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname)
-							: ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+
+						// Pojo specific code.
+						Object pojocapa	= capaname!=null
+							? (ia.getComponentFeature0(IBDIAgentFeature.class) instanceof BDIAgentFeature ? ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname) : null)
+							: (ia.getComponentFeature0(IPojoComponentFeature.class)!=null ? ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent() : null);
 
 						
-						f.setAccessible(true);
-						Class<?> ft = f.getType();
-						if(ft.equals(ICapability.class))
+						if(f.getType().isAssignableFrom(IInternalAccess.class))
 						{
-							f.set(plan, new CapabilityWrapper(ia, capa, null));
+							f.setAccessible(true);
+							f.set(plan, new CapabilityWrapper(ia, pojocapa, capaname).getAgent());
+						}
+						else if(f.getType().isAssignableFrom(ICapability.class))
+						{
+							f.setAccessible(true);
+							f.set(plan, new CapabilityWrapper(ia, pojocapa, capaname));
+						}
+						else if(pojocapa!=null && f.getType().isAssignableFrom(pojocapa.getClass()))
+						{
+							f.setAccessible(true);
+							f.set(plan, pojocapa);
 						}
 						else
 						{
-							f.set(plan, capa);
+							throw new RuntimeException("Cannot set @PlanCapability: "+f+", capaname="+capaname+", pojocapa="+pojocapa);
 						}
 					}
 					else if(f.isAnnotationPresent(PlanReason.class))

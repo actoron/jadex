@@ -102,6 +102,10 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public Object	getPojoCapability()
 	{
+		if(pojo==null)
+		{
+			throw new UnsupportedOperationException("No pojo capability for XML agents.");
+		}
 		return pojo;
 	}
 

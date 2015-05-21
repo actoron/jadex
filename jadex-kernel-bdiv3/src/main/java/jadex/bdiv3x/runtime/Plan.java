@@ -1,9 +1,16 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
+import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
+import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
@@ -22,23 +29,28 @@ import java.util.logging.Logger;
 /**
  *  Dummy class for loading v2 examples using v3x.
  */
+@jadex.bdiv3.annotation.Plan
 public abstract class Plan
 {
 	/** The internal access. */
+	@PlanCapability
 	protected IInternalAccess agent;
 	
 	/** The rplan. */
+	@PlanAPI
 	protected RPlan rplan;
 	
 	/**
 	 *  The body method is called on the
 	 *  instantiated plan instance from the scheduler.
 	 */
+	@PlanBody
 	public abstract void body();
 
 	/**
 	 *  The passed method is called on plan success.
 	 */
+	@PlanPassed
 	public void	passed()
 	{
 	}
@@ -46,6 +58,7 @@ public abstract class Plan
 	/**
 	 *  The failed method is called on plan failure/abort.
 	 */
+	@PlanFailed
 	public void	failed()
 	{
 	}
@@ -54,6 +67,7 @@ public abstract class Plan
 	 *  The plan was aborted (because of conditional goal
 	 *  success or termination from outside).
 	 */
+	@PlanAborted
 	public void aborted()
 	{
 	}
@@ -115,7 +129,7 @@ public abstract class Plan
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addMessageEvent(mevent);
 
-		IMessageEvent res = (IMessageEvent)getRPlan().getFromWaitqueue(wa);
+		IMessageEvent res = (IMessageEvent)rplan.getFromWaitqueue(wa);
 		if(res!=null)
 		{
 			return res;
@@ -123,7 +137,7 @@ public abstract class Plan
 		else
 		{
 			// todo: add scope name if is in capa
-			getRPlan().setWaitAbstraction(wa);
+			rplan.setWaitAbstraction(wa);
 			
 			// todo: timeout
 			
@@ -178,7 +192,7 @@ public abstract class Plan
 	 *  Get the rplan.
 	 *  @return The rplan
 	 */
-	public RPlan getRPlan()
+	public IPlan getRPlan()
 	{
 		return rplan;
 	}

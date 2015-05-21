@@ -14,14 +14,14 @@ public interface ICapability
 	 *  @param name The belief name.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefListener(final String name, final IBeliefListener listener);
+	public <T> void addBeliefListener(final String name, final IBeliefListener<T> listener);
 	
 	/**
 	 *  Remove a belief listener.
 	 *  @param name The belief name.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefListener(String name, IBeliefListener listener);
+	public <T> void removeBeliefListener(String name, IBeliefListener<T> listener);
 	
 	/**
 	 *  Get the agent.
@@ -30,6 +30,9 @@ public interface ICapability
 	
 	/**
 	 *  Get the pojo capability object.
+	 *  Only applicable for Pojo BDI agents (i.e. not for XML BDI agents).
+	 *  @return The user defined java object for the capability.
+	 *  @throws UnsupportedOperationException for XML BDI agents.
 	 */
 	public Object getPojoCapability();
 	
