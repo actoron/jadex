@@ -60,18 +60,18 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 	/** The set of inhibitors. */
 	protected Set<RGoal> inhibitors;
 
-	/** The internal access. */
-	protected IInternalAccess ia;
+//	/** The internal access. */
+//	protected IInternalAccess ia;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(IInternalAccess ia, MGoal mgoal, Object goal, RPlan parentplan)
+	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RPlan parentplan)
 	{
-		super(mgoal, goal);
-		this.ia = ia;
+		super(mgoal, goal, agent);
+//		this.ia = ia;
 		this.parentplan = parentplan;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;
@@ -80,10 +80,10 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(IInternalAccess ia, MGoal mgoal, Object goal, RGoal parentgoal)
+	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RGoal parentgoal)
 	{
-		super(mgoal, goal);
-		this.ia = ia;
+		super(mgoal, goal, agent);
+//		this.ia = ia;
 		this.parentgoal = parentgoal;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;
@@ -762,12 +762,12 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 			// AND case
 			else
 			{
-				MCapability mcapa = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability();
+				MCapability mcapa = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability();
 				
 				String capaname = getMGoal().getCapabilityName();
 				if(capaname!=null)
 				{
-					mcapa = ((BDIModel)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getBDIModel()).getCapability(capaname);
+					mcapa = ((BDIModel)((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class)).getBDIModel()).getCapability(capaname);
 				}
 				
 				// No further candidate? Then is considered as succeeded
@@ -848,7 +848,7 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 			&& !GoalLifecycleState.DROPPING.equals(getLifecycleState()) 
 			&& !GoalLifecycleState.DROPPED.equals(getLifecycleState()))
 		{
-			setLifecycleState(ia, GoalLifecycleState.DROPPING);
+			setLifecycleState(getAgent(), GoalLifecycleState.DROPPING);
 		}
 	}
 	
@@ -909,7 +909,7 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 				List<Object> res = new ArrayList<Object>();
 				res.add(result);
 				Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), 
-					rplan!=null? rplan.getModelElement(): rpe.getModelElement(), event, rplan, rpe, res, ia);
+					rplan!=null? rplan.getModelElement(): rpe.getModelElement(), event, rplan, rpe, res, getAgent());
 				if(params==null)
 					System.out.println("Invalid parameter assignment");
 				m.invoke(getPojoElement(), params);
@@ -1110,12 +1110,12 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 	 */
 	public void publishToolGoalEvent(String evtype)
 	{
-		if(ia.getComponentFeature0(IMonitoringComponentFeature.class)!=null 
-			&& ia.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
+		if(getAgent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
+			&& getAgent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
-			mev.setSourceIdentifier(ia.getComponentIdentifier());
+			mev.setSourceIdentifier(getAgent().getComponentIdentifier());
 			mev.setTime(time);
 			
 			GoalInfo info = GoalInfo.createGoalInfo(this);
@@ -1125,7 +1125,7 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			ia.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
+			getAgent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	

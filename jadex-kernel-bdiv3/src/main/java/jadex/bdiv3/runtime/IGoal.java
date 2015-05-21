@@ -1,9 +1,11 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3x.runtime.IParameterElement;
+
 /**
  *  Interface for a bdi goal.
  */
-public interface IGoal
+public interface IGoal extends IParameterElement // needed for xml version of BDI
 {
 	//-------- goal states --------
 	

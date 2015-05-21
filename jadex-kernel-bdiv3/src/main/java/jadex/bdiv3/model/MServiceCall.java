@@ -1,7 +1,7 @@
 package jadex.bdiv3.model;
 
 /**
- * 
+ *  Model element for a service call.
  */
 public class MServiceCall extends MProcessableElement
 {

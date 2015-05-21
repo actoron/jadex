@@ -24,9 +24,6 @@ import java.util.Map;
  */
 public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 {
-	/** The internal access. */
-	protected IInternalAccess agent;
-	
 	/** The beliefs. */
 	protected Map<String, IBelief> beliefs;
 	
@@ -36,10 +33,32 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	/**
 	 *  Create a new beliefbase.
 	 */
-	public RBeliefbase(IInternalAccess ia)
+	public RBeliefbase(IInternalAccess agent)
 	{
-		super(null);
-		this.agent = ia;
+		super(null, agent);
+	}
+	
+	/**
+	 *  
+	 */
+	public void init(MCapability mcapa)
+	{
+		List<MBelief> mbels = mcapa.getBeliefs();
+		if(mbels!=null)
+		{
+			for(MBelief mbel: mbels)
+			{
+				if(!mbel.isMulti(agent.getClassLoader()))
+				{
+					addBelief(new RBelief(mbel, getAgent()));
+				}
+				else
+				{
+					addBeliefSet(new RBeliefSet(mbel, getAgent()));
+				}
+				
+			}
+		}
 	}
 	
 	/**
@@ -106,29 +125,6 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	public String[] getBeliefSetNames()
 	{
 		return beliefsets==null? SUtil.EMPTY_STRING_ARRAY: beliefsets.keySet().toArray(new String[beliefsets.size()]);
-	}
-	
-	/**
-	 *  
-	 */
-	public void init(MCapability mcapa)
-	{
-		List<MBelief> mbels = mcapa.getBeliefs();
-		if(mbels!=null)
-		{
-			for(MBelief mbel: mbels)
-			{
-				if(!mbel.isMulti(agent.getClassLoader()))
-				{
-					addBelief(new RBelief(mbel));
-				}
-				else
-				{
-					addBeliefSet(new RBeliefSet(mbel));
-				}
-				
-			}
-		}
 	}
 
 	/**
@@ -269,9 +265,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RBelief(MBelief modelelement)
+		public RBelief(MBelief modelelement, IInternalAccess agent)
 		{
-			super(modelelement);
+			super(modelelement, agent);
 			String name = getModelElement().getName();
 			this.value = modelelement.getDefaultFact()==null? null: SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
 			this.publisher = new EventPublisher(agent, ChangeEvent.FACTADDED+"."+name, 
@@ -332,9 +328,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RBeliefSet(MBelief modelelement)
+		public RBeliefSet(MBelief modelelement, IInternalAccess agent)
 		{
-			super(modelelement);
+			super(modelelement, agent);
 			String name = getModelElement().getName();
 			
 			List<Object> tmpfacts;

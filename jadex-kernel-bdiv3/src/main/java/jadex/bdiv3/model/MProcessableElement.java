@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *  Base class for all elements that can be processed with means-end reasoning.
  */
-public class MProcessableElement extends MElement
+public class MProcessableElement extends MParameterElement
 {
 	public static Map<String, ExcludeMode> modes = new HashMap<String, ExcludeMode>();
 	

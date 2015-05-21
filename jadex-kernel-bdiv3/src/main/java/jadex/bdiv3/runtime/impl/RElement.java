@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.model.MElement;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 
 /**
@@ -17,15 +18,19 @@ public class RElement
 		
 	/** The element id. */
 	protected String id;
+	
+	/** The internal access. */
+	protected IInternalAccess agent;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new runtime element.
 	 */
-	public RElement(MElement modelelement)
+	public RElement(MElement modelelement, IInternalAccess agent)
 	{
 		this.modelelement = modelelement;
+		this.agent = agent;
 		this.id = modelelement==null? "nomodel": modelelement.getName()+"_#"+cnt++;
 	}
 
@@ -89,6 +94,15 @@ public class RElement
 			ret = ((RElement)obj).getId().equals(getId());
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get the agent.
+	 *  @return The agent
+	 */
+	public IInternalAccess getAgent()
+	{
+		return agent;
 	}
 
 	/** 

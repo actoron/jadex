@@ -1,63 +1,83 @@
-package jadex.bdiv3x.runtime;
+package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MElement;
-import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
-import jadex.bdiv3.runtime.impl.RElement;
-import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.bdiv3.model.MParameterElement;
+import jadex.bdiv3x.runtime.IParameter;
+import jadex.bdiv3x.runtime.IParameterElement;
+import jadex.bdiv3x.runtime.IParameterSet;
+import jadex.bdiv3x.runtime.RBeliefbase.RBelief;
+import jadex.bdiv3x.runtime.RBeliefbase.RBeliefSet;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.message.MessageType;
+import jadex.javaparser.IMapAccess;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Base element for elements with parameters such as:
+ *  - message event
+ *  - internal event
+ *  - goal
+ *  - plan
  */
-public class RMessageEvent extends RProcessableElement implements IMessageEvent 
+public class RParameterElement extends RElement implements IParameterElement, IMapAccess
 {
-	//-------- attributes --------
+	/** The parameters. */
+	protected Map<String, IParameter> parameters;
 	
-	/** The message. */
-	protected Map<String, Object> msg;
-	
-	/** The message type. */
-	protected MessageType mt;
-	
-	/** The finished flag. */
-	boolean finished;
-	
-	//-------- constructors --------
+	/** The parameter sets. */
+	protected Map<String, IParameterSet> parametersets;
 	
 	/**
-	 *  Create a new runtime element.
+	 *  Create a new beliefbase.
 	 */
-	public RMessageEvent(MMessageEvent modelelement, Map<String, Object> msg, MessageType mt, IInternalAccess agent)
+	public RParameterElement(MParameterElement melement, IInternalAccess agent)
 	{
-		super(modelelement, null, agent);
-		this.msg = msg;
-		this.mt = mt;
+		super(melement, agent);
 	}
 	
-	//-------- methods --------
+//	/**
+//	 *  
+//	 */
+//	public void init()
+//	{
+//		List<MParameter> mbels = ((MParameterElement)getModelElement()).getParameters();
+//		if(mbels!=null)
+//		{
+//			for(MParameter mbel: mbels)
+//			{
+//				if(!mbel.isMulti(agent.getClassLoader()))
+//				{
+//					addParameter(new RBelief(mbel, getAgent()));
+//				}
+//				else
+//				{
+//					addParameterSet(new RBeliefSet(mbel, getAgent()));
+//				}
+//			}
+//		}
+//	}
 	
 	/**
 	 *  Get all parameters.
 	 *  @return All parameters.
 	 */
-	public IParameter[] getParameters()
+	public IParameter[]	getParameters()
 	{
-		throw new UnsupportedOperationException();
+		return parameters==null? new IParameter[0]: parameters.values().toArray(new IParameter[parameters.size()]);
 	}
 
 	/**
 	 *  Get all parameter sets.
 	 *  @return All parameter sets.
 	 */
-	public IParameterSet[] getParameterSets()
+	public IParameterSet[]	getParameterSets()
 	{
-		throw new UnsupportedOperationException();
+		return parametersets==null? new IParameterSet[0]: parametersets.values().toArray(new IParameterSet[parametersets.size()]);
 	}
 
 	/**
@@ -67,11 +87,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameter getParameter(String name)
 	{
-		if(mt.getParameter(name)==null)
-			throw new RuntimeException("Unknown parameter: "+name);
-		
-		MParameter mp = getMMessageEvent().getParameter(name);
-		return new RParameter(mp, name, getAgent());
+		if(parameters==null || !parameters.containsKey(name))
+			throw new RuntimeException("Parameter not found: "+name);
+		return parameters.get(name);
 	}
 
 	/**
@@ -81,11 +99,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameterSet getParameterSet(String name)
 	{
-		if(mt.getParameterSet(name)==null)
-			throw new RuntimeException("Unknown parameter set: "+name);
-		
-		MParameter mp = getMMessageEvent().getParameter(name);
-		return new RParameterSet(mp, name, getAgent());
+		if(parametersets==null || !parametersets.containsKey(name))
+			throw new RuntimeException("Parameterset not found: "+name);
+		return parametersets.get(name);
 	}
 
 	/**
@@ -95,9 +111,9 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public boolean hasParameter(String name)
 	{
-		return mt.getParameter(name)!=null;
+		return parameters==null? false: parameters.containsKey(name);
 	}
-	
+
 	/**
 	 *  Has the element a parameter set element.
 	 *  @param name The name.
@@ -105,51 +121,43 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public boolean hasParameterSet(String name)
 	{
-		return mt.getParameterSet(name)!=null;
+		return parametersets==null? false: parametersets.containsKey(name);
 	}
 
 	/**
-	 *  Get the native (platform specific) message object.
-	 *  @return The native message.
+	 *  Get an object from the map.
+	 *  @param key The key
+	 *  @return The value.
 	 */
-	public Object getMessage()
+	public Object get(Object key)
 	{
-		return msg;
-	}
-
-	/**
-	 *  Get the message type.
-	 *  @return The message type.
-	 */
-	public MessageType getMessageType()
-	{
-		return mt;
-	}
-	
-//	/**
-//	 *  Get the element type (i.e. the name declared in the ADF).
-//	 *  @return The element type.
-//	 */
-//	public String getType()
-//	{
-//		return getModelElement().getName();
-//	}
-	
-	/**
-	 * 
-	 */
-	public MMessageEvent getMMessageEvent()
-	{
-		return (MMessageEvent)getModelElement();
+		String name = (String)key;
+		Object ret = null;
+		if(hasParameter(name))
+		{
+			ret = getParameter(name).getValue();
+		}
+		else if(hasParameterSet(name))
+		{
+			ret = getParameterSet(name).getValues();
+		}
+		else
+		{
+			throw new RuntimeException("Unknown parameter/set: "+name);
+		}
+		return ret;
 	}
 	
 	/**
 	 * 
 	 */
-	public class RParameter extends RElement implements IParameter
+	public static class RParameter extends RElement implements IParameter
 	{
 		/** The name. */
 		protected String name;
+		
+		/** The value. */
+		protected Object value;
 
 		/**
 		 *  Create a new parameter.
@@ -177,7 +185,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public void setValue(Object value)
 		{
-			msg.put(name, value);
+			this.value = value;
 		}
 
 		/**
@@ -186,18 +194,21 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public Object	getValue()
 		{
-			return msg.get(name);
+			return value;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
-	public class RParameterSet extends RElement implements IParameterSet
+	public static class RParameterSet extends RElement implements IParameterSet
 	{
 		/** The name. */
 		protected String name;
 		
+		/** The value. */
+		protected List<Object> values;
+
 		/**
 		 *  Create a new parameter.
 		 *  @param modelelement The model element.
@@ -224,7 +235,6 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public void addValue(Object value)
 		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
 			if(values==null)
 				values = new ArrayList<Object>();
 			values.add(value);
@@ -236,7 +246,6 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public void removeValue(Object value)
 		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
 			if(values!=null)
 				values.remove(value);
 		}
@@ -260,7 +269,6 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public void removeValues()
 		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
 			if(values!=null)
 				values.clear();
 		}
@@ -278,7 +286,6 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public boolean containsValue(Object value)
 		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
 			return values==null? false: values.contains(value);
 		}
 
@@ -288,7 +295,6 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public Object[]	getValues()
 		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
 			return values==null? new Object[0]: values.toArray();
 		}
 
@@ -299,26 +305,16 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public int size()
 		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
 			return values==null? 0: values.size();
 		}
 	}
-
-	//todo: set finished
 	
-	/**
-	 *  Test if element is succeeded.
-	 */
-	public boolean isSucceeded()
-	{
-		return finished && exception==null;
-	}
-	
-	/**
-	 *  Test if element is failed.
-	 */
-	public boolean isFailed()
-	{
-		return finished && exception!=null;
-	}
+//	/**
+//	 *  Get the element type (i.e. the name declared in the ADF).
+//	 *  @return The element type.
+//	 */
+//	public String getType()
+//	{
+//		
+//	}
 }

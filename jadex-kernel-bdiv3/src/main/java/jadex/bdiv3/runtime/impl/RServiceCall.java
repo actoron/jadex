@@ -5,7 +5,7 @@ import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
 
 /**
- * 
+ *  Runtime element for handling a service call as plan. 
  */
 public class RServiceCall extends RProcessableElement
 {
@@ -15,9 +15,9 @@ public class RServiceCall extends RProcessableElement
 	/**
 	 *  Create a new ServiceCall. 
 	 */
-	public RServiceCall(MProcessableElement modelelement, InvocationInfo pojoelement)
+	public RServiceCall(MProcessableElement modelelement, InvocationInfo pojoelement, IInternalAccess agent)
 	{
-		super(modelelement, pojoelement);
+		super(modelelement, pojoelement, agent);
 	}
 	
 	/**

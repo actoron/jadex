@@ -31,6 +31,7 @@ import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.RExpressionBase;
+import jadex.bdiv3x.runtime.RGoalbase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -107,7 +108,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		super(component, cinfo);
 		
 		this.bdimodel = (IBDIModel)getComponent().getModel();
-		this.capa = new RCapability(bdimodel.getCapability());
+		this.capa = new RCapability(bdimodel.getCapability(), component);
 		this.rulesystem = new RuleSystem(null);
 	}
 
@@ -125,6 +126,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		
 		RExpressionBase eb = new RExpressionBase(getComponent());
 		getCapability().setExpressionbase(eb);
+		
+		RGoalbase gb = new RGoalbase(getComponent());
+		getCapability().setGoalbase(gb);
 		
 //		injectAgent(getComponent(), pojo, bdimodel, null);
 //		invokeInitCalls(pojo);

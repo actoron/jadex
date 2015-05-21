@@ -121,7 +121,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		Object pojo = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 		ASMBDIClassGenerator.checkEnhanced(pojo.getClass());
 		this.bdimodel = (BDIModel)getComponent().getModel().getRawModel();
-		this.capa = new RCapability(bdimodel.getCapability());
+		this.capa = new RCapability(bdimodel.getCapability(), component);
 		this.rulesystem = new RuleSystem(pojo);
 	}
 

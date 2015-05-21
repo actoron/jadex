@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  Runtime element for all elements that can be processed via means-end reasoning.
  */
-public abstract class RProcessableElement extends RElement
+public abstract class RProcessableElement extends RParameterElement
 {
 	/** The allowed states. */
 	public static enum State
@@ -45,9 +45,9 @@ public abstract class RProcessableElement extends RElement
 	/**
 	 *  Create a new element.
 	 */
-	public RProcessableElement(MProcessableElement modelelement, Object pojoelement)
+	public RProcessableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent)
 	{
-		super(modelelement);
+		super(modelelement, agent);
 		this.pojoelement = pojoelement;
 		this.state = State.INITIAL;
 	}

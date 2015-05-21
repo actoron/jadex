@@ -2,14 +2,11 @@ package jadex.bdiv3.model;
 
 import jadex.bridge.modelinfo.UnparsedExpression;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
- * 
+ *  Modelelement for a plan.
  */
-public class MPlan extends MElement
+public class MPlan extends MParameterElement
 {
 	/** The trigger. */
 	protected MTrigger trigger;
@@ -25,8 +22,8 @@ public class MPlan extends MElement
 	
 	//-------- additional xml properties --------
 
-	/** The parameters. */
-	protected List<MParameter> parameters;
+//	/** The parameters. */
+//	protected List<MParameter> parameters;
 		
 	/** The precondition. */
 	protected UnparsedExpression	precondition;
@@ -122,62 +119,62 @@ public class MPlan extends MElement
 		this.priority = priority;
 	}
 
-	/**
-	 *  Get the parameters.
-	 *  @return The parameters.
-	 */
-	public List<MParameter> getParameters()
-	{
-		return parameters;
-	}
-	
-	/**
-	 *  Get a parameter by name.
-	 */
-	public MParameter getParameter(String name)
-	{
-		MParameter ret = null;
-		if(parameters!=null && name!=null)
-		{
-			for(MParameter param: parameters)
-			{
-				if(param.getName().equals(name))
-				{
-					ret = param;
-					break;
-				}
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Test if goal has a parameter.
-	 */
-	public boolean hasParameter(String name)
-	{
-		return getParameter(name)!=null;
-	}
-
-	/**
-	 *  Set the parameters.
-	 *  @param parameters The parameters to set.
-	 */
-	public void setParameters(List<MParameter> parameters)
-	{
-		this.parameters = parameters;
-	}
-	
-	/**
-	 *  Add a parameter.
-	 *  @param parameter The parameter.
-	 */
-	public void addParameter(MParameter parameter)
-	{
-		if(parameters==null)
-			parameters = new ArrayList<MParameter>();
-		this.parameters.add(parameter);
-	}
+//	/**
+//	 *  Get the parameters.
+//	 *  @return The parameters.
+//	 */
+//	public List<MParameter> getParameters()
+//	{
+//		return parameters;
+//	}
+//	
+//	/**
+//	 *  Get a parameter by name.
+//	 */
+//	public MParameter getParameter(String name)
+//	{
+//		MParameter ret = null;
+//		if(parameters!=null && name!=null)
+//		{
+//			for(MParameter param: parameters)
+//			{
+//				if(param.getName().equals(name))
+//				{
+//					ret = param;
+//					break;
+//				}
+//			}
+//		}
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Test if goal has a parameter.
+//	 */
+//	public boolean hasParameter(String name)
+//	{
+//		return getParameter(name)!=null;
+//	}
+//
+//	/**
+//	 *  Set the parameters.
+//	 *  @param parameters The parameters to set.
+//	 */
+//	public void setParameters(List<MParameter> parameters)
+//	{
+//		this.parameters = parameters;
+//	}
+//	
+//	/**
+//	 *  Add a parameter.
+//	 *  @param parameter The parameter.
+//	 */
+//	public void addParameter(MParameter parameter)
+//	{
+//		if(parameters==null)
+//			parameters = new ArrayList<MParameter>();
+//		this.parameters.add(parameter);
+//	}
 	
 	/**
 	 *  Get the precondition.

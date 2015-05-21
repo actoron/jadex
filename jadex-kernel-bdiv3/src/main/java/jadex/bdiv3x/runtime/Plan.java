@@ -3,12 +3,16 @@ package jadex.bdiv3x.runtime;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -61,6 +65,31 @@ public abstract class Plan
 	public void	waitFor(int timeout)
 	{
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(timeout).get();
+	}
+	
+	/**
+	 *  Create a goal from a template goal.
+	 *  To be processed, the goal has to be dispatched as subgoal
+	 *  or adopted as top-level goal.
+	 *  @param type	The template goal name as specified in the ADF.
+	 *  @return The created goal.
+	 */
+	public IGoal createGoal(String type)
+	{
+		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getGoalbase().createGoal(type);
+	}
+	
+	/**
+	 *  Dispatch a new top-level goal.
+	 *  @param goal The new goal.
+	 */
+	public void	dispatchSubgoalAndWait(IGoal goal)
+	{
+		RGoal rgoal = (RGoal)goal;
+		Future<Void> ret = new Future<Void>();
+		rgoal.addListener(new DelegationResultListener<Void>(ret));
+		RGoal.adoptGoal(rgoal, agent);
+		ret.get();
 	}
 	
 	/**
@@ -142,7 +171,7 @@ public abstract class Plan
 	 */
 	public IBeliefbase getBeliefbase()
 	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getBeliefbase();
+		return getCapability().getBeliefbase();
 	}
 
 	/**
@@ -189,8 +218,7 @@ public abstract class Plan
 	 */
 	public IExpression getExpression(String name)
 	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class))
-			.getCapability().getExpressionbase().getExpression(name);
+		return getCapability().getExpressionbase().getExpression(name);
 	}
 	
 	/**
@@ -200,8 +228,7 @@ public abstract class Plan
 	 */
 	public IExpression createExpression(String exp)
 	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class))
-			.getCapability().getExpressionbase().createExpression(exp);
+		return getCapability().getExpressionbase().createExpression(exp);
 	}
 	
 	/**
@@ -220,5 +247,14 @@ public abstract class Plan
 	public void fail()
 	{
 		throw new PlanFailureException();
+	}
+	
+	/**
+	 *  Get the capability.
+	 *  @return The capability.
+	 */
+	protected RCapability getCapability()
+	{
+		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 	}
 }

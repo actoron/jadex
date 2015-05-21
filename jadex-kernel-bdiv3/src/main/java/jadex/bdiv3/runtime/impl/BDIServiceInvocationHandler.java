@@ -58,7 +58,7 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 		// Find fitting MServiceCall
 		String mn = method.toString();
 		MServiceCall msc = ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getBDIModel().getCapability().getService(mn);
-		final RServiceCall sc = new RServiceCall(msc, new InvocationInfo(args));
+		final RServiceCall sc = new RServiceCall(msc, new InvocationInfo(args), agent);
 		sc.addListener(new ExceptionDelegationResultListener<Void, Object>(ret)
 		{
 			public void customResultAvailable(Void result)

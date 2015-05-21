@@ -20,19 +20,15 @@ import java.util.Map;
  */
 public class RExpressionBase extends RElement implements IExpressionbase
 {
-	/** The internal access. */
-	protected IInternalAccess agent;
-	
 	/** The expressions. */
 	protected Map<String, IExpression> expressions;
 	
 	/**
 	 *  Create a new beliefbase.
 	 */
-	public RExpressionBase(IInternalAccess ia)
+	public RExpressionBase(IInternalAccess agent)
 	{
-		super(null);
-		this.agent = ia;
+		super(null, agent);
 	}
 	
 	/**
@@ -50,7 +46,7 @@ public class RExpressionBase extends RElement implements IExpressionbase
 			UnparsedExpression uexp = mcapa.getExpression(name);
 			if(uexp==null)
 				throw new RuntimeException("Unknown expression: "+name);
-			RExpression rexp = new RExpression(uexp);
+			RExpression rexp = new RExpression(uexp, getAgent());
 			expressions = new HashMap<String, IExpression>();
 			expressions.put(name, rexp);
 		}
@@ -64,7 +60,7 @@ public class RExpressionBase extends RElement implements IExpressionbase
 	 */
 	public IExpression	createExpression(String expression)
 	{
-		return new RExpression(new UnparsedExpression(null, expression));
+		return new RExpression(new UnparsedExpression(null, expression), getAgent());
 	}
 
 //	/**
@@ -93,17 +89,17 @@ public class RExpressionBase extends RElement implements IExpressionbase
 		/**
 		 * 
 		 */
-		public RExpression(UnparsedExpression uexp)
+		public RExpression(UnparsedExpression uexp, IInternalAccess agent)
 		{
-			this(uexp, null);
+			this(uexp, null, agent);
 		}
 		
 		/**
 		 * 
 		 */
-		public RExpression(UnparsedExpression uexp, IValueFetcher fetcher)
+		public RExpression(UnparsedExpression uexp, IValueFetcher fetcher, IInternalAccess agent)
 		{
-			super(null);
+			super(null, agent);
 			this.uexp = uexp;
 			this.fetcher = fetcher==null? agent.getFetcher(): fetcher;
 		}

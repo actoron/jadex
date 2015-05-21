@@ -6,6 +6,7 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3x.runtime.RBeliefbase;
 import jadex.bdiv3x.runtime.RExpressionBase;
+import jadex.bdiv3x.runtime.RGoalbase;
 import jadex.bridge.IInternalAccess;
 
 import java.util.Collection;
@@ -36,7 +37,7 @@ public class RCapability extends RElement
 	/** The goals by model element. */
 	protected Map<MGoal, Collection<RGoal>> mgoals;
 	
-	/** The goals by goal class. */
+	/** The goals by goal type (class or string). */
 	protected Map<Class<?>, Collection<RGoal>> cgoals;
 	
 	
@@ -51,6 +52,9 @@ public class RCapability extends RElement
 	/** The beliefbase. */
 	protected RBeliefbase beliefbase;
 	
+	/** The goalbase. */
+	protected RGoalbase goalbase;
+	
 	/** The expressionbase. */
 	protected RExpressionBase expressionbase;
 	
@@ -59,9 +63,9 @@ public class RCapability extends RElement
 	/**
 	 *  Create a new bdi state.
 	 */
-	public RCapability(MCapability mcapa)
+	public RCapability(MCapability mcapa, IInternalAccess agent)
 	{
-		super(mcapa);
+		super(mcapa, agent);
 	}
 	
 	//-------- methods --------
@@ -133,12 +137,13 @@ public class RCapability extends RElement
 	
 	/**
 	 *  Test if a goal is contained.
+	 *  Goal can be either pojogoal or an IGoal.
 	 *  @param type The type.
 	 *  @return The goals.
 	 */
-	public boolean containsGoal(Object pojogoal)
+	public boolean containsGoal(Object goal)
 	{
-		RGoal rgoal = pojogoal instanceof RGoal? (RGoal)pojogoal: getRGoal(pojogoal);
+		RGoal rgoal = goal instanceof RGoal? (RGoal)goal: getRGoal(goal);
 		return goals!=null? goals.contains(rgoal): false;
 //		return goals!=null? goals.contains(pojogoal): false;
 	}
@@ -182,13 +187,17 @@ public class RCapability extends RElement
 		}
 		mymgoals.add(goal);
 		
-		Collection<RGoal>	mycgoals	= cgoals.get(goal.getPojoElement().getClass());
-		if(mycgoals==null)
+		// for pojo goal also add to class map
+		if(goal.getPojoElement()!=null)
 		{
-			mycgoals	= new LinkedHashSet<RGoal>();
-			cgoals.put(goal.getPojoElement().getClass(), mycgoals);
+			Collection<RGoal> mycgoals = cgoals.get(goal.getPojoElement().getClass());
+			if(mycgoals==null)
+			{
+				mycgoals	= new LinkedHashSet<RGoal>();
+				cgoals.put(goal.getPojoElement().getClass(), mycgoals);
+			}
+			mycgoals.add(goal);
 		}
-		mycgoals.add(goal);
 
 //		if(goal.getPojoElement().getClass().getName().indexOf("AchieveCleanup")!=-1)
 //			System.out.println("adopted new goal: "+goal);
@@ -232,12 +241,16 @@ public class RCapability extends RElement
 				mgoals.remove((MGoal)goal.getModelElement());
 			}
 			
-			Collection<RGoal>	mycgoals	= cgoals.get(goal.getPojoElement().getClass());
-			mycgoals.remove(goal);
-			if(mycgoals.isEmpty())
+			// for pojo goal also remove from class map
+			if(goal.getPojoElement()!=null)
 			{
-				cgoals.remove(goal.getPojoElement().getClass());
-			}			
+				Collection<RGoal>	mycgoals	= cgoals.get(goal.getPojoElement().getClass());
+				mycgoals.remove(goal);
+				if(mycgoals.isEmpty())
+				{
+					cgoals.remove(goal.getPojoElement().getClass());
+				}
+			}
 		}
 	}
 	
@@ -375,6 +388,24 @@ public class RCapability extends RElement
 	public void setExpressionbase(RExpressionBase expressionbase)
 	{
 		this.expressionbase = expressionbase;
+	}
+
+	/**
+	 *  Get the goalbase.
+	 *  @return The goalbase
+	 */
+	public RGoalbase getGoalbase()
+	{
+		return goalbase;
+	}
+
+	/**
+	 *  The goalbase to set.
+	 *  @param goalbase The goalbase to set
+	 */
+	public void setGoalbase(RGoalbase goalbase)
+	{
+		this.goalbase = goalbase;
 	}
 
 	/**
