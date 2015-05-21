@@ -5,17 +5,20 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
 import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.bridge.service.types.dht.RingNodeEvent;
 import jadex.commons.DebugException;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -79,12 +82,16 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 
 	/** Event subscriptions. **/
 	protected List<SubscriptionIntermediateFuture<RingNodeEvent>> subscriptions;
+
+	/** Ring overlay identifier. **/
+	protected String	overlayId;
 	
 	/**
 	 * Constructor.
 	 */
-	public RingNodeService()
+	public RingNodeService(String overlayId)
 	{
+		this.overlayId = overlayId;
 		logger = Logger.getLogger(this.getClass().getName());
 		subscriptions = new ArrayList<SubscriptionIntermediateFuture<RingNodeEvent>>();
 	}
@@ -112,15 +119,26 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 			}
 			
 //			log("Searching for other nodes, because state != JOINED");
-			IRequiredServicesFeature componentFeature = agent.getComponentFeature(IRequiredServicesFeature.class);
-			ITerminableIntermediateFuture<Object> requiredServices = componentFeature.getRequiredServices("ringnodes");
 			
-			requiredServices.addResultListener(new IntermediateDefaultResultListener<Object>()
+			ITerminableIntermediateFuture<IRingNodeService> requiredServices = SServiceProvider.getServices(agent, IRingNodeService.class, RequiredServiceInfo.SCOPE_GLOBAL, new IAsyncFilter<IRingNodeService>() {
+
+				@Override
+				public IFuture<Boolean> filter(IRingNodeService obj)
+				{
+					return new Future<Boolean>(overlayId.equals(obj.getOverlayId()));
+				}
+				
+			});
+			
+//			IRequiredServicesFeature componentFeature = agent.getComponentFeature(IRequiredServicesFeature.class);
+//			ITerminableIntermediateFuture<Object> requiredServices = componentFeature.getRequiredServices("ringnodes");
+			
+			requiredServices.addResultListener(new IntermediateDefaultResultListener<IRingNodeService>()
 			{
 				Boolean found = false;
 				
 				@Override
-				public void intermediateResultAvailable(Object result)
+				public void intermediateResultAvailable(IRingNodeService result)
 				{
 					IRingNodeService other = (IRingNodeService)result;
 					if (!found && state != State.JOINED) {
@@ -181,6 +199,10 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 				notifySubscribers(RingNodeEvent.fingerChange(myId, index, oldFinger, newFinger));
 			}
 		});
+	}
+	
+	public String getOverlayId() {
+		return overlayId;
 	}
 
 	/**
@@ -943,7 +965,7 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	@Override
 	public String toString()
 	{
-		return "Ringnode (" + myId + ")";
+		return overlayId + " - Ringnode (" + myId + ")";
 	}
 	
 	
