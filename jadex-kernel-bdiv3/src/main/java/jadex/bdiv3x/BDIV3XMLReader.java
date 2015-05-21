@@ -458,6 +458,14 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
+			}), new LinkingInfo(new IObjectLinker()
+			{
+				public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
+				{
+					// Need to add the match expression directly to the trigger
+					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-3).getObject();
+					mtrig.addGoalMatchExpression((String)parent, (UnparsedExpression)object);
+				}
 			})));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goalfinisheds")}), new ObjectInfo(refcr),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -472,6 +480,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName")),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goal"), new QName(uri, "match")}), new AccessInfo("match", "goalMatchExpression")),
 	//			new SubobjectInfo(new AccessInfo(new QName(uri, "factadded"), OAVBDIMetaModel.trigger_has_factaddeds)),
 	//			new SubobjectInfo(new AccessInfo(new QName(uri, "factremoved"), OAVBDIMetaModel.trigger_has_factremoveds)),
 	//			new SubobjectInfo(new AccessInfo(new QName(uri, "factchanged"), OAVBDIMetaModel.trigger_has_factchangeds)),
@@ -493,6 +502,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
 			})));
+		
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "internalevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
 //				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
 //		

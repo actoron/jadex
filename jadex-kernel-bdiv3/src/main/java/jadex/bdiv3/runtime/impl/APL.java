@@ -15,6 +15,7 @@ import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -22,6 +23,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -383,6 +386,8 @@ public class APL
 		
 		for(final MPlan mplan: precandidates)
 		{
+			
+			
 			// check precondition
 			MethodInfo mi = mplan.getBody().getPreconditionMethod(ia.getClassLoader());
 			if(mi!=null)

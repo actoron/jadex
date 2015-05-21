@@ -1,8 +1,13 @@
 package jadex.bdiv3.model;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.Tuple2;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Model element for a plan trigger.
@@ -16,6 +21,9 @@ public class MTrigger
 	
 	/** The goal types. */
 	protected List<MGoal> goals;
+	
+	/** Goal match expressions that restrict general goal type triggers. */
+	protected Map<String, UnparsedExpression> goalmatches;
 	
 	/** The goal types of finished goals. */
 	protected List<MGoal> goalfinisheds;
@@ -174,6 +182,24 @@ public class MTrigger
 	public List<String> getGoalNames()
 	{
 		return goalnames;
+	}
+	
+	/**
+	 *  Add a goal name.
+	 */
+	public void addGoalMatchExpression(String goalname, UnparsedExpression match)
+	{
+		if(goalmatches==null)
+			this.goalmatches = new HashMap<String, UnparsedExpression>();
+		goalmatches.put(goalname, match);
+	}
+	
+	/**
+	 *  Get a goal match expression.
+	 */
+	public UnparsedExpression getGoalMatchExpression(MGoal mgoal)
+	{
+		return goalmatches==null? null: goalmatches.get(mgoal.getName());
 	}
 
 //	/**
