@@ -43,4 +43,12 @@ public class BDIV3XModel	extends ModelInfo implements IBDIModel
 	{
 		throw new UnsupportedOperationException();
 	}
+	
+	/**
+	 *  Overridden to avoid null pointer when getRawModel() is used.
+	 */
+	public Object getRawModel()
+	{
+		return this;
+	}
 }

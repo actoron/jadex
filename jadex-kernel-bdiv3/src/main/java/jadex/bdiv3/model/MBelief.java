@@ -59,7 +59,7 @@ public class MBelief extends MElement
 	/** The default facts (multi). */
 	protected List<UnparsedExpression> facts;
 	
-	/** The type (if explicitly specified. */
+	/** The type (if explicitly specified). */
 	protected ClassInfo clazz;
 	
 	/** The exported flag. */
@@ -453,7 +453,7 @@ public class MBelief extends MElement
 				e.printStackTrace();
 			}
 		}
-		else
+		else if(mgetter!=null)
 		{
 			try
 			{
@@ -464,6 +464,10 @@ public class MBelief extends MElement
 			{
 				e.printStackTrace();
 			}
+		}
+		else if(clazz!=null)
+		{
+			ret = clazz.getType(cl);
 		}
 		return ret;
 	}

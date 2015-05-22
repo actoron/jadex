@@ -37,11 +37,11 @@
 			<artifactId>jadex-bridge</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+	<!-- <dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency> -->	
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools-swing</artifactId>

@@ -1,7 +1,7 @@
 package jadex.bdiv3.features.impl;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.GoalInfo;
@@ -40,7 +40,7 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 		List<IMonitoringEvent> ret = new ArrayList<IMonitoringEvent>();
 		
 		// Already gets merged beliefs (including subcapas).
-		BDIModel bdimodel = (BDIModel)getComponent().getModel().getRawModel();
+		IBDIModel bdimodel = (IBDIModel)getComponent().getModel().getRawModel();
 		List<MBelief> mbels = bdimodel.getCapability().getBeliefs();
 		
 		if(mbels!=null)

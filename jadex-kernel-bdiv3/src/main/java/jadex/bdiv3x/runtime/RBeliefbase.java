@@ -289,6 +289,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public void setFact(Object value)
 		{
+			System.out.println("belief set val: "+value);
 			publisher.entryChanged(this.value, value, -1);
 			this.value = value;
 //			publisher.unobserveValue(this.value);

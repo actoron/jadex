@@ -110,9 +110,9 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	 *  Create a new component factory.
 	 *  @param provider	The component.
 	 */
-	public BDIV3XComponentFactory(IInternalAccess provider)
+	public BDIV3XComponentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
+		super(provider.getComponentIdentifier(), IComponentFactory.class, properties);
 		this.provider = provider;
 		this.features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BDI_FEATURES));
 	}
@@ -318,9 +318,8 @@ public class BDIV3XComponentFactory extends BasicService implements IComponentFa
 	public Map<String, Object>	getProperties(String type)
 	{
 		return FILETYPE_AGENT.equals(type) || FILETYPE_CAPABILITY.equals(type)
-			? Collections.EMPTY_MAP : null;
+			? super.getPropertyMap(): null;
 	}
-	
 	
 	/**
 	 *  Get the component features for a model.

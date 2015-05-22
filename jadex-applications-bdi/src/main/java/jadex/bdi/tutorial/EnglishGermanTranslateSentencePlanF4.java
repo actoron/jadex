@@ -27,15 +27,15 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 	/** The translation agent. */
 	protected IComponentIdentifier ta;
 
-	//-------- constructors --------
-
-	/**
-	 *  Create a new plan.
-	 */
-	public EnglishGermanTranslateSentencePlanF4()
-	{
-		getLogger().info("Created:"+this);
-	}
+//	//-------- constructors --------
+//
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public EnglishGermanTranslateSentencePlanF4()
+//	{
+//		getLogger().info("Created:"+this);
+//	}
 
 	//-------- methods --------
 
@@ -64,7 +64,7 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 			// Search a translation agent.
 			while(ta==null)
 			{
-				IDF	dfservice	= (IDF)SServiceProvider.getLocalService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IDF	dfservice	= (IDF)SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				
 				// Create a service description to search for.
 				IDFServiceDescription sd = dfservice.createDFServiceDescription(null, "translate english_german", null);

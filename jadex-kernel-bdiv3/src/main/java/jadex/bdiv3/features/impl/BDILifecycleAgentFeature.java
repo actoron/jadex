@@ -49,6 +49,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.EventType;
@@ -890,7 +891,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			{
 				for(final MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
+					final Method m = cond.getMethodTarget()==null? null: cond.getMethodTarget().getMethod(component.getClassLoader());
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_maintain", 
 						new GoalsExistCondition(mgoal, bdif.getCapability()), new IAction<Void>()
@@ -907,23 +908,44 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
 									&& RGoal.GoalProcessingState.IDLE.equals(goal.getProcessingState()))
 								{	
-									executeGoalMethod(m, goal, event, component)
-										.addResultListener(new IResultListener<Boolean>()
+									if(m!=null)
 									{
-										public void resultAvailable(Boolean result)
+										executeGoalMethod(m, goal, event, component)
+											.addResultListener(new IResultListener<Boolean>()
 										{
-											if(!result.booleanValue())
+											public void resultAvailable(Boolean result)
 											{
-//													System.out.println("Goal maintain triggered: "+goal);
-//													System.out.println("state was: "+goal.getProcessingState());
-												goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
+												if(!result.booleanValue())
+												{
+	//													System.out.println("Goal maintain triggered: "+goal);
+	//													System.out.println("state was: "+goal.getProcessingState());
+													goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
+												}
 											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
+											
+											public void exceptionOccurred(Exception exception)
+											{
+											}
+										});
+									}
+									else // xml expression
+									{
+										UnparsedExpression uexp = cond.getExpression();
+										if(uexp.getParsed()==null)
+											SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
+										SimpleValueFetcher fet = new SimpleValueFetcher(component.getFetcher());
+										fet.setValue("$goal", goal);
+										Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
+										if(res instanceof Boolean)
 										{
+											if(!((Boolean)res).booleanValue())
+												goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
 										}
-									});
+										else
+										{
+											System.out.println("Maintain condition does not evaluate to boolean: "+uexp.getValue());
+										}
+									}
 								}
 							}
 							return IFuture.DONE;
@@ -946,21 +968,42 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							{
 								for(final RGoal goal: bdif.getCapability().getGoals(mgoal))
 								{
-									executeGoalMethod(m, goal, event, component)
-										.addResultListener(new IResultListener<Boolean>()
+									if(m!=null)
 									{
-										public void resultAvailable(Boolean result)
+										executeGoalMethod(m, goal, event, component)
+											.addResultListener(new IResultListener<Boolean>()
 										{
-											if(result.booleanValue())
+											public void resultAvailable(Boolean result)
 											{
-												goal.targetConditionTriggered(component, event, rule, context);
+												if(result.booleanValue())
+												{
+													goal.targetConditionTriggered(component, event, rule, context);
+												}
 											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
+											
+											public void exceptionOccurred(Exception exception)
+											{
+											}
+										});
+									}
+									else // xml expression
+									{
+										UnparsedExpression uexp = cond.getExpression();
+										if(uexp.getParsed()==null)
+											SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
+										SimpleValueFetcher fet = new SimpleValueFetcher(component.getFetcher());
+										fet.setValue("$goal", goal);
+										Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
+										if(res instanceof Boolean)
 										{
+											if(((Boolean)res).booleanValue())
+												goal.targetConditionTriggered(component, event, rule, context);
 										}
-									});
+										else
+										{
+											System.out.println("Target condition does not evaluate to boolean: "+uexp.getValue());
+										}
+									}
 								}
 								
 								return IFuture.DONE;

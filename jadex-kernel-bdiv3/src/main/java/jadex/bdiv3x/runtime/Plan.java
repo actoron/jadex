@@ -570,4 +570,13 @@ public abstract class Plan
 	{
 		throw new UnsupportedOperationException();
 	}
+
+	/**
+	 *  Get the agent.
+	 *  @return The agent
+	 */
+	public IInternalAccess getAgent()
+	{
+		return agent;
+	}
 }

@@ -21,7 +21,7 @@
 	<services>
 		<providedservice class="IComponentFactory">
 			<implementation>
-				new BDIV3XComponentFactory($component)
+				new BDIV3XComponentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{"debugger.panels"},new Object[]{"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel"}))
 			</implementation>
 		</providedservice>
 	</services>

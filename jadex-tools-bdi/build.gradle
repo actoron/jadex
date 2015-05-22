@@ -4,7 +4,7 @@ dependencies
 	compile project(':jadex-xml')
 	compile project(':jadex-commons')
 	compile project(':jadex-bridge')
-	compile project(':jadex-kernel-bdi')
+	//compile project(':jadex-kernel-bdi')
 	compile project(':jadex-runtimetools-swing')
 	compile project(':jadex-rules-tools')
 	compile project(':jadex-kernel-bdiv3')
