@@ -10,10 +10,12 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MMessageEvent.Direction;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -96,6 +98,22 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		}
 	};
 	
+	public static final IStringObjectConverter excludeconv = new IStringObjectConverter()
+	{
+		public Object convertString(String val, Object context) throws Exception
+		{
+			return MProcessableElement.ExcludeMode.getExcludeMode(val);
+		}
+	};
+	
+	public static final IObjectStringConverter reexcludeconv = new IObjectStringConverter()
+	{
+		public String convertObject(Object val, Object context)
+		{
+			return ((ExcludeMode)val).toString();
+		}
+	};
+	
 	//-------- constructors --------
 	
 	/**
@@ -151,24 +169,35 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "capabilities"), new QName(uri, "capability")}), new ObjectInfo(MCapabilityReference.class)));
 		
+		IObjectLinker condlinker = new IObjectLinker()
+		{
+			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
+			{
+				MGoal mgoal = (MGoal)parent;
+				String condtype = pathname[pathname.length-1].getLocalPart();
+				condtype = condtype.substring(0, condtype.length()-9);
+				mgoal.addCondition(condtype, (MCondition)object);
+			}
+		};
+		
 		TypeInfo ti_performgoal = new TypeInfo(new XMLInfo(new QName(uri, "performgoal")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
 		TypeInfo ti_performgoalref = new TypeInfo(new XMLInfo(new QName(uri, "performgoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
 		TypeInfo ti_achievegoal = new TypeInfo(new XMLInfo(new QName(uri, "achievegoal")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
 		TypeInfo ti_achievegoalref = new TypeInfo(new XMLInfo(new QName(uri, "achievegoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
 		TypeInfo ti_querygoal = new TypeInfo(new XMLInfo(new QName(uri, "querygoal")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
 		TypeInfo ti_querygoalref = new TypeInfo(new XMLInfo(new QName(uri, "querygoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
 		TypeInfo ti_maintaingoal = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoal")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
 		TypeInfo ti_maintaingoalref = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
 		TypeInfo ti_metagoal = new TypeInfo(new XMLInfo(new QName(uri, "metagoal")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
 		TypeInfo ti_metagoalref = new TypeInfo(new XMLInfo(new QName(uri, "metagoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
 		typeinfos.add(ti_performgoal);
@@ -614,7 +643,17 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(UnparsedExpression.class, condexpost),
 			new MappingInfo(null, null, "value")));
-				
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "creationcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
+			new MappingInfo(null, null, "value")));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "dropcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
+			new MappingInfo(null, null, "value")));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "targetcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
+			new MappingInfo(null, null, "value")));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "maintaincondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
+			new MappingInfo(null, null, "value")));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "recurcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
+			new MappingInfo(null, null, "value")));
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "achievegoal"), new QName(uri, "publish")}), new ObjectInfo(OAVBDIMetaModel.publish_type, scpost), 
 //				new MappingInfo(null, new AttributeInfo[]{
 //					new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.publish_has_classname)),

@@ -62,6 +62,9 @@ public class MClassBasedElement extends MProcessableElement
 	 */
 	public boolean equals(Object other)
 	{
+		if(!(other instanceof MGoal))
+			return false;
+		
 		String oname = ((MGoal)other).getName();
 		String otarget = ((MGoal)other).getTarget();
 		

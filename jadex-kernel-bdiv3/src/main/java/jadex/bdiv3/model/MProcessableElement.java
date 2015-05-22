@@ -39,9 +39,9 @@ public class MProcessableElement extends MParameterElement
 		}
 		
 		/**
-		 * 
+		 *  Convert from string to enum.
 		 */
-		public static ExcludeMode getDirection(String name)
+		public static ExcludeMode getExcludeMode(String name)
 		{
 			return modes.get(name);
 		}
@@ -72,6 +72,11 @@ public class MProcessableElement extends MParameterElement
 
 	/** The exclude mode. */
 	protected ExcludeMode excludemode = ExcludeMode.WhenTried;
+	
+	// additional xml attributes
+	
+	/** The exported flag. */
+	protected boolean exported;
 	
 	/**
 	 *	Bean Constructor. 
@@ -164,4 +169,22 @@ public class MProcessableElement extends MParameterElement
 		this.excludemode = excludemode;
 	}
 	
+	
+	/**
+	 *  Get the exported flag.
+	 *  @return The exported flag.
+	 */
+	public boolean isExported()
+	{
+		return exported;
+	}
+
+	/**
+	 *  Set the exported flag.
+	 *  @param exported The exported to set.
+	 */
+	public void setExported(boolean exported)
+	{
+		this.exported = exported;
+	}
 }

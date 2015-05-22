@@ -211,7 +211,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						{
 							mgoal = bdimodel.getCapability().getGoal(gcl.getName());
 						}
-						if(goal==null)
+						if(goal==null && gcl!=null)
 						{
 							try
 							{
@@ -245,7 +245,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							}
 						}
 						
-						if(mgoal==null || goal==null)
+						if(mgoal==null || (goal==null && gcl!=null))
 						{
 							throw new RuntimeException("Could not create initial goal: "+uexp);
 						}

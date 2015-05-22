@@ -1,6 +1,5 @@
 package jadex.bdiv3.model;
 
-import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
