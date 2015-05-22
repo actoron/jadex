@@ -59,31 +59,31 @@ public class MProcessableElement extends MParameterElement
 //	/** Exclude succeeded plan candidates from apl. */
 //	public static final String EXCLUDE_WHEN_SUCCEEDED = "when_succeeded";
 
+	// default values for xml reader
 	
 	/** Post to all flag. */
-	protected boolean posttoall;
+	protected boolean posttoall = false;
 	
 	/** Random selection flag. */
-	protected boolean randomselection;
+	protected boolean randomselection = false;
 	
 	/** The rebuild mode. */
-	protected boolean rebuild;
+	protected boolean rebuild = false;
 
 	/** The exclude mode. */
-	protected ExcludeMode excludemode;
+	protected ExcludeMode excludemode = ExcludeMode.WhenTried;
 	
 	/**
 	 *	Bean Constructor. 
 	 */
 	public MProcessableElement()
 	{
-		// used by xml reader
-		this.excludemode = excludemode==null? ExcludeMode.WhenTried: excludemode;
 	}
 	
 	/**
-	 * 
+	 *  Create a new element.
 	 */
+	// todo: add rebuild?
 	public MProcessableElement(String name, boolean posttoall, boolean randomselection, ExcludeMode excludemode)
 	{
 		super(name);

@@ -612,7 +612,7 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 		{
 			// Find parameter mappings for xml agents
 			// todo: goal-goal mappings
-			if(rplan instanceof RPlan)
+			if(rplan instanceof RPlan && rplan.isPassed())
 			{
 				MPlan mplan = (MPlan)((RPlan)rplan).getModelElement();
 				Map<String, Object> mappingvals = null;

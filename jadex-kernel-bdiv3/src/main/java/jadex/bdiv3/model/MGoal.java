@@ -1,5 +1,6 @@
 package jadex.bdiv3.model;
 
+import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
@@ -39,24 +40,25 @@ public class MGoal extends MClassBasedElement
 	/** Goal recur condition name. */
 	public static final String CONDITION_RECUR = "recur";
 
+	// default values copied from Goal annotation for xml version
 	
 	/** The retry flag. */
-	protected boolean retry;
+	protected boolean retry = true; 
 	
 	/** The recur flag. */
-	protected boolean recur;
+	protected boolean recur = false;
 	
 	/** The retry delay. */
-	protected long retrydelay;
+	protected long retrydelay = -1;
 	
 	/** The recur delay. */
-	protected long recurdelay;
+	protected long recurdelay = -1;
 	
 	/** The procedual success flag. */
-	protected boolean orsuccess;
+	protected boolean orsuccess = true;
 	
 	/** The unique. */
-	protected boolean unique;
+	protected boolean unique = false;
 	
 	/** The deliberation. */
 	protected MDeliberation deliberation;

@@ -408,24 +408,27 @@ public class APL
 			{
 				RGoal rgoal = (RGoal)element;
 				UnparsedExpression uexp = mplan.getTrigger().getGoalMatchExpression((MGoal)rgoal.getModelElement());
-				if(uexp.getParsed()==null)
-					SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader());
-				IParsedExpression exp = (IParsedExpression)uexp.getParsed();
-				Object val = exp.getValue(fetcher);
-				if(val instanceof Boolean)
+				if(uexp!=null)
 				{
-					valid	= ((Boolean)val).booleanValue();
-				}
-				else
-				{
-					ia.getLogger().warning("Match expression of plan trigger "+mplan.getName()+" not boolean: "+val);
-					valid	= false;						
-				}
-				
-				if(!valid)
-				{
-					lis.exceptionOccurred(null);
-					continue;
+					if(uexp.getParsed()==null)
+						SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader());
+					IParsedExpression exp = (IParsedExpression)uexp.getParsed();
+					Object val = exp.getValue(fetcher);
+					if(val instanceof Boolean)
+					{
+						valid	= ((Boolean)val).booleanValue();
+					}
+					else
+					{
+						ia.getLogger().warning("Match expression of plan trigger "+mplan.getName()+" not boolean: "+val);
+						valid	= false;						
+					}
+					
+					if(!valid)
+					{
+						lis.exceptionOccurred(null);
+						continue;
+					}
 				}
 			}
 			
