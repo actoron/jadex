@@ -30,7 +30,7 @@ public class MPlanParameter	extends MParameter
 	/**
 	 *  Set the goal mappings.
 	 */
-	public void	getGoalMappings(List<String> goalmappings)
+	public void	setGoalMappings(List<String> goalmappings)
 	{
 		this.goalmappings	= goalmappings;
 	}
@@ -58,7 +58,7 @@ public class MPlanParameter	extends MParameter
 	/**
 	 *  Set the message event mappings.
 	 */
-	public void	getMessageEventMappings(List<String> messageeventmappings)
+	public void	setMessageEventMappings(List<String> messageeventmappings)
 	{
 		this.messageeventmappings	= messageeventmappings;
 	}

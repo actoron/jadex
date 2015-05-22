@@ -10,6 +10,9 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.IComponentStep;
@@ -32,6 +35,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -606,6 +610,47 @@ public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
 		
 		if(rplan!=null)
 		{
+			// Find parameter mappings for xml agents
+			// todo: goal-goal mappings
+			if(rplan instanceof RPlan)
+			{
+				MPlan mplan = (MPlan)((RPlan)rplan).getModelElement();
+				Map<String, Object> mappingvals = null;
+				if(mplan.getParameters()!=null && mplan.getParameters().size()>0)
+				{
+					for(MParameter mparam: mplan.getParameters())
+					{
+						if(MParameter.Direction.OUT.equals(mparam.getDirection()) || MParameter.Direction.INOUT.equals(mparam.getDirection()))
+						{
+							List<String> mappings = ((MPlanParameter)mparam).getGoalMappings();
+							for(String mapping: mappings)
+							{
+								if(mapping.startsWith(getModelElement().getName()))
+								{
+									String target = mapping.substring(mapping.indexOf(".")+1);
+									if(mappingvals==null)
+										mappingvals = new HashMap<String, Object>();
+									if(mparam.isMulti(null))
+									{
+										getParameterSet(target).removeValues();
+										Object[] vals = rplan.getParameterSet(mparam.getName()).getValues();
+										for(Object val: vals)
+										{
+											getParameterSet(target).addValue(val);
+										}
+									}
+									else
+									{
+										getParameter(target).setValue(rplan.getParameter(mparam.getName()).getValue());
+									}
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			
 //			PlanLifecycleState state = rplan.getLifecycleState();
 //			if(state.equals(RPlan.PlanLifecycleState.FAILED))
 			if(rplan.isFailed())

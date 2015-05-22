@@ -40,7 +40,7 @@ public class EnglishGermanTranslationPlanE1 extends Plan
 		{
 			//getLogger().info("Translating from english to german: "+eword+" - "+gword);
 			getParameter("result").setValue(gword);
-}
+		}
 		else
 		{
 			getLogger().info("Sorry word is not in database: "+eword);

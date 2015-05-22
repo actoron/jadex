@@ -1,12 +1,18 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
+import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.model.MProcessableElement;
+import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Runtime element for all elements that can be processed via means-end reasoning.

@@ -78,7 +78,7 @@ public class MParameter extends MElement
 	//-------- additional xml properties --------
 	
 	/** The direction. */
-	protected Direction direction;
+	protected Direction direction = Direction.IN; // default is 'in'
 	
 	/** The type (if explicitly specified. */
 	protected ClassInfo clazz;

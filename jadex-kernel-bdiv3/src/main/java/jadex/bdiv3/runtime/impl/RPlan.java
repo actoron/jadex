@@ -9,13 +9,16 @@ import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -54,7 +57,9 @@ import jadex.rules.eca.Rule;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Runtime element of a plan.
@@ -145,7 +150,75 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia)
 	{
-		final RPlan rplan = new RPlan(mplan, candidate, ia);
+		// Find parameter mappings for xml agents
+		Map<String, Object> mappingvals = null;
+		if(mplan.getParameters()!=null && mplan.getParameters().size()>0)
+		{
+			if(reason instanceof RGoal)
+			{
+				RGoal rgoal = (RGoal)reason;
+				
+				for(MParameter mparam: mplan.getParameters())
+				{
+					if(MParameter.Direction.IN.equals(mparam.getDirection()) || MParameter.Direction.INOUT.equals(mparam.getDirection()))
+					{
+						List<String> mappings = ((MPlanParameter)mparam).getGoalMappings();
+						for(String mapping: mappings)
+						{
+							if(mapping.startsWith(rgoal.getModelElement().getName()))
+							{
+								String source = mapping.substring(mapping.indexOf(".")+1);
+								if(mappingvals==null)
+									mappingvals = new HashMap<String, Object>();
+								if(mparam.isMulti(null))
+								{
+									mappingvals.put(mparam.getName(), rgoal.getParameterSet(source).getValues());
+								}
+								else
+								{
+									mappingvals.put(mparam.getName(), rgoal.getParameter(source).getValue());
+								}
+								break;
+							}
+						}
+					}
+				}
+			}
+			else if(reason instanceof RMessageEvent)
+			{
+				RMessageEvent revent = (RMessageEvent)reason;
+				mappingvals = new HashMap<String, Object>();
+				
+				for(MParameter mparam: mplan.getParameters())
+				{
+					if(MParameter.Direction.IN.equals(mparam.getDirection()) || MParameter.Direction.INOUT.equals(mparam.getDirection()))
+					{
+						List<String> mappings = ((MPlanParameter)mparam).getMessageEventMappings();
+						for(String mapping: mappings)
+						{
+							if(mapping.startsWith(revent.getModelElement().getName()))
+							{
+								String source = mapping.substring(mapping.indexOf(".")+1);
+								if(mappingvals==null)
+									mappingvals = new HashMap<String, Object>();
+								if(mparam.isMulti(null))
+								{
+									mappingvals.put(mparam.getName(), revent.getParameterSet(source).getValues());
+								}
+								else
+								{
+									mappingvals.put(mparam.getName(), revent.getParameter(source).getValue());
+								}
+								break;
+							}
+						}
+					}
+				}
+			}
+			// todo: others
+		}
+		
+		final RPlan rplan = new RPlan(mplan, candidate, ia, mappingvals); //mappingvals==null? new RPlan(mplan, candidate, ia): 
 //		rplan.setInternalAccess(ia);
 		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);
@@ -329,12 +402,20 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //		ia.getExternalAccess().scheduleStep(action);
 //	}
 	
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public RPlan(MPlan mplan, Object candidate, IInternalAccess agent)
+//	{
+//		this(mplan, candidate, agent, null);
+//	}
+	
 	/**
 	 *  Create a new plan.
 	 */
-	public RPlan(MPlan mplan, Object candidate, IInternalAccess agent)
+	public RPlan(MPlan mplan, Object candidate, IInternalAccess agent, Map<String, Object> mappingvals)
 	{
-		super(mplan, agent);
+		super(mplan, agent, mappingvals);
 		this.candidate = candidate;
 		setLifecycleState(PlanLifecycleState.NEW);
 		setProcessingState(PlanProcessingState.READY);

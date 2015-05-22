@@ -10,6 +10,7 @@ import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 
@@ -38,8 +39,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	 */
 	public RParameterElement(MParameterElement melement, IInternalAccess agent)
 	{
-		super(melement, agent);
-		initParameters(null);
+		this(melement, agent, null);
 	}
 	
 	/**
@@ -76,7 +76,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 				{
 					if(vals!=null && vals.containsKey(mparam.getName()))
 					{
-						addParameterSet(new RParameterSet(mparam, getAgent(), (List<Object>)vals.get(mparam.getName())));
+						addParameterSet(new RParameterSet(mparam, getAgent(), (Object[])vals.get(mparam.getName())));
 					}
 					else
 					{
@@ -216,8 +216,8 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		{
 			super(modelelement, agent);
 			String name = modelelement.getName();
-			setValue(modelelement.getDefaultValue()==null? null: SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher()));
 			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+name, (MParameter)getModelElement());
+			setValue(modelelement.getDefaultValue()==null? null: SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher()));
 		}
 		
 		/**
@@ -229,8 +229,8 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		{
 			super(modelelement, agent);
 			String name = modelelement.getName();
-			setValue(value);
 			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+name, (MParameter)getModelElement());
+			setValue(value);
 		}
 
 		/**
@@ -275,12 +275,12 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameterSet(MParameter modelelement, IInternalAccess agent, List<Object> vals)
+		public RParameterSet(MParameter modelelement, IInternalAccess agent, Object[] vals)
 		{
 			super(modelelement, agent);
 			
 			String name = modelelement.getName();
-			this.values = new ListWrapper<Object>(vals, getAgent(), ChangeEvent.VALUEADDED+"."+name, 
+			this.values = new ListWrapper<Object>(vals!=null? SUtil.arrayToList(vals): new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+name, 
 				ChangeEvent.VALUEREMOVED+"."+name, ChangeEvent.VALUECHANGED+"."+name, getModelElement());
 		}
 		

@@ -1,9 +1,11 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3x.runtime.IParameterElement;
+
 /**
  *  Abstraction for rplans and rgoals that act as plan.
  */
-public interface IInternalPlan
+public interface IInternalPlan extends IParameterElement
 {
 	/**
 	 *  Get the candidate.
