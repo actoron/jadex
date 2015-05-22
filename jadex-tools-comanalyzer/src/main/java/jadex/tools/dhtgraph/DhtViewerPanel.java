@@ -112,6 +112,7 @@ public class DhtViewerPanel extends JPanel
 		protected List<IFinger> fingers;
 		protected IFinger predecessor;
 		protected IDistributedKVStoreService store;
+		protected String overlayId;
 
 		public ProxyHolder(IRingNodeService ringNode, long lastSeen) {
 			super();
@@ -122,6 +123,7 @@ public class DhtViewerPanel extends JPanel
 	}
 	
 	private JLabel componentLabel;
+	private JLabel overlayIdLabel;
 	private JLabel idLabel;
 	private JLabel preLabel;
 	private JLabel sucLabel;
@@ -387,6 +389,13 @@ public class DhtViewerPanel extends JPanel
 				c.gridwidth = 1;
 				c.gridy++;
 				c.gridx = 0;
+				add(new JLabel("overlay: "),c);
+				c.gridx = 1;
+				add(new JLabel("overlaytext") {{ overlayIdLabel = this; }},c);
+				
+				c.gridwidth = 1;
+				c.gridy++;
+				c.gridx = 0;
 				add(new JLabel("ID: "),c);
 				c.gridx = 1;
 				add(new JLabel("idtext") {{ idLabel = this; }},c);
@@ -608,6 +617,7 @@ public class DhtViewerPanel extends JPanel
 			sucLabel.setText(sucText);
 			idLabel.setText(""+id);
 			componentLabel.setText(""+proxyHolder.ringNode);
+			overlayIdLabel.setText(proxyHolder.overlayId);
 			String preText = proxyHolder.predecessor == null ? "-" : proxyHolder.predecessor.getNodeId().toString();
 			preLabel.setText(preText);
 			
@@ -710,6 +720,7 @@ public class DhtViewerPanel extends JPanel
 								} else {
 									final IComponentIdentifier cid = service.getServiceIdentifier().getProviderId();
 									final ProxyHolder newProxyHolder = new ProxyHolder(other, System.currentTimeMillis());
+									newProxyHolder.overlayId = other.getOverlayId();
 									proxyHolder = newProxyHolder;
 									
 									IFuture<IDistributedKVStoreService> storeFut = access.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<IDistributedKVStoreService>() {
@@ -750,8 +761,10 @@ public class DhtViewerPanel extends JPanel
 										}
 										
 										public void exceptionOccurred(Exception exception) {
-											super.exceptionOccurred(exception);
-											proxies.put(other.getId().get(), newProxyHolder);
+//											super.exceptionOccurred(exception);
+											IID iid = other.getId().get();
+											System.out.println("Didn't find Store Service on node: " + iid);
+											proxies.put(iid, newProxyHolder);
 											
 											buildGraph(g);
 											layout.reset();
@@ -925,6 +938,7 @@ public class DhtViewerPanel extends JPanel
 					counter.resultAvailable(null);
 				}
 			});
+			
 		}
 		future.addResultListener(new DefaultResultListener<Void>()
 		{

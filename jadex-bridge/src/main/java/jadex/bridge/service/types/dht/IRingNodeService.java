@@ -72,6 +72,10 @@ public interface IRingNodeService extends IRingApplicationService
 	@Timeout(TIMEOUT)
 	IFuture<List<IFinger>> getFingers();
 
-	
+	/**
+	 * Returns the overlay id this node operates in.
+	 * @return String
+	 */
+	String getOverlayId();
 
 }
