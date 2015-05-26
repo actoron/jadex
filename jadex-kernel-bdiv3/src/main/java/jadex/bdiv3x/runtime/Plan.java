@@ -22,6 +22,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -31,6 +32,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -413,26 +415,26 @@ public abstract class Plan
 	 */
 	public IGoalbase getGoalbase()
 	{
-		throw new UnsupportedOperationException();
+		return getCapability().getGoalbase();
 	}
 
-	/**
-	 *  Get the plan base.
-	 *  @return The plan base.
-	 */
-	public IPlanbase getPlanbase()
-	{
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Get the plan base.
+//	 *  @return The plan base.
+//	 */
+//	public IPlanbase getPlanbase()
+//	{
+//		throw new UnsupportedOperationException();
+//	}
 
-	/**
-	 *  Get the event base.
-	 *  @return The event base.
-	 */
-	public IEventbase getEventbase()
-	{
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Get the event base.
+//	 *  @return The event base.
+//	 */
+//	public IEventbase getEventbase()
+//	{
+//		throw new UnsupportedOperationException();
+//	}
 
 	/**
 	 * Get the expression base.
@@ -440,7 +442,7 @@ public abstract class Plan
 	 */
 	public IExpressionbase getExpressionbase()
 	{
-		throw new UnsupportedOperationException();
+		return getCapability().getExpressionbase();
 	}
 	
 	/**
@@ -473,7 +475,7 @@ public abstract class Plan
 	 */
 	public void dispatchTopLevelGoal(IGoal goal)
 	{
-		throw new UnsupportedOperationException();
+		getCapability().getGoalbase().dispatchTopLevelGoal(goal);
 	}
 
 	/**
@@ -483,18 +485,18 @@ public abstract class Plan
 	 */
 	public IFuture<Void> sendMessage(IMessageEvent me, byte[] codecids)
 	{	
-		throw new UnsupportedOperationException();
+		return agent.getComponentFeature(IMessageFeature.class).sendMessage((Map<String, Object>)me.getMessage(), me.getMessageType(), codecids);
 	}
 
-	/**
-	 *  Dispatch an internal event.
-	 *  @param event The event.
-	 *  Note: plan step is interrupted after call.
-	 */
-	public void dispatchInternalEvent(IInternalEvent event)
-	{
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Dispatch an internal event.
+//	 *  @param event The event.
+//	 *  Note: plan step is interrupted after call.
+//	 */
+//	public void dispatchInternalEvent(IInternalEvent event)
+//	{
+//		throw new UnsupportedOperationException();
+//	}
 
 	/**
 	 *  Create a new message event.
@@ -502,17 +504,20 @@ public abstract class Plan
 	 */
 	public IMessageEvent createMessageEvent(String type)
 	{
-		throw new UnsupportedOperationException();
+		MMessageEvent mevent = (MMessageEvent)getCapability().getMCapability().getMessageEvent(type);
+		if(mevent==null)
+			throw new RuntimeException("Message event not found");
+		return new RMessageEvent(mevent, new HashMap<String, Object>(), SFipa.FIPA_MESSAGE_TYPE, agent);
 	}
 
-	/**
-	 *  Create a new intenal event.
-	 *  @return The new intenal event.
-	 */
-	public IInternalEvent createInternalEvent(String type)
-	{
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Create a new intenal event.
+//	 *  @return The new intenal event.
+//	 */
+//	public IInternalEvent createInternalEvent(String type)
+//	{
+//		throw new UnsupportedOperationException();
+//	}
 
 	/**
 	 *  Get the scope.
