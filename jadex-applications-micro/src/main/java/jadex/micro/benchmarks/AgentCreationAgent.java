@@ -56,10 +56,10 @@ public class AgentCreationAgent
 	{
 //		System.out.println("body");
 		
-		Map arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();	
+		Map<String, Object> arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();	
 		if(arguments==null)
-			arguments = new HashMap();
-		final Map args = arguments;	
+			arguments = new HashMap<String, Object>();
+		final Map<String, Object> args = arguments;	
 		
 		if(args.get("num")==null)
 		{
@@ -90,7 +90,7 @@ public class AgentCreationAgent
 	/**
 	 *  Execute the first step.
 	 */
-	protected void step1(final Map args)
+	protected void step1(final Map<String, Object> args)
 	{
 		final int num = ((Integer)args.get("num")).intValue();
 		final int max = ((Integer)args.get("max")).intValue();
@@ -151,7 +151,7 @@ public class AgentCreationAgent
 							@Classname("deletePeers")
 							public IFuture<Void> execute(final IInternalAccess ia)
 							{
-								IClockService clock = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+								IClockService clock = SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 								((AgentCreationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent()).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
 								return IFuture.DONE;
 							}

@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -20,7 +21,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * 
+ *  XML version of the capability. 
+ *  Is a facade to the old API.
  */
 public class RCapability implements ICapability
 {
@@ -31,7 +33,7 @@ public class RCapability implements ICapability
 	protected jadex.bdiv3.runtime.impl.RCapability capa;
 	
 	/**
-	 * 
+	 *  Create a new capability.
 	 */
 	public RCapability(IInternalAccess agent)
 	{
@@ -146,7 +148,7 @@ public class RCapability implements ICapability
 	 */
 	public String getAgentName()
 	{
-		return agent.getComponentIdentifier().getName();
+		return agent.getComponentIdentifier().getLocalName();
 	}
 
 	/**
@@ -200,7 +202,7 @@ public class RCapability implements ICapability
 	 */
 	public long getTime()
 	{
-		return SServiceProvider.getLocalService(agent, IClockService.class).getTime();
+		return SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
 	}
 
 	/**

@@ -2,11 +2,13 @@ package jadex.bdiv3x.runtime;
 
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.wrappers.EventPublisher;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
@@ -46,15 +48,30 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		List<MBelief> mbels = getMCapability().getBeliefs();
 		if(mbels!=null)
 		{
+			Map<String, Object> args = getAgent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 			for(MBelief mbel: mbels)
 			{
 				if(!mbel.isMulti(agent.getClassLoader()))
 				{
-					addBelief(new RBelief(mbel, getAgent()));
+					if(mbel.isExported() && args.containsKey(mbel.getName()))
+					{	
+						addBelief(new RBelief(mbel, getAgent(), args.get(mbel.getName())));
+					}
+					else
+					{
+						addBelief(new RBelief(mbel, getAgent()));
+					}
 				}
 				else
 				{
-					addBeliefSet(new RBeliefSet(mbel, getAgent()));
+					if(mbel.isExported() && args.containsKey(mbel.getName()))
+					{	
+						addBeliefSet(new RBeliefSet(mbel, getAgent(), (Object[])args.get(mbel.getName())));
+					}
+					else
+					{
+						addBeliefSet(new RBeliefSet(mbel, getAgent()));
+					}
 				}
 			}
 		}
@@ -273,6 +290,19 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			this.value = modelelement.getDefaultFact()==null? null: SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
 			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
 		}
+		
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RBelief(MBelief modelelement, IInternalAccess agent, Object value)
+		{
+			super(modelelement, agent);
+			String name = getModelElement().getName();
+			this.value = value;
+			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+		}
 
 		/**
 		 *  Get the name.
@@ -331,6 +361,20 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
+		public RBeliefSet(MBelief modelelement, IInternalAccess agent, Object[] vals)
+		{
+			super(modelelement, agent);
+			
+			String name = modelelement.getName();
+			this.facts = new ListWrapper<Object>(vals!=null? SUtil.arrayToList(vals): new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+name, 
+				ChangeEvent.VALUEREMOVED+"."+name, ChangeEvent.VALUECHANGED+"."+name, getModelElement());
+		}
+		
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
 		public RBeliefSet(MBelief modelelement, IInternalAccess agent)
 		{
 			super(modelelement, agent);
@@ -355,7 +399,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			}
 			
 			this.facts = new ListWrapper<Object>(tmpfacts, agent, ChangeEvent.FACTADDED+"."+name, 
-					ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
 		}
 
 		/**

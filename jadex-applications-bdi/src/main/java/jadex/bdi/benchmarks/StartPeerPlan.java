@@ -46,7 +46,7 @@ public class StartPeerPlan extends Plan
 			
 			if(newnum<=max)
 			{
-				Map args = SCollection.createHashMap();
+				Map<String, Object> args = SCollection.createHashMap();
 				args.put("max", Integer.valueOf(max));
 				args.put("num", Integer.valueOf(newnum));
 				args.put("counter", counter);
@@ -69,7 +69,7 @@ public class StartPeerPlan extends Plan
 				
 				if(newnum<=max)
 				{
-					Map args = SCollection.createHashMap();
+					Map<String, Object> args = SCollection.createHashMap();
 					args.put("max", Integer.valueOf(max));
 					args.put("num", Integer.valueOf(newnum));
 					args.put("counter", counter);
@@ -168,7 +168,7 @@ public class StartPeerPlan extends Plan
 //		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
 //		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 		
-		IFuture ret = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(null, args, getComponentDescription().getResourceIdentifier()), null);
+		IFuture<IComponentIdentifier> ret = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(null, args, getComponentDescription().getResourceIdentifier()), null);
 		IComponentIdentifier aid = (IComponentIdentifier)ret.get();
 		return aid;
 	}
@@ -178,7 +178,7 @@ public class StartPeerPlan extends Plan
 	 *  @param name The agent instance name.
 	 *  @param args The arguments.
 	 */
-	protected IComponentIdentifier capabilityCreateAgent(String name, Map args)
+	protected IComponentIdentifier capabilityCreateAgent(String name, Map<String, Object> args)
 	{
 		IGoal sp = createGoal("cms_create_component");
 		sp.getParameter("type").setValue("/jadex/bdi/benchmarks/AgentCreation.agent.xml");
@@ -209,7 +209,7 @@ public class StartPeerPlan extends Plan
 		
 //		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, getComponentIdentifier().getRoot());
-		IFuture ret = ces.destroyComponent(aid);
+		IFuture<Map<String, Object>> ret = ces.destroyComponent(aid);
 		ret.get();
 	}
 	

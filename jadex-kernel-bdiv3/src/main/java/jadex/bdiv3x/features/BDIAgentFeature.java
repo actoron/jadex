@@ -1659,6 +1659,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				{
 					return getCapability().getExpressionbase();
 				}
+				else if("$scope".equals(name))
+				{
+					return new jadex.bdiv3x.runtime.RCapability(getComponent());
+				}
 				else
 				{
 					throw new RuntimeException("Value not found: "+name);
@@ -1667,12 +1671,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		};
 	}
 	
-	/**
-	 *  Get a capability pojo object.
-	 *  @return The capability pojo.
-	 */
-	public Object	getCapabilityObject(String name)
-	{
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Get a capability pojo object.
+//	 *  @return The capability pojo.
+//	 */
+//	public Object	getCapabilityObject(String name)
+//	{
+//		throw new UnsupportedOperationException();
+//	}
 }

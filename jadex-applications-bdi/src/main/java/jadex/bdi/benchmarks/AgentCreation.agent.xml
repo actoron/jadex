@@ -33,7 +33,7 @@
 			<fact>false</fact>
 		</belief>
 		<belief name="max" class="Integer" exported="true">
-			<fact>new Integer(1000)</fact>
+			<fact>new Integer(10000)</fact>
 		</belief>
 		<belief name="num" class="int" exported="true">
 			<fact>new Integer(1)</fact>
