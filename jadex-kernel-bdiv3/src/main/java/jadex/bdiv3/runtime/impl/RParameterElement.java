@@ -65,22 +65,22 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 				{
 					if(vals!=null && vals.containsKey(mparam.getName()))
 					{
-						addParameter(new RParameter(mparam, getAgent(), vals.get(mparam.getName())));
+						addParameter(createParameter(mparam, getAgent(), vals.get(mparam.getName())));
 					}
 					else
 					{
-						addParameter(new RParameter(mparam, getAgent()));
+						addParameter(createParameter(mparam, getAgent()));
 					}
 				}
 				else
 				{
 					if(vals!=null && vals.containsKey(mparam.getName()))
 					{
-						addParameterSet(new RParameterSet(mparam, getAgent(), (Object[])vals.get(mparam.getName())));
+						addParameterSet(createParameterSet(mparam, getAgent(), (Object[])vals.get(mparam.getName())));
 					}
 					else
 					{
-						addParameterSet(new RParameterSet(mparam, getAgent()));
+						addParameterSet(createParameterSet(mparam, getAgent()));
 					}
 					
 				}
@@ -89,25 +89,57 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	}
 	
 	/**
-	 *  Add a parameter.
-	 *  @param bel The parameter.
+	 * 
 	 */
-	public void addParameter(RParameter bel)
+	public IParameter createParameter(MParameter modelelement, IInternalAccess agent)
+	{
+		return new RParameter(modelelement, modelelement.getName(), agent);
+	}
+	
+	/**
+	 * 
+	 */
+	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, Object value)
+	{
+		return new RParameter(modelelement, modelelement.getName(), agent, value);
+	}
+	
+	/**
+	 * 
+	 */
+	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent)
+	{
+		return new RParameterSet(modelelement, modelelement.getName(), agent);
+	}
+	
+	/**
+	 * 
+	 */
+	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, Object[] values)
+	{
+		return new RParameterSet(modelelement, modelelement.getName(), agent, values);
+	}
+	
+	/**
+	 *  Add a parameter.
+	 *  @param param The parameter.
+	 */
+	public void addParameter(IParameter param)
 	{
 		if(parameters==null)
 			parameters = new HashMap<String, IParameter>();
-		parameters.put(bel.getName(), bel);
+		parameters.put(param.getName(), param);
 	}
 	
 	/**
 	 *  Add a parameterset.
-	 *  @param bel The parameterset.
+	 *  @param paramset The parameterset.
 	 */
-	public void addParameterSet(RParameterSet belset)
+	public void addParameterSet(IParameterSet paramset)
 	{
 		if(parametersets==null)
 			parametersets = new HashMap<String, IParameterSet>();
-		parametersets.put(belset.getName(), belset);
+		parametersets.put(paramset.getName(), paramset);
 	}
 	
 	/**
@@ -201,6 +233,9 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	 */
 	public static class RParameter extends RElement implements IParameter
 	{
+		/** The name. */
+		protected String name;
+		
 		/** The value. */
 		protected Object value;
 
@@ -212,12 +247,13 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameter(MParameter modelelement, IInternalAccess agent)
+		public RParameter(MParameter modelelement, String name, IInternalAccess agent)
 		{
 			super(modelelement, agent);
-			String name = modelelement.getName();
+			this.name = name!=null?name: modelelement.getName();
 			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+name, (MParameter)getModelElement());
-			setValue(modelelement.getDefaultValue()==null? null: SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher()));
+			if(modelelement!=null)
+				setValue(modelelement.getDefaultValue()==null? null: SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher()));
 		}
 		
 		/**
@@ -225,11 +261,11 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameter(MParameter modelelement, IInternalAccess agent, Object value)
+		public RParameter(MParameter modelelement, String name, IInternalAccess agent, Object value)
 		{
 			super(modelelement, agent);
-			String name = modelelement.getName();
-			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+name, (MParameter)getModelElement());
+			this.name = name!=null?name: modelelement.getName();
+			this.publisher = new EventPublisher(agent, ChangeEvent.VALUECHANGED+"."+getName(), (MParameter)getModelElement());
 			setValue(value);
 		}
 
@@ -239,7 +275,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public String getName()
 		{
-			return getModelElement().getName();
+			return name;
 		}
 		
 		/**
@@ -267,6 +303,9 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 	 */
 	public static class RParameterSet extends RElement implements IParameterSet
 	{
+		/** The name. */
+		protected String name;
+		
 		/** The value. */
 		protected List<Object> values;
 
@@ -275,13 +314,13 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameterSet(MParameter modelelement, IInternalAccess agent, Object[] vals)
+		public RParameterSet(MParameter modelelement, String name, IInternalAccess agent, Object[] vals)
 		{
 			super(modelelement, agent);
 			
-			String name = modelelement.getName();
-			this.values = new ListWrapper<Object>(vals!=null? SUtil.arrayToList(vals): new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+name, 
-				ChangeEvent.VALUEREMOVED+"."+name, ChangeEvent.VALUECHANGED+"."+name, getModelElement());
+			this.name = name!=null?name: modelelement.getName();
+			setValues(new ListWrapper<Object>(vals!=null? SUtil.arrayToList(vals): new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+getName(), 
+				ChangeEvent.VALUEREMOVED+"."+getName(), ChangeEvent.VALUECHANGED+"."+getName(), getModelElement()));
 		}
 		
 		/**
@@ -289,31 +328,38 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameterSet(MParameter modelelement, IInternalAccess agent)
+		public RParameterSet(MParameter modelelement, String name, IInternalAccess agent)
 		{
 			super(modelelement, agent);
+			this.name = name!=null?name: modelelement.getName();
 			
 			List<Object> tmpvalues;
-			if(modelelement.getDefaultValue()!=null)
+			if(modelelement!=null)
 			{
-				tmpvalues = (List<Object>)SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
-			}
-			else 
-			{
-				tmpvalues = new ArrayList<Object>();
-				if(modelelement.getDefaultValues()!=null)
+				if(modelelement.getDefaultValue()!=null)
 				{
-					for(UnparsedExpression uexp: modelelement.getDefaultValues())
+					tmpvalues = (List<Object>)SJavaParser.parseExpression(modelelement.getDefaultValue(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+				}
+				else 
+				{
+					tmpvalues = new ArrayList<Object>();
+					if(modelelement.getDefaultValues()!=null)
 					{
-						Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
-						tmpvalues.add(fact);
+						for(UnparsedExpression uexp: modelelement.getDefaultValues())
+						{
+							Object fact = SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+							tmpvalues.add(fact);
+						}
 					}
 				}
 			}
+			else
+			{
+				tmpvalues = new ArrayList<Object>();
+			}
 			
-			String name = modelelement.getName();
-			this.values = new ListWrapper<Object>(new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+name, 
-				ChangeEvent.VALUEREMOVED+"."+name, ChangeEvent.VALUECHANGED+"."+name, getModelElement());
+			setValues(new ListWrapper<Object>(tmpvalues, getAgent(), ChangeEvent.VALUEADDED+"."+getName(), 
+				ChangeEvent.VALUEREMOVED+"."+getName(), ChangeEvent.VALUECHANGED+"."+getName(), getModelElement()));
 		}
 
 		/**
@@ -322,7 +368,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public String getName()
 		{
-			return getModelElement().getName();
+			return name;
 		}
 		
 		/**
@@ -331,7 +377,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public void addValue(Object value)
 		{
-			values.add(value);
+			internalGetValues().add(value);
 		}
 
 		/**
@@ -340,7 +386,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public void removeValue(Object value)
 		{
-			values.remove(value);
+			internalGetValues().remove(value);
 		}
 
 		/**
@@ -362,7 +408,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public void removeValues()
 		{
-			values.clear();
+			internalGetValues().clear();
 		}
 
 		/**
@@ -378,7 +424,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public boolean containsValue(Object value)
 		{
-			return values.contains(value);
+			return internalGetValues().contains(value);
 		}
 
 		/**
@@ -387,7 +433,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public Object[]	getValues()
 		{
-			return values.toArray();
+			return internalGetValues().toArray();
 		}
 
 		/**
@@ -397,7 +443,24 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public int size()
 		{
-			return values.size();
+			return internalGetValues().size();
+		}
+
+		/**
+		 *  The values to set.
+		 *  @param values The values to set
+		 */
+		public void setValues(List<Object> values)
+		{
+			this.values = values;
+		}
+		
+		/**
+		 * 
+		 */
+		protected List<Object> internalGetValues()
+		{
+			return values;
 		}
 	}
 	

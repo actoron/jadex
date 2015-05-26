@@ -1,8 +1,7 @@
 package jadex.bdi.benchmarks;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IBeliefListener;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -39,19 +38,23 @@ public class MessageGui extends JFrame
 			@Classname("addListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.getBeliefbase().getBelief("sent").addBeliefListener(new IBeliefListener()
+				IBDIAgentFeature bdif = ia.getComponentFeature(IBDIAgentFeature.class);
+//				bia.getBeliefbase().getBelief("sent").addBeliefListener(new IBeliefListener()
+//				((BDIAgentFeature)bdif).getCapability().getBeliefbase().getBelief("sent").addBeliefListener(new IBeliefListener()
+				bdif.addBeliefListener("sent", new BeliefAdapter<Object>()
 				{
-					public void beliefChanged(AgentEvent ae)
+					public void beliefChanged(jadex.rules.eca.ChangeInfo<Object> info) 
 					{
-						sent.setText("Sent: ["+ae.getValue()+"]");
+						sent.setText("Sent: ["+info.getValue()+"]");
 					}
 				});
-				bia.getBeliefbase().getBelief("received").addBeliefListener(new IBeliefListener()
+				
+//				bia.getBeliefbase().getBelief("received").addBeliefListener(new IBeliefListener()
+				bdif.addBeliefListener("received", new BeliefAdapter<Object>()
 				{
-					public void beliefChanged(AgentEvent ae)
+					public void beliefChanged(jadex.rules.eca.ChangeInfo<Object> info) 
 					{
-						rec.setText("Received: ["+ae.getValue()+"]");
+						rec.setText("Received: ["+info.getValue()+"]");
 					}
 				});
 //				bia.addComponentListener(new TerminationAdapter()
@@ -68,7 +71,7 @@ public class MessageGui extends JFrame
 //					}
 //				});
 				
-				bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

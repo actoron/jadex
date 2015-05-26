@@ -18,6 +18,8 @@ public class MessageReceiverPlan extends Plan
 		received++;
 		getBeliefbase().getBelief("received").setFact(Integer.valueOf(received));
 		
+//		System.out.println("received: "+received);
+		
 		if(received==msgcnt)
 		{
 			long starttime = ((Long)getBeliefbase().getBelief("starttime").getFact()).longValue();

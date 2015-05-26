@@ -1,10 +1,13 @@
 package jadex.bdiv3x;
 
+import java.util.Collections;
 import java.util.Map;
 
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MCapability;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.commons.SReflect;
+import jadex.commons.collection.SCollection;
 
 /**
  *  Model for BDI v3x agents
@@ -41,7 +44,8 @@ public class BDIV3XModel	extends ModelInfo implements IBDIModel
 	 */
 	public Map<String, String> getBeliefMappings()
 	{
-		throw new UnsupportedOperationException();
+		// todo: 
+		return Collections.EMPTY_MAP;
 	}
 	
 	/**
