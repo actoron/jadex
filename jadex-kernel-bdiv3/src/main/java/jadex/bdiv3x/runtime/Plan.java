@@ -85,7 +85,7 @@ public abstract class Plan
 	 *  Wait for a some time.
 	 *  @param duration The duration.
 	 */
-	public void	waitFor(int timeout)
+	public void	waitFor(long timeout)
 	{
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(timeout).get();
 	}

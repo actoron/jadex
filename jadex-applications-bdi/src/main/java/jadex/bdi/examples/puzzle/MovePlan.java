@@ -1,6 +1,6 @@
 package jadex.bdi.examples.puzzle;
 
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 
 

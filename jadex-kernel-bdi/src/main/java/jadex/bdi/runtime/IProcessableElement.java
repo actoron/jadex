@@ -4,6 +4,7 @@ package jadex.bdi.runtime;
  *  Interface for all processable elements (goals, internal and message events).
  */
 // Todo: other interface that includes change events (for plan.getReason())
+// Should not extend IParameterElement!
 public interface IProcessableElement extends IParameterElement
 {
 	//-------- BDI event properties --------

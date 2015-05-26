@@ -188,23 +188,53 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		};
 		
 		TypeInfo ti_performgoal = new TypeInfo(new XMLInfo(new QName(uri, "performgoal")), new ObjectInfo(MGoal.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
+				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+			}), new LinkingInfo(condlinker));
 		TypeInfo ti_performgoalref = new TypeInfo(new XMLInfo(new QName(uri, "performgoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
+		
 		TypeInfo ti_achievegoal = new TypeInfo(new XMLInfo(new QName(uri, "achievegoal")), new ObjectInfo(MGoal.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
+				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+			}), new LinkingInfo(condlinker));
+			
 		TypeInfo ti_achievegoalref = new TypeInfo(new XMLInfo(new QName(uri, "achievegoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
+		
 		TypeInfo ti_querygoal = new TypeInfo(new XMLInfo(new QName(uri, "querygoal")), new ObjectInfo(MGoal.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
+				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+			}), new LinkingInfo(condlinker));
 		TypeInfo ti_querygoalref = new TypeInfo(new XMLInfo(new QName(uri, "querygoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
+		
 		TypeInfo ti_maintaingoal = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoal")), new ObjectInfo(MGoal.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
+				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+			}), new LinkingInfo(condlinker));
 		TypeInfo ti_maintaingoalref = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
+		
 		TypeInfo ti_metagoal = new TypeInfo(new XMLInfo(new QName(uri, "metagoal")), new ObjectInfo(MGoal.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))}), new LinkingInfo(condlinker));
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
+				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+			}), new LinkingInfo(condlinker));
 		TypeInfo ti_metagoalref = new TypeInfo(new XMLInfo(new QName(uri, "metagoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
 		typeinfos.add(ti_performgoal);
@@ -716,7 +746,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "parameterset")), new ObjectInfo(MParameter.class, 
 			new ParamMultiProc(true)), 
 			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv))
 			}, new SubobjectInfo[]{
 				// because there is only MParameter the values expression is stored as default value
 				// and multiple facts are added to a list

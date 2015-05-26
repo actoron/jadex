@@ -1,6 +1,6 @@
 package jadex.bdi.examples.puzzle;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -91,7 +91,7 @@ public class BoardGui extends JFrame
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+//				IBDIAgentFeature bdif = ia.getComponentFeature(IBDIAgentFeature.class);
 //				bia.addComponentListener(new TerminationAdapter()
 //				{
 //					public void componentTerminated()
@@ -106,7 +106,7 @@ public class BoardGui extends JFrame
 //					}
 //				});
 				
-				bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

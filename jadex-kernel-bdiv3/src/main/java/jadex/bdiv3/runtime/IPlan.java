@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
@@ -11,7 +12,7 @@ import java.util.List;
 /**
  *  User interface for plans.
  */
-public interface IPlan
+public interface IPlan extends IParameterElement  // todo: do not extend IParameterElement in case of non bdiv3x
 {
 	/**
 	 *  Get the id.

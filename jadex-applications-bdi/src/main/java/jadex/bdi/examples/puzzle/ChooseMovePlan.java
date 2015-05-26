@@ -1,6 +1,6 @@
 package jadex.bdi.examples.puzzle;
 
-import jadex.bdi.runtime.ICandidateInfo;
+import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
 
@@ -103,7 +103,6 @@ public class ChooseMovePlan extends Plan
 
 		return ret;
 	}
-
 
 	/**
 	 *  Match move with color constraint.
