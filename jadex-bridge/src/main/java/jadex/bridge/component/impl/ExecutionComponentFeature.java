@@ -5,6 +5,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IntermediateComponentResultListener;
@@ -948,8 +949,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			Throwable ex = null;
 			try
 			{
-				step.getTransfer().afterSwitch();
-				stepfut	= step.getStep().execute(component);
+				boolean valid = true;
+				if(step.getStep() instanceof IConditionalComponentStep<?>)
+					valid = ((IConditionalComponentStep<?>)step.getStep()).isValid();
+				if(valid)
+				{
+					step.getTransfer().afterSwitch();
+					stepfut	= step.getStep().execute(component);
+				}
+				else
+				{
+					ex = new RuntimeException("Step invalid.");
+				}
 			}
 			catch(Throwable t)
 			{
