@@ -148,7 +148,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						try
 						{
 							MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
-							Object val = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(null);
+							Object val = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
 	//						Field f = mbel.getTarget().getField(getClassLoader());
 	//						f.setAccessible(true);
 	//						f.set(agent, val);

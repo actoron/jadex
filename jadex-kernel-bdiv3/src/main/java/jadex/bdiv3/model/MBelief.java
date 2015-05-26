@@ -10,6 +10,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.FieldInfo;
+import jadex.commons.IterableIteratorWrapper;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.rules.eca.EventType;
@@ -352,11 +353,12 @@ public class MBelief extends MElement
 	{
 		Object ret = null;
 		
-		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
-			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
 		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		
 		if(bdif instanceof BDIAgentFeature)
 		{
+			String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
+				? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
 			ret = getValue(((BDIAgentFeature)bdif).getCapabilityObject(capaname), agent.getClassLoader());
 		}
 		else if(bdif instanceof jadex.bdiv3x.features.BDIAgentFeature)
@@ -417,11 +419,39 @@ public class MBelief extends MElement
 	/**
 	 *  Set the value of the belief.
 	 */
-	public boolean setValue(IInternalAccess agent, Object value)
+	public boolean setValue(IInternalAccess agent, final Object value)
 	{
-		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
-			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		return setValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), value, agent.getClassLoader());
+		boolean ret = false;
+		
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		
+		if(bdif instanceof BDIAgentFeature)
+		{
+			String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
+				? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
+			return setValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), value, agent.getClassLoader());
+		}
+		else if(bdif instanceof jadex.bdiv3x.features.BDIAgentFeature)
+		{
+			if(multi)
+			{
+				IBeliefSet rbelset = bdif.getCapability().getBeliefbase().getBeliefSet(getName());
+				if(value!=null)
+				{
+					for(Object val: new IterableIteratorWrapper<Object>(SReflect.getIterator(value)))
+					{
+						rbelset.addFact(val);
+					}
+				}
+			}
+			else
+			{
+				IBelief rbel = bdif.getCapability().getBeliefbase().getBelief(getName());
+				rbel.setFact(value);
+			}
+		}	
+		
+		return ret;
 	}
 
 	/**

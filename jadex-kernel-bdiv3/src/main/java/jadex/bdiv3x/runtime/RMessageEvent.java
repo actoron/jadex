@@ -1,15 +1,13 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
-import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,16 +33,49 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		super(modelelement, null, agent);
 		this.msg = msg;
 		this.mt = mt;
+		
+		// Must be done after msg has been assigned :-(
+		super.initParameters(null);
 	}
 	
 	/**
 	 *  Create the parameters from model spec.
 	 */
-	public void initParameters()
+	public void initParameters(Map<String, Object> vals)
 	{
 		// do nothing
-		// todo: do we want to create all parameters of the message template
-		// or only when getParameters() is called?!
+	}
+	
+	/**
+	 * 
+	 */
+	public IParameter createParameter(MParameter modelelement, IInternalAccess agent)
+	{
+		return new RParam(modelelement, modelelement.getName(), agent);
+	}
+	
+	/**
+	 * 
+	 */
+	public IParameter createParameter(MParameter modelelement, IInternalAccess agent, Object value)
+	{
+		return new RParam(modelelement, modelelement.getName(), agent, value);
+	}
+	
+	/**
+	 * 
+	 */
+	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent)
+	{
+		return new RParamSet(modelelement, modelelement.getName(), agent);
+	}
+	
+	/**
+	 * 
+	 */
+	public IParameterSet createParameterSet(MParameter modelelement, IInternalAccess agent, Object[] values)
+	{
+		return new RParamSet(modelelement, modelelement.getName(), agent, values);
 	}
 	
 	//-------- methods --------
@@ -55,7 +86,12 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameter[] getParameters()
 	{
-		throw new UnsupportedOperationException();
+		List<IParameter> ret = new ArrayList<IParameter>();
+		for(String name: mt.getParameterNames())
+		{
+			ret.add(getParameter(name));
+		}
+		return ret.toArray(new IParameter[ret.size()]);
 	}
 
 	/**
@@ -64,7 +100,12 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public IParameterSet[] getParameterSets()
 	{
-		throw new UnsupportedOperationException();
+		List<IParameterSet> ret = new ArrayList<IParameterSet>();
+		for(String name: mt.getParameterSetNames())
+		{
+			ret.add(getParameterSet(name));
+		}
+		return ret.toArray(new IParameterSet[ret.size()]);
 	}
 
 	/**
@@ -77,8 +118,19 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(mt.getParameter(name)==null)
 			throw new RuntimeException("Unknown parameter: "+name);
 		
-		MParameter mp = getMMessageEvent().getParameter(name);
-		return new RParameter(mp, name, getAgent());
+		IParameter param;
+		if(!super.hasParameter(name))
+		{
+			MParameter mp = getMMessageEvent().getParameter(name);
+			param = new RParam(mp, name, getAgent());
+			addParameter(param);
+		}
+		else
+		{
+			param = getParameter(name);
+		}
+		
+		return param;
 	}
 
 	/**
@@ -91,8 +143,18 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		if(mt.getParameterSet(name)==null)
 			throw new RuntimeException("Unknown parameter set: "+name);
 		
-		MParameter mp = getMMessageEvent().getParameter(name);
-		return new RParameterSet(mp, name, getAgent());
+		IParameterSet paramset;
+		if(!super.hasParameterSet(name))
+		{
+			MParameter mp = getMMessageEvent().getParameter(name);
+			paramset = new RParamSet(mp, name, getAgent());
+			addParameterSet(paramset);
+		}
+		else
+		{
+			paramset = getParameterSet(name);
+		}
+		return paramset;
 	}
 
 	/**
@@ -153,29 +215,26 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	/**
 	 * 
 	 */
-	public class RParameter extends RElement implements IParameter
+	public class RParam extends RParameter
 	{
-		/** The name. */
-		protected String name;
-
 		/**
 		 *  Create a new parameter.
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameter(MElement modelelement, String name, IInternalAccess agent)
+		public RParam(MParameter modelelement, String name, IInternalAccess agent)
 		{
-			super(modelelement, agent);
-			this.name = name;
+			super(modelelement, name, agent);
 		}
-
+		
 		/**
-		 *  Get the name.
-		 *  @return The name
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
 		 */
-		public String getName()
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, Object value)
 		{
-			return name;
+			super(modelelement, name, agent, value);
 		}
 		
 		/**
@@ -184,7 +243,8 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public void setValue(Object value)
 		{
-			msg.put(name, value);
+			publisher.entryChanged(msg.get(getName()), value, -1);
+			msg.put(getName(), value);
 		}
 
 		/**
@@ -193,121 +253,220 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		 */
 		public Object	getValue()
 		{
-			return msg.get(name);
+			return msg.get(getName());
 		}
 	}
 	
 	/**
 	 * 
 	 */
-	public class RParameterSet extends RElement implements IParameterSet
+	public class RParamSet extends RParameterSet
 	{
-		/** The name. */
-		protected String name;
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent)
+		{
+			super(modelelement, name, agent);
+		}
 		
 		/**
 		 *  Create a new parameter.
 		 *  @param modelelement The model element.
 		 *  @param name The name.
 		 */
-		public RParameterSet(MElement modelelement, String name, IInternalAccess agent)
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, Object[] values)
 		{
-			super(modelelement, agent);
-			this.name = name;
-		}
-
-		/**
-		 *  Get the name.
-		 *  @return The name
-		 */
-		public String getName()
-		{
-			return name;
+			super(modelelement, name, agent, values);
 		}
 		
 		/**
-		 *  Add a value to a parameter set.
-		 *  @param value The new value.
+		 *  The values to set.
+		 *  @param values The values to set
 		 */
-		public void addValue(Object value)
+		public void setValues(List<Object> values)
 		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
-			if(values==null)
-				values = new ArrayList<Object>();
-			values.add(value);
+			msg.put(getName(), values);
 		}
-
+		
 		/**
-		 *  Remove a value to a parameter set.
-		 *  @param value The new value.
+		 * 
 		 */
-		public void removeValue(Object value)
+		protected List<Object> internalGetValues()
 		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
-			if(values!=null)
-				values.remove(value);
-		}
-
-		/**
-		 *  Add values to a parameter set.
-		 */
-		public void addValues(Object[] values)
-		{
-			if(values!=null)
+			List<Object> vals = (List<Object>)msg.get(getName());
+			if(vals==null)
 			{
-				for(Object value: values)
-				{
-					addValue(value);
-				}
+				vals = new ArrayList<Object>();
+				msg.put(getName(), vals);
 			}
-		}
-
-		/**
-		 *  Remove all values from a parameter set.
-		 */
-		public void removeValues()
-		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
-			if(values!=null)
-				values.clear();
-		}
-
-		/**
-		 *  Get a value equal to the given object.
-		 *  @param oldval The old value.
-		 */
-//		public Object	getValue(Object oldval);
-
-		/**
-		 *  Test if a value is contained in a parameter.
-		 *  @param value The value to test.
-		 *  @return True, if value is contained.
-		 */
-		public boolean containsValue(Object value)
-		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
-			return values==null? false: values.contains(value);
-		}
-
-		/**
-		 *  Get the values of a parameterset.
-		 *  @return The values.
-		 */
-		public Object[]	getValues()
-		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
-			return values==null? new Object[0]: values.toArray();
-		}
-
-		/**
-		 *  Get the number of values currently
-		 *  contained in this set.
-		 *  @return The values count.
-		 */
-		public int size()
-		{
-			Collection<Object> values = (Collection<Object>)msg.get(name);
-			return values==null? 0: values.size();
+			return vals;
 		}
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public class RParameter extends RElement implements IParameter
+//	{
+//		/** The name. */
+//		protected String name;
+//
+//		/**
+//		 *  Create a new parameter.
+//		 *  @param modelelement The model element.
+//		 *  @param name The name.
+//		 */
+//		public RParameter(MElement modelelement, String name, IInternalAccess agent)
+//		{
+//			super(modelelement, agent);
+//			this.name = name;
+//		}
+//
+//		/**
+//		 *  Get the name.
+//		 *  @return The name
+//		 */
+//		public String getName()
+//		{
+//			return name;
+//		}
+//		
+//		/**
+//		 *  Set a value of a parameter.
+//		 *  @param value The new value.
+//		 */
+//		public void setValue(Object value)
+//		{
+//			msg.put(name, value);
+//		}
+//
+//		/**
+//		 *  Get the value of a parameter.
+//		 *  @return The value.
+//		 */
+//		public Object	getValue()
+//		{
+//			return msg.get(name);
+//		}
+//	}
+//	
+//	/**
+//	 * 
+//	 */
+//	public class RParameterSet extends RElement implements IParameterSet
+//	{
+//		/** The name. */
+//		protected String name;
+//		
+//		/**
+//		 *  Create a new parameter.
+//		 *  @param modelelement The model element.
+//		 *  @param name The name.
+//		 */
+//		public RParameterSet(MElement modelelement, String name, IInternalAccess agent)
+//		{
+//			super(modelelement, agent);
+//			this.name = name;
+//		}
+//
+//		/**
+//		 *  Get the name.
+//		 *  @return The name
+//		 */
+//		public String getName()
+//		{
+//			return name;
+//		}
+//		
+//		/**
+//		 *  Add a value to a parameter set.
+//		 *  @param value The new value.
+//		 */
+//		public void addValue(Object value)
+//		{
+//			Collection<Object> values = (Collection<Object>)msg.get(name);
+//			if(values==null)
+//			{
+//				values = new ArrayList<Object>();
+//				msg.put(name, values);
+//			}
+//			values.add(value);
+//		}
+//
+//		/**
+//		 *  Remove a value to a parameter set.
+//		 *  @param value The new value.
+//		 */
+//		public void removeValue(Object value)
+//		{
+//			Collection<Object> values = (Collection<Object>)msg.get(name);
+//			if(values!=null)
+//				values.remove(value);
+//		}
+//
+//		/**
+//		 *  Add values to a parameter set.
+//		 */
+//		public void addValues(Object[] values)
+//		{
+//			if(values!=null)
+//			{
+//				for(Object value: values)
+//				{
+//					addValue(value);
+//				}
+//			}
+//		}
+//
+//		/**
+//		 *  Remove all values from a parameter set.
+//		 */
+//		public void removeValues()
+//		{
+//			Collection<Object> values = (Collection<Object>)msg.get(name);
+//			if(values!=null)
+//				values.clear();
+//		}
+//
+//		/**
+//		 *  Get a value equal to the given object.
+//		 *  @param oldval The old value.
+//		 */
+////		public Object	getValue(Object oldval);
+//
+//		/**
+//		 *  Test if a value is contained in a parameter.
+//		 *  @param value The value to test.
+//		 *  @return True, if value is contained.
+//		 */
+//		public boolean containsValue(Object value)
+//		{
+//			Collection<Object> values = (Collection<Object>)msg.get(name);
+//			return values==null? false: values.contains(value);
+//		}
+//
+//		/**
+//		 *  Get the values of a parameterset.
+//		 *  @return The values.
+//		 */
+//		public Object[]	getValues()
+//		{
+//			Collection<Object> values = (Collection<Object>)msg.get(name);
+//			return values==null? new Object[0]: values.toArray();
+//		}
+//
+//		/**
+//		 *  Get the number of values currently
+//		 *  contained in this set.
+//		 *  @return The values count.
+//		 */
+//		public int size()
+//		{
+//			Collection<Object> values = (Collection<Object>)msg.get(name);
+//			return values==null? 0: values.size();
+//		}
+//	}
 }
