@@ -289,7 +289,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
 				if(i!=-1)
 				{
-					ocapa	= bdif.getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
+					ocapa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
 				}
 				cap	= ocapa;
 
@@ -347,11 +347,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			if(mbel.getUpdaterate()>0)
 			{
 				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
-				final String	name;
-				final Object	capa;
+				final String name;
+				final Object capa;
 				if(i!=-1)
 				{
-					capa	= bdif.getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
+					capa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
 					name	= mbel.getName().substring(mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)+1); 
 				}
 				else

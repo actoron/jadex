@@ -53,9 +53,9 @@ public interface IInternalBDIAgentFeature extends IBDIAgentFeature
 //	 */
 //	public Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs);
 
-	/**
-	 *  Get a capability pojo object.
-	 *  @return The capability pojo.
-	 */
-	public Object	getCapabilityObject(String name);
+//	/**
+//	 *  Get a capability pojo object.
+//	 *  @return The capability pojo.
+//	 */
+//	public Object	getCapabilityObject(String name);
 }

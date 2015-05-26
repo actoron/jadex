@@ -2,6 +2,10 @@ package jadex.bdiv3.model;
 
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3x.runtime.IBelief;
+import jadex.bdiv3x.runtime.IBeliefSet;
+import jadex.bdiv3x.runtime.RBeliefbase.RBelief;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -346,9 +350,30 @@ public class MBelief extends MElement
 	 */
 	public Object getValue(IInternalAccess agent)
 	{
+		Object ret = null;
+		
 		String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 			? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		return getValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), agent.getClassLoader());
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		if(bdif instanceof BDIAgentFeature)
+		{
+			ret = getValue(((BDIAgentFeature)bdif).getCapabilityObject(capaname), agent.getClassLoader());
+		}
+		else if(bdif instanceof jadex.bdiv3x.features.BDIAgentFeature)
+		{
+			if(multi)
+			{
+				IBeliefSet rbelset = bdif.getCapability().getBeliefbase().getBeliefSet(getName());
+				ret = rbelset.getFacts();
+			}
+			else
+			{
+				IBelief rbel = bdif.getCapability().getBeliefbase().getBelief(getName());
+				ret = rbel.getFact();
+			}
+		}	
+		
+		return ret;
 	}
 
 	/**
