@@ -7,7 +7,7 @@ import jadex.bridge.IInternalAccess;
 /**
  *  Runtime element for handling a service call as plan. 
  */
-public class RServiceCall extends RProcessableElement
+public class RServiceCall extends RFinishableElement
 {
 	/** The finished flag. */
 	boolean finished;

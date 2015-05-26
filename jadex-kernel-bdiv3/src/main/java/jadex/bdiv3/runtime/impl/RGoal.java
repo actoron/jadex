@@ -44,7 +44,7 @@ import java.util.Set;
 /**
  *  Goal instance implementation.
  */
-public class RGoal extends RProcessableElement implements IGoal, IInternalPlan
+public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 {
 	//-------- attributes --------
 	

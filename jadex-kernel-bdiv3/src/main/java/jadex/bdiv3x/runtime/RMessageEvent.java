@@ -23,9 +23,6 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	/** The message type. */
 	protected MessageType mt;
 	
-	/** The finished flag. */
-	boolean finished;
-	
 	//-------- constructors --------
 	
 	/**
@@ -309,7 +306,6 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 		}
 	}
 	
-	
 //	/**
 //	 * 
 //	 */
@@ -473,22 +469,4 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 //			return values==null? 0: values.size();
 //		}
 //	}
-
-	//todo: set finished
-	
-	/**
-	 *  Test if element is succeeded.
-	 */
-	public boolean isSucceeded()
-	{
-		return finished && exception==null;
-	}
-	
-	/**
-	 *  Test if element is failed.
-	 */
-	public boolean isFailed()
-	{
-		return finished && exception!=null;
-	}
 }
