@@ -9,7 +9,6 @@ import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MMessageEvent;
-import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
@@ -320,33 +319,33 @@ public abstract class Plan
 	 */
 	public ICapability getScope()
 	{
-		throw new UnsupportedOperationException();
+		return new jadex.bdiv3x.runtime.RCapability(agent);
 	}
 	
-	/**
-	 *  Start an atomic transaction.
-	 *  All possible side-effects (i.e. triggered conditions)
-	 *  of internal changes (e.g. belief changes)
-	 *  will be delayed and evaluated after endAtomic() has been called.
-	 *  @see #endAtomic()
-	 */
-	public void	startAtomic()
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *  End an atomic transaction.
-	 *  Side-effects (i.e. triggered conditions)
-	 *  of all internal changes (e.g. belief changes)
-	 *  performed after the last call to startAtomic()
-	 *  will now be evaluated and performed.
-	 *  @see #startAtomic()
-	 */
-	public void	endAtomic()
-	{
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Start an atomic transaction.
+//	 *  All possible side-effects (i.e. triggered conditions)
+//	 *  of internal changes (e.g. belief changes)
+//	 *  will be delayed and evaluated after endAtomic() has been called.
+//	 *  @see #endAtomic()
+//	 */
+//	public void	startAtomic()
+//	{
+//		throw new UnsupportedOperationException();
+//	}
+//
+//	/**
+//	 *  End an atomic transaction.
+//	 *  Side-effects (i.e. triggered conditions)
+//	 *  of all internal changes (e.g. belief changes)
+//	 *  performed after the last call to startAtomic()
+//	 *  will now be evaluated and performed.
+//	 *  @see #startAtomic()
+//	 */
+//	public void	endAtomic()
+//	{
+//		throw new UnsupportedOperationException();
+//	}
 
 	/**
 	 *  Dispatch a new subgoal.
