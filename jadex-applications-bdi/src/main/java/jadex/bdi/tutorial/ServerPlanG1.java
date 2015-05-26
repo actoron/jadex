@@ -37,25 +37,25 @@ public class ServerPlanG1 extends Plan	implements Runnable
 	
 	//-------- constructors --------
 
-	/**
-	 *  Create a new plan.
-	 */
-	public ServerPlanG1()	//throws IOException
-	{
-		int port = ((Integer)getParameter("port").getValue()).intValue();
-		this.logger = getLogger();
-		
-		try
-		{
-			this.server	= new ServerSocket(port);
-		}
-		catch(IOException e)
-		{
-			throw new RuntimeException(e.getMessage());
-		}
-		
-		getLogger().info("Created: "+server);
-	}
+//	/**
+//	 *  Create a new plan.
+//	 */
+//	public ServerPlanG1()	//throws IOException
+//	{
+//		int port = ((Integer)getParameter("port").getValue()).intValue();
+//		this.logger = getLogger();
+//		
+//		try
+//		{
+//			this.server	= new ServerSocket(port);
+//		}
+//		catch(IOException e)
+//		{
+//			throw new RuntimeException(e.getMessage());
+//		}
+//		
+//		getLogger().info("Created: "+server);
+//	}
 	
 	/**
 	 *  Close the server.
@@ -81,6 +81,20 @@ public class ServerPlanG1 extends Plan	implements Runnable
 	 */
 	public void body()
 	{
+		int port = ((Integer)getParameter("port").getValue()).intValue();
+		this.logger = getLogger();
+		
+		try
+		{
+			this.server	= new ServerSocket(port);
+		}
+		catch(IOException e)
+		{
+			throw new RuntimeException(e.getMessage());
+		}
+		
+		getLogger().info("Created: "+server);
+		
 		// Start the conmnection listener thread.
 		new Thread(this).start();
 

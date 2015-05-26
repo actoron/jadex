@@ -520,18 +520,18 @@ public abstract class Plan
 	 */
 	public IExternalAccess getExternalAccess()
 	{
-		throw new UnsupportedOperationException();
+		return agent.getExternalAccess();
 	}
 
-	/**
-	 *  Create a precompiled expression.
-	 *  @param expression	The expression string.
-	 *  @return The precompiled expression.
-	 */
-	public IExpression	createExpression(String expression, String[] paramnames, Class<?>[] paramtypes)
-	{
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Create a precompiled expression.
+//	 *  @param expression	The expression string.
+//	 *  @return The precompiled expression.
+//	 */
+//	public IExpression	createExpression(String expression, String[] paramnames, Class<?>[] paramtypes)
+//	{
+//		throw new UnsupportedOperationException();
+//	}
 
 	/**
 	 *  Get all parameters.
@@ -539,7 +539,7 @@ public abstract class Plan
 	 */
 	public IParameter[]	getParameters()
 	{
-		throw new UnsupportedOperationException();
+		return rplan.getParameters();
 	}
 
 	/**
@@ -548,7 +548,7 @@ public abstract class Plan
 	 */
 	public IParameterSet[]	getParameterSets()
 	{
-		throw new UnsupportedOperationException();
+		return rplan.getParameterSets();
 	}
 
 	/**
@@ -558,7 +558,7 @@ public abstract class Plan
 	 */
 	public boolean hasParameter(String name)
 	{
-		throw new UnsupportedOperationException();
+		return rplan.hasParameter(name);
 	}
 
 	/**
@@ -568,7 +568,7 @@ public abstract class Plan
 	 */
 	public boolean hasParameterSet(String name)
 	{
-		throw new UnsupportedOperationException();
+		return rplan.hasParameterSet(name);
 	}
 
 	/**
