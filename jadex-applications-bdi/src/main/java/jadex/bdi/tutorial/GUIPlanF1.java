@@ -1,6 +1,7 @@
 package jadex.bdi.tutorial;
 
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -54,7 +55,8 @@ public class GUIPlanF1 extends Plan
 //			}
 //		});
 		
-		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+//		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+		getAgent().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 			.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)

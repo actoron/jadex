@@ -1,10 +1,13 @@
 package jadex.bdi.tutorial;
 
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.IFuture;
@@ -90,7 +93,8 @@ public class ServerPlanG1 extends Plan	implements Runnable
 //			}
 //		});
 		
-		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+//		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+		getAgent().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 			.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)
@@ -122,10 +126,11 @@ public class ServerPlanG1 extends Plan	implements Runnable
 					@Classname("translate")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-						IGoal goal = scope.getGoalbase().createGoal("translate");
+						IBDIAgentFeature bdif = ia.getComponentFeature(IBDIAgentFeature.class);
+						// HACK! todo: how should API be exposed?
+						IGoal goal = ((IInternalBDIAgentFeature)bdif).getCapability().getGoalbase().createGoal("translate");
 						goal.getParameter("client").setValue(client);
-						scope.getGoalbase().dispatchTopLevelGoal(goal);
+						bdif.dispatchTopLevelGoal(goal);
 						return IFuture.DONE;
 					}
 				});

@@ -679,6 +679,21 @@ public class Reader extends AReader
 							IObjectLinker linker = (IObjectLinker)(patypeinfo!=null && patypeinfo.getLinker()!=null? patypeinfo.getLinker(): pse.getReaderHandler());
 							linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo, 
 								pathname.toArray(new jadex.xml.stax.QName[pathname.size()]), readcontext);
+							
+//							IObjectLinker linker = (IObjectLinker)(patypeinfo!=null && patypeinfo.getLinker()!=null? patypeinfo.getLinker(): null);
+//							boolean linked = false;
+//							if(linker!=null)
+//							{
+//								linked = linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo, 
+//									pathname.toArray(new jadex.xml.stax.QName[pathname.size()]), readcontext);
+//							}
+//							
+//							if(!linked)
+//							{
+//								linker = pse.getReaderHandler();
+//								linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo, 
+//									pathname.toArray(new jadex.xml.stax.QName[pathname.size()]), readcontext);
+//							}
 						}
 						else
 						{

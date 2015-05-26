@@ -173,10 +173,17 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		{
 			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 			{
-				MGoal mgoal = (MGoal)parent;
-				String condtype = pathname[pathname.length-1].getLocalPart();
-				condtype = condtype.substring(0, condtype.length()-9);
-				mgoal.addCondition(condtype, (MCondition)object);
+				if(object instanceof MCondition)
+				{
+					MGoal mgoal = (MGoal)parent;
+					String condtype = pathname[pathname.length-1].getLocalPart();
+					condtype = condtype.substring(0, condtype.length()-9);
+					mgoal.addCondition(condtype, (MCondition)object);
+				}
+				else
+				{
+					context.getDefaultHandler().linkObject(object, parent, linkinfo, pathname, context);
+				}
 			}
 		};
 		

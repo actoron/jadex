@@ -42,8 +42,8 @@ public interface IBDIAgentFeature
 	 *  Drop a pojo goal.
 	 *  @param goal The pojo goal.
 	 */
-	public void dropGoal(Object goal);
-
+	public void dropGoal(Object goal);	
+	
 	/**
 	 *  Dispatch a pojo plan and wait for its result.
 	 *  @param plan The pojo plan or plan name.
@@ -64,12 +64,13 @@ public interface IBDIAgentFeature
 	 *  @param name The belief name.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefListener(String name, final IBeliefListener listener);
+	public void addBeliefListener(String name, final IBeliefListener<?> listener);
 	
 	/**
 	 *  Remove a belief listener.
 	 *  @param name The belief name.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefListener(String name, IBeliefListener listener);
+	public void removeBeliefListener(String name, IBeliefListener<?> listener);
+	
 }
