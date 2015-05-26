@@ -1,11 +1,8 @@
 package jadex.bdi.tutorial;
 
+import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.future.Future;
 
 import javax.swing.SwingUtilities;
 
@@ -26,19 +23,27 @@ public class GUIPlanF1 extends Plan
 	 */
 	public void body()
 	{
-		// Could be done in a more elegant way via listeners since 0.96
-		
-		this.gui = new TranslationGuiF1();
-		
-		getEventbase().addInternalEventListener("gui_update", new IInternalEventListener()
+		// Create gui on swing thread.
+		final Future<Void>	created	= new Future<Void>();
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			public void internalEventOccurred(AgentEvent ae)
+			public void run()
 			{
-				String[] res = (String[])((IInternalEvent)ae.getSource()).getParameter("content").getValue();
-				gui.addRow(res);	
-//				gui.addRow((String[]));
+				GUIPlanF1.this.gui = new TranslationGuiF1();
+				created.setResult(null);
 			}
 		});
+		created.get();
+		
+//		getEventbase().addInternalEventListener("gui_update", new IInternalEventListener()
+//		{
+//			public void internalEventOccurred(AgentEvent ae)
+//			{
+//				String[] res = (String[])((IInternalEvent)ae.getSource()).getParameter("content").getValue();
+//				gui.addRow(res);	
+////				gui.addRow((String[]));
+//			}
+//		});
 		
 //		getScope().addComponentListener(new TerminationAdapter()
 //		{
@@ -56,20 +61,28 @@ public class GUIPlanF1 extends Plan
 //		});
 		
 //		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
-		getAgent().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
-			.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
-		{
-			public void intermediateResultAvailable(IMonitoringEvent result)
-			{
-				gui.dispose();
-			}
-		}));
-		
-//		while(true)
+//		getAgent().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+//			.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 //		{
-//			IInternalEvent event = waitForInternalEvent("gui_update");
-//			gui.addRow((String[])event.getParameter("content").getValue());
-//		}
+//			public void intermediateResultAvailable(IMonitoringEvent result)
+//			{
+//				gui.dispose();
+//			}
+//		}));
+		
+		while(true)
+		{
+			IInternalEvent event = waitForInternalEvent("gui_update");
+			final String[]	row	= (String[])event.getParameter("content").getValue();
+			// Change gui on swing thread.
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					gui.addRow(row);
+				}
+			});
+		}
 	}
 
 	/**
@@ -78,6 +91,7 @@ public class GUIPlanF1 extends Plan
 	 */
 	public void aborted()
 	{
+		// Close gui on swing thread.
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

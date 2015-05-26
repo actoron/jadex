@@ -1,18 +1,12 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
-import jadex.bdiv3.model.MParameter;
-import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.model.MProcessableElement;
-import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  Runtime element for all elements that can be processed via means-end reasoning.
@@ -42,12 +36,6 @@ public abstract class RProcessableElement extends RParameterElement
 	/** The state. */
 	protected State state;
 
-	/** The exception. */
-	protected Exception exception;
-	
-	/** The listeners. */
-	protected List<IResultListener<Void>>	listeners;
-	
 	/**
 	 *  Create a new element.
 	 */
@@ -187,93 +175,4 @@ public abstract class RProcessableElement extends RParameterElement
 				apl.planFinished(rplan);
 		}
 	}
-
-	/**
-	 *  Add a new listener.
-	 */
-	public void addListener(IResultListener<Void> listener)
-	{
-		if(listeners==null)
-			listeners = new ArrayList<IResultListener<Void>>();
-		
-		if(isSucceeded())
-		{
-			listener.resultAvailable(null);
-		}
-		else if(isFailed())
-		{
-			listener.exceptionOccurred(exception);
-		}
-		else
-		{
-			listeners.add(listener);
-		}
-	}
-
-	/**
-	 *  Remove a listener.
-	 */
-	public void removeListener(IResultListener<Void> listener)
-	{
-		if(listeners!=null)
-			listeners.remove(listener);
-	}
-	
-	/**
-	 *  Get the listeners.
-	 *  @return The listeners.
-	 */
-	public List<IResultListener<Void>> getListeners()
-	{
-		return listeners;
-	}
-
-	/**
-	 *  Get the exception.
-	 *  @return The exception.
-	 */
-	public Exception getException()
-	{
-		return exception;
-	}
-
-	/**
-	 *  Set the exception.
-	 *  @param exception The exception to set.
-	 */
-	public void setException(Exception exception)
-	{
-		this.exception = exception;
-	}
-	
-	/**
-	 *  Notify the listeners.
-	 */
-	public void notifyListeners()
-	{
-		if(getListeners()!=null)
-		{
-			for(IResultListener<Void> lis: getListeners())
-			{
-				if(isSucceeded())
-				{
-					lis.resultAvailable(null);
-				}
-				else if(isFailed())
-				{
-					lis.exceptionOccurred(exception);
-				}
-			}
-		}
-	}
-	
-	/**
-	 *  Test if element is succeeded.
-	 */
-	public abstract boolean isSucceeded();
-	
-	/**
-	 *  Test if element is failed.
-	 */
-	public abstract boolean isFailed();
 }

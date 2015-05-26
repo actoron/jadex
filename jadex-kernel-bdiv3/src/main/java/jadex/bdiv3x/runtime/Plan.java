@@ -1,5 +1,6 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
@@ -8,6 +9,7 @@ import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
@@ -16,6 +18,7 @@ import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -139,6 +142,62 @@ public abstract class Plan
 		wa.addMessageEvent(mevent);
 
 		IMessageEvent res = (IMessageEvent)rplan.getFromWaitqueue(wa);
+		if(res!=null)
+		{
+			return res;
+		}
+		else
+		{
+			// todo: add scope name if is in capa
+			rplan.setWaitAbstraction(wa);
+			
+			// todo: timeout
+			
+	//		final ResumeCommand<IMessageEvent> rescom = getRPlan().new ResumeCommand<IMessageEvent>(ret, false);
+	//
+	//		if(timeout>-1)
+	//		{
+	//			IFuture<ITimer> cont = getRPlan().createTimer(timeout, agent, rescom);
+	//			cont.addResultListener(new DefaultResultListener<ITimer>()
+	//			{
+	//				public void resultAvailable(final ITimer timer)
+	//				{
+	//					if(timer!=null)
+	//						rescom.setTimer(timer);
+	//				}
+	//			});
+	//		}
+			
+	//		rplan.addResumeCommand(rescom);
+			
+			return ret.get();
+		}
+	}
+	
+	/**
+	 *  Wait for an internal event.
+	 *  @param type The internal event type.
+	 */
+	public IInternalEvent waitForInternalEvent(String type)
+	{
+		return waitForInternalEvent(type, -1);
+	}
+
+	/**
+	 *  Wait for an internal event.
+	 *  @param type The internal event type.
+	 *  @param timeout The timeout.
+	 */
+	public IInternalEvent waitForInternalEvent(String type, long timeout)
+	{
+		final Future<IInternalEvent> ret = new Future<IInternalEvent>();
+
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+		MInternalEvent mevent = bdif.getBDIModel().getCapability().getInternalEvent(type);
+		WaitAbstraction wa = new WaitAbstraction();
+		wa.addInternalEvent(mevent);
+
+		IInternalEvent res = (IInternalEvent)rplan.getFromWaitqueue(wa);
 		if(res!=null)
 		{
 			return res;
@@ -487,15 +546,16 @@ public abstract class Plan
 		return agent.getComponentFeature(IMessageFeature.class).sendMessage((Map<String, Object>)me.getMessage(), me.getMessageType(), codecids);
 	}
 
-//	/**
-//	 *  Dispatch an internal event.
-//	 *  @param event The event.
-//	 *  Note: plan step is interrupted after call.
-//	 */
-//	public void dispatchInternalEvent(IInternalEvent event)
-//	{
-//		throw new UnsupportedOperationException();
-//	}
+	/**
+	 *  Dispatch an internal event.
+	 *  @param event The event.
+	 *  Note: plan step is interrupted after call.
+	 */
+	public void dispatchInternalEvent(IInternalEvent event)
+	{
+		FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction((RProcessableElement)event);
+		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
+	}
 
 	/**
 	 *  Create a new message event.
@@ -503,20 +563,23 @@ public abstract class Plan
 	 */
 	public IMessageEvent createMessageEvent(String type)
 	{
-		MMessageEvent mevent = (MMessageEvent)getCapability().getMCapability().getMessageEvent(type);
+		MMessageEvent mevent = getCapability().getMCapability().getMessageEvent(type);
 		if(mevent==null)
-			throw new RuntimeException("Message event not found");
+			throw new RuntimeException("Message event not found: "+type);
 		return new RMessageEvent(mevent, new HashMap<String, Object>(), SFipa.FIPA_MESSAGE_TYPE, agent);
 	}
 
-//	/**
-//	 *  Create a new intenal event.
-//	 *  @return The new intenal event.
-//	 */
-//	public IInternalEvent createInternalEvent(String type)
-//	{
-//		throw new UnsupportedOperationException();
-//	}
+	/**
+	 *  Create a new intenal event.
+	 *  @return The new intenal event.
+	 */
+	public IInternalEvent createInternalEvent(String type)
+	{
+		MInternalEvent mevent = getCapability().getMCapability().getInternalEvent(type);
+		if(mevent==null)
+			throw new RuntimeException("Internal event not found: "+type);
+		return new RInternalEvent(mevent, agent);
+	}
 
 	/**
 	 *  Get the scope.

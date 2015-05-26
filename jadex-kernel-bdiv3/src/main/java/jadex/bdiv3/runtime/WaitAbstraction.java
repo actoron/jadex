@@ -1,9 +1,9 @@
 package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.model.MElement;
+import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.impl.RElement;
-import jadex.bdiv3.runtime.impl.RProcessableElement;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,15 +44,15 @@ public class WaitAbstraction
 //		runtimeelements.add(mevent);
 //	}
 
-//	/**
-//	 *  Add an internal event.
-//	 *  @param type The type.
-//	 */
-//	public void addInternalEvent(MInternalEvent mevent)
-//	{
-//		addModelElement(mevent);
-//	}
-//
+	/**
+	 *  Add an internal event.
+	 *  @param type The type.
+	 */
+	public void addInternalEvent(MInternalEvent mevent)
+	{
+		addModelElement(mevent);
+	}
+
 //	/**
 //	 *  Add a goal.
 //	 *  @param type The type.
