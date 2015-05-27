@@ -70,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -521,11 +522,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										}
 									});
 								}
-//									else
-//									{
-//										System.out.println("new goal not adopted, already contained: "+pojogoal);
-//									}
-								
+//								else
+//								{
+//									System.out.println("new goal not adopted, already contained: "+pojogoal);
+//								}
+							
 								return IFuture.DONE;
 							}
 						});
@@ -546,24 +547,6 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									mgoal, new ChangeEvent(event), null, null, component);
 								return pvals!=null? m.invoke(null, pvals): null;
 							}
-														
-//								public Tuple2<Boolean, Object> prepareResult(Object res)
-//								{
-//									Tuple2<Boolean, Object> ret = null;
-//									if(res instanceof Boolean)
-//									{
-//										ret = new Tuple2<Boolean, Object>((Boolean)res, null);
-//									}
-//									else if(res!=null)
-//									{
-//										ret = new Tuple2<Boolean, Object>(Boolean.TRUE, res);
-//									}
-//									else
-//									{
-//										ret = new Tuple2<Boolean, Object>(Boolean.FALSE, null);
-//									}
-//									return ret;
-//								}
 						}, new IAction<Void>()
 						{
 							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
@@ -587,57 +570,42 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								}
 								else
 								{
-//										Object pojogoal = null;
-//										if(event.getContent()!=null)
-//										{
-//											try
-//											{
-//												Class<?> evcl = event.getContent().getClass();
-//												Constructor<?> c = gcl.getConstructor(new Class[]{evcl});
-//												pojogoal = c.newInstance(new Object[]{event.getContent()});
-//												dispatchTopLevelGoal(pojogoal);
-//											}
-//											catch(Exception e)
-//											{
-//												e.printStackTrace();
-//											}
-//										}
-//										else
-//										{
-										Constructor<?>[] cons = gcl.getConstructors();
-										Object pojogoal = null;
-										boolean ok = false;
-										for(Constructor<?> c: cons)
+									Constructor<?>[] cons = gcl.getConstructors();
+									Object pojogoal = null;
+									boolean ok = false;
+									for(Constructor<?> c: cons)
+									{
+										try
 										{
-											try
+											Object[] vals = BDIAgentFeature.getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(),
+												mgoal, new ChangeEvent(event), null, null, component);
+											if(vals!=null)
 											{
-												Object[] vals = BDIAgentFeature.getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(),
-													mgoal, new ChangeEvent(event), null, null, component);
-												if(vals!=null)
-												{
-													pojogoal = c.newInstance(vals);
-													bdif.dispatchTopLevelGoal(pojogoal);
-													break;
-												}
-												else
-												{
-													ok = true;
-												}
+												pojogoal = c.newInstance(vals);
+												bdif.dispatchTopLevelGoal(pojogoal);
+												break;
 											}
-											catch(Exception e)
+											else
 											{
+												ok = true;
 											}
 										}
-										if(pojogoal==null && !ok)
-											throw new RuntimeException("Unknown how to create goal: "+gcl);
+										catch(Exception e)
+										{
+										}
 									}
-//									}
-								
+									if(pojogoal==null && !ok)
+										throw new RuntimeException("Unknown how to create goal: "+gcl);
+								}
 								return IFuture.DONE;
 							}
 						});
 						rule.setEvents(cond.getEvents());
 						rulesystem.getRulebase().addRule(rule);
+					}
+					else
+					{
+						throw new UnsupportedOperationException("todo: creation condition with expression");
 					}
 				}
 			}
@@ -645,7 +613,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			conds = mgoal.getConditions(MGoal.CONDITION_DROP);
 			if(conds!=null)
 			{
-				for(MCondition cond: conds)
+				for(final MCondition cond: conds)
 				{
 					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
 					
@@ -659,33 +627,47 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								if(!RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
 									 && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
 								{
-									executeGoalMethod(m, goal, event, component)
-										.addResultListener(new IResultListener<Boolean>()
+									if(m!=null)
 									{
-										public void resultAvailable(Boolean result)
+										executeGoalMethod(m, goal, event, component)
+											.addResultListener(new IResultListener<Boolean>()
 										{
-											if(result.booleanValue())
+											public void resultAvailable(Boolean result)
 											{
-//													System.out.println("Goal dropping triggered: "+goal);
-				//								rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
-												if(!goal.isFinished())
+												if(result.booleanValue())
 												{
-													goal.setException(new GoalFailureException("drop condition: "+m.getName()));
+	//												System.out.println("Goal dropping triggered: "+goal);
+					//								rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
+													if(!goal.isFinished())
+													{
+														goal.setException(new GoalFailureException("drop condition: "+m.getName()));
 //														{
 //															public void printStackTrace() 
 //															{
 //																super.printStackTrace();
 //															}
 //														});
-													goal.setProcessingState(component, RGoal.GoalProcessingState.FAILED);
+														goal.setProcessingState(component, RGoal.GoalProcessingState.FAILED);
+													}
 												}
 											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
+											
+											public void exceptionOccurred(Exception exception)
+											{
+											}
+										});
+									}
+									else
+									{
+										if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
+											if(!goal.isFinished())
+											{
+												goal.setException(new GoalFailureException("drop condition: "+cond.getExpression().getName()));
+												goal.setProcessingState(component, RGoal.GoalProcessingState.FAILED);
+											}
 										}
-									});
+									}
 								}
 							}
 							
@@ -706,7 +688,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			{
 				for(final MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
+					final Method m = cond.getMethodTarget()==null? null: cond.getMethodTarget().getMethod(component.getClassLoader());
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_suspend", 
 						new GoalsExistCondition(mgoal, bdif.getCapability()), new IAction<Void>()
@@ -719,24 +701,35 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								  && !RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
 								  && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
 								{	
-									executeGoalMethod(m, goal, event, component)
-										.addResultListener(new IResultListener<Boolean>()
+									if(m!=null)
 									{
-										public void resultAvailable(Boolean result)
+										executeGoalMethod(m, goal, event, component)
+											.addResultListener(new IResultListener<Boolean>()
 										{
-											if(!result.booleanValue())
+											public void resultAvailable(Boolean result)
 											{
-//													if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-//														System.out.println("Goal suspended: "+goal);
-												goal.setLifecycleState(component, RGoal.GoalLifecycleState.SUSPENDED);
-												goal.setState(RProcessableElement.State.INITIAL);
+												if(!result.booleanValue())
+												{
+	//												if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
+	//													System.out.println("Goal suspended: "+goal);
+													goal.setLifecycleState(component, RGoal.GoalLifecycleState.SUSPENDED);
+													goal.setState(RProcessableElement.State.INITIAL);
+												}
 											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
+											
+											public void exceptionOccurred(Exception exception)
+											{
+											}
+										});
+									}
+									else
+									{
+										if(!evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
+											goal.setLifecycleState(component, RGoal.GoalLifecycleState.SUSPENDED);
+											goal.setState(RProcessableElement.State.INITIAL);
 										}
-									});
+									}
 								}
 							}
 							return IFuture.DONE;
@@ -759,24 +752,34 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							{
 								if(RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState()))
 								{	
-									executeGoalMethod(m, goal, event, component)
-										.addResultListener(new IResultListener<Boolean>()
+									if(m!=null)
 									{
-										public void resultAvailable(Boolean result)
+										executeGoalMethod(m, goal, event, component)
+											.addResultListener(new IResultListener<Boolean>()
 										{
-											if(result.booleanValue())
+											public void resultAvailable(Boolean result)
 											{
-//													if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-//														System.out.println("Goal made option: "+goal);
-												goal.setLifecycleState(component, RGoal.GoalLifecycleState.OPTION);
-//													setState(ia, PROCESSABLEELEMENT_INITIAL);
+												if(result.booleanValue())
+												{
+	//													if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
+	//														System.out.println("Goal made option: "+goal);
+													goal.setLifecycleState(component, RGoal.GoalLifecycleState.OPTION);
+	//													setState(ia, PROCESSABLEELEMENT_INITIAL);
+												}
 											}
-										}
-										
-										public void exceptionOccurred(Exception exception)
+											
+											public void exceptionOccurred(Exception exception)
+											{
+											}
+										});
+									}
+									else
+									{
+										if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
+											goal.setLifecycleState(component, RGoal.GoalLifecycleState.OPTION);
 										}
-									});
+									}
 								}
 							}
 							
@@ -835,22 +838,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								}
 								else
 								{
-									UnparsedExpression uexp = cond.getExpression();
-									if(uexp.getParsed()==null)
-										SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
-									SimpleValueFetcher fet = new SimpleValueFetcher(component.getFetcher());
-									fet.setValue("$goal", goal);
-									Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
-									if(res instanceof Boolean)
+									if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 									{
-										if(((Boolean)res).booleanValue())
-										{
-											goal.targetConditionTriggered(component, event, rule, context);
-										}
-									}
-									else
-									{
-										System.out.println("Target condition does not evaluate to boolean: "+uexp.getValue());
+										goal.targetConditionTriggered(component, event, rule, context);
 									}
 								}
 							}
@@ -909,24 +899,11 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else
 									{
-										UnparsedExpression uexp = cond.getExpression();
-										if(uexp.getParsed()==null)
-											SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
-										SimpleValueFetcher fet = new SimpleValueFetcher(component.getFetcher());
-										fet.setValue("$goal", goal);
-										Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
-										if(res instanceof Boolean)
+										if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
-											if(((Boolean)res).booleanValue())
-											{
-												goal.setTriedPlans(null);
-												goal.setApplicablePlanList(null);
-												goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
-											}
-										}
-										else
-										{
-											System.out.println("Recur condition does not evaluate to boolean: "+uexp.getValue());
+											goal.setTriedPlans(null);
+											goal.setApplicablePlanList(null);
+											goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
 										}
 									}
 								}
@@ -983,20 +960,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else // xml expression
 									{
-										UnparsedExpression uexp = cond.getExpression();
-										if(uexp.getParsed()==null)
-											SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
-										SimpleValueFetcher fet = new SimpleValueFetcher(component.getFetcher());
-										fet.setValue("$goal", goal);
-										Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
-										if(res instanceof Boolean)
+										if(!evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
-											if(!((Boolean)res).booleanValue())
-												goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
-										}
-										else
-										{
-											System.out.println("Maintain condition does not evaluate to boolean: "+uexp.getValue());
+											goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
 										}
 									}
 								}
@@ -1041,20 +1007,9 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									}
 									else // xml expression
 									{
-										UnparsedExpression uexp = cond.getExpression();
-										if(uexp.getParsed()==null)
-											SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
-										SimpleValueFetcher fet = new SimpleValueFetcher(component.getFetcher());
-										fet.setValue("$goal", goal);
-										Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
-										if(res instanceof Boolean)
+										if(evaluateCondition(component, cond, SUtil.createHashMap(new String[]{"$goal"}, new Object[]{goal})))
 										{
-											if(((Boolean)res).booleanValue())
-												goal.targetConditionTriggered(component, event, rule, context);
-										}
-										else
-										{
-											System.out.println("Target condition does not evaluate to boolean: "+uexp.getValue());
+											goal.targetConditionTriggered(component, event, rule, context);
 										}
 									}
 								}
@@ -1484,5 +1439,40 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	{
 		return inited;
 	}
+
+	// for xml
 	
+	/**
+	 *  Evaluate the condition.
+	 *  @return
+	 */
+	public static boolean evaluateCondition(IInternalAccess agent, MCondition cond, Map<String, Object> vals)
+	{
+		boolean ret = false;
+		
+		UnparsedExpression uexp = cond.getExpression();
+		if(uexp.getParsed()==null)
+			SJavaParser.parseExpression(uexp, agent.getModel().getAllImports(), agent.getClassLoader());
+		SimpleValueFetcher fet = new SimpleValueFetcher(agent.getFetcher());
+		if(vals!=null)
+		{
+			for(Map.Entry<String, Object> entry: vals.entrySet())
+			{
+				fet.setValue(entry.getKey(), entry.getValue());
+			}
+		}
+		Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
+		if(res instanceof Boolean)
+		{
+			ret = ((Boolean)res).booleanValue();
+		}
+		else
+		{
+			System.out.println("Suspend condition does not evaluate to boolean: "+uexp.getValue());
+		}
+		
+		return ret;
+	}
 }
+
+
