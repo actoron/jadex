@@ -118,18 +118,18 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public IFuture<Void> init()
 	{
-		// cannot do this in constructor because it needs access to this feature in expressions
-
 		RBeliefbase bb = new RBeliefbase(getComponent());
-		bb.init();
 		getCapability().setBeliefbase(bb);
+		bb.init();
 		
 		RExpressionBase eb = new RExpressionBase(getComponent());
 		getCapability().setExpressionbase(eb);
 		
 		RGoalbase gb = new RGoalbase(getComponent());
 		getCapability().setGoalbase(gb);
-		
+
+		// cannot do this in constructor because it needs access to this feature in expressions
+	
 //		injectAgent(getComponent(), pojo, bdimodel, null);
 //		invokeInitCalls(pojo);
 //		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);

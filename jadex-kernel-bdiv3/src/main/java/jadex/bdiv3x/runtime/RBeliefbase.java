@@ -1,8 +1,8 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.model.MCapability;
-import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.wrappers.EventPublisher;
@@ -13,8 +13,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
-import jadex.rules.eca.ChangeInfo;
-import jadex.rules.eca.Event;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Runtime element for storing beliefs.
  */
 public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 {
@@ -45,17 +43,52 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 */
 	public void init()
 	{	
+		Map<String, Object> args = getAgent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+		Map<String, Object> vals = args==null? new HashMap<String, Object>(): new HashMap<String, Object>(args);
+		
+		String confname = getAgent().getConfiguration();
+		if(confname!=null)
+		{
+			IBDIModel bdimodel = (IBDIModel)getAgent().getModel().getRawModel();
+			MConfiguration mconf = bdimodel.getCapability().getConfiguration(confname);
+			
+			if(mconf!=null)
+			{
+				// Set initial belief values
+				List<UnparsedExpression> ibels = mconf.getInitialBeliefs();
+				if(ibels!=null)
+				{
+					for(UnparsedExpression uexp: ibels)
+					{
+						try
+						{
+							MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
+							Object val = SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+							vals.put(mbel.getName(), val);
+						}
+						catch(RuntimeException e)
+						{
+							throw e;
+						}
+						catch(Exception e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+				}
+			}
+		}
+		
 		List<MBelief> mbels = getMCapability().getBeliefs();
 		if(mbels!=null)
 		{
-			Map<String, Object> args = getAgent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 			for(MBelief mbel: mbels)
 			{
 				if(!mbel.isMulti(agent.getClassLoader()))
 				{
-					if(mbel.isExported() && args.containsKey(mbel.getName()))
+					if(vals.containsKey(mbel.getName())) // mbel.isExported() && 
 					{	
-						addBelief(new RBelief(mbel, getAgent(), args.get(mbel.getName())));
+						addBelief(new RBelief(mbel, getAgent(), vals.get(mbel.getName())));
 					}
 					else
 					{
@@ -64,9 +97,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				}
 				else
 				{
-					if(mbel.isExported() && args.containsKey(mbel.getName()))
+					if(vals.containsKey(mbel.getName())) // mbel.isExported() && 
 					{	
-						addBeliefSet(new RBeliefSet(mbel, getAgent(), (Object[])args.get(mbel.getName())));
+						addBeliefSet(new RBeliefSet(mbel, getAgent(), (Object[])vals.get(mbel.getName())));
 					}
 					else
 					{

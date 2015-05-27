@@ -7,6 +7,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature.GoalsExistCondition;
 import jadex.bdiv3.features.impl.BDIAgentFeature.LifecycleStateCondition;
 import jadex.bdiv3.features.impl.BDIAgentFeature.PlansExistCondition;
+import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCondition;
@@ -139,28 +140,32 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			if(mconf!=null)
 			{
-				// Set initial belief values
-				List<UnparsedExpression> ibels = mconf.getInitialBeliefs();
-				if(ibels!=null)
+				// only for pojo agents / xml is inited in beliefbase init
+				if(bdimodel instanceof BDIModel)
 				{
-					for(UnparsedExpression uexp: ibels)
+					// Set initial belief values
+					List<UnparsedExpression> ibels = mconf.getInitialBeliefs();
+					if(ibels!=null)
 					{
-						try
+						for(UnparsedExpression uexp: ibels)
 						{
-							MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
-							Object val = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
-	//						Field f = mbel.getTarget().getField(getClassLoader());
-	//						f.setAccessible(true);
-	//						f.set(agent, val);
-							mbel.setValue(component, val);
-						}
-						catch(RuntimeException e)
-						{
-							throw e;
-						}
-						catch(Exception e)
-						{
-							throw new RuntimeException(e);
+							try
+							{
+								MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
+								Object val = SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+		//						Field f = mbel.getTarget().getField(getClassLoader());
+		//						f.setAccessible(true);
+		//						f.set(agent, val);
+								mbel.setValue(component, val);
+							}
+							catch(RuntimeException e)
+							{
+								throw e;
+							}
+							catch(Exception e)
+							{
+								throw new RuntimeException(e);
+							}
 						}
 					}
 				}
@@ -791,8 +796,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			{
 				for(final MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
-					
+					final Method m = cond.getMethodTarget()==null? null: cond.getMethodTarget().getMethod(component.getClassLoader());
+										
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_target", 
 						new CombinedCondition(new ICondition[]{
 							new GoalsExistCondition(mgoal, bdif.getCapability())
@@ -810,21 +815,44 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						{
 							for(final RGoal goal: bdif.getCapability().getGoals(mgoal))
 							{
-								executeGoalMethod(m, goal, event, component)
-									.addResultListener(new IResultListener<Boolean>()
+								if(m!=null)
 								{
-									public void resultAvailable(Boolean result)
+									executeGoalMethod(m, goal, event, component)
+										.addResultListener(new IResultListener<Boolean>()
 									{
-										if(result.booleanValue())
+										public void resultAvailable(Boolean result)
+										{
+											if(result.booleanValue())
+											{
+												goal.targetConditionTriggered(component, event, rule, context);
+											}
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+										}
+									});
+								}
+								else
+								{
+									UnparsedExpression uexp = cond.getExpression();
+									if(uexp.getParsed()==null)
+										SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
+									SimpleValueFetcher fet = new SimpleValueFetcher(component.getFetcher());
+									fet.setValue("$goal", goal);
+									Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
+									if(res instanceof Boolean)
+									{
+										if(((Boolean)res).booleanValue())
 										{
 											goal.targetConditionTriggered(component, event, rule, context);
 										}
 									}
-									
-									public void exceptionOccurred(Exception exception)
+									else
 									{
+										System.out.println("Target condition does not evaluate to boolean: "+uexp.getValue());
 									}
-								});
+								}
 							}
 						
 							return IFuture.DONE;
@@ -842,8 +870,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			{
 				for(final MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
-					
+					final Method m = cond.getMethodTarget()==null? null: cond.getMethodTarget().getMethod(component.getClassLoader());
+										
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_recur",
 						new GoalsExistCondition(mgoal, bdif.getCapability()), new IAction<Void>()
 	//						new CombinedCondition(new ICondition[]{
@@ -859,23 +887,48 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
 									&& RGoal.GoalProcessingState.PAUSED.equals(goal.getProcessingState()))
 								{	
-									executeGoalMethod(m, goal, event, component)
-										.addResultListener(new IResultListener<Boolean>()
+									if(m!=null)
 									{
-										public void resultAvailable(Boolean result)
+										executeGoalMethod(m, goal, event, component)
+											.addResultListener(new IResultListener<Boolean>()
 										{
-											if(result.booleanValue())
+											public void resultAvailable(Boolean result)
+											{
+												if(result.booleanValue())
+												{
+													goal.setTriedPlans(null);
+													goal.setApplicablePlanList(null);
+													goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
+												}
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+											}
+										});
+									}
+									else
+									{
+										UnparsedExpression uexp = cond.getExpression();
+										if(uexp.getParsed()==null)
+											SJavaParser.parseExpression(uexp, component.getModel().getAllImports(), component.getClassLoader());
+										SimpleValueFetcher fet = new SimpleValueFetcher(component.getFetcher());
+										fet.setValue("$goal", goal);
+										Object res = ((IParsedExpression)uexp.getParsed()).getValue(fet);
+										if(res instanceof Boolean)
+										{
+											if(((Boolean)res).booleanValue())
 											{
 												goal.setTriedPlans(null);
 												goal.setApplicablePlanList(null);
 												goal.setProcessingState(component, RGoal.GoalProcessingState.INPROCESS);
 											}
 										}
-										
-										public void exceptionOccurred(Exception exception)
+										else
 										{
+											System.out.println("Recur condition does not evaluate to boolean: "+uexp.getValue());
 										}
-									});
+									}
 								}
 							}
 							return IFuture.DONE;
