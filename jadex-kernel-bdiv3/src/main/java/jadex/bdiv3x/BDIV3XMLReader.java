@@ -10,12 +10,11 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
-import jadex.bdiv3.model.MMetaGoal;
-import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MMessageEvent.Direction;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
+import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -229,15 +228,19 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		TypeInfo ti_maintaingoalref = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
 		
-		TypeInfo ti_metagoal = new TypeInfo(new XMLInfo(new QName(uri, "metagoal")), new ObjectInfo(MMetaGoal.class),
+		TypeInfo ti_metagoal = new TypeInfo(new XMLInfo(new QName(uri, "metagoal")), new ObjectInfo(MGoal.class, new GoalMetaProc(true)),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
 				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
 			}, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
+				new SubobjectInfo(new AccessInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goal")}, "triggerGoal"))
 			}), new LinkingInfo(condlinker));
 		TypeInfo ti_metagoalref = new TypeInfo(new XMLInfo(new QName(uri, "metagoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger")}), null)); 
+		
 		typeinfos.add(ti_performgoal);
 		typeinfos.add(ti_performgoalref);
 		typeinfos.add(ti_achievegoal);
@@ -915,6 +918,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		return typeinfos;
 	}
 	
+	/**
+	 * 
+	 */
 	public static class ParamMultiProc implements IPostProcessor
 	{
 		boolean multi;
@@ -929,6 +935,31 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			MParameter mparam = (MParameter)object;
 			mparam.setMulti(multi);
 			return mparam;
+		}
+		
+		public int getPass()
+		{
+			return 0;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class GoalMetaProc implements IPostProcessor
+	{
+		boolean meta;
+		
+		GoalMetaProc(boolean meta)
+		{
+			this.meta = meta;
+		}
+		
+		public Object postProcess(IContext context, Object object)
+		{
+			MGoal mgoal = (MGoal)object;
+			mgoal.setMetagoal(meta);
+			return mgoal;
 		}
 		
 		public int getPass()

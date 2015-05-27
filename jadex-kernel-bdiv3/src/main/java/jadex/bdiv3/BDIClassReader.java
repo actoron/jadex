@@ -322,7 +322,7 @@ public class BDIClassReader extends MicroClassReader
 				MGoal goal2	= new MGoal(name+MElement.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
 					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
 					goal.getRetryDelay(), goal.getRecurDelay(), goal.isOrSuccess(), goal.isUnique(), goal.getDeliberation(), goal.getParameters(),
-					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), new ArrayList<ClassInfo>(goal.getTriggerGoals())); // clone params?
+					goal.getServiceParameterMappings(), goal.getServiceResultMappings(), new ArrayList<String>(goal.getTriggerGoals())); // clone params?
 						
 				// Convert goal condition events
 				if(goal.getConditions()!=null)
@@ -1080,14 +1080,14 @@ public class BDIClassReader extends MicroClassReader
 			tmpcl = tmpcl.getSuperclass();
 		}
 		
-		List<ClassInfo> triggergoals = null;
+		List<String> triggergoals = null;
 		Class<?>[] trgoals = goal.triggergoals();
 		if(trgoals!=null)
 		{
-			triggergoals = new ArrayList<ClassInfo>();
+			triggergoals = new ArrayList<String>();
 			for(Class<?> trgoal: trgoals)
 			{
-				triggergoals.add(new ClassInfo(trgoal.getName()));
+				triggergoals.add(trgoal.getName());
 			}
 		}
 		

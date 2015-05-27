@@ -1,6 +1,5 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.annotation.GoalAPLBuild;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
@@ -13,11 +12,11 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -117,42 +116,31 @@ public class APL
 		if(candidates==null || ((MProcessableElement)element.getModelElement()).isRebuild())
 		{
 			boolean	done	= false;
+
 			Object	pojo	= element.getPojoElement();
-			if(pojo!=null)
+			if(pojo!=null && element instanceof IGoal)
 			{
-				Class<?>	clazz	= pojo.getClass();
-				
-				// todo: this causes poor performance -> should be moved to model level
-				Method[]	ms	= SReflect.getAllMethods(clazz);
-				for(int i=0; !done && i<ms.length; i++)
+				IGoal goal = (IGoal)element;
+				MGoal mgoal = (MGoal)goal.getModelElement();
+				MethodInfo mi = mgoal.getBuildAPLMethod(ia.getClassLoader());
+				if(mi!=null)
 				{
-					if(ms[i].isAnnotationPresent(GoalAPLBuild.class))
+					Method m = mi.getMethod(ia.getClassLoader());
+					try
 					{
-						if((ms[i].getModifiers()&Modifier.PUBLIC)!=0)
-						{
-							done	= true;
-							try
-							{
-								candidates	= (List<Object>)ms[i].invoke(pojo, new Object[0]);
-							}
-							catch(InvocationTargetException e)
-							{
-								throw e.getTargetException() instanceof RuntimeException
-									? (RuntimeException)e.getTargetException()
-									: new RuntimeException(e.getTargetException());
-							}
-							catch(Exception e)
-							{
-								throw e instanceof RuntimeException
-									? (RuntimeException)e
-									: new RuntimeException(e);
-							}
-							
-						}
-						else
-						{
-							throw new RuntimeException("Method not public: "+ms[i]);
-						}
+						candidates	= (List<Object>)m.invoke(pojo, new Object[0]);
+					}
+					catch(InvocationTargetException e)
+					{
+						throw e.getTargetException() instanceof RuntimeException
+							? (RuntimeException)e.getTargetException()
+							: new RuntimeException(e.getTargetException());
+					}
+					catch(Exception e)
+					{
+						throw e instanceof RuntimeException
+							? (RuntimeException)e
+							: new RuntimeException(e);
 					}
 				}
 			}

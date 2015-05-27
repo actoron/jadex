@@ -1073,7 +1073,16 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	
 					addSubgoal(rgoal);
 					
-					getAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal));
+					getAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new AdoptGoalAction(rgoal))
+						.addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+					});
 				}
 			}
 		});

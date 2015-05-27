@@ -1,15 +1,17 @@
 package jadex.bdiv3.model;
 
+import jadex.bdiv3.annotation.GoalAPLBuild;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,11 +61,14 @@ public class MGoal extends MClassBasedElement
 	/** The unique. */
 	protected boolean unique = false;
 	
+	/** The metagoal flag. */
+	protected boolean metagoal = false;
+	
 	/** The deliberation. */
 	protected MDeliberation deliberation;
 	
 	/** The trigger (other goals) if this goal is used as plan. */
-	protected List<ClassInfo> triggergoals;
+	protected List<String> triggergoals; // classname (pojo) or typename (xml)
 	protected List<MGoal> mtriggergoals;
 	
 	/** The pojo result access (field or method). */
@@ -73,14 +78,14 @@ public class MGoal extends MClassBasedElement
 	/** The goal conditions. */
 	protected Map<String, List<MCondition>> conditions;
 	
-//	/** The parameters. */
-//	protected List<MParameter> parameters;
-	
 	/** The goal service parameter mappings. */
 	protected Map<String, MethodInfo> spmappings;
 	
 	/** The goal service result mappings. */
 	protected Map<String, MethodInfo> srmappings;
+	
+	/** The method info for building apl. */
+	protected MethodInfo buildaplmethod;
 	
 	/**
 	 *	Bean Constructor. 
@@ -95,7 +100,7 @@ public class MGoal extends MClassBasedElement
 	public MGoal(String name, String target, boolean posttoall, boolean randomselection, ExcludeMode excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
 		boolean orsuccess, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
-		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings, List<ClassInfo> triggergoals)
+		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings, List<String> triggergoals)
 	{
 		super(name, target, posttoall, randomselection, excludemode);
 		this.retry = retry;
@@ -203,36 +208,8 @@ public class MGoal extends MClassBasedElement
 	public boolean isDeclarative()
 	{
 		return conditions!=null && (conditions.get(CONDITION_TARGET)!=null || conditions.get(CONDITION_MAINTAIN)!=null);
-//		return declarative;
 	}
 
-//	/**
-//	 *  Set the declarative.
-//	 *  @param declarative The declarative to set.
-//	 */
-//	public void setDeclarative(boolean declarative)
-//	{
-//		this.declarative = declarative;
-//	}
-
-//	/**
-//	 *  Get the maintain.
-//	 *  @return The maintain.
-//	 */
-//	public boolean isMaintain()
-//	{
-//		return maintain;
-//	}
-//
-//	/**
-//	 *  Set the maintain.
-//	 *  @param maintain The maintain to set.
-//	 */
-//	public void setMaintain(boolean maintain)
-//	{
-//		this.maintain = maintain;
-//	}
-	
 	/**
 	 *  Get the pojo result access, i.e. the method or field
 	 *  annotated with @GoalResult.
@@ -409,52 +386,6 @@ public class MGoal extends MClassBasedElement
 		return conditions;
 	}
 
-//	/**
-//	 *  Get the parameters.
-//	 *  @return The parameters.
-//	 */
-//	public List<MParameter> getParameters()
-//	{
-//		return parameters;
-//	}
-//	
-//	/**
-//	 *  Get a parameter by name.
-//	 */
-//	public MParameter getParameter(String name)
-//	{
-//		MParameter ret = null;
-//		if(parameters!=null && name!=null)
-//		{
-//			for(MParameter param: parameters)
-//			{
-//				if(param.getName().equals(name))
-//				{
-//					ret = param;
-//					break;
-//				}
-//			}
-//		}
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Test if goal has a parameter.
-//	 */
-//	public boolean hasParameter(String name)
-//	{
-//		return getParameter(name)!=null;
-//	}
-//
-//	/**
-//	 *  Set the parameters.
-//	 *  @param parameters The parameters to set.
-//	 */
-//	public void setParameters(List<MParameter> parameters)
-//	{
-//		this.parameters = parameters;
-//	}
-	
 	/**
 	 * 
 	 */
@@ -513,7 +444,7 @@ public class MGoal extends MClassBasedElement
 	 *  Get the triggergoals.
 	 *  @return The triggergoals.
 	 */
-	public List<ClassInfo> getTriggerGoals()
+	public List<String> getTriggerGoals()
 	{
 		return triggergoals;
 	}
@@ -522,9 +453,19 @@ public class MGoal extends MClassBasedElement
 	 *  Set the triggergoals.
 	 *  @param triggergoals The triggergoals to set.
 	 */
-	public void setTriggerGoals(List<ClassInfo> triggergoals)
+	public void setTriggerGoals(List<String> triggergoals)
 	{
 		this.triggergoals = triggergoals;
+	}
+	
+	/**
+	 *  Add a trigger goal.
+	 */
+	public void addTriggerGoal(String typename)
+	{
+		if(triggergoals==null)
+			triggergoals = new ArrayList<String>();
+		triggergoals.add(typename);
 	}
 	
 	/**
@@ -537,17 +478,61 @@ public class MGoal extends MClassBasedElement
 		{
 			mtriggergoals = new ArrayList<MGoal>();
 			
-			for(ClassInfo cl: triggergoals)
+			for(String cl: triggergoals)
 			{
-				MGoal mgoal = mcapa.getGoal(cl.getTypeName());
+				MGoal mgoal = mcapa.getGoal(cl);
 				if(mgoal==null)
-				{
 					throw new RuntimeException("Goal not for for pojo class: "+cl);
-				}
 				mtriggergoals.add(mgoal);
 			}
 		}
 		
 		return mtriggergoals;
+	}
+	
+	/**
+	 *  Get the build apl method.
+	 */
+	public MethodInfo getBuildAPLMethod(ClassLoader cl)
+	{
+		if(buildaplmethod==null)
+		{
+			Class<?> tcl = getTargetClass(cl);
+			Method[] ms = SReflect.getAllMethods(tcl);
+			boolean done = false;
+			for(int i=0; !done && i<ms.length; i++)
+			{
+				if(ms[i].isAnnotationPresent(GoalAPLBuild.class))
+				{
+					if((ms[i].getModifiers()&Modifier.PUBLIC)!=0)
+					{
+						buildaplmethod = new MethodInfo(ms[i]);
+						done = true;
+					}
+				}
+			}
+			if(buildaplmethod==null)
+				buildaplmethod = MBody.MI_NOTFOUND;
+		}
+		
+		return buildaplmethod==MBody.MI_NOTFOUND? null: buildaplmethod;
+	}
+
+	/**
+	 *  Get the metagoal.
+	 *  @return The metagoal
+	 */
+	public boolean isMetagoal()
+	{
+		return metagoal;
+	}
+
+	/**
+	 *  The metagoal to set.
+	 *  @param metagoal The metagoal to set
+	 */
+	public void setMetagoal(boolean metagoal)
+	{
+		this.metagoal = metagoal;
 	}
 }

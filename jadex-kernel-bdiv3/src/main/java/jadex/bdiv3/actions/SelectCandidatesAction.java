@@ -8,11 +8,9 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
-import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ICommand;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -73,6 +71,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		MCapability	mcapa = (MCapability)((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability().getModelElement();
 
 		List<Object> cands = element.getApplicablePlanList().selectCandidates(mcapa);
+		
 		if(cands!=null && !cands.isEmpty())
 		{
 			element.setState(RProcessableElement.State.CANDIDATESSELECTED);
@@ -92,6 +91,11 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					final MGoal mgoal = (MGoal)cand;
 					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
 					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal);
+					
+					if(mgoal.isMetagoal())
+					{
+						System.out.println("metagoal execution");
+					}
 					
 					rgoal.addListener(new IResultListener<Void>()
 					{

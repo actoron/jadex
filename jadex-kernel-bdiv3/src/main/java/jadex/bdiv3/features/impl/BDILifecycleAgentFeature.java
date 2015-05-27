@@ -91,23 +91,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	public BDILifecycleAgentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-		
-//		BDIAgentFeature bdif = (IInternalBDIAgentFeature)component.getComponentFeature(IBDIAgentFeature.class);
-//		Object pojo = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-//		bdif.injectAgent(component, pojo, bdif.getBDIModel(), null);
-//		bdif.invokeInitCalls(pojo);
-//		bdif.initCapabilities(pojo, bdif.getBDIModel().getSubcapabilities() , 0);
 	}
-	
-//	/**
-//	 *  Initialize the feature.
-//	 *  Empty implementation that can be overridden.
-//	 */
-//	public IFuture<Void> init()
-//	{
-////		startBehavior();
-//		return super.init();
-//	}
 	
 	/**
 	 *  Execute the functional body of the agent.
