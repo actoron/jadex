@@ -1,8 +1,8 @@
 package jadex.bdi.planlib.protocols;
 
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 
 /**

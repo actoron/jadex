@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.fipa.CMSSearchComponents;
 import jadex.bridge.fipa.Done;

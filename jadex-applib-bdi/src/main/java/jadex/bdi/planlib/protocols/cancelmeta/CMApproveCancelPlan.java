@@ -1,6 +1,6 @@
 package jadex.bdi.planlib.protocols.cancelmeta;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Default plan to decide about cancel requests.

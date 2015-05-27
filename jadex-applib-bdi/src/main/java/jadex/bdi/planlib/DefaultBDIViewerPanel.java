@@ -4,8 +4,6 @@ import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.ICapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;

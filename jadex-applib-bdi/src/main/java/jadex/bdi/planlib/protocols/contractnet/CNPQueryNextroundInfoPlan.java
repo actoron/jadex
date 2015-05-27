@@ -3,7 +3,7 @@ package jadex.bdi.planlib.protocols.contractnet;
 import jadex.bdi.planlib.protocols.IQueryNextroundInfo;
 import jadex.bdi.planlib.protocols.NegotiationRecord;
 import jadex.bdi.planlib.protocols.ParticipantProposal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Default plan for the query nextround info goal

@@ -1,9 +1,8 @@
 package jadex.bdi.planlib.protocols.cancelmeta;
 
 import jadex.bdi.planlib.protocols.InteractionState;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.TimeoutException;
+import jadex.bdiv3x.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;

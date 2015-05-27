@@ -3,7 +3,7 @@ package jadex.bdi.planlib.protocols.contractnet;
 import jadex.bdi.planlib.protocols.IProposalEvaluator;
 import jadex.bdi.planlib.protocols.NegotiationRecord;
 import jadex.bdi.planlib.protocols.ParticipantProposal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Evaluate proposals using the proposal evaluator interface.

@@ -43,12 +43,15 @@
 	<goals>
 		<achievegoal name="alarm" exclude="when_failed">
 			<parameter name="alarm" class="Alarm">
-				<value>$alarm</value>
+				<!-- <value>$alarm</value> -->
+				<bindingoptions>
+				    SELECT $alarm FROM Alarm $alarm IN $beliefbase.alarms WHERE $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM)!=null
+				</bindingoptions>
 			</parameter>
 			<unique/>
-			<creationcondition language="jcl">
+<!-- 			<creationcondition language="jel">
 				Alarm $alarm &amp;&amp; $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM
-			</creationcondition>
+			</creationcondition> -->
 			<contextcondition language="jcl">
 				$goal.alarm.isActive()
 			</contextcondition>

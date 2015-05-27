@@ -1,6 +1,6 @@
 package jadex.bdi.planlib.ping;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  The ping plan reacts on ping requests.

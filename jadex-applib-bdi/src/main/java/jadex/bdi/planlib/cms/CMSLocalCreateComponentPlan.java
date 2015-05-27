@@ -1,6 +1,6 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.component.IRequiredServicesFeature;

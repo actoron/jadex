@@ -1,6 +1,6 @@
 package jadex.bdi.planlib.messaging;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;

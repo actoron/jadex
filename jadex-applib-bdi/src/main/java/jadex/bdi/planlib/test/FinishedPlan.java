@@ -1,6 +1,6 @@
 package jadex.bdi.planlib.test;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  Stop the test agent.

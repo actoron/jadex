@@ -2,10 +2,9 @@ package jadex.bdi.planlib.protocols.dutchauction;
 
 import jadex.bdi.planlib.protocols.AbstractInitiatorPlan;
 import jadex.bdi.planlib.protocols.AuctionDescription;
-import jadex.bdi.runtime.BDIFailureException;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.TimeoutException;
+import jadex.bdiv3.runtime.BDIFailureException;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;

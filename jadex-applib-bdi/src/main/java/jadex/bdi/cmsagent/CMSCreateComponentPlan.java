@@ -1,7 +1,7 @@
 package jadex.bdi.cmsagent;
 
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.CMSCreateComponent;
 import jadex.bridge.fipa.Done;

@@ -1,6 +1,6 @@
 package jadex.bdi.cmsagent;
 
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.CMSShutdownPlatform;
 import jadex.bridge.fipa.Done;
 

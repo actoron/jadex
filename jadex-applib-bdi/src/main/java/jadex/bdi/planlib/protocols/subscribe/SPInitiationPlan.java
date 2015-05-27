@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.protocols.subscribe;
 
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.IMessageEvent;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 
 public class SPInitiationPlan extends Plan

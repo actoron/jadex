@@ -1,8 +1,7 @@
 package jadex.bdi.planlib;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IPlan;
-import jadex.bdi.runtime.IPlanListener;
+import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.IPlanListener;
 import jadex.commons.IBooleanCondition;
 
 /**

@@ -1,7 +1,6 @@
 package jadex.bdi.planlib.iasteps;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IBeliefbase;
+import jadex.bdiv3x.runtime.IBeliefbase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;

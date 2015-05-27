@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.ping;
 
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.Plan;
 
 /**
  *  The pinging plan continously sends ping messages

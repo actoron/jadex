@@ -1,10 +1,7 @@
 package jadex.bdi.planlib.iasteps;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
-import jadex.bdi.runtime.IParameter;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IParameter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DefaultResultListener;

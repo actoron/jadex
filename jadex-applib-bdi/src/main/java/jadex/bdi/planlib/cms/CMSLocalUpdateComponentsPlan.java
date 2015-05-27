@@ -1,7 +1,6 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
