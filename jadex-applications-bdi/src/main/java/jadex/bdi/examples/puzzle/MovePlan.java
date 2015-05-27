@@ -30,10 +30,6 @@ public class MovePlan extends Plan
 	 */
 	public MovePlan()
 	{
-		this.move = (Move)getParameter("move").getValue();
-		this.depth = ((Integer)getParameter("depth").getValue()).intValue();
-		this.delay = ((Long)getBeliefbase().getBelief("move_delay").getFact()).longValue();
-		this.board = (IBoard)getBeliefbase().getBelief("board").getFact();
 	}
 
 	//-------- methods --------
@@ -43,6 +39,11 @@ public class MovePlan extends Plan
 	 */
 	public void body()
 	{
+		this.move = (Move)getParameter("move").getValue();
+		this.depth = ((Integer)getParameter("depth").getValue()).intValue();
+		this.delay = ((Long)getBeliefbase().getBelief("move_delay").getFact()).longValue();
+		this.board = (IBoard)getBeliefbase().getBelief("board").getFact();
+		
 		int triescnt = ((Integer)getBeliefbase().getBelief("triescnt").getFact()).intValue()+1;
 		getBeliefbase().getBelief("triescnt").setFact(Integer.valueOf(triescnt));
 		print("Trying "+move+" ("+triescnt+") ", depth);

@@ -239,6 +239,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		TypeInfo ti_metagoalref = new TypeInfo(new XMLInfo(new QName(uri, "metagoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
 		
+		// reset to not create MTrigger for metagoal goal triggers (are added as trigger goals)
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger")}), null)); 
 		
 		typeinfos.add(ti_performgoal);

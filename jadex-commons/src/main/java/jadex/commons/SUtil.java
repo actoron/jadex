@@ -1809,17 +1809,17 @@ public class SUtil
 	 * @param values The values (must be some form of collection, i.e. array,
 	 *        list, iterator etc.)
 	 */
-	public static List calculateCartesianProduct(String[] names, Object[] values)
+	public static <T, E> List<Map<T, E>> calculateCartesianProduct(T[] names, E[] values)
 	{
-		ArrayList ret = SCollection.createArrayList();
+		ArrayList<Map<T, E>> ret = SCollection.createArrayList();
 		if(names == null || values == null)
 			return ret;
 		if(names.length != values.length)
 			throw new IllegalArgumentException("Must have same length: "
 					+ names.length + " " + values.length);
 
-		HashMap binding = SCollection.createHashMap();
-		Iterator[] iters = new Iterator[values.length];
+		HashMap<T, E> binding = SCollection.createHashMap();
+		Iterator<E>[] iters = new Iterator[values.length];
 
 		for(int i = 0; i < values.length; i++)
 		{
@@ -1842,7 +1842,7 @@ public class SUtil
 		{
 			// Calculate next binding.
 			// Copy old binding and change one value.
-			binding = (HashMap)binding.clone();
+			binding = (HashMap<T, E>)binding.clone();
 			int i = 0;
 			for(; i < values.length && !iters[i].hasNext(); i++)
 			{

@@ -148,10 +148,11 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 *  Create a new rplan based on an mplan.
 	 */
-	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia)
+	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia, Map<String, Object> binding)
 	{
 		// Find parameter mappings for xml agents
-		Map<String, Object> mappingvals = null;
+		Map<String, Object> mappingvals = binding;
+		
 		if(mplan.getParameters()!=null && mplan.getParameters().size()>0)
 		{
 			if(reason instanceof RGoal)
@@ -163,22 +164,25 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 					if(MParameter.Direction.IN.equals(mparam.getDirection()) || MParameter.Direction.INOUT.equals(mparam.getDirection()))
 					{
 						List<String> mappings = ((MPlanParameter)mparam).getGoalMappings();
-						for(String mapping: mappings)
+						if(mappings!=null)
 						{
-							if(mapping.startsWith(rgoal.getModelElement().getName()))
+							for(String mapping: mappings)
 							{
-								String source = mapping.substring(mapping.indexOf(".")+1);
-								if(mappingvals==null)
-									mappingvals = new HashMap<String, Object>();
-								if(mparam.isMulti(null))
+								if(mapping.startsWith(rgoal.getModelElement().getName()))
 								{
-									mappingvals.put(mparam.getName(), rgoal.getParameterSet(source).getValues());
+									String source = mapping.substring(mapping.indexOf(".")+1);
+									if(mappingvals==null)
+										mappingvals = new HashMap<String, Object>();
+									if(mparam.isMulti(null))
+									{
+										mappingvals.put(mparam.getName(), rgoal.getParameterSet(source).getValues());
+									}
+									else
+									{
+										mappingvals.put(mparam.getName(), rgoal.getParameter(source).getValue());
+									}
+									break;
 								}
-								else
-								{
-									mappingvals.put(mparam.getName(), rgoal.getParameter(source).getValue());
-								}
-								break;
 							}
 						}
 					}

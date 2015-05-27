@@ -256,7 +256,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						// todo: allow Java plan constructor calls
 	//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 					
-						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component);
+						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, component, null);
 						RPlan.executePlan(rplan, component);
 					}
 				}
@@ -1018,7 +1018,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			{
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 				{
-					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component);
+					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), component, null);
 					RPlan.executePlan(rplan, component);
 					return IFuture.DONE;
 				}

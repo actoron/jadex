@@ -7,6 +7,7 @@ import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
@@ -16,8 +17,11 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -31,7 +35,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *  The APL is the applicable plan list. It stores the
@@ -51,7 +60,7 @@ public class APL
 //	protected Object apl_has_metagoal;
 	
 	/** The mplan candidates. */
-	protected List<MPlan> precandidates;
+	protected List<MPlanInfo> precandidates;
 	
 	/** The mgoal candidates (in case a goal triggers another goal). */
 	protected List<MGoal> goalprecandidates;
@@ -69,42 +78,19 @@ public class APL
 	 */
 	public APL(RProcessableElement element)
 	{
+		this(element, null);
+	}
+	
+	/**
+	 *  Create a new APL.
+	 */
+	public APL(RProcessableElement element, List<Object> candidates)
+	{
 		this.element = element;
+		this.candidates = candidates;
 	}
 	
 	//-------- methods --------
-	
-//	/**
-//	 *  Get the plancandidates.
-//	 *  @return The plancandidates.
-//	 */
-//	public List<MPlan> getPlanCandidates()
-//	{
-//		return plancandidates;
-//	}
-//
-//	/**
-//	 *  Set the plancandidates.
-//	 *  @param plancandidates The plancandidates to set.
-//	 */
-//	public void setPlanCandidates(List<MPlan> plancandidates)
-//	{
-//		this.plancandidates = plancandidates;
-//	}
-	
-//	/**
-//	 *  Get the next candidate.
-//	 */
-//	public Object getNextCandidate()
-//	{
-//		Object ret = null;
-//		if(plancandidates!=null && plancandidates.size()>0)
-//		{
-//			// todo exclude modes
-//			ret = plancandidates.remove(0);
-//		}
-//		return ret;
-//	}
 	
 	/**
 	 *  Build the apl.
@@ -117,7 +103,7 @@ public class APL
 		{
 			boolean	done	= false;
 
-			Object	pojo	= element.getPojoElement();
+			Object pojo = element.getPojoElement();
 			if(pojo!=null && element instanceof IGoal)
 			{
 				IGoal goal = (IGoal)element;
@@ -128,7 +114,7 @@ public class APL
 					Method m = mi.getMethod(ia.getClassLoader());
 					try
 					{
-						candidates	= (List<Object>)m.invoke(pojo, new Object[0]);
+						candidates = (List<Object>)m.invoke(pojo, new Object[0]);
 					}
 					catch(InvocationTargetException e)
 					{
@@ -196,53 +182,8 @@ public class APL
 			ret.setResult(null);
 		}
 		return ret;
-		
-			
-			// both aspects are dealt with dispatchToAll() via rules
-			// if we want to support disptach of goals, internal or message events to running plans
-			// we need to reintrodcue this
-			
-			// todo: plan to running?
-//			Collection<RPlan> rplans = capa.getPlans();
-//			if(rplans!=null)
-//			{
-//				for(RPlan rplan: rplans)
-//				{
-//					if(rplan.isWaitingFor(element))
-//					{
-//						candidates.add(rplan);
-//					}
-//				}
-//			}
-			// todo waitqueue ?
-//		}
-//		else
-//		{
-//			// check rplans and waitqueues
-//			// first remove all rplans that do not wait
-//			for(Object cand: candidates)
-//			{
-//				if(cand instanceof RPlan && !((RPlan)cand).isWaitingFor(element))
-//				{
-//					candidates.remove(cand);
-//				}
-//			}
-//			// add new rplans that are not contained already
-//			Collection<RPlan> rplans = capa.getPlans();
-//			if(rplans!=null)
-//			{
-//				for(RPlan rplan: rplans)
-//				{
-//					if(!candidates.contains(rplan) && rplan.isWaitingFor(element))
-//					{
-//						candidates.add(rplan);
-//					}
-//				}
-//			}
-//		}
-	
 	}
-	
+			
 	//-------- helper methods --------
 
 	/**
@@ -290,13 +231,13 @@ public class APL
 		// todo: generate binding candidates
 		if(precandidates==null)
 		{
-			precandidates = new ArrayList<MPlan>();
+			precandidates = new ArrayList<MPlanInfo>();
 			List<MPlan> mplans = ((MCapability)bdif.getCapability().getModelElement()).getPlans();
+			
 			if(mplans!=null)
 			{
-				for(int i=0; i<mplans.size(); i++)
+				for(MPlan mplan: mplans)
 				{
-					MPlan mplan = mplans.get(i);
 					MTrigger mtrigger = mplan.getTrigger();
 					
 					if(element instanceof RGoal && mtrigger!=null)
@@ -304,8 +245,8 @@ public class APL
 						List<MGoal> mgoals = mtrigger.getGoals();
 						if(mgoals!=null && mgoals.contains(element.getModelElement()))
 						{
-							precandidates.add(mplan);
-//							res.add(mplan);
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, ia.getFetcher());
+							precandidates.addAll(cands);
 						}
 					}
 					else if(element instanceof RServiceCall && mtrigger!=null)
@@ -313,8 +254,8 @@ public class APL
 						List<MServiceCall> msers = mtrigger.getServices();
 						if(msers!=null && msers.contains(element.getModelElement()))
 						{
-							precandidates.add(mplan);
-//							res.add(mplan);
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, ia.getFetcher());
+							precandidates.addAll(cands);
 						}
 					}
 					else if(element instanceof RMessageEvent && mtrigger!=null)
@@ -322,8 +263,8 @@ public class APL
 						List<MMessageEvent> msgs = mtrigger.getMessageEvents();
 						if(msgs!=null && msgs.contains(element.getModelElement()))
 						{
-							precandidates.add(mplan);
-//							res.add(mplan);
+							List<MPlanInfo> cands = createMPlanCandidates(ia, mplan, ia.getFetcher());
+							precandidates.addAll(cands);
 						}
 					}
 				}
@@ -373,6 +314,36 @@ public class APL
 			lis.resultAvailable(mgoal);
 		}
 		
+		for(final MPlanInfo mplan: precandidates)
+		{
+			checkMPlan(ia, mplan).addResultListener(new IResultListener<Boolean>()
+			{
+				public void resultAvailable(Boolean result)
+				{
+					if(result.booleanValue())
+						lis.resultAvailable(mplan);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					lis.exceptionOccurred(exception);
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test precondition (and match expression) of a plan to decide
+	 *  if it can be added to the candidates.
+	 */
+	protected IFuture<Boolean> checkMPlan(IInternalAccess ia, MPlanInfo mplaninfo) //, IValueFetcher fetcher
+	{
+		Future<Boolean> ret = new Future<Boolean>();
+		boolean	valid	= true;
+		MPlan mplan = mplaninfo.getMPlan();
+		
 		SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ia.getFetcher());
 		if(element instanceof RGoal)
 		{
@@ -386,142 +357,114 @@ public class APL
 		{
 			fetcher.setValue("$call", element);
 		}
-		
-		for(final MPlan mplan: precandidates)
+		if(mplaninfo.getBinding()!=null)
 		{
-			boolean	valid	= true;
-			
-			// chack match expression
-			if(element instanceof RGoal)
+			for(Map.Entry<String, Object> entry: mplaninfo.getBinding().entrySet())
 			{
-				RGoal rgoal = (RGoal)element;
-				UnparsedExpression uexp = mplan.getTrigger().getGoalMatchExpression((MGoal)rgoal.getModelElement());
-				if(uexp!=null)
+				fetcher.setValue(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		// chack match expression
+		if(element instanceof RGoal)
+		{
+			RGoal rgoal = (RGoal)element;
+			UnparsedExpression uexp = mplan.getTrigger().getGoalMatchExpression((MGoal)rgoal.getModelElement());
+			if(uexp!=null)
+			{
+				if(uexp.getParsed()==null)
+					SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader());
+				IParsedExpression exp = (IParsedExpression)uexp.getParsed();
+				Object val = exp.getValue(fetcher);
+				if(val instanceof Boolean)
 				{
-					if(uexp.getParsed()==null)
-						SJavaParser.parseExpression(uexp, ia.getModel().getAllImports(), ia.getClassLoader());
-					IParsedExpression exp = (IParsedExpression)uexp.getParsed();
-					Object val = exp.getValue(fetcher);
-					if(val instanceof Boolean)
-					{
-						valid	= ((Boolean)val).booleanValue();
-					}
-					else
-					{
-						ia.getLogger().warning("Match expression of plan trigger "+mplan.getName()+" not boolean: "+val);
-						valid	= false;						
-					}
-					
-					if(!valid)
-					{
-						lis.exceptionOccurred(null);
-						continue;
-					}
+					valid	= ((Boolean)val).booleanValue();
+				}
+				else
+				{
+					ia.getLogger().warning("Match expression of plan trigger "+mplan.getName()+" not boolean: "+val);
+					valid	= false;						
+				}
+				
+				if(!valid)
+				{
+					ret.setResult(Boolean.FALSE);
+					return ret;
+//					lis.exceptionOccurred(null);
 				}
 			}
-			
-			// check xml precondition
-			UnparsedExpression	upex	= mplan.getPrecondition();
-			if(upex!=null)
+		}
+		
+		// check xml precondition
+		UnparsedExpression upex = mplan.getPrecondition();
+		if(upex!=null)
+		{
+			try
 			{
+				Object	val	= SJavaParser.getParsedValue(upex, null, fetcher, null);
+				if(val instanceof Boolean)
+				{
+					valid	= ((Boolean)val).booleanValue();
+				}
+				else
+				{
+					ia.getLogger().warning("Precondition of plan "+mplan.getName()+" not boolean: "+val);
+					valid	= false;						
+				}
+			}
+			catch(Exception e)
+			{
+				ia.getLogger().warning("Precondition of plan "+mplan.getName()+" threw exception: "+e);
+				valid	= false;
+			}
+			
+			ret.setResult(valid? Boolean.TRUE: Boolean.FALSE);
+		}
+		else
+		{
+			// check pojo precondition
+			MethodInfo mi = mplan.getBody().getPreconditionMethod(ia.getClassLoader());
+			if(mi!=null)
+			{
+				Method m = mi.getMethod(ia.getClassLoader());
+				Object pojo = null;
+				if(!Modifier.isStatic(m.getModifiers()))
+				{
+					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia, mplaninfo.getBinding());
+					pojo = rp.getBody().getBody();
+				}
+				
 				try
 				{
-					Object	val	= SJavaParser.getParsedValue(upex, null, fetcher, null);
-					if(val instanceof Boolean)
+					m.setAccessible(true);
+					
+					Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element, ia);
+					if(params==null)
+						System.out.println("Invalid parameter assignment");
+					Object app = m.invoke(pojo, params);
+					if(app instanceof Boolean)
 					{
-						valid	= ((Boolean)val).booleanValue();
+						ret.setResult((Boolean)app);
 					}
-					else
+					else if(app instanceof IFuture)
 					{
-						ia.getLogger().warning("Precondition of plan "+mplan.getName()+" not boolean: "+val);
-						valid	= false;						
+						((IFuture<Boolean>)app).addResultListener(new DelegationResultListener<Boolean>(ret));
 					}
 				}
 				catch(Exception e)
 				{
-					ia.getLogger().warning("Precondition of plan "+mplan.getName()+" threw exception: "+e);
-					valid	= false;
-				}
-				
-				if(valid)
-				{
-					lis.resultAvailable(mplan);				
-				}
-				else
-				{
-					lis.exceptionOccurred(null);
+					ret.setResult(Boolean.FALSE);
 				}
 			}
 			else
 			{
-				// check pojo precondition
-				MethodInfo mi = mplan.getBody().getPreconditionMethod(ia.getClassLoader());
-				if(mi!=null)
-				{
-					Method m = mi.getMethod(ia.getClassLoader());
-					Object pojo = null;
-					if(!Modifier.isStatic(m.getModifiers()))
-					{
-						RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia);
-						pojo = rp.getBody().getBody();
-					}
-					
-					try
-					{
-						m.setAccessible(true);
-						
-						Object[] params = BDIAgentFeature.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element, ia);
-						if(params==null)
-							System.out.println("Invalid parameter assignment");
-						Object app = m.invoke(pojo, params);
-						if(app instanceof Boolean)
-						{
-							if(((Boolean)app).booleanValue())
-							{
-								lis.resultAvailable(mplan);
-							}
-							else
-							{
-								lis.exceptionOccurred(null);
-							}
-						}
-						else if(app instanceof IFuture)
-						{
-							((IFuture<Boolean>)app).addResultListener(new IResultListener<Boolean>()
-							{
-								public void resultAvailable(Boolean result)
-								{
-									if(result.booleanValue())
-									{
-										lis.resultAvailable(mplan);
-									}
-									else
-									{
-										lis.exceptionOccurred(null);
-									}
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									lis.exceptionOccurred(exception);
-								}
-							});
-						}
-					}
-					catch(Exception e)
-					{
-						lis.exceptionOccurred(e);
-					}
-				}
-				else
-				{
-					lis.resultAvailable(mplan);
-				}
+				ret.setResult(Boolean.TRUE);
 			}
 		}
 		
 		return ret;
 	}
+	
 	
 //	/**
 //	 *  Method that tries to guess the parameters for the method call.
@@ -600,6 +543,15 @@ public class APL
 		}
 
 		return cand;
+	}
+	
+	/**
+	 *  Get the candidates.
+	 *  @return The candidates
+	 */
+	public List<Object> getCandidates()
+	{
+		return candidates==null? null: Collections.unmodifiableList(candidates);
 	}
 
 	/**
@@ -693,4 +645,174 @@ public class APL
 			}
 		}
 	}
+	
+	/** 
+	 *  Create candidates for a matching mplan.
+	 *  Checks precondition and evaluates bindings (if any).
+	 *  @return apl	returns new apl object in case a null apl is supplied.
+	 */
+	protected static List<MPlanInfo> createMPlanCandidates(IInternalAccess agent, MPlan mplan, IValueFetcher fetcher)
+	{
+		List<MPlanInfo> ret = new ArrayList<MPlanInfo>();
+		
+		List<Map<String, Object>> bindings = calculateBindingElements(agent, mplan, fetcher);
+		
+		if(bindings!=null)
+		{
+			for(Map<String, Object> binding: bindings)
+			{
+				ret.add(new MPlanInfo(mplan, binding));
+			}
+		}
+		// No binding: generate one candidate.
+		else
+		{
+			ret.add(new MPlanInfo(mplan, null));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Calculate the possible binding value combinations.
+	 *  @param state The state.
+	 *  @param mel The parameter element.
+	 *  @param cel The config parameter element.
+	 *  @param fetcher The value fetcher.
+	 *  @return The list of binding maps.
+	 */
+	protected static List<Map<String, Object>> calculateBindingElements(IInternalAccess agent, MPlan melem, IValueFetcher fetcher)
+	{
+		List<Map<String, Object>> ret = null;
+		
+		Map<String, Object> bindingparams	= null;
+		List<MParameter> params	= melem.getParameters();
+		if(params.size()>0)
+		{
+			Set<String> initializedparams = new HashSet<String>();
+			
+			// todo: configs with elements that have parameters?
+			
+//			String confname = agent.getConfiguration();
+//			if(confname!=null)
+//			{
+//				final IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class);
+//				final IBDIModel bdimodel = bdif.getBDIModel();
+//				MConfiguration mconf = bdimodel.getCapability().getConfiguration(confname);
+//				if(mconf!=null)
+//				{
+//					List<UnparsedExpression> iplans = mconf.getInitialPlans();
+//				}
+				
+//				Collection cparams = state.getAttributeValues(cel, OAVBDIMetaModel.configparameterelement_has_parameters);
+//				if(cparams!=null)
+//				{
+//					for(Iterator it=cparams.iterator(); it.hasNext(); )
+//					{
+//						Object cparam = it.next();
+//						String pname = (String)state.getAttributeValue(cparam, OAVBDIMetaModel.configparameter_has_ref);
+//						Object param = state.getAttributeValue(mel, OAVBDIMetaModel.parameterelement_has_parameters, pname);
+//						initializedparams.add(param);
+//					}
+//				}
+//			}
+			
+			for(MParameter param: params)
+			{
+				if(!initializedparams.contains(param))
+				{
+					UnparsedExpression bo = param.getBindingOptions();
+					if(bo!=null)
+					{
+						if(bindingparams==null)
+							bindingparams = new HashMap<String, Object>();
+						IParsedExpression exp = SJavaParser.parseExpression(bo, agent.getModel().getAllImports(), agent.getClassLoader());
+						Object val = exp.getValue(fetcher);
+						bindingparams.put(param.getName(), val);
+					}
+				}
+			}
+		}
+		
+		// Calculate bindings and generate candidates. 
+		if(bindingparams!=null)
+		{			
+			String[] names = (String[])bindingparams.keySet().toArray(new String[bindingparams.keySet().size()]);
+			Object[] values = new Object[names.length];
+			for(int i=0; i<names.length; i++)
+			{
+				values[i]	= bindingparams.get(names[i]);
+			}
+			bindingparams	= null;
+			ret = SUtil.calculateCartesianProduct(names, values);
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static class MPlanInfo
+	{
+		/** The mplan. */
+		protected MPlan mplan; 
+	
+		/** The bindings. */
+		protected Map<String, Object> binding;
+
+		/**
+		 *  Create a new plan info.
+		 */
+		public MPlanInfo()
+		{
+		}
+		
+		/**
+		 *  Create a new plan info.
+		 *  @param mplan
+		 *  @param binding
+		 */
+		public MPlanInfo(MPlan mplan, Map<String, Object> binding)
+		{
+			this.mplan = mplan;
+			this.binding = binding;
+		}
+
+		/**
+		 *  Get the mplan.
+		 *  @return The mplan
+		 */
+		public MPlan getMPlan()
+		{
+			return mplan;
+		}
+
+		/**
+		 *  The mplan to set.
+		 *  @param mplan The mplan to set
+		 */
+		public void setMPlan(MPlan mplan)
+		{
+			this.mplan = mplan;
+		}
+
+		/**
+		 *  Get the binding.
+		 *  @return The binding
+		 */
+		public Map<String, Object> getBinding()
+		{
+			return binding;
+		}
+
+		/**
+		 *  The binding to set.
+		 *  @param binding The binding to set
+		 */
+		public void setBinding(Map<String, Object> binding)
+		{
+			this.binding = binding;
+		}
+	}
 }
+
