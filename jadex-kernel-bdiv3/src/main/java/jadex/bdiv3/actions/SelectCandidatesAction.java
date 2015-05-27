@@ -6,9 +6,14 @@ import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.impl.APL;
+import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.bdiv3x.runtime.ICandidateInfo;
+import jadex.bdiv3x.runtime.IElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Tuple2;
@@ -77,10 +82,10 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 			element.setState(RProcessableElement.State.CANDIDATESSELECTED);
 			for(Object cand: cands)
 			{
-				if(cand instanceof MPlan)
+				if(cand instanceof MPlanInfo)
 				{
-					MPlan mplan = (MPlan)cand;
-					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
+					MPlanInfo mplaninfo = (MPlanInfo)cand;
+					RPlan rplan = RPlan.createRPlan(mplaninfo.getMPlan(), cand, element, ia, mplaninfo.getBinding());
 					RPlan.executePlan(rplan, ia);
 					ret.setResult(null);
 				}
@@ -92,9 +97,25 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
 					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal);
 					
+					// Add candidates to meta goal
 					if(mgoal.isMetagoal())
 					{
-						System.out.println("metagoal execution");
+						for(Object c: element.getApplicablePlanList().getCandidates())
+						{
+							// find by type and direction?!
+							rgoal.getParameterSet("applicables").addValue(new ICandidateInfo()
+							{
+								public IPlan getPlan()
+								{
+									return null;
+								}
+								
+								public IElement getElement()
+								{
+									return element;
+								}
+							});
+						}
 					}
 					
 					rgoal.addListener(new IResultListener<Void>()
@@ -103,12 +124,22 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 						{
 							// Set goal result on parent goal
 							Object res = RGoal.getGoalResult(pgoal, mgoal, ia.getClassLoader());
-							pagoal.setGoalResult(res, ia.getClassLoader(), null, null, rgoal);
-							pagoal.planFinished(ia, rgoal);
+							
+							if(mgoal.isMetagoal())
+							{
+								element.setApplicablePlanList(new APL(element, (List<Object>)res));
+								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
+							}
+							else
+							{
+								pagoal.setGoalResult(res, ia.getClassLoader(), null, null, rgoal);
+								pagoal.planFinished(ia, rgoal);
+							}
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
+							// todo: what if meta-level reasoning fails?!
 							pagoal.planFinished(ia, rgoal);
 						}
 					});
@@ -118,7 +149,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				else if(cand.getClass().isAnnotationPresent(Plan.class))
 				{
 					MPlan mplan = mcapa.getPlan(cand.getClass().getName());
-					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
+					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia, null);
 					RPlan.executePlan(rplan, ia);
 					ret.setResult(null);
 				}
