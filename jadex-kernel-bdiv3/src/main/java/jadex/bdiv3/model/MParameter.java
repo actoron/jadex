@@ -92,6 +92,9 @@ public class MParameter extends MElement
 	/** The optional flag. */
 	protected boolean optional; 
 	
+	/** The binding options. */
+	protected UnparsedExpression bindingoptions;
+	
 	/**
 	 *	Bean Constructor. 
 	 */
@@ -442,5 +445,23 @@ public class MParameter extends MElement
 	public void setOptional(boolean optional)
 	{
 		this.optional = optional;
+	}
+
+	/**
+	 *  Get the bindingOptions.
+	 *  @return The bindingOptions
+	 */
+	public UnparsedExpression getBindingOptions()
+	{
+		return bindingoptions;
+	}
+
+	/**
+	 *  The binding options to set.
+	 *  @param bindingoptions The bindingOptions to set
+	 */
+	public void setBindingOptions(UnparsedExpression bindingoptions)
+	{
+		this.bindingoptions = bindingoptions;
 	}
 }

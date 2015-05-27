@@ -10,6 +10,7 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
+import jadex.bdiv3.model.MMetaGoal;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MMessageEvent.Direction;
 import jadex.bdiv3.model.MParameter;
@@ -228,7 +229,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		TypeInfo ti_maintaingoalref = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(MGoal.class),
 			null, null);//, new OAVObjectReaderHandler());
 		
-		TypeInfo ti_metagoal = new TypeInfo(new XMLInfo(new QName(uri, "metagoal")), new ObjectInfo(MGoal.class),
+		TypeInfo ti_metagoal = new TypeInfo(new XMLInfo(new QName(uri, "metagoal")), new ObjectInfo(MMetaGoal.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
 				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
@@ -457,9 +458,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "plan")), new ObjectInfo(MPlan.class), 
 			new MappingInfo(null, "description", null, null,
 			new SubobjectInfo[]{
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "parameter"), OAVBDIMetaModel.parameterelement_has_parameters)),	
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), OAVBDIMetaModel.parameterelement_has_parametersets))	
-			}), null));//, new OAVObjectReaderHandler()));
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))	
+			}), null));
 //		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "body")), new ObjectInfo(MBody.class), 
 			new MappingInfo(null, new AttributeInfo[]{
@@ -739,7 +739,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv))
 			}, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValue"))
+				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValue")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "bindingoptions"), "bindingOptions"))
 			}
 		)));
 		
@@ -747,7 +748,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new ParamMultiProc(true)), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv))
+				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping"))
 			}, new SubobjectInfo[]{
 				// because there is only MParameter the values expression is stored as default value
 				// and multiple facts are added to a list
@@ -763,8 +766,24 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping"))
 			}, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValue"))
+				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValue")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "bindingoptions"), "bindingOptions"))
 			})));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "plan"), new QName(uri, "parameterset")}), new ObjectInfo(MPlanParameter.class, 
+			new ParamMultiProc(true)), 
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
+				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping"))
+			}, new SubobjectInfo[]{
+				// because there is only MParameter the values expression is stored as default value
+				// and multiple facts are added to a list
+				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValues")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "values"), "defaultValue"))
+			})));
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "plan"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.planparameterset_type, tepost), 
 //			new MappingInfo(null, new AttributeInfo[]{
 //			new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.typedelement_has_classname)),
@@ -794,6 +813,12 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "bindingoptions")}), new ObjectInfo(UnparsedExpression.class, null),//new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null)));
+		
 		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "values")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 //			new MappingInfo(ti_expression)));
