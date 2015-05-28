@@ -1,5 +1,6 @@
 package jadex.bdiv3.model;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
 
 import java.util.HashSet;
@@ -7,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ *  Model element for inhibitions.
  */
 public class MDeliberation
 {
@@ -23,6 +24,11 @@ public class MDeliberation
 	
 	/** The inhnames. */
 	protected Set<String> inhnames;
+	
+	//-------- additional xml attributes --------
+	
+	/** The methods for checking inhibitions. */
+	protected Set<UnparsedExpression> inhexpressions;
 	
 	/**
 	 *	Bean Constructor. 
@@ -42,7 +48,7 @@ public class MDeliberation
 	}
 	
 	/**
-	 * 
+	 *  Resolve the inhibitions from inhibition names.
 	 */
 	public void init(MCapability capa)
 	{
@@ -108,5 +114,36 @@ public class MDeliberation
 	public void setInhibitionMethods(Map<String, MethodInfo> inhmethods)
 	{
 		this.inhmethods = inhmethods;
+	}
+	
+	/**
+	 *  Add an inhibition name.
+	 *  @param inhname The inhibition name.
+	 */
+	public void addInhibitionName(String inhname)
+	{
+		if(inhnames==null)
+			inhnames = new HashSet<String>();
+		inhnames.add(inhname);
+	}
+	
+	/**
+	 *  Add an inhibition expression.
+	 *  @param inhname The inhibition expression.
+	 */
+	public void addInhibitionExpression(UnparsedExpression inhexp)
+	{
+		if(inhexpressions==null)
+			inhexpressions = new HashSet<UnparsedExpression>();
+		inhexpressions.add(inhexp);
+	}
+
+	/**
+	 *  Get the inhibition expressions.
+	 *  @return The inhexpressions
+	 */
+	public Set<UnparsedExpression> getInhibitionExpressions()
+	{
+		return inhexpressions;
 	}
 }

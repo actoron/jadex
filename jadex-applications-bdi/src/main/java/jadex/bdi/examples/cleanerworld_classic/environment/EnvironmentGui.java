@@ -6,7 +6,9 @@ import jadex.bdi.examples.cleanerworld_classic.Environment;
 import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
-import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -99,7 +101,7 @@ public class EnvironmentGui	extends JFrame
 			@Classname("disp")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+//				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				
 //				bia.addComponentListener(new TerminationAdapter()
 //				{
@@ -117,7 +119,11 @@ public class EnvironmentGui	extends JFrame
 //					}
 //				});
 				
-				bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				// Hack, as long as we do not have a specific XML feature interface
+				IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+				RCapability capa = bdif.getCapability();
+				
+				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -128,7 +134,7 @@ public class EnvironmentGui	extends JFrame
 					}
 				}));
 				
-				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
+				final Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -416,8 +422,11 @@ public class EnvironmentGui	extends JFrame
 									@Classname("mouse")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
+										// Hack, as long as we do not have a specific XML feature interface
+										IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+										RCapability capa = bdif.getCapability();
+										
+										Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 										
 										Waste[] wastes = env.getWastes();
 										Waste nearest = null;

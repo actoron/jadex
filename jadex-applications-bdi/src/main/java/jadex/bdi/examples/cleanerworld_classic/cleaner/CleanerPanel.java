@@ -7,9 +7,11 @@ import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.examples.cleanerworld_classic.MapPoint;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IExpression;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3x.runtime.IExpression;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -214,22 +216,25 @@ class CleanerPanel extends JPanel
 	{
 		public IFuture<DrawData> execute(IInternalAccess ia)
 		{
-			IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+			// Hack, as long as we do not have a specific XML feature interface
+			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class);
+			RCapability capa = bdif.getCapability();
+			
 			DrawData	drawdata	= new DrawData();
-			drawdata.daytime = ((Boolean)bia.getBeliefbase().getBelief("daytime").getFact()).booleanValue();
-			drawdata.visited_positions = (MapPoint[])bia.getBeliefbase().getBeliefSet("visited_positions").getFacts();
-			drawdata.max_quantity = ((MapPoint)((IExpression)bia.getExpressionbase().getExpression("query_max_quantity")).execute()).getQuantity();
-			drawdata.xcnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[0].intValue();
-			drawdata.ycnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[1].intValue();
-			drawdata.cleaners = (Cleaner[])bia.getBeliefbase().getBeliefSet("cleaners").getFacts();
-			drawdata.chargingstations = (Chargingstation[])bia.getBeliefbase().getBeliefSet("chargingstations").getFacts();
-			drawdata.wastebins = (Wastebin[])bia.getBeliefbase().getBeliefSet("wastebins").getFacts();
-			drawdata.wastes = (Waste[])bia.getBeliefbase().getBeliefSet("wastes").getFacts();
-			drawdata.my_vision = ((Double)bia.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
-			drawdata.my_chargestate = ((Double)bia.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
-			drawdata.my_location = (Location)bia.getBeliefbase().getBelief("my_location").getFact();
-			drawdata.my_waste = bia.getBeliefbase().getBelief("carriedwaste").getFact()!=null;
-			IGoal[] goals = (IGoal[])bia.getGoalbase().getGoals("achievemoveto");
+			drawdata.daytime = ((Boolean)capa.getBeliefbase().getBelief("daytime").getFact()).booleanValue();
+			drawdata.visited_positions = (MapPoint[])capa.getBeliefbase().getBeliefSet("visited_positions").getFacts();
+			drawdata.max_quantity = ((MapPoint)((IExpression)capa.getExpressionbase().getExpression("query_max_quantity")).execute()).getQuantity();
+			drawdata.xcnt = ((Integer[])capa.getBeliefbase().getBeliefSet("raster").getFacts())[0].intValue();
+			drawdata.ycnt = ((Integer[])capa.getBeliefbase().getBeliefSet("raster").getFacts())[1].intValue();
+			drawdata.cleaners = (Cleaner[])capa.getBeliefbase().getBeliefSet("cleaners").getFacts();
+			drawdata.chargingstations = (Chargingstation[])capa.getBeliefbase().getBeliefSet("chargingstations").getFacts();
+			drawdata.wastebins = (Wastebin[])capa.getBeliefbase().getBeliefSet("wastebins").getFacts();
+			drawdata.wastes = (Waste[])capa.getBeliefbase().getBeliefSet("wastes").getFacts();
+			drawdata.my_vision = ((Double)capa.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
+			drawdata.my_chargestate = ((Double)capa.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
+			drawdata.my_location = (Location)capa.getBeliefbase().getBelief("my_location").getFact();
+			drawdata.my_waste = capa.getBeliefbase().getBelief("carriedwaste").getFact()!=null;
+			IGoal[] goals = (IGoal[])capa.getGoalbase().getGoals("achievemoveto");
 			drawdata.dests = new Location[goals.length];
 			for(int i=0; i<goals.length; i++)
 			{

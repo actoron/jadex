@@ -3,8 +3,8 @@ package jadex.bdi.examples.cleanerworld_classic.cleaner;
 import jadex.bdi.examples.cleanerworld_classic.IEnvironment;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bdiv3x.runtime.PlanFailureException;
 
 
 /**

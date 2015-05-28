@@ -3,7 +3,7 @@ package jadex.bdi.examples.cleanerworld_classic.cleaner;
 import jadex.bdi.examples.cleanerworld_classic.RequestDropWaste;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
-import jadex.bdi.runtime.PlanFailureException;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
 
 /**
  *  Pick up a piece of waste in the environment.

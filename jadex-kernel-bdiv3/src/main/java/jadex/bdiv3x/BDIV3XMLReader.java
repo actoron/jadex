@@ -6,6 +6,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MCapabilityReference;
 import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfiguration;
+import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
@@ -195,7 +196,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
 			}), new LinkingInfo(condlinker));
 		TypeInfo ti_performgoalref = new TypeInfo(new XMLInfo(new QName(uri, "performgoalref")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			null, null);
 		
 		TypeInfo ti_achievegoal = new TypeInfo(new XMLInfo(new QName(uri, "achievegoal")), new ObjectInfo(MGoal.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -206,7 +207,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}), new LinkingInfo(condlinker));
 			
 		TypeInfo ti_achievegoalref = new TypeInfo(new XMLInfo(new QName(uri, "achievegoalref")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			null, null);
 		
 		TypeInfo ti_querygoal = new TypeInfo(new XMLInfo(new QName(uri, "querygoal")), new ObjectInfo(MGoal.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -216,7 +217,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
 			}), new LinkingInfo(condlinker));
 		TypeInfo ti_querygoalref = new TypeInfo(new XMLInfo(new QName(uri, "querygoalref")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			null, null);
 		
 		TypeInfo ti_maintaingoal = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoal")), new ObjectInfo(MGoal.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -226,7 +227,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
 			}), new LinkingInfo(condlinker));
 		TypeInfo ti_maintaingoalref = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			null, null);
 		
 		TypeInfo ti_metagoal = new TypeInfo(new XMLInfo(new QName(uri, "metagoal")), new ObjectInfo(MGoal.class, new GoalMetaProc(true)),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -237,7 +238,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new AccessInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goal")}, "triggerGoal"))
 			}), new LinkingInfo(condlinker));
 		TypeInfo ti_metagoalref = new TypeInfo(new XMLInfo(new QName(uri, "metagoalref")), new ObjectInfo(MGoal.class),
-			null, null);//, new OAVObjectReaderHandler());
+			null, null);
 		
 		// reset to not create MTrigger for metagoal goal triggers (are added as trigger goals)
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger")}), null)); 
@@ -264,9 +265,17 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "recurcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type), 
 //			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_text)));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger")}), new ObjectInfo(OAVBDIMetaModel.metagoaltrigger_type)));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "inhibits")), new ObjectInfo(OAVBDIMetaModel.inhibits_type, expost), 
-//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_text, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.inhibits_has_ref))})));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "deliberation")), null));
+
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "deliberation")), new ObjectInfo(MDeliberation.class),
+			new MappingInfo(null, null, new SubobjectInfo[]{new SubobjectInfo(new XMLInfo(new QName(uri, "inhibits")), new AccessInfo("inhibits", "inhibitionExpression"))})));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "inhibits")}), new ObjectInfo(UnparsedExpression.class, null),
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
+				new AttributeInfo(new AccessInfo("ref", "name")),
+				new AttributeInfo(new AccessInfo("inhibit", null, AccessInfo.IGNORE_READ)),
+			}, null)));
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "unique")), new ObjectInfo(new IBeanObjectCreator()
 //			{
 //				public Object createObject(IContext context, Map rawattributes) throws Exception
@@ -278,7 +287,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		// Find type infos. hack???
 		TypeInfo	comptype	= null;
 		TypeInfo	configtype	= null;
-		for(Iterator it=typeinfos.iterator(); (configtype==null || comptype==null) && it.hasNext(); )
+		for(Iterator<TypeInfo> it=typeinfos.iterator(); (configtype==null || comptype==null) && it.hasNext(); )
 		{
 			TypeInfo	ti	= (TypeInfo)it.next();
 			if(comptype==null && ti.getXMLInfo().getXMLPath().equals(new XMLInfo(new QName(uri, "componenttype")).getXMLPath()))

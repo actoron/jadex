@@ -1,6 +1,5 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.runtime.IBeliefListener;
 
 /**
  *  The interface for all beliefs (concrete and referenced).
@@ -17,7 +16,7 @@ public interface IBelief extends IElement
 	 *  Get the fact of a belief.
 	 *  @return The fact.
 	 */
-	public Object	getFact();
+	public Object getFact();
 
 	/**
 //	 *  Indicate that the fact of this belief was modified.

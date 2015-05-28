@@ -1,7 +1,7 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
 import jadex.bdi.examples.cleanerworld_classic.Location;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 
 

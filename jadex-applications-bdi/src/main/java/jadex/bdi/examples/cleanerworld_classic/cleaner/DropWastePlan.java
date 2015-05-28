@@ -3,10 +3,10 @@ package jadex.bdi.examples.cleanerworld_classic.cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
-import jadex.bdi.runtime.IBeliefSet;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bdiv3x.runtime.IBeliefSet;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bdiv3x.runtime.PlanFailureException;
 
 
 /**
