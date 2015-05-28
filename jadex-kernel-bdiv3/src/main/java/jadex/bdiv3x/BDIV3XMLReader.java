@@ -193,7 +193,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
 				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
 			}, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 			}), new LinkingInfo(condlinker));
 		TypeInfo ti_performgoalref = new TypeInfo(new XMLInfo(new QName(uri, "performgoalref")), new ObjectInfo(MGoal.class),
 			null, null);
@@ -203,7 +203,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
 				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
 			}, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 			}), new LinkingInfo(condlinker));
 			
 		TypeInfo ti_achievegoalref = new TypeInfo(new XMLInfo(new QName(uri, "achievegoalref")), new ObjectInfo(MGoal.class),
@@ -214,7 +214,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
 				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
 			}, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 			}), new LinkingInfo(condlinker));
 		TypeInfo ti_querygoalref = new TypeInfo(new XMLInfo(new QName(uri, "querygoalref")), new ObjectInfo(MGoal.class),
 			null, null);
@@ -224,7 +224,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
 				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
 			}, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
 			}), new LinkingInfo(condlinker));
 		TypeInfo ti_maintaingoalref = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(MGoal.class),
 			null, null);
@@ -471,7 +471,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "plan")), new ObjectInfo(MPlan.class), 
 			new MappingInfo(null, "description", null, null,
 			new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter"))	
+				new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "contextcondition"), "contextCondition"))	
 			}), null));
 //		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "body")), new ObjectInfo(MBody.class), 
