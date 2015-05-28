@@ -15,7 +15,7 @@
 	package="jadex.bdi.examples.puzzle">
 
 	<imports>
-		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
 	</imports>
 
 	<beliefs>

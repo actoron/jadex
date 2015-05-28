@@ -139,27 +139,20 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					{
 						public void resultAvailable(Void result)
 						{
-							// Set goal result on parent goal
 							Object res = RGoal.getGoalResult(rgoal, ia.getClassLoader());
 							
 							if(mgoal.isMetagoal())
 							{
-//								List<Object> cands = new ArrayList<Object>();
+								// Execute selected plans if was metagoal
+								// APL is automatically kept uptodate
 								for(ICandidateInfo ci: (ICandidateInfo[])res)
 								{
-//									cands.add((RPlan)ci.getPlan());
-									// todo: this is dump because it leads to recreation of plan RPlan
-									// but rplan cannot be added because it is not the original candidate
-									// and planFinished will not work
-//									cands.add(((RPlan)ci.getPlan()).getCandidate());
-									
 									RPlan.executePlan((RPlan)ci.getPlan(), ia);
 								}
-//								element.setApplicablePlanList(new APL(element, (List)cands));
-//								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
 							}
 							else
 							{
+								// Set goal result on parent goal
 								pagoal.setGoalResult(res, ia.getClassLoader(), null, null, rgoal);
 								pagoal.planFinished(ia, rgoal);
 							}
