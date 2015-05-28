@@ -10,6 +10,7 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
@@ -17,6 +18,7 @@ import jadex.javaparser.SJavaParser;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +47,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	public void init()
 	{	
 		Map<String, Object> args = getAgent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
-		Map<String, Object> vals = args==null? new HashMap<String, Object>(): new HashMap<String, Object>(args);
+		Map<String, UnparsedExpression> inibels = new HashMap<String, UnparsedExpression>();
 		
 		String confname = getAgent().getConfiguration();
 		if(confname!=null)
@@ -61,20 +63,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				{
 					for(UnparsedExpression uexp: ibels)
 					{
-						try
-						{
-							MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
-							Object val = SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
-							vals.put(mbel.getName(), val);
-						}
-						catch(RuntimeException e)
-						{
-							throw e;
-						}
-						catch(Exception e)
-						{
-							throw new RuntimeException(e);
-						}
+						inibels.put(uexp.getName(), uexp);
 					}
 				}
 			}
@@ -85,11 +74,37 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			for(MBelief mbel: mbels)
 			{
+				Object	inival	= null;
+				boolean	hasinival	= false;
+				
+				if(args.containsKey(mbel.getName())) // mbel.isExported() && 
+				{	
+					inival	= args.get(mbel.getName());
+					hasinival	= true;
+				}
+				else if(inibels.containsKey(mbel.getName()))
+				{
+					try
+					{
+						inival = SJavaParser.parseExpression(inibels.get(mbel.getName()), getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+						hasinival	= true;
+					}
+					catch(RuntimeException e)
+					{
+						throw e;
+					}
+					catch(Exception e)
+					{
+						throw new RuntimeException(e);
+					}
+				}
+
+				
 				if(!mbel.isMulti(agent.getClassLoader()))
 				{
-					if(vals.containsKey(mbel.getName())) // mbel.isExported() && 
+					if(hasinival)
 					{	
-						addBelief(new RBelief(mbel, getAgent(), vals.get(mbel.getName())));
+						addBelief(new RBelief(mbel, getAgent(), inival));
 					}
 					else
 					{
@@ -98,9 +113,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				}
 				else
 				{
-					if(vals.containsKey(mbel.getName())) // mbel.isExported() && 
-					{	
-						addBeliefSet(new RBeliefSet(mbel, getAgent(), (Object[])vals.get(mbel.getName())));
+					if(hasinival)
+					{
+						addBeliefSet(new RBeliefSet(mbel, getAgent(), inival));
 					}
 					else
 					{
@@ -394,13 +409,23 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 *  Create a new parameter.
 		 *  @param modelelement The model element.
 		 *  @param name The name.
+		 *  @param vals	The values as array, list, iterable...
 		 */
-		public RBeliefSet(MBelief modelelement, IInternalAccess agent, Object[] vals)
+		public RBeliefSet(MBelief modelelement, IInternalAccess agent, Object vals)
 		{
 			super(modelelement, agent);
 			
+			List<Object>	inifacts	= new ArrayList<Object>();
 			String name = modelelement.getName();
-			this.facts = new ListWrapper<Object>(vals!=null? SUtil.arrayToList(vals): new ArrayList<Object>(), getAgent(), ChangeEvent.VALUEADDED+"."+name, 
+			if(vals!=null)
+			{
+				Iterator<?>	it	= SReflect.getIterator(vals);
+				while(it.hasNext())
+				{
+					inifacts.add(it.next());
+				}
+			}
+			this.facts = new ListWrapper<Object>(inifacts, getAgent(), ChangeEvent.VALUEADDED+"."+name, 
 				ChangeEvent.VALUEREMOVED+"."+name, ChangeEvent.VALUECHANGED+"."+name, getModelElement());
 		}
 		

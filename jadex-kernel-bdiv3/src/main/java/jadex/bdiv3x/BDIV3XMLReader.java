@@ -35,14 +35,12 @@ import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.IObjectLinker;
 import jadex.xml.stax.QName;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -141,7 +139,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 	{
 		Set<TypeInfo> typeinfos = ComponentXMLReader.getXMLMapping(null);
 		
-		String uri = "http://jadex.sourceforge.net/jadex";
+		final String uri = "http://jadex.sourceforge.net/jadex";
 		
 		// Post processors.
 		final IPostProcessor expost = new ExpressionProcessor();
@@ -542,87 +540,59 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}
 		};
 		
-		IBeanObjectCreator refcr = new IBeanObjectCreator()
+		AttributeInfo[]	trigger_attributes	= new AttributeInfo[]
 		{
-			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
-			{
-				return rawattributes.containsKey("ref") ? rawattributes.get("ref") : rawattributes.get("cref");
-			}
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "factchanged"), new QName("ref")}, "factChanged")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "factadded"), new QName("ref")}, "factAdded")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "factremoved"), new QName("ref")}, "factRemoved")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "internalevent"), new QName("ref")}, "internalEventName")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageevent"), new QName("ref")}, "messageName")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goal"), new QName("ref")}, "goalName")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalfinished"), new QName("ref")}, "goalFinishedName")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "factchanged"), new QName("cref")}, "factChanged")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "factadded"), new QName("cref")}, "factAdded")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "factremoved"), new QName("cref")}, "factRemoved")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "internalevent"), new QName("cref")}, "internalEventName")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageevent"), new QName("cref")}, "messageName")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goal"), new QName("cref")}, "goalName")),
+			new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalfinished"), new QName("cref")}, "goalFinishedName"))
 		};
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "trigger")), new ObjectInfo(MTrigger.class, mtrpp), 
-			new MappingInfo(null,
-				new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "factadded"), new QName("ref")}, "factAdded"))
-				},
-				new SubobjectInfo[]{
-					new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), "internalEventName")),
-					new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
-					new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
-					new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName"))
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "condition"), OAVBDIMetaModel.plantrigger_has_condition))
-			})));
-		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "internalevent")}), new ObjectInfo(refcr),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
-				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
-			})));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "messageevent")}), new ObjectInfo(refcr),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
-				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
-			})));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(refcr),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
-				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
-			}), new LinkingInfo(new IObjectLinker()
+		// Special handling to add match-expressions directly to the trigger.
+		LinkingInfo	matchlinker	= new LinkingInfo(new IObjectLinker()
+		{
+			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 			{
-				public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
+				if(context.getStackElement(context.getStackSize()-1).getTag().equals(new QName(uri, "match")))
 				{
-					// Need to add the match expression directly to the trigger
 					MTrigger mtrig = (MTrigger)context.getStackElement(context.getStackSize()-3).getObject();
-					mtrig.addGoalMatchExpression((String)parent, (UnparsedExpression)object);
+					String	ref	= (String)context.getStackElement(context.getStackSize()-2).getRawAttributes().get("ref");
+					if(ref==null)
+					{
+						ref	= (String)context.getStackElement(context.getStackSize()-2).getRawAttributes().get("cref");
+					}
+					mtrig.addGoalMatchExpression(ref, (UnparsedExpression)object);	// Todo: support match expression on other elements as allowed in schema 
 				}
-			})));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goalfinisheds")}), new ObjectInfo(refcr),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
-				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
-			})));
+				else
+				{
+					context.getTopStackElement().getReaderHandler().linkObject(object, parent, linkinfo, pathname, context);
+				}
+			}
+		});
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "waitqueue")), new ObjectInfo(MTrigger.class, mtrpp),
-			new MappingInfo(null, 
-				new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), "internalEventName")),
-				new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
-				new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
-				new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName")),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goal"), new QName(uri, "match")}), new AccessInfo("match", "goalMatchExpression"))
-	//			new SubobjectInfo(new AccessInfo(new QName(uri, "condition"), OAVBDIMetaModel.plantrigger_has_condition))
-			})));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "trigger")), new ObjectInfo(MTrigger.class, mtrpp), 
+			new MappingInfo(null, trigger_attributes), matchlinker));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "waitqueue")), new ObjectInfo(MTrigger.class, mtrpp), 
+			new MappingInfo(null, trigger_attributes), matchlinker));
 
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "messageevent")}), new ObjectInfo(refcr),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
-				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
-			})));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "goal")}), new ObjectInfo(refcr),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
-				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
-			})));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "goalfinisheds")}), new ObjectInfo(refcr),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
-				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
-			})));
-		
-		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "internalevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type),
-//				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("cref", OAVBDIMetaModel.triggerreference_has_ref))})));
-//		
+		// Ignore <goal>, etc. tags inside trigger/waitqueue
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "internalevent")}), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "messageevent")}), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goal")}), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "internalevent")}), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "messageevent")}), null));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "goal")}), null));
+
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internalevent")), new ObjectInfo(MInternalEvent.class),
 			null, null));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internaleventref")), new ObjectInfo(OAVBDIMetaModel.internaleventreference_type),

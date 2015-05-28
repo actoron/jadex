@@ -105,8 +105,8 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, true, true, true);
-//		this(path, root, excludes, false, true, false);
+//		this(path, root, excludes, true, true, true);
+		this(path, root, excludes, false, true, false);
 	}
 	
 	/**
