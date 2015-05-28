@@ -98,11 +98,12 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					final MGoal mgoal = (MGoal)cand;
 					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
 					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal);
+					final APL apl = element.getApplicablePlanList();
 					
 					// Add candidates to meta goal
 					if(mgoal.isMetagoal())
 					{
-						List<Object> allcands = element.getApplicablePlanList().getCandidates();
+						List<Object> allcands = apl.getCandidates();
 						if(allcands.size()==1)
 						{
 							element.planFinished(ia, null);
@@ -143,18 +144,19 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 							
 							if(mgoal.isMetagoal())
 							{
-								List<Object> cands = new ArrayList<Object>();
+//								List<Object> cands = new ArrayList<Object>();
 								for(ICandidateInfo ci: (ICandidateInfo[])res)
 								{
 //									cands.add((RPlan)ci.getPlan());
 									// todo: this is dump because it leads to recreation of plan RPlan
 									// but rplan cannot be added because it is not the original candidate
 									// and planFinished will not work
-									cands.add(((RPlan)ci.getPlan()).getCandidate());
+//									cands.add(((RPlan)ci.getPlan()).getCandidate());
+									
+									RPlan.executePlan((RPlan)ci.getPlan(), ia);
 								}
-								
-								element.setApplicablePlanList(new APL(element, (List)cands));
-								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
+//								element.setApplicablePlanList(new APL(element, (List)cands));
+//								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
 							}
 							else
 							{
