@@ -417,8 +417,8 @@ public class TypeInfo	extends AbstractInfo
 				for(int j=xmlnames.length-1; j>=0; j--)
 				{
 					key.add(0, xmlnames[j]);
-					ret.put(key.size()==1 ? key.get(0) : new Tuple(key.toArray()), attributeinfos[i]);
 				}
+				ret.put(key.size()==1 ? key.get(0) : new Tuple(key.toArray()), attributeinfos[i]);
 			}
 			else
 			{

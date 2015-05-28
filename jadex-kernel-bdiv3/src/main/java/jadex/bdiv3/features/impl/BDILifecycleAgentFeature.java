@@ -599,7 +599,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			{
 				for(final MCondition cond: conds)
 				{
-					final Method m = cond.getMethodTarget().getMethod(component.getClassLoader());
+					final Method m = cond.getMethodTarget()==null? null: cond.getMethodTarget().getMethod(component.getClassLoader());
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_drop", 
 						new GoalsExistCondition(mgoal, bdif.getCapability()), new IAction<Void>()

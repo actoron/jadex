@@ -1,6 +1,8 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -184,7 +186,7 @@ public class ClockFrame extends JFrame
 					@Classname("settings")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 						final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
 						
 						if(sets.isAutosave())
@@ -353,16 +355,7 @@ public class ClockFrame extends JFrame
 			@Classname("tray")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//				bia.addComponentListener(new TerminationAdapter()
-//				{
-//					public void componentTerminated()
-//					{
-//						dislis.exceptionOccurred(null);
-//					}
-//				});
-				
-				bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -390,7 +383,7 @@ public class ClockFrame extends JFrame
 				@Classname("refresh")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 					final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
 					SServiceProvider.getService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //					ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")

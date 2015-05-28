@@ -4,6 +4,7 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -42,10 +43,10 @@ public class PlaySongPlan extends Plan
 	public void body()
 	{
 		final URL song = (URL)getParameter("song").getValue();
-		final SyncResultListener lis = new SyncResultListener();
+		final Future<Void>	play	= new Future<Void>();
 		
 //		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), IThreadPoolService.class).get();
-		IThreadPoolService tp = (IThreadPoolService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tpservice").get();
+		IThreadPoolService tp = (IThreadPoolService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tpservice").get();
 		final ClassLoader cl = getScope().getClassLoader();
 		tp.execute(new Runnable()
 		{
@@ -64,7 +65,7 @@ public class PlaySongPlan extends Plan
 					}
 					catch(Exception ex)
 					{
-						lis.exceptionOccurred(e);
+						play.setException(ex);
 					}
 				}
 					
@@ -75,26 +76,18 @@ public class PlaySongPlan extends Plan
 						AudioDevice dev = FactoryRegistry.systemRegistry().createAudioDevice();
 						player = new Player(in, dev);
 						player.play();
-						lis.resultAvailable(null);
+						play.setResult(null);
 					}
 					catch(Exception e)
 					{
 //						e.printStackTrace();
-						lis.exceptionOccurred(e);
+						play.setException(e);
 					}
 				}
 			}
 		});
 			
-		try
-		{
-			waitForExternalCondition(lis);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			fail(e);
-		}
+		play.get();
 
 //			URLDataSource	uds	= new URLDataSource(song)
 //			{

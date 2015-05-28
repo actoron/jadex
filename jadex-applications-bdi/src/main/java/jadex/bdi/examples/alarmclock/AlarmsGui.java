@@ -1,6 +1,8 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -191,7 +193,7 @@ public class AlarmsGui extends JFrame
 									@Classname("alarms")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 										final Alarm[] alarms = (Alarm[])bia.getBeliefbase().getBeliefSet("alarms").getFacts();
 										SwingUtilities.invokeLater(new Runnable()
 										{
@@ -277,7 +279,7 @@ public class AlarmsGui extends JFrame
 			@Classname("addAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 				bia.getBeliefbase().getBeliefSet("alarms").addFact(alarm);
 				return IFuture.DONE;
 			}
@@ -304,7 +306,7 @@ public class AlarmsGui extends JFrame
 			@Classname("removeAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 				bia.getBeliefbase().getBeliefSet("alarms").removeFact(alarm);
 				return IFuture.DONE;
 			}

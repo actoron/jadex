@@ -1,13 +1,15 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -188,8 +190,8 @@ public class AlarmSettingsDialog extends JDialog
 					@Classname("setTime")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-						final Date now = new Date(bia.getTime());
+						IClockService	cs	= SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+						final Date now = new Date(cs.getTime());
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()
@@ -249,7 +251,7 @@ public class AlarmSettingsDialog extends JDialog
 							@Classname("play")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+								RCapability bia = ((IInternalBDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapability();
 								playing = bia.getGoalbase().createGoal("play_song");
 								playing.getParameter("song").setValue(song);
 								playing.addGoalListener(new IGoalListener()
