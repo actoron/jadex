@@ -45,21 +45,21 @@
 			<parameter name="alarm" class="Alarm">
 				<!-- <value>$alarm</value> -->
 				<bindingoptions>
-				    SELECT $alarm FROM Alarm $alarm IN $beliefbase.alarms WHERE $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM)!=null
+				    SELECT Alarm $alarm FROM $beliefbase.alarms WHERE $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM)!=null
 				</bindingoptions>
 			</parameter>
 			<unique/>
 <!-- 			<creationcondition language="jel">
 				Alarm $alarm &amp;&amp; $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM
 			</creationcondition> -->
-			<contextcondition language="jcl">
+			<contextcondition> <!-- language="jcl"> -->
 				$goal.alarm.isActive()
 			</contextcondition>
-			<dropcondition language="jcl">
+			<dropcondition> <!-- language="jcl"> -->
 				//!$beliefbase.getBeliefSet("alarms").containsFact($goal.alarm)
 				!Arrays.asList($beliefbase.alarms).contains($goal.alarm)
 			</dropcondition>
-			<targetcondition language="jcl">
+			<targetcondition> <!-- language="jcl"> -->
 				$goal.alarm.getAlarmtime($scope.getTime())==Alarm.NO_ALARM
 			</targetcondition>
 		</achievegoal>
@@ -71,10 +71,11 @@
 		<performgoal name="play_song">
 			<parameter name="song" class="URL"/>
 		</performgoal>
-
+<!-- 
 		<achievegoalref name="cms_shutdown_platform">
 			<concrete ref="cmscap.cms_shutdown_platform"/>
 		</achievegoalref>
+		 -->
 	</goals>
 
 	<plans>

@@ -551,19 +551,19 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		};
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "trigger")), new ObjectInfo(MTrigger.class, mtrpp), 
-			new MappingInfo(null, 
-			new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), "internalEventName")),
-				new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
-				new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
-				new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName")),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "factadded"), OAVBDIMetaModel.trigger_has_factaddeds)),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "factremoved"), OAVBDIMetaModel.trigger_has_factremoveds)),
-//			new SubobjectInfo(new AccessInfo(new QName(uri, "factchanged"), OAVBDIMetaModel.trigger_has_factchangeds)),
+			new MappingInfo(null,
+				new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "factadded"), new QName("ref")}, "factAdded"))
+				},
+				new SubobjectInfo[]{
+					new SubobjectInfo(new AccessInfo(new QName(uri, "internalevent"), "internalEventName")),
+					new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
+					new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
+					new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName"))
 //			new SubobjectInfo(new AccessInfo(new QName(uri, "condition"), OAVBDIMetaModel.plantrigger_has_condition))
 			})));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "internalevent")}), new ObjectInfo(MInternalEvent.class),
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "internalevent")}), new ObjectInfo(refcr),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("ref", null, AccessInfo.IGNORE_READ)),
 				new AttributeInfo(new AccessInfo("cref", null, AccessInfo.IGNORE_READ))
@@ -599,10 +599,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new AccessInfo(new QName(uri, "messageevent"), "messageName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "goal"), "goalName")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "goalfinished"), "goalFinishedName")),
-				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goal"), new QName(uri, "match")}), new AccessInfo("match", "goalMatchExpression")),
-	//			new SubobjectInfo(new AccessInfo(new QName(uri, "factadded"), OAVBDIMetaModel.trigger_has_factaddeds)),
-	//			new SubobjectInfo(new AccessInfo(new QName(uri, "factremoved"), OAVBDIMetaModel.trigger_has_factremoveds)),
-	//			new SubobjectInfo(new AccessInfo(new QName(uri, "factchanged"), OAVBDIMetaModel.trigger_has_factchangeds)),
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "goal"), new QName(uri, "match")}), new AccessInfo("match", "goalMatchExpression"))
 	//			new SubobjectInfo(new AccessInfo(new QName(uri, "condition"), OAVBDIMetaModel.plantrigger_has_condition))
 			})));
 
@@ -693,6 +690,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "maintaincondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
 			new MappingInfo(null, null, "value")));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "recurcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
+			new MappingInfo(null, null, "value")));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
 			new MappingInfo(null, null, "value")));
 		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "achievegoal"), new QName(uri, "publish")}), new ObjectInfo(OAVBDIMetaModel.publish_type, scpost), 
@@ -807,7 +806,12 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
-		
+
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "facts")}), new ObjectInfo(UnparsedExpression.class, null),//new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null)));
+
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "match")}), new ObjectInfo(UnparsedExpression.class, null),//new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
@@ -855,6 +859,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //			null, null, new OAVObjectReaderHandler()));
 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbelief"), new QName(uri, "fact")}), new ObjectInfo(String.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "initialbeliefset"), new QName(uri, "facts")}), new ObjectInfo(String.class)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbelief")), new ObjectInfo(UnparsedExpression.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -864,7 +869,13 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new SubobjectInfo(new XMLInfo(new QName(uri, "fact")), new AccessInfo("fact", "value"))
 			}), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialbeliefset")), new ObjectInfo(UnparsedExpression.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("ref", "name")),
+				new AttributeInfo(new AccessInfo("cref", "name"))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new XMLInfo(new QName(uri, "facts")), new AccessInfo("facts", "value"))
+			}), null));	// Todo: multiple <fact> entries
+		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialgoal")), new ObjectInfo(UnparsedExpression.class),
 			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ref", "name"))}), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "initialplan")), new ObjectInfo(UnparsedExpression.class),
