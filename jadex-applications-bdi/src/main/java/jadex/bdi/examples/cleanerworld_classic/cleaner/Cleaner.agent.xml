@@ -23,7 +23,6 @@
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.commons.*</import>
-		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
 	<capabilities>
@@ -127,18 +126,10 @@
 			<!-- Engage in actions when the state is below 0.2. -->
  			<maintaincondition language="jcl">
  				$beliefbase.my_chargestate > 0.2
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				// (test (> ?fact 0.2))
  			</maintaincondition>
 			<!-- The goal is satisfied when the charge state is 1.0. -->
 			<targetcondition language="jcl">
  				$beliefbase.my_chargestate >= 1.0
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				// (test (>= ?fact 0.3))
  			</targetcondition>
 		</maintaingoal>
 
@@ -161,8 +152,6 @@
 			<!-- The goal will be dropped when
  				the agent currently walks to the waste and the waste has vanished. -->
 			<dropcondition language="jcl">
-				// $beliefbase.carriedwaste==null &amp;&amp;
-				// !$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
 				$beliefbase.carriedwaste==null &amp;&amp;
 				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
  			</dropcondition>
@@ -186,9 +175,6 @@
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
 			<contextcondition language="jcl">
 				$beliefbase.daytime
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 
@@ -217,10 +203,6 @@
 			</failurecondition> -->
 			<dropcondition language="jcl">
 				$goal.wastebin.isFull()
-				
-				// ?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
-				// ?wastebin = (Wastebin (isFull() true)) 
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</dropcondition>
 		</achievegoal>
 
@@ -282,14 +264,14 @@
 		<performgoal name="performmemorizepositions"/>
 
 		<!-- Imported DF-Goals -->
-
+<!--  
 		<achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search"/>
 		</achievegoalref>
 
 		<achievegoalref name="rp_initiate">
 			<concrete ref="procap.rp_initiate"/>
-		</achievegoalref>
+		</achievegoalref>-->
  	</goals>
 
 	<plans>
@@ -375,10 +357,6 @@
 			</trigger>
 			<contextcondition language="jcl">
 				$beliefbase.my_chargestate &gt; 0
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				// (test (> ?fact 0))
 			</contextcondition>
 		</plan>
 

@@ -5,7 +5,7 @@ import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.examples.cleanerworld_classic.RequestVision;
 import jadex.bdi.examples.cleanerworld_classic.Vision;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.fipa.Done;
 
 

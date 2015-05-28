@@ -22,12 +22,14 @@ public class MPlan extends MParameterElement
 	
 	//-------- additional xml properties --------
 
-//	/** The parameters. */
-//	protected List<MParameter> parameters;
+	// pojo pre- and contextcondition are in body
 		
 	/** The precondition. */
-	protected UnparsedExpression	precondition;
+	protected UnparsedExpression precondition;
 		
+	/** The context condition. */
+	protected MCondition contextcondition;
+	
 	/**
 	 *	Bean Constructor. 
 	 */
@@ -119,63 +121,6 @@ public class MPlan extends MParameterElement
 		this.priority = priority;
 	}
 
-//	/**
-//	 *  Get the parameters.
-//	 *  @return The parameters.
-//	 */
-//	public List<MParameter> getParameters()
-//	{
-//		return parameters;
-//	}
-//	
-//	/**
-//	 *  Get a parameter by name.
-//	 */
-//	public MParameter getParameter(String name)
-//	{
-//		MParameter ret = null;
-//		if(parameters!=null && name!=null)
-//		{
-//			for(MParameter param: parameters)
-//			{
-//				if(param.getName().equals(name))
-//				{
-//					ret = param;
-//					break;
-//				}
-//			}
-//		}
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Test if goal has a parameter.
-//	 */
-//	public boolean hasParameter(String name)
-//	{
-//		return getParameter(name)!=null;
-//	}
-//
-//	/**
-//	 *  Set the parameters.
-//	 *  @param parameters The parameters to set.
-//	 */
-//	public void setParameters(List<MParameter> parameters)
-//	{
-//		this.parameters = parameters;
-//	}
-//	
-//	/**
-//	 *  Add a parameter.
-//	 *  @param parameter The parameter.
-//	 */
-//	public void addParameter(MParameter parameter)
-//	{
-//		if(parameters==null)
-//			parameters = new ArrayList<MParameter>();
-//		this.parameters.add(parameter);
-//	}
-	
 	/**
 	 *  Get the precondition.
 	 */
@@ -190,5 +135,23 @@ public class MPlan extends MParameterElement
 	public void	setPrecondition(UnparsedExpression precondition)
 	{
 		this.precondition	= precondition;
+	}
+
+	/**
+	 *  Get the contextcondition.
+	 *  @return The contextcondition
+	 */
+	public MCondition getContextCondition()
+	{
+		return contextcondition;
+	}
+
+	/**
+	 *  The contextcondition to set.
+	 *  @param contextcondition The contextcondition to set
+	 */
+	public void setContextCondition(MCondition contextcondition)
+	{
+		this.contextcondition = contextcondition;
 	}
 }

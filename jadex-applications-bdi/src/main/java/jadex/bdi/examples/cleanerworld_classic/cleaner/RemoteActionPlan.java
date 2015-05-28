@@ -1,9 +1,9 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bdiv3x.runtime.PlanFailureException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.IComponentAction;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -61,7 +61,7 @@ public abstract class RemoteActionPlan extends Plan
 
 		if(res==null)
 		{
-			IDF df = (IDF)SServiceProvider.getService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			IDF df = (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 			IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
 			IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 				

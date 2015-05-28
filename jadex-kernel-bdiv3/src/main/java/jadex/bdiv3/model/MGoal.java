@@ -128,6 +128,15 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
+	 *  The retry to set.
+	 *  @param retry The retry to set
+	 */
+	public void setRetry(boolean retry)
+	{
+		this.retry = retry;
+	}
+
+	/**
 	 *  Get the retry delay.
 	 *  @return The retry delay.
 	 */
@@ -136,6 +145,15 @@ public class MGoal extends MClassBasedElement
 		return retrydelay;
 	}
 	
+	/**
+	 *  The retrydelay to set.
+	 *  @param retrydelay The retrydelay to set
+	 */
+	public void setRetrydelay(long retrydelay)
+	{
+		this.retrydelay = retrydelay;
+	}
+
 	/**
 	 *  Test if is recur.
 	 *  @return True, if is recur.
@@ -146,6 +164,15 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
+	 *  The recur to set.
+	 *  @param recur The recur to set
+	 */
+	public void setRecur(boolean recur)
+	{
+		this.recur = recur;
+	}
+
+	/**
 	 *  Get the retry delay.
 	 *  @return The retry delay.
 	 */
@@ -154,6 +181,15 @@ public class MGoal extends MClassBasedElement
 		return recurdelay;
 	}
 	
+	/**
+	 *  The recurdelay to set.
+	 *  @param recurdelay The recurdelay to set
+	 */
+	public void setRecurdelay(long recurdelay)
+	{
+		this.recurdelay = recurdelay;
+	}
+
 	/**
 	 *  Get the flag if is or success.
 	 *  @return The or success flag..
@@ -199,8 +235,17 @@ public class MGoal extends MClassBasedElement
 		return deliberation;
 	}
 	
+	/**
+	 *  The deliberation to set.
+	 *  @param deliberation The deliberation to set
+	 */
+	public void setDeliberation(MDeliberation deliberation)
+	{
+		this.deliberation = deliberation;
+	}
+
 	// todo: do not write from instance level!
-	
+
 	/**
 	 *  Get the declarative.
 	 *  @return The declarative.

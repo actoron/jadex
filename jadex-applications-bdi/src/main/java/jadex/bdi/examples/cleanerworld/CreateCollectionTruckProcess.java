@@ -1,6 +1,5 @@
 package jadex.bdi.examples.cleanerworld;
 
-import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -119,7 +118,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 											@Classname("rem")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+//												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 //												bia.addComponentListener(new TerminationAdapter()
 //												{
 //													public void componentTerminated()
@@ -128,7 +127,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 //													}
 //												});
 												
-												bia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+												ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 													.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 												{
 													public void intermediateResultAvailable(IMonitoringEvent result)

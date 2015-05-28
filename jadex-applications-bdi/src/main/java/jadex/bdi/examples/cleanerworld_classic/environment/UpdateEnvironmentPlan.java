@@ -7,8 +7,8 @@ import jadex.bdi.examples.cleanerworld_classic.RequestCompleteVision;
 import jadex.bdi.examples.cleanerworld_classic.Vision;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -94,7 +94,7 @@ public class UpdateEnvironmentPlan extends Plan
 	 */
 	protected void searchEnvironmentAgent()
 	{
-		IDF df = (IDF)SServiceProvider.getService(getInterpreter(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IDF df = (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 
