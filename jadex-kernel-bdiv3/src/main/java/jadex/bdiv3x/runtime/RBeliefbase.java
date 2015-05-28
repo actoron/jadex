@@ -439,14 +439,18 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			super(modelelement, agent);
 			
 			String name = getModelElement().getName();
-			List<Object> tmpfacts;
+			List<Object> tmpfacts = new ArrayList<Object>();
 			if(modelelement.getDefaultFact()!=null)
 			{
-				tmpfacts = (List<Object>)SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+				Object tmp = SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+				Iterator<?>	it	= SReflect.getIterator(tmp);
+				while(it.hasNext())
+				{
+					tmpfacts.add(it.next());
+				}
 			}
 			else 
 			{
-				tmpfacts = new ArrayList<Object>();
 				if(modelelement.getDefaultFacts()!=null)
 				{
 					for(UnparsedExpression uexp: modelelement.getDefaultFacts())
