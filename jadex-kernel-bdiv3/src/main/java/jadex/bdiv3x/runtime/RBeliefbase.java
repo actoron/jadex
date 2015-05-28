@@ -10,6 +10,7 @@ import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
@@ -524,7 +525,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			
 			Class<?> type = ((MBelief)getModelElement()).getType(getAgent().getClassLoader());
 			int size = facts==null? 0: facts.size();
-			ret = type!=null? ret = Array.newInstance(type, size): new Object[size];
+			ret = type!=null? ret = Array.newInstance(SReflect.getWrappedType(type), size): new Object[size];
 			
 			if(facts!=null)
 				System.arraycopy(facts.toArray(new Object[facts.size()]), 0, ret, 0, facts.size());

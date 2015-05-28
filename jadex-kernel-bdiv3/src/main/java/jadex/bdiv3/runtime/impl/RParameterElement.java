@@ -11,6 +11,7 @@ import jadex.bdiv3x.runtime.IParameterElement;
 import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
@@ -440,7 +441,7 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 			
 			Class<?> type = ((MParameter)getModelElement()).getType(getAgent().getClassLoader());
 			int size = vals==null? 0: vals.size();
-			ret = type!=null? ret = Array.newInstance(type, size): new Object[size];
+			ret = type!=null? ret = Array.newInstance(SReflect.getWrappedType(type), size): new Object[size];
 			
 			if(vals!=null)
 				System.arraycopy(vals.toArray(new Object[vals.size()]), 0, ret, 0, vals.size());

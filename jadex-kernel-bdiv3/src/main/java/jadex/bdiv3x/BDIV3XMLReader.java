@@ -16,6 +16,7 @@ import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.model.MProcessableElement;
+import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -112,6 +113,22 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		public String convertObject(Object val, Object context)
 		{
 			return ((ExcludeMode)val).toString();
+		}
+	};
+	
+	public static final IStringObjectConverter evamodeconv = new IStringObjectConverter()
+	{
+		public Object convertString(String val, Object context) throws Exception
+		{
+			return MParameter.EvaluationMode.getEvaluationMode(val);
+		}
+	};
+	
+	public static final IObjectStringConverter reevamodeconv = new IObjectStringConverter()
+	{
+		public String convertObject(Object val, Object context)
+		{
+			return ((EvaluationMode)val).toString();
 		}
 	};
 	
@@ -750,7 +767,9 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new ParamMultiProc(false)), 
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
-				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv))
+				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
+				new AttributeInfo(new AccessInfo("updaterate", "updateRate")),
+				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv))
 			}, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "value"), "defaultValue")),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "bindingoptions"), "bindingOptions"))
@@ -762,6 +781,8 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 				new AttributeInfo(new AccessInfo("direction"), new AttributeConverter(pdirconv, repdirconv)),
+				new AttributeInfo(new AccessInfo("updaterate", "updateRate")),
+				new AttributeInfo(new AccessInfo("evaluationmode", "evaluationMode"), new AttributeConverter(evamodeconv, reevamodeconv)),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "messageeventmapping"), new QName("ref")}, "messageEventMapping")),
 				new AttributeInfo(new AccessInfo(new QName[]{new QName(uri, "goalmapping"), new QName("ref")}, "goalMapping"))
 			}, new SubobjectInfo[]{
