@@ -14,6 +14,7 @@ import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -519,7 +520,16 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public Object[]	getFacts()
 		{
-			return facts==null? new Object[0]: facts.toArray(new Object[facts.size()]);
+			Object ret;
+			
+			Class<?> type = ((MBelief)getModelElement()).getType(getAgent().getClassLoader());
+			int size = facts==null? 0: facts.size();
+			ret = type!=null? ret = Array.newInstance(type, size): new Object[size];
+			
+			if(facts!=null)
+				System.arraycopy(facts.toArray(new Object[facts.size()]), 0, ret, 0, facts.size());
+			
+			return (Object[])ret;
 		}
 
 		/**

@@ -793,8 +793,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		final Future<E> ret = new Future<E>();
 		
-		RGoal rgoal;
-		final MGoal mgoal;
+		final RGoal rgoal;
+		MGoal mgoal;
 		if(goal instanceof RGoal)
 		{
 			rgoal = (RGoal)goal;
@@ -811,7 +811,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			public void customResultAvailable(Void result)
 			{
-				Object res = RGoal.getGoalResult(goal, mgoal, ((ModelInfo)bdimodel).getClassLoader());
+				Object res = RGoal.getGoalResult(rgoal, ((ModelInfo)bdimodel).getClassLoader());
+//				Object res = RGoal.getGoalResult(goal, mgoal, ((ModelInfo)bdimodel).getClassLoader());
 				ret.setResult((E)res);
 			}
 		});

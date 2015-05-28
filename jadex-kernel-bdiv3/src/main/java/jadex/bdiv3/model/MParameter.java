@@ -8,6 +8,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -80,7 +81,7 @@ public class MParameter extends MElement
 	/** The direction. */
 	protected Direction direction = Direction.IN; // default is 'in'
 	
-	/** The type (if explicitly specified. */
+	/** The type (if explicitly specified). */
 	protected ClassInfo clazz;
 	
 	/** The default value. */
@@ -251,7 +252,7 @@ public class MParameter extends MElement
 				e.printStackTrace();
 			}
 		}
-		else
+		else if(mgetter!=null)
 		{
 			try
 			{
@@ -262,6 +263,20 @@ public class MParameter extends MElement
 			{
 				e.printStackTrace();
 			}
+		}
+		else if(clazz!=null)
+		{
+			ret = clazz.getType(cl);
+		}
+		else if(value!=null)
+		{
+			// todo: imports?
+			ret = SJavaParser.parseExpression(value, null, cl).getStaticType();
+		}
+		else if(values!=null && values.size()>0)
+		{
+			// todo: imports?
+			ret = SJavaParser.parseExpression(values.get(0), null, cl).getStaticType();
 		}
 		return ret;
 	}

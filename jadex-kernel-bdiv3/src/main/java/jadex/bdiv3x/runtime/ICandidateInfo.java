@@ -1,12 +1,19 @@
 package jadex.bdiv3x.runtime;
 
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 
 /**
  *  The info objects for plan candidates.
  */
 public interface ICandidateInfo
 {
+//	/**
+//	 *  Get the plan instance.
+//	 *  @return	The plan instance.
+//	 */
+//	public MPlanInfo getPlanInfo();
+	
 	/**
 	 *  Get the plan instance.
 	 *  @return	The plan instance.

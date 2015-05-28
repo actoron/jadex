@@ -622,6 +622,7 @@ public class APL
 		// Do nothing is APL is always rebuilt or exclude is never
 		if(((MProcessableElement)element.getModelElement()).isRebuild()
 			|| MProcessableElement.ExcludeMode.Never.equals(exclude))
+//			|| (rplan.getModelElement() instanceof MGoal && ((MGoal)rplan.getModelElement()).isMetagoal()))
 		{
 			return;
 		}

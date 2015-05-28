@@ -7,6 +7,9 @@ import jadex.commons.future.IResultListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  Element that can be finished with processing.
+ */
 public abstract class RFinishableElement extends RProcessableElement
 {
 	//-------- attributes --------

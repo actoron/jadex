@@ -112,10 +112,11 @@ public class GoalDelegationHandler  implements InvocationHandler
 		{
 			public void customResultAvailable(Object result)
 			{
-				Object res = RGoal.getGoalResult(fgoal, mgoal, agent.getClassLoader());
+//				Object res = RGoal.getGoalResult(fgoal, mgoal, agent.getClassLoader());
+//				Object res = RGoal.getGoalResult(rgoal, agent.getClassLoader());
 				// Do not set goal itself as result of service call but null then
 				// Use setResultIfUndo as it could be a terminable future
-				ret.setResultIfUndone(fgoal==res? null: res);
+				ret.setResultIfUndone(fgoal==result? null: result);
 			}
 			public void exceptionOccurred(Exception exception)
 			{

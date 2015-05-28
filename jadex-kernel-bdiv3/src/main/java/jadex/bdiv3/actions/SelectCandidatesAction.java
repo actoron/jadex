@@ -16,11 +16,13 @@ import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -100,21 +102,35 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					// Add candidates to meta goal
 					if(mgoal.isMetagoal())
 					{
-						for(Object c: element.getApplicablePlanList().getCandidates())
+						List<Object> allcands = element.getApplicablePlanList().getCandidates();
+						if(allcands.size()==1)
 						{
-							// find by type and direction?!
-							rgoal.getParameterSet("applicables").addValue(new ICandidateInfo()
+							element.planFinished(ia, null);
+							ret.setResult(null);
+							return ret;
+						}
+						
+						for(Object c: allcands)
+						{
+							if(!c.equals(cand) && c instanceof MPlanInfo)
 							{
-								public IPlan getPlan()
-								{
-									return null;
-								}
+								MPlanInfo pi = (MPlanInfo)c;
+								final RPlan rplan = RPlan.createRPlan(pi.getMPlan(), c, element, ia, pi.getBinding());
 								
-								public IElement getElement()
+								// find by type and direction?!
+								rgoal.getParameterSet("applicables").addValue(new ICandidateInfo()
 								{
-									return element;
-								}
-							});
+									public IPlan getPlan()
+									{
+										return rplan;
+									}
+									
+									public IElement getElement()
+									{
+										return element;
+									}
+								});
+							}
 						}
 					}
 					
@@ -123,11 +139,21 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 						public void resultAvailable(Void result)
 						{
 							// Set goal result on parent goal
-							Object res = RGoal.getGoalResult(pgoal, mgoal, ia.getClassLoader());
+							Object res = RGoal.getGoalResult(rgoal, ia.getClassLoader());
 							
 							if(mgoal.isMetagoal())
 							{
-								element.setApplicablePlanList(new APL(element, (List<Object>)res));
+								List<Object> cands = new ArrayList<Object>();
+								for(ICandidateInfo ci: (ICandidateInfo[])res)
+								{
+//									cands.add((RPlan)ci.getPlan());
+									// todo: this is dump because it leads to recreation of plan RPlan
+									// but rplan cannot be added because it is not the original candidate
+									// and planFinished will not work
+									cands.add(((RPlan)ci.getPlan()).getCandidate());
+								}
+								
+								element.setApplicablePlanList(new APL(element, (List)cands));
 								ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
 							}
 							else
@@ -158,7 +184,16 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					// dispatch to running plan
 					final RPlan rplan = (RPlan)cand;
 					rplan.setDispatchedElement(element);
-					rplan.getResumeCommand().execute(new Tuple2<Boolean, Boolean>(null, Boolean.FALSE));
+					if(rplan.getResumeCommand()==null)
+					{
+						// case meta-level reasoning, plan has been created but is new
+						RPlan.executePlan(rplan, ia);
+					}
+					else
+					{
+						// normal case when plan was waiting
+						rplan.getResumeCommand().execute(new Tuple2<Boolean, Boolean>(null, Boolean.FALSE));
+					}
 					ret.setResult(null);
 				}
 				else if(cand instanceof List)
@@ -167,6 +202,13 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					((List)cand).add(element);
 					ret.setResult(null);
 				}
+//				// Unwrap candidate info coming from meta-level reasoning
+//				else if(cand instanceof ICandidateInfo)
+//				{
+//					ICandidateInfo ci = (ICandidateInfo)cand;
+//					RPlan.executePlan((RPlan)ci.getPlan(), ia);
+//					ret.setResult(null);
+//				}
 			}
 		}
 		else

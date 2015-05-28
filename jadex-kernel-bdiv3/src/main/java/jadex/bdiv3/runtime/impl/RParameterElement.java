@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -14,6 +15,7 @@ import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -433,7 +435,17 @@ public class RParameterElement extends RElement implements IParameterElement, IM
 		 */
 		public Object[]	getValues()
 		{
-			return internalGetValues().toArray();
+			Object ret;
+			List<Object> vals = internalGetValues();
+			
+			Class<?> type = ((MParameter)getModelElement()).getType(getAgent().getClassLoader());
+			int size = vals==null? 0: vals.size();
+			ret = type!=null? ret = Array.newInstance(type, size): new Object[size];
+			
+			if(vals!=null)
+				System.arraycopy(vals.toArray(new Object[vals.size()]), 0, ret, 0, vals.size());
+			
+			return (Object[])ret;
 		}
 
 		/**

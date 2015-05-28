@@ -15,6 +15,8 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.runtime.IParameter;
+import jadex.bdiv3x.runtime.IParameterSet;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -851,38 +853,105 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 *  Get the goal result of the pojo element.
 	 *  Searches @GoalResult and delivers value.
 	 */
-	public static Object getGoalResult(Object pojo, MGoal mgoal, ClassLoader cl)
+	public static Object getGoalResult(RGoal rgoal, ClassLoader cl)
 	{
-		Object ret = pojo;
-		Object pac = mgoal.getPojoResultReadAccess(cl);
-		if(pac instanceof Field)
+		Object ret = null;
+		Object pojo = rgoal.getPojoElement();
+		MGoal mgoal = rgoal.getMGoal();
+		
+		if(pojo!=null)
 		{
-			try
+			ret = pojo;
+			Object pac = mgoal.getPojoResultReadAccess(cl);
+			if(pac instanceof Field)
 			{
-				Field f = (Field)pac;
-				f.setAccessible(true);
-				ret = f.get(pojo);
+				try
+				{
+					Field f = (Field)pac;
+					f.setAccessible(true);
+					ret = f.get(pojo);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
-			catch(Exception e)
+			else if(pac instanceof Method)
 			{
-				e.printStackTrace();
+				try
+				{
+					Method m = (Method)pac;
+					m.setAccessible(true);
+					ret = m.invoke(pojo, new Object[0]);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
-		else if(pac instanceof Method)
+		// xml goals
+		else
 		{
-			try
+			Map<String, Object> res = new HashMap<String, Object>(); 
+			for(IParameter param: rgoal.getParameters())
 			{
-				Method m = (Method)pac;
-				m.setAccessible(true);
-				ret = m.invoke(pojo, new Object[0]);
+				MParameter.Direction dir = ((MParameter)param.getModelElement()).getDirection();
+				if(MParameter.Direction.OUT.equals(dir) || MParameter.Direction.INOUT.equals(dir))
+				{
+					res.put(param.getName(), param.getValue());
+				}
 			}
-			catch(Exception e)
+			for(IParameterSet paramset: rgoal.getParameterSets())
 			{
-				e.printStackTrace();
+				MParameter.Direction dir = ((MParameter)paramset.getModelElement()).getDirection();
+				if(MParameter.Direction.OUT.equals(dir) || MParameter.Direction.INOUT.equals(dir))
+				{
+					res.put(paramset.getName(), paramset.getValues());
+				}
 			}
+			ret = res.size()==0? null: res.size()==1? res.values().iterator().next(): res;
 		}
+		
 		return ret;
 	}
+	
+//	/**
+//	 *  Get the goal result of the pojo element.
+//	 *  Searches @GoalResult and delivers value.
+//	 */
+//	public static Object getGoalResult(Object pojo, MGoal mgoal, ClassLoader cl)
+//	{
+//		Object ret = pojo;
+//		Object pac = mgoal.getPojoResultReadAccess(cl);
+//		if(pac instanceof Field)
+//		{
+//			try
+//			{
+//				Field f = (Field)pac;
+//				f.setAccessible(true);
+//				ret = f.get(pojo);
+//			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
+//		}
+//		else if(pac instanceof Method)
+//		{
+//			try
+//			{
+//				Method m = (Method)pac;
+//				m.setAccessible(true);
+//				ret = m.invoke(pojo, new Object[0]);
+//			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 * 

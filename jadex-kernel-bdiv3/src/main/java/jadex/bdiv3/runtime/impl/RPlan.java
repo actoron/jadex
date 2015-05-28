@@ -147,6 +147,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	
 	/**
 	 *  Create a new rplan based on an mplan.
+	 *  
+	 *  Reason is Object (not RProcessableElement) because it can be also ChangeEvent
 	 */
 	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia, Map<String, Object> binding)
 	{
@@ -1035,7 +1037,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							{
 								if(rgoal.isFinished() && getException()==null)
 								{
-									Object o = RGoal.getGoalResult(goal, mgoal, getAgent().getClassLoader());
+//									Object o = RGoal.getGoalResult(goal, mgoal, getAgent().getClassLoader());
+									Object o = RGoal.getGoalResult(rgoal, getAgent().getClassLoader());
 									if(o==null)
 										o = goal;
 									setDispatchedElement(o);

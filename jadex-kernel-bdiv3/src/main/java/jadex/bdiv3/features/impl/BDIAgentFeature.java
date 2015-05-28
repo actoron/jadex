@@ -1542,7 +1542,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			public void customResultAvailable(Void result)
 			{
-				Object res = RGoal.getGoalResult(goal, mgoal, bdimodel.getClassloader());
+				Object res = RGoal.getGoalResult(rgoal, bdimodel.getClassloader());
 				ret.setResult((E)res);
 			}
 		});
