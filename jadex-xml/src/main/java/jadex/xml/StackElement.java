@@ -30,12 +30,12 @@ public class StackElement
 	
 	/** Collecting content. */
 //	protected StringBuffer cbuf;
-	protected List parts;
+	protected List<String> parts;
 	
 	// todo: remove rest somehow
 	
 	/** The raw attributes. */
-	protected Map rawattrs;
+	protected Map<String, String> rawattrs;
 	
 	/** The type info. */
 	protected TypeInfo typeinfo;
@@ -65,7 +65,7 @@ public class StackElement
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(IObjectReaderHandler readerhandler, QName tag, Object object, Map rawattrs)
+	public StackElement(IObjectReaderHandler readerhandler, QName tag, Object object, Map<String, String> rawattrs)
 	{
 		this(readerhandler, tag, object, rawattrs, null, null);
 	}
@@ -73,7 +73,7 @@ public class StackElement
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(IObjectReaderHandler readerhandler, QName tag, Object object, Map rawattrs, TypeInfo typeinfo, ILocation location)
+	public StackElement(IObjectReaderHandler readerhandler, QName tag, Object object, Map<String, String> rawattrs, TypeInfo typeinfo, ILocation location)
 	{
 		this.readerhandler	= readerhandler;
 		this.tag = tag;
@@ -150,7 +150,7 @@ public class StackElement
 	 *  Get the raw attributes.
 	 *  @return The raw attributes.
 	 */
-	public Map getRawAttributes()
+	public Map<String, String> getRawAttributes()
 	{
 		return this.rawattrs;
 	}
@@ -182,7 +182,7 @@ public class StackElement
 		assert content!=null;
 		
 		if(parts==null)
-			parts = new ArrayList();
+			parts = new ArrayList<String>();
 //		System.out.println("Added content: '"+content+"'");
 
 		parts.add(content);

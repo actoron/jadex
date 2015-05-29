@@ -439,14 +439,18 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			super(modelelement, agent);
 			
 			String name = getModelElement().getName();
-			List<Object> tmpfacts;
+			List<Object> tmpfacts = new ArrayList<Object>();
 			if(modelelement.getDefaultFact()!=null)
 			{
-				tmpfacts = (List<Object>)SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+				Object tmp = SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
+				Iterator<?>	it	= SReflect.getIterator(tmp);
+				while(it.hasNext())
+				{
+					tmpfacts.add(it.next());
+				}
 			}
 			else 
 			{
-				tmpfacts = new ArrayList<Object>();
 				if(modelelement.getDefaultFacts()!=null)
 				{
 					for(UnparsedExpression uexp: modelelement.getDefaultFacts())
@@ -549,7 +553,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			
 			Class<?> type = ((MBelief)getModelElement()).getType(getAgent().getClassLoader());
 			int size = facts==null? 0: facts.size();
-			ret = type!=null? ret = Array.newInstance(type, size): new Object[size];
+			ret = type!=null? ret = Array.newInstance(SReflect.getWrappedType(type), size): new Object[size];
 			
 			if(facts!=null)
 				System.arraycopy(facts.toArray(new Object[facts.size()]), 0, ret, 0, facts.size());

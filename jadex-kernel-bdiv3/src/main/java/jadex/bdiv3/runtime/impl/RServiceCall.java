@@ -17,7 +17,7 @@ public class RServiceCall extends RFinishableElement
 	 */
 	public RServiceCall(MProcessableElement modelelement, InvocationInfo pojoelement, IInternalAccess agent)
 	{
-		super(modelelement, pojoelement, agent);
+		super(modelelement, pojoelement, agent, null);
 	}
 	
 	/**

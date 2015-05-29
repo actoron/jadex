@@ -66,18 +66,14 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/** The set of inhibitors. */
 	protected Set<RGoal> inhibitors;
 
-//	/** The internal access. */
-//	protected IInternalAccess ia;
-	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RPlan parentplan)
+	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RPlan parentplan, Map<String, Object> vals)
 	{
-		super(mgoal, goal, agent);
-//		this.ia = ia;
+		super(mgoal, goal, agent, vals);
 		this.parentplan = parentplan;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;
@@ -86,10 +82,9 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RGoal parentgoal)
+	public RGoal(IInternalAccess agent, MGoal mgoal, Object goal, RGoal parentgoal, Map<String, Object> vals)
 	{
-		super(mgoal, goal, agent);
-//		this.ia = ia;
+		super(mgoal, goal, agent, vals);
 		this.parentgoal = parentgoal;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;

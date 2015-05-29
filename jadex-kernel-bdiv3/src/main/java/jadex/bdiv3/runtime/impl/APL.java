@@ -8,6 +8,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MParameterElement;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
@@ -682,13 +683,16 @@ public class APL
 	 *  @param fetcher The value fetcher.
 	 *  @return The list of binding maps.
 	 */
-	protected static List<Map<String, Object>> calculateBindingElements(IInternalAccess agent, MPlan melem, IValueFetcher fetcher)
+	public static List<Map<String, Object>> calculateBindingElements(IInternalAccess agent, MParameterElement melem, IValueFetcher fetcher)
 	{
 		List<Map<String, Object>> ret = null;
 		
+		if(fetcher==null)
+			fetcher = agent.getFetcher();
+		
 		Map<String, Object> bindingparams	= null;
 		List<MParameter> params	= melem.getParameters();
-		if(params.size()>0)
+		if(params!=null && params.size()>0)
 		{
 			Set<String> initializedparams = new HashSet<String>();
 			

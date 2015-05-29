@@ -64,6 +64,44 @@ public class MParameter extends MElement
 		}
 	}
 	
+	public static Map<String, EvaluationMode> evas = new HashMap<String, EvaluationMode>();
+
+	/** The message direction. */
+	public enum EvaluationMode
+	{
+		STATIC("static"),
+		PUSH("push"),
+		PULL("pull");
+		
+		protected String str;
+		
+		/**
+		 *  Create a new direction
+		 */
+		EvaluationMode(String str)
+		{
+			this.str = str;
+			evas.put(str, this);
+		} 
+		
+		/**
+		 *  Get the string representation.
+		 *  @return The string representation.
+		 */
+		public String getString()
+		{
+			return str;
+		}
+		
+		/**
+		 * 
+		 */
+		public static EvaluationMode getEvaluationMode(String name)
+		{
+			return evas.get(name);
+		}
+	}
+	
 	//-------- attributes --------
 	
 	/** The field target. */
@@ -95,6 +133,12 @@ public class MParameter extends MElement
 	
 	/** The binding options. */
 	protected UnparsedExpression bindingoptions;
+	
+	/** The direction. */
+	protected EvaluationMode evaluationmode = EvaluationMode.STATIC;
+	
+	/** The update rate. */
+	protected UnparsedExpression updaterate;
 	
 	/**
 	 *	Bean Constructor. 
@@ -478,5 +522,41 @@ public class MParameter extends MElement
 	public void setBindingOptions(UnparsedExpression bindingoptions)
 	{
 		this.bindingoptions = bindingoptions;
+	}
+
+	/**
+	 *  Get the evaluationmode.
+	 *  @return The evaluationmode
+	 */
+	public EvaluationMode getEvaluationMode()
+	{
+		return evaluationmode;
+	}
+
+	/**
+	 *  The evaluationmode to set.
+	 *  @param evaluationmode The evaluationmode to set
+	 */
+	public void setEvaluationMode(EvaluationMode evaluationmode)
+	{
+		this.evaluationmode = evaluationmode;
+	}
+
+	/**
+	 *  Get the updaterate.
+	 *  @return The updaterate
+	 */
+	public UnparsedExpression getUpdateRate()
+	{
+		return updaterate;
+	}
+
+	/**
+	 *  The updaterate to set.
+	 *  @param updaterate The updaterate to set
+	 */
+	public void setUpdateRate(UnparsedExpression updaterate)
+	{
+		this.updaterate = updaterate;
 	}
 }

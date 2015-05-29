@@ -589,7 +589,7 @@ public class Reader extends AReader
 						{
 							Object changed = postprocs[i].postProcess(readcontext, topse.getObject());
 							
-							if (changed == IPostProcessor.DISCARD_OBJECT)
+							if(changed == IPostProcessor.DISCARD_OBJECT)
 							{
 								topse.setObject(null);
 							}
@@ -606,8 +606,8 @@ public class Reader extends AReader
 					}
 					else
 					{
-						final StackElement	ftopse	= topse;
-						final StackElement[]	stack	= readcontext.getStack();	// Use snapshot of stack for error report, as stack isn't available in delayed post processors.
+						final StackElement ftopse = topse;
+						final StackElement[] stack = readcontext.getStack();	// Use snapshot of stack for error report, as stack isn't available in delayed post processors.
 						final int fi = i;
 						readcontext.getPostProcessors().add(Integer.valueOf(postprocs[i].getPass()), new IPostProcessorCall()
 						{

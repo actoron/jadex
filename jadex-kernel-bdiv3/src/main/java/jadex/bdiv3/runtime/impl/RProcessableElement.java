@@ -3,10 +3,10 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Runtime element for all elements that can be processed via means-end reasoning.
@@ -41,7 +41,15 @@ public abstract class RProcessableElement extends RParameterElement
 	 */
 	public RProcessableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent)
 	{
-		super(modelelement, agent);
+		this(modelelement, pojoelement, agent, null);
+	}
+	
+	/**
+	 *  Create a new element.
+	 */
+	public RProcessableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent, Map<String, Object> vals)
+	{
+		super(modelelement, agent, vals);
 		this.pojoelement = pojoelement;
 		this.state = State.INITIAL;
 	}

@@ -18,10 +18,13 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.impl.APL;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
+import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.bdiv3.runtime.impl.APL.MPlanInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -241,7 +244,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							throw new RuntimeException("Could not create initial goal: "+uexp);
 						}
 						
-						RGoal rgoal = new RGoal(component, mgoal, goal, (RPlan)null);
+						RGoal rgoal = new RGoal(component, mgoal, goal, (RPlan)null, null);
 						RGoal.adoptGoal(rgoal, component);
 					}
 				}
@@ -589,7 +592,36 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					}
 					else
 					{
-						throw new UnsupportedOperationException("todo: creation condition with expression");
+						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
+							new EvaluateExpressionCondition(component, cond, null), new IAction<Void>()
+						{
+							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+							{
+		//						System.out.println("create: "+context);
+								
+								List<Map<String, Object>> bindings = APL.calculateBindingElements(component, mgoal, null);
+								
+								if(bindings!=null)
+								{
+									for(Map<String, Object> binding: bindings)
+									{
+										RGoal rgoal = new RGoal(component, mgoal, null, (RPlan)null, binding);
+										bdif.dispatchTopLevelGoal(rgoal);
+									}
+								}
+								// No binding: generate one candidate.
+								else
+								{
+									RGoal rgoal = new RGoal(component, mgoal, null, (RPlan)null, null);
+									bdif.dispatchTopLevelGoal(rgoal);
+								}
+								
+								return IFuture.DONE;
+							}
+						});
+						
+						rule.setEvents(cond.getEvents());
+						rulesystem.getRulebase().addRule(rule);
 					}
 				}
 			}
@@ -1456,6 +1488,30 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Condition that tests if an expression evalutes to true.
+	 */
+	public static class EvaluateExpressionCondition implements ICondition
+	{
+		protected MCondition cond;
+		protected IInternalAccess agent;
+		protected Map<String, Object> vals;
+		
+		public EvaluateExpressionCondition(IInternalAccess agent, MCondition cond, Map<String, Object> vals)
+		{
+			this.agent = agent;
+			this.cond = cond;
+			this.vals = vals;
+		}
+		
+		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+		{
+//			vals.put("$event", event);
+			boolean res = evaluateCondition(agent, cond, vals);
+			return new Future<Tuple2<Boolean,Object>>(res? ICondition.TRUE: ICondition.FALSE);
+		}
 	}
 }
 

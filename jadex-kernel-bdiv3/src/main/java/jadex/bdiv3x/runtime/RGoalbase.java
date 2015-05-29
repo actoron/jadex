@@ -78,7 +78,7 @@ public class RGoalbase extends RElement implements IGoalbase
 		final MGoal mgoal = ((MCapability)getCapability().getModelElement()).getGoal(type);
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+type);
-		return new RGoal(agent, mgoal, null, (RPlan)null);
+		return new RGoal(agent, mgoal, null, (RPlan)null, null);
 	}
 
 	/**
