@@ -6,6 +6,7 @@ import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Element that can be finished with processing.
@@ -25,9 +26,9 @@ public abstract class RFinishableElement extends RProcessableElement
 	/**
 	 *  Create a new element.
 	 */
-	public RFinishableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent)
+	public RFinishableElement(MProcessableElement modelelement, Object pojoelement, IInternalAccess agent, Map<String, Object> vals)
 	{
-		super(modelelement, pojoelement, agent);
+		super(modelelement, pojoelement, agent, vals);
 	}
 	
 	//-------- methods --------

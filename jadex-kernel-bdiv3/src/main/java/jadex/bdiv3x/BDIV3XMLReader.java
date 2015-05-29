@@ -19,12 +19,14 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.component.ComponentXMLReader;
+import jadex.rules.eca.EventType;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -44,6 +46,7 @@ import jadex.xml.stax.QName;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  *  Reader for loading component XML models into a Java representation states.
@@ -648,16 +651,16 @@ public class BDIV3XMLReader extends ComponentXMLReader
 //
 
 		// Exchange expression with condition for trigger.
-		IPostProcessor	condexpost	= new IPostProcessor()
+		IPostProcessor condexpost = new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
 				expost.postProcess(context, object);
-				MCondition	cond	= new MCondition();
+				MCondition cond = new MCondition();
 				cond.setExpression((UnparsedExpression)object);
 				
 				AReadContext<?>	ar	= (AReadContext<?>)context;
-				MElement	pe	= null;
+				MElement pe	= null;
 				for(StackElement se: ar.getStack())
 				{
 					if(se.getObject() instanceof MGoal || se.getObject() instanceof MPlan)
@@ -666,6 +669,43 @@ public class BDIV3XMLReader extends ComponentXMLReader
 					}
 				}				
 				cond.initEvents(pe);
+				
+				String bels = ar.getTopStackElement().getRawAttributes()==null? null: ar.getTopStackElement().getRawAttributes().get("beliefs");
+				if(bels!=null)
+				{
+					StringTokenizer stok = new StringTokenizer(bels, ",");
+					while(stok.hasMoreElements())
+					{
+						String tok = stok.nextToken();
+						cond.addEvent(new EventType(ChangeEvent.BELIEFCHANGED, tok));
+						cond.addEvent(new EventType(ChangeEvent.FACTCHANGED, tok));
+						cond.addEvent(new EventType(ChangeEvent.FACTADDED, tok));
+						cond.addEvent(new EventType(ChangeEvent.FACTREMOVED, tok));
+					}
+				}
+				String params = ar.getTopStackElement().getRawAttributes()==null? null: ar.getTopStackElement().getRawAttributes().get("parameters");
+				if(params!=null)
+				{
+					StringTokenizer stok = new StringTokenizer(params, ",");
+					while(stok.hasMoreElements())
+					{
+						String tok = stok.nextToken();
+						cond.addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, pe.getName(), tok));
+						cond.addEvent(new EventType(ChangeEvent.VALUECHANGED, pe.getName(), tok));
+						cond.addEvent(new EventType(ChangeEvent.VALUEADDED, pe.getName(), tok));
+						cond.addEvent(new EventType(ChangeEvent.VALUEREMOVED, pe.getName(), tok));
+					}
+				}
+				String rawevs = ar.getTopStackElement().getRawAttributes()==null? null: ar.getTopStackElement().getRawAttributes().get("rawevents");
+				if(rawevs!=null)
+				{
+					StringTokenizer stok = new StringTokenizer(rawevs, ",");
+					while(stok.hasMoreElements())
+					{
+						String tok = stok.nextToken();
+						cond.addEvent(new EventType(tok));
+					}
+				}
 				
 				return cond;
 			}
@@ -679,7 +719,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(UnparsedExpression.class, condexpost),
 			new MappingInfo(null, null, "value")));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "creationcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
-			new MappingInfo(null, null, "value")));
+			new MappingInfo(null, null, "value", new AttributeInfo[]{new AttributeInfo(new AccessInfo("beliefs", null, AccessInfo.IGNORE_READ))})));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "dropcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),
 			new MappingInfo(null, null, "value")));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "targetcondition")), new ObjectInfo(UnparsedExpression.class, condexpost),

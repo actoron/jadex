@@ -3,9 +3,9 @@ package jadex.bdiv3.model;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3x.runtime.IBelief;
 import jadex.bdiv3x.runtime.IBeliefSet;
-import jadex.bdiv3x.runtime.RBeliefbase.RBelief;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -69,6 +69,9 @@ public class MBelief extends MElement
 	
 	/** The exported flag. */
 	protected boolean exported;
+	
+	/** The direction. */
+	protected EvaluationMode evaluationmode = EvaluationMode.STATIC;
 	
 	/**
 	 *	Bean Constructor. 
@@ -625,5 +628,23 @@ public class MBelief extends MElement
 		if(facts==null)
 			facts = new ArrayList<UnparsedExpression>();
 		facts.add(fact);
+	}
+	
+	/**
+	 *  Get the evaluationmode.
+	 *  @return The evaluationmode
+	 */
+	public EvaluationMode getEvaluationMode()
+	{
+		return evaluationmode;
+	}
+
+	/**
+	 *  The evaluationmode to set.
+	 *  @param evaluationmode The evaluationmode to set
+	 */
+	public void setEvaluationMode(EvaluationMode evaluationmode)
+	{
+		this.evaluationmode = evaluationmode;
 	}
 }

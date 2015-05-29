@@ -1,5 +1,6 @@
 package jadex.rules.eca;
 
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /**
@@ -15,10 +16,18 @@ public class EventType
 	/** The full name. */
 	protected String typename;
 	
+//	/**
+//	 *  Create an event type from a string.
+//	 */
+//	public EventType(String[] types)
+//	{
+//		this.types = types;
+//	}
+	
 	/**
 	 *  Create an event type from a string.
 	 */
-	public EventType(String[] types)
+	public EventType(String... types)
 	{
 		this.types = types;
 	}
@@ -38,13 +47,6 @@ public class EventType
 		if(typename==null)
 			throw new IllegalArgumentException("Typename must not null");
 		setTypename(typename);
-//		this.typename = typename;
-//		StringTokenizer stok = new StringTokenizer(typename, ".");
-//		this.types = new String[stok.countTokens()];
-//		for(int i=0; stok.hasMoreTokens(); i++)
-//		{
-//			types[i] = stok.nextToken();
-//		}
 	}
 
 	/**
@@ -98,8 +100,33 @@ public class EventType
 		this.types = types;
 	}
 
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(types);
+		return result;
+	}
+
+	/**
+	 *  Test if equals to another object.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof EventType)
+		{
+			EventType other = (EventType)obj;
+			ret = Arrays.equals(types, other.types);
+		}
+		return ret;
+	}
+
 	/** 
-	 * 
+	 *  Get the string representation.
 	 */
 	public String toString()
 	{

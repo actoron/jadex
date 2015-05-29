@@ -97,7 +97,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					final RGoal pagoal = (RGoal)element;
 					final MGoal mgoal = (MGoal)cand;
 					final Object pgoal = mgoal.createPojoInstance(ia, pagoal);
-					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal);
+					final RGoal rgoal = new RGoal(ia, mgoal, pgoal, pagoal, null);
 					final APL apl = element.getApplicablePlanList();
 					
 					// Add candidates to meta goal

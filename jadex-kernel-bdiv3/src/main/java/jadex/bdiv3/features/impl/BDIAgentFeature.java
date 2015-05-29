@@ -1537,7 +1537,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		final MGoal mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getComponent(), mgoal, goal, (RPlan)null);
+		final RGoal rgoal = new RGoal(getComponent(), mgoal, goal, (RPlan)null, null);
 		rgoal.addListener(new ExceptionDelegationResultListener<Void, E>(ret)
 		{
 			public void customResultAvailable(Void result)

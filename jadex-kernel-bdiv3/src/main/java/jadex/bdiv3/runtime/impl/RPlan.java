@@ -1009,7 +1009,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getAgent(), mgoal, goal, this);
+		final RGoal rgoal = new RGoal(getAgent(), mgoal, goal, this, null);
 		
 		final ResumeCommand<E> rescom = new ResumeCommand<E>(ret, false);
 //		setResumeCommand(rescom);

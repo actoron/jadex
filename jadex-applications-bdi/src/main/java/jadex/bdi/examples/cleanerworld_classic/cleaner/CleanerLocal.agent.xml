@@ -24,7 +24,6 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.future.*</import>
-		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
 	<beliefs>
@@ -120,99 +119,48 @@
 			<!-- Engage in actions when the state is below 0.2. -->
  			<maintaincondition language="jcl">
  				$beliefbase.my_chargestate > 0.2
- 				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				// (test (> ?fact 0.2))
  			</maintaincondition>
 			<!-- The goal is satisfied when the charge state is 1.0. -->
 			<targetcondition language="jcl">
  				$beliefbase.my_chargestate >= 1.0
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?fact))
-				// ?mbelief = (mbelief (melement_has_name "my_chargestate"))
-				// (test (>= ?fact 0.3))
  			</targetcondition>
 		</maintaingoal>
 
 		<!-- Clean up some waste. -->
 		<achievegoal name="achievecleanup" retry="true" exclude="when_failed">
 			<parameter name="waste" class="Waste">
-				<!-- Bind against variable from creation condition. -->
-				<!-- <bindingoptions>"?waste"</bindingoptions> -->
-				<value>$waste</value>
+				<bindingoptions>$beliefbase.wastes</bindingoptions>
 			</parameter>
 			<!-- Uniqueness ensures that no two goal are adopted for the same waste. -->
 			<unique/>
-			<creationcondition language="jcl">
-				Waste $waste
-			
-				// ?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?waste $?y))
-				// ?mbeliefset = (mbeliefset (melement_has_name "wastes"))
-				// 
-				// // unique (?rcapa and ?mgoal are provided internally)
-				// (not (and
-				// 	?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-				// 	?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
-				// 	?rcapa = (capability (capability_has_goals contains ?adopted))
-				// 	// ?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters $?x ?rparam $?y))
-				// 	//?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-				// ))
+			<!-- Create a new goal when new waste is seen and
+				the agent isnt already cleaning. -->
+			<creationcondition beliefs="wastes">
+				true
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
 			<contextcondition language="jcl">
 				$beliefbase.daytime
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
 			<!-- The goal will be dropped when
  				the agent currently walks to the waste and the waste has vanished. -->
-			<dropcondition language="jcl">
-				// $beliefbase.carriedwaste==null &amp;&amp;
-				// !$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
+			<dropcondition>
 				$beliefbase.carriedwaste==null &amp;&amp;
-				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
-				
-				// ?rgoal and ?mgoal are provided internally
-				// ?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-				//
-				// ?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts excludes ?waste))
-				// ?mbeliefset = (mbeliefset (melement_has_name "wastes"))
-				// 
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact null))
-				// ?mbelief = (mbelief (melement_has_name "carriedwaste"))
-				
-				// todo: make sure that all elements are in same capa
- 			</dropcondition>
+					!$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
+			</dropcondition>
 			<!-- <deliberation cardinality="1"> -->
-			<deliberation>
+			<deliberation> <!--   cardinality="1"> -->
 				<inhibits ref="performlookforwaste"/>
-				<inhibits ref="achievecleanup" language="jcl">
+				<inhibits ref="achievecleanup">
 					$beliefbase.my_location.getDistance($goal.waste.getLocation())
 					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
-					
-					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					// ?mbelief = (mbelief (melement_has_name "my_location"))
-					// 
-					// ?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-					// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-					// ?waste = (Waste (location ?wasteloc))
-					// 
-					// ?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?refwaste))
-					// ?refgoal = (goal (parameterelement_has_parameters contains ?refparam))
-					// ?refwaste = (Waste (location ?refwasteloc &amp; 
-					// 	:(&lt; (MethodCallFunction "Location" "getDistance" ?myloc ?wasteloc)
-					// 		(MethodCallFunction "Location" "getDistance" ?myloc ?refwasteloc)  
-					// )))
 				</inhibits>
 			</deliberation>
-			<!-- The goal is achieved when the waste is in some wastebin. - ->
+			<!-- The goal is achieved when the waste is in some wastebin. -->
 			<targetcondition>
 				(select one Wastebin $wastebin from $beliefbase.wastebins
 				where $wastebin.contains($goal.waste))!=null
-			</targetcondition>-->
+			</targetcondition>
 		</achievegoal>
 
 		<!-- Look out for waste when nothing better to do, what means that
@@ -220,8 +168,6 @@
 		<performgoal name="performlookforwaste" retry="true" exclude="never">
 			<contextcondition language="jcl">
 				$beliefbase.daytime
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 
@@ -229,8 +175,6 @@
 		<performgoal name="performpatrol" retry="true" exclude="never">
 			<contextcondition language="jcl">
 				!$beliefbase.daytime
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 
@@ -253,10 +197,6 @@
 			</failurecondition> -->
 			<dropcondition language="jcl">
 				$goal.wastebin.isFull()
-				
-				// ?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
-				// ?wastebin = (Wastebin (isFull() true)) 
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</dropcondition>
 		</achievegoal>
 
@@ -264,34 +204,32 @@
 		<achievegoal name="achievemoveto">
 			<parameter name="location" class="Location"/>
 			<!-- The goal has been reached when the agent's location is
-				near the target position as specified in the parameter. - ->
+				near the target position as specified in the parameter. -->
 			<targetcondition>
  				$beliefbase.my_location.isNear($goal.location)
-			</targetcondition> -->
+			</targetcondition>
 		</achievegoal>
 
 		<!-- Try to find a not full waste bin that
 			is as near as possible to the agent. -->
 		<querygoal name="querywastebin" exclude="never">
-			<parameter name="result" class="Wastebin" evaluationmode="push" direction="out">
-				<value language="jcl" variable="$wastebin">
-					Wastebin $wastebin &amp;&amp; !$wastebin.isFull()
-					&amp;&amp;
-					!(Wastebin $wastebin2 &amp;&amp; !$wastebin2.isFull()
-										  &amp;&amp; $beliefbase.my_location.getDistance($wastebin.getLocation())
-												   > $beliefbase.my_location.getDistance($wastebin2.getLocation()))
+			<parameter name="result" class="Wastebin" direction="out" evaluationmode="push">
+				<value>
+					select one Wastebin $wastebin
+					from $beliefbase.wastebins
+					where !$wastebin.isFull()
+					order by $beliefbase.my_location.getDistance($wastebin.getLocation())
 				</value>
 			</parameter>
 		</querygoal>
 
 		<!-- Find the nearest charging station. -->
 		<querygoal name="querychargingstation" exclude="never">
-			<parameter name="result" class="Chargingstation" evaluationmode="push" direction="out">
-				<value language="jcl" variable="$chargingstation">
-					Chargingstation $chargingstation
-					&amp;&amp;
-					!(Chargingstation $chargingstation2 &amp;&amp; $beliefbase.my_location.getDistance($chargingstation.getLocation())
-																 > $beliefbase.my_location.getDistance($chargingstation2.getLocation()))
+			<parameter name="result" class="Chargingstation" direction="out" evaluationmode="push">
+				<value>
+					select one Chargingstation $station
+					from $beliefbase.chargingstations
+					order by $beliefbase.my_location.getDistance($station.getLocation())
 				</value>
 			</parameter>
 		</querygoal>
@@ -455,12 +393,12 @@
 			select LocationObject $object
 			from SUtil.joinArbitraryArrays(new Object[]
  				{
- 					$beliefbase.getBeliefSet("wastes").getFacts(),
- 					$beliefbase.getBeliefSet("wastebins").getFacts(),
- 					$beliefbase.getBeliefSet("chargingstations").getFacts(),
- 					$beliefbase.getBeliefSet("cleaners").getFacts()
+ 					$beliefbase.wastes,
+ 					$beliefbase.wastebins,
+ 					$beliefbase.chargingstations,
+ 					$beliefbase.cleaners
 				})
-			where $beliefbase.getBelief("my_location").getFact().isNear($object.getLocation(), $beliefbase.getBelief("my_vision").getFact())
+			where $beliefbase.my_location.isNear($object.getLocation(), $beliefbase.my_vision)
 		</expression>
 
 		<!-- Query the max quantity map point. -->

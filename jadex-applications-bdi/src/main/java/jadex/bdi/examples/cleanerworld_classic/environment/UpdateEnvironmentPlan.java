@@ -98,7 +98,7 @@ public class UpdateEnvironmentPlan extends Plan
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 
-		// Use a subgoal to search for a translation agent
+		// Use a subgoal to search for  agent
 		IGoal ft = createGoal("df_search");
 		ft.getParameter("description").setValue(ad);
 		if(getBeliefbase().getBelief("df").getFact()!=null)

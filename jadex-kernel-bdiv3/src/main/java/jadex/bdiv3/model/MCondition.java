@@ -15,12 +15,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 
+ *  Model element for conditions.
  */
 public class MCondition extends MElement
 {
 	/** The events this condition depends on. */
-//	protected Set<String> events;
 	protected List<EventType> events;
 	
 	//-------- pojo part --------
@@ -105,7 +104,6 @@ public class MCondition extends MElement
 		if(expression!=null && expression.getParsed() instanceof ExpressionNode)
 		{
 			Set<String>	done	= new HashSet<String>();
-			events	= new ArrayList<EventType>();
 			ParameterNode[]	params	= ((ExpressionNode)expression.getParsed()).getUnboundParameterNodes();
 			for(ParameterNode param: params)
 			{
@@ -118,9 +116,10 @@ public class MCondition extends MElement
 						if(ref.getType()==ReflectNode.FIELD)
 						{
 							// Todo: differentiate between beliefs/sets
-							addEvent(events, done, ChangeEvent.FACTCHANGED, ref.getText());
-							addEvent(events, done, ChangeEvent.FACTADDED, ref.getText());
-							addEvent(events, done, ChangeEvent.FACTREMOVED, ref.getText());
+							addEvent(new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+							addEvent(new EventType(ChangeEvent.FACTCHANGED, ref.getText()));
+							addEvent(new EventType(ChangeEvent.FACTADDED, ref.getText()));
+							addEvent(new EventType(ChangeEvent.FACTREMOVED, ref.getText()));
 						}
 						
 						else if(ref.getType()==ReflectNode.METHOD)
@@ -129,14 +128,16 @@ public class MCondition extends MElement
 							if("getBelief".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
 							{
 								String	name	= (String)arg.getConstantValue();
-								addEvent(events, done, ChangeEvent.FACTCHANGED, name);
+								addEvent(new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(new EventType(ChangeEvent.FACTCHANGED, name));
 							}
 							else if("getBeliefSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
 							{
 								String	name	= (String)arg.getConstantValue();
-								addEvent(events, done, ChangeEvent.FACTCHANGED, name);
-								addEvent(events, done, ChangeEvent.FACTADDED, name);
-								addEvent(events, done, ChangeEvent.FACTREMOVED, name);
+								addEvent(new EventType(ChangeEvent.BELIEFCHANGED, ref.getText()));
+								addEvent(new EventType(ChangeEvent.FACTCHANGED, name));
+								addEvent(new EventType(ChangeEvent.FACTADDED, name));
+								addEvent(new EventType(ChangeEvent.FACTREMOVED, name));
 							}
 						}
 					}
@@ -151,9 +152,10 @@ public class MCondition extends MElement
 						if(ref.getType()==ReflectNode.FIELD && !done.contains(ref.getText()))
 						{
 							// Todo: differentiate between parameters/sets
-							addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), ref.getText());
-							addEvent(events, done, ChangeEvent.VALUEADDED, pe.getName(), ref.getText());
-							addEvent(events, done, ChangeEvent.VALUEREMOVED, pe.getName(), ref.getText());
+							addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, pe.getName(), ref.getText()));
+							addEvent(new EventType(ChangeEvent.VALUECHANGED, pe.getName(), ref.getText()));
+							addEvent(new EventType(ChangeEvent.VALUEADDED, pe.getName(), ref.getText()));
+							addEvent(new EventType(ChangeEvent.VALUEREMOVED, pe.getName(), ref.getText()));
 						}
 						
 						else if(ref.getType()==ReflectNode.METHOD)
@@ -162,14 +164,16 @@ public class MCondition extends MElement
 							if("getParameter".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
 							{
 								String	name	= (String)arg.getConstantValue();
-								addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
+								addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, pe.getName(), name));
+								addEvent(new EventType(ChangeEvent.VALUECHANGED, pe.getName(), name));
 							}
 							else if("getParameterSet".equals(ref.getText()) && arg.isConstant() && arg.getConstantValue() instanceof String)
 							{
 								String	name	= (String)arg.getConstantValue();
-								addEvent(events, done, ChangeEvent.VALUECHANGED, pe.getName(), name);
-								addEvent(events, done, ChangeEvent.VALUEADDED, pe.getName(), name);
-								addEvent(events, done, ChangeEvent.VALUEREMOVED, pe.getName(), name);
+								addEvent(new EventType(ChangeEvent.PARAMETERCHANGED, pe.getName(), name));
+								addEvent(new EventType(ChangeEvent.VALUECHANGED, pe.getName(), name));
+								addEvent(new EventType(ChangeEvent.VALUEADDED, pe.getName(), name));
+								addEvent(new EventType(ChangeEvent.VALUEREMOVED, pe.getName(), name));
 							}
 						}
 					}
@@ -180,30 +184,26 @@ public class MCondition extends MElement
 	}
 	
 	/**
-	 *  Add event if not already added.
+	 *  The events to set.
+	 *  @param events The events to set
 	 */
-	private void	addEvent(List<EventType> events, Set<String> done, String... event)
+	public void setEvents(List<EventType> events)
 	{
-		String	ev	= null;
-		for(String part: event)
-		{
-			if(ev==null)
-			{
-				ev	= part;
-			}
-			else
-			{
-				ev	+= "." + part;
-			}
-		}
-		
-		if(!done.contains(ev))
-		{
-			events.add(new EventType(ev));	
-			done.add(ev);
-		}
+		this.events = events;
 	}
 	
+	/**
+	 *  Add an event.
+	 *  @param event The event.
+	 */
+	public void addEvent(EventType event)
+	{
+		if(events==null)
+			events = new ArrayList<EventType>();
+		if(!events.contains(event))
+			events.add(event);
+	}
+
 	/**
 	 *  Get the expression.
 	 */

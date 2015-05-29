@@ -27,7 +27,7 @@ public class Rulebase implements IRulebase
 	 */
 	public void addRule(IRule<?> rule)
 	{
-		if(rule.getEvents()==null)
+		if(rule.getEvents()==null || rule.getEvents().size()==0)
 			throw new RuntimeException("Rule must have events: "+rule);
 		
 		if(rules==null)
