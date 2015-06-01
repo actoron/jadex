@@ -1,6 +1,5 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bdiv3.runtime.IBeliefListener;
 
 
 /**

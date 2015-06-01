@@ -45,10 +45,13 @@
 			<parameter name="alarm" class="Alarm">
 				<!-- <value>$alarm</value> -->
 				<bindingoptions>
-				    SELECT Alarm $alarm FROM $beliefbase.alarms WHERE $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM)!=null
+				    SELECT Alarm $alarm FROM $beliefbase.alarms WHERE $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM
 				</bindingoptions>
 			</parameter>
 			<unique/>
+			<creationcondition>
+			    $beliefbase.alarms.length>0
+			</creationcondition>
 <!-- 			<creationcondition language="jel">
 				Alarm $alarm &amp;&amp; $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM
 			</creationcondition> -->

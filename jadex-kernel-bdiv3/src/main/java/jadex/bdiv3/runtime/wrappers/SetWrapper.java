@@ -31,6 +31,12 @@ public class SetWrapper<T> extends jadex.commons.collection.wrappers.SetWrapper<
 	{
 		super(delegate);
 		this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, mbel);
+		
+		int	i=0;
+		for(T entry: delegate)
+		{
+			publisher.entryAdded(entry, i++);
+		}
 	}
 	
 	/**

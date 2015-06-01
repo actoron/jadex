@@ -31,6 +31,11 @@ public class MapWrapper<T, E> extends jadex.commons.collection.wrappers.MapWrapp
 	{
 		super(delegate);
 		this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, mbel);
+		
+		for(Map.Entry<T,E> entry: delegate.entrySet())
+		{
+			publisher.entryAdded(entry.getKey(), entry.getValue());
+		}
 	}
 	
 	/**

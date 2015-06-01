@@ -547,7 +547,7 @@ public class AlarmSettingsDialog extends JDialog
 			@Classname("play")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				if(playing!=null && playing.isAdopted())
+				if(playing!=null)// && playing.isAdopted())
 				{
 					playing.drop();
 				}

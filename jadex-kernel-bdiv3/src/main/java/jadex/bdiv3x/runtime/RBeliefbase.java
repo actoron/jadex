@@ -425,8 +425,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 					inifacts.add(it.next());
 				}
 			}
-			this.facts = new ListWrapper<Object>(inifacts, getAgent(), ChangeEvent.VALUEADDED+"."+name, 
-				ChangeEvent.VALUEREMOVED+"."+name, ChangeEvent.VALUECHANGED+"."+name, getModelElement());
+			this.facts = new ListWrapper<Object>(inifacts, agent, ChangeEvent.FACTADDED+"."+name, 
+				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, getModelElement());
 		}
 		
 		/**
@@ -462,7 +462,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			}
 			
 			this.facts = new ListWrapper<Object>(tmpfacts, agent, ChangeEvent.FACTADDED+"."+name, 
-				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+				ChangeEvent.FACTREMOVED+"."+name, ChangeEvent.FACTCHANGED+"."+name, getModelElement());
 		}
 
 		/**

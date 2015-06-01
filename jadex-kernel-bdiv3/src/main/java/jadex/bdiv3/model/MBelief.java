@@ -439,6 +439,7 @@ public class MBelief extends MElement
 			if(multi)
 			{
 				IBeliefSet rbelset = bdif.getCapability().getBeliefbase().getBeliefSet(getName());
+				rbelset.removeFacts();
 				if(value!=null)
 				{
 					for(Object val: new IterableIteratorWrapper<Object>(SReflect.getIterator(value)))

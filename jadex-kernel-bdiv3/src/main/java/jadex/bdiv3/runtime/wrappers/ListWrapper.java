@@ -1,10 +1,7 @@
 package jadex.bdiv3.runtime.wrappers;
 
-import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MElement;
 import jadex.bridge.IInternalAccess;
-import jadex.rules.eca.ChangeInfo;
-import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 
 import java.util.List;
@@ -34,6 +31,12 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	{
 		super(delegate);
 		this.publisher = new EventPublisher(agent, addevent, remevent, changeevent, melem);
+		
+		int	i=0;
+		for(T entry: delegate)
+		{
+			publisher.entryAdded(entry, i++);
+		}
 	}
 	
 	/**
