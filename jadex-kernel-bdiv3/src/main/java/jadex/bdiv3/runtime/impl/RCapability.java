@@ -174,6 +174,9 @@ public class RCapability extends RElement
 			cgoals	= new HashMap<Class<?>, Collection<RGoal>>();
 		}
 		
+//		if(goal.getModelElement().getName().indexOf("cleanup")!=-1)
+//			System.out.println("dffded");
+		
 		if(goals.contains(goal))
 			throw new RuntimeException("Goal already contained: "+goal);
 		

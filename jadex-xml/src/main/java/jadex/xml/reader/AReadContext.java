@@ -9,6 +9,7 @@ import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  *  Context for reader that stores all relevant information of the read process.
  */
-public abstract class AReadContext<T> implements IContext
+public abstract class AReadContext implements IContext
 {
 	//-------- attributes --------
 	
@@ -27,7 +28,7 @@ public abstract class AReadContext<T> implements IContext
 	protected IObjectReaderHandler defaulthandler;
 	
 	/** The parser. */
-	protected T parser;
+	protected Object parser;
 	
 	/** The parser. */
 	protected XMLReporter reporter;
@@ -39,13 +40,13 @@ public abstract class AReadContext<T> implements IContext
 	protected Object rootobject;
 	
 	/** The stack. */
-	protected List stack;
+	protected List<StackElement> stack;
 	
 	/** The current comment. */
 	protected String comment;
 	
 	/** The read objects per id. */
-	protected Map readobjects;
+	protected Map<String, Object> readobjects;
 	
 	/** The readignore counter (0=do not ignore). */
 	protected int readignore;
@@ -57,20 +58,20 @@ public abstract class AReadContext<T> implements IContext
 	protected MultiCollection<Integer, IPostProcessorCall> postprocessors;
 	
 	/** The map or array information. */
-	protected Map arrayinfos;
+	protected Map<Object, Integer> arrayinfos;
 	
 	/** The map of objects to link in bulk mode (object -> map of tags -> objects per tag). */
-	protected MultiCollection<Object, Object> children;
+	protected MultiCollection<Object, LinkData> children;
 	
 	//-------- constructors --------
 	
 	/**
 	 * @param parser
 	 */
-	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, T parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
+	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, Object parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
 	{
-		this(pathmanager, handler, parser, reporter, callcontext, classloader, null, new ArrayList(), 
-			null, null, new HashMap(), 0, new MultiCollection<Integer, IPostProcessorCall>());
+		this(pathmanager, handler, parser, reporter, callcontext, classloader, null, new ArrayList<StackElement>(), 
+			null, null, new HashMap<String, Object>(), 0, new MultiCollection<Integer, IPostProcessorCall>());
 	}
 	
 	/**
@@ -82,8 +83,8 @@ public abstract class AReadContext<T> implements IContext
 	 * @param comment
 	 * @param readobjects
 	 */
-	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, T parser,  XMLReporter reporter, Object callcontext, ClassLoader classloader, Object root, List stack,
-		StackElement topse, String comment, Map readobjects, int readignore, MultiCollection<Integer, IPostProcessorCall> postprocessors)
+	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, Object parser,  XMLReporter reporter, Object callcontext, ClassLoader classloader, 
+		Object root, List<StackElement> stack, StackElement topse, String comment, Map<String, Object> readobjects, int readignore, MultiCollection<Integer, IPostProcessorCall> postprocessors)
 	{
 		this.pathmanager = pathmanager;
 		this.defaulthandler = handler;
@@ -106,7 +107,7 @@ public abstract class AReadContext<T> implements IContext
 	 *  Get the parser.
 	 *  @return The parser.
 	 */
-	public T getParser()
+	public Object getParser()
 	{
 		return parser;
 	}
@@ -282,7 +283,7 @@ public abstract class AReadContext<T> implements IContext
 	 *  Get the readobjects.
 	 *  @return The readobjects.
 	 */
-	public Map getReadObjects()
+	public Map<String, Object> getReadObjects()
 	{
 		return readobjects;
 	}
@@ -291,7 +292,7 @@ public abstract class AReadContext<T> implements IContext
 	 *  Set the readobjects.
 	 *  @param readobjects The readobjects to set.
 	 */
-	public void setReadObjects(Map readobjects)
+	public void setReadObjects(Map<String, Object> readobjects)
 	{
 		this.readobjects = readobjects;
 	}
@@ -376,7 +377,7 @@ public abstract class AReadContext<T> implements IContext
 		int ret = 0;
 		
 		if(arrayinfos==null)
-			arrayinfos = new HashMap();
+			arrayinfos = new HashMap<Object, Integer>();
 		
 		if(arrayinfos.containsKey(parent))
 			ret = ((Integer)arrayinfos.get(parent)).intValue();
@@ -389,27 +390,27 @@ public abstract class AReadContext<T> implements IContext
 	/**
 	 *  Get children.
 	 */
-	public Object getChildren(Object key)
+	public List<LinkData> getChildren(Object key)
 	{
-		return children==null? null: children.get(key);
+		return (List<LinkData>)(children==null? null: children.get(key));
 	}
 	
 	/**
 	 *  Add a child.
 	 */
-	public void addChild(Object key, Object value)
+	public void addChild(Object key, LinkData value)
 	{
 		if(children==null)
-			children = new MultiCollection<Object, Object>();
+			children = new MultiCollection<Object, LinkData>();
 		children.add(key, value);
 	}
 	
 	/**
 	 *  Remove a child.
 	 */
-	public List removeChildren(Object key)
+	public List<LinkData> removeChildren(Object key)
 	{
-		return children==null? null: (List)children.remove(key);
+		return children==null? null: (List<LinkData>)children.remove(key);
 	}
 	
 	/**

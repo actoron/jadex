@@ -53,17 +53,17 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 //	protected int nscnt;
 		
 	/** No type infos. */
-	protected Set no_typeinfos;
+	protected Set<Class<?>> no_typeinfos;
 		
 	/** The filter based post processors. */
-	protected Map<IFilter, IPreProcessor> preprocessors;
+	protected Map<IFilter<Object>, IPreProcessor> preprocessors;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new writer (gentypetags=false, prefertags=true, flattening=true).
 	 */
-	public BeanObjectWriterHandler(Set typeinfos)
+	public BeanObjectWriterHandler(Set<TypeInfo> typeinfos)
 	{
 		this(typeinfos, false);
 	}
@@ -71,7 +71,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Create a new writer (prefertags=true, flattening=true).
 	 */
-	public BeanObjectWriterHandler(Set typeinfos, boolean gentypetags)
+	public BeanObjectWriterHandler(Set<TypeInfo> typeinfos, boolean gentypetags)
 	{
 		this(typeinfos, gentypetags, false);
 	}
@@ -79,7 +79,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Create a new writer (flattening=true).
 	 */
-	public BeanObjectWriterHandler(Set typeinfos, boolean gentypetags, boolean prefertags)
+	public BeanObjectWriterHandler(Set<TypeInfo> typeinfos, boolean gentypetags, boolean prefertags)
 	{
 		this(typeinfos, gentypetags, prefertags, true);
 	}
@@ -87,7 +87,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Create a new writer.
 	 */
-	public BeanObjectWriterHandler(Set typeinfos, boolean gentypetags, boolean prefertags ,boolean flattening)
+	public BeanObjectWriterHandler(Set<TypeInfo> typeinfos, boolean gentypetags, boolean prefertags ,boolean flattening)
 	{
 		super(gentypetags, prefertags, flattening, typeinfos);
 		this.no_typeinfos = Collections.synchronizedSet(new HashSet());
@@ -115,12 +115,12 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			if(type instanceof Class)
 			{
 				// Try if interface or supertype is registered
-				List tocheck = new ArrayList();
-				tocheck.add(type);
+				List<Class<?>> tocheck = new ArrayList<Class<?>>();
+				tocheck.add((Class<?>)type);
 				
 				for(int i=0; i<tocheck.size() && ret==null; i++)
 				{
-					Class clazz = (Class)tocheck.get(i);
+					Class<?> clazz = (Class<?>)tocheck.get(i);
 //					Set tis = getTypeInfoManager().getTypeInfosByType(clazz);
 //					ret = getTypeInfoManager().findTypeInfo(tis, fullpath);
 					ret = getTypeInfoManager().getTypeInfo(clazz, fullpath);
@@ -131,7 +131,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 					
 					if(ret==null)
 					{
-						Class[] interfaces = clazz.getInterfaces();
+						Class<?>[] interfaces = clazz.getInterfaces();
 						for(int j=0; j<interfaces.length; j++)
 							tocheck.add(interfaces[j]);
 						clazz = clazz.getSuperclass();
@@ -142,7 +142,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				
 				// Special case array
 				// Requires Object[].class being registered 
-				if(ret==null && ((Class)type).isArray())
+				if(ret==null && ((Class<?>)type).isArray())
 				{
 //					System.out.println("array: "+type);
 //					ret = getTypeInfoManager().findTypeInfo(getTypeInfoManager().getTypeInfosByType(Object[].class), fullpath);
@@ -164,7 +164,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				{
 //					if(no_typeinfos==null)
 //						no_typeinfos = new HashSet();
-					no_typeinfos.add(type);
+					no_typeinfos.add((Class<?>)type);
 				}
 			}
 		}
@@ -193,7 +193,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		String tag;
 		if(object!=null)
 		{
-			Class clazz = object.getClass();
+			Class<?> clazz = object.getClass();
 			String clazzname = STransformation.registerClass(clazz);
 //			if(clazzname.indexOf("IRemoteMessageListener")!=-1)
 //			{
@@ -451,7 +451,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the properties of an object. 
 	 */
-	protected Collection getProperties(Object object, IContext context, boolean includemethods, boolean includefields)
+	protected Collection<BeanProperty> getProperties(Object object, IContext context, boolean includemethods, boolean includefields)
 	{
 		return object==null? Collections.EMPTY_LIST: introspector.getBeanProperties(object.getClass(), includemethods, includefields).values();
 	}
@@ -491,7 +491,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		boolean ret = true;
 		if(info!=null && object!=null && info.getTypeInfo() instanceof Class)
 		{
-			Class clazz = (Class)info.getTypeInfo();
+			Class<?> clazz = (Class<?>)info.getTypeInfo();
 			ret = clazz.isAssignableFrom(object.getClass());
 		}
 		return ret;
@@ -537,9 +537,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		
 		if(preprocessors!=null)
 		{
-			for(Iterator<IFilter> it = preprocessors.keySet().iterator(); it.hasNext(); )
+			for(Iterator<IFilter<Object>> it = preprocessors.keySet().iterator(); it.hasNext(); )
 			{
-				IFilter fil = it.next();
+				IFilter<Object> fil = it.next();
 				if(fil.filter(object))
 				{
 					ret.add(preprocessors.get(fil));
@@ -555,10 +555,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  @param filter The filter.
 	 *  @param processor The pre processor.
 	 */
-	public synchronized void addPreProcessor(IFilter filter, IPreProcessor processor)
+	public synchronized void addPreProcessor(IFilter<Object> filter, IPreProcessor processor)
 	{
 		if(preprocessors==null)
-			preprocessors = new LinkedHashMap<IFilter, IPreProcessor>();
+			preprocessors = new LinkedHashMap<IFilter<Object>, IPreProcessor>();
 		preprocessors.put(filter, processor);
 	}
 	/**
@@ -566,7 +566,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  @param filter The filter.
 	 *  @param processor The pre processor.
 	 */
-	public synchronized void removePreProcessor(IFilter filter)
+	public synchronized void removePreProcessor(IFilter<Object> filter)
 	{
 		if(preprocessors!=null)
 			preprocessors.remove(filter);

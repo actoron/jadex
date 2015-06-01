@@ -70,6 +70,4 @@ public class LinkData
 		return "LinkData(child=" + this.child + ", linkinfo=" + this.linkinfo
 			+ ", pathname=" + Arrays.toString(this.pathname) + ")";
 	}
-
-	
 }

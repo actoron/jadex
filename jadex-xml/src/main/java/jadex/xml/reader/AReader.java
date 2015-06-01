@@ -27,7 +27,7 @@ public abstract class AReader
 
 	/** This thread local variable provides access to the read context,
 	 *  e.g. from the XML reporter, if required. */
-	public static final ThreadLocal	READ_CONTEXT	= new ThreadLocal();
+	public static final ThreadLocal<AReadContext> READ_CONTEXT = new ThreadLocal<AReadContext>();
 	
 	/** The null object. */
 	public static final Object NULL = new Object();
@@ -71,7 +71,7 @@ public abstract class AReader
 		try
 		{
 			rd = new StringReader(val);
-			Object ret = reader.read(manager, handler, rd, classloader, context);
+			Object ret = reader.read(manager, (IObjectReaderHandler)handler, rd, classloader, context);
 			return ret;
 		}
 		catch(Exception e)
@@ -130,7 +130,7 @@ public abstract class AReader
 	{
 		try
 		{
-			Object ret = reader.read(manager, handler, bis, classloader, context);
+			Object ret = reader.read(manager, (IObjectReaderHandler)handler, bis, classloader, context);
 			return ret;
 		}
 		catch(Exception e)
@@ -173,7 +173,7 @@ public abstract class AReader
 	/**
 	 *  Get a subobject info for reading.
 	 */
-	public static SubobjectInfo getSubobjectInfoRead(QName localname, QName[] fullpath, TypeInfo patypeinfo, Map attrs)
+	public static SubobjectInfo getSubobjectInfoRead(QName localname, QName[] fullpath, TypeInfo patypeinfo, Map<String, String> attrs)
 	{
 		SubobjectInfo ret = null;
 		if(patypeinfo!=null)

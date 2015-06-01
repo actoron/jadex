@@ -198,12 +198,12 @@ public class Reader extends AReader
 			// Handle post-processors.
 			for(int i=1; readcontext.getPostProcessors().size()>0; i++)
 			{
-				List ps = (List)readcontext.getPostProcessors().remove(Integer.valueOf(i));
+				List<IPostProcessorCall> ps = (List<IPostProcessorCall>)readcontext.getPostProcessors().remove(Integer.valueOf(i));
 				if(ps!=null)
 				{
 					for(int j=0; j<ps.size(); j++)
 					{
-						((IPostProcessorCall)ps.get(j)).callPostProcessor();
+						ps.get(j).callPostProcessor();
 					}
 				}
 	//			System.out.println("i: "+i);
@@ -231,9 +231,9 @@ public class Reader extends AReader
 	protected void handleComment(ReadContextDesktop readcontext) throws Exception
 	{
 		if(readcontext.getReadIgnore()==0)
-			readcontext.setComment(readcontext.getParser().getText());
+			readcontext.setComment(getParser(readcontext).getText());
 		else if(DEBUG)
-			System.out.println("Ignoring: "+readcontext.getParser().getText());
+			System.out.println("Ignoring: "+getParser(readcontext).getText());
 		//	System.out.println("Found comment: "+comment);
 	}
 
@@ -244,9 +244,9 @@ public class Reader extends AReader
 	protected void handleContent(ReadContextDesktop readcontext) throws Exception
 	{
 		if(readcontext.getReadIgnore()==0)
-			readcontext.getTopStackElement().addContent(readcontext.getParser().getText()); 
+			readcontext.getTopStackElement().addContent(getParser(readcontext).getText()); 
 		else if(DEBUG)
-			System.out.println("Ignoring: "+readcontext.getParser().getText());
+			System.out.println("Ignoring: "+getParser(readcontext).getText());
 //		System.out.println("content: "+parser.getLocalName()+" "+content);
 	}
 	
@@ -259,7 +259,7 @@ public class Reader extends AReader
 	 */
 	protected void handleStartElement(ReadContextDesktop readcontext) throws Exception
 	{
-		XMLStreamReader parser = readcontext.getParser();
+		XMLStreamReader parser = (XMLStreamReader)getParser(readcontext);
 		
 		if(readcontext.getReadIgnore()>0)
 		{
@@ -272,11 +272,11 @@ public class Reader extends AReader
 //			List stack = readcontext.getStack();
 
 			// Fetch for info when creating attributes.
-			Map rawattrs = null;
+			Map<String, String> rawattrs = null;
 			int attrcnt = parser.getAttributeCount();
 			if(attrcnt>0)
 			{
-				rawattrs = new HashMap();
+				rawattrs = new HashMap<String, String>();
 				for(int i=0; i<attrcnt; i++)
 				{
 					String attrname = parser.getAttributeLocalName(i);
@@ -298,7 +298,7 @@ public class Reader extends AReader
 			
 			// Get type info and corresponding handler.
 			TypeInfo typeinfo = readcontext.getPathManager().getTypeInfo(localname, fullpath, rawattrs);
-			IObjectReaderHandler	handler	= typeinfo!=null ? typeinfo.getReaderHandler() : null;
+			IObjectReaderHandler handler = typeinfo!=null ? typeinfo.getReaderHandler() : null;
 			if(handler==null)
 			{
 				if(readcontext.getTopStackElement()!=null && readcontext.getTopStackElement().getReaderHandler()!=null)
@@ -474,7 +474,7 @@ public class Reader extends AReader
 								}
 							}
 							// Handle unset attributes (possibly have default value).
-							for(Iterator it=attrs.iterator(); it.hasNext(); )
+							for(Iterator<Object> it=attrs.iterator(); it.hasNext(); )
 							{
 								Object key = it.next();
 								if(key instanceof QName)	// ignore path entries of same attributes.
@@ -520,7 +520,7 @@ public class Reader extends AReader
 	{
 		if(readcontext.getReadIgnore()==0)
 		{
-			XMLStreamReader parser = readcontext.getParser();
+			XMLStreamReader parser = getParser(readcontext);
 //			List stack = readcontext.getStack();
 			StackElement topse = readcontext.getTopStackElement();
 			
@@ -648,7 +648,7 @@ public class Reader extends AReader
 				if(readcontext.getStackSize()>0 && bulklink)
 				{
 					// Invoke bulk link for the finished object (as parent).
-					List childs = readcontext.removeChildren(topse.getObject());
+					List<LinkData> childs = readcontext.removeChildren(topse.getObject());
 					if(childs!=null)
 					{
 						IBulkObjectLinker linker = (IBulkObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): topse.getReaderHandler());
@@ -748,4 +748,12 @@ public class Reader extends AReader
 //		}
 //		return result;
 //	}
+	
+	/**
+	 * 
+	 */
+	public static XMLStreamReader getParser(AReadContext context)
+	{
+		return (XMLStreamReader)context.getParser();
+	}
 }

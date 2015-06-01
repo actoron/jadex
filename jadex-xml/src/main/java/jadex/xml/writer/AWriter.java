@@ -1,6 +1,5 @@
 package jadex.xml.writer;
 
-import jadex.commons.SReflect;
 import jadex.xml.SXML;
 
 import java.io.ByteArrayOutputStream;

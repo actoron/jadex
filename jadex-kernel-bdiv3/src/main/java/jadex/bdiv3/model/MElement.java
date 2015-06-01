@@ -1,7 +1,7 @@
 package jadex.bdiv3.model;
 
 /**
- * 
+ *  Base element for model elements.
  */
 public class MElement
 {
@@ -82,6 +82,28 @@ public class MElement
 			}
 		}
 		
+		return ret;
+	}
+
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return 31 + ((name == null) ? 0 : name.hashCode());
+	}
+
+	/**
+	 *  Test if objects are equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof MElement)
+		{
+			MElement other = (MElement)obj;
+			ret = getName()!=null? getName().equals(other.getName()): super.equals(obj);
+		}
 		return ret;
 	}
 }

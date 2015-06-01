@@ -23,7 +23,7 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object typeinfo, boolean root, AReadContext context, Map rawattributes) throws Exception;
+	public Object createObject(Object typeinfo, boolean root, AReadContext context, Map<String, String> rawattributes) throws Exception;
 	
 //	/**
 //	 *  Get the object type
@@ -45,7 +45,7 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
+	public void handleAttributeValue(Object object, QName xmlattrname, List<QName> attrpath, String attrval, 
 		Object attrinfo, AReadContext context) throws Exception;
 	
 //	/**

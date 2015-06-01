@@ -116,8 +116,8 @@ public class Writer extends AWriter
 	 */
 	protected void writeObject(WriteContextDesktop wc, Object object, QName tag) throws Exception
 	{
-		XMLStreamWriter writer = wc.getWriter();
-		List stack = wc.getStack();
+		XMLStreamWriter writer = getWriter(wc);
+		List<StackElement> stack = wc.getStack();
 		
 		// Special case null
 		if(object==null)
@@ -218,10 +218,10 @@ public class Writer extends AWriter
 			
 			// Attributes
 			
-			Map attrs = wi.getAttributes();
+			Map<Object, String> attrs = wi.getAttributes();
 			if(attrs!=null)
 			{
-				for(Iterator it=attrs.keySet().iterator(); it.hasNext(); )
+				for(Iterator<Object> it=attrs.keySet().iterator(); it.hasNext(); )
 				{
 					Object propname = it.next();
 					String value = (String)attrs.get(propname);
@@ -312,10 +312,10 @@ public class Writer extends AWriter
 	 */
 	protected void writeSubobjects(WriteContextDesktop wc, TreeNode node, TypeInfo typeinfo) throws Exception
 	{
-		XMLStreamWriter writer = wc.getWriter();
-		List stack = wc.getStack();
+		XMLStreamWriter writer = getWriter(wc);
+		List<StackElement> stack = wc.getStack();
 			
-		List children = node.getChildren();
+		List<TreeNode> children = node.getChildren();
 		for(int i=0; i<children.size(); i++)
 		{
 			TreeNode subnode = (TreeNode)children.get(i);
@@ -463,12 +463,12 @@ public class Writer extends AWriter
 	 *  @param stack The stack.
 	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
 	 */
-	protected QName[] getXMLPath(List stack)
+	protected QName[] getXMLPath(List<StackElement> stack)
 	{
 		QName[] ret = new QName[stack.size()];
 		for(int i=0; i<stack.size(); i++)
 		{
-			ret[i] = ((StackElement)stack.get(i)).getTag();
+			ret[i] = stack.get(i).getTag();
 		}
 		return ret;
 		
@@ -480,6 +480,14 @@ public class Writer extends AWriter
 //				ret.append("/");
 //		}
 //		return ret.toString();
+	}
+	
+	/**
+	 * 
+	 */
+	public static XMLStreamWriter getWriter(AWriteContext context)
+	{
+		return (XMLStreamWriter)context.getWriter();
 	}
 	
 }

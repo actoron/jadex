@@ -1243,7 +1243,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						MDeliberation delib = goal.getMGoal().getDeliberation();
 						if(delib!=null)
 						{
-							Set<MGoal> inhs = delib.getInhibitions();
+							Set<MGoal> inhs = delib.getInhibitions(bdif.getCapability().getMCapability());
 							if(inhs!=null)
 							{
 								for(MGoal inh: inhs)
@@ -1295,7 +1295,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						MDeliberation delib = goal.getMGoal().getDeliberation();
 						if(delib!=null)
 						{
-							Set<MGoal> inhs = delib.getInhibitions();
+							Set<MGoal> inhs = delib.getInhibitions(bdif.getCapability().getMCapability());
 							if(inhs!=null)
 							{
 								for(MGoal inh: inhs)

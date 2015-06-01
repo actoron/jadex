@@ -53,8 +53,8 @@ public class ExploreMapPlan extends Plan
 		Location dest = mp.getLocation();
 		IGoal moveto = createGoal("achievemoveto");
 		moveto.getParameter("location").setValue(dest);		
-//		System.out.println("Created: "+dest+" "+this);
+		System.out.println("Created: "+dest+" "+this);
 		dispatchSubgoalAndWait(moveto);
-//		System.out.println("Reached: "+dest+" "+this);
+		System.out.println("Reached: "+dest+" "+this);
 	}
 }

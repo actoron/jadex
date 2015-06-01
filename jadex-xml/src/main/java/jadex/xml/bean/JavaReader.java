@@ -866,7 +866,7 @@ public class JavaReader
 			{
 				public Object postProcess(IContext context, Object object)
 				{
-					Map<String, Object>	map	= (Map<String, Object>) object;
+					Map<String, Object>	map	= (Map<String, Object>)object;
 					return new Tuple3<Object, Object, Object>(map.get("firstEntity"), map.get("secondEntity"), map.get("thirdEntity"));
 				}
 				

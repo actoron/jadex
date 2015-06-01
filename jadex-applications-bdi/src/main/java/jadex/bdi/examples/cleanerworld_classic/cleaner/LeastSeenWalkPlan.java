@@ -57,13 +57,13 @@ public class LeastSeenWalkPlan extends Plan
 //		System.out.println("Reached: "+dest+" "+this);
 	}
 	
-//	public void aborted()
-//	{
-//		System.out.println("Aborted: "+this);
-//	}
+	public void aborted()
+	{
+		System.out.println("Aborted: "+this);
+	}
 	
-//	public void failed()
-//	{
-//		System.out.println("Failed: "+this);
-//	}
+	public void failed()
+	{
+		System.out.println("Failed: "+this);
+	}
 }

@@ -4,6 +4,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.xml.IContext;
 import jadex.xml.IPreProcessor;
 import jadex.xml.Namespace;
+import jadex.xml.StackElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.Map;
 /**
  *  Context for writing an xml.
  */
-public abstract class AWriteContext<T> implements IContext
+public abstract class AWriteContext implements IContext
 {
 	//-------- attributes --------
 	
@@ -22,7 +23,7 @@ public abstract class AWriteContext<T> implements IContext
 	protected IObjectWriterHandler handler;
 	
 	/** The writer. */
-	protected T writer;
+	protected Object writer;
 	
 	/** The classloader. */
 	protected ClassLoader classloader;
@@ -34,10 +35,10 @@ public abstract class AWriteContext<T> implements IContext
 	protected Object usercontext;
 	
 	/** The written objects. */
-	protected Map writtenobs;
+	protected Map<Object, Object> writtenobs;
 	
 	/** The stack. */
-	protected List stack;
+	protected List<StackElement> stack;
 	
 	/** The pre processors. */
 	protected MultiCollection<Integer, IPreProcessor> preprocessors;
@@ -46,7 +47,7 @@ public abstract class AWriteContext<T> implements IContext
 	protected int id;
 	
 	/** The namespaces. */
-	protected Map namespacebypackage;
+	protected Map<String, Namespace> namespacebypackage;
 	protected int nscnt;
 	
 //	/** Storage for objects. */
@@ -57,16 +58,16 @@ public abstract class AWriteContext<T> implements IContext
 	/**
 	 *  Create a new write context.
 	 */
-	public AWriteContext(IObjectWriterHandler handler, T writer, Object usercontext, Object rootobject, ClassLoader classloader)
+	public AWriteContext(IObjectWriterHandler handler, Object writer, Object usercontext, Object rootobject, ClassLoader classloader)
 	{
-		this(handler, writer, usercontext, rootobject, classloader, new IdentityHashMap(), new ArrayList(), new MultiCollection<Integer, IPreProcessor>());
+		this(handler, writer, usercontext, rootobject, classloader, new IdentityHashMap<Object, Object>(), new ArrayList<StackElement>(), new MultiCollection<Integer, IPreProcessor>());
 	}
 		
 	/**
 	 *  Create a new write context.
 	 */
-	public AWriteContext(IObjectWriterHandler handler, T writer, Object usercontext, Object rootobject, ClassLoader classloader, 
-		Map writtenobs, List stack, MultiCollection<Integer, IPreProcessor> preprocessors)
+	public AWriteContext(IObjectWriterHandler handler, Object writer, Object usercontext, Object rootobject, ClassLoader classloader, 
+		Map<Object, Object> writtenobs, List<StackElement> stack, MultiCollection<Integer, IPreProcessor> preprocessors)
 	{
 		this.handler = handler;
 		this.writer = writer;
@@ -102,7 +103,7 @@ public abstract class AWriteContext<T> implements IContext
 	 *  Get the writer.
 	 *  @return The writer.
 	 */
-	public T getWriter()
+	public Object getWriter()
 	{
 		return this.writer;
 	}
@@ -111,7 +112,7 @@ public abstract class AWriteContext<T> implements IContext
 	 *  Set the writer.
 	 *  @param writer The writer to set.
 	 */
-	public void setWriter(T writer)
+	public void setWriter(Object writer)
 	{
 		this.writer = writer;
 	}
@@ -184,7 +185,7 @@ public abstract class AWriteContext<T> implements IContext
 	 *  Get the writtenobs.
 	 *  @return The writtenobs.
 	 */
-	public Map getWrittenObjects()
+	public Map<Object, Object> getWrittenObjects()
 	{
 		return this.writtenobs;
 	}
@@ -193,7 +194,7 @@ public abstract class AWriteContext<T> implements IContext
 	 *  Set the writtenobs.
 	 *  @param writtenobs The writtenobs to set.
 	 */
-	public void setWrittenObjects(Map writtenobs)
+	public void setWrittenObjects(Map<Object, Object> writtenobs)
 	{
 		this.writtenobs = writtenobs;
 	}
@@ -202,7 +203,7 @@ public abstract class AWriteContext<T> implements IContext
 	 *  Get the stack.
 	 *  @return The stack.
 	 */
-	public List getStack()
+	public List<StackElement> getStack()
 	{
 		return this.stack;
 	}
@@ -211,7 +212,7 @@ public abstract class AWriteContext<T> implements IContext
 	 *  Set the stack.
 	 *  @param stack The stack to set.
 	 */
-	public void setStack(List stack)
+	public void setStack(List<StackElement> stack)
 	{
 		this.stack = stack;
 	}
@@ -259,7 +260,7 @@ public abstract class AWriteContext<T> implements IContext
 	public Namespace getNamespace(String uri)
 	{
 		if(namespacebypackage==null)
-			namespacebypackage = new HashMap();
+			namespacebypackage = new HashMap<String, Namespace>();
 		
 		Namespace ns = (Namespace)namespacebypackage.get(uri);
 		if(ns==null)

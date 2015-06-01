@@ -567,16 +567,16 @@ public class BDIClassReader extends MicroClassReader
 			}
 		}
 		
-		// init deliberation of goals
-		List<MGoal> mgoals = bdimodel.getCapability().getGoals();
-		for(MGoal mgoal: mgoals)
-		{
-			MDeliberation delib = mgoal.getDeliberation();
-			if(delib!=null)
-			{
-				delib.init(bdimodel.getCapability());
-			}
-		}
+//		// init deliberation of goals
+//		List<MGoal> mgoals = bdimodel.getCapability().getGoals();
+//		for(MGoal mgoal: mgoals)
+//		{
+//			MDeliberation delib = mgoal.getDeliberation();
+//			if(delib!=null)
+//			{
+//				delib.init(bdimodel.getCapability());
+//			}
+//		}
 		
 		ModelInfo modelinfo = (ModelInfo)bdimodel.getModelInfo();
 		if(confs.size()>0)

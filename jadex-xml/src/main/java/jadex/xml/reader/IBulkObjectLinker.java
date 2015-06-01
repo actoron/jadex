@@ -15,5 +15,5 @@ public interface IBulkObjectLinker
 	 *  @param classloader The classloader.
 	 *  @param root The root object.
 	 */
-	public void bulkLinkObjects(Object parent, List children, AReadContext context) throws Exception;
+	public void bulkLinkObjects(Object parent, List<LinkData> children, AReadContext context) throws Exception;
 }

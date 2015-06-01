@@ -116,7 +116,7 @@ public class AbstractInfo
 	 *  Get the filter.
 	 *  @return the filter
 	 */
-	public IFilter getFilter()
+	public IFilter<Object> getFilter()
 	{
 		return xmlinfo!=null ? xmlinfo.getFilter() : null;
 	}
@@ -151,9 +151,9 @@ public class AbstractInfo
 	/**
 	 *  Compare infos by specificity of the XML path.
 	 */
-	public static final class SpecificityComparator implements Comparator
+	public static final class SpecificityComparator implements Comparator<AbstractInfo>
 	{
-		public int compare(Object arg0, Object arg1)
+		public int compare(AbstractInfo arg0, AbstractInfo arg1)
 		{
 			int	ret	= 0;
 			if(arg0!=arg1)

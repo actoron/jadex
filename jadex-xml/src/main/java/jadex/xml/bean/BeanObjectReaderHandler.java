@@ -20,13 +20,11 @@ import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
+import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
-import jadex.xml.reader.AReadContext;
 import jadex.xml.stax.QName;
-import jadex.xml.stax.StaxLocationWrapper;
-import jadex.xml.stax.StaxXMLReporterWrapper;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -36,7 +34,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -62,7 +59,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	protected TypeInfoTypeManager titmanager;
 	
 	/** No type infos. */
-	protected Set no_typeinfos;
+	protected Set<Object> no_typeinfos;
 	
 	/** The bean introspector. */
 	protected IBeanIntrospector introspector = BeanIntrospectorFactory.getInstance().getBeanIntrospector();
@@ -83,7 +80,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  Create a new handler for Java XML supporting on-the-fly
 	 *  type info creation for arrays.
 	 */
-	public BeanObjectReaderHandler(Set typeinfos)
+	public BeanObjectReaderHandler(Set<TypeInfo> typeinfos)
 	{
 		this.titmanager = new TypeInfoTypeManager(typeinfos);
 	}
@@ -111,18 +108,18 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					if(type instanceof Class)
 					{
 						// Try if interface or supertype is registered
-						List tocheck = new ArrayList();
-						tocheck.add(type);
+						List<Class<?>> tocheck = new ArrayList<Class<?>>();
+						tocheck.add((Class<?>)type);
 						
 						for(int i=0; i<tocheck.size() && ret==null; i++)
 						{
-							Class clazz = (Class)tocheck.get(i);
+							Class<?> clazz = tocheck.get(i);
 		//					Set tis = titmanager.getTypeInfosByType(clazz);
 		//					ret = titmanager.findTypeInfo(tis, fullpath);
 							ret = titmanager.getTypeInfo(clazz, fullpath);
 							if(ret==null)
 							{
-								Class[] interfaces = clazz.getInterfaces();
+								Class<?>[] interfaces = clazz.getInterfaces();
 								for(int j=0; j<interfaces.length; j++)
 									tocheck.add(interfaces[j]);
 								clazz = clazz.getSuperclass();
@@ -133,7 +130,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						
 						// Special case array
 						// Requires Object[].class being registered 
-						if(ret==null && ((Class)type).isArray())
+						if(ret==null && ((Class<?>)type).isArray())
 						{
 		//					ret = titmanager.findTypeInfo(titmanager.getTypeInfosByType(Object[].class), fullpath);
 							ret = titmanager.getTypeInfo(Object[].class, fullpath);
@@ -158,7 +155,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						else
 						{
 							if(no_typeinfos==null)
-								no_typeinfos = new HashSet();
+								no_typeinfos = new HashSet<Object>();
 							no_typeinfos.add(type);
 						}
 					}
@@ -176,7 +173,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, AReadContext context, Map rawattributes) throws Exception
+	public Object createObject(Object type, boolean root, AReadContext context, Map<String, String> rawattributes) throws Exception
 	{
 		Object ret = null;
 		
@@ -218,7 +215,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					clazzname	= STransformation.getClassname(clazzname);
 				}
 				
-				Class clazz = SReflect.classForName(clazzname, context.getClassLoader());
+				Class<?> clazz = SReflect.classForName(clazzname, context.getClassLoader());
 				
 				if(dim>0)
 				{
@@ -238,9 +235,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							try
 							{
-								Constructor	c	= clazz.getDeclaredConstructors()[0];
+								Constructor<?>	c	= clazz.getDeclaredConstructors()[0];
 								c.setAccessible(true);
-								Class[] paramtypes = c.getParameterTypes();
+								Class<?>[] paramtypes = c.getParameterTypes();
 								Object[] paramvalues = new Object[paramtypes.length];
 								for(int i=0; i<paramtypes.length; i++)
 								{
@@ -281,7 +278,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		else if(type instanceof TypeInfo)
 		{
 			Object ti =  ((TypeInfo)type).getTypeInfo();
-			if(ti instanceof Class && ((Class)ti).isInterface())
+			if(ti instanceof Class && ((Class<?>)ti).isInterface())
 			{
 				type = ((TypeInfo)type).getXMLTag();
 			}
@@ -293,7 +290,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(type instanceof Class)
 		{
-			Class clazz = (Class)type;
+			Class<?> clazz = (Class<?>)type;
 			if(!BasicTypeConverter.isBuiltInType(clazz))
 			{
 				// Must have empty constructor.
@@ -319,9 +316,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Bug with Java compilers that enumerate anonymous inner classes as they like. 
 	 */
-	protected Class getCorrectAnonymousInnerClass(Class clazz, Map rawattributes, ClassLoader classloader)
+	protected Class<?> getCorrectAnonymousInnerClass(Class<?> clazz, Map<String, String> rawattributes, ClassLoader classloader)
 	{
-		Class ret = isCorrectAnonymousInnerClass(clazz, rawattributes)? clazz: null;
+		Class<?> ret = isCorrectAnonymousInnerClass(clazz, rawattributes)? clazz: null;
 		
 		if(ret==null)
 		{
@@ -350,7 +347,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Test if a class is the correct inner class.
 	 */
-	protected boolean isCorrectAnonymousInnerClass(Class clazz, Map rawattributes)
+	protected boolean isCorrectAnonymousInnerClass(Class<?> clazz, Map<String, String> rawattributes)
 	{
 		boolean ret = true;
 		
@@ -405,7 +402,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		if(tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
 		{
 			String clazzname = tag.getNamespaceURI().substring(SXML.PROTOCOL_TYPEINFO.length())+"."+tag.getLocalPart();
-			Class clazz = SReflect.classForName0(clazzname, context.getClassLoader());
+			Class<?> clazz = SReflect.classForName0(clazzname, context.getClassLoader());
 			if(clazz!=null)
 			{
 				if(BasicTypeConverter.isBuiltInType(clazz))
@@ -431,7 +428,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
+	public void handleAttributeValue(Object object, QName xmlattrname, List<QName> attrpath, String attrval, 
 		Object attrinfo, AReadContext context) throws Exception
 	{
 		// Hack!
@@ -526,12 +523,12 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			// Try name guessing via class/superclass/interface names of object to add
 			if(!linked)
 			{
-				List classes	= new LinkedList();
+				List<Class<?>> classes	= new LinkedList<Class<?>>();
 				classes.add(object.getClass());
 			
 				while(!linked && !classes.isEmpty())
 				{
-					Class clazz = (Class)classes.remove(0);
+					Class<?> clazz = classes.remove(0);
 					if(!BasicTypeConverter.isBuiltInType(clazz))
 					{
 						String name = SReflect.getInnerClassName(clazz);
@@ -542,7 +539,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						if(clazz.getSuperclass()!=null)
 							classes.add(clazz.getSuperclass());
-						Class[]	ifs	= clazz.getInterfaces();
+						Class<?>[]	ifs	= clazz.getInterfaces();
 						for(int i=0; i<ifs.length; i++)
 						{
 							classes.add(ifs[i]);
@@ -566,7 +563,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void bulkLinkObjects(List childs, Object parent, Object linkinfo, 
+	public void bulkLinkObjects(List<Object> childs, Object parent, Object linkinfo, 
 		QName[] pathname, AReadContext context) throws Exception
 	{
 		QName tag = pathname[pathname.length-1];
@@ -606,12 +603,12 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			// Try name guessing via class/superclass/interface names of objects to add
 			if(!linked)
 			{
-				List classes	= new LinkedList();
+				List<Class<?>> classes	= new LinkedList<Class<?>>();
 				classes.add(childs.get(0).getClass());
 			
 				while(!linked && !classes.isEmpty())
 				{
-					Class clazz = (Class)classes.remove(0);
+					Class<?> clazz = (Class<?>)classes.remove(0);
 					if(!BasicTypeConverter.isBuiltInType(clazz))
 					{
 						String name = SReflect.getInnerClassName(clazz);
@@ -622,7 +619,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						if(clazz.getSuperclass()!=null)
 							classes.add(clazz.getSuperclass());
-						Class[]	ifs	= clazz.getInterfaces();
+						Class<?>[]	ifs	= clazz.getInterfaces();
 						for(int i=0; i<ifs.length; i++)
 						{
 							classes.add(ifs[i]);
@@ -733,7 +730,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 *  @param root The root object.
 	 */
-	public void bulkLinkObjects(Object parent, List children, AReadContext context) throws Exception
+	public void bulkLinkObjects(Object parent, List<LinkData> children, AReadContext context) throws Exception
 	{
 //		System.out.println("bulk link for: "+parent+" "+children);
 		
@@ -743,7 +740,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		// Whenever a new path/tag is used the last bulk is considered finished
 
 		LinkData linkdata = (LinkData)children.get(0);
-		List childs = new ArrayList();
+		List<Object> childs = new ArrayList<Object>();
 		childs.add(linkdata.getChild());
 		QName[] pathname = linkdata.getPathname();
 		int startidx = 0;
@@ -769,7 +766,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Initiate the bulk link calls.
 	 */
-	protected void handleBulkLinking(List childs, Object parent, AReadContext context, QName[] pathname, List linkdatas, int startidx) throws Exception
+	protected void handleBulkLinking(List<Object> childs, Object parent, AReadContext context, QName[] pathname, List<LinkData> linkdatas, int startidx) throws Exception
 	{
 		if(childs.size()>1)
 		{
@@ -888,7 +885,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						try
 						{
 							Method m = (Method)sh;
-							Class[] ps = m.getParameterTypes();
+							Class<?>[] ps = m.getParameterTypes();
 							Object arg = convertValue(val, ps[1], converter, context, id);
 							m.invoke(object, new Object[]{key, arg});
 							set = true;
@@ -915,11 +912,11 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							// Hack?! create on demand, should be customizable.
 							if(map==null)
 							{
-								map = new HashMap();
+								map = new HashMap<Object, Object>();
 								f.set(object, map);
 							}
 							Object arg = convertValue(val, null, converter, context, id);
-							((Map)map).put(key, arg);
+							((Map<Object, Object>)map).put(key, arg);
 							set = true;
 						}
 						catch(Exception e)
@@ -952,7 +949,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						Method[] ms = SReflect.getMethods(object.getClass(), prefixes[i]+mapname);
 						for(int j=0; j<ms.length && !set; j++)
 						{
-							Class[] ps = ms[j].getParameterTypes();
+							Class<?>[] ps = ms[j].getParameterTypes();
 							if(ps.length==2)
 							{
 								Object arg = convertValue(val, ps[1], converter, context, id);
@@ -988,7 +985,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				if(sh instanceof Method)
 				{
 					Method m = (Method)sh;
-					Class[] ps = m.getParameterTypes();
+					Class<?>[] ps = m.getParameterTypes();
 					if(ps.length==1)
 					{
 						Object arg = convertValue(val, ps[0], converter, context, id);
@@ -1078,7 +1075,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			// Write as normal bean attribute.
 			// Try to find bean class information
 			
-			Map props = introspector.getBeanProperties(object.getClass(), true, true);
+			Map<String, BeanProperty> props = introspector.getBeanProperties(object.getClass(), true, true);
 			Object prop = props.get(accessinfo instanceof String? accessinfo: xmlname.getLocalPart());
 			if(prop instanceof BeanProperty && !((BeanProperty)prop).isWritable())
 			{
@@ -1177,7 +1174,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 */
 	protected boolean	setBulkAttributeValues(Object accessinfo, QName xmlattrname, Object object, 
-		List vals, Object converter, String id, AReadContext context) throws Exception
+		List<Object> vals, Object converter, String id, AReadContext context) throws Exception
 	{
 		boolean set = false;
 		
@@ -1197,7 +1194,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				if(sh instanceof Method)
 				{
 					Method m = (Method)sh;
-					Class[] ps = m.getParameterTypes();
+					Class<?>[] ps = m.getParameterTypes();
 					if(ps.length==1)
 					{
 						Object arg = convertBulkValues(vals, ps[0], converter, context, id);
@@ -1272,7 +1269,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			// Try to find bean class information
 			
-			Map props = introspector.getBeanProperties(object.getClass(), true, true);
+			Map<String, BeanProperty> props = introspector.getBeanProperties(object.getClass(), true, true);
 			BeanProperty prop = (BeanProperty)props.get(accessinfo instanceof String? accessinfo: xmlattrname.getLocalPart());
 			if(prop!=null)
 			{
@@ -1353,7 +1350,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				
 				for(int j=0; j<ms.length && !set; j++)
 				{
-					Class[] ps = ms[j].getParameterTypes();
+					Class<?>[] ps = ms[j].getParameterTypes();
 					if(ps.length==1)
 					{
 						Object arg = convertValue(value, ps[0], converter, context, idref);
@@ -1392,7 +1389,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 *  @param converter The converter.
 	 */
-	protected boolean invokeBulkSetMethod(String[] prefixes, String postfix, List vals, Object object, 
+	protected boolean invokeBulkSetMethod(String[] prefixes, String postfix, List<Object> vals, Object object, 
 		AReadContext context, Object converter, String idref) throws Exception
 	{
 		boolean set = false;
@@ -1405,7 +1402,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				
 				for(int j=0; j<ms.length && !set; j++)
 				{
-					Class[] ps = ms[j].getParameterTypes();
+					Class<?>[] ps = ms[j].getParameterTypes();
 					if(ps.length==1)
 					{
 						Object arg = convertBulkValues(vals, ps[0], converter, context, idref);
@@ -1442,7 +1439,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		try
 		{
 			Field field = parent.getClass().getField(fieldname);
-			Class type = field.getType();
+			Class<?> type = field.getType();
 			
 			Object val = object;
 			val = convertValue(object, type, converter, context, idref);
@@ -1464,14 +1461,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Directly access a field for setting the objects.
 	 */
-	protected boolean setBulkField(String fieldname, Object parent, List objects, Object converter,
+	protected boolean setBulkField(String fieldname, Object parent, List<Object> objects, Object converter,
 		AReadContext context, String idref) throws Exception
 	{
 		boolean set;
 		try
 		{
 			Field field = parent.getClass().getField(fieldname);
-			Class type = field.getType();
+			Class<?> type = field.getType();
 			
 //			object = convertAttributeValue(object, type, converter, root, classloader, idref, readobjects);
 			
@@ -1612,7 +1609,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root.
 	 *  @param classloader The classloader.
 	 */
-	protected Object convertValue(Object val, Class targetclass, Object converter, 
+	protected Object convertValue(Object val, Class<?> targetclass, Object converter, 
 		AReadContext context, String id) throws Exception
 	{
 		Object ret = val;
@@ -1647,7 +1644,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Convert a list of values into the target format (list, set, collection, array).
 	 */
-	protected Object convertBulkValues(List vals, Class targetclass, Object converter, 
+	protected Object convertBulkValues(List<Object> vals, Class<?> targetclass, Object converter, 
 		AReadContext context, String id) throws Exception
 	{
 		// todo: use converter?!
@@ -1657,7 +1654,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 		if(SReflect.isSupertype(Set.class, targetclass))
 		{
-			ret = new HashSet(vals);
+			ret = new HashSet<Object>(vals);
 		}
 		else if(targetclass.isArray())
 		{
@@ -1725,7 +1722,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param filter The filter.
 	 *  @param processor The post processor.
 	 */
-	public synchronized void removePostProcessor(IFilter filter)
+	public synchronized void removePostProcessor(IFilter<Object> filter)
 	{
 		if(postprocessors!=null)
 			postprocessors.remove(filter);

@@ -14,7 +14,7 @@ public class TreeNode
 	protected Object data;
 
 	/** The children. */
-	public List children;
+	public List<TreeNode> children;
 
 	//-------- constructors --------
 	
@@ -37,7 +37,7 @@ public class TreeNode
 	 *  Return the children of node.
 	 *  @return The children of node.
 	 */
-	public List getChildren()
+	public List<TreeNode> getChildren()
 	{
 		return children;
 	}
@@ -46,7 +46,7 @@ public class TreeNode
 	 * Sets the children of a Node object.
 	 * @param children The list to set.
 	 */
-	public void setChildren(List children)
+	public void setChildren(List<TreeNode> children)
 	{
 		this.children = children;
 	}

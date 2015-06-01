@@ -20,7 +20,7 @@ public class WriteObjectInfo
 	protected String comment;
 	
 	/** The attribute values. */
-	protected Map attributes;
+	protected Map<Object, String> attributes;
 
 	/** The content. */
 	protected String content;
@@ -52,7 +52,7 @@ public class WriteObjectInfo
 	 *  Get the attributes.
 	 *  @return The attributes.
 	 */
-	public Map getAttributes()
+	public Map<Object, String> getAttributes()
 	{
 		return this.attributes;
 	}
@@ -65,7 +65,7 @@ public class WriteObjectInfo
 	public void addAttribute(Object name, String value)
 	{
 		if(attributes==null)
-			attributes = new LinkedHashMap();
+			attributes = new LinkedHashMap<Object, String>();
 		else if(attributes.containsKey(name))
 			throw new RuntimeException("Duplicate attribute: "+name);
 		attributes.put(name, value);
@@ -129,7 +129,7 @@ public class WriteObjectInfo
 		if(flatten)
 		{
 			// Find fitting tag 
-			List children = node.getChildren();
+			List<TreeNode> children = node.getChildren();
 			if(children!=null)
 			{
 				for(int i=0; i<children.size() && ret==null; i++)

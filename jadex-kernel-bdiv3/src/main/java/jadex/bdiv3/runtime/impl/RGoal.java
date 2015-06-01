@@ -21,6 +21,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -28,6 +29,9 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IEvent;
@@ -37,6 +41,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -293,6 +298,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		if(GoalProcessingState.SUCCEEDED.equals(processingstate)
 			|| GoalProcessingState.FAILED.equals(processingstate))
 		{
+//			if(getModelElement().getName().indexOf("vision")==-1)
+//				System.out.println("sgmndsdgbjk");
 			setLifecycleState(ia, GoalLifecycleState.DROPPING);
 		}
 		
@@ -571,7 +578,40 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public int hashCode()
 	{
-		return getMGoal().isUnique()? getPojoElement().hashCode(): super.hashCode();
+		int ret;
+		if(getMGoal().isUnique())
+		{
+			if(getPojoElement()!=null)
+			{
+				ret = getPojoElement().hashCode();
+			}
+			else
+			{
+				MGoal mgoal	= (MGoal)getModelElement();
+				ret = 31 + mgoal.hashCode();
+				for(MParameter param: mgoal.getParameters())
+				{
+					if(mgoal.getExcludes()==null || !mgoal.getExcludes().contains(mgoal.getName()))
+					{
+						if(!param.isMulti(getAgent().getClassLoader()))
+						{
+							Object val = getParameter(param.getName()).getValue();
+							ret = 31*ret + (val==null? 0: val.hashCode());
+						}
+						else
+						{
+							Object[] vals = getParameterSet(param.getName()).getValues();
+							ret = 31*ret + (vals==null? 0: Arrays.hashCode(vals));
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			ret = super.hashCode();
+		}
+		return ret;
 	}
 
 	/**
@@ -582,9 +622,25 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		boolean ret = false;
 		if(obj instanceof RGoal)
 		{
-			ret = getMGoal().isUnique()? getPojoElement().equals(((RProcessableElement)obj).getPojoElement()): super.equals(obj);
+			RGoal other = (RGoal)obj;
+			if(getMGoal().isUnique())
+			{
+				if(getPojoElement()!=null)
+				{
+					ret = getPojoElement().equals(other.getPojoElement());
+				}
+				else
+				{
+					ret = isSame(other);
+				}
+			}
+			else
+			{
+				ret = super.equals(obj);
+			}
 		}
 		return ret;
+//		ret = getMGoal().isUnique()? getPojoElement().equals(((RProcessableElement)obj).getPojoElement()): super.equals(obj);
 	}
 
 	/** 
@@ -607,6 +663,9 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		
 		if(rplan!=null)
 		{
+//			if(rplan.getModelElement().getName().indexOf("seen")!=-1)
+//				System.out.println("hhhhhhhhhhhhhggg");
+			
 			// Find parameter mappings for xml agents
 			// todo: goal-goal mappings
 			if(rplan instanceof RPlan && rplan.isPassed())
@@ -1053,7 +1112,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				}
 				else
 				{
-					Set<MGoal> minh = delib.getInhibitions();
+//					Set<MGoal> minh = delib.getInhibitions();
+					Set<MGoal> minh = delib.getInhibitions(getMCapability());
 					MGoal mother = other.getMGoal();
 					if(minh!=null && minh.contains(mother))
 					{
@@ -1071,6 +1131,31 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 								{
 									dm.setAccessible(true);
 									ret = ((Boolean)dm.invoke(getPojoElement(), new Object[]{other.getPojoElement()})).booleanValue();
+								}
+								catch(Exception e)
+								{
+									Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+									ia.getLogger().severe("Exception in inhibits expression: "+t);
+								}
+							}
+						}
+						
+						// xml inhibition expressions
+						Map<String, UnparsedExpression> uexps = delib.getInhibitionExpressions();
+						if(uexps!=null)
+						{
+							UnparsedExpression uexp = uexps.get(mother.getName());
+							if(uexp!=null && uexp.getValue()!=null && uexp.getValue().length()>0)
+							{
+								if(uexp.getParsed()==null)
+									SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), getAgent().getClassLoader());
+								IParsedExpression pe = (IParsedExpression)uexp.getParsed();
+								SimpleValueFetcher fet = new SimpleValueFetcher();
+								fet.setValue("$goal", this);
+								fet.setValue("$ref", other);
+								try
+								{
+									ret = ((Boolean)pe.getValue(fet)).booleanValue();
 								}
 								catch(Exception e)
 								{
@@ -1284,5 +1369,49 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	public boolean isPassed()
 	{
 		return isSucceeded();
+	}
+	
+	/**
+	 *  Check if the goal is the same as another goal
+	 *  with respect to uniqueness settings.
+	 *  When two goals are the same this does not mean
+	 *  the objects are equal() in the Java sense!
+	 */
+	public boolean	isSame(IGoal goal)
+	{
+		// Goals are only the same when they are of same type.
+		boolean	same	= getModelElement().equals(goal.getModelElement());
+		
+		if(same)
+		{
+			// Check parameter correspondence of goal.
+			MGoal mgoal	= (MGoal)goal.getModelElement();
+
+			for(MParameter param: mgoal.getParameters())
+			{
+				if(!param.isMulti(getAgent().getClassLoader()))
+				{
+					// Compare parameter values.
+					// Todo: Catch exceptions on parameter access?
+					Object	val1	= this.getParameter(param.getName()).getValue();
+					Object	val2	= goal.getParameter(param.getName()).getValue();
+					same	= val1==val2 || val1!=null && val1.equals(val2);
+				}
+				else
+				{
+					// Compare parameter set values.
+					// Todo: Catch exceptions on parameter set access?
+					Object[] vals1 = this.getParameterSet(param.getName()).getValues();
+					Object[] vals2 = goal.getParameterSet(param.getName()).getValues();
+					same = vals1.length==vals2.length;
+					for(int j = 0; same && j < vals1.length; j++)
+					{
+						same = vals1[j] == vals2[j] || vals1[j] != null && vals1[j].equals(vals2[j]);
+					}
+				}
+			}
+		}
+
+		return same;
 	}
 }

@@ -125,9 +125,12 @@ subprojects
 
     if(isAndroidProject(project))
     {
-        if (isAndroidLibraryProject(project)) {
+        if (isAndroidLibraryProject(project)) 
+        {
             apply plugin: 'android-library'
-        } else {
+        } 
+        else 
+        {
             apply plugin: 'com.android.application'
         }
         allSource   = android.sourceSets.main.java.srcDirs

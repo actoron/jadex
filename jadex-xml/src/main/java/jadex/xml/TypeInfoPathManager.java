@@ -44,7 +44,7 @@ public class TypeInfoPathManager
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public synchronized TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map rawattributes)
+	public synchronized TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map<String, String> rawattributes)
 	{
 		return findTypeInfo((Set)typeinfos.get(tag), fullpath, rawattributes);
 	}

@@ -1,10 +1,9 @@
 package jadex.xml.writer;
 
+import jadex.commons.SReflect;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import jadex.commons.SReflect;
-import jadex.xml.reader.XMLReaderFactory;
 
 /**
  * Factory to create XML Writers.

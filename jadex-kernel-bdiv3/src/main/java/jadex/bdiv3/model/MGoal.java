@@ -14,8 +14,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -86,6 +88,15 @@ public class MGoal extends MClassBasedElement
 	
 	/** The method info for building apl. */
 	protected MethodInfo buildaplmethod;
+	
+	//-------- additional xml attributes --------
+	
+	/** The unique relevant attributes */
+	protected List<MParameter> relevants;
+	
+	/** The unique parameter excludes. */
+	protected Set<String> excludes;
+	
 	
 	/**
 	 *	Bean Constructor. 
@@ -580,4 +591,70 @@ public class MGoal extends MClassBasedElement
 	{
 		this.metagoal = metagoal;
 	}
+	
+	/**
+	 *  Get the parameters which are relevant for comparing goals.
+	 */
+	public List<MParameter>	getRelevantParameters()
+	{
+		if(relevants==null)
+		{
+			// Init relevant parameters.
+			if(isUnique())
+			{
+				relevants = new ArrayList<MParameter>();
+				//Set	includes	= getIncludes();
+				Set<String>	excludes	= getExcludes();
+				
+				for(MParameter param: getParameters())
+				{
+					// Excluded parameters are not considered.
+					if(!excludes.contains(param.getName()))
+					{
+						relevants.add(param);
+					}
+				}
+			}
+		}
+		
+		return relevants;
+	}
+
+	/**
+	 *  Get the excludes.
+	 *  Parameters not used in unique checks.
+	 *  @return The excludes
+	 */
+	public Set<String> getExcludes()
+	{
+		return excludes;
+	}
+
+	/**
+	 *  The excludes to set.
+	 *  Parameters not used in unique checks.
+	 *  @param excludes The excludes to set
+	 */
+	public void setExcludes(Set<String> excludes)
+	{
+		this.excludes = excludes;
+	}
+
+	/**
+	 *  Add an excluded parameter
+	 */
+	public void addExclude(String paramname)
+	{
+		if(excludes==null)
+			excludes = new HashSet<String>();
+		excludes.add(paramname);
+	}
+	
+//	/**
+//	 *  Get the parameter sets which are relevant for comparing goals.
+//	 */
+//	public MParameter[]	getRelevantParameterSets()
+//	{
+//		return relevants;
+//	}
 }

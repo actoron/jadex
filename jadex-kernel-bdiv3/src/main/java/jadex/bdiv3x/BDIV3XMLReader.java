@@ -13,10 +13,10 @@ import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MMessageEvent.Direction;
 import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.model.MProcessableElement;
-import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -39,12 +39,14 @@ import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.IObjectLinker;
 import jadex.xml.stax.QName;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -206,7 +208,21 @@ public class BDIV3XMLReader extends ComponentXMLReader
 			}
 		};
 		
-		TypeInfo ti_performgoal = new TypeInfo(new XMLInfo(new QName(uri, "performgoal")), new ObjectInfo(MGoal.class),
+		TypeInfo ti_performgoal = new TypeInfo(new XMLInfo(new QName(uri, "performgoal")), new ObjectInfo(MGoal.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				// set or-success to false for perform goals
+				MGoal mgoal = (MGoal)object;
+				mgoal.setOrSuccess(false);
+				return object;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		}),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("recalculate", "rebuild")), 
 				new AttributeInfo(new AccessInfo("exclude", "excludeMode"), new AttributeConverter(excludeconv, reexcludeconv))
@@ -294,13 +310,13 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				new AttributeInfo(new AccessInfo("inhibit", null, AccessInfo.IGNORE_READ)),
 			}, null)));
 		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "unique")), new ObjectInfo(new IBeanObjectCreator()
-//			{
-//				public Object createObject(IContext context, Map rawattributes) throws Exception
-//				{
-//					return Boolean.TRUE;
-//				}
-//			})));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "unique")), new ObjectInfo(new IBeanObjectCreator()
+		{
+			public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
+			{
+				return Boolean.TRUE;
+			}
+		})));
 		
 		// Find type infos. hack???
 		TypeInfo	comptype	= null;
@@ -659,7 +675,7 @@ public class BDIV3XMLReader extends ComponentXMLReader
 				MCondition cond = new MCondition();
 				cond.setExpression((UnparsedExpression)object);
 				
-				AReadContext<?>	ar	= (AReadContext<?>)context;
+				AReadContext ar	= (AReadContext)context;
 				MElement pe	= null;
 				for(StackElement se: ar.getStack())
 				{

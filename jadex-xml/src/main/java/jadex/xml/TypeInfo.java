@@ -4,7 +4,6 @@ import jadex.commons.Tuple;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.stax.QName;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +18,7 @@ import java.util.TreeSet;
 /**
  *  Mapping from tag (or path fragment) to object.
  */
-public class TypeInfo	extends AbstractInfo
+public class TypeInfo extends AbstractInfo
 {	
 	//-------- attributes -------- 
 	
@@ -39,13 +38,13 @@ public class TypeInfo	extends AbstractInfo
 
 	
 	/** The attributes info (xmlname -> attrinfo). */
-	protected Map attributeinfos;
+	protected Map<Object, AttributeInfo> attributeinfos;
 	
 	/** The sub objects (non-xml name -> subobject info). */
-	protected Map subobjectinfoswrite;
+	protected Map<AccessInfo, SubobjectInfo> subobjectinfoswrite;
 	
 	/** The sub objects (xmlpath -> subobject info). */ 
-	protected Map subobjectinfosread;
+	protected Map<QName, TreeSet<SubobjectInfo>> subobjectinfosread;
 	
 	//-------- constructors --------
 	
@@ -196,9 +195,9 @@ public class TypeInfo	extends AbstractInfo
 	 *  Get the xml attribute names.
 	 *  @return The attribute names.
 	 */
-	public Set getXMLAttributeNames()
+	public Set<Object> getXMLAttributeNames()
 	{
-		Set ret = attributeinfos==null? new HashSet(): new HashSet(attributeinfos.keySet());
+		Set<Object> ret = attributeinfos==null? new HashSet<Object>(): new HashSet<Object>(attributeinfos.keySet());
 		if(getSupertype()!=null)
 			ret.addAll(getSupertype().getXMLAttributeNames());
 		return ret;
@@ -208,9 +207,9 @@ public class TypeInfo	extends AbstractInfo
 	 *  Get the attribute infos.
 	 *  @return The attribute infos.
 	 */
-	public Collection getAttributeInfos()
+	public Collection<AttributeInfo> getAttributeInfos()
 	{
-		Collection ret = attributeinfos==null? new HashSet(): attributeinfos.values();
+		Collection<AttributeInfo> ret = attributeinfos==null? new HashSet<AttributeInfo>(): attributeinfos.values();
 		if(getSupertype()!=null)
 			ret.addAll(getSupertype().getAttributeInfos());
 		return ret;
@@ -256,9 +255,9 @@ public class TypeInfo	extends AbstractInfo
 	 *  Get the subobject infos. 
 	 *  @return The subobject infos.
 	 */
-	public Collection getSubobjectInfos()
+	public Collection<SubobjectInfo> getSubobjectInfos()
 	{
-		Collection ret = subobjectinfoswrite!=null? new LinkedHashSet(subobjectinfoswrite.values()): new LinkedHashSet();
+		Collection<SubobjectInfo> ret = subobjectinfoswrite!=null? new LinkedHashSet<SubobjectInfo>(subobjectinfoswrite.values()): new LinkedHashSet<SubobjectInfo>();
 		if(getSupertype()!=null)
 			ret.addAll(getSupertype().getSubobjectInfos());
 		return ret;
@@ -282,11 +281,11 @@ public class TypeInfo	extends AbstractInfo
 	 *  @param fullpath The full path.
 	 *  @return The most specific subobject info.
 	 */
-	public SubobjectInfo getSubobjectInfoRead(QName tag, QName[] fullpath, Map rawattributes)
+	public SubobjectInfo getSubobjectInfoRead(QName tag, QName[] fullpath, Map<String, String> rawattributes)
 	{
 		SubobjectInfo ret = null;
 		
-		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;
+		Set<SubobjectInfo> subobjects = subobjectinfosread!=null? (Set<SubobjectInfo>)subobjectinfosread.get(tag): null;
 		ret = findSubobjectInfo(subobjects, fullpath, rawattributes);
 		
 		return ret;
@@ -320,12 +319,12 @@ public class TypeInfo	extends AbstractInfo
 	/**
 	 *  Find a subobject info.
 	 */
-	protected SubobjectInfo findSubobjectInfo(Set soinfos, QName[] fullpath, Map rawattributes)
+	protected SubobjectInfo findSubobjectInfo(Set<SubobjectInfo> soinfos, QName[] fullpath, Map<String, String> rawattributes)
 	{
 		SubobjectInfo ret = null;
 		if(soinfos!=null)
 		{
-			for(Iterator it=soinfos.iterator(); ret==null && it.hasNext(); )
+			for(Iterator<SubobjectInfo> it=soinfos.iterator(); ret==null && it.hasNext(); )
 			{
 				SubobjectInfo si = (SubobjectInfo)it.next();
 				QName[] tmp = si.getXMLPathElementsWithoutElement();
@@ -350,9 +349,9 @@ public class TypeInfo	extends AbstractInfo
 	 *  @param subobjectinfos The subobject infos.
 	 *  @return Map of subobject infos.
 	 */
-	protected Map createSubobjectInfosWrite(SubobjectInfo[] subobjectinfos)
+	protected Map<AccessInfo, SubobjectInfo> createSubobjectInfosWrite(SubobjectInfo[] subobjectinfos)
 	{
-		Map ret = new LinkedHashMap();
+		Map<AccessInfo, SubobjectInfo> ret = new LinkedHashMap<AccessInfo, SubobjectInfo>();
 		for(int i=0; i<subobjectinfos.length; i++)
 		{
 			ret.put(subobjectinfos[i].getAccessInfo(), subobjectinfos[i]);
@@ -365,18 +364,18 @@ public class TypeInfo	extends AbstractInfo
 	 *  @param subobjectinfos The subobject infos.
 	 *  @return Map of subobject infos.
 	 */
-	protected Map createSubobjectInfosRead(SubobjectInfo[] subobjectinfos)
+	protected Map<QName, TreeSet<SubobjectInfo>> createSubobjectInfosRead(SubobjectInfo[] subobjectinfos)
 	{
-		Map ret = new HashMap();
+		Map<QName, TreeSet<SubobjectInfo>> ret = new HashMap<QName, TreeSet<SubobjectInfo>>();
 		
 		if(subobjectinfos!=null)
 		{
 			for(int i=0; i<subobjectinfos.length; i++)
 			{
-				TreeSet subobjects = (TreeSet)ret.get(subobjectinfos[i].getXMLTag());
+				TreeSet<SubobjectInfo> subobjects = (TreeSet<SubobjectInfo>)ret.get(subobjectinfos[i].getXMLTag());
 				if(subobjects==null)
 				{
-					subobjects = new TreeSet(new AbstractInfo.SpecificityComparator());
+					subobjects = new TreeSet<SubobjectInfo>(new AbstractInfo.SpecificityComparator());
 					ret.put(subobjectinfos[i].getXMLTag(), subobjects);
 				}
 				subobjects.add(subobjectinfos[i]);
@@ -385,14 +384,14 @@ public class TypeInfo	extends AbstractInfo
 		
 		if(getSupertype()!=null)
 		{
-			Collection soinfos = getSupertype().getSubobjectInfos();
-			for(Iterator it=soinfos.iterator(); it.hasNext(); )
+			Collection<SubobjectInfo> soinfos = getSupertype().getSubobjectInfos();
+			for(Iterator<SubobjectInfo> it=soinfos.iterator(); it.hasNext(); )
 			{
-				SubobjectInfo soinfo = (SubobjectInfo)it.next();
-				TreeSet subobjects = (TreeSet)ret.get(soinfo.getXMLTag());
+				SubobjectInfo soinfo = it.next();
+				TreeSet<SubobjectInfo> subobjects = (TreeSet<SubobjectInfo>)ret.get(soinfo.getXMLTag());
 				if(subobjects==null)
 				{
-					subobjects = new TreeSet(new AbstractInfo.SpecificityComparator());
+					subobjects = new TreeSet<SubobjectInfo>(new AbstractInfo.SpecificityComparator());
 					ret.put(soinfo.getXMLTag(), subobjects);
 				}
 				subobjects.add(soinfo);
@@ -405,9 +404,9 @@ public class TypeInfo	extends AbstractInfo
 	/**
 	 *  Create the attribute info map (xml name(s) -> attribute info).
 	 */
-	protected Map createAttributeInfos(AttributeInfo[] attributeinfos)
+	protected Map<Object, AttributeInfo> createAttributeInfos(AttributeInfo[] attributeinfos)
 	{
-		Map ret = new LinkedHashMap();
+		Map<Object, AttributeInfo> ret = new LinkedHashMap<Object, AttributeInfo>();
 		for(int i=0; i<attributeinfos.length; i++)
 		{
 			QName[] xmlnames = attributeinfos[i].getXMLAttributeNames();

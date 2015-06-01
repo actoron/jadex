@@ -3,6 +3,7 @@ package jadex.bdiv3.model;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +29,7 @@ public class MDeliberation
 	//-------- additional xml attributes --------
 	
 	/** The methods for checking inhibitions. */
-	protected Set<UnparsedExpression> inhexpressions;
+	protected Map<String, UnparsedExpression> inhexpressions;
 	
 	/**
 	 *	Bean Constructor. 
@@ -47,20 +48,20 @@ public class MDeliberation
 		this.inhmethods = inhmethods;
 	}
 	
-	/**
-	 *  Resolve the inhibitions from inhibition names.
-	 */
-	public void init(MCapability capa)
-	{
-		if(inhibitions==null && inhnames!=null)
-		{
-			inhibitions = new HashSet<MGoal>();
-			for(String gname: inhnames)
-			{
-				inhibitions.add(capa.getGoal(gname));
-			}
-		}
-	}
+//	/**
+//	 *  Resolve the inhibitions from inhibition names.
+//	 */
+//	public void init(MCapability capa)
+//	{
+//		if(inhibitions==null && inhnames!=null)
+//		{
+//			inhibitions = new HashSet<MGoal>();
+//			for(String gname: inhnames)
+//			{
+//				inhibitions.add(capa.getGoal(gname));
+//			}
+//		}
+//	}
 
 	/**
 	 *  Get the cardinalityone.
@@ -84,8 +85,29 @@ public class MDeliberation
 	 *  Get the inhibited.
 	 *  @return The inhibited.
 	 */
-	public Set<MGoal> getInhibitions()
+//	public Set<MGoal> getInhibitions()
+	public Set<MGoal> getInhibitions(MCapability capa)
 	{
+		if(inhibitions==null)
+		{
+			if(inhnames!=null)
+			{
+				inhibitions = new HashSet<MGoal>();
+				for(String gname: inhnames)
+				{
+					inhibitions.add(capa.getGoal(gname));
+				}
+			}
+			// xml version
+			else if(inhexpressions!=null)
+			{
+				inhibitions = new HashSet<MGoal>();
+				for(UnparsedExpression gexp: inhexpressions.values())
+				{
+					inhibitions.add(capa.getGoal(gexp.getName()));
+				}
+			}
+		}
 		return inhibitions;
 	}
 
@@ -134,15 +156,15 @@ public class MDeliberation
 	public void addInhibitionExpression(UnparsedExpression inhexp)
 	{
 		if(inhexpressions==null)
-			inhexpressions = new HashSet<UnparsedExpression>();
-		inhexpressions.add(inhexp);
+			inhexpressions = new HashMap<String, UnparsedExpression>();
+		inhexpressions.put(inhexp.getName(), inhexp);
 	}
 
 	/**
 	 *  Get the inhibition expressions.
 	 *  @return The inhexpressions
 	 */
-	public Set<UnparsedExpression> getInhibitionExpressions()
+	public Map<String, UnparsedExpression> getInhibitionExpressions()
 	{
 		return inhexpressions;
 	}
