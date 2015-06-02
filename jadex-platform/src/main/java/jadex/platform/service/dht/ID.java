@@ -16,7 +16,7 @@ public class ID implements IID {
 	 * Debug field. Setting this to true enables 8-bit hashes (0-255) for better
 	 * readability.
 	 */
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	/**
 	 * The byte array containing the id information.

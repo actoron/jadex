@@ -24,5 +24,6 @@
 		<nfproperty class="jadex.bridge.sensor.memory.MaxPermGenMemoryProperty"/>
 		<nfproperty class="jadex.bridge.sensor.memory.UsedPermGenMemoryProperty"/>
 		<nfproperty class="jadex.bridge.sensor.memory.LoadedClassesProperty"/>
+		<nfproperty class="jadex.bridge.sensor.time.ComponentUptimeProperty"/>
 	</nfproperties>
 </componenttype>
