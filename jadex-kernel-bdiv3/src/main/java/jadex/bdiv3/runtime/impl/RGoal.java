@@ -1151,7 +1151,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 								if(uexp.getParsed()==null)
 									SJavaParser.parseExpression(uexp, getAgent().getModel().getAllImports(), getAgent().getClassLoader());
 								IParsedExpression pe = (IParsedExpression)uexp.getParsed();
-								SimpleValueFetcher fet = new SimpleValueFetcher();
+								SimpleValueFetcher fet = new SimpleValueFetcher(agent.getFetcher());
 								fet.setValue("$goal", this);
 								fet.setValue("$ref", other);
 								try

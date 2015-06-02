@@ -5,6 +5,8 @@ import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MConfiguration;
+import jadex.bdiv3.model.MParameter;
+import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.RElement;
@@ -83,28 +85,30 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				Object	inival	= null;
 				boolean	hasinival	= false;
 				
-				if(args.containsKey(mbel.getName())) // mbel.isExported() && 
-				{	
-					inival	= args.get(mbel.getName());
-					hasinival	= true;
-				}
-				else if(inibels.containsKey(mbel.getName()))
+				if(MParameter.EvaluationMode.STATIC.equals(mbel.getEvaluationMode()))
 				{
-					try
-					{
-						inival = SJavaParser.parseExpression(inibels.get(mbel.getName()), getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+					if(args.containsKey(mbel.getName())) // mbel.isExported() && 
+					{	
+						inival	= args.get(mbel.getName());
 						hasinival	= true;
 					}
-					catch(RuntimeException e)
+					else if(inibels.containsKey(mbel.getName()))
 					{
-						throw e;
-					}
-					catch(Exception e)
-					{
-						throw new RuntimeException(e);
+						try
+						{
+							inival = SJavaParser.parseExpression(inibels.get(mbel.getName()), getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+							hasinival	= true;
+						}
+						catch(RuntimeException e)
+						{
+							throw e;
+						}
+						catch(Exception e)
+						{
+							throw new RuntimeException(e);
+						}
 					}
 				}
-
 				
 				if(!mbel.isMulti(agent.getClassLoader()))
 				{
@@ -323,7 +327,10 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 //		public void deregisterBeliefSetReference(IMBeliefSetReference mbeliefsetref);
 
 	/**
-	 * 
+	 *  static: belief is evaluated once on init, afterwards set manually
+	 *  pull: belief is reevaluated on each read access
+	 *  push: reevaluates on each event and sets the new value and throws change event
+	 *  polling/updaterate: reevaluates in intervals and and sets the new value and throws change event
 	 */
 	public class RBelief extends RElement implements IBelief
 	{
@@ -342,8 +349,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			super(modelelement, agent);
 			String name = getModelElement().getName();
-			this.value = modelelement.getDefaultFact()==null? null: SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher());
 			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+			if(modelelement.getDefaultFact()!=null)
+				setFact(SJavaParser.parseExpression(modelelement.getDefaultFact(), agent.getModel().getAllImports(), agent.getClassLoader()).getValue(agent.getFetcher()));
 		}
 		
 		/**
@@ -355,8 +363,8 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			super(modelelement, agent);
 			String name = getModelElement().getName();
-			this.value = value;
 			this.publisher = new EventPublisher(agent, ChangeEvent.FACTCHANGED+"."+name, (MBelief)getModelElement());
+			setFact(value);
 		}
 
 		/**
@@ -390,7 +398,16 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public Object getFact()
 		{
-			return value;
+			Object ret = value;
+			EvaluationMode eva = ((MBelief)getModelElement()).getEvaluationMode();
+			UnparsedExpression uexp = ((MBelief)getModelElement()).getDefaultFact();
+			// In case of push the last evaluated value is returned
+			if(uexp!=null && MParameter.EvaluationMode.PULL.equals(eva))
+			{
+				ret = SJavaParser.parseExpression(((MBelief)getModelElement()).getDefaultFact(), 
+					getAgent().getModel().getAllImports(), getAgent().getClassLoader()).getValue(getAgent().getFetcher());
+			}
+			return ret;
 		}
 		
 		/**

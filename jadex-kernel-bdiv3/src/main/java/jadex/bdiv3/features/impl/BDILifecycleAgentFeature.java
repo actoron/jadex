@@ -23,6 +23,7 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.bdiv3x.runtime.RBeliefbase.RBelief;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -272,18 +273,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			List<EventType> events = new ArrayList<EventType>();
 			
 			Collection<String> evs = mbel.getEvents();
-			Object	cap = null;
 			if(evs!=null && !evs.isEmpty())
 			{
-				Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-				Object	ocapa	= agent;
-				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
-				if(i!=-1)
-				{
-					ocapa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
-				}
-				cap	= ocapa;
-
 				for(String ev: evs)
 				{
 					BDIAgentFeature.addBeliefEvents(component, events, ev);
@@ -298,9 +289,23 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					events.addAll(revs);
 			}
 		
+			// Automatic reevaluation if belief depends on other beliefs
 			if(!events.isEmpty())
 			{
+				Object cap = null;
+				if(component.getComponentFeature0(IPojoComponentFeature.class)!=null)
+				{
+					Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+					Object ocapa = agent;
+					int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
+					if(i!=-1)
+					{
+						ocapa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
+					}
+					cap	= ocapa;
+				}
 				final Object fcapa = cap;
+				
 				Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
 					ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
@@ -308,7 +313,8 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
-//							System.out.println("belief update: "+event);
+//						System.out.println("belief update: "+event);
+						// Invoke dynamic update method if field belief
 						if(mbel.isFieldBelief())
 						{
 							try
@@ -321,10 +327,22 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 								e.printStackTrace();
 							}
 						}
-						else
+						// Otherwise just call getValue and throw event
+						else if(fcapa!=null) // if is pojo 
 						{
 							Object value = mbel.getValue(component);
 							// todo: save old value?!
+							BDIAgentFeature.createChangeEvent(value, oldval, null, component, mbel.getName());
+							oldval = value;
+						}
+						else // xml belief push mode
+						{
+							// reevaluate the belief on change events
+							Object value = SJavaParser.parseExpression(mbel.getDefaultFact(), 
+								component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+							// save the value
+							mbel.setValue(component, value);
+							// throw change event
 							BDIAgentFeature.createChangeEvent(value, oldval, null, component, mbel.getName());
 							oldval = value;
 						}
@@ -337,23 +355,29 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			if(mbel.getUpdaterate()>0)
 			{
-				int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
-				final String name;
-				final Object capa;
-				if(i!=-1)
+				String name = null;
+				Object capa = null;
+				if(component.getComponentFeature0(IPojoComponentFeature.class)!=null)
 				{
-					capa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
-					name	= mbel.getName().substring(mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)+1); 
+					int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
+					if(i!=-1)
+					{
+						capa	= ((BDIAgentFeature)bdif).getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)));
+						name	= mbel.getName().substring(mbel.getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR)+1); 
+					}
+					else
+					{
+						Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+						capa	= agent;
+						name	= mbel.getName();
+					}
 				}
-				else
-				{
-					Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-					capa	= agent;
-					name	= mbel.getName();
-				}
-
+				final String fname = name;
+				final Object fcapa = capa;
+				
 				final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
+//				cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
+				ITimedObject to = new ITimedObject()
 				{
 					ITimedObject	self	= this;
 					Object oldval = null;
@@ -371,13 +395,24 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										// Invoke dynamic update method if field belief
 										if(mbel.isFieldBelief())
 										{
-											Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(name), new Class[0]);
-											um.invoke(capa, new Object[0]);
+											Method um = fcapa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(fname), new Class[0]);
+											um.invoke(fcapa, new Object[0]);
 										}
 										// Otherwise just call getValue and throw event
-										else
+										else if(fcapa!=null)
 										{
-											Object value = mbel.getValue(capa, component.getClassLoader());
+											Object value = mbel.getValue(fcapa, component.getClassLoader());
+											BDIAgentFeature.createChangeEvent(value, oldval, null, component, mbel.getName());
+											oldval = value;
+										}
+										else // xml belief updaterate
+										{
+											// reevaluate the belief on change events
+											Object value = SJavaParser.parseExpression(mbel.getDefaultFact(), 
+												component.getModel().getAllImports(), component.getClassLoader()).getValue(component.getFetcher());
+											// save the value
+											mbel.setValue(component, value);
+											// throw change event
 											BDIAgentFeature.createChangeEvent(value, oldval, null, component, mbel.getName());
 											oldval = value;
 										}
@@ -398,11 +433,13 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						}
 					}
 				
-					public void exceptionOccurred(Exception exception)
-					{
-						component.getLogger().severe("Cannot update belief "+mbel.getName()+": "+exception);
-					}
-				});
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						component.getLogger().severe("Cannot update belief "+mbel.getName()+": "+exception);
+//					}
+				};
+				// Evaluate at time 0, updaterate*1, updaterate*2, ...
+				to.timeEventOccurred(cs.getTime());
 			}
 		}
 		
