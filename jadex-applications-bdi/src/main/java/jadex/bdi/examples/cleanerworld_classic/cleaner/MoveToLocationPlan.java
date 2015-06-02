@@ -35,6 +35,8 @@ public class MoveToLocationPlan extends Plan
 	 */
 	public void body()
 	{
+		try
+		{
 		//long	time	= getRootGoal().getExecutionTime();
 		Location target = (Location)getParameter("location").getValue();
 		Location myloc = (Location)getBeliefbase().getBelief("my_location").getFact();
@@ -66,6 +68,11 @@ public class MoveToLocationPlan extends Plan
 			myloc = (Location)getBeliefbase().getBelief("my_location").getFact();
 
 			updateVision();
+		}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 
@@ -211,5 +218,15 @@ public class MoveToLocationPlan extends Plan
 		}
 		
 //		System.out.println("update vision: "+(System.currentTimeMillis()-start));
+	}
+	
+	public void aborted()
+	{
+		System.out.println("Aborted: "+this);
+	}
+	
+	public void failed()
+	{
+		System.out.println("Failed: "+this);
 	}
 }

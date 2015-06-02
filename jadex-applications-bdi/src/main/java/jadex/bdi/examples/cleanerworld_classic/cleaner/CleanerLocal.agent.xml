@@ -435,9 +435,9 @@
 		<configuration name="default">
 			<goals>
 				<initialgoal ref="performlookforwaste"/>
-  				<initialgoal ref="performpatrol"/>
+  				<!--  <initialgoal ref="performpatrol"/>
 		  		<initialgoal ref="maintainbatteryloaded"/>
-				<initialgoal ref="performmemorizepositions"/>
+				<initialgoal ref="performmemorizepositions"/> -->
 			</goals>
 		</configuration>
 	</configurations>

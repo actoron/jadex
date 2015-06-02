@@ -467,7 +467,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
 	    		synchronized(mon)
 				{
-	    			String	state	= callers.get(caller);
+	    			String state = callers.get(caller);
 	    			if(CALLER_SUSPENDED.equals(state))
 	    			{
 	    				// Only reactivate thread when previously suspended.

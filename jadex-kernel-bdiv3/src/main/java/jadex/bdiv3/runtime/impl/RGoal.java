@@ -82,6 +82,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		this.parentplan = parentplan;
 		this.lifecyclestate = GoalLifecycleState.NEW;
 		this.processingstate = GoalProcessingState.IDLE;
+//		System.out.println("created: "+mgoal.getName()+" parent: "+parentplan);
 	}
 	
 	/**

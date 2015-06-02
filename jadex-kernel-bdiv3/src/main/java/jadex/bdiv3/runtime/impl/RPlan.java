@@ -770,8 +770,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public void abort()
 	{
-//		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("Go")!=-1)
-//			System.out.println("abort plan: "+getId()+" "+isFinished());
+//		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("move")!=-1)
+			System.out.println("abort plan: "+getId()+" "+isFinished());
 		
 		if(!isFinished())
 		{

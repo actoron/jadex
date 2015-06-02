@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.IGoal;
@@ -102,7 +103,11 @@ public abstract class Plan
 	 */
 	public IGoal createGoal(String type)
 	{
-		return ((IInternalBDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapability().getGoalbase().createGoal(type);
+		MGoal mgoal = getCapability().getMCapability().getGoal(type);
+		if(mgoal==null)
+			throw new RuntimeException("Unknown goal type: "+type);
+		RGoal rgoal = new RGoal(getAgent(), mgoal, null, rplan, null);
+		return rgoal;
 	}
 	
 	/**
@@ -114,6 +119,7 @@ public abstract class Plan
 		RGoal rgoal = (RGoal)goal;
 		Future<Void> ret = new Future<Void>();
 		rgoal.addListener(new DelegationResultListener<Void>(ret));
+		rplan.addSubgoal(rgoal);
 		RGoal.adoptGoal(rgoal, agent);
 		ret.get();
 	}

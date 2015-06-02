@@ -46,9 +46,9 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 	/**
 	 *  Called before blocking the component thread.
 	 */
-	protected void	beforeBlock()
+	protected void beforeBlock()
 	{
-		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
+		RPlan rplan = ExecutePlanStepAction.RPLANS.get();
 		if(rplan!=null)
 		{
 			rplan.beforeBlock();
@@ -58,9 +58,9 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 	/**
 	 *  Called after unblocking the component thread.
 	 */
-	protected void	afterBlock()
+	protected void afterBlock()
 	{
-		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
+		RPlan rplan = ExecutePlanStepAction.RPLANS.get();
 		if(rplan!=null)
 		{
 			rplan.afterBlock();
