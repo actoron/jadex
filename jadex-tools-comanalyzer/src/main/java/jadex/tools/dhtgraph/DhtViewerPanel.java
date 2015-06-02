@@ -518,11 +518,11 @@ public class DhtViewerPanel extends JPanel
 						@Override
 						public void resultAvailable(final IID respId) {
 							
-							storage.lookup(key).addResultListener(new DefaultResultListener<String>() {
+							storage.lookup(key).addResultListener(new DefaultResultListener<Object>() {
 								
 								@Override
-								public void resultAvailable(String result) {
-									readValueTf.setText(result);
+								public void resultAvailable(Object result) {
+									readValueTf.setText(""+result);
 									statusTf.setText("Status: Read successful from node: " + respId);
 									blink(respId);
 								}
@@ -648,11 +648,11 @@ public class DhtViewerPanel extends JPanel
 			ArrayList<String> keyList = new ArrayList<String>(set);
 			Collections.sort(keyList);
 			
-			ArrayList<Tuple2<String, String>> tuples = new ArrayList<Tuple2<String,String>>();
+			ArrayList<Tuple2<String, Object>> tuples = new ArrayList<Tuple2<String,Object>>();
 			
 			for (String key : keyList) {
-				String value = proxyHolder.store.lookup(key).get();
-				Tuple2<String, String> tup = new Tuple2<String,String>(key, value);
+				Object value = proxyHolder.store.lookup(key).get();
+				Tuple2<String, Object> tup = new Tuple2<String,Object>(key, value);
 				tuples.add(tup);
 			}
 			

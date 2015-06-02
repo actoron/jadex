@@ -4,9 +4,14 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
 import jadex.bridge.service.types.dht.IFinger;
 import jadex.bridge.service.types.dht.IID;
@@ -52,6 +57,9 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 
 	/** The logger. **/
 	protected  Logger	logger;
+
+	/** Flag that indicates whether this Service is already usable. */
+	protected boolean	initialized;
 	
 	/**
 	 * Constructor.
@@ -61,6 +69,27 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 		this.keyMap = new HashMap<String, StoreEntry>();
 		this.idMap = new HashMap<IID, StoreEntry>();
 		this.logger = Logger.getLogger(this.getClass().getName());
+	}
+	
+	/**
+	 * Sets the initialized flag.
+	 */
+	public void setInitialized(boolean value)
+	{
+		this.initialized = value;
+	}
+	
+	/**
+	 * Gets the initialized flag.
+	 */
+	public boolean isInitialized()
+	{
+		return initialized;
+	}
+	
+	@ServiceStart
+	public void onServiceStarted() {
+//		System.out.println("KVStoreService started");
 	}
 
 	/**
@@ -201,82 +230,89 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 */
 	public IFuture<Object> lookup(final String key, final IID idHash)
 	{
-		final Future<Object> ret = new Future<Object>();
+//		final Future<Object> ret = new Future<Object>();
+		if (!initialized) {
+			Future<Object> future = new Future<Object>();
+			System.out.println("KVStore not initialized!");
+			future.setResult(null);
+			return future;
+		}
 		final IExecutionFeature execFeature = agent.getComponentFeature(IExecutionFeature.class);
-		ring.findSuccessor(idHash).addResultListener(new DefaultResultListener<IFinger>()
+		return execFeature.scheduleStep(new IComponentStep<Object>()
 		{
 
 			@Override
-			public void resultAvailable(IFinger result)
+			public IFuture<Object> execute(IInternalAccess ia)
 			{
-				logger.log(Level.INFO, myId + ": retrieving key: " +key+" (hash: " + idHash + ") from successor: " + result.getNodeId());
-				final IComponentIdentifier providerId = result.getSid().getProviderId();
-				final IID nodeId = result.getNodeId();
-				execFeature.scheduleStep(new IComponentStep<Object>()
+				// TODO Auto-generated method stub
+				final Future<Object> fut = new Future<Object>();
+				ring.findSuccessor(idHash).addResultListener(new DefaultResultListener<IFinger>()
 				{
-
+				
 					@Override
-					public IFuture<Object> execute(IInternalAccess ia)
+					public void resultAvailable(final IFinger finger)
 					{
-						final Future<Object> ret = new Future<Object>();
-//						if (providerId.equals(myCid)) {
-						if(nodeId.equals(myId))
+						logger.log(Level.INFO, myId + ": retrieving key: " +key+" (hash: " + idHash + ") from successor: " + finger.getNodeId());
+						//	final IComponentIdentifier providerId = result.getSid().getProviderId();
+						execFeature.scheduleStep(new IComponentStep<Object>()
 						{
-							// use local access
-
-							logger.info(myId + ": retrieving from local map: "  +key+ " (hash: " + idHash +")");
-							if(!isResponsibleFor(idHash))
+						
+							@Override
+							public IFuture<Object> execute(IInternalAccess ia)
 							{
-								logger.log(Level.WARNING, myId + ": lookupLocal called even if i do not feel responsible for: " + idHash + ". My successor is " + ring.getSuccessor().get().getNodeId());
-							}
-							StoreEntry storeEntry = keyMap.get(key);
-							if(storeEntry != null)
-							{
-								ret.setResult(storeEntry.getValue());
-							}
-							else
-							{
-								ret.setResult(null);
-							}
-						}
-						else
-						{
-							// search for remote kvstore service
-//							System.out.println(myId + ": retrieving from remote: " + " (hash: " + idHash +")");
-							IFuture<IDistributedKVStoreService> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDistributedKVStoreService.class,
-								providerId.getParent());
-							searchService.addResultListener(new DefaultResultListener<IDistributedKVStoreService>()
-							{
-								@Override
-								public void resultAvailable(IDistributedKVStoreService result)
+								final Future<Object> ret = new Future<Object>();;
+								if(finger.getNodeId().equals(myId))
 								{
-									IFuture<Object> value = result.lookup(key, idHash);
-									value.addResultListener(new DefaultResultListener<Object>()
+									// use local access
+									
+									logger.info(myId + ": retrieving from local map: "  +key+ " (hash: " + idHash +")");
+									if(!isResponsibleFor(idHash))
 									{
-
+										logger.log(Level.WARNING, myId + ": lookupLocal called even if i do not feel responsible for: " + idHash + ". My successor is " + ring.getSuccessor().get().getNodeId());
+									}
+									StoreEntry storeEntry = keyMap.get(key);
+									if(storeEntry != null)
+									{
+										ret.setResult(storeEntry.getValue());
+									}
+									else
+									{
+										ret.setResult(null);
+									}
+								}
+								else
+								{
+									// search for remote kvstore service
+		//							System.out.println(myId + ": retrieving from remote: " + " (hash: " + idHash +")");
+									IFuture<IDistributedKVStoreService> storeService = getStoreService(finger);
+		//							IFuture<IDistributedKVStoreService> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDistributedKVStoreService.class,
+		//								providerId.getParent());
+									storeService.addResultListener(new DefaultResultListener<IDistributedKVStoreService>()
+									{
 										@Override
-										public void resultAvailable(Object result)
+										public void resultAvailable(IDistributedKVStoreService result)
 										{
-											ret.setResult(result);
+											IFuture<Object> value = result.lookup(key, idHash);
+											value.addResultListener(new DefaultResultListener<Object>()
+											{
+											
+												@Override
+												public void resultAvailable(Object result)
+												{
+													ret.setResult(result);
+												}
+											});
 										}
 									});
 								}
-							});
-						}
-						return ret;
-					}
-				}).addResultListener(new DefaultResultListener<Object>()
-				{
-
-					@Override
-					public void resultAvailable(Object result)
-					{
-						ret.setResult(result);
+								return ret;
+							}
+						}).addResultListener(new DelegationResultListener<Object>(fut));
 					}
 				});
+				return fut;
 			}
 		});
-		return ret;
 	}
 
 	/**
@@ -356,10 +392,7 @@ public class DistributedKVStoreService implements IDistributedKVStoreService
 	 * @return {@link IDistributedKVStoreService}
 	 */
 	public IFuture<IDistributedKVStoreService> getStoreService(IFinger finger) {
-		// search for remote kvstore service. This assumes every component providing a ring service also
-		// provides a KVStore service...
-		IFuture<IDistributedKVStoreService> searchService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDistributedKVStoreService.class,
-			finger.getSid().getProviderId().getParent());
+		IFuture<IDistributedKVStoreService> searchService = SServiceProvider.getService(agent, finger.getSid().getProviderId(), IDistributedKVStoreService.class);
 		return searchService;
 	}
 	

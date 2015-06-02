@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.dht;
 
+import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -44,4 +45,16 @@ public interface IRingApplicationService
 	 */
 	@Timeout(Timeout.NONE)
 	ISubscriptionIntermediateFuture<RingNodeEvent> subscribeForEvents();
+
+	/**
+	 * Sets the initialized flag.
+	 */
+	@Excluded
+	public void setInitialized(boolean b);
+	
+	/**
+	 * Gets the initialized flag.
+	 */
+	@Excluded
+	public boolean isInitialized();
 }

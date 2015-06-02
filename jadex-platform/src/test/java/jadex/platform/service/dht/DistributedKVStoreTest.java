@@ -70,19 +70,19 @@ public class DistributedKVStoreTest extends TestCase
 //					"-relaytransport", "false",
 //					"-deftimeout", Long.toString(timeout),
 //					"-logging", "true",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			"-dht true -saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 //			"-component", "jadex/platform/service/dht/RingAgent.class"
 			}).get(timeout);
 				
 		platform2 = Starter.createPlatform(new String[]{"-platformname", pid,
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			"-dht true -saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 	//					"-relaytransport", "false",
 	//					"-deftimeout", Long.toString(timeout),
 	//					"-logging", "true",
 		}).get(timeout);
 			
 		platform3 = Starter.createPlatform(new String[]{"-platformname", pid,
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+			"-dht true -saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 	//					"-relaytransport", "false",
 	//					"-deftimeout", Long.toString(timeout),
 	//					"-logging", "true",
@@ -154,13 +154,13 @@ public class DistributedKVStoreTest extends TestCase
 		
 		IRingNodeDebugService iDebugRingNode = null; 
 		
-		IComponentIdentifier[] iComponentIdentifiers = cms.getChildren(identifier).get();
-		for(IComponentIdentifier cid : iComponentIdentifiers)
-		{
-			if (cid.getLocalName().equals("RingNode")) {
-				iDebugRingNode = SServiceProvider.getService(platform, cid, IRingNodeDebugService.class).get(timeout);		
-			}
-		}
+//		IComponentIdentifier[] iComponentIdentifiers = cms.getChildren(identifier).get();
+//		for(IComponentIdentifier cid : iComponentIdentifiers)
+//		{
+//			if (cid.getLocalName().equals("RingNode")) {
+				iDebugRingNode = SServiceProvider.getService(platform, identifier, IRingNodeDebugService.class).get(timeout);		
+//			}
+//		}
 		
 		iDebugRingNode.disableSchedules();
 		return new Tuple2<IDistributedKVStoreService, IRingNodeDebugService>(storeService, iDebugRingNode);

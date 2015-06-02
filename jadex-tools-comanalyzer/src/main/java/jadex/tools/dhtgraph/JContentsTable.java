@@ -15,7 +15,7 @@ import javax.swing.table.AbstractTableModel;
 
 public class JContentsTable extends JTable {
 
-	private List<Tuple2<String, String>> content;
+	private List<Tuple2<String, Object>> content;
 	private ContentsModel model;
 	
 	private Method hasher;
@@ -32,15 +32,15 @@ public class JContentsTable extends JTable {
 			}
 		}
 		
-		this.content = new ArrayList<Tuple2<String, String>>();
+		this.content = new ArrayList<Tuple2<String, Object>>();
 
 		model = new ContentsModel(content);
 		setModel(model);
 	}
 	
-	public void setSortedContent(List<Tuple2<String, String>> content) {
+	public void setSortedContent(List<Tuple2<String, Object>> content) {
 		if (content == null) {
-			content = new ArrayList<Tuple2<String, String>>();
+			content = new ArrayList<Tuple2<String, Object>>();
 		}
 		this.content = content;
 		model.content = content;
@@ -49,9 +49,9 @@ public class JContentsTable extends JTable {
 
 	class ContentsModel extends AbstractTableModel {
 
-		private List<Tuple2<String, String>> content;
+		private List<Tuple2<String, Object>> content;
 
-		public ContentsModel(List<Tuple2<String, String>> content) {
+		public ContentsModel(List<Tuple2<String, Object>> content) {
 			super();
 			this.content = content;
 		}
@@ -83,7 +83,7 @@ public class JContentsTable extends JTable {
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			Tuple2<String, String> tuple = content.get(rowIndex);
+			Tuple2<String, Object> tuple = content.get(rowIndex);
 			switch (columnIndex) {
 			case 0:
 				return tuple.getFirstEntity();

@@ -1,11 +1,14 @@
 package jadex.platform.service.dht;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.dht.IRingApplicationService;
 import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -32,7 +35,7 @@ import jadex.micro.annotation.RequiredServices;
 	@ProvidedService(name="providedDebugRing", type = IRingNodeDebugService.class, implementation = @Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"providedRing\")"), scope = RequiredServiceInfo.SCOPE_GLOBAL),
 })
 @RequiredServices({
-	@RequiredService(name = "ringnodes", type = IRingNodeService.class, multiple = true, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = true)),
+	@RequiredService(name = "ringnodes", type = IRingNodeService.class, multiple = true, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = false)),
 	@RequiredService(name="ring", type = IRingApplicationService.class, binding=@Binding(scope=Binding.SCOPE_COMPONENT, create = false))
 })
 //@RequiredServices( {
@@ -49,4 +52,14 @@ public class RingNodeAgent
 	/** The local ringnode service **/
 	@AgentService
 	protected IRingApplicationService	ring;
+	
+	/** The agent access **/
+	@Agent
+	private IInternalAccess agent;
+	
+	@AgentCreated
+	public void onCreate() {
+//		System.out.println("ring agent created");
+		ring.setInitialized(true);
+	}
 }

@@ -86,5 +86,17 @@ public interface IDistributedKVStoreService
 	 * @return Set of all matching entries.
 	 */
 	public IFuture<Set<StoreEntry>> moveEntries(IID targetNodeId);
+
+	/**
+	 * Sets the initialized flag.
+	 */
+	@Excluded
+	public void setInitialized(boolean b);
+	
+	/**
+	 * Gets the initialized flag.
+	 */
+	@Excluded
+	public boolean isInitialized();
 	
 }

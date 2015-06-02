@@ -6,12 +6,16 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.dht.IDistributedKVStoreService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 /**
  * Agent that includes a Ring component and provides a storage service additionally. 
@@ -25,9 +29,13 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices( {
 	@ProvidedService(type = IDistributedKVStoreService.class, implementation = @Implementation(value = DistributedKVStoreService.class), scope = RequiredServiceInfo.SCOPE_GLOBAL)
 })
+@RequiredServices({
+	@RequiredService(name="store", type = IDistributedKVStoreService.class, binding=@Binding(scope=Binding.SCOPE_COMPONENT, create = false))
+})
 public class DistributedKVStoreAgent extends RingNodeAgent
 {
 	/** The local store service **/
+	@AgentService
 	private IDistributedKVStoreService store;
 
 	/** The agent access **/
@@ -36,7 +44,9 @@ public class DistributedKVStoreAgent extends RingNodeAgent
 	
 	@AgentCreated
 	public void onCreate() {
-		store = agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IDistributedKVStoreService.class);
+		super.onCreate();
 		store.setRingService(ring);
+//		System.out.println("kv store agent created");
+		store.setInitialized(true);
 	}
 }

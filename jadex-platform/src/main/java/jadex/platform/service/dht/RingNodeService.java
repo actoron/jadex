@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -85,6 +86,9 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 
 	/** Ring overlay identifier. **/
 	protected String	overlayId;
+
+	/** Flag that indicates whether this Service is already usable. */
+	protected boolean	initialized;
 	
 	/**
 	 * Constructor.
@@ -96,9 +100,26 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 		subscriptions = new ArrayList<SubscriptionIntermediateFuture<RingNodeEvent>>();
 	}
 	
+	/**
+	 * Sets the initialized flag.
+	 */
+	public void setInitialized(boolean value)
+	{
+		this.initialized = value;
+	}
+	
+	/**
+	 * Gets the initialized flag.
+	 */
+	public boolean isInitialized()
+	{
+		return initialized;
+	}
+	
 	@ServiceStart
 	public void onStart()
 	{
+		System.out.println("Ringservice started");
 		if(this.myId != null)
 		{
 			return;
@@ -241,6 +262,10 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	 */
 	public IFuture<IFinger> findSuccessor(final IID id) {
 		final Future<IFinger> ret = new Future<IFinger>();
+		if (!initialized) {
+			ret.setException(new IllegalStateException("RingNode not yet initialized!"));
+			return ret;
+		}
 //		log("findSuccessor for: " + id);		
 		final IFinger nDash = findPredecessor(id).get();
 //		IRingNode suc = nDash.findSuccessor(id).get();
@@ -273,6 +298,9 @@ public class RingNodeService implements IRingNodeService, IRingNodeDebugService
 	protected IFuture<IFinger> findPredecessor(final IID id)
 	{
 //		log("findPredecessor for: " + id);
+		if (!initialized) {
+			return new Future<IFinger>(new IllegalStateException("RingNode not yet initialized!"));
+		}
 		final IFinger beginDash = fingertable.getSelf();
 		final IRingNodeService beginDashRing = this;
 		
