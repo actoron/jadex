@@ -1,10 +1,9 @@
 package jadex.bdi.testcases.goals;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.TimeoutException;
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  Check test cases of goal inhibition agent.

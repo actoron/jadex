@@ -1,10 +1,10 @@
 package jadex.bdi.testcases.events;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.TimeoutException;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
+import jadex.commons.concurrent.TimeoutException;
 
 
 /**

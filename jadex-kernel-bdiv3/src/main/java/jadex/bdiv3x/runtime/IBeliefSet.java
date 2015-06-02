@@ -1,5 +1,7 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.runtime.IBeliefListener;
+
 
 
 /**
@@ -62,12 +64,12 @@ public interface IBeliefSet extends IElement
 	 */
 	public int size();
 	
-//	/**
-//	 *  Indicate that a fact of this belief set was modified.
-//	 *  Calling this method causes an internal facts changed
-//	 *  event that might cause dependent actions.
-//	 */
-//	public void modified(Object fact);
+	/**
+	 *  Indicate that a fact of this belief set was modified.
+	 *  Calling this method causes an internal facts changed
+	 *  event that might cause dependent actions.
+	 */
+	public void modified(Object fact);
 
 	/**
 	 *  Update or add a fact. When the fact is already
@@ -98,15 +100,15 @@ public interface IBeliefSet extends IElement
 	
 	//-------- listeners --------
 	
-//	/**
-//	 *  Add a belief set listener.
-//	 *  @param listener The belief set listener.
-//	 */
-//	public <T> void addBeliefSetListener(IBeliefListener<T> listener);
-//	
-//	/**
-//	 *  Remove a belief set listener.
-//	 *  @param listener The belief set listener.
-//	 */
-//	public <T> void removeBeliefSetListener(IBeliefListener<T> listener);
+	/**
+	 *  Add a belief set listener.
+	 *  @param listener The belief set listener.
+	 */
+	public <T> void addBeliefSetListener(IBeliefListener<T> listener);
+	
+	/**
+	 *  Remove a belief set listener.
+	 *  @param listener The belief set listener.
+	 */
+	public <T> void removeBeliefSetListener(IBeliefListener<T> listener);
 }

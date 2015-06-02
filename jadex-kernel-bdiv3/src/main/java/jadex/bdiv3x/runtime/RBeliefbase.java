@@ -1,9 +1,12 @@
 package jadex.bdiv3x.runtime;
 
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.RElement;
 import jadex.bdiv3.runtime.wrappers.EventPublisher;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
@@ -14,6 +17,9 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
+import jadex.rules.eca.ChangeInfo;
+import jadex.rules.eca.Event;
+import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -395,6 +401,36 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		{
 			return ((MBelief)getModelElement()).getType(agent.getClassLoader());
 		}
+		
+		/**
+		 *  Indicate that the fact of this belief was modified.
+		 *  Calling this method causes an internal fact changed
+		 *  event that might cause dependent actions.
+		 */
+		public void modified()
+		{
+			publisher.entryChanged(value, value, -1);
+		}
+		
+		/**
+		 *  Add a belief set listener.
+		 *  @param listener The belief set listener.
+		 */
+		public <T> void addBeliefListener(IBeliefListener<T> listener)
+		{
+			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class);
+			bdif.addBeliefListener(getName(), listener);
+		}
+		
+		/**
+		 *  Remove a belief set listener.
+		 *  @param listener The belief set listener.
+		 */
+		public <T> void removeBeliefListener(IBeliefListener<T> listener)
+		{
+			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class);
+			bdif.removeBeliefListener(getName(), listener);
+		}
 	}
 	
 	/**
@@ -403,7 +439,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	public class RBeliefSet extends RElement implements IBeliefSet
 	{
 		/** The value. */
-		protected List<Object> facts;
+		protected ListWrapper<Object> facts;
 		
 		/**
 		 *  Create a new parameter.
@@ -585,6 +621,44 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		public Class<?>	getClazz()
 		{
 			return ((MBelief)getModelElement()).getType(agent.getClassLoader());
+		}
+		
+		/**
+		 *  Indicate that the fact of this belief was modified.
+		 *  Calling this method causes an internal fact changed
+		 *  event that might cause dependent actions.
+		 */
+		public void modified(Object fact)
+		{
+			if(fact!=null)
+			{
+				facts.entryChanged(null, fact, facts.indexOf(fact));
+			}
+			else
+			{
+				RuleSystem rs = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class)).getRuleSystem();
+				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+getName(), new ChangeInfo<Object>(facts, facts, null)));
+			}
+		}
+		
+		/**
+		 *  Add a belief set listener.
+		 *  @param listener The belief set listener.
+		 */
+		public <T> void addBeliefSetListener(IBeliefListener<T> listener)
+		{
+			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class);
+			bdif.addBeliefListener(getName(), listener);
+		}
+		
+		/**
+		 *  Remove a belief set listener.
+		 *  @param listener The belief set listener.
+		 */
+		public <T> void removeBeliefSetListener(IBeliefListener<T> listener)
+		{
+			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIAgentFeature.class);
+			bdif.removeBeliefListener(getName(), listener);
 		}
 	}
 }

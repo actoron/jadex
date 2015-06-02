@@ -1,9 +1,8 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.model.IMBelief;
-import jadex.bdi.model.IMPlan;
-import jadex.bdi.model.IMPlanbase;
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3x.runtime.Plan;
 
 /**
@@ -21,7 +20,7 @@ public class AccessModelPlan extends Plan
 		TestReport tr = new TestReport("#1", "Test accessing a belief model.");
 		try
 		{
-			IMBelief mbel = (IMBelief)getBeliefbase().getBelief("timeout").getModelElement();
+			MBelief mbel = (MBelief)getBeliefbase().getBelief("timeout").getModelElement();
 	
 			if(mbel!=null)
 				tr.setSucceeded(true);
@@ -38,7 +37,7 @@ public class AccessModelPlan extends Plan
 		tr = new TestReport("#2", "Test accessing a plan model.");
 		try
 		{
-			IMPlan mplan = ((IMPlanbase)getPlanbase().getModelElement()).getPlan("accessmodel_plan");
+			MPlan mplan = ((MPlanbase)getPlanbase().getModelElement()).getPlan("accessmodel_plan");
 			if(mplan!=null)
 				tr.setSucceeded(true);
 			else

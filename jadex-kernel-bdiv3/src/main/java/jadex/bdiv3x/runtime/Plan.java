@@ -36,6 +36,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -651,5 +652,13 @@ public abstract class Plan
 	public IInternalAccess getAgent()
 	{
 		return agent;
+	}
+	
+	/**
+	 *  Get the waitqueue.
+	 */
+	public List<Object> getWaitqueue()
+	{
+		return rplan.getWaitqueue();
 	}
 }

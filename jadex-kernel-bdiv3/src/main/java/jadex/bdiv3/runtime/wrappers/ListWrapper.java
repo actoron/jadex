@@ -42,7 +42,7 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	/**
 	 *  An entry was added to the collection.
 	 */
-	protected void entryAdded(T value, int index)
+	public void entryAdded(T value, int index)
 	{
 		publisher.entryAdded(value, index);
 	}
@@ -50,7 +50,7 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	/**
 	 *  An entry was removed from the collection.
 	 */
-	protected void entryRemoved(T value, int index)
+	public void entryRemoved(T value, int index)
 	{
 		publisher.entryRemoved(value, index);
 	}
@@ -58,7 +58,7 @@ public class ListWrapper<T> extends jadex.commons.collection.wrappers.ListWrappe
 	/**
 	 *  An entry was changed in the collection.
 	 */
-	protected void entryChanged(T oldvalue, T newvalue, int index)
+	public void entryChanged(T oldvalue, T newvalue, int index)
 	{
 		publisher.entryChanged(oldvalue, newvalue, index);
 	}
