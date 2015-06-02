@@ -12,7 +12,7 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * Android Implementation of {@link AWriteContext}.
  */
-public class WriteContextAndroid extends AWriteContext<XmlSerializer>
+public class WriteContextAndroid extends AWriteContext
 {
 	// -------- constructors --------
 	/**

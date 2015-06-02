@@ -10,22 +10,27 @@ import jadex.xml.stax.XMLReporter;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamReader;
+
 import org.xmlpull.v1.XmlPullParser;
 
 
 /**
  *  Android Implementation of {@link AReadContext}.
  */
-public class ReadContextAndroid extends AReadContext<XmlPullParser>
+public class ReadContextAndroid extends AReadContext
 {
+	
+	/** The XML Pull Parser */
+	private XmlPullParser	pullparser;
 
 	//-------- constructors --------
-	
-	
+
 	public ReadContextAndroid(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, XmlPullParser parser, XMLReporter reporter,
 			Object callcontext, ClassLoader classloader)
 	{
 		super(pathmanager, handler, parser, reporter, callcontext, classloader);
+		this.pullparser = parser;
 	}
 
 	public ReadContextAndroid(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, XmlPullParser parser, XMLReporter reporter,
@@ -45,8 +50,8 @@ public class ReadContextAndroid extends AReadContext<XmlPullParser>
 	 */
 	public ILocation getLocation()
 	{
-		return new Location(parser.getLineNumber(),
-				parser.getColumnNumber(), 0, null, null);
+		return new Location(pullparser.getLineNumber(),
+				pullparser.getColumnNumber(), 0, null, null);
 	}
 
 }

@@ -18,9 +18,9 @@
 		<android-maven-plugin-version>3.8.2</android-maven-plugin-version>
 		<android-api-version>2.2.1</android-api-version>
 		<android-support-version>r7</android-support-version>
-		<munge-default-excludes>**/.svn/,**/ui/,**/gui/</munge-default-excludes>
-		<munge-default-includes>**/*.java,**/*.xml,**/*.bpmn,**/*.gpmn</munge-default-includes>
-		<munge-generated-sources-dir>src/gen/java</munge-generated-sources-dir>
+<!-- 		<munge-default-excludes>**/.svn/,**/ui/,**/gui/</munge-default-excludes> -->
+<!-- 		<munge-default-includes>**/*.java,**/*.xml,**/*.bpmn,**/*.gpmn</munge-default-includes> -->
+<!-- 		<munge-generated-sources-dir>src/gen/java</munge-generated-sources-dir> -->
 	</properties>
 	
 	<repositories>

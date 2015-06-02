@@ -1,4 +1,4 @@
-
+package jadex.xml;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
@@ -38,7 +38,7 @@ import junit.framework.TestCase;
 /**
  * Testcases for writer and reader.
  */
-public class XMLTests extends TestCase
+public class XMLTest extends TestCase
 {
 	/**
 	 * 
@@ -929,16 +929,16 @@ public class XMLTests extends TestCase
 		}
 	}
 	
-	public void testAmpersands() {
-		Object o = doWrite("<implementation proxytype=\"raw\">" +
-				"//new jadex.platform.service.execution.AsyncExecutionService($component)" +
-				"($args.asyncexecution!=null &amp;&amp; !$args.asyncexecution.booleanValue()) ||" +
-				"($args.asyncexecution==null &amp;&amp; $args.simulation!=null &amp;&amp; $args.simulation.booleanValue())" +
-				"? new jadex.platform.service.execution.SyncExecutionService($component)" +
-				": new jadex.platform.service.execution.AsyncExecutionService($component)" +
-				"</implementation>");
-		Object read = doRead(o);
-		assertEquals("\\&", read);
-	}
+//	public void testAmpersands() {
+//		Object o = doWrite("<implementation proxytype=\"raw\">" +
+//				"//new jadex.platform.service.execution.AsyncExecutionService($component)" +
+//				"($args.asyncexecution!=null &amp;&amp; !$args.asyncexecution.booleanValue()) ||" +
+//				"($args.asyncexecution==null &amp;&amp; $args.simulation!=null &amp;&amp; $args.simulation.booleanValue())" +
+//				"? new jadex.platform.service.execution.SyncExecutionService($component)" +
+//				": new jadex.platform.service.execution.AsyncExecutionService($component)" +
+//				"</implementation>");
+//		Object read = doRead(o);
+//		assertEquals("\\&", read);
+//	}
 
 }
