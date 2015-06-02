@@ -6,9 +6,11 @@ import jadex.bridge.service.types.dht.IRingNodeDebugService;
 import jadex.bridge.service.types.dht.IRingNodeService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -26,15 +28,25 @@ import jadex.micro.annotation.RequiredServices;
 })
 @ProvidedServices({
 	@ProvidedService(name="providedRing", type = IRingNodeService.class, implementation = @Implementation(expression = "new jadex.platform.service.dht.RingNodeService($args.overlayId)"), scope = RequiredServiceInfo.SCOPE_GLOBAL),
-	@ProvidedService(name="providedRingApplication", type = IRingApplicationService.class, implementation = @Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"providedRing\")"), scope = RequiredServiceInfo.SCOPE_GLOBAL),
+	@ProvidedService(name="ring", type = IRingApplicationService.class, implementation = @Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"providedRing\")"), scope = RequiredServiceInfo.SCOPE_GLOBAL),
 	@ProvidedService(name="providedDebugRing", type = IRingNodeDebugService.class, implementation = @Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"providedRing\")"), scope = RequiredServiceInfo.SCOPE_GLOBAL),
 })
 @RequiredServices({
-	@RequiredService(name = "ringnodes", type = IRingNodeService.class, multiple = true, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = true))
+	@RequiredService(name = "ringnodes", type = IRingNodeService.class, multiple = true, binding=@Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL, dynamic = true)),
+	@RequiredService(name="ring", type = IRingApplicationService.class, binding=@Binding(scope=Binding.SCOPE_COMPONENT, create = false))
 })
+//@RequiredServices( {
+//@RequiredService(name="ring", type = IRingApplicationService.class, binding=@Binding(scope=Binding.SCOPE_COMPONENT, create = false,
+//	creationinfo=@CreationInfo(type = "ringAgent")))
+//})
+
 public class RingNodeAgent 
 {
 	/** Identifier for the overlay for this node to be part of. */
 	@AgentArgument
 	protected String	overlayId;
+	
+	/** The local ringnode service **/
+	@AgentService
+	protected IRingApplicationService	ring;
 }
