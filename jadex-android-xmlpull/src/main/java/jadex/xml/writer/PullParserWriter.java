@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -75,7 +76,7 @@ public class PullParserWriter extends AWriter
 
 	private void writeObject(WriteContextAndroid wc, Object object, QName tag) throws Exception
 	{
-		XmlSerializer writer = wc.getWriter();
+		XmlSerializer writer = getWriter(wc);
 		List stack = wc.getStack();
 		
 		// Special case null
@@ -271,7 +272,7 @@ public class PullParserWriter extends AWriter
 	 */
 	protected void writeSubobjects(WriteContextAndroid wc, TreeNode node, TypeInfo typeinfo) throws Exception
 	{
-		XmlSerializer writer = wc.getWriter();
+		XmlSerializer writer = getWriter(wc);
 		List stack = wc.getStack();
 			
 		List children = node.getChildren();
@@ -428,5 +429,12 @@ public class PullParserWriter extends AWriter
 //		return ret.toString();
 	}
 	
+	/**
+	 * 
+	 */
+	public static XmlSerializer getWriter(AWriteContext context)
+	{
+		return (XmlSerializer)context.getWriter();
+	}
 
 }

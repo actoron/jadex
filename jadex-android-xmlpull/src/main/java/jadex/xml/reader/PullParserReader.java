@@ -158,22 +158,22 @@ public class PullParserReader extends AReader
 	private void handleContent(ReadContextAndroid readcontext)
 	{
 		if (readcontext.getReadIgnore() == 0)
-			readcontext.getTopStackElement().addContent(readcontext.getParser().getText());
+			readcontext.getTopStackElement().addContent(getParser(readcontext).getText());
 		else if (DEBUG)
-			System.out.println("Ignoring: " + readcontext.getParser().getText());
+			System.out.println("Ignoring: " + getParser(readcontext).getText());
 	}
 
 	private void handleComment(ReadContextAndroid readcontext)
 	{
 		if (readcontext.getReadIgnore() == 0)
-			readcontext.setComment(readcontext.getParser().getText());
+			readcontext.setComment(getParser(readcontext).getText());
 		else if (DEBUG)
-			System.out.println("Ignoring: " + readcontext.getParser().getText());
+			System.out.println("Ignoring: " + getParser(readcontext).getText());
 	}
 
 	private void handleStartTag(ReadContextAndroid readcontext) throws Exception
 	{
-		XmlPullParser parser = readcontext.getParser();
+		XmlPullParser parser = getParser(readcontext);
 
 		if (readcontext.getReadIgnore() > 0)
 		{
@@ -420,7 +420,7 @@ public class PullParserReader extends AReader
 	{
 		if(readcontext.getReadIgnore()==0)
 		{
-			XmlPullParser parser = readcontext.getParser();
+			XmlPullParser parser = getParser(readcontext);
 //			List stack = readcontext.getStack();
 			StackElement topse = readcontext.getTopStackElement();
 			
@@ -594,6 +594,11 @@ public class PullParserReader extends AReader
 		{
 			readcontext.setReadIgnore(readcontext.getReadIgnore()-1);
 		}
+	}
+	
+	public static XmlPullParser getParser(AReadContext context)
+	{
+		return (XmlPullParser)context.getParser();
 	}
 
 }
