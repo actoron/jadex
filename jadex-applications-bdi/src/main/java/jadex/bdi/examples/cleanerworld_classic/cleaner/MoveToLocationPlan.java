@@ -35,8 +35,6 @@ public class MoveToLocationPlan extends Plan
 	 */
 	public void body()
 	{
-		try
-		{
 		//long	time	= getRootGoal().getExecutionTime();
 		Location target = (Location)getParameter("location").getValue();
 		Location myloc = (Location)getBeliefbase().getBelief("my_location").getFact();
@@ -68,11 +66,6 @@ public class MoveToLocationPlan extends Plan
 			myloc = (Location)getBeliefbase().getBelief("my_location").getFact();
 
 			updateVision();
-		}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
 		}
 	}
 
